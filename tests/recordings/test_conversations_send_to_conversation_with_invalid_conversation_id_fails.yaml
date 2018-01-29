@@ -1,0 +1,30 @@
+interactions:
+- request:
+    body: '{"recipient": {"id": "U19KH8EHJ:T03CWQ0QB"}, "channelId": "slack", "text":
+      "Error!", "from": {"id": "B21UTEF8S:T03CWQ0QB"}, "type": "message"}'
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['142']
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.5.3 (Linux-4.11.0-041100-generic-x86_64-with-Ubuntu-17.04-zesty)
+          requests/2.18.1 msrest/0.4.23 azure-botframework-connector/v3.0]
+    method: POST
+    uri: https://slack.botframework.com/v3/conversations/123/activities
+  response:
+    body: {string: "{\r\n  \"error\": {\r\n    \"code\": \"ServiceError\",\r\n   \
+        \ \"message\": \"Invalid ConversationId: 123\"\r\n  }\r\n}"}
+    headers:
+      cache-control: [no-cache]
+      content-length: ['98']
+      content-type: [application/json; charset=utf-8]
+      date: ['Tue, 26 Dec 2017 13:51:33 GMT']
+      expires: ['-1']
+      pragma: [no-cache]
+      request-context: ['appId=cid-v1:6814484e-c0d5-40ea-9dba-74ff29ca4f62']
+      server: [Microsoft-IIS/10.0]
+      strict-transport-security: [max-age=31536000]
+      x-powered-by: [ASP.NET]
+    status: {code: 400, message: Bad Request}
+version: 1
