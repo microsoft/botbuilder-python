@@ -12,7 +12,7 @@
 
 from setuptools import setup, find_packages
 
-NAME = "bot-connector"
+NAME = "azure-botframework-connector"
 VERSION = "v3"
 
 # To install the library, run the following
