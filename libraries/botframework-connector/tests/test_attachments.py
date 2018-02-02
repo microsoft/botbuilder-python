@@ -15,7 +15,6 @@ from azure_devtools.scenario_tests import ReplayableTest
 
 import msrest
 from microsoft.botframework.connector import ConnectorClient
-from microsoft.botframework.connector import customs
 from microsoft.botframework.connector import models
 from microsoft.botframework.connector.auth import MicrosoftTokenAuthentication
 

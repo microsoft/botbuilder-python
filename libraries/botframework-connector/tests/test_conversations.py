@@ -12,7 +12,6 @@ import pytest
 from azure_devtools.scenario_tests import ReplayableTest
 
 from microsoft.botframework.connector import ConnectorClient
-from microsoft.botframework.connector import customs
 from microsoft.botframework.connector import models
 from microsoft.botframework.connector.auth import MicrosoftTokenAuthentication
 
@@ -56,7 +55,7 @@ class ConversationTest(ReplayableTest):
             bot=models.ChannelAccount(id=BOT_ID),
             members=[to],
             activity = models.Activity(
-                type=customs.ActivityType.message,
+                type=models.ActivityTypes.message,
                 channel_id=CHANNEL_ID,
                 from_property=models.ChannelAccount(id=BOT_ID),
                 recipient=to,
@@ -73,7 +72,7 @@ class ConversationTest(ReplayableTest):
             bot=models.ChannelAccount(id='INVALID'),
             members=[to],
             activity = models.Activity(
-                type=customs.ActivityType.message,
+                type=models.ActivityTypes.message,
                 channel_id=CHANNEL_ID,
                 from_property=models.ChannelAccount(id='INVALID'),
                 recipient=to,
@@ -90,7 +89,7 @@ class ConversationTest(ReplayableTest):
         create_conversation = models.ConversationParameters(
             bot=models.ChannelAccount(id=BOT_ID),
             activity=models.Activity(
-                type=customs.ActivityType.message,
+                type=models.ActivityTypes.message,
                 channel_id=CHANNEL_ID,
                 from_property=models.ChannelAccount(id=BOT_ID),
                 text='Hi there!'),
@@ -110,7 +109,7 @@ class ConversationTest(ReplayableTest):
             bot=sender,
             members=[to],
             activity = models.Activity(
-                type=customs.ActivityType.message,
+                type=models.ActivityTypes.message,
                 channel_id=CHANNEL_ID,
                 from_property=sender,
                 recipient=to,
@@ -125,7 +124,7 @@ class ConversationTest(ReplayableTest):
 
     def test_conversations_send_to_conversation(self):
         activity = models.Activity(
-            type=customs.ActivityType.message,
+            type=models.ActivityTypes.message,
             channel_id=CHANNEL_ID,
             recipient=models.ChannelAccount(id=RECIPIENT_ID),
             from_property=models.ChannelAccount(id=BOT_ID),
@@ -153,14 +152,14 @@ class ConversationTest(ReplayableTest):
             ])
 
         activity = models.Activity(
-            type=customs.ActivityType.message,
+            type=models.ActivityTypes.message,
             channel_id=CHANNEL_ID,
             recipient=models.ChannelAccount(id=RECIPIENT_ID),
             from_property=models.ChannelAccount(id=BOT_ID),
-            attachment_layout=customs.AttachmentLayout.list,
+            attachment_layout=models.AttachmentLayoutTypes.list,
             attachments=[
-                models.Attachment(content_type=customs.CardContentType.hero, content=card1),
-                models.Attachment(content_type=customs.CardContentType.hero, content=card2),
+                models.Attachment(content_type='application/vnd.microsoft.card.hero', content=card1),
+                models.Attachment(content_type='application/vnd.microsoft.card.hero', content=card2),
             ])
 
         connector = ConnectorClient(self.credentials, base_url=SERVICE_URL)
@@ -170,7 +169,7 @@ class ConversationTest(ReplayableTest):
 
     def test_conversations_send_to_conversation_with_invalid_conversation_id_fails(self):
         activity = models.Activity(
-            type=customs.ActivityType.message,
+            type=models.ActivityTypes.message,
             channel_id=CHANNEL_ID,
             recipient=models.ChannelAccount(id=RECIPIENT_ID),
             from_property=models.ChannelAccount(id=BOT_ID),
@@ -203,14 +202,14 @@ class ConversationTest(ReplayableTest):
 
     def test_conversations_update_activity(self):
         activity = models.Activity(
-            type=customs.ActivityType.message,
+            type=models.ActivityTypes.message,
             channel_id=CHANNEL_ID,
             recipient=models.ChannelAccount(id=RECIPIENT_ID),
             from_property=models.ChannelAccount(id=BOT_ID),
             text='Updating activity...')
 
         activity_update = models.Activity(
-            type=customs.ActivityType.message,
+            type=models.ActivityTypes.message,
             channel_id=CHANNEL_ID,
             recipient=models.ChannelAccount(id=RECIPIENT_ID),
             from_property=models.ChannelAccount(id=BOT_ID),
@@ -226,14 +225,14 @@ class ConversationTest(ReplayableTest):
 
     def test_conversations_update_activity_invalid_conversation_id_fails(self):
         activity = models.Activity(
-            type=customs.ActivityType.message,
+            type=models.ActivityTypes.message,
             channel_id=CHANNEL_ID,
             recipient=models.ChannelAccount(id=RECIPIENT_ID),
             from_property=models.ChannelAccount(id=BOT_ID),
             text='Updating activity...')
 
         activity_update = models.Activity(
-            type=customs.ActivityType.message,
+            type=models.ActivityTypes.message,
             channel_id=CHANNEL_ID,
             recipient=models.ChannelAccount(id=RECIPIENT_ID),
             from_property=models.ChannelAccount(id=BOT_ID),
@@ -250,14 +249,14 @@ class ConversationTest(ReplayableTest):
 
     def test_conversations_reply_to_activity(self):
         activity = models.Activity(
-            type=customs.ActivityType.message,
+            type=models.ActivityTypes.message,
             channel_id=CHANNEL_ID,
             recipient=models.ChannelAccount(id=RECIPIENT_ID),
             from_property=models.ChannelAccount(id=BOT_ID),
             text='Thread activity')
 
         child_activity = models.Activity(
-            type=customs.ActivityType.message,
+            type=models.ActivityTypes.message,
             channel_id=CHANNEL_ID,
             recipient=models.ChannelAccount(id=RECIPIENT_ID),
             from_property=models.ChannelAccount(id=BOT_ID),
@@ -273,7 +272,7 @@ class ConversationTest(ReplayableTest):
 
     def test_conversations_reply_to_activity_with_invalid_conversation_id_fails(self):
         child_activity = models.Activity(
-            type=customs.ActivityType.message,
+            type=models.ActivityTypes.message,
             channel_id=CHANNEL_ID,
             recipient=models.ChannelAccount(id=RECIPIENT_ID),
             from_property=models.ChannelAccount(id=BOT_ID),
@@ -288,7 +287,7 @@ class ConversationTest(ReplayableTest):
 
     def test_conversations_delete_activity(self):
         activity = models.Activity(
-            type=customs.ActivityType.message,
+            type=models.ActivityTypes.message,
             channel_id=CHANNEL_ID,
             recipient=models.ChannelAccount(id=RECIPIENT_ID),
             from_property=models.ChannelAccount(id=BOT_ID),
@@ -311,7 +310,7 @@ class ConversationTest(ReplayableTest):
 
     def test_conversations_get_activity_members(self):
         activity = models.Activity(
-            type=customs.ActivityType.message,
+            type=models.ActivityTypes.message,
             channel_id=CHANNEL_ID,
             recipient=models.ChannelAccount(id=RECIPIENT_ID),
             from_property=models.ChannelAccount(id=BOT_ID),
@@ -327,7 +326,7 @@ class ConversationTest(ReplayableTest):
 
     def test_conversations_get_activity_members_invalid_conversation_id_fails(self):
         activity = models.Activity(
-            type=customs.ActivityType.message,
+            type=models.ActivityTypes.message,
             channel_id=CHANNEL_ID,
             recipient=models.ChannelAccount(id=RECIPIENT_ID),
             from_property=models.ChannelAccount(id=BOT_ID),
