@@ -1,6 +1,0 @@
--r ../libraries/requirements.txt
--e ../libraries/bot-connector
-
-pytest-cov
-pytest>=3.2.0
-azure-devtools>=0.4.1

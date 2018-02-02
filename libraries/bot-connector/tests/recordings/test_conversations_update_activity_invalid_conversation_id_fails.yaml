@@ -1,0 +1,60 @@
+interactions:
+- request:
+    body: '{"type": "message", "channelId": "slack", "from": {"id": "B21UTEF8S:T03CWQ0QB"},
+      "recipient": {"id": "U19KH8EHJ:T03CWQ0QB"}, "textFormat": "markdown", "attachmentLayout":
+      "list", "text": "Updating activity..."}'
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['210']
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.2 (Windows-10-10.0.16299-SP0) requests/2.18.1 msrest/0.4.23
+          azure-botframework-connector/3.0]
+    method: POST
+    uri: https://slack.botframework.com/v3/conversations/B21UTEF8S%3AT03CWQ0QB%3AD2369CT7C/activities
+  response:
+    body: {string: "{\r\n  \"id\": \"1514572506.000066\"\r\n}"}
+    headers:
+      cache-control: [no-cache]
+      content-length: ['33']
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 29 Dec 2017 18:35:06 GMT']
+      expires: ['-1']
+      pragma: [no-cache]
+      request-context: ['appId=cid-v1:6814484e-c0d5-40ea-9dba-74ff29ca4f62']
+      server: [Microsoft-IIS/10.0]
+      strict-transport-security: [max-age=31536000]
+      vary: [Accept-Encoding]
+      x-powered-by: [ASP.NET]
+    status: {code: 200, message: OK}
+- request:
+    body: '{"type": "message", "channelId": "slack", "from": {"id": "B21UTEF8S:T03CWQ0QB"},
+      "recipient": {"id": "U19KH8EHJ:T03CWQ0QB"}, "textFormat": "markdown", "attachmentLayout":
+      "list", "text": "Activity updated."}'
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['207']
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.2 (Windows-10-10.0.16299-SP0) requests/2.18.1 msrest/0.4.23
+          azure-botframework-connector/3.0]
+    method: PUT
+    uri: https://slack.botframework.com/v3/conversations/INVALID_ID/activities/1514572506.000066
+  response:
+    body: {string: "{\r\n  \"error\": {\r\n    \"code\": \"ServiceError\",\r\n   \
+        \ \"message\": \"Invalid ConversationId: INVALID_ID\"\r\n  }\r\n}"}
+    headers:
+      cache-control: [no-cache]
+      content-length: ['105']
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 29 Dec 2017 18:35:07 GMT']
+      expires: ['-1']
+      pragma: [no-cache]
+      request-context: ['appId=cid-v1:6814484e-c0d5-40ea-9dba-74ff29ca4f62']
+      server: [Microsoft-IIS/10.0]
+      strict-transport-security: [max-age=31536000]
+      x-powered-by: [ASP.NET]
+    status: {code: 400, message: Bad Request}
+version: 1
