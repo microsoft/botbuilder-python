@@ -1200,9 +1200,6 @@
     },
     "ThumbnailUrl": {
       "description": "Thumbnail URL",
-      "required": [
-        "url"
-      ],
       "type": "object",
       "properties": {
         "url": {
@@ -1217,9 +1214,6 @@
     },
     "MediaUrl": {
       "description": "Media URL",
-      "required": [
-        "url"
-      ],
       "type": "object",
       "properties": {
         "url": {
