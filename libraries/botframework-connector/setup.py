@@ -13,7 +13,7 @@
 from setuptools import setup, find_packages
 
 NAME = "microsoft-botframework-connector"
-VERSION = "v3"
+VERSION = "3"
 
 # To install the library, run the following
 #
