@@ -14,8 +14,8 @@ import pytest
 from azure_devtools.scenario_tests import ReplayableTest
 
 import msrest
+from microsoft.botbuilder.schema import *
 from microsoft.botframework.connector import ConnectorClient
-from microsoft.botframework.connector import models
 from microsoft.botframework.connector.auth import MicrosoftTokenAuthentication
 
 from authentication_stub import MicrosoftTokenAuthenticationStub
@@ -57,7 +57,7 @@ class AttachmentsTest(ReplayableTest):
         return MicrosoftTokenAuthenticationStub(auth_token)
 
     def test_attachments_upload_and_get_attachment(self):
-        attachment = models.AttachmentData(
+        attachment = AttachmentData(
             type='image/png',
             name='Bot.png',
             original_base64=read_base64('bot.png'),
@@ -74,7 +74,7 @@ class AttachmentsTest(ReplayableTest):
         assert len(attachment_info.views) == 2
 
     def test_attachments_get_info_invalid_attachment_id_fails(self):
-        with pytest.raises(models.error_response.ErrorResponseException) as excinfo:
+        with pytest.raises(ErrorResponseException) as excinfo:
             connector = ConnectorClient(self.credentials, base_url=SERVICE_URL)
             connector.attachments.get_attachment_info('bt13796-GJS4yaxDLI')
 
@@ -82,7 +82,7 @@ class AttachmentsTest(ReplayableTest):
 
     def test_attachments_get_attachment_view(self):
         original = read_base64('bot.png')
-        attachment = models.AttachmentData(
+        attachment = AttachmentData(
             type='image/png',
             name='Bot.png',
             original_base64=original,
@@ -104,7 +104,7 @@ class AttachmentsTest(ReplayableTest):
 
     def test_attachments_get_attachment_view_with_invalid_view_id_fails(self):
         original = read_base64('bot.png')
-        attachment = models.AttachmentData(
+        attachment = AttachmentData(
             type='image/png',
             name='Bot.png',
             original_base64=original,
