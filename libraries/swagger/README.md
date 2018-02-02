@@ -27,9 +27,9 @@ python:
   license-header: MICROSOFT_MIT_NO_VERSION
   add-credentials: true
   payload-flattening-threshold: 2
-  namespace: bot.connector
-  package-name: bot-connector
-  override-client-name: BotConnector
+  namespace: botframework.connector
+  package-name: botframework-connector
+  override-client-name: ConnectorClient
   clear-output-folder: true
   output-folder: ./generated
 ```
