@@ -20,9 +20,9 @@ More information: https://docs.microsoft.com/en-us/bot-framework/rest-api/bot-fr
 ### Example
 Client creation (with authentication), conversation initialization and activity send to user.
 ````python
-from microsoft.botframework.connector import BotConnector
-from microsoft.botframework.connectorauth import MicrosoftTokenAuthentication
-from microsoft.botframework.connector import models
+from microsoft.botbuilder.schema import *
+from microsoft.botframework.connector import ConnectorClient
+from microsoft.botframework.connector.auth import MicrosoftTokenAuthentication
 
 APP_ID = '<your-app-id>'
 APP_PASSWORD = '<your-app-password>'
@@ -32,17 +32,17 @@ BOT_ID = '<bot-id>'
 RECIPIENT_ID = '<user-id>'
 
 credentials = MicrosoftTokenAuthentication(APP_ID, APP_PASSWORD)
-connector = BotConnector(credentials, base_url=SERVICE_URL)
+connector = ConnectorClient(credentials, base_url=SERVICE_URL)
 
-conversation = connector.conversations.create_conversation(models.ConversationParameters(
-            bot=models.ChannelAccount(id=BOT_ID),
-            members=[models.ChannelAccount(id=RECIPIENT_ID)]))
+conversation = connector.conversations.create_conversation(ConversationParameters(
+            bot=ChannelAccount(id=BOT_ID),
+            members=[ChannelAccount(id=RECIPIENT_ID)]))
 
-connector.conversations.send_to_conversation(conversation.id, models.Activity(
-            type=models.ActivityType.message,
+connector.conversations.send_to_conversation(conversation.id, Activity(
+            type=ActivityTypes.message,
             channel_id=CHANNEL_ID,
-            recipient=models.ChannelAccount(id=RECIPIENT_ID),
-            from_property=models.ChannelAccount(id=BOT_ID),
+            recipient=ChannelAccount(id=RECIPIENT_ID),
+            from_property=ChannelAccount(id=BOT_ID),
             text='Hello World!'))
 ````
 
