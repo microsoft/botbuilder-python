@@ -1,0 +1,1 @@
+call autorest README.md --python

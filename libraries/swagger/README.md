@@ -23,7 +23,6 @@ input-file: ConnectorAPI.json
 These settings apply only when `--python` is specified on the command line. Use `--python-mode=update` if you already have a setup.py and just want to update the code itself.
 
 ``` yaml $(python)
-python-mode: create
 python:
   license-header: MICROSOFT_MIT_NO_VERSION
   add-credentials: true
@@ -32,14 +31,5 @@ python:
   package-name: bot-connector
   override-client-name: BotConnector
   clear-output-folder: true
-```
-``` yaml $(python) && $(python-mode) == 'update'
-python:
-  no-namespace-folders: true
-  output-folder: ../microsoft
-```
-``` yaml $(python) && $(python-mode) == 'create'
-python:
-  basic-setup-py: true
-  output-folder: ../microsoft
+  output-folder: ./generated
 ```

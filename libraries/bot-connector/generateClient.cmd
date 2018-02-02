@@ -1,1 +1,0 @@
-call autorest %~dp0\swagger\README.md --python
