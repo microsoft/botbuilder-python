@@ -10,7 +10,7 @@ In addition to the Python Connector, Bot Builder supports creating bots in other
 - The [v4 .NET SDK](https://github.com/Microsoft/botbuilder-dotnet) has a high degree of parity with the JavaScript SDK 
   and lets you build rich bots using C# for the Microsoft Bot Framework.
 - The [v4 JavaScript SDK](https://github.com/Microsoft/botbuilder-js) has a high degree of parity with the .NET SDK 
-  and lets you build rich bots using C# for the Microsoft Bot Framework.
+  and lets you build rich bots using JavaScript for the Microsoft Bot Framework.
 - The [Java Connector](https://github.com/Microsoft/botbuilder-java) provides basic connectivity to the Microsoft Bot Framework 
   and lets developers build bots using Java. **v4 SDK coming soon**.
 
