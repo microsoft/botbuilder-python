@@ -1,3 +1,7 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
+
 def get_conversation_reference(activity):
     return {
         'activityId': activity['id'],
@@ -7,6 +11,7 @@ def get_conversation_reference(activity):
         'channelId': activity['channelId'],
         'serviceUrl': activity['serviceUrl']
     }
+
 
 def apply_conversation_reference(activity, reference):
     activity['channelId'] = reference['channelId']
