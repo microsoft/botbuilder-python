@@ -1,7 +1,8 @@
 import json
 
 from flask import Flask, request, Response
-from microsoft.botframework.connector import ConnectorClient, MicrosoftTokenAuthentication
+from microsoft.botframework.connector import ConnectorClient
+from microsoft.botframework.connector.auth import MicrosoftTokenAuthentication
 from microsoft.botbuilder.schema import *
 
 APP_ID = ''
