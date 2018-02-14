@@ -18,7 +18,7 @@ from microsoft.botbuilder.schema import *
 from microsoft.botframework.connector import ConnectorClient
 from microsoft.botframework.connector.auth import MicrosoftTokenAuthentication
 
-from authentication_stub import MicrosoftTokenAuthenticationStub
+from .authentication_stub import MicrosoftTokenAuthenticationStub
 
 SERVICE_URL = 'https://slack.botframework.com'
 CHANNEL_ID = 'slack'
@@ -116,4 +116,4 @@ class AttachmentsTest(ReplayableTest):
             attachment_id = response.id
             attachment_view = connector.attachments.get_attachment(attachment_id, 'invalid')
 
-        assert ('Not Found' in str(excinfo.value))
+        assert ('not found' in str(excinfo.value))
