@@ -30,12 +30,19 @@ def messages():
         app.connector.conversations.send_to_conversation(activity['conversation']['id'], response_activity)
         return Response("{}", status=200, mimetype='application/json')
     elif activity['type'] == 'conversationUpdate':
+        message = 'Conversation update!'
+        if 'membersAdded' in activity:
+            message = 'Conversation update!\n\n"%s" (id: %s) joined the conversation.' %\
+                      (activity['membersAdded'][0]['name'],
+                       activity['membersAdded'][0]['id'])
+        elif 'membersRemoved' in activity:
+            message = 'Conversation update!\n\nid: "%s" left the conversation.' % activity['membersRemoved'][0]['id']
         response_activity = Activity(
             type=ActivityTypes.message,
             channel_id=activity['channelId'],
             recipient=ChannelAccount(id=activity['from']['id'], name=activity['from']['name']),
             from_property=ChannelAccount(id=activity['recipient']['id'], name=activity['recipient']['name']),
-            text='Conversation Update!'
+            text=message
             )
         app.connector.conversations.send_to_conversation(activity['conversation']['id'], response_activity)
         return Response("{}", status=202, mimetype='application/json')
