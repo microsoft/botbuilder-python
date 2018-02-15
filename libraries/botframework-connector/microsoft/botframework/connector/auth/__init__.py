@@ -9,5 +9,5 @@
 # regenerated.
 # --------------------------------------------------------------------------
 
-from .microsoftAuthentication import *
+from .microsoft_app_credentials import *
 from .jwt_token_validation import *
