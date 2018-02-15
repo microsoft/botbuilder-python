@@ -9,4 +9,4 @@
 # regenerated.
 # --------------------------------------------------------------------------
 
-from .microsoftAuthentication import *
+from .microsoft_app_credentials import *
