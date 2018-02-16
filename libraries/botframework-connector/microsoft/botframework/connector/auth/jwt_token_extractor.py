@@ -1,6 +1,7 @@
 import asyncio
-import jwt
 import requests
+import jwt
+from jwt.algorithms import RSAAlgorithm
 from datetime import datetime, timedelta
 
 class JwtTokenExtractor:
@@ -23,14 +24,14 @@ class JwtTokenExtractor:
     async def get_identity_from_auth(self, authHeader):
         if not authHeader:
             return None
-        parts = authHeader.split(".")
-        if len(parts) is 2:
-            return await asyncio.ensure_future(self.get_identity(parts[0], parts[1]))
+        parts = authHeader.split(" ")
+        if len(parts) == 2:
+            return await self.get_identity(parts[0], parts[1])
         return None
 
     async def get_identity(self, schema, parameter):
         # No header in correct scheme or no token
-        if schema is not "Bearer" or not parameter:
+        if schema != "Bearer" or not parameter:
             return None
         
         # Issuer isn't allowed? No need to check signature
@@ -38,25 +39,27 @@ class JwtTokenExtractor:
             return None
         
         try:
-            return await asyncio.ensure_future(self._validate_token(parameter))
+            return await self._validate_token(parameter)
         except:
             raise
 
     def _has_allowed_issuer(self, jwtToken):
         decoded = jwt.decode(jwtToken, verify=False)
-        issuer = decoded.iss
+        issuer = decoded.get("iss", None)
         if issuer in self.validationParameters.issuer:
             return True
         
         return issuer is self.validationParameters.issuer
 
     async def _validate_token(self, jwtToken):
-        decoded = jwt.decode(jwtToken, verify=False)
         headers = jwt.get_unverified_header(jwtToken)
 
         # Update the signing tokens from the last refresh
-        keyId = headers["kid"]
-        metadata = await asyncio.ensure_future(self.openIdMetadata.get(keyId))
+        keyId = headers.get("kid", None)
+        metadata = await self.openIdMetadata.get(keyId)
+
+        options = {'verify_aud': False}
+        decodedPayload = jwt.decode(jwtToken, metadata.publicKey, options=options)
         return
 
 class _OpenIdMetadata:
@@ -68,7 +71,7 @@ class _OpenIdMetadata:
     async def get(self, keyId):
         # If keys are more than 5 days old, refresh them
         if self.lastUpdated < (datetime.now() + timedelta(days=5)):
-            await asyncio.ensure_future(self._refresh())
+            await self._refresh()
         return self._find(keyId)
 
     async def _refresh(self):
@@ -78,7 +81,17 @@ class _OpenIdMetadata:
         responseKeys = requests.get(keysUrl)
         responseKeys.raise_for_status()
         self.lastUpdated = datetime.now()
-        self.keys = responseKeys.json()
+        self.keys = responseKeys.json()["keys"]
 
     def _find(self, keyId):
-        pass
+        if  len(self.keys) == 0:
+            return None
+        key = next(x for x in self.keys if x["kid"] == keyId)
+        publicKey = RSAAlgorithm.from_jwk(json.dumps(key))
+        endorsements = key.get("endorsements", [])
+        return _OpenIdConfig(publicKey, endorsements)
+        
+class _OpenIdConfig:
+    def __init__(self, publicKey, endorsements):
+        self.publicKey = publicKey
+        self.endorsements = endorsements
