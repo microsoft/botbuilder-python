@@ -7,7 +7,9 @@ from .channel_validation import ChannelValidation
 from .microsoft_app_credentials import MicrosoftAppCredentials
 
 class JwtTokenValidation:
-    async def assertValidActivity(self, activity, authHeader, credentials):
+    
+    @staticmethod
+    async def assertValidActivity(activity, authHeader, credentials):
         """Validates the security tokens required by the Bot Framework Protocol. Throws on any exceptions.
         activity: The incoming Activity from the Bot Framework or the Emulator
         authHeader:The Bearer token included as part of the request
