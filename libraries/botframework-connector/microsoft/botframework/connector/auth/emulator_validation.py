@@ -4,21 +4,27 @@ import jwt
 from .credential_provider import CredentialProvider 
 from .jwt_token_extractor import JwtTokenExtractor
 from .verify_options import VerifyOptions
+from .constants import Constants
 
 class EmulatorValidation:
     APP_ID_CLAIM = "appid"
     VERSION_CLAIM = "ver"
     TO_BOT_FROM_EMULATOR_TOKEN_VALIDATION_PARAMETERS = VerifyOptions(
-        issuer = [
-            'https://sts.windows.net/d6d49420-f39b-4df7-a1dc-d59a935871db/',                   # Auth v3.1, 1.0 token
-            'https://login.microsoftonline.com/d6d49420-f39b-4df7-a1dc-d59a935871db/v2.0',     # Auth v3.1, 2.0 token
-            'https://sts.windows.net/f8cdef31-a31e-4b4a-93e4-5f571e91255a/',                   # Auth v3.2, 1.0 token
-            'https://login.microsoftonline.com/f8cdef31-a31e-4b4a-93e4-5f571e91255a/v2.0',     # Auth v3.2, 2.0 token
-            'https://sts.windows.net/72f988bf-86f1-41af-91ab-2d7cd011db47/'                    # ???
+        issuer=[
+            # Auth v3.1, 1.0 token
+            'https://sts.windows.net/d6d49420-f39b-4df7-a1dc-d59a935871db/',
+            # Auth v3.1, 2.0 token
+            'https://login.microsoftonline.com/d6d49420-f39b-4df7-a1dc-d59a935871db/v2.0',
+            # Auth v3.2, 1.0 token
+            'https://sts.windows.net/f8cdef31-a31e-4b4a-93e4-5f571e91255a/',
+            # Auth v3.2, 2.0 token
+            'https://login.microsoftonline.com/f8cdef31-a31e-4b4a-93e4-5f571e91255a/v2.0',
+            # ???
+            'https://sts.windows.net/72f988bf-86f1-41af-91ab-2d7cd011db47/'
         ],
-        audience = None,
-        clock_tolerance = 5 * 60,
-        ignore_expiration = False
+        audience=None,
+        clock_tolerance=5 * 60,
+        ignore_expiration=False
     )
 
     @staticmethod
