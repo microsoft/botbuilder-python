@@ -4,6 +4,7 @@ from msrest.authentication import (
 
 import requests
 from datetime import datetime, timedelta
+from urllib.parse import urlparse
 import json
 
 AuthSettings = {
@@ -18,12 +19,31 @@ AuthSettings = {
     "emulatorAuthV32IssuerV2": 'https://login.microsoftonline.com/f8cdef31-a31e-4b4a-93e4-5f571e91255a/v2.0'
 }
 
+class _OAuthResponse:
+    def __init__(self):
+        self.token_type = None
+        self.expires_in = None
+        self.access_token = None
+        self.expiration_time = None
+
+    @staticmethod
+    def from_json(jsonValues):
+        result = _OAuthResponse()
+        try:
+            result.token_type = jsonValues["token_type"]
+            result.access_token = jsonValues["access_token"]
+            result.expires_in = jsonValues["expires_in"]
+        except KeyError:
+            pass
+        return result
+
 class MicrosoftAppCredentials(Authentication):
     refreshEndpoint = AuthSettings["refreshEndpoint"]
     refreshScope = AuthSettings["refreshScope"]
     schema = 'Bearer'
 
-    cache = dict()
+    trustedHostNames = {}
+    cache = {}
 
     def __init__(self, appId, password):
         self.microsoftAppId = appId
@@ -37,18 +57,18 @@ class MicrosoftAppCredentials(Authentication):
     def get_accessToken(self, forceRefresh=False):
         if not forceRefresh:
             # check the global cache for the token. If we have it, and it's valid, we're done.
-            oAuthToken = MicrosoftAppCredentials.cache.get(self.tokenCacheKey)
-            if oAuthToken:
+            oAuthToken = MicrosoftAppCredentials.cache.get(self.tokenCacheKey, None)
+            if oAuthToken is not None:
                 # we have the token. Is it valid?
-                if (oAuthToken.get("expiration_time") > datetime.now()):
-                    return oAuthToken.get("access_token")
+                if (oAuthToken.expiration_time > datetime.now()):
+                    return oAuthToken.access_token
         # We need to refresh the token, because:
         #   1. The user requested it via the forceRefresh parameter
         #   2. We have it, but it's expired
         #   3. We don't have it in the cache.
         oAuthToken = self.refresh_token()
-        MicrosoftAppCredentials.cache[self.tokenCacheKey] = oAuthToken
-        return oAuthToken.get("access_token")
+        MicrosoftAppCredentials.cache.setdefault(self.tokenCacheKey, oAuthToken)
+        return oAuthToken.access_token
     
     def refresh_token(self):
         options = {'grant_type': 'client_credentials', \
@@ -57,6 +77,26 @@ class MicrosoftAppCredentials(Authentication):
             'scope': MicrosoftAppCredentials.refreshScope }
         response = requests.post(MicrosoftAppCredentials.refreshEndpoint, data=options)
         response.raise_for_status()
-        oauthResponse = response.json()
-        oauthResponse["expiration_time"] = datetime.now() + timedelta(seconds = (oauthResponse["expires_in"] - 300))
+        oauthResponse = _OAuthResponse.from_json(response.json())
+        oauthResponse.expiration_time = datetime.now() + timedelta(seconds=(oauthResponse.expires_in - 300))
         return oauthResponse
+
+    @staticmethod
+    def trust_service_url(serviceUrl, expiration=None):
+        if expiration is None:
+            expiration = datetime.now() + timedelta(days=1)
+        host = urlparse(serviceUrl).hostname
+        if host is not None:
+            MicrosoftAppCredentials.trustedHostNames[host] = expiration
+
+    @staticmethod
+    def is_trusted_service(serviceUrl):
+        host = urlparse(serviceUrl).hostname
+        if host is not None:
+            return MicrosoftAppCredentials.is_trusted_url(host)
+        return False
+
+    @staticmethod
+    def is_trusted_url(host):
+        expiration = MicrosoftAppCredentials.trustedHostNames.get(host, datetime.min)
+        return expiration > (datetime.now() - timedelta(minutes=5))
