@@ -11,3 +11,6 @@
 
 from .microsoft_app_credentials import *
 from .jwt_token_validation import *
+from .credential_provider import *
+from .channel_validation import *
+from .emulator_validation import *

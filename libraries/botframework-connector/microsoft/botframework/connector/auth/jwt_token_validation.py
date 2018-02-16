@@ -1,10 +1,10 @@
 import asyncio
 from microsoft.botbuilder.schema import activity
 
-from .credentialProvider import ICredentialProvider
-from .emulatorValidation import EmulatorValidation
-from .channelValidation import ChannelValidation
-from .microsoftAppCredentials import MicrosoftAppCredentials
+from .credential_provider import CredentialProvider
+from .emulator_validation import EmulatorValidation
+from .channel_validation import ChannelValidation
+from .microsoft_app_credentials import MicrosoftAppCredentials
 
 class JwtTokenValidation:
     async def assertValidActivity(self, activity, authHeader, credentials):
@@ -24,11 +24,11 @@ class JwtTokenValidation:
             # No Auth Header. Auth is required. Request is not authorized.
             raise Exception('Unauthorized Access. Request is not authorized')
 
-        usingEmulator = EmulatorValidation.isTokenFromEmulator(authHeader)
+        usingEmulator = EmulatorValidation.is_from_emulator(authHeader)
         if (usingEmulator):
-            await asyncio.ensure_future(EmulatorValidation.authenticateEmulatorToken(authHeader, credentials))
+            await asyncio.ensure_future(EmulatorValidation.authenticate_token(authHeader, credentials))
         else:
-            await asyncio.ensure_future(ChannelValidation.authenticateChannelTokenWithServiceUrl(authHeader, credentials, activity.serviceUrl))
+            await asyncio.ensure_future(ChannelValidation.authenticate_token(authHeader, credentials, activity.serviceUrl))
 
         # On the standard Auth path, we need to trust the URL that was incoming.
-        MicrosoftAppCredentials.trustServiceUrl(activity.serviceUrl)
+        MicrosoftAppCredentials.trust_service_url(activity.serviceUrl)
