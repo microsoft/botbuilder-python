@@ -28,9 +28,9 @@ class JwtTokenValidation:
 
         usingEmulator = EmulatorValidation.is_token_from_emulator(authHeader)
         if (usingEmulator):
-            await asyncio.ensure_future(EmulatorValidation.authenticate_emulator_token(authHeader, credentials))
+            await EmulatorValidation.authenticate_emulator_token(authHeader, credentials)
         else:
-            await asyncio.ensure_future(ChannelValidation.authenticate_channel_token_with_service_url(authHeader, credentials, activity.service_url))
+            await ChannelValidation.authenticate_channel_token_with_service_url(authHeader, credentials, activity.service_url)
 
         # On the standard Auth path, we need to trust the URL that was incoming.
-        MicrosoftAppCredentials.trust_service_url(activity.serviceUrl)
+        MicrosoftAppCredentials.trust_service_url(activity.service_url)

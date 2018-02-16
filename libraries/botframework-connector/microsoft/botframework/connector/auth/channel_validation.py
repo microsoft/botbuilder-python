@@ -25,7 +25,7 @@ class ChannelValidation:
     async def authenticate_channel_token_with_service_url(authHeader, credentials, serviceUrl):
         identity = await asyncio.ensure_future(ChannelValidation.authenticate_channel_token(authHeader, credentials))
 
-        serviceUrlClaim = identity.getClaimValue(ChannelValidation.SERVICE_URL_CLAIM)
+        serviceUrlClaim = identity.get_claim_value(ChannelValidation.SERVICE_URL_CLAIM)
         if (serviceUrlClaim != serviceUrl):
             # Claim must match. Not Authorized.
             raise Exception('Unauthorized. ServiceUrl claim do not match.')
@@ -54,14 +54,14 @@ class ChannelValidation:
         # Async validation.
 
         # Look for the "aud" claim, but only if issued from the Bot Framework
-        if (identity.getClaimValue(Constants.ISSUER_CLAIM) != Constants.BOT_FRAMEWORK_TOKEN_ISSUER):
+        if (identity.get_claim_value(Constants.ISSUER_CLAIM) != Constants.BOT_FRAMEWORK_TOKEN_ISSUER):
             # The relevant Audiance Claim MUST be present. Not Authorized.
             raise Exception('Unauthorized. Audiance Claim MUST be present.')
 
         # The AppId from the claim in the token must match the AppId specified by the developer. Note that
         # the Bot Framwork uses the Audiance claim ("aud") to pass the AppID.
-        audClaim = identity.getClaimValue(Constants.AUDIENCE_CLAIM)
-        isValidAppId = await asyncio.ensure_future(credentials.isValidAppId(audClaim or ""))
+        audClaim = identity.get_claim_value(Constants.AUDIENCE_CLAIM)
+        isValidAppId = await asyncio.ensure_future(credentials.is_valid_appid(audClaim or ""))
         if (not isValidAppId):
             # The AppId is not valid or not present. Not Authorized.
             raise Exception('Unauthorized. Invalid AppId passed on token: ', audClaim)

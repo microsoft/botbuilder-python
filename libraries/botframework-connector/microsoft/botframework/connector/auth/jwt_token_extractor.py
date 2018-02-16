@@ -4,11 +4,12 @@ import jwt
 import json
 from jwt.algorithms import RSAAlgorithm
 from datetime import datetime, timedelta
+from .claims_identity import ClaimsIdentity
 
 class JwtTokenExtractor:
     metadataCache = {}
 
-    def __init__(self, validationParams, allowedAlgorithms, metadataUrl, validator = None):
+    def __init__(self, validationParams, metadataUrl, allowedAlgorithms, validator = None):
         self.validationParameters = validationParams
         self.validationParameters.algorithms = allowedAlgorithms
         self.openIdMetadata = JwtTokenExtractor.get_open_id_metadata(metadataUrl)
@@ -59,9 +60,10 @@ class JwtTokenExtractor:
         keyId = headers.get("kid", None)
         metadata = await self.openIdMetadata.get(keyId)
 
-        options = {'verify_aud': False}
+        options = {'verify_aud': False, 'verify_exp': False }
         decodedPayload = jwt.decode(jwtToken, metadata.publicKey, options=options)
-        return
+        claims = ClaimsIdentity(decodedPayload, True)
+        return claims
 
 class _OpenIdMetadata:
     def __init__(self, url):

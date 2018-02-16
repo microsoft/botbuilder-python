@@ -132,7 +132,7 @@ class EmulatorValidation:
             raise Exception('Unauthorized. Emulator token version "3.0" is depricated.')
         elif (versionClaim == '3.1' or versionClaim == '3.2'):
             # The emulator for token versions "3.1" & "3.2" puts the AppId in the "Audiance" claim.
-            audianceClaim = identity.getClaimValue(Constants.AUDIENCE_CLAIM)
+            audianceClaim = identity.get_claim_value(Constants.AUDIENCE_CLAIM)
             if (not audianceClaim):
                 # No claim around AppID. Not Authorized.
                 raise Exception('Unauthorized. "aud" claim is required on Emulator Token version "3.x".')
@@ -142,7 +142,7 @@ class EmulatorValidation:
             # Unknown Version. Not Authorized.
             raise Exception('Unauthorized. Unknown Emulator Token version ', versionClaim, '.')
 
-        isValidAppId = await asyncio.ensure_future(credentials.isValidAppId(appId))
+        isValidAppId = await asyncio.ensure_future(credentials.is_valid_appid(appId))
         if (not isValidAppId):
             raise Exception('Unauthorized. Invalid AppId passed on token: ', appId)
 
