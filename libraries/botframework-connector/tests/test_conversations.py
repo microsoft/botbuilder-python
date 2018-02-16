@@ -15,7 +15,7 @@ from microsoft.botbuilder.schema import *
 from microsoft.botframework.connector import ConnectorClient
 from microsoft.botframework.connector.auth import MicrosoftTokenAuthentication
 
-from authentication_stub import MicrosoftTokenAuthenticationStub
+from .authentication_stub import MicrosoftTokenAuthenticationStub
 
 SERVICE_URL = 'https://slack.botframework.com'
 CHANNEL_ID = 'slack'
