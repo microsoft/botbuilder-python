@@ -1,9 +1,7 @@
 import jwt
 
-from .credential_provider import ICredentialProvider 
+from .credential_provider import CredentialProvider 
 from .jwt_token_extractor import JwtTokenExtractor
-from .constants import Constants 
-from .claims_identity import ClaimsIdentity
 
 class VerifyOptions:
     def __init__(self, issuer, audience, clock_tolerance, ignore_expiration):
@@ -28,7 +26,8 @@ class EmulatorValidation:
         ignore_expiration = False
     )
 
-    def is_token_from_emulator(self, authHeader):
+    @staticmethod
+    def is_from_emulator(authHeader):
         """Determines if a given Auth header is from the Bot Framework Emulator
         authHeader Bearer Token, in the "Bearer [Long String]" Format.
         returns True, if the token was issued by the Emulator. Otherwise, false.
@@ -73,3 +72,7 @@ class EmulatorValidation:
 
         # The Token is from the Bot Framework Emulator. Success!
         return True
+
+    @staticmethod
+    def authenticate_token(header, credentials):
+        pass
