@@ -1,13 +1,14 @@
 import asyncio
 import requests
 import jwt
+import json
 from jwt.algorithms import RSAAlgorithm
 from datetime import datetime, timedelta
 
 class JwtTokenExtractor:
     metadataCache = {}
 
-    def __init__(self, validationParams, allowedAlgorithms, metadataUrl, validator):
+    def __init__(self, validationParams, allowedAlgorithms, metadataUrl, validator = None):
         self.validationParameters = validationParams
         self.validationParameters.algorithms = allowedAlgorithms
         self.openIdMetadata = JwtTokenExtractor.get_open_id_metadata(metadataUrl)
@@ -21,7 +22,7 @@ class JwtTokenExtractor:
             JwtTokenExtractor.metadataCache.setdefault(metadataUrl, metadata)
         return metadata
 
-    async def get_identity_from_auth(self, authHeader):
+    async def get_identity_from_auth_header(self, authHeader):
         if not authHeader:
             return None
         parts = authHeader.split(" ")

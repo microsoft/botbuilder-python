@@ -26,11 +26,11 @@ class JwtTokenValidation:
             # No Auth Header. Auth is required. Request is not authorized.
             raise Exception('Unauthorized Access. Request is not authorized')
 
-        usingEmulator = EmulatorValidation.is_from_emulator(authHeader)
+        usingEmulator = EmulatorValidation.is_token_from_emulator(authHeader)
         if (usingEmulator):
-            await asyncio.ensure_future(EmulatorValidation.authenticate_token(authHeader, credentials))
+            await asyncio.ensure_future(EmulatorValidation.authenticate_emulator_token(authHeader, credentials))
         else:
-            await asyncio.ensure_future(ChannelValidation.authenticate_token(authHeader, credentials, activity.serviceUrl))
+            await asyncio.ensure_future(ChannelValidation.authenticate_channel_token_with_service_url(authHeader, credentials, activity.service_url))
 
         # On the standard Auth path, we need to trust the URL that was incoming.
         MicrosoftAppCredentials.trust_service_url(activity.serviceUrl)
