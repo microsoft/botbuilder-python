@@ -41,7 +41,7 @@ class EmulatorValidation:
             return False
 
         parts = authHeader.split(' ')
-        if (parts.length != 2):
+        if (len(parts) != 2):
             # Emulator tokens MUST have exactly 2 parts. If we don't have 2 parts, it's not an emulator token
             return False
 
