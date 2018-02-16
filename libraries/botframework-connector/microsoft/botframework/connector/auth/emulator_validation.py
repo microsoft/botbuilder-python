@@ -61,13 +61,14 @@ class EmulatorValidation:
             return False
 
         # Is there an Issuer?
-        issuer = token.payload.iss
+        issuer = token['iss']
         if (not issuer):
             # No Issuer, means it's not from the Emulator.
             return False
 
         # Is the token issues by a source we consider to be the emulator?
-        if (EmulatorValidation.TO_BOT_FROM_EMULATOR_TOKEN_VALIDATION_PARAMETERS.issuer and EmulatorValidation.TO_BOT_FROM_EMULATOR_TOKEN_VALIDATION_PARAMETERS.issuer.find(issuer) == -1):
+        if (EmulatorValidation.TO_BOT_FROM_EMULATOR_TOKEN_VALIDATION_PARAMETERS.issuer 
+            and not issuer in EmulatorValidation.TO_BOT_FROM_EMULATOR_TOKEN_VALIDATION_PARAMETERS.issuer):
             # Not a Valid Issuer. This is NOT a Bot Framework Emulator Token.
             return False
 
