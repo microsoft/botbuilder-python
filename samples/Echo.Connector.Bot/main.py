@@ -12,7 +12,7 @@ APP_PASSWORD = ''
 
 class MyHandler(http.server.BaseHTTPRequestHandler):
 
-    def handle_conversationUpdate_activity(self, data):
+    def __handle_conversationUpdate_activity(self, data):
         self.send_response(202)
         self.end_headers()
         if data['membersAdded'][0]['id'] != data['recipient']['id']:
@@ -26,7 +26,7 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
                 text='Hello and welcome to the echo bot!')
             connector.conversations.send_to_conversation(data['conversation']['id'], activity)
 
-    def handle_message_activity(self, data):
+    def __handle_message_activity(self, data):
         self.send_response(200)
         self.end_headers()
         credentials = MicrosoftTokenAuthentication(APP_ID, APP_PASSWORD)
@@ -39,7 +39,7 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
             text = 'You said: %s' % data['text'])
         connector.conversations.send_to_conversation(data['conversation']['id'], activity)
 
-    def unhandled_activity(self):
+    def __unhandled_activity(self):
         self.send_response(404)
         self.end_headers()
 
@@ -47,11 +47,11 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
         body = self.rfile.read(int(self.headers['Content-Length']))
         data = json.loads(str(body, 'utf-8'))
         if data['type'] == 'conversationUpdate':
-            self.handle_conversationUpdate_activity(data)
+            self.__handle_conversationUpdate_activity(data)
         elif data['type'] == 'message':
-            self.handle_message_activity(data)
+            self.__handle_message_activity(data)
         else:
-            self.unhandled_activity()
+            self.__unhandled_activity()
 
 try:
     server = http.server.HTTPServer(('localhost', 9000), MyHandler)
