@@ -1,12 +1,9 @@
 #### Echo Connector Bot
 
-Requires [Flask][Flask] to run.
-
-- To run the sample on Windows, enter the following into your command line:
+To run this sample:
 
 ```
-set FLASK_APP=main.py
-flask run
+python main.py
 ```
 
-  [Flask]: http://flask.pocoo.org/
+and you can test with the Bot FRamework Emulator by connecting to http://localhost:9000
