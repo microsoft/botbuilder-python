@@ -30,7 +30,7 @@ class JwtTokenValidation:
         if (usingEmulator):
             await EmulatorValidation.authenticate_emulator_token(authHeader, credentials)
         else:
-            await ChannelValidation.authenticate_channel_token_with_service_url(authHeader, credentials, activity.service_url)
+            await ChannelValidation.authenticate_token_service_url(authHeader, credentials, activity.service_url)
 
         # On the standard Auth path, we need to trust the URL that was incoming.
         MicrosoftAppCredentials.trust_service_url(activity.service_url)
