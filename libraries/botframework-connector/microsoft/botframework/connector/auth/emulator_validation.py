@@ -1,7 +1,6 @@
 import asyncio
 import jwt
 
-from .credential_provider import CredentialProvider 
 from .jwt_token_extractor import JwtTokenExtractor
 from .verify_options import VerifyOptions
 from .constants import Constants
@@ -28,47 +27,48 @@ class EmulatorValidation:
     )
 
     @staticmethod
-    def is_token_from_emulator(authHeader):
+    def is_token_from_emulator(auth_header):
         """Determines if a given Auth header is from the Bot Framework Emulator
-        authHeader Bearer Token, in the "Bearer [Long String]" Format.
+        auth_header Bearer Token, in the "Bearer [Long String]" Format.
         returns True, if the token was issued by the Emulator. Otherwise, false.
         """
 
         # The Auth Header generally looks like this:
         # "Bearer eyJ0e[...Big Long String...]XAiO"
-        if (not authHeader):
+        if not auth_header:
             # No token. Can't be an emulator token.
             return False
 
-        parts = authHeader.split(' ')
-        if (len(parts) != 2):
-            # Emulator tokens MUST have exactly 2 parts. If we don't have 2 parts, it's not an emulator token
+        parts = auth_header.split(' ')
+        if len(parts) != 2:
+            # Emulator tokens MUST have exactly 2 parts.
+            # If we don't have 2 parts, it's not an emulator token
             return False
 
-        authScheme = parts[0]
-        bearerToken = parts[1]
+        auth_scheme = parts[0]
+        bearer_token = parts[1]
 
         # We now have an array that should be:
         # [0] = "Bearer"
         # [1] = "[Big Long String]"
-        if (authScheme != 'Bearer'):
+        if auth_scheme != 'Bearer':
             # The scheme from the emulator MUST be "Bearer"
             return False
 
         # Parse the Big Long String into an actual token.
-        token = jwt.decode(bearerToken, verify=False)
-        if (not token):
+        token = jwt.decode(bearer_token, verify=False)
+        if not token:
             return False
 
         # Is there an Issuer?
         issuer = token['iss']
-        if (not issuer):
+        if not issuer:
             # No Issuer, means it's not from the Emulator.
             return False
 
         # Is the token issues by a source we consider to be the emulator?
-        if (EmulatorValidation.TO_BOT_FROM_EMULATOR_TOKEN_VALIDATION_PARAMETERS.issuer 
-            and not issuer in EmulatorValidation.TO_BOT_FROM_EMULATOR_TOKEN_VALIDATION_PARAMETERS.issuer):
+        issuer_list = EmulatorValidation.TO_BOT_FROM_EMULATOR_TOKEN_VALIDATION_PARAMETERS.issuer
+        if issuer_list and not issuer in issuer_list:
             # Not a Valid Issuer. This is NOT a Bot Framework Emulator Token.
             return False
 
@@ -76,25 +76,26 @@ class EmulatorValidation:
         return True
 
     @staticmethod
-    async def authenticate_emulator_token(authHeader, credentials):
+    async def authenticate_emulator_token(auth_header, credentials):
         """Validate the incoming Auth Header as a token sent from the Bot Framework Emulator.
         A token issued by the Bot Framework will FAIL this check. Only Emulator tokens will pass.
-        authHeader The raw HTTP header in the format: "Bearer [longString]"
+        auth_header The raw HTTP header in the format: "Bearer [longString]"
         credentials The user defined set of valid credentials, such as the AppId.
         returns A valid ClaimsIdentity.
         """
 
-        tokenExtractor = JwtTokenExtractor(
+        token_extractor = JwtTokenExtractor(
             EmulatorValidation.TO_BOT_FROM_EMULATOR_TOKEN_VALIDATION_PARAMETERS,
             Constants.TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL,
             Constants.ALLOWED_SIGNING_ALGORITHMS)
 
-        identity = await asyncio.ensure_future(tokenExtractor.get_identity_from_auth_header(authHeader))
-        if (not identity):
+        identity = await asyncio.ensure_future(
+            token_extractor.get_identity_from_auth_header(auth_header))
+        if not identity:
             # No valid identity. Not Authorized.
             raise Exception('Unauthorized. No valid identity.')
 
-        if (not identity.isAuthenticated):
+        if not identity.isAuthenticated:
             # The token is in some way invalid. Not Authorized.
             raise Exception('Unauthorized. Is not authenticated')
 
@@ -102,48 +103,51 @@ class EmulatorValidation:
         # what we're looking for. Note that in a multi-tenant bot, this value
         # comes from developer code that may be reaching out to a service, hence the
         # Async validation.
-        versionClaim = identity.get_claim_value(EmulatorValidation.VERSION_CLAIM)
-        if (versionClaim == None):
+        version_claim = identity.get_claim_value(EmulatorValidation.VERSION_CLAIM)
+        if version_claim is None:
             raise Exception('Unauthorized. "ver" claim is required on Emulator Tokens.')
 
-        appId= ''
+        app_id = ''
 
         # The Emulator, depending on Version, sends the AppId via either the
         # appid claim (Version 1) or the Authorized Party claim (Version 2).
-        if (not versionClaim or versionClaim == '1.0'):
+        if not version_claim or version_claim == '1.0':
             # either no Version or a version of "1.0" means we should look for
             # the claim in the "appid" claim.
-            appIdClaim = identity.get_claim_value(EmulatorValidation.APP_ID_CLAIM)
-            if (not appIdClaim):
+            app_id_claim = identity.get_claim_value(EmulatorValidation.APP_ID_CLAIM)
+            if not app_id_claim:
                 # No claim around AppID. Not Authorized.
-                raise Exception('Unauthorized. "appid" claim is required on Emulator Token version "1.0".')
+                raise Exception('Unauthorized. '
+                                '"appid" claim is required on Emulator Token version "1.0".')
 
-            appId = appIdClaim
-        elif (versionClaim == '2.0'):
+            app_id = app_id_claim
+        elif version_claim == '2.0':
             # Emulator, "2.0" puts the AppId in the "azp" claim.
-            appZClaim = identity.get_claim_value(Constants.AUTHORIZED_PARTY)
-            if (not appZClaim):
+            app_authz_claim = identity.get_claim_value(Constants.AUTHORIZED_PARTY)
+            if not app_authz_claim:
                 # No claim around AppID. Not Authorized.
-                raise Exception('Unauthorized. "azp" claim is required on Emulator Token version "2.0".')
+                raise Exception('Unauthorized. '
+                                '"azp" claim is required on Emulator Token version "2.0".')
 
-            appId = appZClaim
-        elif (versionClaim == '3.0'):
+            app_id = app_authz_claim
+        elif version_claim == '3.0':
             # The v3.0 Token types have been disallowed. Not Authorized.
             raise Exception('Unauthorized. Emulator token version "3.0" is depricated.')
-        elif (versionClaim == '3.1' or versionClaim == '3.2'):
+        elif version_claim == '3.1' or version_claim == '3.2':
             # The emulator for token versions "3.1" & "3.2" puts the AppId in the "Audiance" claim.
-            audianceClaim = identity.get_claim_value(Constants.AUDIENCE_CLAIM)
-            if (not audianceClaim):
+            audiance_claim = identity.get_claim_value(Constants.AUDIENCE_CLAIM)
+            if not audiance_claim:
                 # No claim around AppID. Not Authorized.
-                raise Exception('Unauthorized. "aud" claim is required on Emulator Token version "3.x".')
+                raise Exception('Unauthorized. '
+                                '"aud" claim is required on Emulator Token version "3.x".')
 
-            appId = audianceClaim
+            app_id = audiance_claim
         else:
             # Unknown Version. Not Authorized.
-            raise Exception('Unauthorized. Unknown Emulator Token version ', versionClaim, '.')
+            raise Exception('Unauthorized. Unknown Emulator Token version ', version_claim, '.')
 
-        isValidAppId = await asyncio.ensure_future(credentials.is_valid_appid(appId))
-        if (not isValidAppId):
-            raise Exception('Unauthorized. Invalid AppId passed on token: ', appId)
+        is_valid_app_id = await asyncio.ensure_future(credentials.is_valid_appid(app_id))
+        if not is_valid_app_id:
+            raise Exception('Unauthorized. Invalid AppId passed on token: ', app_id)
 
         return identity
