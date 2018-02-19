@@ -3,10 +3,14 @@ import pytest
 from microsoft.botbuilder.schema import Activity
 from microsoft.botframework.connector.auth import JwtTokenValidation
 from microsoft.botframework.connector.auth import SimpleCredentialProvider
+from microsoft.botframework.connector.auth import EmulatorValidation
+from microsoft.botframework.connector.auth import ChannelValidation
 
 import asyncio
 
 class TestAuth():
+    EmulatorValidation.TO_BOT_FROM_EMULATOR_TOKEN_VALIDATION_PARAMETERS.ignore_expiration = True
+    ChannelValidation.TO_BOT_FROM_CHANNEL_TOKEN_VALIDATION_PARAMETERS.ignore_expiration = True
     
     @pytest.mark.asyncio
     async def test_connector_auth_header_correct_app_id_and_service_url_should_validate(self):

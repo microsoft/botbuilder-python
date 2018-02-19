@@ -13,7 +13,7 @@ class JwtTokenExtractor:
         self.validationParameters = validationParams
         self.validationParameters.algorithms = allowedAlgorithms
         self.openIdMetadata = JwtTokenExtractor.get_open_id_metadata(metadataUrl)
-        self.validator = validator
+        self.validator = validator if validator is not None else lambda x : True
 
     @staticmethod
     def get_open_id_metadata(metadataUrl):
@@ -60,9 +60,18 @@ class JwtTokenExtractor:
         keyId = headers.get("kid", None)
         metadata = await self.openIdMetadata.get(keyId)
 
-        options = {'verify_aud': False, 'verify_exp': False }
+
+        if headers.get("alg", None) not in self.validationParameters.algorithms:
+            raise Exception('Token signing algorithm not in allowed list')
+
+        if self.validator is not None:
+            if not self.validator(metadata.endorsements):
+                raise Exception('Could not validate endorsement key')
+                
+        options = {'verify_aud': False, 'verify_exp': not self.validationParameters.ignore_expiration }
         decodedPayload = jwt.decode(jwtToken, metadata.publicKey, options=options)
         claims = ClaimsIdentity(decodedPayload, True)
+
         return claims
 
 class _OpenIdMetadata:
