@@ -3,8 +3,6 @@ class Claim:
         self.type = claim_type
         self.value = value
 
-
-
 class ClaimsIdentity:
     def __init__(self, claims, isAuthenticated):
         self.claims = claims

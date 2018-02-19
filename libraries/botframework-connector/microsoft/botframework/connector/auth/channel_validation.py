@@ -21,6 +21,21 @@ class ChannelValidation:
 
     @staticmethod
     async def authenticate_token_service_url(auth_header, credentials, service_url):
+        """ Validate the incoming Auth Header
+
+        Validate the incoming Auth Header as a token sent from the Bot Framework Service.
+        A token issued by the Bot Framework emulator will FAIL this check.
+
+        :param auth_header: The raw HTTP header in the format: 'Bearer [longString]'
+        :type auth_header: str
+        :param credentials: The user defined set of valid credentials, such as the AppId.
+        :type credentials: CredentialProvider
+        :param service_url: Claim value that must match in the identity.
+        :type service_url: str
+
+        :return: A valid ClaimsIdentity.
+        :raises Exception:
+        """
         identity = await asyncio.ensure_future(
             ChannelValidation.authenticate_token(auth_header, credentials))
 
@@ -33,6 +48,19 @@ class ChannelValidation:
 
     @staticmethod
     async def authenticate_token(auth_header, credentials):
+        """ Validate the incoming Auth Header
+
+        Validate the incoming Auth Header as a token sent from the Bot Framework Service.
+        A token issued by the Bot Framework emulator will FAIL this check.
+
+        :param auth_header: The raw HTTP header in the format: 'Bearer [longString]'
+        :type auth_header: str
+        :param credentials: The user defined set of valid credentials, such as the AppId.
+        :type credentials: CredentialProvider
+
+        :return: A valid ClaimsIdentity.
+        :raises Exception:
+        """
         token_extractor = JwtTokenExtractor(
             ChannelValidation.TO_BOT_FROM_CHANNEL_TOKEN_VALIDATION_PARAMETERS,
             Constants.TO_BOT_FROM_CHANNEL_OPEN_ID_METADATA_URL,

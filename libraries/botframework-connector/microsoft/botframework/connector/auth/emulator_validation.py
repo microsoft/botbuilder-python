@@ -28,11 +28,13 @@ class EmulatorValidation:
 
     @staticmethod
     def is_token_from_emulator(auth_header):
-        """Determines if a given Auth header is from the Bot Framework Emulator
-        auth_header Bearer Token, in the "Bearer [Long String]" Format.
-        returns True, if the token was issued by the Emulator. Otherwise, false.
-        """
+        """ Determines if a given Auth header is from the Bot Framework Emulator
 
+        :param auth_header: Bearer Token, in the 'Bearer [Long String]' Format.
+        :type auth_header: str
+
+        :return: True, if the token was issued by the Emulator. Otherwise, false.
+        """
         # The Auth Header generally looks like this:
         # "Bearer eyJ0e[...Big Long String...]XAiO"
         if not auth_header:
@@ -77,13 +79,19 @@ class EmulatorValidation:
 
     @staticmethod
     async def authenticate_emulator_token(auth_header, credentials):
-        """Validate the incoming Auth Header as a token sent from the Bot Framework Emulator.
-        A token issued by the Bot Framework will FAIL this check. Only Emulator tokens will pass.
-        auth_header The raw HTTP header in the format: "Bearer [longString]"
-        credentials The user defined set of valid credentials, such as the AppId.
-        returns A valid ClaimsIdentity.
-        """
+        """ Validate the incoming Auth Header
 
+        Validate the incoming Auth Header as a token sent from the Bot Framework Service.
+        A token issued by the Bot Framework emulator will FAIL this check.
+
+        :param auth_header: The raw HTTP header in the format: 'Bearer [longString]'
+        :type auth_header: str
+        :param credentials: The user defined set of valid credentials, such as the AppId.
+        :type credentials: CredentialProvider
+
+        :return: A valid ClaimsIdentity.
+        :raises Exception:
+        """
         token_extractor = JwtTokenExtractor(
             EmulatorValidation.TO_BOT_FROM_EMULATOR_TOKEN_VALIDATION_PARAMETERS,
             Constants.TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL,
