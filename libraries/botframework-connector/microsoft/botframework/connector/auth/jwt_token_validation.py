@@ -18,7 +18,7 @@ class JwtTokenValidation:
         """
         if(not authHeader):
             # No auth header was sent. We might be on the anonymous code path.
-            isAuthDisabled = await credentials.isAuthenticationDisabled()
+            isAuthDisabled = await credentials.is_authentication_disabled()
             if(isAuthDisabled):
                 # We are on the anonymous code path.
                 return

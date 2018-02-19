@@ -14,5 +14,4 @@ from .jwt_token_validation import *
 from .credential_provider import *
 from .channel_validation import *
 from .emulator_validation import *
-from .simple_credential_provider import *
 from .jwt_token_extractor import *
