@@ -1,6 +1,6 @@
 class Claim:
-    def __init__(self, cType, value):
-        self.cType = cType
+    def __init__(self, claim_type, value):
+        self.type = claim_type
         self.value = value
 
 
@@ -10,5 +10,5 @@ class ClaimsIdentity:
         self.claims = claims
         self.isAuthenticated = isAuthenticated
 
-    def get_claim_value(self, cType):
-        return self.claims.get(cType)
+    def get_claim_value(self, claim_type):
+        return self.claims.get(claim_type)
