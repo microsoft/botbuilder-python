@@ -22,7 +22,12 @@ VERSION = "3"
 # prerequisite: setuptools
 # http://pypi.python.org/pypi/setuptools
 
-REQUIRES = ["msrest>=0.2.0"]
+REQUIRES = [
+    "msrest>=0.2.0",
+    "requests>=2.8.1",
+    "cryptography>=2.1.4",
+    "PyJWT>=1.5.3",
+    "microsoft-botbuilder-schema"]
 
 setup(
     name=NAME,

@@ -16,7 +16,7 @@ from azure_devtools.scenario_tests import ReplayableTest
 import msrest
 from microsoft.botbuilder.schema import *
 from microsoft.botframework.connector import ConnectorClient
-from microsoft.botframework.connector.auth import MicrosoftTokenAuthentication
+from microsoft.botframework.connector.auth import MicrosoftAppCredentials
 
 from .authentication_stub import MicrosoftTokenAuthenticationStub
 
@@ -33,7 +33,9 @@ def get_auth_token():
         # Define a "app_creds_real.py" file with your bot credentials as follows:
         # MICROSOFT_APP_ID = '...'
         # MICROSOFT_APP_PASSWORD = '...'
-        return MicrosoftTokenAuthentication(app_creds_real.MICROSOFT_APP_ID, app_creds_real.MICROSOFT_APP_PASSWORD).get_accessToken()
+        return MicrosoftAppCredentials(
+            app_creds_real.MICROSOFT_APP_ID,
+            app_creds_real.MICROSOFT_APP_PASSWORD).get_accessToken()
     except ImportError:
         return 'STUB_ACCESS_TOKEN'
 

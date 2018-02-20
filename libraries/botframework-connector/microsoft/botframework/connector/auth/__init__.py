@@ -8,5 +8,11 @@
 # Changes may cause incorrect behavior and will be lost if the code is
 # regenerated.
 # --------------------------------------------------------------------------
+# pylint: disable=missing-docstring
 
-from .microsoftAuthentication import *
+from .microsoft_app_credentials import *
+from .jwt_token_validation import *
+from .credential_provider import *
+from .channel_validation import *
+from .emulator_validation import *
+from .jwt_token_extractor import *
