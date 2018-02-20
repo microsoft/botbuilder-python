@@ -58,20 +58,23 @@ class MicrosoftAppCredentials(Authentication):
         return  basic_authentication.signed_session()
 
     def get_access_token(self, force_refresh=False):
-        if not force_refresh:
-            # check the global cache for the token. If we have it, and it's valid, we're done.
-            oauth_token = MicrosoftAppCredentials.cache.get(self.token_cache_key, None)
-            if oauth_token is not None:
-                # we have the token. Is it valid?
-                if oauth_token.expiration_time > datetime.now():
-                    return oauth_token.access_token
-        # We need to refresh the token, because:
-        #   1. The user requested it via the force_refresh parameter
-        #   2. We have it, but it's expired
-        #   3. We don't have it in the cache.
-        oauth_token = self.refresh_token()
-        MicrosoftAppCredentials.cache.setdefault(self.token_cache_key, oauth_token)
-        return oauth_token.access_token
+        if self.microsoft_app_id and self.microsoft_app_password:
+            if not force_refresh:
+                # check the global cache for the token. If we have it, and it's valid, we're done.
+                oauth_token = MicrosoftAppCredentials.cache.get(self.token_cache_key, None)
+                if oauth_token is not None:
+                    # we have the token. Is it valid?
+                    if oauth_token.expiration_time > datetime.now():
+                        return oauth_token.access_token
+            # We need to refresh the token, because:
+            #   1. The user requested it via the force_refresh parameter
+            #   2. We have it, but it's expired
+            #   3. We don't have it in the cache.
+            oauth_token = self.refresh_token()
+            MicrosoftAppCredentials.cache.setdefault(self.token_cache_key, oauth_token)
+            return oauth_token.access_token
+        else:
+            return ''
 
     def refresh_token(self):
         options = {
