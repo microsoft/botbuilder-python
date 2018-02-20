@@ -15,34 +15,36 @@ APP_PASSWORD = ''
 class MyHandler(http.server.BaseHTTPRequestHandler):
     credential_provider = SimpleCredentialProvider(APP_ID, APP_PASSWORD)
 
-    def __handle_conversation_update_activity(self, data):
+    def __handle_conversation_update_activity(self, activity):
         self.send_response(202)
         self.end_headers()
-        if data['membersAdded'][0]['id'] != data['recipient']['id']:
+        if activity.members_added[0].id != activity.recipient.id:
             credentials = MicrosoftAppCredentials(APP_ID, APP_PASSWORD)
-            connector = ConnectorClient(credentials, base_url=data['serviceUrl'])
-            activity = Activity(
+            connector = ConnectorClient(credentials, base_url=activity.service_url)
+            reply = Activity(
                 type=ActivityTypes.message,
-                channel_id=data['channelId'],
-                recipient=ChannelAccount(id=data['from']['id'], name=data['from']['name']),
+                channel_id=activity.channel_id,
+                recipient=ChannelAccount(
+                    id=activity.from_property.id,
+                    name=activity.from_property.name),
                 from_property=ChannelAccount(
-                    id=data['recipient']['id'],
-                    name=data['recipient']['name']),
+                    id=activity.recipient.id,
+                    name=activity.recipient.name),
                 text='Hello and welcome to the echo bot!')
-            connector.conversations.send_to_conversation(data['conversation']['id'], activity)
+            connector.conversations.send_to_conversation(activity.conversation.id, reply)
 
-    def __handle_message_activity(self, data):
+    def __handle_message_activity(self, activity):
         self.send_response(200)
         self.end_headers()
         credentials = MicrosoftAppCredentials(APP_ID, APP_PASSWORD)
-        connector = ConnectorClient(credentials, base_url=data['serviceUrl'])
-        activity = Activity(
+        connector = ConnectorClient(credentials, base_url=activity.service_url)
+        reply = Activity(
             type=ActivityTypes.message,
-            channel_id=data['channelId'],
-            recipient=ChannelAccount(id=data['from']['id']),
-            from_property=ChannelAccount(id=data['recipient']['id']),
-            text='You said: %s' % data['text'])
-        connector.conversations.send_to_conversation(data['conversation']['id'], activity)
+            channel_id=activity.channel_id,
+            recipient=ChannelAccount(id=activity.from_property.id),
+            from_property=ChannelAccount(id=activity.recipient.id),
+            text='You said: %s' % activity.text)
+        connector.conversations.send_to_conversation(activity.conversation.id, reply)
 
     def __handle_authentication(self, activity):
         loop = asyncio.new_event_loop()
@@ -64,15 +66,15 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
     def do_POST(self):
         body = self.rfile.read(int(self.headers['Content-Length']))
         data = json.loads(str(body, 'utf-8'))
-
         activity = Activity.deserialize(data)
+
         if not self.__handle_authentication(activity):
             return
 
-        if data['type'] == 'conversationUpdate':
-            self.__handle_conversation_update_activity(data)
-        elif data['type'] == 'message':
-            self.__handle_message_activity(data)
+        if activity.type == ActivityTypes.conversation_update.value:
+            self.__handle_conversation_update_activity(activity)
+        elif activity.type == ActivityTypes.message.value:
+            self.__handle_message_activity(activity)
         else:
             self.__unhandled_activity()
 
