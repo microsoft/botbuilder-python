@@ -8,6 +8,7 @@ from .constants import Constants
 class EmulatorValidation:
     APP_ID_CLAIM = "appid"
     VERSION_CLAIM = "ver"
+
     TO_BOT_FROM_EMULATOR_TOKEN_VALIDATION_PARAMETERS = VerifyOptions(
         issuer=[
             # Auth v3.1, 1.0 token
@@ -138,18 +139,6 @@ class EmulatorValidation:
                                 '"azp" claim is required on Emulator Token version "2.0".')
 
             app_id = app_authz_claim
-        elif version_claim == '3.0':
-            # The v3.0 Token types have been disallowed. Not Authorized.
-            raise Exception('Unauthorized. Emulator token version "3.0" is depricated.')
-        elif version_claim == '3.1' or version_claim == '3.2':
-            # The emulator for token versions "3.1" & "3.2" puts the AppId in the "Audiance" claim.
-            audiance_claim = identity.get_claim_value(Constants.AUDIENCE_CLAIM)
-            if not audiance_claim:
-                # No claim around AppID. Not Authorized.
-                raise Exception('Unauthorized. '
-                                '"aud" claim is required on Emulator Token version "3.x".')
-
-            app_id = audiance_claim
         else:
             # Unknown Version. Not Authorized.
             raise Exception('Unauthorized. Unknown Emulator Token version ', version_claim, '.')

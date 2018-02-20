@@ -12,7 +12,7 @@ class ChannelValidation:
     # TO BOT FROM CHANNEL: Token validation parameters when connecting to a bot
     #
     TO_BOT_FROM_CHANNEL_TOKEN_VALIDATION_PARAMETERS = VerifyOptions(
-        issuer=[Constants.BOT_FRAMEWORK_TOKEN_ISSUER],
+        issuer=[Constants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER],
         # Audience validation takes place manually in code.
         audience=None,
         clock_tolerance=5 * 60,
@@ -82,12 +82,12 @@ class ChannelValidation:
         # Async validation.
 
         # Look for the "aud" claim, but only if issued from the Bot Framework
-        if identity.get_claim_value(Constants.ISSUER_CLAIM) != Constants.BOT_FRAMEWORK_TOKEN_ISSUER:
-            # The relevant Audiance Claim MUST be present. Not Authorized.
-            raise Exception('Unauthorized. Audiance Claim MUST be present.')
+        if identity.get_claim_value(Constants.ISSUER_CLAIM) != Constants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER:
+            # The relevant Audience Claim MUST be present. Not Authorized.
+            raise Exception('Unauthorized. Audience Claim MUST be present.')
 
         # The AppId from the claim in the token must match the AppId specified by the developer.
-        # Note that the Bot Framwork uses the Audiance claim ("aud") to pass the AppID.
+        # Note that the Bot Framework uses the Audience claim ("aud") to pass the AppID.
         aud_claim = identity.get_claim_value(Constants.AUDIENCE_CLAIM)
         is_valid_app_id = await asyncio.ensure_future(credentials.is_valid_appid(aud_claim or ""))
         if not is_valid_app_id:
