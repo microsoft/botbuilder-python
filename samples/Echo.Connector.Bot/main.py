@@ -3,6 +3,7 @@
 
 import http.server
 import json
+import asyncio
 from microsoft.botbuilder.schema import (Activity, ActivityTypes, ChannelAccount)
 from microsoft.botframework.connector import ConnectorClient
 from microsoft.botframework.connector.auth import (MicrosoftAppCredentials,
@@ -12,6 +13,7 @@ APP_ID = ''
 APP_PASSWORD = ''
 
 class MyHandler(http.server.BaseHTTPRequestHandler):
+    credential_provider = SimpleCredentialProvider(APP_ID, APP_PASSWORD)
 
     def __handle_conversation_update_activity(self, data):
         self.send_response(202)
@@ -42,6 +44,19 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
             text='You said: %s' % data['text'])
         connector.conversations.send_to_conversation(data['conversation']['id'], activity)
 
+    def __handle_authentication(self, activity):
+        loop = asyncio.new_event_loop()
+        try:
+            loop.run_until_complete(JwtTokenValidation.assert_valid_activity(
+                activity, self.headers.get("Authorization"), MyHandler.credential_provider))
+            return True
+        except Exception as ex:
+            self.send_response(401, ex)
+            self.end_headers()
+            return False
+        finally:
+            loop.close()
+
     def __unhandled_activity(self):
         self.send_response(404)
         self.end_headers()
@@ -49,6 +64,11 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
     def do_POST(self):
         body = self.rfile.read(int(self.headers['Content-Length']))
         data = json.loads(str(body, 'utf-8'))
+
+        activity = Activity.deserialize(data)
+        if not self.__handle_authentication(activity):
+            return
+
         if data['type'] == 'conversationUpdate':
             self.__handle_conversation_update_activity(data)
         elif data['type'] == 'message':
