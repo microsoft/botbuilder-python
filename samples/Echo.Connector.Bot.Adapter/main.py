@@ -5,15 +5,13 @@ import http.server
 import json
 import asyncio
 from microsoft.botbuilder.schema import (Activity, ActivityTypes, ChannelAccount)
-from microsoft.botframework.connector import ConnectorClient
-from microsoft.botframework.connector.auth import (MicrosoftAppCredentials,
-                                                   JwtTokenValidation, SimpleCredentialProvider)
+
+from bot_framework_adapter import BotFrameworkAdapter
 
 APP_ID = ''
 APP_PASSWORD = ''
 
 class MyHandler(http.server.BaseHTTPRequestHandler):
-    credential_provider = SimpleCredentialProvider(APP_ID, APP_PASSWORD)
 
     @staticmethod
     def __create_reply_activity(request_activity, text):
@@ -33,50 +31,32 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
         self.send_response(202)
         self.end_headers()
         if activity.members_added[0].id != activity.recipient.id:
-            credentials = MicrosoftAppCredentials(APP_ID, APP_PASSWORD)
-            connector = ConnectorClient(credentials, base_url=activity.service_url)
-            reply = MyHandler.__create_reply_activity(activity, 'Hello and welcome to the echo bot!')
-            connector.conversations.send_to_conversation(reply.conversation.id, reply)
+            self._adapter.send([MyHandler.__create_reply_activity(activity, 'Hello and welcome to the echo bot!')])
 
     def __handle_message_activity(self, activity):
         self.send_response(200)
         self.end_headers()
-        credentials = MicrosoftAppCredentials(APP_ID, APP_PASSWORD)
-        connector = ConnectorClient(credentials, base_url=activity.service_url)
-        reply = MyHandler.__create_reply_activity(activity, 'You said: %s' % activity.text)
-        connector.conversations.send_to_conversation(reply.conversation.id, reply)
-
-    def __handle_authentication(self, activity):
-        loop = asyncio.new_event_loop()
-        try:
-            loop.run_until_complete(JwtTokenValidation.assert_valid_activity(
-                activity, self.headers.get("Authorization"), MyHandler.credential_provider))
-            return True
-        except Exception as ex:
-            self.send_response(401, ex)
-            self.end_headers()
-            return False
-        finally:
-            loop.close()
+        self._adapter.send([MyHandler.__create_reply_activity(activity, 'You said: %s' % activity.text)])
 
     def __unhandled_activity(self):
         self.send_response(404)
         self.end_headers()
 
-    def do_POST(self):
-        body = self.rfile.read(int(self.headers['Content-Length']))
-        data = json.loads(str(body, 'utf-8'))
-        activity = Activity.deserialize(data)
-
-        if not self.__handle_authentication(activity):
-            return
-
+    def receive(self, activity):
         if activity.type == ActivityTypes.conversation_update.value:
             self.__handle_conversation_update_activity(activity)
         elif activity.type == ActivityTypes.message.value:
             self.__handle_message_activity(activity)
         else:
             self.__unhandled_activity()
+
+    def do_POST(self):
+        body = self.rfile.read(int(self.headers['Content-Length']))
+        data = json.loads(str(body, 'utf-8'))
+        activity = Activity.deserialize(data)
+        self._adapter = BotFrameworkAdapter(APP_ID, APP_PASSWORD)
+        self._adapter.on_receive = self.receive
+        self._adapter.receive(self.headers.get("Authorization"), activity)
 
 try:
     SERVER = http.server.HTTPServer(('localhost', 9000), MyHandler)
