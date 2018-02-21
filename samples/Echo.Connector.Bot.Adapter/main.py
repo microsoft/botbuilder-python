@@ -7,6 +7,7 @@ import asyncio
 from microsoft.botbuilder.schema import (Activity, ActivityTypes, ChannelAccount)
 
 from bot_framework_adapter import BotFrameworkAdapter
+from receive_delegate import ReceiveDelegate
 
 APP_ID = ''
 APP_PASSWORD = ''
@@ -55,7 +56,7 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
         data = json.loads(str(body, 'utf-8'))
         activity = Activity.deserialize(data)
         self._adapter = BotFrameworkAdapter(APP_ID, APP_PASSWORD)
-        self._adapter.on_receive = self.receive
+        self._adapter.on_receive = ReceiveDelegate(self)
         self._adapter.receive(self.headers.get("Authorization"), activity)
 
 try:
