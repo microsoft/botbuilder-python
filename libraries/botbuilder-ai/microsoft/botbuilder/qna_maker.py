@@ -29,7 +29,7 @@ class QnAMaker:
 
     async def get_answers(question):        # HTTP call
         headers = {
-            "Ocp-Apim-Subscription-Key" : __api_management_header,
+            __api_management_header : self.__options.subscription_key
             "Content-Type" : __json_mime_type
         }
         
