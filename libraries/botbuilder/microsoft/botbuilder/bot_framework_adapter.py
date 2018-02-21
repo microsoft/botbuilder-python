@@ -9,7 +9,7 @@ from microsoft.botframework.connector.auth import (MicrosoftAppCredentials,
                                                    JwtTokenValidation, SimpleCredentialProvider)
 
 
-class BotFrameworkAdapter:
+class BotFrameworkAdapter(ActivityAdapter):
     
     def __init__(self, app_id: str, app_password: str):
         self._credentials = MicrosoftAppCredentials(app_id, app_password)

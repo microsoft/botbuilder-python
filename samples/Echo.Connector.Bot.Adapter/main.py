@@ -5,28 +5,22 @@ import http.server
 import json
 import asyncio
 from microsoft.botbuilder.schema import (Activity, ActivityTypes, ChannelAccount)
-
 from bot_framework_adapter import BotFrameworkAdapter
-from receive_delegate import ReceiveDelegate
 
 APP_ID = ''
 APP_PASSWORD = ''
 
 
-class MyHandler(http.server.BaseHTTPRequestHandler):
+class BotRequestHandler(http.server.BaseHTTPRequestHandler):
 
     @staticmethod
-    def __create_reply_activity(request_activity: Activity, text: str):
+    def __create_reply_activity(request_activity, text):
         return Activity(
             type=ActivityTypes.message,
             channel_id=request_activity.channel_id,
             conversation=request_activity.conversation,
-            recipient=ChannelAccount(
-                id=request_activity.from_property.id,
-                name=request_activity.from_property.name),
-            from_property=ChannelAccount(
-                id=request_activity.recipient.id,
-                name=request_activity.recipient.name),
+            recipient=request_activity.from_property,
+            from_property=request_activity.recipient,
             text=text,
             service_url=request_activity.service_url)
 
@@ -34,18 +28,18 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
         self.send_response(202)
         self.end_headers()
         if activity.members_added[0].id != activity.recipient.id:
-            self._adapter.send([MyHandler.__create_reply_activity(activity, 'Hello and welcome to the echo bot!')])
+            self._adapter.send([BotRequestHandler.__create_reply_activity(activity, 'Hello and welcome to the echo bot!')])
 
     def __handle_message_activity(self, activity: Activity):
         self.send_response(200)
         self.end_headers()
-        self._adapter.send([MyHandler.__create_reply_activity(activity, 'You said: %s' % activity.text)])
+        self._adapter.send([BotRequestHandler.__create_reply_activity(activity, 'You said: %s' % activity.text)])
 
     def __unhandled_activity(self):
         self.send_response(404)
         self.end_headers()
 
-    def receive(self, activity: Activity):
+    def on_receive(self, activity: Activity):
         if activity.type == ActivityTypes.conversation_update.value:
             self.__handle_conversation_update_activity(activity)
         elif activity.type == ActivityTypes.message.value:
@@ -58,12 +52,12 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
         data = json.loads(str(body, 'utf-8'))
         activity = Activity.deserialize(data)
         self._adapter = BotFrameworkAdapter(APP_ID, APP_PASSWORD)
-        self._adapter.on_receive = ReceiveDelegate(self)
+        self._adapter.on_receive = getattr(self, 'on_receive')
         self._adapter.receive(self.headers.get("Authorization"), activity)
 
 
 try:
-    SERVER = http.server.HTTPServer(('localhost', 9000), MyHandler)
+    SERVER = http.server.HTTPServer(('localhost', 9000), BotRequestHandler)
     print('Started http server')
     SERVER.serve_forever()
 except KeyboardInterrupt:
