@@ -49,11 +49,11 @@ class MiddlewareSet(object):
                     await asyncio.ensure_future(middleware['receive_activity'](context))
         return await asyncio.ensure_future(call_middleware(self._middleware[0:]))
 
-    async def post_activity(self, context, activities):
+    async def send_activity(self, context, activities):
         async def call_middleware(middleware_set):
             for middleware in middleware_set:
-                if hasattr(middleware, 'post_activity') and callable(middleware.post_activity):
-                    await asyncio.ensure_future(middleware.post_activity(context, activities))
-                elif 'post_activity' in middleware and callable(middleware['post_activity']):
-                    await asyncio.ensure_future(middleware['post_activity'](context, activities))
+                if hasattr(middleware, 'send_activity') and callable(middleware.send_activity):
+                    await asyncio.ensure_future(middleware.send_activity(context, activities))
+                elif 'send_activity' in middleware and callable(middleware['send_activity']):
+                    await asyncio.ensure_future(middleware['send_activity'](context, activities))
         return await asyncio.ensure_future(call_middleware(self._middleware[0:]))
