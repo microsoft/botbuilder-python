@@ -12,10 +12,11 @@ from receive_delegate import ReceiveDelegate
 APP_ID = ''
 APP_PASSWORD = ''
 
+
 class MyHandler(http.server.BaseHTTPRequestHandler):
 
     @staticmethod
-    def __create_reply_activity(request_activity, text):
+    def __create_reply_activity(request_activity: Activity, text: str):
         return Activity(
             type=ActivityTypes.message,
             channel_id=request_activity.channel_id,
@@ -26,15 +27,16 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
             from_property=ChannelAccount(
                 id=request_activity.recipient.id,
                 name=request_activity.recipient.name),
-            text=text)
+            text=text,
+            service_url=request_activity.service_url)
 
-    def __handle_conversation_update_activity(self, activity):
+    def __handle_conversation_update_activity(self, activity: Activity):
         self.send_response(202)
         self.end_headers()
         if activity.members_added[0].id != activity.recipient.id:
             self._adapter.send([MyHandler.__create_reply_activity(activity, 'Hello and welcome to the echo bot!')])
 
-    def __handle_message_activity(self, activity):
+    def __handle_message_activity(self, activity: Activity):
         self.send_response(200)
         self.end_headers()
         self._adapter.send([MyHandler.__create_reply_activity(activity, 'You said: %s' % activity.text)])
@@ -43,7 +45,7 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
         self.send_response(404)
         self.end_headers()
 
-    def receive(self, activity):
+    def receive(self, activity: Activity):
         if activity.type == ActivityTypes.conversation_update.value:
             self.__handle_conversation_update_activity(activity)
         elif activity.type == ActivityTypes.message.value:
@@ -58,6 +60,7 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
         self._adapter = BotFrameworkAdapter(APP_ID, APP_PASSWORD)
         self._adapter.on_receive = ReceiveDelegate(self)
         self._adapter.receive(self.headers.get("Authorization"), activity)
+
 
 try:
     SERVER = http.server.HTTPServer(('localhost', 9000), MyHandler)
