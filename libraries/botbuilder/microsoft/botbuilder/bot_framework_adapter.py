@@ -8,6 +8,7 @@ from microsoft.botframework.connector import ConnectorClient
 from microsoft.botframework.connector.auth import (MicrosoftAppCredentials,
                                                    JwtTokenValidation, SimpleCredentialProvider)
 
+from .activity_adapter import ActivityAdapter
 
 class BotFrameworkAdapter(ActivityAdapter):
     

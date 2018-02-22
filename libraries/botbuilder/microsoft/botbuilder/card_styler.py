@@ -2,11 +2,11 @@
 # Licensed under the MIT License.
 
 
-import enum
+from enum import Enum
 from copy import deepcopy
 
 
-class ContentTypes(enum):
+class ContentTypes(Enum):
     """List of content types for each card style."""
     adaptive_card = 'application/vnd.microsoft.card.adaptive'
     animation_card = 'application/vnd.microsoft.card.animation'
