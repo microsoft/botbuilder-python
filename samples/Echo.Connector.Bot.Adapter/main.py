@@ -5,7 +5,7 @@ import http.server
 import json
 import asyncio
 from microsoft.botbuilder.schema import (Activity, ActivityTypes, ChannelAccount)
-from bot_framework_adapter import BotFrameworkAdapter
+from microsoft.botbuilder import BotFrameworkAdapter
 
 APP_ID = ''
 APP_PASSWORD = ''
