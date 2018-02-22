@@ -12,45 +12,43 @@ from microsoft.botframework.connector.auth import (MicrosoftAppCredentials,
 APP_ID = ''
 APP_PASSWORD = ''
 
-class MyHandler(http.server.BaseHTTPRequestHandler):
-    credential_provider = SimpleCredentialProvider(APP_ID, APP_PASSWORD)
+
+class BotRequestHandler(http.server.BaseHTTPRequestHandler):
+
+    @staticmethod
+    def __create_reply_activity(request_activity, text):
+        return Activity(
+            type=ActivityTypes.message,
+            channel_id=request_activity.channel_id,
+            conversation=request_activity.conversation,
+            recipient=request_activity.from_property,
+            from_property=request_activity.recipient,
+            text=text,
+            service_url=request_activity.service_url)
 
     def __handle_conversation_update_activity(self, activity):
         self.send_response(202)
         self.end_headers()
         if activity.members_added[0].id != activity.recipient.id:
             credentials = MicrosoftAppCredentials(APP_ID, APP_PASSWORD)
-            connector = ConnectorClient(credentials, base_url=activity.service_url)
-            reply = Activity(
-                type=ActivityTypes.message,
-                channel_id=activity.channel_id,
-                recipient=ChannelAccount(
-                    id=activity.from_property.id,
-                    name=activity.from_property.name),
-                from_property=ChannelAccount(
-                    id=activity.recipient.id,
-                    name=activity.recipient.name),
-                text='Hello and welcome to the echo bot!')
-            connector.conversations.send_to_conversation(activity.conversation.id, reply)
+            reply = BotRequestHandler.__create_reply_activity(activity, 'Hello and welcome to the echo bot!')
+            connector = ConnectorClient(credentials, base_url=reply.service_url)
+            connector.conversations.send_to_conversation(reply.conversation.id, reply)
 
     def __handle_message_activity(self, activity):
         self.send_response(200)
         self.end_headers()
         credentials = MicrosoftAppCredentials(APP_ID, APP_PASSWORD)
         connector = ConnectorClient(credentials, base_url=activity.service_url)
-        reply = Activity(
-            type=ActivityTypes.message,
-            channel_id=activity.channel_id,
-            recipient=ChannelAccount(id=activity.from_property.id),
-            from_property=ChannelAccount(id=activity.recipient.id),
-            text='You said: %s' % activity.text)
-        connector.conversations.send_to_conversation(activity.conversation.id, reply)
+        reply = BotRequestHandler.__create_reply_activity(activity, 'You said: %s' % activity.text)
+        connector.conversations.send_to_conversation(reply.conversation.id, reply)
 
     def __handle_authentication(self, activity):
+        credential_provider = SimpleCredentialProvider(APP_ID, APP_PASSWORD)
         loop = asyncio.new_event_loop()
         try:
             loop.run_until_complete(JwtTokenValidation.assert_valid_activity(
-                activity, self.headers.get("Authorization"), MyHandler.credential_provider))
+                activity, self.headers.get("Authorization"), credential_provider))
             return True
         except Exception as ex:
             self.send_response(401, ex)
@@ -78,8 +76,9 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
         else:
             self.__unhandled_activity()
 
+
 try:
-    SERVER = http.server.HTTPServer(('localhost', 9000), MyHandler)
+    SERVER = http.server.HTTPServer(('localhost', 9000), BotRequestHandler)
     print('Started http server')
     SERVER.serve_forever()
 except KeyboardInterrupt:

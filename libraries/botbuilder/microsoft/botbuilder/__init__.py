@@ -6,21 +6,13 @@
 # --------------------------------------------------------------------------
 
 
-from .activity import ACTIVITY_TYPES, ATTACHMENT_LAYOUTS, END_OF_CONVERSATION_CODES, TEXT_FORMATS
 from .activity_adapter import ActivityAdapter
-from .card_styler import CardStyler, ContentTypes
 from .assertions import BotAssert
+from .bot_framework_adapter import BotFrameworkAdapter
+from .card_styler import CardStyler, ContentTypes
 
-__all__ = ['activity',
-           'activity_adapter',
-           'assertions',
-           'card_styler',
-           'ACTIVITY_TYPES',
-           'ATTACHMENT_LAYOUTS',
-           'END_OF_CONVERSATION_CODES',
-           'TEXT_FORMATS',
-           'ActivityAdapter',
+__all__ = ['ActivityAdapter',
+           'BotAssert',
+           'BotFrameworkAdapter',
            'CardStyler',
-           'ContentTypes',
-           'BotAssert']
-
+           'ContentTypes',]
