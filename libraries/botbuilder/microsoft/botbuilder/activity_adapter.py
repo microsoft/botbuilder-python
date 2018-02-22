@@ -2,6 +2,8 @@
 # Licensed under the MIT License.
 
 from abc import ABC, abstractmethod
+from typing import List
+from microsoft.botbuilder.schema import Activity
 
 
 class ActivityAdapter(ABC):
