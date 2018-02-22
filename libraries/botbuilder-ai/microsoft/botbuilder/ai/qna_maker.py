@@ -10,8 +10,12 @@ class QnAMaker:
 
     def __init__(self, options, http_client):
         
-        self.__http_client = _http_client or raise TypeError('HTTP Client failed')
-        self.__options = options or raise TypeError('Options config error')
+        self.__http_client = _http_client or False
+        if not self.__http_client:
+            raise TypeError('HTTP Client failed')
+        self.__options = options or False
+        if not self.__options:
+            raise TypeError('Options config error')
 
         self.__answerUrl = "%s%s/generateanswer" % (__qnaMakerServiceEndpoint,options.knowledge_base_id)
 
@@ -29,7 +33,7 @@ class QnAMaker:
 
     async def get_answers(question):        # HTTP call
         headers = {
-            __api_management_header : self.__options.subscription_key
+            __api_management_header : self.__options.subscription_key,
             "Content-Type" : __json_mime_type
         }
         
