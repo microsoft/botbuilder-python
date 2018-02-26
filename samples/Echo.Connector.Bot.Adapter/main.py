@@ -52,7 +52,7 @@ class BotRequestHandler(http.server.BaseHTTPRequestHandler):
         data = json.loads(str(body, 'utf-8'))
         activity = Activity.deserialize(data)
         self._adapter = BotFrameworkAdapter(APP_ID, APP_PASSWORD)
-        self._adapter.on_receive = getattr(self, 'on_receive')
+        self._adapter.on_receive = self.on_receive
         self._adapter.receive(self.headers.get("Authorization"), activity)
 
 
