@@ -4,6 +4,8 @@ import jwt
 from .jwt_token_extractor import JwtTokenExtractor
 from .verify_options import VerifyOptions
 from .constants import Constants
+from .credential_provider import CredentialProvider
+from .claims_identity import ClaimsIdentity
 
 class EmulatorValidation:
     APP_ID_CLAIM = "appid"
@@ -28,7 +30,7 @@ class EmulatorValidation:
     )
 
     @staticmethod
-    def is_token_from_emulator(auth_header):
+    def is_token_from_emulator(auth_header: str) -> bool:
         """ Determines if a given Auth header is from the Bot Framework Emulator
 
         :param auth_header: Bearer Token, in the 'Bearer [Long String]' Format.
@@ -79,7 +81,7 @@ class EmulatorValidation:
         return True
 
     @staticmethod
-    async def authenticate_emulator_token(auth_header, credentials):
+    async def authenticate_emulator_token(auth_header: str, credentials: CredentialProvider) -> ClaimsIdentity:
         """ Validate the incoming Auth Header
 
         Validate the incoming Auth Header as a token sent from the Bot Framework Service.

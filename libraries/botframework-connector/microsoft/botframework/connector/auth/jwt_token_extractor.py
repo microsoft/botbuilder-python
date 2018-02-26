@@ -5,25 +5,26 @@ import requests
 from jwt.algorithms import RSAAlgorithm
 import jwt
 from .claims_identity import ClaimsIdentity
+from .verify_options import VerifyOptions
 
 class JwtTokenExtractor:
     metadataCache = {}
 
-    def __init__(self, validationParams, metadata_url, allowedAlgorithms, validator=None):
+    def __init__(self, validationParams: VerifyOptions, metadata_url: str, allowedAlgorithms: list, validator=None):
         self.validation_parameters = validationParams
         self.validation_parameters.algorithms = allowedAlgorithms
         self.open_id_metadata = JwtTokenExtractor.get_open_id_metadata(metadata_url)
         self.validator = validator if validator is not None else lambda x: True
 
     @staticmethod
-    def get_open_id_metadata(metadata_url):
+    def get_open_id_metadata(metadata_url: str):
         metadata = JwtTokenExtractor.metadataCache.get(metadata_url, None)
         if metadata is None:
             metadata = _OpenIdMetadata(metadata_url)
             JwtTokenExtractor.metadataCache.setdefault(metadata_url, metadata)
         return metadata
 
-    async def get_identity_from_auth_header(self, auth_header):
+    async def get_identity_from_auth_header(self, auth_header: str) -> ClaimsIdentity:
         if not auth_header:
             return None
         parts = auth_header.split(" ")
@@ -31,7 +32,7 @@ class JwtTokenExtractor:
             return await self.get_identity(parts[0], parts[1])
         return None
 
-    async def get_identity(self, schema, parameter):
+    async def get_identity(self, schema: str, parameter: str) -> ClaimsIdentity:
         # No header in correct scheme or no token
         if schema != "Bearer" or not parameter:
             return None
@@ -45,7 +46,7 @@ class JwtTokenExtractor:
         except:
             raise
 
-    def _has_allowed_issuer(self, jwt_token):
+    def _has_allowed_issuer(self, jwt_token: str) -> bool:
         decoded = jwt.decode(jwt_token, verify=False)
         issuer = decoded.get("iss", None)
         if issuer in self.validation_parameters.issuer:
@@ -53,7 +54,7 @@ class JwtTokenExtractor:
 
         return issuer is self.validation_parameters.issuer
 
-    async def _validate_token(self, jwt_token):
+    async def _validate_token(self, jwt_token: str) -> ClaimsIdentity:
         headers = jwt.get_unverified_header(jwt_token)
 
         # Update the signing tokens from the last refresh
@@ -82,7 +83,7 @@ class _OpenIdMetadata:
         self.keys = []
         self.last_updated = datetime.min
 
-    async def get(self, key_id):
+    async def get(self, key_id: str):
         # If keys are more than 5 days old, refresh them
         if self.last_updated < (datetime.now() + timedelta(days=5)):
             await self._refresh()
@@ -97,7 +98,7 @@ class _OpenIdMetadata:
         self.last_updated = datetime.now()
         self.keys = response_keys.json()["keys"]
 
-    def _find(self, key_id):
+    def _find(self, key_id: str):
         if not self.keys:
             return None
         key = next(x for x in self.keys if x["kid"] == key_id)
