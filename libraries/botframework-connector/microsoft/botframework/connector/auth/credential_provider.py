@@ -7,7 +7,7 @@ class CredentialProvider:
     appid/password pair is valid.
     """
 
-    async def is_valid_appid(self, app_id):
+    async def is_valid_appid(self, app_id: str) -> bool:
         """Validate AppId.
 
         This method is async to enable custom implementations
@@ -18,7 +18,7 @@ class CredentialProvider:
         """
         raise NotImplementedError
 
-    async def get_app_password(self, app_id):
+    async def get_app_password(self, app_id: str) -> str:
         """Get the app password for a given bot appId, if it is not a valid appId, return Null
 
         This method is async to enable custom implementations
@@ -29,7 +29,7 @@ class CredentialProvider:
         """
         raise NotImplementedError
 
-    async def is_authentication_disabled(self):
+    async def is_authentication_disabled(self) -> bool:
         """Checks if bot authentication is disabled.
 
         Return true if bot authentication is disabled.
@@ -41,15 +41,15 @@ class CredentialProvider:
         raise NotImplementedError
 
 class SimpleCredentialProvider(CredentialProvider):
-    def __init__(self, app_id, password):
+    def __init__(self, app_id: str, password: str):
         self.app_id = app_id
         self.password = password
 
-    async def is_valid_appid(self, app_id):
+    async def is_valid_appid(self, app_id: str) -> bool:
         return self.app_id == app_id
 
-    async def get_app_password(self, app_id):
+    async def get_app_password(self, app_id: str) -> str:
         return self.password if self.app_id == app_id else None
 
-    async def is_authentication_disabled(self):
+    async def is_authentication_disabled(self) -> bool:
         return not self.app_id

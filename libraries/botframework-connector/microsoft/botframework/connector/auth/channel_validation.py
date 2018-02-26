@@ -3,6 +3,8 @@ import asyncio
 from .verify_options import VerifyOptions
 from .constants import Constants
 from .jwt_token_extractor import JwtTokenExtractor
+from .claims_identity import ClaimsIdentity
+from .credential_provider import CredentialProvider
 
 class ChannelValidation:
     # This claim is ONLY used in the Channel Validation, and not in the emulator validation
@@ -20,7 +22,7 @@ class ChannelValidation:
     )
 
     @staticmethod
-    async def authenticate_token_service_url(auth_header, credentials, service_url):
+    async def authenticate_token_service_url(auth_header: str, credentials: CredentialProvider, service_url: str) -> ClaimsIdentity:
         """ Validate the incoming Auth Header
 
         Validate the incoming Auth Header as a token sent from the Bot Framework Service.
@@ -47,7 +49,7 @@ class ChannelValidation:
         return identity
 
     @staticmethod
-    async def authenticate_token(auth_header, credentials):
+    async def authenticate_token(auth_header: str, credentials: CredentialProvider) -> ClaimsIdentity:
         """ Validate the incoming Auth Header
 
         Validate the incoming Auth Header as a token sent from the Bot Framework Service.

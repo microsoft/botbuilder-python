@@ -48,7 +48,7 @@ class MicrosoftAppCredentials(Authentication):
     trustedHostNames = {}
     cache = {}
 
-    def __init__(self, appId, password):
+    def __init__(self, appId: str, password: str):
         self.microsoft_app_id = appId
         self.microsoft_app_password = password
         self.token_cache_key = appId + '-cache'
@@ -90,7 +90,7 @@ class MicrosoftAppCredentials(Authentication):
         return oauth_response
 
     @staticmethod
-    def trust_service_url(service_url, expiration=None):
+    def trust_service_url(service_url: str, expiration=None):
         if expiration is None:
             expiration = datetime.now() + timedelta(days=1)
         host = urlparse(service_url).hostname
@@ -98,13 +98,13 @@ class MicrosoftAppCredentials(Authentication):
             MicrosoftAppCredentials.trustedHostNames[host] = expiration
 
     @staticmethod
-    def is_trusted_service(service_url):
+    def is_trusted_service(service_url: str) -> bool:
         host = urlparse(service_url).hostname
         if host is not None:
             return MicrosoftAppCredentials.is_trusted_url(host)
         return False
 
     @staticmethod
-    def is_trusted_url(host):
+    def is_trusted_url(host: str) -> bool:
         expiration = MicrosoftAppCredentials.trustedHostNames.get(host, datetime.min)
         return expiration > (datetime.now() - timedelta(minutes=5))
