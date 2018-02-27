@@ -3,9 +3,15 @@
 
 from setuptools import setup
 
+NAME = "botbuilder-core"
+VERSION = "4.0.0-a0"
+REQUIRES = [
+    "botbuilder-schema",
+    "botframework-connector"]
+
 setup(
-    name='botbuilder-core',
-    version='4.0.0-a0',
+    name=NAME,
+    version=VERSION,
     url='https://www.github.com/Microsoft/botbuilder-python',
     author='Microsoft',
     description='Microsoft Bot Framework Bot Builder',
@@ -13,6 +19,7 @@ setup(
     long_description='Microsoft Bot Framework Bot Builder SDK for Python.',
     license='MIT',
     packages=["botbuilder.core"],
+    install_requires=REQUIRES,
     classifiers=[
         'Programming Language :: Python',
         'Intended Audience :: Bot Developers',
