@@ -1,10 +1,10 @@
 import pytest
 
-from microsoft.botbuilder.schema import Activity
-from microsoft.botframework.connector.auth import JwtTokenValidation
-from microsoft.botframework.connector.auth import SimpleCredentialProvider
-from microsoft.botframework.connector.auth import EmulatorValidation
-from microsoft.botframework.connector.auth import ChannelValidation
+from botbuilder.schema import Activity
+from botframework.connector.auth import JwtTokenValidation
+from botframework.connector.auth import SimpleCredentialProvider
+from botframework.connector.auth import EmulatorValidation
+from botframework.connector.auth import ChannelValidation
 
 import asyncio
 

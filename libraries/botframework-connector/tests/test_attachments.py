@@ -14,9 +14,9 @@ import pytest
 from azure_devtools.scenario_tests import ReplayableTest
 
 import msrest
-from microsoft.botbuilder.schema import *
-from microsoft.botframework.connector import ConnectorClient
-from microsoft.botframework.connector.auth import MicrosoftAppCredentials
+from botbuilder.schema import *
+from botframework.connector import ConnectorClient
+from botframework.connector.auth import MicrosoftAppCredentials
 
 from .authentication_stub import MicrosoftTokenAuthenticationStub
 
