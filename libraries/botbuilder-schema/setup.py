@@ -12,8 +12,8 @@
 
 from setuptools import setup, find_packages
 
-NAME = "microsoft-botbuilder-schema"
-VERSION = "4"
+NAME = "botbuilder-schema"
+VERSION = "4.0.0-a0"
 
 # To install the library, run the following
 #
@@ -27,12 +27,12 @@ REQUIRES = ["msrest>=0.2.0"]
 setup(
     name=NAME,
     version=VERSION,
-    description="BotBouilderSchema",
+    description="BotBouilder Schema",
     author_email="",
     url="",
     keywords=["Swagger", "BotBouilderSchema"],
     install_requires=REQUIRES,
-    packages=find_packages(),
+    packages=["botbuilder.schema"],
     include_package_data=True,
     long_description="""\
     This package contains the schema classes for using the Bot Framework.

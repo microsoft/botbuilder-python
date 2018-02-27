@@ -9,4 +9,4 @@
 # regenerated.
 # --------------------------------------------------------------------------
 
-from microsoft.botbuilder.schema import *
+from botbuilder.schema import *

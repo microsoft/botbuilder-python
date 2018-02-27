@@ -1,3 +1,3 @@
 ../../libraries/botbuilder-schema/
 ../../libraries/botframework-connector/
-../../libraries/botbuilder/
+../../libraries/botbuilder-core/
