@@ -4,10 +4,10 @@
 import http.server
 import json
 import asyncio
-from microsoft.botbuilder.schema import (Activity, ActivityTypes, ChannelAccount)
-from microsoft.botframework.connector import ConnectorClient
-from microsoft.botframework.connector.auth import (MicrosoftAppCredentials,
-                                                   JwtTokenValidation, SimpleCredentialProvider)
+from botbuilder.schema import (Activity, ActivityTypes, ChannelAccount)
+from botframework.connector import ConnectorClient
+from botframework.connector.auth import (MicrosoftAppCredentials,
+                                         JwtTokenValidation, SimpleCredentialProvider)
 
 APP_ID = ''
 APP_PASSWORD = ''

@@ -12,7 +12,7 @@
 
 from setuptools import setup, find_packages
 
-NAME = "microsoft-botframework-connector"
+NAME = "botframework-connector"
 VERSION = "3"
 
 # To install the library, run the following
@@ -27,7 +27,7 @@ REQUIRES = [
     "requests>=2.8.1",
     "cryptography>=2.1.4",
     "PyJWT>=1.5.3",
-    "microsoft-botbuilder-schema"]
+    "botbuilder-schema"]
 
 setup(
     name=NAME,
@@ -37,7 +37,7 @@ setup(
     url="",
     keywords=["Swagger", "BotFrameworkConnector"],
     install_requires=REQUIRES,
-    packages=find_packages(),
+    packages=["botframework.connector", "botframework.connector.auth", "botframework.connector.operations", "botframework.connector.models"],
     include_package_data=True,
     long_description="""\
     The Bot Connector REST API allows your bot to send and receive messages to channels configured in the

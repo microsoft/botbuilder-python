@@ -3,10 +3,10 @@
 
 import asyncio
 from typing import List
-from microsoft.botbuilder.schema import Activity
-from microsoft.botframework.connector import ConnectorClient
-from microsoft.botframework.connector.auth import (MicrosoftAppCredentials,
-                                                   JwtTokenValidation, SimpleCredentialProvider)
+from botbuilder.schema import Activity
+from botframework.connector import ConnectorClient
+from botframework.connector.auth import (MicrosoftAppCredentials,
+                                         JwtTokenValidation, SimpleCredentialProvider)
 
 from .activity_adapter import ActivityAdapter
 
