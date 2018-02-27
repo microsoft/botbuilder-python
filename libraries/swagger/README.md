@@ -20,7 +20,9 @@ input-file: ConnectorAPI.json
 
 ### Connector API 3.0 - Python Settings
 
-These settings apply only when `--python` is specified on the command line. Use `--python-mode=update` if you already have a setup.py and just want to update the code itself.
+These settings apply only when `--python` is specified on the command line.
+DO NOT use `--basic-setup-py` as this will overwrite the existing setup.py files.
+If you upgrade autorest from npm you may need to run `autorest ---reset` before continuing.
 
 ``` yaml $(python)
 python:

@@ -1,15 +1,25 @@
-from setuptools import setup, find_packages
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
+from setuptools import setup
+
+NAME = "botbuilder-core"
+VERSION = "4.0.0.a0"
+REQUIRES = [
+    "botbuilder-schema>=4.0.0.a0",
+    "botframework-connector>=4.0.0.a0"]
 
 setup(
-    name='botbuilder-core',
-    version='4.0.0-a0',
+    name=NAME,
+    version=VERSION,
     url='https://www.github.com/Microsoft/botbuilder-python',
-    long_description='Microsoft Bot Framework Bot Builder SDK for Python. Build intelligent bots that scale.',
-    license='MIT',
     author='Microsoft',
-    author_email='bf-reports@microsoft.com',
     description='Microsoft Bot Framework Bot Builder',
+    keywords=["BotBuilderCore", "bots","ai", "botframework", "botbuilder"],
+    long_description='Microsoft Bot Framework Bot Builder SDK for Python.',
+    license='MIT',
     packages=["botbuilder.core"],
+    install_requires=REQUIRES,
     classifiers=[
         'Programming Language :: Python',
         'Intended Audience :: Bot Developers',
