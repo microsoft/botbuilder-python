@@ -4,13 +4,13 @@
 from setuptools import setup
 
 NAME = "botframework-connector"
-VERSION = "4.0.0-a0"
+VERSION = "4.0.0.a0"
 REQUIRES = [
     "msrest>=0.2.0",
     "requests>=2.8.1",
     "cryptography>=2.1.4",
     "PyJWT>=1.5.3",
-    "botbuilder-schema"]
+    "botbuilder-schema>=4.0.0.a0"]
 
 setup(
     name=NAME,
