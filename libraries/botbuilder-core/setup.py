@@ -21,8 +21,8 @@ setup(
     packages=["botbuilder.core"],
     install_requires=REQUIRES,
     classifiers=[
-        'Programming Language :: Python',
-        'Intended Audience :: Bot Developers',
+        'Programming Language :: Python :: 3.6',
+        'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent'
     ]
