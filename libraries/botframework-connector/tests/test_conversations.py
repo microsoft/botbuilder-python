@@ -11,9 +11,9 @@
 import pytest
 from azure_devtools.scenario_tests import ReplayableTest
 
-from microsoft.botbuilder.schema import *
-from microsoft.botframework.connector import ConnectorClient
-from microsoft.botframework.connector.auth import MicrosoftAppCredentials
+from botbuilder.schema import *
+from botframework.connector import ConnectorClient
+from botframework.connector.auth import MicrosoftAppCredentials
 
 from .authentication_stub import MicrosoftTokenAuthenticationStub
 
@@ -141,7 +141,7 @@ class ConversationTest(ReplayableTest):
             title='A static image',
             text='JPEG image',
             images=[
-                CardImage(url='https://docs.microsoft.com/en-us/bot-framework/media/designing-bots/core/dialogs-screens.png')
+                CardImage(url='https://docs.com/en-us/bot-framework/media/designing-bots/core/dialogs-screens.png')
             ])
 
         card2 = HeroCard(
@@ -158,8 +158,8 @@ class ConversationTest(ReplayableTest):
             from_property=ChannelAccount(id=BOT_ID),
             attachment_layout=AttachmentLayoutTypes.list,
             attachments=[
-                Attachment(content_type='application/vnd.microsoft.card.hero', content=card1),
-                Attachment(content_type='application/vnd.microsoft.card.hero', content=card2),
+                Attachment(content_type='application/vnd.card.hero', content=card1),
+                Attachment(content_type='application/vnd.card.hero', content=card2),
             ])
 
         connector = ConnectorClient(self.credentials, base_url=SERVICE_URL)
