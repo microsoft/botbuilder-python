@@ -23,6 +23,8 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
-        'Operating System :: OS Independent'
+        'Operating System :: OS Independent',
+        'Development Status :: 3 - Alpha',
+        'Topic :: Scientific/Engineering :: Artificial Intelligence',
     ]
 )
