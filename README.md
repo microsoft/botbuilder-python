@@ -1,5 +1,5 @@
 
-# Bot Builder SDK v4
+# Bot Builder SDK v4 (Python)
 
 [![Build Status](https://travis-ci.org/Microsoft/botbuilder-python.svg?branch=master)](https://travis-ci.org/Microsoft/botbuilder-python)
 
@@ -7,6 +7,12 @@ This repository contains code for the Python version of the [Microsoft Bot Build
 In addition to the Python SDK, Bot Builder supports creating bots in other popular programming languages like [.Net SDK](https://github.com/Microsoft/botbuilder-dotnet), [JavaScript](https://github.com/Microsoft/botbuilder-js), and [Java](https://github.com/Microsoft/botbuilder-java).
 
 To get started see the [wiki](https://github.com/Microsoft/botbuilder-python/wiki) for the v4 SDK.
+
+## Packages
+
+- [![PyPI version](https://badge.fury.io/py/botbuilder-core.svg)](https://badge.fury.io/py/botbuilder-core) botbuilder-core
+- [![PyPI version](https://badge.fury.io/py/botbuilder-schema.svg)](https://badge.fury.io/py/botbuilder-schema) botbuilder-schema
+- [![PyPI version](https://badge.fury.io/py/botframework-connector.svg)](https://badge.fury.io/py/botframework-connector) botframework-connecrtor
 
 ## Contributing
 
