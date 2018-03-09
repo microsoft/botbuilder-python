@@ -1,3 +1,3 @@
-pip install -e .\libraries\botbuilder-schema
-pip install -e .\libraries\botframework-connector
-pip install -e .\libraries\botbuilder-core
+pip install botbuilder-schema
+pip install botframework-connector
+pip install botbuilder-core
