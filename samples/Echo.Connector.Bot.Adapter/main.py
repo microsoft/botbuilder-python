@@ -24,28 +24,28 @@ class BotRequestHandler(http.server.BaseHTTPRequestHandler):
             text=text,
             service_url=request_activity.service_url)
 
-    def __handle_conversation_update_activity(self, activity: Activity):
+    async def __handle_conversation_update_activity(self, activity: Activity):
         self.send_response(202)
         self.end_headers()
         if activity.members_added[0].id != activity.recipient.id:
-            self._adapter.send([BotRequestHandler.__create_reply_activity(activity, 'Hello and welcome to the echo bot!')])
+            await self._adapter.send([BotRequestHandler.__create_reply_activity(activity, 'Hello and welcome to the echo bot!')])
 
-    def __handle_message_activity(self, activity: Activity):
+    async def __handle_message_activity(self, activity: Activity):
         self.send_response(200)
         self.end_headers()
-        self._adapter.send([BotRequestHandler.__create_reply_activity(activity, 'You said: %s' % activity.text)])
+        await self._adapter.send([BotRequestHandler.__create_reply_activity(activity, 'You said: %s' % activity.text)])
 
-    def __unhandled_activity(self):
+    async def __unhandled_activity(self):
         self.send_response(404)
         self.end_headers()
 
-    def on_receive(self, activity: Activity):
+    async def on_receive(self, activity: Activity):
         if activity.type == ActivityTypes.conversation_update.value:
-            self.__handle_conversation_update_activity(activity)
+            await self.__handle_conversation_update_activity(activity)
         elif activity.type == ActivityTypes.message.value:
-            self.__handle_message_activity(activity)
+            await self.__handle_message_activity(activity)
         else:
-            self.__unhandled_activity()
+            await self.__unhandled_activity()
 
     def do_POST(self):
         body = self.rfile.read(int(self.headers['Content-Length']))
@@ -53,12 +53,13 @@ class BotRequestHandler(http.server.BaseHTTPRequestHandler):
         activity = Activity.deserialize(data)
         self._adapter = BotFrameworkAdapter(APP_ID, APP_PASSWORD)
         self._adapter.on_receive = self.on_receive
-        self._adapter.receive(self.headers.get("Authorization"), activity)
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(self._adapter.receive(self.headers.get("Authorization"), activity))
 
 
 try:
     SERVER = http.server.HTTPServer(('localhost', 9000), BotRequestHandler)
-    print('Started http server')
+    print('Started http server on port %s.' % SERVER.server_port)
     SERVER.serve_forever()
 except KeyboardInterrupt:
     print('^C received, shutting down server')

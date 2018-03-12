@@ -17,17 +17,16 @@ class BotFrameworkAdapter(ActivityAdapter):
         self._credential_provider = SimpleCredentialProvider(app_id, app_password)
         self.on_receive = None
 
-    def send(self, activities: List[Activity]):
+    async def send(self, activities: List[Activity]):
         for activity in activities:
             connector = ConnectorClient(self._credentials, base_url=activity.service_url)
-            connector.conversations.send_to_conversation(activity.conversation.id, activity)
+            await connector.conversations.send_to_conversation_async(activity.conversation.id, activity)
 
-    def receive(self, auth_header: str, activity: Activity):
-        loop = asyncio.new_event_loop()
+    async def receive(self, auth_header: str, activity: Activity):
         try:
-            loop.run_until_complete(JwtTokenValidation.assert_valid_activity(
-                activity, auth_header, self._credential_provider))
-        finally:
-            loop.close()
-        if self.on_receive is not None:
-            self.on_receive(activity)
+            await JwtTokenValidation.assert_valid_activity(activity, auth_header, self._credential_provider)
+        except BaseException as e:
+            raise e
+        else:
+            if self.on_receive is not None:
+                await self.on_receive(activity)
