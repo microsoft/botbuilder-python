@@ -30,8 +30,8 @@ class MicrosoftPayMethodData(Model):
         'supported_types': {'key': 'supportedTypes', 'type': '[str]'},
     }
 
-    def __init__(self, mechant_id=None, supported_networks=None, supported_types=None):
-        super(MicrosoftPayMethodData, self).__init__()
-        self.mechant_id = mechant_id
-        self.supported_networks = supported_networks
-        self.supported_types = supported_types
+    def __init__(self, **kwargs):
+        super(MicrosoftPayMethodData, self).__init__(**kwargs)
+        self.mechant_id = kwargs.get('mechant_id', None)
+        self.supported_networks = kwargs.get('supported_networks', None)
+        self.supported_types = kwargs.get('supported_types', None)

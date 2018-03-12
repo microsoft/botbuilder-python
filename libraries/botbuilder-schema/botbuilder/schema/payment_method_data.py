@@ -29,7 +29,7 @@ class PaymentMethodData(Model):
         'data': {'key': 'data', 'type': 'object'},
     }
 
-    def __init__(self, supported_methods=None, data=None):
-        super(PaymentMethodData, self).__init__()
-        self.supported_methods = supported_methods
-        self.data = data
+    def __init__(self, **kwargs):
+        super(PaymentMethodData, self).__init__(**kwargs)
+        self.supported_methods = kwargs.get('supported_methods', None)
+        self.data = kwargs.get('data', None)

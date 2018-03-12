@@ -43,11 +43,11 @@ class CardAction(Model):
         'value': {'key': 'value', 'type': 'object'},
     }
 
-    def __init__(self, type=None, title=None, image=None, text=None, display_text=None, value=None):
-        super(CardAction, self).__init__()
-        self.type = type
-        self.title = title
-        self.image = image
-        self.text = text
-        self.display_text = display_text
-        self.value = value
+    def __init__(self, **kwargs):
+        super(CardAction, self).__init__(**kwargs)
+        self.type = kwargs.get('type', None)
+        self.title = kwargs.get('title', None)
+        self.image = kwargs.get('image', None)
+        self.text = kwargs.get('text', None)
+        self.display_text = kwargs.get('display_text', None)
+        self.value = kwargs.get('value', None)

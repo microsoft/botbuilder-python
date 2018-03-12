@@ -24,6 +24,6 @@ class MessageReaction(Model):
         'type': {'key': 'type', 'type': 'str'},
     }
 
-    def __init__(self, type=None):
-        super(MessageReaction, self).__init__()
-        self.type = type
+    def __init__(self, **kwargs):
+        super(MessageReaction, self).__init__(**kwargs)
+        self.type = kwargs.get('type', None)

@@ -26,7 +26,7 @@ class TextHighlight(Model):
         'occurence': {'key': 'occurence', 'type': 'int'},
     }
 
-    def __init__(self, text=None, occurence=None):
-        super(TextHighlight, self).__init__()
-        self.text = text
-        self.occurence = occurence
+    def __init__(self, **kwargs):
+        super(TextHighlight, self).__init__(**kwargs)
+        self.text = kwargs.get('text', None)
+        self.occurence = kwargs.get('occurence', None)

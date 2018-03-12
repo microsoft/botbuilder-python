@@ -26,7 +26,7 @@ class AttachmentView(Model):
         'size': {'key': 'size', 'type': 'int'},
     }
 
-    def __init__(self, view_id=None, size=None):
-        super(AttachmentView, self).__init__()
-        self.view_id = view_id
-        self.size = size
+    def __init__(self, **kwargs):
+        super(AttachmentView, self).__init__(**kwargs)
+        self.view_id = kwargs.get('view_id', None)
+        self.size = kwargs.get('size', None)

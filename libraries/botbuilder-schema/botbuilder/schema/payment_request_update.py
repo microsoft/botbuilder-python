@@ -32,9 +32,9 @@ class PaymentRequestUpdate(Model):
         'shipping_option': {'key': 'shippingOption', 'type': 'str'},
     }
 
-    def __init__(self, id=None, details=None, shipping_address=None, shipping_option=None):
-        super(PaymentRequestUpdate, self).__init__()
-        self.id = id
-        self.details = details
-        self.shipping_address = shipping_address
-        self.shipping_option = shipping_option
+    def __init__(self, **kwargs):
+        super(PaymentRequestUpdate, self).__init__(**kwargs)
+        self.id = kwargs.get('id', None)
+        self.details = kwargs.get('details', None)
+        self.shipping_address = kwargs.get('shipping_address', None)
+        self.shipping_option = kwargs.get('shipping_option', None)

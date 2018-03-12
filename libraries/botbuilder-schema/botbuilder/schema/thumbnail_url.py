@@ -26,7 +26,7 @@ class ThumbnailUrl(Model):
         'alt': {'key': 'alt', 'type': 'str'},
     }
 
-    def __init__(self, url=None, alt=None):
-        super(ThumbnailUrl, self).__init__()
-        self.url = url
-        self.alt = alt
+    def __init__(self, **kwargs):
+        super(ThumbnailUrl, self).__init__(**kwargs)
+        self.url = kwargs.get('url', None)
+        self.alt = kwargs.get('alt', None)

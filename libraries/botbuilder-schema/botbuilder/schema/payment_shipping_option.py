@@ -33,9 +33,9 @@ class PaymentShippingOption(Model):
         'selected': {'key': 'selected', 'type': 'bool'},
     }
 
-    def __init__(self, id=None, label=None, amount=None, selected=None):
-        super(PaymentShippingOption, self).__init__()
-        self.id = id
-        self.label = label
-        self.amount = amount
-        self.selected = selected
+    def __init__(self, **kwargs):
+        super(PaymentShippingOption, self).__init__(**kwargs)
+        self.id = kwargs.get('id', None)
+        self.label = kwargs.get('label', None)
+        self.amount = kwargs.get('amount', None)
+        self.selected = kwargs.get('selected', None)

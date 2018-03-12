@@ -27,7 +27,7 @@ class MediaUrl(Model):
         'profile': {'key': 'profile', 'type': 'str'},
     }
 
-    def __init__(self, url=None, profile=None):
-        super(MediaUrl, self).__init__()
-        self.url = url
-        self.profile = profile
+    def __init__(self, **kwargs):
+        super(MediaUrl, self).__init__(**kwargs)
+        self.url = kwargs.get('url', None)
+        self.profile = kwargs.get('profile', None)

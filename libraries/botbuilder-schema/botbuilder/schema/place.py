@@ -38,10 +38,10 @@ class Place(Model):
         'name': {'key': 'name', 'type': 'str'},
     }
 
-    def __init__(self, address=None, geo=None, has_map=None, type=None, name=None):
-        super(Place, self).__init__()
-        self.address = address
-        self.geo = geo
-        self.has_map = has_map
-        self.type = type
-        self.name = name
+    def __init__(self, **kwargs):
+        super(Place, self).__init__(**kwargs)
+        self.address = kwargs.get('address', None)
+        self.geo = kwargs.get('geo', None)
+        self.has_map = kwargs.get('has_map', None)
+        self.type = kwargs.get('type', None)
+        self.name = kwargs.get('name', None)

@@ -12,7 +12,7 @@
 from enum import Enum
 
 
-class ActivityTypes(Enum):
+class ActivityTypes(str, Enum):
 
     message = "message"
     contact_relation_update = "contactRelationUpdate"
@@ -30,33 +30,33 @@ class ActivityTypes(Enum):
     suggestion = "suggestion"
 
 
-class TextFormatTypes(Enum):
+class TextFormatTypes(str, Enum):
 
     markdown = "markdown"
     plain = "plain"
     xml = "xml"
 
 
-class AttachmentLayoutTypes(Enum):
+class AttachmentLayoutTypes(str, Enum):
 
     list = "list"
     carousel = "carousel"
 
 
-class MessageReactionTypes(Enum):
+class MessageReactionTypes(str, Enum):
 
     like = "like"
     plus_one = "plusOne"
 
 
-class InputHints(Enum):
+class InputHints(str, Enum):
 
     accepting_input = "acceptingInput"
     ignoring_input = "ignoringInput"
     expecting_input = "expectingInput"
 
 
-class ActionTypes(Enum):
+class ActionTypes(str, Enum):
 
     open_url = "openUrl"
     im_back = "imBack"
@@ -71,7 +71,7 @@ class ActionTypes(Enum):
     message_back = "messageBack"
 
 
-class EndOfConversationCodes(Enum):
+class EndOfConversationCodes(str, Enum):
 
     unknown = "unknown"
     completed_successfully = "completedSuccessfully"
@@ -81,19 +81,19 @@ class EndOfConversationCodes(Enum):
     channel_failed = "channelFailed"
 
 
-class ContactRelationUpdateActionTypes(Enum):
+class ContactRelationUpdateActionTypes(str, Enum):
 
     add = "add"
     remove = "remove"
 
 
-class InstallationUpdateActionTypes(Enum):
+class InstallationUpdateActionTypes(str, Enum):
 
     add = "add"
     remove = "remove"
 
 
-class ActivityImportance(Enum):
+class ActivityImportance(str, Enum):
 
     low = "low"
     normal = "normal"

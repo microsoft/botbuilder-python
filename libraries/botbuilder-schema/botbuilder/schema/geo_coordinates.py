@@ -38,10 +38,10 @@ class GeoCoordinates(Model):
         'name': {'key': 'name', 'type': 'str'},
     }
 
-    def __init__(self, elevation=None, latitude=None, longitude=None, type=None, name=None):
-        super(GeoCoordinates, self).__init__()
-        self.elevation = elevation
-        self.latitude = latitude
-        self.longitude = longitude
-        self.type = type
-        self.name = name
+    def __init__(self, **kwargs):
+        super(GeoCoordinates, self).__init__(**kwargs)
+        self.elevation = kwargs.get('elevation', None)
+        self.latitude = kwargs.get('latitude', None)
+        self.longitude = kwargs.get('longitude', None)
+        self.type = kwargs.get('type', None)
+        self.name = kwargs.get('name', None)

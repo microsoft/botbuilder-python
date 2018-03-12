@@ -30,8 +30,8 @@ class ConversationResourceResponse(Model):
         'id': {'key': 'id', 'type': 'str'},
     }
 
-    def __init__(self, activity_id=None, service_url=None, id=None):
-        super(ConversationResourceResponse, self).__init__()
-        self.activity_id = activity_id
-        self.service_url = service_url
-        self.id = id
+    def __init__(self, **kwargs):
+        super(ConversationResourceResponse, self).__init__(**kwargs)
+        self.activity_id = kwargs.get('activity_id', None)
+        self.service_url = kwargs.get('service_url', None)
+        self.id = kwargs.get('id', None)

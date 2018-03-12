@@ -40,9 +40,9 @@ class PaymentDetailsModifier(Model):
         'data': {'key': 'data', 'type': 'object'},
     }
 
-    def __init__(self, supported_methods=None, total=None, additional_display_items=None, data=None):
-        super(PaymentDetailsModifier, self).__init__()
-        self.supported_methods = supported_methods
-        self.total = total
-        self.additional_display_items = additional_display_items
-        self.data = data
+    def __init__(self, **kwargs):
+        super(PaymentDetailsModifier, self).__init__(**kwargs)
+        self.supported_methods = kwargs.get('supported_methods', None)
+        self.total = kwargs.get('total', None)
+        self.additional_display_items = kwargs.get('additional_display_items', None)
+        self.data = kwargs.get('data', None)

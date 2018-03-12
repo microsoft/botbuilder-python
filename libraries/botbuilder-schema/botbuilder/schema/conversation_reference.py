@@ -39,11 +39,11 @@ class ConversationReference(Model):
         'service_url': {'key': 'serviceUrl', 'type': 'str'},
     }
 
-    def __init__(self, activity_id=None, user=None, bot=None, conversation=None, channel_id=None, service_url=None):
-        super(ConversationReference, self).__init__()
-        self.activity_id = activity_id
-        self.user = user
-        self.bot = bot
-        self.conversation = conversation
-        self.channel_id = channel_id
-        self.service_url = service_url
+    def __init__(self, **kwargs):
+        super(ConversationReference, self).__init__(**kwargs)
+        self.activity_id = kwargs.get('activity_id', None)
+        self.user = kwargs.get('user', None)
+        self.bot = kwargs.get('bot', None)
+        self.conversation = kwargs.get('conversation', None)
+        self.channel_id = kwargs.get('channel_id', None)
+        self.service_url = kwargs.get('service_url', None)

@@ -1,7 +1,7 @@
 @echo off
 
 rd /s /q generated
-call autorest README.md --python
+call autorest README.md --python --use="git+https://github.com/Azure/autorest.python#async"
 
 rd /s /q ..\botbuilder-schema\botbuilder\schema
 rd /s /q ..\botframework-connector\botframework\connector\operations

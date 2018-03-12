@@ -51,11 +51,11 @@ class PaymentResponse(Model):
         'payer_phone': {'key': 'payerPhone', 'type': 'str'},
     }
 
-    def __init__(self, method_name=None, details=None, shipping_address=None, shipping_option=None, payer_email=None, payer_phone=None):
-        super(PaymentResponse, self).__init__()
-        self.method_name = method_name
-        self.details = details
-        self.shipping_address = shipping_address
-        self.shipping_option = shipping_option
-        self.payer_email = payer_email
-        self.payer_phone = payer_phone
+    def __init__(self, **kwargs):
+        super(PaymentResponse, self).__init__(**kwargs)
+        self.method_name = kwargs.get('method_name', None)
+        self.details = kwargs.get('details', None)
+        self.shipping_address = kwargs.get('shipping_address', None)
+        self.shipping_option = kwargs.get('shipping_option', None)
+        self.payer_email = kwargs.get('payer_email', None)
+        self.payer_phone = kwargs.get('payer_phone', None)

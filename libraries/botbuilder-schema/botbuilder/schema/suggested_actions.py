@@ -28,7 +28,7 @@ class SuggestedActions(Model):
         'actions': {'key': 'actions', 'type': '[CardAction]'},
     }
 
-    def __init__(self, to=None, actions=None):
-        super(SuggestedActions, self).__init__()
-        self.to = to
-        self.actions = actions
+    def __init__(self, **kwargs):
+        super(SuggestedActions, self).__init__(**kwargs)
+        self.to = kwargs.get('to', None)
+        self.actions = kwargs.get('actions', None)

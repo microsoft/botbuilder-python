@@ -37,10 +37,10 @@ class PaymentRequest(Model):
         'expires': {'key': 'expires', 'type': 'str'},
     }
 
-    def __init__(self, id=None, method_data=None, details=None, options=None, expires=None):
-        super(PaymentRequest, self).__init__()
-        self.id = id
-        self.method_data = method_data
-        self.details = details
-        self.options = options
-        self.expires = expires
+    def __init__(self, **kwargs):
+        super(PaymentRequest, self).__init__(**kwargs)
+        self.id = kwargs.get('id', None)
+        self.method_data = kwargs.get('method_data', None)
+        self.details = kwargs.get('details', None)
+        self.options = kwargs.get('options', None)
+        self.expires = kwargs.get('expires', None)

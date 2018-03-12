@@ -32,9 +32,9 @@ class AttachmentData(Model):
         'thumbnail_base64': {'key': 'thumbnailBase64', 'type': 'bytearray'},
     }
 
-    def __init__(self, type=None, name=None, original_base64=None, thumbnail_base64=None):
-        super(AttachmentData, self).__init__()
-        self.type = type
-        self.name = name
-        self.original_base64 = original_base64
-        self.thumbnail_base64 = thumbnail_base64
+    def __init__(self, **kwargs):
+        super(AttachmentData, self).__init__(**kwargs)
+        self.type = kwargs.get('type', None)
+        self.name = kwargs.get('name', None)
+        self.original_base64 = kwargs.get('original_base64', None)
+        self.thumbnail_base64 = kwargs.get('thumbnail_base64', None)

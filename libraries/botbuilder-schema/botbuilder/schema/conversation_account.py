@@ -30,8 +30,8 @@ class ConversationAccount(Model):
         'name': {'key': 'name', 'type': 'str'},
     }
 
-    def __init__(self, is_group=None, id=None, name=None):
-        super(ConversationAccount, self).__init__()
-        self.is_group = is_group
-        self.id = id
-        self.name = name
+    def __init__(self, **kwargs):
+        super(ConversationAccount, self).__init__(**kwargs)
+        self.is_group = kwargs.get('is_group', None)
+        self.id = kwargs.get('id', None)
+        self.name = kwargs.get('name', None)

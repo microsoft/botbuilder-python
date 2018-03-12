@@ -26,7 +26,7 @@ class SigninCard(Model):
         'buttons': {'key': 'buttons', 'type': '[CardAction]'},
     }
 
-    def __init__(self, text=None, buttons=None):
-        super(SigninCard, self).__init__()
-        self.text = text
-        self.buttons = buttons
+    def __init__(self, **kwargs):
+        super(SigninCard, self).__init__(**kwargs)
+        self.text = kwargs.get('text', None)
+        self.buttons = kwargs.get('buttons', None)

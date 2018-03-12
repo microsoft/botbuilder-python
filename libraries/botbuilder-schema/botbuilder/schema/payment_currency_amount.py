@@ -29,8 +29,8 @@ class PaymentCurrencyAmount(Model):
         'currency_system': {'key': 'currencySystem', 'type': 'str'},
     }
 
-    def __init__(self, currency=None, value=None, currency_system=None):
-        super(PaymentCurrencyAmount, self).__init__()
-        self.currency = currency
-        self.value = value
-        self.currency_system = currency_system
+    def __init__(self, **kwargs):
+        super(PaymentCurrencyAmount, self).__init__(**kwargs)
+        self.currency = kwargs.get('currency', None)
+        self.value = kwargs.get('value', None)
+        self.currency_system = kwargs.get('currency_system', None)

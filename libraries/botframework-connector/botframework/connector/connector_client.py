@@ -12,8 +12,8 @@
 from msrest.service_client import ServiceClient
 from msrest import Configuration, Serializer, Deserializer
 from .version import VERSION
-from .operations.attachments_operations import AttachmentsOperations
-from .operations.conversations_operations import ConversationsOperations
+from .operations import AttachmentsOperations
+from .operations import ConversationsOperations
 from . import models
 
 

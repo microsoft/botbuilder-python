@@ -56,16 +56,16 @@ class VideoCard(Model):
         'value': {'key': 'value', 'type': 'object'},
     }
 
-    def __init__(self, title=None, subtitle=None, text=None, image=None, media=None, buttons=None, shareable=None, autoloop=None, autostart=None, aspect=None, value=None):
-        super(VideoCard, self).__init__()
-        self.title = title
-        self.subtitle = subtitle
-        self.text = text
-        self.image = image
-        self.media = media
-        self.buttons = buttons
-        self.shareable = shareable
-        self.autoloop = autoloop
-        self.autostart = autostart
-        self.aspect = aspect
-        self.value = value
+    def __init__(self, **kwargs):
+        super(VideoCard, self).__init__(**kwargs)
+        self.title = kwargs.get('title', None)
+        self.subtitle = kwargs.get('subtitle', None)
+        self.text = kwargs.get('text', None)
+        self.image = kwargs.get('image', None)
+        self.media = kwargs.get('media', None)
+        self.buttons = kwargs.get('buttons', None)
+        self.shareable = kwargs.get('shareable', None)
+        self.autoloop = kwargs.get('autoloop', None)
+        self.autostart = kwargs.get('autostart', None)
+        self.aspect = kwargs.get('aspect', None)
+        self.value = kwargs.get('value', None)
