@@ -1,3 +1,5 @@
+git+https://github.com/Azure/msrest-for-python@async2
+git+https://github.com/Azure/msrestazure-for-python@async
 ../../libraries/botbuilder-schema/
 ../../libraries/botframework-connector/
 ../../libraries/botbuilder-core/
