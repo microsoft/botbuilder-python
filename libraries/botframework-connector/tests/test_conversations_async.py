@@ -74,7 +74,7 @@ class TestAsyncConversation(ReplayableTest):
 
         with pytest.raises(ErrorResponseException) as excinfo:
             connector = ConnectorClient(self.credentials, base_url=SERVICE_URL)
-            self.loop.run_until_complete(connector.conversations.create_conversation(create_conversation))
+            self.loop.run_until_complete(connector.conversations.create_conversation_async(create_conversation))
 
         assert excinfo.value.error.error.code == 'ServiceError'
         assert ('Invalid userId' in str(excinfo.value.error.error.message))
@@ -91,7 +91,7 @@ class TestAsyncConversation(ReplayableTest):
 
         with pytest.raises(ErrorResponseException) as excinfo:
             connector = ConnectorClient(self.credentials, base_url=SERVICE_URL)
-            self.loop.run_until_complete(connector.conversations.create_conversation(create_conversation))
+            self.loop.run_until_complete(connector.conversations.create_conversation_async(create_conversation))
 
         assert excinfo.value.error.error.code == 'BadArgument'
         assert ('Conversations' in str(excinfo.value.error.error.message))
@@ -111,7 +111,7 @@ class TestAsyncConversation(ReplayableTest):
 
         with pytest.raises(ErrorResponseException) as excinfo:
             connector = ConnectorClient(self.credentials, base_url=SERVICE_URL)
-            self.loop.run_until_complete(connector.conversations.create_conversation(create_conversation))
+            self.loop.run_until_complete(connector.conversations.create_conversation_async(create_conversation))
 
         assert excinfo.value.error.error.code == 'BadArgument'
         assert ('Bots cannot IM other bots' in str(excinfo.value.error.error.message))
@@ -194,7 +194,7 @@ class TestAsyncConversation(ReplayableTest):
     def test_conversations_get_conversation_members_invalid_id_fails(self):
         with pytest.raises(ErrorResponseException) as excinfo:
             connector = ConnectorClient(self.credentials, base_url=SERVICE_URL)
-            members = self.loop.run_until_complete(connector.conversations.get_conversation_members('INVALID_ID'))
+            members = self.loop.run_until_complete(connector.conversations.get_conversation_members_async('INVALID_ID'))
 
         assert excinfo.value.error.error.code == 'ServiceError'
         assert ('cannot send messages to this id' in str(excinfo.value.error.error.message)
