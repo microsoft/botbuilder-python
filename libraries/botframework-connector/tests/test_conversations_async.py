@@ -1,3 +1,4 @@
+import asyncio
 import pytest
 from azure_devtools.scenario_tests import ReplayableTest
 
@@ -17,10 +18,10 @@ CONVERSATION_ID = 'B21UTEF8S:T03CWQ0QB:D2369CT7C'
 
 def get_auth_token():
     try:
-        from .app_creds_real import MICROSOFT_APP_ID, MICROSOFT_APP_PASSWORD
-        # Define a "app_creds_real.py" file with your bot credentials as follows:
-        # MICROSOFT_APP_ID = '...'
-        # MICROSOFT_APP_PASSWORD = '...'
+        from .app_creds_real import MICROSOFT_APP_PASSWORD, MICROSOFT_APP_ID
+        # # Define a "app_creds_real.py" file with your bot credentials as follows:
+        # # MICROSOFT_APP_ID = '...'
+        # # MICROSOFT_APP_PASSWORD = '...'
         return MicrosoftAppCredentials(
             MICROSOFT_APP_ID,
             MICROSOFT_APP_PASSWORD).get_access_token()
@@ -28,16 +29,12 @@ def get_auth_token():
         return 'STUB_ACCESS_TOKEN'
 
 
-auth_token = get_auth_token()
+class TestAsyncConversation(ReplayableTest):
 
-
-class ConversationTest(ReplayableTest):
     def __init__(self, method_name):
-        super(ConversationTest, self).__init__(method_name)
-
-    @property
-    def credentials(self):
-        return MicrosoftTokenAuthenticationStub(auth_token)
+        super(TestAsyncConversation, self).__init__(method_name)
+        self.loop = asyncio.get_event_loop()
+        self.credentials = MicrosoftTokenAuthenticationStub(get_auth_token())
 
     def test_conversations_create_conversation(self):
         to = ChannelAccount(id=RECIPIENT_ID)
@@ -50,11 +47,18 @@ class ConversationTest(ReplayableTest):
                 from_property=ChannelAccount(id=BOT_ID),
                 recipient=to,
                 text='Hi there!'))
-
+        # creds = MicrosoftTokenAuthenticationStub(get_auth_token())
+        print('Printing the pointer to the generated MicrosoftAppCredentials:')
+        # print(creds)
         connector = ConnectorClient(self.credentials, base_url=SERVICE_URL)
-        conversation = connector.conversations.create_conversation(create_conversation)
-
-        assert conversation.id is not None
+        try:
+            conversation = self.loop.run_until_complete(
+                connector.conversations.create_conversation_async(create_conversation)
+            )
+        except BaseException as e:
+            raise e
+        else:
+            assert conversation.id is not None
 
     def test_conversations_create_conversation_with_invalid_bot_id_fails(self):
         to = ChannelAccount(id=RECIPIENT_ID)
@@ -70,7 +74,7 @@ class ConversationTest(ReplayableTest):
 
         with pytest.raises(ErrorResponseException) as excinfo:
             connector = ConnectorClient(self.credentials, base_url=SERVICE_URL)
-            connector.conversations.create_conversation(create_conversation)
+            self.loop.run_until_complete(connector.conversations.create_conversation(create_conversation))
 
         assert excinfo.value.error.error.code == 'ServiceError'
         assert ('Invalid userId' in str(excinfo.value.error.error.message))
@@ -87,7 +91,7 @@ class ConversationTest(ReplayableTest):
 
         with pytest.raises(ErrorResponseException) as excinfo:
             connector = ConnectorClient(self.credentials, base_url=SERVICE_URL)
-            connector.conversations.create_conversation(create_conversation)
+            self.loop.run_until_complete(connector.conversations.create_conversation(create_conversation))
 
         assert excinfo.value.error.error.code == 'BadArgument'
         assert ('Conversations' in str(excinfo.value.error.error.message))
@@ -107,7 +111,7 @@ class ConversationTest(ReplayableTest):
 
         with pytest.raises(ErrorResponseException) as excinfo:
             connector = ConnectorClient(self.credentials, base_url=SERVICE_URL)
-            connector.conversations.create_conversation(create_conversation)
+            self.loop.run_until_complete(connector.conversations.create_conversation(create_conversation))
 
         assert excinfo.value.error.error.code == 'BadArgument'
         assert ('Bots cannot IM other bots' in str(excinfo.value.error.error.message))
@@ -119,12 +123,15 @@ class ConversationTest(ReplayableTest):
             recipient=ChannelAccount(id=RECIPIENT_ID),
             from_property=ChannelAccount(id=BOT_ID),
             text='Hello again!')
-
         connector = ConnectorClient(self.credentials, base_url=SERVICE_URL)
-        response = connector.conversations.send_to_conversation(
-            CONVERSATION_ID, activity)
-
-        assert response is not None
+        try:
+            response = self.loop.run_until_complete(
+                    connector.conversations.send_to_conversation_async(CONVERSATION_ID, activity)
+                )
+        except BaseException as e:
+            raise e
+        else:
+            assert response is not None
 
     def test_conversations_send_to_conversation_with_attachment(self):
         card1 = HeroCard(
@@ -153,7 +160,9 @@ class ConversationTest(ReplayableTest):
             ])
 
         connector = ConnectorClient(self.credentials, base_url=SERVICE_URL)
-        response = connector.conversations.send_to_conversation(CONVERSATION_ID, activity)
+        response = self.loop.run_until_complete(
+            connector.conversations.send_to_conversation_async(CONVERSATION_ID, activity)
+        )
 
         assert response is not None
 
@@ -167,7 +176,7 @@ class ConversationTest(ReplayableTest):
 
         with pytest.raises(ErrorResponseException) as excinfo:
             connector = ConnectorClient(self.credentials, base_url=SERVICE_URL)
-            connector.conversations.send_to_conversation('123', activity)
+            self.loop.run_until_complete(connector.conversations.send_to_conversation_async('123', activity))
 
         assert excinfo.value.error.error.code == 'ServiceError'
         assert ('cannot send messages to this id' in str(excinfo.value.error.error.message)
@@ -175,8 +184,9 @@ class ConversationTest(ReplayableTest):
 
     def test_conversations_get_conversation_members(self):
         connector = ConnectorClient(self.credentials, base_url=SERVICE_URL)
-        members = connector.conversations.get_conversation_members(CONVERSATION_ID)
-
+        members = self.loop.run_until_complete(
+            connector.conversations.get_conversation_members_async(CONVERSATION_ID)
+        )
         assert len(members) == 2
         assert members[0].name == BOT_NAME
         assert members[0].id == BOT_ID
@@ -184,7 +194,7 @@ class ConversationTest(ReplayableTest):
     def test_conversations_get_conversation_members_invalid_id_fails(self):
         with pytest.raises(ErrorResponseException) as excinfo:
             connector = ConnectorClient(self.credentials, base_url=SERVICE_URL)
-            members = connector.conversations.get_conversation_members('INVALID_ID')
+            members = self.loop.run_until_complete(connector.conversations.get_conversation_members('INVALID_ID'))
 
         assert excinfo.value.error.error.code == 'ServiceError'
         assert ('cannot send messages to this id' in str(excinfo.value.error.error.message)
@@ -206,9 +216,13 @@ class ConversationTest(ReplayableTest):
             text='Activity updated.')
 
         connector = ConnectorClient(self.credentials, base_url=SERVICE_URL)
-        response = connector.conversations.send_to_conversation(CONVERSATION_ID, activity)
+        response = self.loop.run_until_complete(
+            connector.conversations.send_to_conversation_async(CONVERSATION_ID, activity)
+        )
         activity_id = response.id
-        response = connector.conversations.update_activity(CONVERSATION_ID, activity_id, activity_update)
+        response = self.loop.run_until_complete(
+            connector.conversations.update_activity_async(CONVERSATION_ID, activity_id, activity_update)
+        )
 
         assert response is not None
         assert response.id == activity_id
@@ -230,9 +244,13 @@ class ConversationTest(ReplayableTest):
 
         with pytest.raises(ErrorResponseException) as excinfo:
             connector = ConnectorClient(self.credentials, base_url=SERVICE_URL)
-            response = connector.conversations.send_to_conversation(CONVERSATION_ID, activity)
+            response = self.loop.run_until_complete(
+                connector.conversations.send_to_conversation_async(CONVERSATION_ID, activity)
+            )
             activity_id = response.id
-            connector.conversations.update_activity('INVALID_ID', activity_id, activity_update)
+            self.loop.run_until_complete(
+                connector.conversations.update_activity('INVALID_ID', activity_id, activity_update)
+            )
 
         assert excinfo.value.error.error.code == 'ServiceError'
         assert ('Invalid ConversationId' in str(excinfo.value.error.error.message))
@@ -253,9 +271,13 @@ class ConversationTest(ReplayableTest):
             text='Child activity.')
 
         connector = ConnectorClient(self.credentials, base_url=SERVICE_URL)
-        response = connector.conversations.send_to_conversation(CONVERSATION_ID, activity)
+        response = self.loop.run_until_complete(
+            connector.conversations.send_to_conversation_async(CONVERSATION_ID, activity)
+        )
         activity_id = response.id
-        response = connector.conversations.reply_to_activity(CONVERSATION_ID, activity_id, child_activity)
+        response = self.loop.run_until_complete(
+            connector.conversations.reply_to_activity_async(CONVERSATION_ID, activity_id, child_activity)
+        )
 
         assert response is not None
         assert response.id != activity_id
@@ -270,7 +292,9 @@ class ConversationTest(ReplayableTest):
 
         with pytest.raises(ErrorResponseException) as excinfo:
             connector = ConnectorClient(self.credentials, base_url=SERVICE_URL)
-            connector.conversations.reply_to_activity('INVALID_ID', 'INVALID_ID', child_activity)
+            self.loop.run_until_complete(
+                connector.conversations.reply_to_activity_async('INVALID_ID', 'INVALID_ID', child_activity)
+            )
 
         assert excinfo.value.error.error.code == 'ServiceError'
         assert ('Invalid ConversationId' in str(excinfo.value.error.error.message))
@@ -284,16 +308,22 @@ class ConversationTest(ReplayableTest):
             text='Activity to be deleted..')
 
         connector = ConnectorClient(self.credentials, base_url=SERVICE_URL)
-        response = connector.conversations.send_to_conversation(CONVERSATION_ID, activity)
+        response = self.loop.run_until_complete(
+            connector.conversations.send_to_conversation_async(CONVERSATION_ID, activity)
+        )
         activity_id = response.id
-        response = connector.conversations.delete_activity(CONVERSATION_ID, activity_id)
+        response = self.loop.run_until_complete(
+            connector.conversations.delete_activity_async(CONVERSATION_ID, activity_id)
+        )
 
         assert response is None
 
     def test_conversations_delete_activity_with_invalid_conversation_id_fails(self):
         with pytest.raises(ErrorResponseException) as excinfo:
             connector = ConnectorClient(self.credentials, base_url=SERVICE_URL)
-            connector.conversations.delete_activity('INVALID_ID', 'INVALID_ID')
+            self.loop.run_until_complete(
+                connector.conversations.delete_activity_async('INVALID_ID', 'INVALID_ID')
+            )
 
         assert excinfo.value.error.error.code == 'ServiceError'
         assert ('Invalid ConversationId' in str(excinfo.value.error.error.message))
@@ -307,8 +337,12 @@ class ConversationTest(ReplayableTest):
             text='Test Activity')
 
         connector = ConnectorClient(self.credentials, base_url=SERVICE_URL)
-        response = connector.conversations.send_to_conversation(CONVERSATION_ID, activity)
-        members = connector.conversations.get_activity_members(CONVERSATION_ID, response.id)
+        response = self.loop.run_until_complete(
+            connector.conversations.send_to_conversation_async(CONVERSATION_ID, activity)
+        )
+        members = self.loop.run_until_complete(
+            connector.conversations.get_activity_members_async(CONVERSATION_ID, response.id)
+        )
 
         assert len(members) == 2
         assert members[0].name == BOT_NAME
@@ -324,8 +358,10 @@ class ConversationTest(ReplayableTest):
 
         with pytest.raises(ErrorResponseException) as excinfo:
             connector = ConnectorClient(self.credentials, base_url=SERVICE_URL)
-            response = connector.conversations.send_to_conversation(CONVERSATION_ID, activity)
-            connector.conversations.get_activity_members('INVALID_ID', response.id)
+            response = self.loop.run_until_complete(
+                connector.conversations.send_to_conversation_async(CONVERSATION_ID, activity)
+            )
+            self.loop.run_until_complete(connector.conversations.get_activity_members_async('INVALID_ID', response.id))
 
         assert excinfo.value.error.error.code == 'ServiceError'
         assert 'Invalid ConversationId' in str(excinfo.value.error.error.message)
