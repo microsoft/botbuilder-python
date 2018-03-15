@@ -40,10 +40,10 @@ class PaymentDetails(Model):
         'error': {'key': 'error', 'type': 'str'},
     }
 
-    def __init__(self, total=None, display_items=None, shipping_options=None, modifiers=None, error=None):
-        super(PaymentDetails, self).__init__()
-        self.total = total
-        self.display_items = display_items
-        self.shipping_options = shipping_options
-        self.modifiers = modifiers
-        self.error = error
+    def __init__(self, **kwargs):
+        super(PaymentDetails, self).__init__(**kwargs)
+        self.total = kwargs.get('total', None)
+        self.display_items = kwargs.get('display_items', None)
+        self.shipping_options = kwargs.get('shipping_options', None)
+        self.modifiers = kwargs.get('modifiers', None)
+        self.error = kwargs.get('error', None)

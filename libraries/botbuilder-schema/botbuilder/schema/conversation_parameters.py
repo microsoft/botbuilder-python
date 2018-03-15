@@ -41,11 +41,11 @@ class ConversationParameters(Model):
         'channel_data': {'key': 'channelData', 'type': 'object'},
     }
 
-    def __init__(self, is_group=None, bot=None, members=None, topic_name=None, activity=None, channel_data=None):
-        super(ConversationParameters, self).__init__()
-        self.is_group = is_group
-        self.bot = bot
-        self.members = members
-        self.topic_name = topic_name
-        self.activity = activity
-        self.channel_data = channel_data
+    def __init__(self, **kwargs):
+        super(ConversationParameters, self).__init__(**kwargs)
+        self.is_group = kwargs.get('is_group', None)
+        self.bot = kwargs.get('bot', None)
+        self.members = kwargs.get('members', None)
+        self.topic_name = kwargs.get('topic_name', None)
+        self.activity = kwargs.get('activity', None)
+        self.channel_data = kwargs.get('channel_data', None)

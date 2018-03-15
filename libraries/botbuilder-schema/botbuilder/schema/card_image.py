@@ -29,8 +29,8 @@ class CardImage(Model):
         'tap': {'key': 'tap', 'type': 'CardAction'},
     }
 
-    def __init__(self, url=None, alt=None, tap=None):
-        super(CardImage, self).__init__()
-        self.url = url
-        self.alt = alt
-        self.tap = tap
+    def __init__(self, **kwargs):
+        super(CardImage, self).__init__(**kwargs)
+        self.url = kwargs.get('url', None)
+        self.alt = kwargs.get('alt', None)
+        self.tap = kwargs.get('tap', None)

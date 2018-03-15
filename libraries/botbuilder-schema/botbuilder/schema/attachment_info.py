@@ -29,8 +29,8 @@ class AttachmentInfo(Model):
         'views': {'key': 'views', 'type': '[AttachmentView]'},
     }
 
-    def __init__(self, name=None, type=None, views=None):
-        super(AttachmentInfo, self).__init__()
-        self.name = name
-        self.type = type
-        self.views = views
+    def __init__(self, **kwargs):
+        super(AttachmentInfo, self).__init__(**kwargs)
+        self.name = kwargs.get('name', None)
+        self.type = kwargs.get('type', None)
+        self.views = kwargs.get('views', None)

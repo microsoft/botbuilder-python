@@ -23,6 +23,6 @@ class PaymentRequestUpdateResult(Model):
         'details': {'key': 'details', 'type': 'PaymentDetails'},
     }
 
-    def __init__(self, details=None):
-        super(PaymentRequestUpdateResult, self).__init__()
-        self.details = details
+    def __init__(self, **kwargs):
+        super(PaymentRequestUpdateResult, self).__init__(**kwargs)
+        self.details = kwargs.get('details', None)

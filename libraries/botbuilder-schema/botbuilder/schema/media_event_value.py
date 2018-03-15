@@ -24,6 +24,6 @@ class MediaEventValue(Model):
         'card_value': {'key': 'cardValue', 'type': 'object'},
     }
 
-    def __init__(self, card_value=None):
-        super(MediaEventValue, self).__init__()
-        self.card_value = card_value
+    def __init__(self, **kwargs):
+        super(MediaEventValue, self).__init__(**kwargs)
+        self.card_value = kwargs.get('card_value', None)

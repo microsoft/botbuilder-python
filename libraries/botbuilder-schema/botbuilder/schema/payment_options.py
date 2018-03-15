@@ -42,10 +42,10 @@ class PaymentOptions(Model):
         'shipping_type': {'key': 'shippingType', 'type': 'str'},
     }
 
-    def __init__(self, request_payer_name=None, request_payer_email=None, request_payer_phone=None, request_shipping=None, shipping_type=None):
-        super(PaymentOptions, self).__init__()
-        self.request_payer_name = request_payer_name
-        self.request_payer_email = request_payer_email
-        self.request_payer_phone = request_payer_phone
-        self.request_shipping = request_shipping
-        self.shipping_type = shipping_type
+    def __init__(self, **kwargs):
+        super(PaymentOptions, self).__init__(**kwargs)
+        self.request_payer_name = kwargs.get('request_payer_name', None)
+        self.request_payer_email = kwargs.get('request_payer_email', None)
+        self.request_payer_phone = kwargs.get('request_payer_phone', None)
+        self.request_shipping = kwargs.get('request_shipping', None)
+        self.shipping_type = kwargs.get('shipping_type', None)

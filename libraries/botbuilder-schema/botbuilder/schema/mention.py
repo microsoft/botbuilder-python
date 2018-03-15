@@ -29,8 +29,8 @@ class Mention(Model):
         'type': {'key': 'type', 'type': 'str'},
     }
 
-    def __init__(self, mentioned=None, text=None, type=None):
-        super(Mention, self).__init__()
-        self.mentioned = mentioned
-        self.text = text
-        self.type = type
+    def __init__(self, **kwargs):
+        super(Mention, self).__init__(**kwargs)
+        self.mentioned = kwargs.get('mentioned', None)
+        self.text = kwargs.get('text', None)
+        self.type = kwargs.get('type', None)

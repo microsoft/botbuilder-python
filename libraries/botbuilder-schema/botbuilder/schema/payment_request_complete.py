@@ -29,8 +29,8 @@ class PaymentRequestComplete(Model):
         'payment_response': {'key': 'paymentResponse', 'type': 'PaymentResponse'},
     }
 
-    def __init__(self, id=None, payment_request=None, payment_response=None):
-        super(PaymentRequestComplete, self).__init__()
-        self.id = id
-        self.payment_request = payment_request
-        self.payment_response = payment_response
+    def __init__(self, **kwargs):
+        super(PaymentRequestComplete, self).__init__(**kwargs)
+        self.id = kwargs.get('id', None)
+        self.payment_request = kwargs.get('payment_request', None)
+        self.payment_response = kwargs.get('payment_response', None)

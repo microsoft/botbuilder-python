@@ -44,13 +44,13 @@ class ReceiptCard(Model):
         'buttons': {'key': 'buttons', 'type': '[CardAction]'},
     }
 
-    def __init__(self, title=None, items=None, facts=None, tap=None, total=None, tax=None, vat=None, buttons=None):
-        super(ReceiptCard, self).__init__()
-        self.title = title
-        self.items = items
-        self.facts = facts
-        self.tap = tap
-        self.total = total
-        self.tax = tax
-        self.vat = vat
-        self.buttons = buttons
+    def __init__(self, **kwargs):
+        super(ReceiptCard, self).__init__(**kwargs)
+        self.title = kwargs.get('title', None)
+        self.items = kwargs.get('items', None)
+        self.facts = kwargs.get('facts', None)
+        self.tap = kwargs.get('tap', None)
+        self.total = kwargs.get('total', None)
+        self.tax = kwargs.get('tax', None)
+        self.vat = kwargs.get('vat', None)
+        self.buttons = kwargs.get('buttons', None)

@@ -35,10 +35,10 @@ class Attachment(Model):
         'thumbnail_url': {'key': 'thumbnailUrl', 'type': 'str'},
     }
 
-    def __init__(self, content_type=None, content_url=None, content=None, name=None, thumbnail_url=None):
-        super(Attachment, self).__init__()
-        self.content_type = content_type
-        self.content_url = content_url
-        self.content = content
-        self.name = name
-        self.thumbnail_url = thumbnail_url
+    def __init__(self, **kwargs):
+        super(Attachment, self).__init__(**kwargs)
+        self.content_type = kwargs.get('content_type', None)
+        self.content_url = kwargs.get('content_url', None)
+        self.content = kwargs.get('content', None)
+        self.name = kwargs.get('name', None)
+        self.thumbnail_url = kwargs.get('thumbnail_url', None)

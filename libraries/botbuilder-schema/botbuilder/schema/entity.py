@@ -23,6 +23,6 @@ class Entity(Model):
         'type': {'key': 'type', 'type': 'str'},
     }
 
-    def __init__(self, type=None):
-        super(Entity, self).__init__()
-        self.type = type
+    def __init__(self, **kwargs):
+        super(Entity, self).__init__(**kwargs)
+        self.type = kwargs.get('type', None)

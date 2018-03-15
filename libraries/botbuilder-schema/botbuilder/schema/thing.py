@@ -26,7 +26,7 @@ class Thing(Model):
         'name': {'key': 'name', 'type': 'str'},
     }
 
-    def __init__(self, type=None, name=None):
-        super(Thing, self).__init__()
-        self.type = type
-        self.name = name
+    def __init__(self, **kwargs):
+        super(Thing, self).__init__(**kwargs)
+        self.type = kwargs.get('type', None)
+        self.name = kwargs.get('name', None)

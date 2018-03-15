@@ -154,41 +154,41 @@ class Activity(Model):
         'text_highlights': {'key': 'textHighlights', 'type': '[TextHighlight]'},
     }
 
-    def __init__(self, type=None, id=None, timestamp=None, local_timestamp=None, service_url=None, channel_id=None, from_property=None, conversation=None, recipient=None, text_format=None, attachment_layout=None, members_added=None, members_removed=None, reactions_added=None, reactions_removed=None, topic_name=None, history_disclosed=None, locale=None, text=None, speak=None, input_hint=None, summary=None, suggested_actions=None, attachments=None, entities=None, channel_data=None, action=None, reply_to_id=None, value=None, name=None, relates_to=None, code=None, expiration=None, importance=None, delivery_mode=None, text_highlights=None):
-        super(Activity, self).__init__()
-        self.type = type
-        self.id = id
-        self.timestamp = timestamp
-        self.local_timestamp = local_timestamp
-        self.service_url = service_url
-        self.channel_id = channel_id
-        self.from_property = from_property
-        self.conversation = conversation
-        self.recipient = recipient
-        self.text_format = text_format
-        self.attachment_layout = attachment_layout
-        self.members_added = members_added
-        self.members_removed = members_removed
-        self.reactions_added = reactions_added
-        self.reactions_removed = reactions_removed
-        self.topic_name = topic_name
-        self.history_disclosed = history_disclosed
-        self.locale = locale
-        self.text = text
-        self.speak = speak
-        self.input_hint = input_hint
-        self.summary = summary
-        self.suggested_actions = suggested_actions
-        self.attachments = attachments
-        self.entities = entities
-        self.channel_data = channel_data
-        self.action = action
-        self.reply_to_id = reply_to_id
-        self.value = value
-        self.name = name
-        self.relates_to = relates_to
-        self.code = code
-        self.expiration = expiration
-        self.importance = importance
-        self.delivery_mode = delivery_mode
-        self.text_highlights = text_highlights
+    def __init__(self, **kwargs):
+        super(Activity, self).__init__(**kwargs)
+        self.type = kwargs.get('type', None)
+        self.id = kwargs.get('id', None)
+        self.timestamp = kwargs.get('timestamp', None)
+        self.local_timestamp = kwargs.get('local_timestamp', None)
+        self.service_url = kwargs.get('service_url', None)
+        self.channel_id = kwargs.get('channel_id', None)
+        self.from_property = kwargs.get('from_property', None)
+        self.conversation = kwargs.get('conversation', None)
+        self.recipient = kwargs.get('recipient', None)
+        self.text_format = kwargs.get('text_format', None)
+        self.attachment_layout = kwargs.get('attachment_layout', None)
+        self.members_added = kwargs.get('members_added', None)
+        self.members_removed = kwargs.get('members_removed', None)
+        self.reactions_added = kwargs.get('reactions_added', None)
+        self.reactions_removed = kwargs.get('reactions_removed', None)
+        self.topic_name = kwargs.get('topic_name', None)
+        self.history_disclosed = kwargs.get('history_disclosed', None)
+        self.locale = kwargs.get('locale', None)
+        self.text = kwargs.get('text', None)
+        self.speak = kwargs.get('speak', None)
+        self.input_hint = kwargs.get('input_hint', None)
+        self.summary = kwargs.get('summary', None)
+        self.suggested_actions = kwargs.get('suggested_actions', None)
+        self.attachments = kwargs.get('attachments', None)
+        self.entities = kwargs.get('entities', None)
+        self.channel_data = kwargs.get('channel_data', None)
+        self.action = kwargs.get('action', None)
+        self.reply_to_id = kwargs.get('reply_to_id', None)
+        self.value = kwargs.get('value', None)
+        self.name = kwargs.get('name', None)
+        self.relates_to = kwargs.get('relates_to', None)
+        self.code = kwargs.get('code', None)
+        self.expiration = kwargs.get('expiration', None)
+        self.importance = kwargs.get('importance', None)
+        self.delivery_mode = kwargs.get('delivery_mode', None)
+        self.text_highlights = kwargs.get('text_highlights', None)

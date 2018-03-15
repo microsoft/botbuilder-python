@@ -39,11 +39,11 @@ class ThumbnailCard(Model):
         'tap': {'key': 'tap', 'type': 'CardAction'},
     }
 
-    def __init__(self, title=None, subtitle=None, text=None, images=None, buttons=None, tap=None):
-        super(ThumbnailCard, self).__init__()
-        self.title = title
-        self.subtitle = subtitle
-        self.text = text
-        self.images = images
-        self.buttons = buttons
-        self.tap = tap
+    def __init__(self, **kwargs):
+        super(ThumbnailCard, self).__init__(**kwargs)
+        self.title = kwargs.get('title', None)
+        self.subtitle = kwargs.get('subtitle', None)
+        self.text = kwargs.get('text', None)
+        self.images = kwargs.get('images', None)
+        self.buttons = kwargs.get('buttons', None)
+        self.tap = kwargs.get('tap', None)

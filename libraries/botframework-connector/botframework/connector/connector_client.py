@@ -9,13 +9,23 @@
 # regenerated.
 # --------------------------------------------------------------------------
 
-from msrest.service_client import ServiceClient
+from msrest.service_client import ServiceClient as _ServiceClient
 from msrest import Configuration, Serializer, Deserializer
+from msrest.authentication import Authentication
 from .version import VERSION
-from .operations.attachments_operations import AttachmentsOperations
-from .operations.conversations_operations import ConversationsOperations
+from .operations import AttachmentsOperations
+from .operations import ConversationsOperations
 from . import models
+from .async_mixin import AsyncServiceClientMixin
 
+
+class ServiceClient(_ServiceClient, AsyncServiceClientMixin):
+    def __init__(self, creds, config):
+        super(ServiceClient, self).__init__(creds, config)
+        self.config = config
+        self.creds = creds if creds else Authentication()
+        self._headers = {}
+    
 
 class ConnectorClientConfiguration(Configuration):
     """Configuration for ConnectorClient

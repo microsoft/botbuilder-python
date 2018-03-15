@@ -44,12 +44,12 @@ class ReceiptItem(Model):
         'tap': {'key': 'tap', 'type': 'CardAction'},
     }
 
-    def __init__(self, title=None, subtitle=None, text=None, image=None, price=None, quantity=None, tap=None):
-        super(ReceiptItem, self).__init__()
-        self.title = title
-        self.subtitle = subtitle
-        self.text = text
-        self.image = image
-        self.price = price
-        self.quantity = quantity
-        self.tap = tap
+    def __init__(self, **kwargs):
+        super(ReceiptItem, self).__init__(**kwargs)
+        self.title = kwargs.get('title', None)
+        self.subtitle = kwargs.get('subtitle', None)
+        self.text = kwargs.get('text', None)
+        self.image = kwargs.get('image', None)
+        self.price = kwargs.get('price', None)
+        self.quantity = kwargs.get('quantity', None)
+        self.tap = kwargs.get('tap', None)

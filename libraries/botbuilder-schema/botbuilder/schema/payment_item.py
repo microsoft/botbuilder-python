@@ -30,8 +30,8 @@ class PaymentItem(Model):
         'pending': {'key': 'pending', 'type': 'bool'},
     }
 
-    def __init__(self, label=None, amount=None, pending=None):
-        super(PaymentItem, self).__init__()
-        self.label = label
-        self.amount = amount
-        self.pending = pending
+    def __init__(self, **kwargs):
+        super(PaymentItem, self).__init__(**kwargs)
+        self.label = kwargs.get('label', None)
+        self.amount = kwargs.get('amount', None)
+        self.pending = kwargs.get('pending', None)

@@ -66,16 +66,16 @@ class PaymentAddress(Model):
         'phone': {'key': 'phone', 'type': 'str'},
     }
 
-    def __init__(self, country=None, address_line=None, region=None, city=None, dependent_locality=None, postal_code=None, sorting_code=None, language_code=None, organization=None, recipient=None, phone=None):
-        super(PaymentAddress, self).__init__()
-        self.country = country
-        self.address_line = address_line
-        self.region = region
-        self.city = city
-        self.dependent_locality = dependent_locality
-        self.postal_code = postal_code
-        self.sorting_code = sorting_code
-        self.language_code = language_code
-        self.organization = organization
-        self.recipient = recipient
-        self.phone = phone
+    def __init__(self, **kwargs):
+        super(PaymentAddress, self).__init__(**kwargs)
+        self.country = kwargs.get('country', None)
+        self.address_line = kwargs.get('address_line', None)
+        self.region = kwargs.get('region', None)
+        self.city = kwargs.get('city', None)
+        self.dependent_locality = kwargs.get('dependent_locality', None)
+        self.postal_code = kwargs.get('postal_code', None)
+        self.sorting_code = kwargs.get('sorting_code', None)
+        self.language_code = kwargs.get('language_code', None)
+        self.organization = kwargs.get('organization', None)
+        self.recipient = kwargs.get('recipient', None)
+        self.phone = kwargs.get('phone', None)

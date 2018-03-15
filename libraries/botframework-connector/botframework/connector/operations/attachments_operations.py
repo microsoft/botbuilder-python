@@ -53,7 +53,7 @@ class AttachmentsOperations(object):
          :class:`ErrorResponseException<botframework.connector.models.ErrorResponseException>`
         """
         # Construct URL
-        url = '/v3/attachments/{attachmentId}'
+        url = self.get_attachment_info.metadata['url']
         path_format_arguments = {
             'attachmentId': self._serialize.url("attachment_id", attachment_id, 'str')
         }
@@ -70,7 +70,7 @@ class AttachmentsOperations(object):
 
         # Construct and send request
         request = self._client.get(url, query_parameters)
-        response = self._client.send(request, header_parameters, **operation_config)
+        response = self._client.send(request, header_parameters, stream=False, **operation_config)
 
         if response.status_code not in [200]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -85,6 +85,7 @@ class AttachmentsOperations(object):
             return client_raw_response
 
         return deserialized
+    get_attachment_info.metadata = {'url': '/v3/attachments/{attachmentId}'}
 
     def get_attachment(
             self, attachment_id, view_id, custom_headers=None, raw=False, callback=None, **operation_config):
@@ -112,7 +113,7 @@ class AttachmentsOperations(object):
          :class:`ErrorResponseException<botframework.connector.models.ErrorResponseException>`
         """
         # Construct URL
-        url = '/v3/attachments/{attachmentId}/views/{viewId}'
+        url = self.get_attachment.metadata['url']
         path_format_arguments = {
             'attachmentId': self._serialize.url("attachment_id", attachment_id, 'str'),
             'viewId': self._serialize.url("view_id", view_id, 'str')
@@ -130,7 +131,7 @@ class AttachmentsOperations(object):
 
         # Construct and send request
         request = self._client.get(url, query_parameters)
-        response = self._client.send(request, header_parameters, **operation_config)
+        response = self._client.send(request, header_parameters, stream=True, **operation_config)
 
         if response.status_code not in [200, 301, 302]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -145,3 +146,4 @@ class AttachmentsOperations(object):
             return client_raw_response
 
         return deserialized
+    get_attachment.metadata = {'url': '/v3/attachments/{attachmentId}/views/{viewId}'}

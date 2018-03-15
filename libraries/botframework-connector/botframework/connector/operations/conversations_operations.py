@@ -72,7 +72,7 @@ class ConversationsOperations(object):
          :class:`ErrorResponseException<botframework.connector.models.ErrorResponseException>`
         """
         # Construct URL
-        url = '/v3/conversations'
+        url = self.create_conversation.metadata['url']
 
         # Construct parameters
         query_parameters = {}
@@ -89,7 +89,7 @@ class ConversationsOperations(object):
         # Construct and send request
         request = self._client.post(url, query_parameters)
         response = self._client.send(
-            request, header_parameters, body_content, **operation_config)
+            request, header_parameters, body_content, stream=False, **operation_config)
 
         if response.status_code not in [200, 201, 202]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -108,6 +108,7 @@ class ConversationsOperations(object):
             return client_raw_response
 
         return deserialized
+    create_conversation.metadata = {'url': '/v3/conversations'}
 
     def send_to_conversation(
             self, conversation_id, activity, custom_headers=None, raw=False, **operation_config):
@@ -143,7 +144,7 @@ class ConversationsOperations(object):
          :class:`ErrorResponseException<botframework.connector.models.ErrorResponseException>`
         """
         # Construct URL
-        url = '/v3/conversations/{conversationId}/activities'
+        url = self.send_to_conversation.metadata['url']
         path_format_arguments = {
             'conversationId': self._serialize.url("conversation_id", conversation_id, 'str')
         }
@@ -164,7 +165,7 @@ class ConversationsOperations(object):
         # Construct and send request
         request = self._client.post(url, query_parameters)
         response = self._client.send(
-            request, header_parameters, body_content, **operation_config)
+            request, header_parameters, body_content, stream=False, **operation_config)
 
         if response.status_code not in [200, 201, 202]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -183,6 +184,7 @@ class ConversationsOperations(object):
             return client_raw_response
 
         return deserialized
+    send_to_conversation.metadata = {'url': '/v3/conversations/{conversationId}/activities'}
 
     def update_activity(
             self, conversation_id, activity_id, activity, custom_headers=None, raw=False, **operation_config):
@@ -212,7 +214,7 @@ class ConversationsOperations(object):
          :class:`ErrorResponseException<botframework.connector.models.ErrorResponseException>`
         """
         # Construct URL
-        url = '/v3/conversations/{conversationId}/activities/{activityId}'
+        url = self.update_activity.metadata['url']
         path_format_arguments = {
             'conversationId': self._serialize.url("conversation_id", conversation_id, 'str'),
             'activityId': self._serialize.url("activity_id", activity_id, 'str')
@@ -234,7 +236,7 @@ class ConversationsOperations(object):
         # Construct and send request
         request = self._client.put(url, query_parameters)
         response = self._client.send(
-            request, header_parameters, body_content, **operation_config)
+            request, header_parameters, body_content, stream=False, **operation_config)
 
         if response.status_code not in [200, 201, 202]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -253,6 +255,7 @@ class ConversationsOperations(object):
             return client_raw_response
 
         return deserialized
+    update_activity.metadata = {'url': '/v3/conversations/{conversationId}/activities/{activityId}'}
 
     def reply_to_activity(
             self, conversation_id, activity_id, activity, custom_headers=None, raw=False, **operation_config):
@@ -289,7 +292,7 @@ class ConversationsOperations(object):
          :class:`ErrorResponseException<botframework.connector.models.ErrorResponseException>`
         """
         # Construct URL
-        url = '/v3/conversations/{conversationId}/activities/{activityId}'
+        url = self.reply_to_activity.metadata['url']
         path_format_arguments = {
             'conversationId': self._serialize.url("conversation_id", conversation_id, 'str'),
             'activityId': self._serialize.url("activity_id", activity_id, 'str')
@@ -311,7 +314,7 @@ class ConversationsOperations(object):
         # Construct and send request
         request = self._client.post(url, query_parameters)
         response = self._client.send(
-            request, header_parameters, body_content, **operation_config)
+            request, header_parameters, body_content, stream=False, **operation_config)
 
         if response.status_code not in [200, 201, 202]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -330,6 +333,7 @@ class ConversationsOperations(object):
             return client_raw_response
 
         return deserialized
+    reply_to_activity.metadata = {'url': '/v3/conversations/{conversationId}/activities/{activityId}'}
 
     def delete_activity(
             self, conversation_id, activity_id, custom_headers=None, raw=False, **operation_config):
@@ -354,7 +358,7 @@ class ConversationsOperations(object):
          :class:`ErrorResponseException<botframework.connector.models.ErrorResponseException>`
         """
         # Construct URL
-        url = '/v3/conversations/{conversationId}/activities/{activityId}'
+        url = self.delete_activity.metadata['url']
         path_format_arguments = {
             'conversationId': self._serialize.url("conversation_id", conversation_id, 'str'),
             'activityId': self._serialize.url("activity_id", activity_id, 'str')
@@ -372,7 +376,7 @@ class ConversationsOperations(object):
 
         # Construct and send request
         request = self._client.delete(url, query_parameters)
-        response = self._client.send(request, header_parameters, **operation_config)
+        response = self._client.send(request, header_parameters, stream=False, **operation_config)
 
         if response.status_code not in [200, 202]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -380,6 +384,7 @@ class ConversationsOperations(object):
         if raw:
             client_raw_response = ClientRawResponse(None, response)
             return client_raw_response
+    delete_activity.metadata = {'url': '/v3/conversations/{conversationId}/activities/{activityId}'}
 
     def get_conversation_members(
             self, conversation_id, custom_headers=None, raw=False, **operation_config):
@@ -403,7 +408,7 @@ class ConversationsOperations(object):
          :class:`ErrorResponseException<botframework.connector.models.ErrorResponseException>`
         """
         # Construct URL
-        url = '/v3/conversations/{conversationId}/members'
+        url = self.get_conversation_members.metadata['url']
         path_format_arguments = {
             'conversationId': self._serialize.url("conversation_id", conversation_id, 'str')
         }
@@ -420,7 +425,7 @@ class ConversationsOperations(object):
 
         # Construct and send request
         request = self._client.get(url, query_parameters)
-        response = self._client.send(request, header_parameters, **operation_config)
+        response = self._client.send(request, header_parameters, stream=False, **operation_config)
 
         if response.status_code not in [200]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -435,6 +440,7 @@ class ConversationsOperations(object):
             return client_raw_response
 
         return deserialized
+    get_conversation_members.metadata = {'url': '/v3/conversations/{conversationId}/members'}
 
     def get_activity_members(
             self, conversation_id, activity_id, custom_headers=None, raw=False, **operation_config):
@@ -461,7 +467,7 @@ class ConversationsOperations(object):
          :class:`ErrorResponseException<botframework.connector.models.ErrorResponseException>`
         """
         # Construct URL
-        url = '/v3/conversations/{conversationId}/activities/{activityId}/members'
+        url = self.get_activity_members.metadata['url']
         path_format_arguments = {
             'conversationId': self._serialize.url("conversation_id", conversation_id, 'str'),
             'activityId': self._serialize.url("activity_id", activity_id, 'str')
@@ -479,7 +485,7 @@ class ConversationsOperations(object):
 
         # Construct and send request
         request = self._client.get(url, query_parameters)
-        response = self._client.send(request, header_parameters, **operation_config)
+        response = self._client.send(request, header_parameters, stream=False, **operation_config)
 
         if response.status_code not in [200]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -494,6 +500,7 @@ class ConversationsOperations(object):
             return client_raw_response
 
         return deserialized
+    get_activity_members.metadata = {'url': '/v3/conversations/{conversationId}/activities/{activityId}/members'}
 
     def upload_attachment(
             self, conversation_id, attachment_upload, custom_headers=None, raw=False, **operation_config):
@@ -521,7 +528,7 @@ class ConversationsOperations(object):
          :class:`ErrorResponseException<botframework.connector.models.ErrorResponseException>`
         """
         # Construct URL
-        url = '/v3/conversations/{conversationId}/attachments'
+        url = self.upload_attachment.metadata['url']
         path_format_arguments = {
             'conversationId': self._serialize.url("conversation_id", conversation_id, 'str')
         }
@@ -542,7 +549,7 @@ class ConversationsOperations(object):
         # Construct and send request
         request = self._client.post(url, query_parameters)
         response = self._client.send(
-            request, header_parameters, body_content, **operation_config)
+            request, header_parameters, body_content, stream=False, **operation_config)
 
         if response.status_code not in [200, 201, 202]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -561,3 +568,4 @@ class ConversationsOperations(object):
             return client_raw_response
 
         return deserialized
+    upload_attachment.metadata = {'url': '/v3/conversations/{conversationId}/attachments'}
