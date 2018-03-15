@@ -1,6 +1,5 @@
 git+https://github.com/Azure/msrest-for-python@async2
-git+https://github.com/Azure/msrestazure-for-python@async
-../botbuilder-schema
+botbuilder-schema>=4.0.0.a0
 requests>=2.18.1
 PyJWT==1.5.3
 cryptography==2.1.4
