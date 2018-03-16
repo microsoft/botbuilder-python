@@ -5,7 +5,7 @@ import http.server
 import json
 import asyncio
 from botbuilder.schema import (Activity, ActivityTypes, ChannelAccount)
-from botbuilder.core import BotFrameworkAdapter
+from botbuilder.core import BotFrameworkAdapter, BotFrameworkAdapterSettings
 
 APP_ID = ''
 APP_PASSWORD = ''
@@ -51,7 +51,8 @@ class BotRequestHandler(http.server.BaseHTTPRequestHandler):
         body = self.rfile.read(int(self.headers['Content-Length']))
         data = json.loads(str(body, 'utf-8'))
         activity = Activity.deserialize(data)
-        self._adapter = BotFrameworkAdapter(APP_ID, APP_PASSWORD)
+        settings = BotFrameworkAdapterSettings(APP_ID, APP_PASSWORD)
+        self._adapter = BotFrameworkAdapter(settings)
         self._adapter.on_receive = self.on_receive
         loop = asyncio.get_event_loop()
         loop.run_until_complete(self._adapter.receive(self.headers.get("Authorization"), activity))
