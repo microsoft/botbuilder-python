@@ -33,7 +33,7 @@ class BotFrameworkAdapter(BotAdapter):
         await self.authenticate_request(request, auth_header)
         context = self.create_context(request)
 
-        await self.run_middleware(context, logic)
+        return await self.run_middleware(context, logic)
 
     async def authenticate_request(self, request: Activity, auth_header: str):
         await JwtTokenValidation.assert_valid_activity(request, auth_header, self._credential_provider)

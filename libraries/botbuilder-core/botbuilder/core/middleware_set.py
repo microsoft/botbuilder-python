@@ -25,7 +25,7 @@ class MiddlewareSet(Middleware):
         self._middleware = []
         self._loop = asyncio.get_event_loop()
 
-    def use(self, *middleware: Iterable[Middleware]):  # m2
+    def use(self, *middleware: Iterable[Middleware]):
         """
         Registers middleware plugin(s) with the bot or set.
         :param middleware :
@@ -36,15 +36,14 @@ class MiddlewareSet(Middleware):
                 self._middleware.append(plugin)
             elif isinstance(plugin, object) and hasattr(plugin, 'on_process_request'):
                 self._middleware.append(lambda context, logic: plugin.on_process_request(context, logic))
-                # is the above line going to give me async problems?
             else:
                 raise TypeError('MiddlewareSet.use(): invalid plugin type being added.')
         return self
 
-    async def on_process_request(self, context, logic: Callable):  # m2
+    async def on_process_request(self, context, logic: Callable):
         await self.run(context, logic)
 
-    async def run(self, context: BotContext, logic: Callable):  # m2
+    async def run(self, context: BotContext, logic: Callable):
         handlers = self._middleware[0:]
 
         async def run_next(i: int):
@@ -52,18 +51,8 @@ class MiddlewareSet(Middleware):
                 if i < len(handlers):
                     await run_next(handlers[i](context, run_next(i+1)))
                 else:
-                    await logic(context)
+                    return await logic(context)
             except BaseException as e:
                 raise e
 
-        await run_next(0)
-
-    # some legacy reference functions.
-    async def receive_activity(self, context):
-        return await asyncio.ensure_future(self.__receive_activity(context, self._middleware))
-
-    @staticmethod
-    async def __receive_activity(context, middleware_set):
-        for middleware in middleware_set:
-            if hasattr(middleware, 'receive_activity') and callable(middleware.receive_activity):
-                await asyncio.ensure_future(middleware.receive_activity(context))
+        return await run_next(0)

@@ -29,5 +29,5 @@ class BotAdapter(ABC):
         self._middleware.use(middleware)
 
     async def run_middleware(self, context: BotContext, logic: Callable=None):
-        await self._middleware.run(context, logic)
+        return await self._middleware.run(context, logic)
         # revocable has not been implemented.
