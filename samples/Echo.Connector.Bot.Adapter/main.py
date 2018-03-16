@@ -1,66 +1,69 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import http.server
-import json
-import asyncio
-from botbuilder.schema import (Activity, ActivityTypes, ChannelAccount)
-from botbuilder.core import BotFrameworkAdapter
+from aiohttp import web
+from botbuilder.schema import (Activity, ActivityTypes)
+from botbuilder.core import (BotFrameworkAdapter, BotFrameworkAdapterSettings, BotContext)
 
 APP_ID = ''
 APP_PASSWORD = ''
+PORT = 9000
+SETTINGS = BotFrameworkAdapterSettings(APP_ID, APP_PASSWORD)
+ADAPTER = BotFrameworkAdapter(SETTINGS)
 
 
-class BotRequestHandler(http.server.BaseHTTPRequestHandler):
+async def create_reply_activity(request_activity, text) -> Activity:
+    return Activity(
+        type=ActivityTypes.message,
+        channel_id=request_activity.channel_id,
+        conversation=request_activity.conversation,
+        recipient=request_activity.from_property,
+        from_property=request_activity.recipient,
+        text=text,
+        service_url=request_activity.service_url)
 
-    @staticmethod
-    def __create_reply_activity(request_activity, text):
-        return Activity(
-            type=ActivityTypes.message,
-            channel_id=request_activity.channel_id,
-            conversation=request_activity.conversation,
-            recipient=request_activity.from_property,
-            from_property=request_activity.recipient,
-            text=text,
-            service_url=request_activity.service_url)
 
-    async def __handle_conversation_update_activity(self, activity: Activity):
-        self.send_response(202)
-        self.end_headers()
-        if activity.members_added[0].id != activity.recipient.id:
-            await self._adapter.send([BotRequestHandler.__create_reply_activity(activity, 'Hello and welcome to the echo bot!')])
+async def handle_message(context: BotContext) -> web.Response:
+    response = await create_reply_activity(context.request, 'You said %s.' % context.request.text)
+    await context.send_activity(response)
+    return web.Response(status=202)
 
-    async def __handle_message_activity(self, activity: Activity):
-        self.send_response(200)
-        self.end_headers()
-        await self._adapter.send([BotRequestHandler.__create_reply_activity(activity, 'You said: %s' % activity.text)])
 
-    async def __unhandled_activity(self):
-        self.send_response(404)
-        self.end_headers()
+async def handle_conversation_update(context: BotContext) -> web.Response:
+    if context.request.members_added[0].id != context.request.recipient.id:
+        response = await create_reply_activity(context.request, 'Welcome to the Echo Adapter Bot!')
+        await context.send_activity(response)
+    return web.Response(status=200)
 
-    async def on_receive(self, activity: Activity):
-        if activity.type == ActivityTypes.conversation_update.value:
-            await self.__handle_conversation_update_activity(activity)
-        elif activity.type == ActivityTypes.message.value:
-            await self.__handle_message_activity(activity)
-        else:
-            await self.__unhandled_activity()
 
-    def do_POST(self):
-        body = self.rfile.read(int(self.headers['Content-Length']))
-        data = json.loads(str(body, 'utf-8'))
-        activity = Activity.deserialize(data)
-        self._adapter = BotFrameworkAdapter(APP_ID, APP_PASSWORD)
-        self._adapter.on_receive = self.on_receive
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(self._adapter.receive(self.headers.get("Authorization"), activity))
+async def unhandled_activity() -> web.Response:
+    return web.Response(status=404)
 
+
+async def request_handler(context: BotContext) -> web.Response:
+    if context.request.type == 'message':
+        return await handle_message(context)
+    elif context.request.type == 'conversationUpdate':
+        return await handle_conversation_update(context)
+    else:
+        return await unhandled_activity()
+
+
+async def messages(req: web.web_request) -> web.Response:
+    body = await req.json()
+    activity = Activity().deserialize(body)
+    auth_header = req.headers['Authorization'] if 'Authorization' in req.headers else ''
+    try:
+        return await ADAPTER.process_request(activity, auth_header, request_handler)
+    except BaseException as e:
+        raise e
+
+
+app = web.Application()
+app.router.add_post('/', messages)
 
 try:
-    SERVER = http.server.HTTPServer(('localhost', 9000), BotRequestHandler)
-    print('Started http server on port %s.' % SERVER.server_port)
-    SERVER.serve_forever()
+    web.run_app(app, host='localhost', port=PORT)
+    print('Started http server on port %s.' % PORT)
 except KeyboardInterrupt:
-    print('^C received, shutting down server')
-    SERVER.socket.close()
+    print('Cannot close')
