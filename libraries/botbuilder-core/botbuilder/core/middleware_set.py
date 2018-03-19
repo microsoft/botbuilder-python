@@ -2,7 +2,6 @@
 # Licensed under the MIT License.
 
 
-import asyncio
 from abc import ABC, abstractmethod
 from typing import Iterable, Callable
 
@@ -23,7 +22,6 @@ class MiddlewareSet(Middleware):
     def __init__(self):
         super(MiddlewareSet, self).__init__()
         self._middleware = []
-        self._loop = asyncio.get_event_loop()
 
     def use(self, *middleware: Iterable[Middleware]):
         """
