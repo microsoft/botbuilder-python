@@ -5,12 +5,13 @@
 # license information.
 # --------------------------------------------------------------------------
 
-
+from .bot_adapter import BotAdapter
 from .bot_framework_adapter import BotFrameworkAdapter, BotFrameworkAdapterSettings
 from .bot_context import BotContext
 from .middleware_set import Middleware, MiddlewareSet
 
-__all__ = ['BotContext',
+__all__ = ['BotAdapter',
+           'BotContext',
            'BotFrameworkAdapter',
            'BotFrameworkAdapterSettings',
            'Middleware',
