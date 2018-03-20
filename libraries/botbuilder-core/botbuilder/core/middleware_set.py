@@ -1,8 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-
-import asyncio
 from abc import ABC, abstractmethod
 from typing import Iterable, Callable
 
@@ -23,36 +21,40 @@ class MiddlewareSet(Middleware):
     def __init__(self):
         super(MiddlewareSet, self).__init__()
         self._middleware = []
-        self._loop = asyncio.get_event_loop()
 
-    def use(self, *middleware: Iterable[Middleware]):
+    def use(self, middleware: Middleware):
         """
         Registers middleware plugin(s) with the bot or set.
         :param middleware :
         :return:
         """
-        for plugin in middleware:
-            if isinstance(plugin, Callable):
-                self._middleware.append(plugin)
-            elif isinstance(plugin, object) and hasattr(plugin, 'on_process_request'):
-                self._middleware.append(lambda context, logic: plugin.on_process_request(context, logic))
+        if hasattr(middleware, 'on_process_request') and callable(middleware.on_process_request):
+            self._middleware.append(middleware)
+            return self
+        else:
+            raise TypeError('MiddlewareSet.use(): invalid middleware being added.')
+
+    async def receive_activity(self, context: BotContext):
+        await self.receive_activity_internal(context, None)
+
+    async def on_process_request(self, context, logic):
+        await self.receive_activity_internal(context, None)
+        await logic()
+
+    async def receive_activity_with_status(self, context: BotContext, callback):
+        return await self.receive_activity_internal(context, callback)
+
+    async def receive_activity_internal(self, context, callback, next_middleware_index=0):
+        if next_middleware_index == len(self._middleware):
+            if callback:
+                return await callback(context)
             else:
-                raise TypeError('MiddlewareSet.use(): invalid plugin type being added.')
-        return self
+                return None
+        next_middleware = self._middleware[next_middleware_index]
 
-    async def on_process_request(self, context, logic: Callable):
-        await self.run(context, logic)
-
-    async def run(self, context: BotContext, logic: Callable):
-        handlers = self._middleware[0:]
-
-        async def run_next(i: int):
-            try:
-                if i < len(handlers):
-                    await run_next(handlers[i](context, run_next(i+1)))
-                else:
-                    return await logic(context)
-            except BaseException as e:
-                raise e
-
-        return await run_next(0)
+        async def call_next_middleware():
+            return await self.receive_activity_internal(context, callback, next_middleware_index+1)
+        return await next_middleware.on_process_request(
+            context,
+            call_next_middleware
+        )
