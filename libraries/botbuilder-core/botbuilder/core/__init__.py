@@ -6,13 +6,11 @@
 # --------------------------------------------------------------------------
 
 
-from .activity_adapter import ActivityAdapter
 from .bot_framework_adapter import BotFrameworkAdapter, BotFrameworkAdapterSettings
 from .bot_context import BotContext
 from .middleware_set import Middleware, MiddlewareSet
 
-__all__ = ['ActivityAdapter',
-           'BotContext',
+__all__ = ['BotContext',
            'BotFrameworkAdapter',
            'BotFrameworkAdapterSettings',
            'Middleware',

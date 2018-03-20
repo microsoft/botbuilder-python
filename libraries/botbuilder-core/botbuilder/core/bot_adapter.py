@@ -6,7 +6,7 @@ from typing import List, Callable
 from botbuilder.schema import Activity, ConversationReference
 
 from .bot_context import BotContext
-from .middleware_set import Middleware, MiddlewareSet
+from .middleware_set import MiddlewareSet
 
 
 class BotAdapter(ABC):
@@ -28,6 +28,5 @@ class BotAdapter(ABC):
     def use(self, middleware):
         self._middleware.use(middleware)
 
-    async def run_middleware(self, context: BotContext, logic: Callable=None):
-        return await self._middleware.run(context, logic)
-        # revocable has not been implemented.
+    async def run_middleware(self, context: BotContext, callback: Callable=None):
+        return await self._middleware.receive_activity_with_status(context, callback)
