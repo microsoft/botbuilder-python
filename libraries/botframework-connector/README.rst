@@ -38,6 +38,7 @@ Example
 Client creation (with authentication), conversation initialization and activity send to user.
 
 .. code-block:: python
+
   from microsoft.botbuilder.schema import *
   from microsoft.botframework.connector import ConnectorClient
   from microsoft.botframework.connector.auth import MicrosoftTokenAuthentication
@@ -62,7 +63,7 @@ Client creation (with authentication), conversation initialization and activity 
               recipient=ChannelAccount(id=RECIPIENT_ID),
               from_property=ChannelAccount(id=BOT_ID),
               text='Hello World!'))
-````
+
 
 Rest API Documentation
 ======================
