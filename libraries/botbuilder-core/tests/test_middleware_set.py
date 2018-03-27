@@ -1,7 +1,9 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 import pytest
 
-from botbuilder.schema import Activity
-from botbuilder.core import MiddlewareSet, Middleware
+from botbuilder.core import AnonymousReceiveMiddleware, MiddlewareSet, Middleware
 
 
 class TestMiddlewareSet:
@@ -166,3 +168,99 @@ class TestMiddlewareSet:
 
         assert called_first
         assert not finished_pipeline
+
+    @pytest.mark.asyncio
+    async def test_anonymous_middleware(self):
+        did_run = False
+
+        middleware_set = MiddlewareSet()
+
+        async def processor(context, logic):
+            nonlocal did_run
+            did_run = True
+            return await logic()
+
+        middleware_set.use(AnonymousReceiveMiddleware(processor))
+
+        assert not did_run
+        await middleware_set.receive_activity(None)
+        assert did_run
+
+    @pytest.mark.asyncio
+    async def test_anonymous_two_middleware_and_in_order(self):
+        called_first = False
+        called_second = False
+
+        middleware_set = MiddlewareSet()
+
+        async def processor_one(context, logic):
+            nonlocal called_first, called_second
+            called_first = True
+            assert not called_second
+            return await logic()
+
+        async def processor_two(context, logic):
+            nonlocal called_first, called_second
+            called_second = True
+            return await logic()
+
+        middleware_set.use(AnonymousReceiveMiddleware(processor_one))
+        middleware_set.use(AnonymousReceiveMiddleware(processor_two))
+
+        await middleware_set.receive_activity(None)
+        assert called_first
+        assert called_second
+
+    @pytest.mark.asyncio
+    async def test_mixed_middleware_anonymous_first(self):
+        called_regular_middleware = False
+        called_anonymous_middleware = False
+
+        middleware_set = MiddlewareSet()
+
+        class MyFirstMiddleware(Middleware):
+            async def on_process_request(self, context, logic):
+                nonlocal called_regular_middleware, called_anonymous_middleware
+                assert called_anonymous_middleware
+                called_regular_middleware = True
+                return await logic()
+
+        async def anonymous_method(context, logic):
+            nonlocal called_regular_middleware, called_anonymous_middleware
+            assert not called_regular_middleware
+            called_anonymous_middleware = True
+            return await logic()
+
+        middleware_set.use(AnonymousReceiveMiddleware(anonymous_method))
+        middleware_set.use(MyFirstMiddleware())
+
+        await middleware_set.receive_activity(None)
+        assert called_regular_middleware
+        assert called_anonymous_middleware
+
+    @pytest.mark.asyncio
+    async def test_mixed_middleware_anonymous_last(self):
+        called_regular_middleware = False
+        called_anonymous_middleware = False
+
+        middleware_set = MiddlewareSet()
+
+        class MyFirstMiddleware(Middleware):
+            async def on_process_request(self, context, logic):
+                nonlocal called_regular_middleware, called_anonymous_middleware
+                assert not called_anonymous_middleware
+                called_regular_middleware = True
+                return await logic()
+
+        async def anonymous_method(context, logic):
+            nonlocal called_regular_middleware, called_anonymous_middleware
+            assert called_regular_middleware
+            called_anonymous_middleware = True
+            return await logic()
+
+        middleware_set.use(MyFirstMiddleware())
+        middleware_set.use(AnonymousReceiveMiddleware(anonymous_method))
+
+        await middleware_set.receive_activity(None)
+        assert called_regular_middleware
+        assert called_anonymous_middleware

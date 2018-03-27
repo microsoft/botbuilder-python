@@ -8,9 +8,10 @@
 from .bot_adapter import BotAdapter
 from .bot_framework_adapter import BotFrameworkAdapter, BotFrameworkAdapterSettings
 from .bot_context import BotContext
-from .middleware_set import Middleware, MiddlewareSet
+from .middleware_set import AnonymousReceiveMiddleware, Middleware, MiddlewareSet
 
-__all__ = ['BotAdapter',
+__all__ = ['AnonymousReceiveMiddleware',
+           'BotAdapter',
            'BotContext',
            'BotFrameworkAdapter',
            'BotFrameworkAdapterSettings',

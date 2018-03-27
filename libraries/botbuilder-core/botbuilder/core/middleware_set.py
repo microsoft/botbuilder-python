@@ -1,8 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from asyncio import iscoroutinefunction
 from abc import ABC, abstractmethod
-from typing import Iterable, Callable
 
 from .bot_context import BotContext
 
@@ -10,6 +10,16 @@ from .bot_context import BotContext
 class Middleware(ABC):
     @abstractmethod
     def on_process_request(self, context: BotContext, next): pass
+
+
+class AnonymousReceiveMiddleware(Middleware):
+    def __init__(self, anonymous_handler):
+        if not iscoroutinefunction(anonymous_handler):
+            raise TypeError('AnonymousReceiveMiddleware must be instantiated with a valid coroutine function.')
+        self._to_call = anonymous_handler
+
+    def on_process_request(self, context: BotContext, next):
+        return self._to_call(context, next)
 
 
 class MiddlewareSet(Middleware):
