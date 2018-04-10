@@ -26,6 +26,8 @@ try:
     from .activity_py3 import Activity
     from .conversation_parameters_py3 import ConversationParameters
     from .conversation_resource_response_py3 import ConversationResourceResponse
+    from .conversation_members_py3 import ConversationMembers
+    from .conversations_result_py3 import ConversationsResult
     from .resource_response_py3 import ResourceResponse
     from .attachment_data_py3 import AttachmentData
     from .card_image_py3 import CardImage
@@ -36,10 +38,11 @@ try:
     from .audio_card_py3 import AudioCard
     from .basic_card_py3 import BasicCard
     from .media_card_py3 import MediaCard
-    from .receipt_item_py3 import ReceiptItem
     from .fact_py3 import Fact
+    from .receipt_item_py3 import ReceiptItem
     from .receipt_card_py3 import ReceiptCard
     from .signin_card_py3 import SigninCard
+    from .oauth_card_py3 import OAuthCard
     from .thumbnail_card_py3 import ThumbnailCard
     from .video_card_py3 import VideoCard
     from .geo_coordinates_py3 import GeoCoordinates
@@ -47,6 +50,8 @@ try:
     from .place_py3 import Place
     from .thing_py3 import Thing
     from .media_event_value_py3 import MediaEventValue
+    from .token_request_py3 import TokenRequest
+    from .token_response_py3 import TokenResponse
     from .microsoft_pay_method_data_py3 import MicrosoftPayMethodData
     from .payment_address_py3 import PaymentAddress
     from .payment_currency_amount_py3 import PaymentCurrencyAmount
@@ -79,6 +84,8 @@ except (SyntaxError, ImportError):
     from .activity import Activity
     from .conversation_parameters import ConversationParameters
     from .conversation_resource_response import ConversationResourceResponse
+    from .conversation_members import ConversationMembers
+    from .conversations_result import ConversationsResult
     from .resource_response import ResourceResponse
     from .attachment_data import AttachmentData
     from .card_image import CardImage
@@ -89,10 +96,11 @@ except (SyntaxError, ImportError):
     from .audio_card import AudioCard
     from .basic_card import BasicCard
     from .media_card import MediaCard
-    from .receipt_item import ReceiptItem
     from .fact import Fact
+    from .receipt_item import ReceiptItem
     from .receipt_card import ReceiptCard
     from .signin_card import SigninCard
+    from .oauth_card import OAuthCard
     from .thumbnail_card import ThumbnailCard
     from .video_card import VideoCard
     from .geo_coordinates import GeoCoordinates
@@ -100,6 +108,8 @@ except (SyntaxError, ImportError):
     from .place import Place
     from .thing import Thing
     from .media_event_value import MediaEventValue
+    from .token_request import TokenRequest
+    from .token_response import TokenResponse
     from .microsoft_pay_method_data import MicrosoftPayMethodData
     from .payment_address import PaymentAddress
     from .payment_currency_amount import PaymentCurrencyAmount
@@ -116,6 +126,7 @@ except (SyntaxError, ImportError):
     from .payment_request_update import PaymentRequestUpdate
     from .payment_request_update_result import PaymentRequestUpdateResult
 from .connector_client_enums import (
+    RoleTypes,
     ActivityTypes,
     TextFormatTypes,
     AttachmentLayoutTypes,
@@ -145,6 +156,8 @@ __all__ = [
     'Activity',
     'ConversationParameters',
     'ConversationResourceResponse',
+    'ConversationMembers',
+    'ConversationsResult',
     'ResourceResponse',
     'AttachmentData',
     'CardImage',
@@ -155,10 +168,11 @@ __all__ = [
     'AudioCard',
     'BasicCard',
     'MediaCard',
-    'ReceiptItem',
     'Fact',
+    'ReceiptItem',
     'ReceiptCard',
     'SigninCard',
+    'OAuthCard',
     'ThumbnailCard',
     'VideoCard',
     'GeoCoordinates',
@@ -166,6 +180,8 @@ __all__ = [
     'Place',
     'Thing',
     'MediaEventValue',
+    'TokenRequest',
+    'TokenResponse',
     'MicrosoftPayMethodData',
     'PaymentAddress',
     'PaymentCurrencyAmount',
@@ -181,6 +197,7 @@ __all__ = [
     'PaymentRequestCompleteResult',
     'PaymentRequestUpdate',
     'PaymentRequestUpdateResult',
+    'RoleTypes',
     'ActivityTypes',
     'TextFormatTypes',
     'AttachmentLayoutTypes',

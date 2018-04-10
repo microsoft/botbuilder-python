@@ -1,6 +1,8 @@
 @echo off
 
 rd /s /q generated
+echo [91mWARNING:[0m There is manual code for lines 127-130 in attachments_operations_async.py and lines 12-26 in the connector_client.py.
+echo [91mCalling this command script has removed those sections of code.[0m
 call autorest README.md --python --use="git+https://github.com/Azure/autorest.python#async"
 
 rd /s /q ..\botbuilder-schema\botbuilder\schema

@@ -25,7 +25,7 @@ class ServiceClient(_ServiceClient, AsyncServiceClientMixin):
         self.config = config
         self.creds = creds if creds else Authentication()
         self._headers = {}
-    
+
 
 class ConnectorClientConfiguration(Configuration):
     """Configuration for ConnectorClient

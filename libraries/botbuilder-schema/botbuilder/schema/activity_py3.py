@@ -19,7 +19,8 @@ class Activity(Model):
     :param type: The type of the activity. Possible values include: 'message',
      'contactRelationUpdate', 'conversationUpdate', 'typing', 'ping',
      'endOfConversation', 'event', 'invoke', 'deleteUserData', 'messageUpdate',
-     'messageDelete', 'installationUpdate', 'messageReaction', 'suggestion'
+     'messageDelete', 'installationUpdate', 'messageReaction', 'suggestion',
+     'trace'
     :type type: str or ~botframework.connector.models.ActivityTypes
     :param id: ID of this activity
     :type id: str
@@ -88,6 +89,11 @@ class Activity(Model):
     :type action: str
     :param reply_to_id: The original ID this message is a response to
     :type reply_to_id: str
+    :param label: Descriptive label
+    :type label: str
+    :param value_type: Unique string which identifies the shape of the value
+     object
+    :type value_type: str
     :param value: Open-ended value
     :type value: object
     :param name: Name of the operation to invoke or the name of the event
@@ -144,6 +150,8 @@ class Activity(Model):
         'channel_data': {'key': 'channelData', 'type': 'object'},
         'action': {'key': 'action', 'type': 'str'},
         'reply_to_id': {'key': 'replyToId', 'type': 'str'},
+        'label': {'key': 'label', 'type': 'str'},
+        'value_type': {'key': 'valueType', 'type': 'str'},
         'value': {'key': 'value', 'type': 'object'},
         'name': {'key': 'name', 'type': 'str'},
         'relates_to': {'key': 'relatesTo', 'type': 'ConversationReference'},
@@ -154,7 +162,7 @@ class Activity(Model):
         'text_highlights': {'key': 'textHighlights', 'type': '[TextHighlight]'},
     }
 
-    def __init__(self, *, type=None, id: str=None, timestamp=None, local_timestamp=None, service_url: str=None, channel_id: str=None, from_property=None, conversation=None, recipient=None, text_format=None, attachment_layout=None, members_added=None, members_removed=None, reactions_added=None, reactions_removed=None, topic_name: str=None, history_disclosed: bool=None, locale: str=None, text: str=None, speak: str=None, input_hint=None, summary: str=None, suggested_actions=None, attachments=None, entities=None, channel_data=None, action: str=None, reply_to_id: str=None, value=None, name: str=None, relates_to=None, code=None, expiration=None, importance: str=None, delivery_mode: str=None, text_highlights=None, **kwargs) -> None:
+    def __init__(self, *, type=None, id: str=None, timestamp=None, local_timestamp=None, service_url: str=None, channel_id: str=None, from_property=None, conversation=None, recipient=None, text_format=None, attachment_layout=None, members_added=None, members_removed=None, reactions_added=None, reactions_removed=None, topic_name: str=None, history_disclosed: bool=None, locale: str=None, text: str=None, speak: str=None, input_hint=None, summary: str=None, suggested_actions=None, attachments=None, entities=None, channel_data=None, action: str=None, reply_to_id: str=None, label: str=None, value_type: str=None, value=None, name: str=None, relates_to=None, code=None, expiration=None, importance: str=None, delivery_mode: str=None, text_highlights=None, **kwargs) -> None:
         super(Activity, self).__init__(**kwargs)
         self.type = type
         self.id = id
@@ -184,6 +192,8 @@ class Activity(Model):
         self.channel_data = channel_data
         self.action = action
         self.reply_to_id = reply_to_id
+        self.label = label
+        self.value_type = value_type
         self.value = value
         self.name = name
         self.relates_to = relates_to

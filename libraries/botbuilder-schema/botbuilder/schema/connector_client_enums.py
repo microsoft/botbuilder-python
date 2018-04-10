@@ -12,6 +12,12 @@
 from enum import Enum
 
 
+class RoleTypes(str, Enum):
+
+    user = "user"
+    bot = "bot"
+
+
 class ActivityTypes(str, Enum):
 
     message = "message"
@@ -28,6 +34,7 @@ class ActivityTypes(str, Enum):
     installation_update = "installationUpdate"
     message_reaction = "messageReaction"
     suggestion = "suggestion"
+    trace = "trace"
 
 
 class TextFormatTypes(str, Enum):

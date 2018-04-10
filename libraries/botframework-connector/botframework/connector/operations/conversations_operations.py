@@ -33,6 +33,68 @@ class ConversationsOperations(object):
 
         self.config = config
 
+    def get_conversations(
+            self, continuation_token=None, custom_headers=None, raw=False, **operation_config):
+        """GetConversations.
+
+        List the Conversations in which this bot has participated.
+        GET from this method with a skip token
+        The return value is a ConversationsResult, which contains an array of
+        ConversationMembers and a skip token.  If the skip token is not empty,
+        then
+        there are further values to be returned. Call this method again with
+        the returned token to get more values.
+        Each ConversationMembers object contains the ID of the conversation and
+        an array of ChannelAccounts that describe the members of the
+        conversation.
+
+        :param continuation_token: skip or continuation token
+        :type continuation_token: str
+        :param dict custom_headers: headers that will be added to the request
+        :param bool raw: returns the direct response alongside the
+         deserialized response
+        :param operation_config: :ref:`Operation configuration
+         overrides<msrest:optionsforoperations>`.
+        :return: ConversationsResult or ClientRawResponse if raw=true
+        :rtype: ~botframework.connector.models.ConversationsResult or
+         ~msrest.pipeline.ClientRawResponse
+        :raises:
+         :class:`ErrorResponseException<botframework.connector.models.ErrorResponseException>`
+        """
+        # Construct URL
+        url = self.get_conversations.metadata['url']
+
+        # Construct parameters
+        query_parameters = {}
+        if continuation_token is not None:
+            query_parameters['continuationToken'] = self._serialize.query("continuation_token", continuation_token, 'str')
+
+        # Construct headers
+        header_parameters = {}
+        header_parameters['Content-Type'] = 'application/json; charset=utf-8'
+        if custom_headers:
+            header_parameters.update(custom_headers)
+
+        body_content = None
+        # Construct and send request
+        request = self._client.get(url, query_parameters)
+        response = self._client.send(
+            request, header_parameters, body_content, stream=False, **operation_config)
+
+        if response.status_code not in [200]:
+            raise models.ErrorResponseException(self._deserialize, response)
+
+        deserialized = None
+        if response.status_code == 200:
+            deserialized = self._deserialize('ConversationsResult', response)
+
+        if raw:
+            client_raw_response = ClientRawResponse(deserialized, response)
+            return client_raw_response
+
+        return deserialized
+    get_conversations.metadata = {'url': '/v3/conversations'}
+
     def create_conversation(
             self, parameters, custom_headers=None, raw=False, **operation_config):
         """CreateConversation.
@@ -95,7 +157,6 @@ class ConversationsOperations(object):
             raise models.ErrorResponseException(self._deserialize, response)
 
         deserialized = None
-
         if response.status_code == 200:
             deserialized = self._deserialize('ConversationResourceResponse', response)
         if response.status_code == 201:
@@ -171,7 +232,6 @@ class ConversationsOperations(object):
             raise models.ErrorResponseException(self._deserialize, response)
 
         deserialized = None
-
         if response.status_code == 200:
             deserialized = self._deserialize('ResourceResponse', response)
         if response.status_code == 201:
@@ -242,7 +302,6 @@ class ConversationsOperations(object):
             raise models.ErrorResponseException(self._deserialize, response)
 
         deserialized = None
-
         if response.status_code == 200:
             deserialized = self._deserialize('ResourceResponse', response)
         if response.status_code == 201:
@@ -320,7 +379,6 @@ class ConversationsOperations(object):
             raise models.ErrorResponseException(self._deserialize, response)
 
         deserialized = None
-
         if response.status_code == 200:
             deserialized = self._deserialize('ResourceResponse', response)
         if response.status_code == 201:
@@ -374,9 +432,11 @@ class ConversationsOperations(object):
         if custom_headers:
             header_parameters.update(custom_headers)
 
+        body_content = None
         # Construct and send request
         request = self._client.delete(url, query_parameters)
-        response = self._client.send(request, header_parameters, stream=False, **operation_config)
+        response = self._client.send(
+            request, header_parameters, body_content, stream=False, **operation_config)
 
         if response.status_code not in [200, 202]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -423,15 +483,16 @@ class ConversationsOperations(object):
         if custom_headers:
             header_parameters.update(custom_headers)
 
+        body_content = None
         # Construct and send request
         request = self._client.get(url, query_parameters)
-        response = self._client.send(request, header_parameters, stream=False, **operation_config)
+        response = self._client.send(
+            request, header_parameters, body_content, stream=False, **operation_config)
 
         if response.status_code not in [200]:
             raise models.ErrorResponseException(self._deserialize, response)
 
         deserialized = None
-
         if response.status_code == 200:
             deserialized = self._deserialize('[ChannelAccount]', response)
 
@@ -441,6 +502,61 @@ class ConversationsOperations(object):
 
         return deserialized
     get_conversation_members.metadata = {'url': '/v3/conversations/{conversationId}/members'}
+
+    def delete_conversation_member(
+            self, conversation_id, member_id, custom_headers=None, raw=False, **operation_config):
+        """DeleteConversationMember.
+
+        Deletes a member from a converstion.
+        This REST API takes a ConversationId and a memberId (of type string)
+        and removes that member from the conversation. If that member was the
+        last member
+        of the conversation, the conversation will also be deleted.
+
+        :param conversation_id: Conversation ID
+        :type conversation_id: str
+        :param member_id: ID of the member to delete from this conversation
+        :type member_id: str
+        :param dict custom_headers: headers that will be added to the request
+        :param bool raw: returns the direct response alongside the
+         deserialized response
+        :param operation_config: :ref:`Operation configuration
+         overrides<msrest:optionsforoperations>`.
+        :return: None or ClientRawResponse if raw=true
+        :rtype: None or ~msrest.pipeline.ClientRawResponse
+        :raises:
+         :class:`ErrorResponseException<botframework.connector.models.ErrorResponseException>`
+        """
+        # Construct URL
+        url = self.delete_conversation_member.metadata['url']
+        path_format_arguments = {
+            'conversationId': self._serialize.url("conversation_id", conversation_id, 'str'),
+            'memberId': self._serialize.url("member_id", member_id, 'str')
+        }
+        url = self._client.format_url(url, **path_format_arguments)
+
+        # Construct parameters
+        query_parameters = {}
+
+        # Construct headers
+        header_parameters = {}
+        header_parameters['Content-Type'] = 'application/json; charset=utf-8'
+        if custom_headers:
+            header_parameters.update(custom_headers)
+
+        body_content = None
+        # Construct and send request
+        request = self._client.delete(url, query_parameters)
+        response = self._client.send(
+            request, header_parameters, body_content, stream=False, **operation_config)
+
+        if response.status_code not in [200, 204]:
+            raise models.ErrorResponseException(self._deserialize, response)
+
+        if raw:
+            client_raw_response = ClientRawResponse(None, response)
+            return client_raw_response
+    delete_conversation_member.metadata = {'url': '/v3/conversations/{conversationId}/members/{memberId}'}
 
     def get_activity_members(
             self, conversation_id, activity_id, custom_headers=None, raw=False, **operation_config):
@@ -483,15 +599,16 @@ class ConversationsOperations(object):
         if custom_headers:
             header_parameters.update(custom_headers)
 
+        body_content = None
         # Construct and send request
         request = self._client.get(url, query_parameters)
-        response = self._client.send(request, header_parameters, stream=False, **operation_config)
+        response = self._client.send(
+            request, header_parameters, body_content, stream=False, **operation_config)
 
         if response.status_code not in [200]:
             raise models.ErrorResponseException(self._deserialize, response)
 
         deserialized = None
-
         if response.status_code == 200:
             deserialized = self._deserialize('[ChannelAccount]', response)
 
@@ -555,7 +672,6 @@ class ConversationsOperations(object):
             raise models.ErrorResponseException(self._deserialize, response)
 
         deserialized = None
-
         if response.status_code == 200:
             deserialized = self._deserialize('ResourceResponse', response)
         if response.status_code == 201:
