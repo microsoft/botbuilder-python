@@ -19,7 +19,8 @@ class Activity(Model):
     :param type: The type of the activity. Possible values include: 'message',
      'contactRelationUpdate', 'conversationUpdate', 'typing', 'ping',
      'endOfConversation', 'event', 'invoke', 'deleteUserData', 'messageUpdate',
-     'messageDelete', 'installationUpdate', 'messageReaction', 'suggestion'
+     'messageDelete', 'installationUpdate', 'messageReaction', 'suggestion',
+     'trace'
     :type type: str or ~botframework.connector.models.ActivityTypes
     :param id: ID of this activity
     :type id: str
@@ -88,6 +89,11 @@ class Activity(Model):
     :type action: str
     :param reply_to_id: The original ID this message is a response to
     :type reply_to_id: str
+    :param label: Descriptive label
+    :type label: str
+    :param value_type: Unique string which identifies the shape of the value
+     object
+    :type value_type: str
     :param value: Open-ended value
     :type value: object
     :param name: Name of the operation to invoke or the name of the event
@@ -144,6 +150,8 @@ class Activity(Model):
         'channel_data': {'key': 'channelData', 'type': 'object'},
         'action': {'key': 'action', 'type': 'str'},
         'reply_to_id': {'key': 'replyToId', 'type': 'str'},
+        'label': {'key': 'label', 'type': 'str'},
+        'value_type': {'key': 'valueType', 'type': 'str'},
         'value': {'key': 'value', 'type': 'object'},
         'name': {'key': 'name', 'type': 'str'},
         'relates_to': {'key': 'relatesTo', 'type': 'ConversationReference'},
@@ -184,6 +192,8 @@ class Activity(Model):
         self.channel_data = kwargs.get('channel_data', None)
         self.action = kwargs.get('action', None)
         self.reply_to_id = kwargs.get('reply_to_id', None)
+        self.label = kwargs.get('label', None)
+        self.value_type = kwargs.get('value_type', None)
         self.value = kwargs.get('value', None)
         self.name = kwargs.get('name', None)
         self.relates_to = kwargs.get('relates_to', None)

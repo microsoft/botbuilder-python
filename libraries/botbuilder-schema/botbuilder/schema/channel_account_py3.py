@@ -20,14 +20,19 @@ class ChannelAccount(Model):
     :type id: str
     :param name: Display friendly name
     :type name: str
+    :param role: Role of the entity behind the account (Example: User, Bot,
+     etc.). Possible values include: 'user', 'bot'
+    :type role: str or ~botframework.connector.models.RoleTypes
     """
 
     _attribute_map = {
         'id': {'key': 'id', 'type': 'str'},
         'name': {'key': 'name', 'type': 'str'},
+        'role': {'key': 'role', 'type': 'str'},
     }
 
-    def __init__(self, *, id: str=None, name: str=None, **kwargs) -> None:
+    def __init__(self, *, id: str=None, name: str=None, role=None, **kwargs) -> None:
         super(ChannelAccount, self).__init__(**kwargs)
         self.id = id
         self.name = name
+        self.role = role

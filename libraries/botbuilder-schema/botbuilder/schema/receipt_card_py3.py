@@ -17,17 +17,17 @@ class ReceiptCard(Model):
 
     :param title: Title of the card
     :type title: str
+    :param facts: Array of Fact objects
+    :type facts: list[~botframework.connector.models.Fact]
     :param items: Array of Receipt Items
     :type items: list[~botframework.connector.models.ReceiptItem]
-    :param facts: Array of Fact Objects   Array of key-value pairs.
-    :type facts: list[~botframework.connector.models.Fact]
     :param tap: This action will be activated when user taps on the card
     :type tap: ~botframework.connector.models.CardAction
-    :param total: Total amount of money paid (or should be paid)
+    :param total: Total amount of money paid (or to be paid)
     :type total: str
-    :param tax: Total amount of TAX paid(or should be paid)
+    :param tax: Total amount of tax paid (or to be paid)
     :type tax: str
-    :param vat: Total amount of VAT paid(or should be paid)
+    :param vat: Total amount of VAT paid (or to be paid)
     :type vat: str
     :param buttons: Set of actions applicable to the current card
     :type buttons: list[~botframework.connector.models.CardAction]
@@ -35,8 +35,8 @@ class ReceiptCard(Model):
 
     _attribute_map = {
         'title': {'key': 'title', 'type': 'str'},
-        'items': {'key': 'items', 'type': '[ReceiptItem]'},
         'facts': {'key': 'facts', 'type': '[Fact]'},
+        'items': {'key': 'items', 'type': '[ReceiptItem]'},
         'tap': {'key': 'tap', 'type': 'CardAction'},
         'total': {'key': 'total', 'type': 'str'},
         'tax': {'key': 'tax', 'type': 'str'},
@@ -44,11 +44,11 @@ class ReceiptCard(Model):
         'buttons': {'key': 'buttons', 'type': '[CardAction]'},
     }
 
-    def __init__(self, *, title: str=None, items=None, facts=None, tap=None, total: str=None, tax: str=None, vat: str=None, buttons=None, **kwargs) -> None:
+    def __init__(self, *, title: str=None, facts=None, items=None, tap=None, total: str=None, tax: str=None, vat: str=None, buttons=None, **kwargs) -> None:
         super(ReceiptCard, self).__init__(**kwargs)
         self.title = title
-        self.items = items
         self.facts = facts
+        self.items = items
         self.tap = tap
         self.total = total
         self.tax = tax
