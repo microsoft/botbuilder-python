@@ -124,7 +124,10 @@ class AttachmentsOperations(_AttachmentsOperations):
         if response.status_code not in [200, 301, 302]:
             raise models.ErrorResponseException(self._deserialize, response)
 
-        deserialized = self._client.stream_download_async(response, callback)
+        deserialized = None
+
+        if response.status_code == 200:
+            deserialized = self._client.stream_download(response, callback)
 
         if raw:
             client_raw_response = ClientRawResponse(deserialized, response)
