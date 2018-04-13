@@ -4,7 +4,7 @@
 from setuptools import setup
 
 NAME = "botframework-connector"
-VERSION = "4.0.0.a1"
+VERSION = "4.0.0.a2"
 REQUIRES = [
     "msrest>=0.4.27",
     "requests>=2.8.1",

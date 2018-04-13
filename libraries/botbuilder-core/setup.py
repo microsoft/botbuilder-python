@@ -7,7 +7,7 @@ NAME = "botbuilder-core"
 VERSION = "4.0.0.a1"
 REQUIRES = [
     "botbuilder-schema>=4.0.0.a1",
-    "botframework-connector>=4.0.0.a1"]
+    "botframework-connector>=4.0.0.a2"]
 
 setup(
     name=NAME,
