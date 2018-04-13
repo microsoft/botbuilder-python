@@ -20,7 +20,12 @@ setup(
     url="https://www.github.com/Microsoft/botbuilder-python",
     keywords=["BotFrameworkConnector", "bots","ai", "botframework", "botbuilder"],
     install_requires=REQUIRES,
-    packages=["botframework.connector", "botframework.connector.auth", "botframework.connector.operations", "botframework.connector.models"],
+    packages=["botframework.connector",
+              "botframework.connector.auth",
+              "botframework.connector.async_mixin",
+              "botframework.connector.operations",
+              "botframework.connector.models"
+    ],
     include_package_data=True,
     long_description="Microsoft Bot Framework Bot Builder SDK for Python.",
     license='MIT',
