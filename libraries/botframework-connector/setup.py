@@ -10,7 +10,7 @@ REQUIRES = [
     "requests>=2.8.1",
     "cryptography>=2.1.4",
     "PyJWT>=1.5.3",
-    "botbuilder-schema>=4.0.0.a1"]
+    "botbuilder-schema>=4.0.0.a2"]
 
 setup(
     name=NAME,
