@@ -4,7 +4,7 @@
 from setuptools import setup
 
 NAME = "botbuilder-core"
-VERSION = "4.0.0.a1"
+VERSION = "4.0.0.a2"
 REQUIRES = [
     "botbuilder-schema>=4.0.0.a2",
     "botframework-connector>=4.0.0.a2"]
