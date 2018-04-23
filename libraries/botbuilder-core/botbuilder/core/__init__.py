@@ -5,6 +5,8 @@
 # license information.
 # --------------------------------------------------------------------------
 
+from .about import __version__
+
 from .bot_adapter import BotAdapter
 from .bot_framework_adapter import BotFrameworkAdapter, BotFrameworkAdapterSettings
 from .bot_context import BotContext
@@ -16,4 +18,5 @@ __all__ = ['AnonymousReceiveMiddleware',
            'BotFrameworkAdapter',
            'BotFrameworkAdapterSettings',
            'Middleware',
-           'MiddlewareSet',]
+           'MiddlewareSet',
+           '__version__',]
