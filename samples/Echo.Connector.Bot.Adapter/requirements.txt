@@ -1,4 +1,4 @@
-git+https://github.com/Azure/msrest-for-python@async2
+git+https://github.com/Azure/msrest-for-python@8ffedd8a3a804a38a5057c080ddd382e777df37d # A commit on the "async2" branch of msrest-for-python
 botbuilder-schema>=4.0.0.a2
 botframework-connector>=4.0.0.a2
 botbuilder-core>=4.0.0.a2
