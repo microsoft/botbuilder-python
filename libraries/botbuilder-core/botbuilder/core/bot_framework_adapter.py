@@ -8,8 +8,11 @@ from botframework.connector import ConnectorClient
 from botframework.connector.auth import (MicrosoftAppCredentials,
                                          JwtTokenValidation, SimpleCredentialProvider)
 
+from . import __version__
 from .bot_adapter import BotAdapter
 from .bot_context import BotContext
+
+USER_AGENT = f"Microsoft-BotFramework/3.1 (BotBuilder Python/{__version__})"
 
 
 class BotFrameworkAdapterSettings(object):
@@ -83,7 +86,8 @@ class BotFrameworkAdapter(BotAdapter):
     async def update_activity(self, activity: Activity):
         try:
             connector_client = ConnectorClient(self._credentials, activity.service_url)
-            return connector_client.conversations.update_activity(
+            connector_client.config.add_user_agent(USER_AGENT)
+            return await connector_client.conversations.update_activity_async(
                 activity.conversation.id,
                 activity.conversation.activity_id,
                 activity)
@@ -93,7 +97,8 @@ class BotFrameworkAdapter(BotAdapter):
     async def delete_activity(self, conversation_reference: ConversationReference):
         try:
             connector_client = ConnectorClient(self._credentials, conversation_reference.service_url)
-            connector_client.conversations.delete_activity(conversation_reference.conversation.id,
+            connector_client.config.add_user_agent(USER_AGENT)
+            await connector_client.conversations.delete_activity_async(conversation_reference.conversation.id,
                                                            conversation_reference.activity_id)
         except BaseException as e:
             raise e
@@ -112,7 +117,8 @@ class BotFrameworkAdapter(BotAdapter):
                         await asyncio.sleep(delay_in_ms)
                 else:
                     connector_client = ConnectorClient(self._credentials, activity.service_url)
-                    connector_client.conversations.send_to_conversation(activity.conversation.id, activity)
+                    connector_client.config.add_user_agent(USER_AGENT)
+                    await connector_client.conversations.send_to_conversation_async(activity.conversation.id, activity)
         except BaseException as e:
             raise e
 
@@ -120,6 +126,7 @@ class BotFrameworkAdapter(BotAdapter):
     async def send(self, activities: List[Activity]):
         for activity in activities:
             connector = ConnectorClient(self._credentials, base_url=activity.service_url)
+            connector.config.add_user_agent(USER_AGENT)
             await connector.conversations.send_to_conversation_async(activity.conversation.id, activity)
 
     async def receive(self, auth_header: str, activity: Activity):

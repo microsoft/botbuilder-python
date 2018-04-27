@@ -64,6 +64,5 @@ app.router.add_post('/', messages)
 
 try:
     web.run_app(app, host='localhost', port=PORT)
-    print('Started http server on port %s.' % PORT)
-except KeyboardInterrupt:
-    print('Cannot close')
+except BaseException as e:
+    raise e
