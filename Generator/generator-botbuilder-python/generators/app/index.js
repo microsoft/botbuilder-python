@@ -2,6 +2,10 @@
 const Generator = require('yeoman-generator');
 const chalk = require('chalk');
 const yosay = require('yosay');
+const path = require('path');
+const _ = require('lodash');
+const extend = require('deep-extend');
+const mkdirp = require('mkdirp');
 
 module.exports = class extends Generator {
   prompting() {
@@ -35,7 +39,7 @@ module.exports = class extends Generator {
     this.fs.copyTpl(this.templatePath('requirements.txt'), this.destinationPath('requirements.txt'), { botName: directoryName });
     this.fs.copy(this.templatePath(`main.py`), this.destinationPath(`main.py`));
     this.fs.copyTpl(this.templatePath('README.md'), this.destinationPath('README.md'), {
-      botName: this.props.botName, description: this.props.description, launchSteps: launchSteps
+      botName: this.props.botName, description: this.props.description
     });
   }
 
