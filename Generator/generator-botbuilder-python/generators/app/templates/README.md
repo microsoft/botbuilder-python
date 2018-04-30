@@ -22,14 +22,6 @@ Each class has three properties to help simplify addition to an existing bot:
 - waterfall: The logic (or waterfall) for the dialog
 - name: The intent name for the dialog for triggering
 
-You can add a dialog to a bot with the following code:
-
-``` javascript
-// declare your dialog
-
-bot.dialog(dialog.id, dialog.waterfall).triggerAction({ matches: dialog.name });
-```
-
 By using this structure, it would be possible to dynamically load all of the dialogs in the `dialogs` folder, and then add them to the bot.
 
 ## Getting Started
@@ -45,10 +37,6 @@ By using this structure, it would be possible to dynamically load all of the dia
 - Echo dialog is designed for simple Hello, World demos and to get you started.
 
 ### Running the bot
-
-```
-<%= launchSteps %>
-```
 
 ## Additional Resources
 
