@@ -32,8 +32,6 @@ By using this structure, it would be possible to dynamically load all of the dia
 
 ### Configuring the bot
 
-### The dialogs
-
 - Echo dialog is designed for simple Hello, World demos and to get you started.
 
 ### Running the bot
