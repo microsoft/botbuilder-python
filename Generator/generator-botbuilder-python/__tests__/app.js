@@ -11,6 +11,8 @@ describe('generator-botbuilder-python:app', () => {
   });
 
   it('creates files', () => {
-    assert.file(['dummyfile.txt']);
+    assert.file(['main.py']);
+    assert.file(['README.md']);
+    assert.file(['requirements.txt']);
   });
 });
