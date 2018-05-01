@@ -60,6 +60,8 @@ class BotContext(object):
         output = [BotContext.apply_conversation_reference(
             Activity(text=a, type='message') if isinstance(a, str) else a, reference)
             for a in activity_or_text]
+        for activity in output:
+            activity.input_hint = 'acceptingInput'
 
         async def callback(context: 'BotContext', output):
             responses = await context.adapter.send_activity(output)
@@ -82,7 +84,7 @@ class BotContext(object):
                 if i < len(handlers):
                     await handlers[i](arg, emit_next(i + 1))
                 asyncio.ensure_future(logic)
-            except BaseException as e:
+            except Exception as e:
                 raise e
         await emit_next(0)
 
