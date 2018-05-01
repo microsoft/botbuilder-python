@@ -3,7 +3,7 @@
 
 ## Installation
 
-First, install [Yeoman](http://yeoman.io) and generator-botbuilder-python using [npm](https://www.npmjs.com/) (we assume you have pre-installed [node.js](https://nodejs.org/)).
+First, install [Yeoman](http://yeoman.io) and generator-botbuilder-python using [npm](https://www.npmjs.com/) (we assume you have pre-installed [Node.js](https://nodejs.org/)).
 
 ```bash
 npm install -g yo
@@ -25,7 +25,7 @@ yo botbuilder-python
 
 ## License
 
-MIT © [Microsoft]()
+MIT © [Microsoft](https://microsoft.com)
 
 
 [npm-image]: https://badge.fury.io/js/generator-botbuilder-python.svg

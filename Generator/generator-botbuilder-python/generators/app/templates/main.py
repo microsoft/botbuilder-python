@@ -55,7 +55,7 @@ async def messages(req: web.web_request) -> web.Response:
     auth_header = req.headers['Authorization'] if 'Authorization' in req.headers else ''
     try:
         return await ADAPTER.process_request(activity, auth_header, request_handler)
-    except BaseException as e:
+    except Exception as e:
         raise e
 
 
@@ -64,5 +64,5 @@ app.router.add_post('/', messages)
 
 try:
     web.run_app(app, host='localhost', port=PORT)
-except BaseException as e:
+except Exception as e:
     raise e

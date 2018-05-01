@@ -17,7 +17,7 @@ module.exports = class extends Generator {
     const prompts = [
       { name: 'botName', message: `What 's the name of your bot?`, default: 'sample' },
       { name: 'description', message: 'What will your bot do?', default: 'sample' },
-      { name: 'dialog', type: 'list', message: 'What default dialog do you want?', choices: ['Echo'] },
+      { name: 'dialog', type: 'list', message: 'Which default dialog do you want?', choices: ['Echo'] },
     ];
 
     return this.prompt(prompts).then(props => {
