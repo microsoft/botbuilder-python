@@ -2,7 +2,7 @@
   "generator-node": {
     "promptValues": {
       "authorName": "Microsoft",
-      "authorEmail": "v-frgome@microsoft.com",
+      "authorEmail": "botframework@microsoft.com",
       "authorUrl": ""
     }
   }
