@@ -65,7 +65,7 @@ class BotFrameworkAdapter(BotAdapter):
                     is_valid_activity = await validate_activity(activity)
                     if is_valid_activity:
                         return activity
-                except BaseException as e:
+                except Exception as e:
                     raise e
             elif 'body' in req:
                 try:
@@ -73,7 +73,7 @@ class BotFrameworkAdapter(BotAdapter):
                     is_valid_activity = await validate_activity(activity)
                     if is_valid_activity:
                         return activity
-                except BaseException as e:
+                except Exception as e:
                     raise e
             else:
                 raise TypeError('BotFrameworkAdapter.parse_request(): received invalid request')
@@ -198,19 +198,3 @@ class BotFrameworkAdapter(BotAdapter):
         """
         client = ConnectorClient(self._credentials, service_url)
         return await client.conversations.get_conversations_async(continuation_token)
-
-    # Legacy code.
-    async def send(self, activities: List[Activity]):
-        for activity in activities:
-            connector = ConnectorClient(self._credentials, base_url=activity.service_url)
-            connector.config.add_user_agent(USER_AGENT)
-            await connector.conversations.send_to_conversation_async(activity.conversation.id, activity)
-
-    async def receive(self, auth_header: str, activity: Activity):
-        try:
-            await JwtTokenValidation.assert_valid_activity(activity, auth_header, self._credential_provider)
-        except Exception as e:
-            raise e
-        else:
-            if self.on_receive is not None:
-                await self.on_receive(activity)
