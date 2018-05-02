@@ -4,7 +4,6 @@ const chalk = require('chalk');
 const yosay = require('yosay');
 const path = require('path');
 const _ = require('lodash');
-const extend = require('deep-extend');
 const mkdirp = require('mkdirp');
 
 module.exports = class extends Generator {
@@ -28,10 +27,9 @@ module.exports = class extends Generator {
 
   writing() {
     const directoryName = _.kebabCase(this.props.botName);
-    const defaultDialog = this.props.dialog.split(' ')[0].toLowerCase();
 
     if (path.basename(this.destinationPath()) !== directoryName) {
-      this.log(`Your bot should be in a directory named ${directoryName}\nI'll automatically create this folder.`);
+      this.log(`Your bot should be in a directory named ${ directoryName }\nI'll automatically create this folder.`);
       mkdirp(directoryName);
       this.destinationRoot(this.destinationPath(directoryName));
     }
@@ -44,6 +42,6 @@ module.exports = class extends Generator {
   }
 
   install() {
-    this.installDependencies({bower: false});
+    this.installDependencies({ bower: false });
   }
 };

@@ -47,6 +47,7 @@
   },
   "scripts": {
     "prepublishOnly": "nsp check",
+    "pretest": "eslint .",
     "precommit": "lint-staged",
     "test": "jest"
   },
@@ -69,18 +70,8 @@
       "jest": true,
       "node": true
     },
-    "rules": {
-      "prettier/prettier": [
-        "error",
-        {
-          "singleQuote": true,
-          "printWidth": 90
-        }
-      ]
-    },
-    "plugins": [
-      "prettier"
-    ]
+    "rules": {},
+    "plugins": []
   },
   "repository": "https://github.com/Microsoft/botbuilder-python.git",
   "license": "MIT"
