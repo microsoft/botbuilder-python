@@ -1,5 +1,5 @@
 __title__ = 'botbuilder-core'
-__version__ = '4.0.0.a2'
+__version__ = '4.0.0.a3'
 __uri__ = 'https://www.github.com/Microsoft/botbuilder-python'
 __author__ = 'Microsoft'
 __description__ = 'Microsoft Bot Framework Bot Builder'

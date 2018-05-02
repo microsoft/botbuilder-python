@@ -55,7 +55,7 @@ class TestAsyncConversation(ReplayableTest):
             conversation = self.loop.run_until_complete(
                 connector.conversations.create_conversation_async(create_conversation)
             )
-        except BaseException as e:
+        except Exception as e:
             raise e
         else:
             assert conversation.id is not None
@@ -128,7 +128,7 @@ class TestAsyncConversation(ReplayableTest):
             response = self.loop.run_until_complete(
                     connector.conversations.send_to_conversation_async(CONVERSATION_ID, activity)
                 )
-        except BaseException as e:
+        except Exception as e:
             raise e
         else:
             assert response is not None
