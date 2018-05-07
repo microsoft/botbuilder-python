@@ -1,10 +1,11 @@
 
-# Bot Builder SDK v4 (Python)
+# Bot Builder SDK v4 (Python) (Preview)
 
 [![Build Status](https://travis-ci.org/Microsoft/botbuilder-python.svg?branch=master)](https://travis-ci.org/Microsoft/botbuilder-python)
 [![roadmap badge](https://img.shields.io/badge/visit%20the-roadmap-blue.svg)](https://github.com/Microsoft/botbuilder-python/wiki/Roadmap)
 
-This repository contains code for the Python version of the [Microsoft Bot Builder SDK](https://github.com/Microsoft/BotBuilder). The 4.x version of the SDK is being actively developed and should therefore be used for **EXPERIMENTATION PURPOSES ONLY**.
+This repository contains code for the Python version of the [Microsoft Bot Builder SDK](https://github.com/Microsoft/botbuilder). The Bot Builder SDK v4 is the latest SDK for building bot applications. It is in **Preview** state and is being actively developed. 
+Production bots should continue to be developed using the [v3 SDK](https://github.com/Microsoft/BotBuilder/tree/master/CSharp).
 In addition to the Python SDK, Bot Builder supports creating bots in other popular programming languages like [.Net SDK](https://github.com/Microsoft/botbuilder-dotnet), [JavaScript](https://github.com/Microsoft/botbuilder-js), and [Java](https://github.com/Microsoft/botbuilder-java).
 
 To get started see the [wiki](https://github.com/Microsoft/botbuilder-python/wiki) for the v4 SDK.
