@@ -138,6 +138,7 @@ class BotFrameworkAdapter(BotAdapter):
             service_url = context.request.service_url
             conversation_id = context.request.conversation.id
             client = ConnectorClient(self._credentials, service_url)
+            client.config.add_user_agent(USER_AGENT)
             return await client.conversations.delete_conversation_member_async(conversation_id, member_id)
         except AttributeError as attr_e:
             raise attr_e
@@ -164,6 +165,7 @@ class BotFrameworkAdapter(BotAdapter):
             service_url = context.request.service_url
             conversation_id = context.request.conversation.id
             client = ConnectorClient(self._credentials, service_url)
+            client.config.add_user_agent(USER_AGENT)
             return await client.conversations.get_activity_members_async(conversation_id, activity_id)
         except Exception as e:
             raise e
@@ -183,6 +185,7 @@ class BotFrameworkAdapter(BotAdapter):
             service_url = context.request.service_url
             conversation_id = context.request.conversation.id
             client = ConnectorClient(self._credentials, service_url)
+            client.config.add_user_agent(USER_AGENT)
             return await client.conversations.get_conversation_members_async(conversation_id)
         except Exception as e:
             raise e
@@ -197,4 +200,5 @@ class BotFrameworkAdapter(BotAdapter):
         :return:
         """
         client = ConnectorClient(self._credentials, service_url)
+        client.config.add_user_agent(USER_AGENT)
         return await client.conversations.get_conversations_async(continuation_token)
