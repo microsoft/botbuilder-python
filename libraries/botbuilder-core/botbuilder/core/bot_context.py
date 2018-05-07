@@ -64,16 +64,17 @@ class BotContext(object):
             activity.input_hint = 'acceptingInput'
 
         async def callback(context: 'BotContext', output):
-            responses = await context.adapter.send_activity(output)
+            responses = await context.adapter.send_activity(context, output)
             context._responded = True
             return responses
 
         await self._emit(self._on_send_activity, output, callback(self, output))
 
     async def update_activity(self, activity: Activity):
-        return asyncio.ensure_future(self._emit(self._on_update_activity,
-                                                activity,
-                                                self.adapter.update_activity(activity)))
+        return await self._emit(self._on_update_activity, activity, self.adapter.update_activity(self, activity))
+
+    async def delete_activity(self, reference: ConversationReference):
+        return await self._emit(self._on_delete_activity, reference, self.adapter.delete_activity(self, reference))
 
     @staticmethod
     async def _emit(plugins, arg, logic):
@@ -119,9 +120,9 @@ class BotContext(object):
         :param is_incoming:
         :return:
         """
-        activity.channel_id=reference.channel_id
-        activity.service_url=reference.service_url
-        activity.conversation=reference.conversation
+        activity.channel_id = reference.channel_id
+        activity.service_url = reference.service_url
+        activity.conversation = reference.conversation
         if is_incoming:
             activity.from_property = reference.user
             activity.recipient = reference.bot

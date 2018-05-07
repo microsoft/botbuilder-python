@@ -11,6 +11,7 @@ from .bot_adapter import BotAdapter
 from .bot_framework_adapter import BotFrameworkAdapter, BotFrameworkAdapterSettings
 from .bot_context import BotContext
 from .middleware_set import AnonymousReceiveMiddleware, Middleware, MiddlewareSet
+from .test_adapter import TestAdapter
 
 __all__ = ['AnonymousReceiveMiddleware',
            'BotAdapter',
@@ -19,4 +20,5 @@ __all__ = ['AnonymousReceiveMiddleware',
            'BotFrameworkAdapterSettings',
            'Middleware',
            'MiddlewareSet',
+           'TestAdapter',
            '__version__',]

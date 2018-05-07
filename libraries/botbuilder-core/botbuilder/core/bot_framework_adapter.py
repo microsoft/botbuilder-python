@@ -83,7 +83,7 @@ class BotFrameworkAdapter(BotAdapter):
             if is_valid_activity:
                 return req
 
-    async def update_activity(self, activity: Activity):
+    async def update_activity(self, context: BotContext, activity: Activity):
         try:
             connector_client = ConnectorClient(self._credentials, activity.service_url)
             connector_client.config.add_user_agent(USER_AGENT)
@@ -94,7 +94,7 @@ class BotFrameworkAdapter(BotAdapter):
         except Exception as e:
             raise e
 
-    async def delete_activity(self, conversation_reference: ConversationReference):
+    async def delete_activity(self, context: BotContext, conversation_reference: ConversationReference):
         try:
             connector_client = ConnectorClient(self._credentials, conversation_reference.service_url)
             connector_client.config.add_user_agent(USER_AGENT)
@@ -103,7 +103,7 @@ class BotFrameworkAdapter(BotAdapter):
         except Exception as e:
             raise e
 
-    async def send_activity(self, activities: List[Activity]):
+    async def send_activity(self, context: BotContext, activities: List[Activity]):
         try:
             for activity in activities:
                 if activity.type == 'delay':
