@@ -6,7 +6,7 @@ from setuptools import setup
 
 REQUIRES = [
     'botbuilder-schema>=4.0.0.a3',
-    'botframework-connector>=4.0.0.a3']
+    'botframework-connector>=4.0.0.a4']
 
 root = os.path.abspath(os.path.dirname(__file__))
 
