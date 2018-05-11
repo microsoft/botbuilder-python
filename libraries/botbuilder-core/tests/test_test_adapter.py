@@ -16,47 +16,47 @@ class TestTestAdapter:
     async def test_should_call_bog_logic_when_receive_activity_is_called(self):
         async def logic(context: BotContext):
             assert context
-            assert context.request
-            assert context.request.type == 'message'
-            assert context.request.text == 'test'
-            assert context.request.id
-            assert context.request.from_property
-            assert context.request.recipient
-            assert context.request.conversation
-            assert context.request.channel_id
-            assert context.request.service_url
+            assert context.activity
+            assert context.activity.type == 'message'
+            assert context.activity.text == 'test'
+            assert context.activity.id
+            assert context.activity.from_property
+            assert context.activity.recipient
+            assert context.activity.conversation
+            assert context.activity.channel_id
+            assert context.activity.service_url
         adapter = TestAdapter(logic)
         await adapter.receive_activity('test')
 
     @pytest.mark.asyncio
     async def test_should_support_receive_activity_with_activity(self):
         async def logic(context: BotContext):
-            assert context.request.type == 'message'
-            assert context.request.text == 'test'
+            assert context.activity.type == 'message'
+            assert context.activity.text == 'test'
         adapter = TestAdapter(logic)
         await adapter.receive_activity(Activity(type='message', text='test'))
 
     @pytest.mark.asyncio
     async def test_should_set_activity_type_when_receive_activity_receives_activity_without_type(self):
         async def logic(context: BotContext):
-            assert context.request.type == 'message'
-            assert context.request.text == 'test'
+            assert context.activity.type == 'message'
+            assert context.activity.text == 'test'
         adapter = TestAdapter(logic)
         await adapter.receive_activity(Activity(text='test'))
 
     @pytest.mark.asyncio
     async def test_should_support_custom_activity_id_in_receive_activity(self):
         async def logic(context: BotContext):
-            assert context.request.id == 'myId'
-            assert context.request.type == 'message'
-            assert context.request.text == 'test'
+            assert context.activity.id == 'myId'
+            assert context.activity.type == 'message'
+            assert context.activity.text == 'test'
         adapter = TestAdapter(logic)
         await adapter.receive_activity(Activity(type='message', text='test', id='myId'))
 
     @pytest.mark.asyncio
     async def test_should_call_bot_logic_when_send_is_called(self):
         async def logic(context: BotContext):
-                assert context.request.text == 'test'
+                assert context.activity.text == 'test'
         adapter = TestAdapter(logic)
         await adapter.send('test')
 

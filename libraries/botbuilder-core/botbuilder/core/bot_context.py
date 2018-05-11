@@ -8,22 +8,38 @@ from uuid import uuid4
 from typing import List, Callable, Iterable, Tuple
 from botbuilder.schema import Activity, ActivityTypes, ConversationReference, ResourceResponse
 
-# from .bot_adapter import BotAdapter
-
 
 class BotContext(object):
     def __init__(self, adapter, request: Activity):
         self.adapter = adapter
-        self.request: Activity = request
+        self.activity = request
         self.responses: List[Activity] = []
         self._services: dict = {}
-        self._responded: bool = False
-        self._on_send_activity: Callable[[]] = []
+        self._on_send_activities: Callable[[]] = []
         self._on_update_activity: Callable[[]] = []
         self._on_delete_activity: Callable[[]] = []
+        self.__responded: bool = False
 
-        if not self.request:
+        if self.adapter is None:
+            raise TypeError('BotContext must be instantiated with an adapter.')
+        if self.activity is None:
             raise TypeError('BotContext must be instantiated with a request parameter of type Activity.')
+
+    def copy_to(self, context: 'BotContext') -> None:
+        for attribute in ['adapter', 'activity', 'responded', '_services',
+                          '_on_send_activities', '_on_update_activity', '_on_delete_activity']:
+            setattr(context, attribute, getattr(self, attribute))
+
+    @property
+    def responded(self):
+            return self.__responded
+
+    @responded.setter
+    def responded(self, value):
+        if type(value) != bool or value is False:
+            raise ValueError('BotContext.responded(): cannot set BotContext.responded to False.')
+        else:
+            self.__responded = value
 
     def get(self, key: str) -> object:
         if not key or not isinstance(key, str):
@@ -56,7 +72,7 @@ class BotContext(object):
         self._services[key] = value
 
     async def send_activity(self, *activity_or_text: Tuple[Activity, str]):
-        reference = BotContext.get_conversation_reference(self.request)
+        reference = BotContext.get_conversation_reference(self.activity)
         output = [BotContext.apply_conversation_reference(
             Activity(text=a, type='message') if isinstance(a, str) else a, reference)
             for a in activity_or_text]
@@ -68,7 +84,7 @@ class BotContext(object):
             context._responded = True
             return responses
 
-        await self._emit(self._on_send_activity, output, callback(self, output))
+        await self._emit(self._on_send_activities, output, callback(self, output))
 
     async def update_activity(self, activity: Activity):
         return await self._emit(self._on_update_activity, activity, self.adapter.update_activity(self, activity))
