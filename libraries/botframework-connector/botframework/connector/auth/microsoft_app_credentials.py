@@ -22,6 +22,7 @@ AUTH_SETTINGS = {
         'https://login.microsoftonline.com/f8cdef31-a31e-4b4a-93e4-5f571e91255a/v2.0'
 }
 
+
 class _OAuthResponse:
     def __init__(self):
         self.token_type = None
@@ -40,6 +41,7 @@ class _OAuthResponse:
             pass
         return result
 
+
 class MicrosoftAppCredentials(Authentication):
     refreshEndpoint = AUTH_SETTINGS["refreshEndpoint"]
     refreshScope = AUTH_SETTINGS["refreshScope"]
@@ -55,7 +57,13 @@ class MicrosoftAppCredentials(Authentication):
 
     def signed_session(self):
         basic_authentication = BasicTokenAuthentication({"access_token": self.get_access_token()})
-        return  basic_authentication.signed_session()
+        session = basic_authentication.signed_session()
+
+        # If there is no microsoft_app_id and no self.microsoft_app_password, then there shouldn't
+        # be an "Authorization" header on the outgoing activity.
+        if not self.microsoft_app_id and not self.microsoft_app_password:
+            del session.headers['Authorization']
+        return session
 
     def get_access_token(self, force_refresh=False):
         if self.microsoft_app_id and self.microsoft_app_password:

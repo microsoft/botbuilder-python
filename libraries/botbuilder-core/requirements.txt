@@ -1,5 +1,5 @@
 git+https://github.com/Azure/msrest-for-python@async2
-botframework-connector>=4.0.0.a3
+botframework-connector>=4.0.0.a4
 botbuilder-schema>=4.0.0.a3
 requests>=2.18.1
 PyJWT==1.5.3
