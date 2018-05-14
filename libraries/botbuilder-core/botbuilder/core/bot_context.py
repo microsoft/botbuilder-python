@@ -5,7 +5,7 @@ import asyncio
 import sys
 from copy import deepcopy, copy
 from uuid import uuid4
-from typing import List, Callable, Iterable, Tuple
+from typing import List, Callable, Iterable, Union
 from botbuilder.schema import Activity, ActivityTypes, ConversationReference, ResourceResponse
 
 
@@ -15,7 +15,7 @@ class BotContext(object):
             adapter_or_context.copy_to(self)
         else:
             self.adapter = adapter_or_context
-            self.activity = request
+            self._activity = request
             self.responses: List[Activity] = []
             self._services: dict = {}
             self._on_send_activities: Callable[[]] = []
@@ -34,13 +34,24 @@ class BotContext(object):
             setattr(context, attribute, getattr(self, attribute))
 
     @property
+    def activity(self):
+        return self._activity
+
+    @activity.setter
+    def activity(self, value):
+        if not isinstance(value, Activity):
+            raise TypeError('BotContext: cannot set `activity` to a type other than Activity.')
+        else:
+            self._activity = value
+
+    @property
     def responded(self):
         return self._responded['responded']
 
     @responded.setter
     def responded(self, value):
         if not value:
-            raise ValueError('BotContext.responded(): cannot set BotContext.responded to False.')
+            raise ValueError('BotContext: cannot set BotContext.responded to False.')
         else:
             self._responded['responded'] = True
 
@@ -74,7 +85,7 @@ class BotContext(object):
 
         self._services[key] = value
 
-    async def send_activity(self, *activity_or_text: Tuple[Activity, str]):
+    async def send_activity(self, *activity_or_text: Union[Activity, str]):
         reference = BotContext.get_conversation_reference(self.activity)
         output = [BotContext.apply_conversation_reference(
             Activity(text=a, type='message') if isinstance(a, str) else a, reference)
@@ -83,7 +94,7 @@ class BotContext(object):
             activity.input_hint = 'acceptingInput'
 
         async def callback(context: 'BotContext', output):
-            responses = await context.adapter.send_activity(context, output)
+            responses = await context.adapter.send_activities(context, output)
             context._responded = True
             return responses
 
@@ -92,7 +103,7 @@ class BotContext(object):
     async def update_activity(self, activity: Activity):
         return await self._emit(self._on_update_activity, activity, self.adapter.update_activity(self, activity))
 
-    async def delete_activity(self, reference: ConversationReference):
+    async def delete_activity(self, reference: Union[str, ConversationReference]):
         return await self._emit(self._on_delete_activity, reference, self.adapter.delete_activity(self, reference))
 
     def on_send_activities(self, handler) -> 'BotContext':
@@ -122,14 +133,14 @@ class BotContext(object):
         self._on_delete_activity.append(handler)
         return self
 
-    @staticmethod
-    async def _emit(plugins, arg, logic):
+    async def _emit(self, plugins, arg, logic):
         handlers = copy(plugins)
 
         async def emit_next(i: int):
+            context = self
             try:
                 if i < len(handlers):
-                    await handlers[i](arg, emit_next(i + 1))
+                    await handlers[i](context, arg, emit_next(i + 1))
                 asyncio.ensure_future(logic)
             except Exception as e:
                 raise e
@@ -139,7 +150,7 @@ class BotContext(object):
     def get_conversation_reference(activity: Activity) -> ConversationReference:
         """
         Returns the conversation reference for an activity. This can be saved as a plain old JSON
-        bject and then later used to message the user proactively.
+        object and then later used to message the user proactively.
 
         Usage Example:
         reference = BotContext.get_conversation_reference(context.request)

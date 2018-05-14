@@ -162,7 +162,7 @@ class BotFrameworkAdapter(BotAdapter):
         except Exception as e:
             raise e
 
-    async def send_activity(self, context: BotContext, activities: List[Activity]):
+    async def send_activities(self, context: BotContext, activities: List[Activity]):
         try:
             for activity in activities:
                 if activity.type == 'delay':
@@ -188,13 +188,13 @@ class BotFrameworkAdapter(BotAdapter):
         :return:
         """
         try:
-            if not context.request.service_url:
+            if not context.activity.service_url:
                 raise TypeError('BotFrameworkAdapter.delete_conversation_member(): missing service_url')
-            if not context.request.conversation or not context.request.conversation.id:
+            if not context.activity.conversation or not context.activity.conversation.id:
                 raise TypeError('BotFrameworkAdapter.delete_conversation_member(): missing conversation or '
                                 'conversation.id')
-            service_url = context.request.service_url
-            conversation_id = context.request.conversation.id
+            service_url = context.activity.service_url
+            conversation_id = context.activity.conversation.id
             client = self.create_connector_client(service_url)
             return await client.conversations.delete_conversation_member_async(conversation_id, member_id)
         except AttributeError as attr_e:
@@ -211,16 +211,16 @@ class BotFrameworkAdapter(BotAdapter):
         """
         try:
             if not activity_id:
-                activity_id = context.request.id
-            if not context.request.service_url:
+                activity_id = context.activity.id
+            if not context.activity.service_url:
                 raise TypeError('BotFrameworkAdapter.get_activity_member(): missing service_url')
-            if not context.request.conversation or not context.request.conversation.id:
+            if not context.activity.conversation or not context.activity.conversation.id:
                 raise TypeError('BotFrameworkAdapter.get_activity_member(): missing conversation or conversation.id')
             if not activity_id:
                 raise TypeError('BotFrameworkAdapter.get_activity_member(): missing both activity_id and '
                                 'context.activity.id')
-            service_url = context.request.service_url
-            conversation_id = context.request.conversation.id
+            service_url = context.activity.service_url
+            conversation_id = context.activity.conversation.id
             client = self.create_connector_client(service_url)
             return await client.conversations.get_activity_members_async(conversation_id, activity_id)
         except Exception as e:
@@ -233,13 +233,13 @@ class BotFrameworkAdapter(BotAdapter):
         :return:
         """
         try:
-            if not context.request.service_url:
+            if not context.activity.service_url:
                 raise TypeError('BotFrameworkAdapter.get_conversation_members(): missing service_url')
-            if not context.request.conversation or not context.request.conversation.id:
+            if not context.activity.conversation or not context.activity.conversation.id:
                 raise TypeError('BotFrameworkAdapter.get_conversation_members(): missing conversation or '
                                 'conversation.id')
-            service_url = context.request.service_url
-            conversation_id = context.request.conversation.id
+            service_url = context.activity.service_url
+            conversation_id = context.activity.conversation.id
             client = self.create_connector_client(service_url)
             return await client.conversations.get_conversation_members_async(conversation_id)
         except Exception as e:

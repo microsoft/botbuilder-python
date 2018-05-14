@@ -37,7 +37,7 @@ class TestAdapter(BotAdapter):
             self.template.conversation = template.conversation
             self.template.channel_id = template.channel_id
 
-    async def send_activity(self, context, activities: List[Activity]):
+    async def send_activities(self, context, activities: List[Activity]):
         """
         INTERNAL: called by the logic under test to send a set of activities. These will be buffered
         to the current `TestFlow` instance for comparison against the expected results.

@@ -14,7 +14,7 @@ class BotAdapter(ABC):
         self._middleware = MiddlewareSet()
 
     @abstractmethod
-    async def send_activity(self, context: BotContext, activities: List[Activity]):
+    async def send_activities(self, context: BotContext, activities: List[Activity]):
         """
         Sends a set of activities to the user. An array of responses from the server will be returned.
         :param activities:
