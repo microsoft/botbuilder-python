@@ -10,15 +10,18 @@ from botbuilder.schema import Activity, ActivityTypes, ConversationReference, Re
 
 
 class BotContext(object):
-    def __init__(self, adapter, request: Activity):
-        self.adapter = adapter
-        self.activity = request
-        self.responses: List[Activity] = []
-        self._services: dict = {}
-        self._on_send_activities: Callable[[]] = []
-        self._on_update_activity: Callable[[]] = []
-        self._on_delete_activity: Callable[[]] = []
-        self.__responded: bool = False
+    def __init__(self, adapter_or_context, request: Activity=None):
+        if isinstance(adapter_or_context, BotContext):
+            adapter_or_context.copy_to(self)
+        else:
+            self.adapter = adapter_or_context
+            self.activity = request
+            self.responses: List[Activity] = []
+            self._services: dict = {}
+            self._on_send_activities: Callable[[]] = []
+            self._on_update_activity: Callable[[]] = []
+            self._on_delete_activity: Callable[[]] = []
+            self._responded = {'responded': False}
 
         if self.adapter is None:
             raise TypeError('BotContext must be instantiated with an adapter.')
@@ -26,20 +29,20 @@ class BotContext(object):
             raise TypeError('BotContext must be instantiated with a request parameter of type Activity.')
 
     def copy_to(self, context: 'BotContext') -> None:
-        for attribute in ['adapter', 'activity', 'responded', '_services',
+        for attribute in ['adapter', 'activity', '_responded', '_services',
                           '_on_send_activities', '_on_update_activity', '_on_delete_activity']:
             setattr(context, attribute, getattr(self, attribute))
 
     @property
     def responded(self):
-            return self.__responded
+        return self._responded['responded']
 
     @responded.setter
     def responded(self, value):
-        if type(value) != bool or value is False:
+        if not value:
             raise ValueError('BotContext.responded(): cannot set BotContext.responded to False.')
         else:
-            self.__responded = value
+            self._responded['responded'] = True
 
     def get(self, key: str) -> object:
         if not key or not isinstance(key, str):
@@ -91,6 +94,33 @@ class BotContext(object):
 
     async def delete_activity(self, reference: ConversationReference):
         return await self._emit(self._on_delete_activity, reference, self.adapter.delete_activity(self, reference))
+
+    def on_send_activities(self, handler) -> 'BotContext':
+        """
+        Registers a handler to be notified of and potentially intercept the sending of activities.
+        :param handler:
+        :return:
+        """
+        self._on_send_activities.append(handler)
+        return self
+
+    def on_update_activity(self, handler) -> 'BotContext':
+        """
+        Registers a handler to be notified of and potentially intercept an activity being updated.
+        :param handler:
+        :return:
+        """
+        self._on_update_activity.append(handler)
+        return self
+
+    def on_delete_activity(self, handler) -> 'BotContext':
+        """
+        Registers a handler to be notified of and potentially intercept an activity being deleted.
+        :param handler:
+        :return:
+        """
+        self._on_delete_activity.append(handler)
+        return self
 
     @staticmethod
     async def _emit(plugins, arg, logic):

@@ -30,11 +30,20 @@ class TestBotContext:
         except Exception as e:
             raise e
 
-    def test_copy_to_should_copy_references(self):
+    def test_should_create_context_with_older_context(self):
+        context = BotContext(ADAPTER, ACTIVITY)
+        new_context = BotContext(context)
+
+    def test_copy_to_should_copy_all_references(self):
         old_adapter = TestAdapter(None)
         old_activity = Activity(id='2', type='message', text='test copy')
         old_context = BotContext(old_adapter, old_activity)
         old_context.responded = True
+
+        async def send_activities_handler(context, next_handler):
+            pass
+
+        old_context.on_send_activities(send_activities_handler)
 
         adapter = TestAdapter(None)
         new_context = BotContext(adapter, ACTIVITY)
@@ -43,10 +52,19 @@ class TestBotContext:
         assert new_context.adapter == old_adapter
         assert new_context.activity == old_activity
         assert new_context.responded is True
+        assert len(new_context._on_send_activities) == 1
+        assert len(new_context._on_update_activity) == 0
+        assert len(new_context._on_delete_activity) == 0
 
-    def test_should_not_be_able_to_set_responded_to_True(self):
+    def test_responded_should_be_automatically_set_to_False(self):
         context = BotContext(ADAPTER, ACTIVITY)
+        assert context.responded is False
+
+    def test_should_be_able_to_set_responded_to_True(self):
+        context = BotContext(ADAPTER, ACTIVITY)
+        assert context.responded is False
         context.responded = True
+        assert context.responded
 
     def test_should_not_be_able_to_set_responded_to_False(self):
         context = BotContext(ADAPTER, ACTIVITY)
