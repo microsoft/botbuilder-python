@@ -38,6 +38,7 @@ class SimpleAdapter(BotAdapter):
         assert reference is not None
         assert reference.activity_id == '1234'
 
+
 class TestBotContext:
     def test_should_create_context_with_request_and_adapter(self):
         context = BotContext(SimpleAdapter(), ACTIVITY)

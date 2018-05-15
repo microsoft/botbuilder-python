@@ -2,15 +2,19 @@
 # Licensed under the MIT License.
 
 import asyncio
-import sys
-from copy import deepcopy, copy
+from copy import copy
 from uuid import uuid4
-from typing import List, Callable, Iterable, Union
-from botbuilder.schema import Activity, ActivityTypes, ConversationReference, ResourceResponse
+from typing import List, Callable, Union
+from botbuilder.schema import Activity, ConversationReference, ResourceResponse
 
 
 class BotContext(object):
     def __init__(self, adapter_or_context, request: Activity=None):
+        """
+        Creates a new BotContext instance.
+        :param adapter_or_context:
+        :param request:
+        """
         if isinstance(adapter_or_context, BotContext):
             adapter_or_context.copy_to(self)
         else:
@@ -29,16 +33,31 @@ class BotContext(object):
             raise TypeError('BotContext must be instantiated with a request parameter of type Activity.')
 
     def copy_to(self, context: 'BotContext') -> None:
+        """
+        Called when this TurnContext instance is passed into the constructor of a new TurnContext
+        instance. Can be overridden in derived classes.
+        :param context:
+        :return:
+        """
         for attribute in ['adapter', 'activity', '_responded', '_services',
                           '_on_send_activities', '_on_update_activity', '_on_delete_activity']:
             setattr(context, attribute, getattr(self, attribute))
 
     @property
     def activity(self):
+        """
+        The received activity.
+        :return:
+        """
         return self._activity
 
     @activity.setter
     def activity(self, value):
+        """
+        Used to set BotContext._activity when a context object is created. Only takes instances of Activities.
+        :param value:
+        :return:
+        """
         if not isinstance(value, Activity):
             raise TypeError('BotContext: cannot set `activity` to a type other than Activity.')
         else:
@@ -46,6 +65,10 @@ class BotContext(object):
 
     @property
     def responded(self):
+        """
+        If `true` at least one response has been sent for the current turn of conversation.
+        :return:
+        """
         return self._responded['responded']
 
     @responded.setter
@@ -85,7 +108,12 @@ class BotContext(object):
 
         self._services[key] = value
 
-    async def send_activity(self, *activity_or_text: Union[Activity, str]):
+    async def send_activity(self, *activity_or_text: Union[Activity, str]) -> ResourceResponse:
+        """
+        Sends a single activity or message to the user.
+        :param activity_or_text:
+        :return:
+        """
         reference = BotContext.get_conversation_reference(self.activity)
         output = [BotContext.apply_conversation_reference(
             Activity(text=a, type='message') if isinstance(a, str) else a, reference)
@@ -101,9 +129,19 @@ class BotContext(object):
         await self._emit(self._on_send_activities, output, callback(self, output))
 
     async def update_activity(self, activity: Activity):
+        """
+        Replaces an existing activity.
+        :param activity:
+        :return:
+        """
         return await self._emit(self._on_update_activity, activity, self.adapter.update_activity(self, activity))
 
     async def delete_activity(self, reference: Union[str, ConversationReference]):
+        """
+        Deletes an existing activity.
+        :param reference:
+        :return:
+        """
         return await self._emit(self._on_delete_activity, reference, self.adapter.delete_activity(self, reference))
 
     def on_send_activities(self, handler) -> 'BotContext':
@@ -192,4 +230,3 @@ class BotContext(object):
                 activity.reply_to_id = reference.activity_id
 
         return activity
-

@@ -47,6 +47,13 @@ class BotFrameworkAdapter(BotAdapter):
         return await self.run_middleware(context, logic)
 
     async def create_conversation(self, reference: ConversationReference, logic):
+        """
+        Starts a new conversation with a user. This is typically used to Direct Message (DM) a member
+        of a group.
+        :param reference:
+        :param logic:
+        :return:
+        """
         try:
             if reference.service_url is None:
                 raise TypeError('BotFrameworkAdapter.create_conversation(): reference.service_url cannot be None.')
@@ -86,9 +93,20 @@ class BotFrameworkAdapter(BotAdapter):
         return await self.run_middleware(context, logic)
 
     async def authenticate_request(self, request: Activity, auth_header: str):
+        """
+        Allows for the overriding of authentication in unit tests.
+        :param request:
+        :param auth_header:
+        :return:
+        """
         await JwtTokenValidation.assert_valid_activity(request, auth_header, self._credential_provider)
 
     def create_context(self, activity):
+        """
+        Allows for the overriding of the context object in unit tests and derived adapters.
+        :param activity:
+        :return:
+        """
         return BotContext(self, activity)
 
     @staticmethod
@@ -258,6 +276,11 @@ class BotFrameworkAdapter(BotAdapter):
         return await client.conversations.get_conversations_async(continuation_token)
 
     def create_connector_client(self, service_url: str) -> ConnectorClient:
+        """
+        Allows for mocking of the connector client in unit tests.
+        :param service_url:
+        :return:
+        """
         client = ConnectorClient(self._credentials, base_url=service_url)
         client.config.add_user_agent(USER_AGENT)
         return client
