@@ -78,6 +78,14 @@ class BotContext(object):
         else:
             self._responded['responded'] = True
 
+    @property
+    def services(self):
+        """
+        Map of services and other values cached for the lifetime of the turn.
+        :return:
+        """
+        return self._services
+
     def get(self, key: str) -> object:
         if not key or not isinstance(key, str):
             raise TypeError('"key" must be a valid string.')
@@ -136,12 +144,17 @@ class BotContext(object):
         """
         return await self._emit(self._on_update_activity, activity, self.adapter.update_activity(self, activity))
 
-    async def delete_activity(self, reference: Union[str, ConversationReference]):
+    async def delete_activity(self, id_or_reference: Union[str, ConversationReference]):
         """
         Deletes an existing activity.
-        :param reference:
+        :param id_or_reference:
         :return:
         """
+        if type(id_or_reference) == str:
+            reference = BotContext.get_conversation_reference(self.activity)
+            reference.activity_id = id_or_reference
+        else:
+            reference = id_or_reference
         return await self._emit(self._on_delete_activity, reference, self.adapter.delete_activity(self, reference))
 
     def on_send_activities(self, handler) -> 'BotContext':
@@ -178,11 +191,15 @@ class BotContext(object):
             context = self
             try:
                 if i < len(handlers):
-                    await handlers[i](context, arg, emit_next(i + 1))
-                asyncio.ensure_future(logic)
+                    async def next_handler():
+                        await emit_next(i + 1)
+                    await handlers[i](context, arg, next_handler)
+
             except Exception as e:
                 raise e
         await emit_next(0)
+        # This should be changed to `return await logic()`
+        return await logic
 
     @staticmethod
     def get_conversation_reference(activity: Activity) -> ConversationReference:

@@ -135,8 +135,8 @@ class TestBotContext:
             called = True
             assert reference is not None
             assert context is not None
-            assert reference == '1234'
-            await next_handler_coroutine
+            assert reference.activity_id == '1234'
+            await next_handler_coroutine()
 
         context.on_delete_activity(delete_handler)
         await context.delete_activity(ACTIVITY.id)
@@ -155,8 +155,8 @@ class TestBotContext:
             assert called_second is False, 'Second on_delete_activity handler was called before first.'
             assert reference is not None
             assert context is not None
-            assert reference == '1234'
-            await next_handler_coroutine
+            assert reference.activity_id == '1234'
+            await next_handler_coroutine()
 
         async def second_delete_handler(context, reference, next_handler_coroutine):
             nonlocal called_first, called_second
@@ -165,8 +165,8 @@ class TestBotContext:
             called_second = True
             assert reference is not None
             assert context is not None
-            assert reference == '1234'
-            await next_handler_coroutine
+            assert reference.activity_id == '1234'
+            await next_handler_coroutine()
 
         context.on_delete_activity(first_delete_handler)
         context.on_delete_activity(second_delete_handler)
@@ -185,7 +185,7 @@ class TestBotContext:
             assert activities is not None
             assert context is not None
             assert activities[0].id == '1234'
-            await next_handler_coroutine
+            await next_handler_coroutine()
 
         context.on_send_activities(send_handler)
         await context.send_activity(ACTIVITY)
@@ -202,7 +202,7 @@ class TestBotContext:
             assert activity is not None
             assert context is not None
             assert activity.id == '1234'
-            await next_handler_coroutine
+            await next_handler_coroutine()
 
         context.on_update_activity(update_handler)
         await context.update_activity(ACTIVITY)
