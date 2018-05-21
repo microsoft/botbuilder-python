@@ -20,7 +20,7 @@ MISSING_FROM_PROPERTY = Activity(type='message',
 
 class TestUserState:
     storage = MemoryStorage()
-    adapter = TestAdapter(None)
+    adapter = TestAdapter()
     context = BotContext(adapter, RECEIVED_MESSAGE)
     middleware = UserState(storage)
 

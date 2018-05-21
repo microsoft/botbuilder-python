@@ -12,7 +12,7 @@ from botbuilder.schema import (ActivityTypes, Activity, ConversationAccount,
 
 
 class TestAdapter(BotAdapter):
-    def __init__(self, logic: Coroutine, template: ConversationReference=None):
+    def __init__(self, logic: Coroutine=None, template: ConversationReference=None):
         """
         Creates a new TestAdapter instance.
         :param logic:

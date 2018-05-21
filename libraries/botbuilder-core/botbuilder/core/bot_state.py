@@ -83,7 +83,7 @@ class BotState(Middleware):
         """
         cached = context.services.get(self.state_key)
         if cached is not None:
-            cached['state'] = {}
+            cached['state'] = StoreItem()
             context.services[self.state_key] = cached
 
     async def get(self, context: BotContext):

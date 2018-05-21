@@ -23,7 +23,7 @@ END_OF_CONVERSATION = Activity(type='endOfConversation',
 
 class TestConversationState:
     storage = MemoryStorage()
-    adapter = TestAdapter(None)
+    adapter = TestAdapter()
     context = BotContext(adapter, RECEIVED_MESSAGE)
     middleware = ConversationState(storage)
 
