@@ -10,13 +10,24 @@ class ConversationState(BotState):
     """
     Reads and writes conversation state for your bot to storage.
     """
+
+    no_key_error_message = 'ConversationState: channelId and/or conversation missing from context.activity.'
+
     def __init__(self, storage: Storage, namespace: str=''):
         """
         Creates a new ConversationState instance.
         :param storage:
         :param namespace:
         """
-        super(ConversationState, self).__init__(storage, self.get_storage_key)
+
+        def call_get_storage_key(context):
+            key = self.get_storage_key(context)
+            if key is None:
+                raise AttributeError(self.no_key_error_message)
+            else:
+                return key
+
+        super(ConversationState, self).__init__(storage, call_get_storage_key)
         self.namespace = namespace
 
     def get_storage_key(self, context: BotContext):

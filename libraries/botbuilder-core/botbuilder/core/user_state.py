@@ -10,6 +10,9 @@ class UserState(BotState):
     """
     Reads and writes user state for your bot to storage.
     """
+
+    no_key_error_message = 'UserState: channel_id and/or conversation missing from context.activity.'
+
     def __init__(self, storage: Storage, namespace=''):
         """
         Creates a new UserState instance.
@@ -17,7 +20,15 @@ class UserState(BotState):
         :param namespace:
         """
         self.namespace = namespace
-        super(UserState, self).__init__(storage, self.get_storage_key)
+
+        def call_get_storage_key(context):
+            key = self.get_storage_key(context)
+            if key is None:
+                raise AttributeError(self.no_key_error_message)
+            else:
+                return key
+
+        super(UserState, self).__init__(storage, call_get_storage_key)
 
     def get_storage_key(self, context: BotContext) -> str:
         """
