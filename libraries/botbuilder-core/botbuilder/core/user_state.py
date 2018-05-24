@@ -37,8 +37,9 @@ class UserState(BotState):
         :return:
         """
         activity = context.activity
-        channel_id = activity.channel_id or None
-        user_id = activity.from_property.id or None
+        channel_id = getattr(activity, 'channel_id', None)
+        user_id = getattr(activity.from_property, 'id', None) if hasattr(activity, 'from_property') else None
+
         storage_key = None
         if channel_id and user_id:
             storage_key = f"user/{channel_id}/{user_id}/{self.namespace}"

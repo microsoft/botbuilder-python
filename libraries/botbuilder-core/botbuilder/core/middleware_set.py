@@ -65,7 +65,9 @@ class MiddlewareSet(Middleware):
 
         async def call_next_middleware():
             return await self.receive_activity_internal(context, callback, next_middleware_index+1)
-        return await next_middleware.on_process_request(
-            context,
-            call_next_middleware
-        )
+
+        try:
+            return await next_middleware.on_process_request(context,
+                                                            call_next_middleware)
+        except Exception as e:
+            raise e

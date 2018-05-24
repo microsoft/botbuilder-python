@@ -32,8 +32,10 @@ class ConversationState(BotState):
 
     def get_storage_key(self, context: BotContext):
         activity = context.activity
-        channel_id = activity.channel_id
-        conversation_id = (activity.conversation.id if
-                           (activity and hasattr(activity, 'conversation') and hasattr(activity.conversation, 'id')) else
-                           None)
-        return f"conversation/{channel_id}/{conversation_id}" if channel_id and conversation_id else None
+        channel_id = getattr(activity, 'channel_id', None)
+        conversation_id = getattr(activity.conversation, 'id', None) if hasattr(activity, 'conversation') else None
+
+        storage_key = None
+        if channel_id and conversation_id:
+            storage_key = f"conversation/{channel_id}/{conversation_id}/{self.namespace}"
+        return storage_key

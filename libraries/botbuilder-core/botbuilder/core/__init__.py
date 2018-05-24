@@ -10,7 +10,7 @@ from .about import __version__
 from .bot_adapter import BotAdapter
 from .bot_framework_adapter import BotFrameworkAdapter, BotFrameworkAdapterSettings
 from .bot_context import BotContext
-from .bot_state import BotState, CachedBotState
+from .bot_state import BotState
 from .conversation_state import ConversationState
 from .memory_storage import MemoryStorage
 from .middleware_set import AnonymousReceiveMiddleware, Middleware, MiddlewareSet
@@ -24,7 +24,6 @@ __all__ = ['AnonymousReceiveMiddleware',
            'BotFrameworkAdapter',
            'BotFrameworkAdapterSettings',
            'BotState',
-           'CachedBotState',
            'calculate_change_hash',
            'ConversationState',
            'MemoryStorage',

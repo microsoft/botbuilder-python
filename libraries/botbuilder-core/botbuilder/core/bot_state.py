@@ -6,19 +6,11 @@ from .middleware_set import Middleware
 from .storage import calculate_change_hash, StoreItem, StorageKeyFactory, Storage
 
 
-class CachedBotState(StoreItem):
-    def __init__(self):
-        super(CachedBotState, self).__init__()
-        self.state = None
-        self.hash: str = None
-
-
 class BotState(Middleware):
     def __init__(self, storage: Storage, storage_key: StorageKeyFactory):
         self.state_key = 'state'
         self.storage = storage
         self.storage_key = storage_key
-        pass
 
     async def on_process_request(self, context, next_middleware):
         """

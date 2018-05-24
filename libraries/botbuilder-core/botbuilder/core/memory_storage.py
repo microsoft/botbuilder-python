@@ -17,7 +17,7 @@ class MemoryStorage(Storage):
             for key in keys:
                 if key in self.memory:
                     del self.memory[key]
-        except Exception as e:
+        except TypeError as e:
             raise e
 
     async def read(self, keys: List[str]):
@@ -26,7 +26,7 @@ class MemoryStorage(Storage):
             for key in keys:
                 if key in self.memory:
                     data[key] = self.memory[key]
-        except Exception as e:
+        except TypeError as e:
             raise e
 
         return data
