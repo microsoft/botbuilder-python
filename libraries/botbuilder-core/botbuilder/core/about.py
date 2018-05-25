@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 __title__ = 'botbuilder-core'
 __version__ = '4.0.0.a4'
 __uri__ = 'https://www.github.com/Microsoft/botbuilder-python'

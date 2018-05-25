@@ -3,7 +3,10 @@
 
 import asyncio
 from typing import List, Callable
-from botbuilder.schema import Activity, ChannelAccount, ConversationReference, ConversationsResult
+from botbuilder.schema import (Activity, ChannelAccount,
+                               ConversationAccount,
+                               ConversationParameters, ConversationReference,
+                               ConversationsResult, ConversationResourceResponse)
 from botframework.connector import ConnectorClient
 from botframework.connector.auth import (MicrosoftAppCredentials,
                                          JwtTokenValidation, SimpleCredentialProvider)
@@ -29,19 +32,81 @@ class BotFrameworkAdapter(BotAdapter):
         self._credentials = MicrosoftAppCredentials(self.settings.app_id, self.settings.app_password)
         self._credential_provider = SimpleCredentialProvider(self.settings.app_id, self.settings.app_password)
 
-    async def process_request(self, req, auth_header: str, logic: Callable):
-        request = await self.parse_request(req)
+    async def continue_conversation(self, reference: ConversationReference, logic):
+        """
+        Continues a conversation with a user. This is often referred to as the bots "Proactive Messaging"
+        flow as its lets the bot proactively send messages to a conversation or user that its already
+        communicated with. Scenarios like sending notifications or coupons to a user are enabled by this
+        method.
+        :param reference:
+        :param logic:
+        :return:
+        """
+        request = BotContext.apply_conversation_reference(Activity(), reference, is_incoming=True)
+        context = self.create_context(request)
+        return await self.run_middleware(context, logic)
+
+    async def create_conversation(self, reference: ConversationReference, logic):
+        """
+        Starts a new conversation with a user. This is typically used to Direct Message (DM) a member
+        of a group.
+        :param reference:
+        :param logic:
+        :return:
+        """
+        try:
+            if reference.service_url is None:
+                raise TypeError('BotFrameworkAdapter.create_conversation(): reference.service_url cannot be None.')
+
+            # Create conversation
+            parameters = ConversationParameters(bot=reference.bot)
+            client = self.create_connector_client(reference.service_url)
+
+            resource_response = await client.conversations.create_conversation_async(parameters)
+            request = BotContext.apply_conversation_reference(Activity(), reference, is_incoming=True)
+            request.conversation = ConversationAccount(id=resource_response.id)
+            if resource_response.service_url:
+                request.service_url = resource_response.service_url
+
+            context = self.create_context(request)
+            return await self.run_middleware(context, logic)
+
+        except Exception as e:
+            raise e
+
+    async def process_activity(self, req, auth_header: str, logic: Callable):
+        """
+        Processes an activity received by the bots web server. This includes any messages sent from a
+        user and is the method that drives what's often referred to as the bots "Reactive Messaging"
+        flow.
+        :param req:
+        :param auth_header:
+        :param logic:
+        :return:
+        """
+        activity = await self.parse_request(req)
         auth_header = auth_header or ''
 
-        await self.authenticate_request(request, auth_header)
-        context = self.create_context(request)
+        await self.authenticate_request(activity, auth_header)
+        context = self.create_context(activity)
 
         return await self.run_middleware(context, logic)
 
     async def authenticate_request(self, request: Activity, auth_header: str):
+        """
+        Allows for the overriding of authentication in unit tests.
+        :param request:
+        :param auth_header:
+        :return:
+        """
         await JwtTokenValidation.assert_valid_activity(request, auth_header, self._credential_provider)
 
     def create_context(self, activity):
+        """
+        Allows for the overriding of the context object in unit tests and derived adapters.
+        :param activity:
+        :return:
+        """
         return BotContext(self, activity)
 
     @staticmethod
@@ -83,27 +148,39 @@ class BotFrameworkAdapter(BotAdapter):
             if is_valid_activity:
                 return req
 
-    async def update_activity(self, activity: Activity):
+    async def update_activity(self, context: BotContext, activity: Activity):
+        """
+        Replaces an activity that was previously sent to a channel. It should be noted that not all
+        channels support this feature.
+        :param context:
+        :param activity:
+        :return:
+        """
         try:
-            connector_client = ConnectorClient(self._credentials, activity.service_url)
-            connector_client.config.add_user_agent(USER_AGENT)
-            return await connector_client.conversations.update_activity_async(
+            client = self.create_connector_client(activity.service_url)
+            return await client.conversations.update_activity_async(
                 activity.conversation.id,
                 activity.conversation.activity_id,
                 activity)
         except Exception as e:
             raise e
 
-    async def delete_activity(self, conversation_reference: ConversationReference):
+    async def delete_activity(self, context: BotContext, conversation_reference: ConversationReference):
+        """
+        Deletes an activity that was previously sent to a channel. It should be noted that not all
+        channels support this feature.
+        :param context:
+        :param conversation_reference:
+        :return:
+        """
         try:
-            connector_client = ConnectorClient(self._credentials, conversation_reference.service_url)
-            connector_client.config.add_user_agent(USER_AGENT)
-            await connector_client.conversations.delete_activity_async(conversation_reference.conversation.id,
-                                                           conversation_reference.activity_id)
+            client = self.create_connector_client(conversation_reference.service_url)
+            await client.conversations.delete_activity_async(conversation_reference.conversation.id,
+                                                             conversation_reference.activity_id)
         except Exception as e:
             raise e
 
-    async def send_activity(self, activities: List[Activity]):
+    async def send_activities(self, context: BotContext, activities: List[Activity]):
         try:
             for activity in activities:
                 if activity.type == 'delay':
@@ -116,9 +193,8 @@ class BotFrameworkAdapter(BotAdapter):
                     else:
                         await asyncio.sleep(delay_in_ms)
                 else:
-                    connector_client = ConnectorClient(self._credentials, activity.service_url)
-                    connector_client.config.add_user_agent(USER_AGENT)
-                    await connector_client.conversations.send_to_conversation_async(activity.conversation.id, activity)
+                    client = self.create_connector_client(activity.service_url)
+                    await client.conversations.send_to_conversation_async(activity.conversation.id, activity)
         except Exception as e:
             raise e
 
@@ -130,15 +206,14 @@ class BotFrameworkAdapter(BotAdapter):
         :return:
         """
         try:
-            if not context.request.service_url:
+            if not context.activity.service_url:
                 raise TypeError('BotFrameworkAdapter.delete_conversation_member(): missing service_url')
-            if not context.request.conversation or not context.request.conversation.id:
+            if not context.activity.conversation or not context.activity.conversation.id:
                 raise TypeError('BotFrameworkAdapter.delete_conversation_member(): missing conversation or '
                                 'conversation.id')
-            service_url = context.request.service_url
-            conversation_id = context.request.conversation.id
-            client = ConnectorClient(self._credentials, service_url)
-            client.config.add_user_agent(USER_AGENT)
+            service_url = context.activity.service_url
+            conversation_id = context.activity.conversation.id
+            client = self.create_connector_client(service_url)
             return await client.conversations.delete_conversation_member_async(conversation_id, member_id)
         except AttributeError as attr_e:
             raise attr_e
@@ -154,18 +229,17 @@ class BotFrameworkAdapter(BotAdapter):
         """
         try:
             if not activity_id:
-                activity_id = context.request.id
-            if not context.request.service_url:
+                activity_id = context.activity.id
+            if not context.activity.service_url:
                 raise TypeError('BotFrameworkAdapter.get_activity_member(): missing service_url')
-            if not context.request.conversation or not context.request.conversation.id:
+            if not context.activity.conversation or not context.activity.conversation.id:
                 raise TypeError('BotFrameworkAdapter.get_activity_member(): missing conversation or conversation.id')
             if not activity_id:
                 raise TypeError('BotFrameworkAdapter.get_activity_member(): missing both activity_id and '
                                 'context.activity.id')
-            service_url = context.request.service_url
-            conversation_id = context.request.conversation.id
-            client = ConnectorClient(self._credentials, service_url)
-            client.config.add_user_agent(USER_AGENT)
+            service_url = context.activity.service_url
+            conversation_id = context.activity.conversation.id
+            client = self.create_connector_client(service_url)
             return await client.conversations.get_activity_members_async(conversation_id, activity_id)
         except Exception as e:
             raise e
@@ -177,15 +251,14 @@ class BotFrameworkAdapter(BotAdapter):
         :return:
         """
         try:
-            if not context.request.service_url:
+            if not context.activity.service_url:
                 raise TypeError('BotFrameworkAdapter.get_conversation_members(): missing service_url')
-            if not context.request.conversation or not context.request.conversation.id:
+            if not context.activity.conversation or not context.activity.conversation.id:
                 raise TypeError('BotFrameworkAdapter.get_conversation_members(): missing conversation or '
                                 'conversation.id')
-            service_url = context.request.service_url
-            conversation_id = context.request.conversation.id
-            client = ConnectorClient(self._credentials, service_url)
-            client.config.add_user_agent(USER_AGENT)
+            service_url = context.activity.service_url
+            conversation_id = context.activity.conversation.id
+            client = self.create_connector_client(service_url)
             return await client.conversations.get_conversation_members_async(conversation_id)
         except Exception as e:
             raise e
@@ -199,6 +272,15 @@ class BotFrameworkAdapter(BotAdapter):
         :param continuation_token:
         :return:
         """
-        client = ConnectorClient(self._credentials, service_url)
-        client.config.add_user_agent(USER_AGENT)
+        client = self.create_connector_client(service_url)
         return await client.conversations.get_conversations_async(continuation_token)
+
+    def create_connector_client(self, service_url: str) -> ConnectorClient:
+        """
+        Allows for mocking of the connector client in unit tests.
+        :param service_url:
+        :return:
+        """
+        client = ConnectorClient(self._credentials, base_url=service_url)
+        client.config.add_user_agent(USER_AGENT)
+        return client

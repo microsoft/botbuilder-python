@@ -32,17 +32,18 @@ class MiddlewareSet(Middleware):
         super(MiddlewareSet, self).__init__()
         self._middleware = []
 
-    def use(self, middleware: Middleware):
+    def use(self, *middleware: Middleware):
         """
         Registers middleware plugin(s) with the bot or set.
         :param middleware :
         :return:
         """
-        if hasattr(middleware, 'on_process_request') and callable(middleware.on_process_request):
-            self._middleware.append(middleware)
-            return self
-        else:
-            raise TypeError('MiddlewareSet.use(): invalid middleware being added.')
+        for (idx, m) in enumerate(middleware):
+            if hasattr(m, 'on_process_request') and callable(m.on_process_request):
+                self._middleware.append(m)
+                return self
+            else:
+                raise TypeError('MiddlewareSet.use(): invalid middleware at index "%s" being added.' % idx)
 
     async def receive_activity(self, context: BotContext):
         await self.receive_activity_internal(context, None)
@@ -64,7 +65,9 @@ class MiddlewareSet(Middleware):
 
         async def call_next_middleware():
             return await self.receive_activity_internal(context, callback, next_middleware_index+1)
-        return await next_middleware.on_process_request(
-            context,
-            call_next_middleware
-        )
+
+        try:
+            return await next_middleware.on_process_request(context,
+                                                            call_next_middleware)
+        except Exception as e:
+            raise e

@@ -264,3 +264,15 @@ class TestMiddlewareSet:
         await middleware_set.receive_activity(None)
         assert called_regular_middleware
         assert called_anonymous_middleware
+
+    def test_invalid_middleware_should_not_be_added_to_middleware_set(self):
+        middleware_set = MiddlewareSet()
+
+        try:
+            middleware_set.use(2)
+        except TypeError:
+            pass
+        except Exception as e:
+            raise e
+        else:
+            raise AssertionError('MiddlewareSet.use(): should not have added an invalid middleware.')
