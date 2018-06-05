@@ -3,9 +3,7 @@
 
 from typing import List, Union
 from botbuilder.schema import (ActivityTypes, Activity, Attachment,
-                               AttachmentLayoutTypes, CardAction, SuggestedActions, InputHints)
-
-from .card_factory import CardFactory
+                               AttachmentLayoutTypes, CardAction, CardImage, SuggestedActions, InputHints)
 
 
 def attachment_activity(attachment_layout: AttachmentLayoutTypes, attachments: List[Attachment], text: str = None,
@@ -46,13 +44,15 @@ class MessageFactory:
         return message
 
     @staticmethod
-    def suggested_actions(actions: List[Union[CardAction, str]], text: str = None, speak: str = None,
+    def suggested_actions(actions: List[CardAction], text: str = None, speak: str = None,
                           input_hint: Union[InputHints, str] = InputHints.accepting_input) -> Activity:
         """
         Returns a message that includes a set of suggested actions and optional text.
 
         :Example:
-        message = MessageFactory.suggested_actions(['red', 'green', 'blue'], `Choose a color`)
+        message = MessageFactory.suggested_actions([CardAction(title='a', type=ActionTypes.im_back, value='a'),
+                                                    CardAction(title='b', type=ActionTypes.im_back, value='b'),
+                                                    CardAction(title='c', type=ActionTypes.im_back, value='c')], 'Choose a color')
         await context.send_activity(message)
 
         :param actions:
@@ -61,7 +61,7 @@ class MessageFactory:
         :param input_hint:
         :return:
         """
-        actions = SuggestedActions(actions=CardFactory.actions(actions))
+        actions = SuggestedActions(actions=actions)
         message = Activity(type=ActivityTypes.message, input_hint=input_hint, suggested_actions=actions)
         if text:
             message.text = text
@@ -76,9 +76,9 @@ class MessageFactory:
         Returns a single message activity containing an attachment.
 
         :Example:
-        message = MessageFactory.attachment(CardFactory.heroCard('White T-Shirt',
-                                                                 ['https://example.com/whiteShirt.jpg'],
-                                                                 ['buy']))
+        message = MessageFactory.attachment(CardFactory.hero_card(HeroCard(title='White T-Shirt',
+                                                                  images=[CardImage(url='https://example.com/whiteShirt.jpg')],
+                                                                  buttons=[CardAction(title='buy')])))
         await context.send_activity(message)
 
         :param attachment:
@@ -96,9 +96,15 @@ class MessageFactory:
         Returns a message that will display a set of attachments in list form.
 
         :Example:
-        message = MessageFactory.list([CardFactory.hero_card('title1', ['imageUrl1'], ['button1']),
-                                       CardFactory.hero_card('title2', ['imageUrl2'], ['button2']),
-                                       CardFactory.hero_card('title3', ['imageUrl3'], ['button3'])])
+        message = MessageFactory.list([CardFactory.hero_card(HeroCard(title='title1',
+                                                             images=[CardImage(url='imageUrl1')],
+                                                             buttons=[CardAction(title='button1')])),
+                                       CardFactory.hero_card(HeroCard(title='title2',
+                                                             images=[CardImage(url='imageUrl2')],
+                                                             buttons=[CardAction(title='button2')])),
+                                       CardFactory.hero_card(HeroCard(title='title3',
+                                                             images=[CardImage(url='imageUrl3')],
+                                                             buttons=[CardAction(title='button3')]))])
         await context.send_activity(message)
 
         :param attachments:
@@ -116,9 +122,15 @@ class MessageFactory:
         Returns a message that will display a set of attachments using a carousel layout.
 
         :Example:
-        message = MessageFactory.carousel([CardFactory.hero_card('title1', ['imageUrl1'], ['button1']),
-                                           CardFactory.hero_card('title2', ['imageUrl2'], ['button2']),
-                                           CardFactory.hero_card('title3', ['imageUrl3'], ['button3'])])
+        message = MessageFactory.carousel([CardFactory.hero_card(HeroCard(title='title1',
+                                                                 images=[CardImage(url='imageUrl1')],
+                                                                 buttons=[CardAction(title='button1')])),
+                                           CardFactory.hero_card(HeroCard(title='title2',
+                                                                 images=[CardImage(url='imageUrl2')],
+                                                                 buttons=[CardAction(title='button2')])),
+                                           CardFactory.hero_card(HeroCard(title='title3',
+                                                                 images=[CardImage(url='imageUrl3')],
+                                                                 buttons=[CardAction(title='button3')]))])
         await context.send_activity(message)
 
         :param attachments:
