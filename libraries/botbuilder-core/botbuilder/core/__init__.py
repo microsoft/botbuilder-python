@@ -11,8 +11,10 @@ from .bot_adapter import BotAdapter
 from .bot_framework_adapter import BotFrameworkAdapter, BotFrameworkAdapterSettings
 from .bot_context import BotContext
 from .bot_state import BotState
+from .card_factory import CardFactory
 from .conversation_state import ConversationState
 from .memory_storage import MemoryStorage
+from .message_factory import MessageFactory
 from .middleware_set import AnonymousReceiveMiddleware, Middleware, MiddlewareSet
 from .storage import Storage, StoreItem, StorageKeyFactory, calculate_change_hash
 from .test_adapter import TestAdapter
@@ -25,8 +27,10 @@ __all__ = ['AnonymousReceiveMiddleware',
            'BotFrameworkAdapterSettings',
            'BotState',
            'calculate_change_hash',
+           'CardFactory',
            'ConversationState',
            'MemoryStorage',
+           'MessageFactory',
            'Middleware',
            'MiddlewareSet',
            'Storage',
