@@ -20,22 +20,29 @@ from .storage import Storage, StoreItem, StorageKeyFactory, calculate_change_has
 from .test_adapter import TestAdapter
 from .user_state import UserState
 
-__all__ = ['AnonymousReceiveMiddleware',
-           'BotAdapter',
-           'BotContext',
-           'BotFrameworkAdapter',
-           'BotFrameworkAdapterSettings',
-           'BotState',
-           'calculate_change_hash',
-           'CardFactory',
-           'ConversationState',
-           'MemoryStorage',
-           'MessageFactory',
-           'Middleware',
-           'MiddlewareSet',
-           'Storage',
-           'StorageKeyFactory',
-           'StoreItem',
-           'TestAdapter',
-           'UserState',
-           '__version__',]
+"""Expose botbuilder-schema in botbuilder-core."""
+from botbuilder.schema import *
+import botbuilder.schema
+
+__all__ = [class_name for class_name in dir(botbuilder.schema) if class_name[0].isupper()]
+
+"""Add to __all__ the classes from botbuilder-core."""
+__all__.extend(['AnonymousReceiveMiddleware',
+                'BotAdapter',
+                'BotContext',
+                'BotFrameworkAdapter',
+                'BotFrameworkAdapterSettings',
+                'BotState',
+                'calculate_change_hash',
+                'CardFactory',
+                'ConversationState',
+                'MemoryStorage',
+                'MessageFactory',
+                'Middleware',
+                'MiddlewareSet',
+                'Storage',
+                'StorageKeyFactory',
+                'StoreItem',
+                'TestAdapter',
+                'UserState',
+                '__version__'])
