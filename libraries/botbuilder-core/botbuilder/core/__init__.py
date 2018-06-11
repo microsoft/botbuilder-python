@@ -38,4 +38,4 @@ __all__ = ['AnonymousReceiveMiddleware',
            'StoreItem',
            'TestAdapter',
            'UserState',
-           '__version__',]
+           '__version__']
