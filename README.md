@@ -8,7 +8,7 @@ This repository contains code for the Python version of the [Microsoft Bot Build
 Production bots should continue to be developed using the [v3 SDK](https://github.com/Microsoft/BotBuilder/tree/master/CSharp).
 In addition to the Python SDK, Bot Builder supports creating bots in other popular programming languages like [.Net SDK](https://github.com/Microsoft/botbuilder-dotnet), [JavaScript](https://github.com/Microsoft/botbuilder-js), and [Java](https://github.com/Microsoft/botbuilder-java).
 
-To get started see the [wiki](https://github.com/Microsoft/botbuilder-python/wiki) for the v4 SDK.
+To get started see the [Azure Bot Service Documentation](https://docs.microsoft.com/en-us/azure/bot-service/?view=azure-bot-service-4.0) for the v4 SDK.
 
 ## Packages
 
