@@ -6,7 +6,7 @@ from setuptools import setup
 NAME = "botframework-connector"
 VERSION = "4.0.0.a4"
 REQUIRES = [
-    "msrest>=0.4.27",
+    "msrest==0.4.29",
     "requests>=2.8.1",
     "cryptography>=2.1.4",
     "PyJWT>=1.5.3",
