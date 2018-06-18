@@ -5,7 +5,7 @@ from setuptools import setup
 
 NAME = "botbuilder-schema"
 VERSION = "4.0.0.a3"
-REQUIRES = ["msrest>=0.2.0"]
+REQUIRES = ["msrest==0.4.29"]
 
 setup(
     name=NAME,
