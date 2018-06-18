@@ -22,7 +22,7 @@ class ChannelValidation:
     )
 
     @staticmethod
-    async def authenticate_token_service_url(auth_header: str, credentials: CredentialProvider, service_url: str) -> ClaimsIdentity:
+    async def authenticate_token_service_url(auth_header: str, credentials: CredentialProvider, service_url: str, channel_id: str) -> ClaimsIdentity:
         """ Validate the incoming Auth Header
 
         Validate the incoming Auth Header as a token sent from the Bot Framework Service.
@@ -39,7 +39,7 @@ class ChannelValidation:
         :raises Exception:
         """
         identity = await asyncio.ensure_future(
-            ChannelValidation.authenticate_token(auth_header, credentials))
+            ChannelValidation.authenticate_token(auth_header, credentials, channel_id))
 
         service_url_claim = identity.get_claim_value(ChannelValidation.SERVICE_URL_CLAIM)
         if service_url_claim != service_url:
@@ -49,7 +49,7 @@ class ChannelValidation:
         return identity
 
     @staticmethod
-    async def authenticate_token(auth_header: str, credentials: CredentialProvider) -> ClaimsIdentity:
+    async def authenticate_token(auth_header: str, credentials: CredentialProvider, channel_id: str) -> ClaimsIdentity:
         """ Validate the incoming Auth Header
 
         Validate the incoming Auth Header as a token sent from the Bot Framework Service.
@@ -69,7 +69,7 @@ class ChannelValidation:
             Constants.ALLOWED_SIGNING_ALGORITHMS)
 
         identity = await asyncio.ensure_future(
-            token_extractor.get_identity_from_auth_header(auth_header))
+            token_extractor.get_identity_from_auth_header(auth_header, channel_id))
         if not identity:
             # No valid identity. Not Authorized.
             raise Exception('Unauthorized. No valid identity.')

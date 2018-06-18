@@ -8,7 +8,7 @@ from .credential_provider import CredentialProvider
 class JwtTokenValidation:
 
     @staticmethod
-    async def assert_valid_activity(activity: Activity, auth_header: str, credentials: CredentialProvider):
+    async def assert_valid_activity(activity: Activity, auth_header: str, credentials: CredentialProvider, channel_id: str):
         """Validates the security tokens required by the Bot Framework Protocol. Throws on any exceptions.
         
         :param activity: The incoming Activity from the Bot Framework or the Emulator
@@ -32,10 +32,10 @@ class JwtTokenValidation:
 
         using_emulator = EmulatorValidation.is_token_from_emulator(auth_header)
         if using_emulator:
-            await EmulatorValidation.authenticate_emulator_token(auth_header, credentials)
+            await EmulatorValidation.authenticate_emulator_token(auth_header, credentials, channel_id)
         else:
             await ChannelValidation.authenticate_token_service_url(
-                auth_header, credentials, activity.service_url)
+                auth_header, credentials, activity.service_url, channel_id)
 
         # On the standard Auth path, we need to trust the URL that was incoming.
         MicrosoftAppCredentials.trust_service_url(activity.service_url)
