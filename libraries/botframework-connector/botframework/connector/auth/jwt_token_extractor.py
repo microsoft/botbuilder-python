@@ -61,12 +61,12 @@ class JwtTokenExtractor:
         key_id = headers.get("kid", None)
         metadata = await self.open_id_metadata.get(key_id)
 
+        if key_id and metadata.endorsements:
+            if not EndorsementsValidator.validate(channel_id, metadata.endorsements):
+                raise Exception('Could not validate endorsement key')
 
         if headers.get("alg", None) not in self.validation_parameters.algorithms:
             raise Exception('Token signing algorithm not in allowed list')
-
-        if not EndorsementsValidator.validate(channel_id, metadata.endorsements):
-            raise Exception('Could not validate endorsement key')
 
         options = {
             'verify_aud': False,
