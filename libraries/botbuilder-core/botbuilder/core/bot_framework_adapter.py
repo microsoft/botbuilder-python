@@ -99,7 +99,7 @@ class BotFrameworkAdapter(BotAdapter):
         :param auth_header:
         :return:
         """
-        await JwtTokenValidation.assert_valid_activity(request, auth_header, self._credential_provider)
+        await JwtTokenValidation.authenticate_request(request, auth_header, self._credential_provider)
 
     def create_context(self, activity):
         """

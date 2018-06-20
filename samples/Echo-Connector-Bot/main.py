@@ -47,7 +47,7 @@ class BotRequestHandler(http.server.BaseHTTPRequestHandler):
         credential_provider = SimpleCredentialProvider(APP_ID, APP_PASSWORD)
         loop = asyncio.new_event_loop()
         try:
-            loop.run_until_complete(JwtTokenValidation.assert_valid_activity(
+            loop.run_until_complete(JwtTokenValidation.authenticate_request(
                 activity, self.headers.get("Authorization"), credential_provider))
             return True
         except Exception as ex:

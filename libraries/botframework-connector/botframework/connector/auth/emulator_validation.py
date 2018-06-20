@@ -81,7 +81,7 @@ class EmulatorValidation:
         return True
 
     @staticmethod
-    async def authenticate_emulator_token(auth_header: str, credentials: CredentialProvider) -> ClaimsIdentity:
+    async def authenticate_emulator_token(auth_header: str, credentials: CredentialProvider, channel_id: str) -> ClaimsIdentity:
         """ Validate the incoming Auth Header
 
         Validate the incoming Auth Header as a token sent from the Bot Framework Service.
@@ -101,7 +101,7 @@ class EmulatorValidation:
             Constants.ALLOWED_SIGNING_ALGORITHMS)
 
         identity = await asyncio.ensure_future(
-            token_extractor.get_identity_from_auth_header(auth_header))
+            token_extractor.get_identity_from_auth_header(auth_header, channel_id))
         if not identity:
             # No valid identity. Not Authorized.
             raise Exception('Unauthorized. No valid identity.')
