@@ -7,6 +7,7 @@ install:
   - pip install -e ./libraries/botbuilder-schema
   - pip install -e ./libraries/botframework-connector
   - pip install -e ./libraries/botbuilder-core
+  - pip install -e ./libraries/botbuilder-dialogs
   - pip install -r ./libraries/botframework-connector/tests/requirements.txt
 
 script: pytest
