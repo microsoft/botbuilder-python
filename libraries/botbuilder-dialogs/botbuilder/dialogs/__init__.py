@@ -12,7 +12,20 @@ from .choices import (Channel, Tokenizer,
                       Choice, FindChoicesOptions,
                       ModelResult, FoundValue,
                       SortedValue, Find,
-                      FindValuesOptions)
+                      FindValuesOptions,
+                      ChoiceFactory, ChoiceFactoryOptions)
 
-__all__ = ['Channel', 'Choice', 'FindChoicesOptions', 'ModelResult', 'Tokenizer', 'TokenizerFunction',
-           'Token', 'FoundValue', 'SortedValue', 'Find', 'FindValuesOptions', '__version__']
+__all__ = ['Channel',
+           'Choice',
+           'FindChoicesOptions',
+           'ModelResult',
+           'Tokenizer',
+           'TokenizerFunction',
+           'Token',
+           'FoundValue',
+           'SortedValue',
+           'Find',
+           'FindValuesOptions',
+           'ChoiceFactory',
+           'ChoiceFactoryOptions',
+           '__version__']
