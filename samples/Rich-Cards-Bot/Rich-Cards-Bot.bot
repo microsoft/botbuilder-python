@@ -1,0 +1,14 @@
+{
+    "name": "Rich-Cards-Bot",
+    "secretKey": "",
+    "services": [
+        {
+            "appId": "",
+            "id": "http://localhost:9000",
+            "type": "endpoint",
+            "appPassword": "",
+            "endpoint": "http://localhost:9000",
+            "name": "Rich-Cards-Bot"
+        }
+    ]
+}

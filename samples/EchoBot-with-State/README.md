@@ -8,9 +8,11 @@ git clone https://github.com/Microsoft/botbuilder-python.git
 
 
 ### Visual studio code
-- open `botbuilder-python\samples\EchoBot-with-State` folder
+- Activate your desired virtual environment
+- Open `botbuilder-python\samples\EchoBot-with-State` folder
 - Bring up a terminal, navigate to `botbuilder-python\samples\EchoBot-with-State` folder
-- type 'python main.py'
+- In the terminal, type `pip install -r requirements.txt`
+- In the terminal, type `python main.py`
 
 ## Testing the bot using Bot Framework Emulator
 [Microsoft Bot Framework Emulator](https://github.com/microsoft/botframework-emulator) is a desktop application that allows bot developers to test and debug their bots on localhost or running remotely through a tunnel.
