@@ -9,7 +9,7 @@ from typing import List, Callable
 from botbuilder.schema import (Activity, ActivityTypes,
                                ChannelAccount, ConversationAccount,
                                ResourceResponse, ConversationReference)
-from botbuilder.core.bot_context import BotContext
+from botbuilder.core.turn_context import TurnContext
 from botbuilder.core.bot_adapter import BotAdapter
 
 
@@ -81,11 +81,11 @@ class ConsoleAdapter(BotAdapter):
                                     timestamp=datetime.datetime.now(),
                                     id=str(self._next_id))
 
-                activity = BotContext.apply_conversation_reference(activity, self.reference, True)
-                context = BotContext(self, activity)
+                activity = TurnContext.apply_conversation_reference(activity, self.reference, True)
+                context = TurnContext(self, activity)
                 await self.run_middleware(context, logic)
 
-    async def send_activities(self, context: BotContext, activities: List[Activity]):
+    async def send_activities(self, context: TurnContext, activities: List[Activity]):
         """
         Logs a series of activities to the console.
         :param context:
@@ -124,9 +124,9 @@ class ConsoleAdapter(BotAdapter):
 
         await next_activity(0)
 
-    async def delete_activity(self, context: BotContext, reference: ConversationReference):
+    async def delete_activity(self, context: TurnContext, reference: ConversationReference):
         """
-        Not supported for the ConsoleAdapter. Calling this method or `BotContext.delete_activity()`
+        Not supported for the ConsoleAdapter. Calling this method or `TurnContext.delete_activity()`
         will result an error being returned.
         :param context:
         :param reference:
@@ -134,9 +134,9 @@ class ConsoleAdapter(BotAdapter):
         """
         raise NotImplementedError('ConsoleAdapter.delete_activity(): not supported.')
 
-    async def update_activity(self, context: BotContext, activity: Activity):
+    async def update_activity(self, context: TurnContext, activity: Activity):
         """
-        Not supported for the ConsoleAdapter. Calling this method or `BotContext.update_activity()`
+        Not supported for the ConsoleAdapter. Calling this method or `TurnContext.update_activity()`
         will result an error being returned.
         :param context:
         :param activity:

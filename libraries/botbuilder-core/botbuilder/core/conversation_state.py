@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from .bot_context import BotContext
+from .turn_context import TurnContext
 from .bot_state import BotState
 from .storage import Storage
 
@@ -30,7 +30,7 @@ class ConversationState(BotState):
         super(ConversationState, self).__init__(storage, call_get_storage_key)
         self.namespace = namespace
 
-    def get_storage_key(self, context: BotContext):
+    def get_storage_key(self, context: TurnContext):
         activity = context.activity
         channel_id = getattr(activity, 'channel_id', None)
         conversation_id = getattr(activity.conversation, 'id', None) if hasattr(activity, 'conversation') else None

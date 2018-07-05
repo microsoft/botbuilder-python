@@ -3,7 +3,7 @@
 
 import pytest
 
-from botbuilder.core import BotContext, BotState, MemoryStorage, TestAdapter
+from botbuilder.core import TurnContext, BotState, MemoryStorage, TestAdapter
 from botbuilder.schema import Activity
 
 RECEIVED_MESSAGE = Activity(type='message',
@@ -24,7 +24,7 @@ def key_factory(context):
 class TestBotState:
     storage = MemoryStorage()
     adapter = TestAdapter()
-    context = BotContext(adapter, RECEIVED_MESSAGE)
+    context = TurnContext(adapter, RECEIVED_MESSAGE)
     middleware = BotState(storage, key_factory)
 
     @pytest.mark.asyncio

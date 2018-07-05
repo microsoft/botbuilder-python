@@ -3,7 +3,7 @@
 
 import pytest
 
-from botbuilder.core import BotContext, MemoryStorage, StoreItem, TestAdapter, UserState
+from botbuilder.core import TurnContext, MemoryStorage, StoreItem, TestAdapter, UserState
 from botbuilder.schema import Activity, ChannelAccount
 
 RECEIVED_MESSAGE = Activity(type='message',
@@ -21,7 +21,7 @@ MISSING_FROM_PROPERTY = Activity(type='message',
 class TestUserState:
     storage = MemoryStorage()
     adapter = TestAdapter()
-    context = BotContext(adapter, RECEIVED_MESSAGE)
+    context = TurnContext(adapter, RECEIVED_MESSAGE)
     middleware = UserState(storage)
 
     @pytest.mark.asyncio
@@ -41,7 +41,7 @@ class TestUserState:
 
     @pytest.mark.asyncio
     async def test_should_reject_with_error_if_channel_id_is_missing(self):
-        context = BotContext(self.adapter, MISSING_CHANNEL_ID)
+        context = TurnContext(self.adapter, MISSING_CHANNEL_ID)
 
         async def next_middleware():
             assert False, 'Should not have called next_middleware'
@@ -55,7 +55,7 @@ class TestUserState:
 
     @pytest.mark.asyncio
     async def test_should_reject_with_error_if_from_property_is_missing(self):
-        context = BotContext(self.adapter, MISSING_FROM_PROPERTY)
+        context = TurnContext(self.adapter, MISSING_FROM_PROPERTY)
 
         async def next_middleware():
             assert False, 'Should not have called next_middleware'

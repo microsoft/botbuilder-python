@@ -9,7 +9,7 @@ from .about import __version__
 
 from .bot_adapter import BotAdapter
 from .bot_framework_adapter import BotFrameworkAdapter, BotFrameworkAdapterSettings
-from .bot_context import BotContext
+from .turn_context import TurnContext
 from .bot_state import BotState
 from .card_factory import CardFactory
 from .conversation_state import ConversationState
@@ -22,7 +22,7 @@ from .user_state import UserState
 
 __all__ = ['AnonymousReceiveMiddleware',
            'BotAdapter',
-           'BotContext',
+           'TurnContext',
            'BotFrameworkAdapter',
            'BotFrameworkAdapterSettings',
            'BotState',

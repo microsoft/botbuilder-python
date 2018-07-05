@@ -8,14 +8,14 @@ from typing import List, Callable, Union
 from botbuilder.schema import Activity, ConversationReference, ResourceResponse
 
 
-class BotContext(object):
+class TurnContext(object):
     def __init__(self, adapter_or_context, request: Activity=None):
         """
-        Creates a new BotContext instance.
+        Creates a new TurnContext instance.
         :param adapter_or_context:
         :param request:
         """
-        if isinstance(adapter_or_context, BotContext):
+        if isinstance(adapter_or_context, TurnContext):
             adapter_or_context.copy_to(self)
         else:
             self.adapter = adapter_or_context
@@ -28,11 +28,11 @@ class BotContext(object):
             self._responded = {'responded': False}
 
         if self.adapter is None:
-            raise TypeError('BotContext must be instantiated with an adapter.')
+            raise TypeError('TurnContext must be instantiated with an adapter.')
         if self.activity is None:
-            raise TypeError('BotContext must be instantiated with a request parameter of type Activity.')
+            raise TypeError('TurnContext must be instantiated with a request parameter of type Activity.')
 
-    def copy_to(self, context: 'BotContext') -> None:
+    def copy_to(self, context: 'TurnContext') -> None:
         """
         Called when this TurnContext instance is passed into the constructor of a new TurnContext
         instance. Can be overridden in derived classes.
@@ -54,12 +54,12 @@ class BotContext(object):
     @activity.setter
     def activity(self, value):
         """
-        Used to set BotContext._activity when a context object is created. Only takes instances of Activities.
+        Used to set TurnContext._activity when a context object is created. Only takes instances of Activities.
         :param value:
         :return:
         """
         if not isinstance(value, Activity):
-            raise TypeError('BotContext: cannot set `activity` to a type other than Activity.')
+            raise TypeError('TurnContext: cannot set `activity` to a type other than Activity.')
         else:
             self._activity = value
 
@@ -74,7 +74,7 @@ class BotContext(object):
     @responded.setter
     def responded(self, value):
         if not value:
-            raise ValueError('BotContext: cannot set BotContext.responded to False.')
+            raise ValueError('TurnContext: cannot set TurnContext.responded to False.')
         else:
             self._responded['responded'] = True
 
@@ -92,7 +92,7 @@ class BotContext(object):
         try:
             return self._services[key]
         except KeyError:
-            raise KeyError('%s not found in BotContext._services.' % key)
+            raise KeyError('%s not found in TurnContext._services.' % key)
 
     def has(self, key: str) -> bool:
         """
@@ -122,14 +122,14 @@ class BotContext(object):
         :param activity_or_text:
         :return:
         """
-        reference = BotContext.get_conversation_reference(self.activity)
-        output = [BotContext.apply_conversation_reference(
+        reference = TurnContext.get_conversation_reference(self.activity)
+        output = [TurnContext.apply_conversation_reference(
             Activity(text=a, type='message') if isinstance(a, str) else a, reference)
             for a in activity_or_text]
         for activity in output:
             activity.input_hint = 'acceptingInput'
 
-        async def callback(context: 'BotContext', output):
+        async def callback(context: 'TurnContext', output):
             responses = await context.adapter.send_activities(context, output)
             context._responded = True
             return responses
@@ -151,13 +151,13 @@ class BotContext(object):
         :return:
         """
         if type(id_or_reference) == str:
-            reference = BotContext.get_conversation_reference(self.activity)
+            reference = TurnContext.get_conversation_reference(self.activity)
             reference.activity_id = id_or_reference
         else:
             reference = id_or_reference
         return await self._emit(self._on_delete_activity, reference, self.adapter.delete_activity(self, reference))
 
-    def on_send_activities(self, handler) -> 'BotContext':
+    def on_send_activities(self, handler) -> 'TurnContext':
         """
         Registers a handler to be notified of and potentially intercept the sending of activities.
         :param handler:
@@ -166,7 +166,7 @@ class BotContext(object):
         self._on_send_activities.append(handler)
         return self
 
-    def on_update_activity(self, handler) -> 'BotContext':
+    def on_update_activity(self, handler) -> 'TurnContext':
         """
         Registers a handler to be notified of and potentially intercept an activity being updated.
         :param handler:
@@ -175,7 +175,7 @@ class BotContext(object):
         self._on_update_activity.append(handler)
         return self
 
-    def on_delete_activity(self, handler) -> 'BotContext':
+    def on_delete_activity(self, handler) -> 'TurnContext':
         """
         Registers a handler to be notified of and potentially intercept an activity being deleted.
         :param handler:
@@ -208,7 +208,7 @@ class BotContext(object):
         object and then later used to message the user proactively.
 
         Usage Example:
-        reference = BotContext.get_conversation_reference(context.request)
+        reference = TurnContext.get_conversation_reference(context.request)
         :param activity:
         :return:
         """

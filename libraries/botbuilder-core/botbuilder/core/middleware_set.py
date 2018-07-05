@@ -4,12 +4,12 @@
 from asyncio import iscoroutinefunction
 from abc import ABC, abstractmethod
 
-from .bot_context import BotContext
+from .turn_context import TurnContext
 
 
 class Middleware(ABC):
     @abstractmethod
-    def on_process_request(self, context: BotContext, next): pass
+    def on_process_request(self, context: TurnContext, next): pass
 
 
 class AnonymousReceiveMiddleware(Middleware):
@@ -18,7 +18,7 @@ class AnonymousReceiveMiddleware(Middleware):
             raise TypeError('AnonymousReceiveMiddleware must be instantiated with a valid coroutine function.')
         self._to_call = anonymous_handler
 
-    def on_process_request(self, context: BotContext, next):
+    def on_process_request(self, context: TurnContext, next):
         return self._to_call(context, next)
 
 
@@ -45,14 +45,14 @@ class MiddlewareSet(Middleware):
             else:
                 raise TypeError('MiddlewareSet.use(): invalid middleware at index "%s" being added.' % idx)
 
-    async def receive_activity(self, context: BotContext):
+    async def receive_activity(self, context: TurnContext):
         await self.receive_activity_internal(context, None)
 
     async def on_process_request(self, context, logic):
         await self.receive_activity_internal(context, None)
         await logic()
 
-    async def receive_activity_with_status(self, context: BotContext, callback):
+    async def receive_activity_with_status(self, context: TurnContext, callback):
         return await self.receive_activity_internal(context, callback)
 
     async def receive_activity_internal(self, context, callback, next_middleware_index=0):

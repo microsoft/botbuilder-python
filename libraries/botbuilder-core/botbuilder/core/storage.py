@@ -5,7 +5,7 @@ from copy import copy
 from abc import ABC, abstractmethod
 from typing import Callable, List
 
-from .bot_context import BotContext
+from .turn_context import TurnContext
 
 
 class Storage(ABC):
@@ -54,7 +54,7 @@ class StoreItem(ABC):
         return output
 
 
-StorageKeyFactory = Callable[[BotContext], str]
+StorageKeyFactory = Callable[[TurnContext], str]
 
 
 def calculate_change_hash(item: StoreItem) -> str:

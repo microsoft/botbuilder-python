@@ -15,7 +15,7 @@ from botbuilder.schema import (Activity, ActivityTypes,
                                ThumbnailCard, VideoCard,
                                ReceiptCard, SigninCard,
                                Fact, ReceiptItem)
-from botbuilder.core import (BotFrameworkAdapter, BotFrameworkAdapterSettings, BotContext,
+from botbuilder.core import (BotFrameworkAdapter, BotFrameworkAdapterSettings, TurnContext,
                              ConversationState, MemoryStorage, UserState, CardFactory)
 """Import AdaptiveCard content from adjacent file"""
 from adaptive_card_example import ADAPTIVE_CARD_CONTENT
@@ -144,7 +144,7 @@ async def create_reply_activity(request_activity: Activity, text: str, attachmen
     return activity
 
 
-async def handle_message(context: BotContext) -> web.Response:
+async def handle_message(context: TurnContext) -> web.Response:
     # Access the state for the conversation between the user and the bot.
     state = await conversation_state.get(context)
     if hasattr(state, 'in_prompt'):
@@ -181,7 +181,7 @@ async def handle_message(context: BotContext) -> web.Response:
         return web.Response(status=202)
 
 
-async def card_response(context: BotContext) -> web.Response:
+async def card_response(context: TurnContext) -> web.Response:
     response = context.activity.text.strip()
     choice_dict = {
         '1': [create_adaptive_card], 'adaptive card': [create_adaptive_card],
@@ -214,7 +214,7 @@ async def card_response(context: BotContext) -> web.Response:
         return web.Response(status=200)
 
 
-async def handle_conversation_update(context: BotContext) -> web.Response:
+async def handle_conversation_update(context: TurnContext) -> web.Response:
     if context.activity.members_added[0].id != context.activity.recipient.id:
         response = await create_reply_activity(context.activity, 'Welcome to the Rich Cards Bot!')
         await context.send_activity(response)
@@ -225,7 +225,7 @@ async def unhandled_activity() -> web.Response:
     return web.Response(status=404)
 
 
-async def request_handler(context: BotContext) -> web.Response:
+async def request_handler(context: TurnContext) -> web.Response:
     if context.activity.type == 'message':
         return await handle_message(context)
     elif context.activity.type == 'conversationUpdate':

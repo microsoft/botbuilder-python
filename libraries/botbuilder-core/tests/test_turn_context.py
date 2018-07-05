@@ -4,7 +4,7 @@
 import pytest
 
 from botbuilder.schema import Activity, ChannelAccount, ResourceResponse, ConversationAccount
-from botbuilder.core import BotAdapter, BotContext
+from botbuilder.core import BotAdapter, TurnContext
 ACTIVITY = Activity(id='1234',
                     type='message',
                     text='test',
@@ -41,11 +41,11 @@ class SimpleAdapter(BotAdapter):
 
 class TestBotContext:
     def test_should_create_context_with_request_and_adapter(self):
-        context = BotContext(SimpleAdapter(), ACTIVITY)
+        context = TurnContext(SimpleAdapter(), ACTIVITY)
 
     def test_should_not_create_context_without_request(self):
         try:
-            context = BotContext(SimpleAdapter(), None)
+            context = TurnContext(SimpleAdapter(), None)
         except TypeError:
             pass
         except Exception as e:
@@ -53,20 +53,20 @@ class TestBotContext:
 
     def test_should_not_create_context_without_adapter(self):
         try:
-            context = BotContext(None, ACTIVITY)
+            context = TurnContext(None, ACTIVITY)
         except TypeError:
             pass
         except Exception as e:
             raise e
 
     def test_should_create_context_with_older_context(self):
-        context = BotContext(SimpleAdapter(), ACTIVITY)
-        new_context = BotContext(context)
+        context = TurnContext(SimpleAdapter(), ACTIVITY)
+        new_context = TurnContext(context)
 
     def test_copy_to_should_copy_all_references(self):
         old_adapter = SimpleAdapter()
         old_activity = Activity(id='2', type='message', text='test copy')
-        old_context = BotContext(old_adapter, old_activity)
+        old_context = TurnContext(old_adapter, old_activity)
         old_context.responded = True
 
         async def send_activities_handler(context, activities, next_handler):
@@ -92,7 +92,7 @@ class TestBotContext:
         old_context.on_update_activity(update_activity_handler)
 
         adapter = SimpleAdapter()
-        new_context = BotContext(adapter, ACTIVITY)
+        new_context = TurnContext(adapter, ACTIVITY)
         assert len(new_context._on_send_activities) == 0
         assert len(new_context._on_update_activity) == 0
         assert len(new_context._on_delete_activity) == 0
@@ -107,17 +107,17 @@ class TestBotContext:
         assert len(new_context._on_delete_activity) == 1
 
     def test_responded_should_be_automatically_set_to_False(self):
-        context = BotContext(SimpleAdapter(), ACTIVITY)
+        context = TurnContext(SimpleAdapter(), ACTIVITY)
         assert context.responded is False
 
     def test_should_be_able_to_set_responded_to_True(self):
-        context = BotContext(SimpleAdapter(), ACTIVITY)
+        context = TurnContext(SimpleAdapter(), ACTIVITY)
         assert context.responded is False
         context.responded = True
         assert context.responded
 
     def test_should_not_be_able_to_set_responded_to_False(self):
-        context = BotContext(SimpleAdapter(), ACTIVITY)
+        context = TurnContext(SimpleAdapter(), ACTIVITY)
         try:
             context.responded = False
         except ValueError:
@@ -127,7 +127,7 @@ class TestBotContext:
 
     @pytest.mark.asyncio
     async def test_should_call_on_delete_activity_handlers_before_deletion(self):
-        context = BotContext(SimpleAdapter(), ACTIVITY)
+        context = TurnContext(SimpleAdapter(), ACTIVITY)
         called = False
 
         async def delete_handler(context, reference, next_handler_coroutine):
@@ -144,7 +144,7 @@ class TestBotContext:
 
     @pytest.mark.asyncio
     async def test_should_call_multiple_on_delete_activity_handlers_in_order(self):
-        context = BotContext(SimpleAdapter(), ACTIVITY)
+        context = TurnContext(SimpleAdapter(), ACTIVITY)
         called_first = False
         called_second = False
 
@@ -176,7 +176,7 @@ class TestBotContext:
 
     @pytest.mark.asyncio
     async def test_should_call_send_on_activities_handler_before_send(self):
-        context = BotContext(SimpleAdapter(), ACTIVITY)
+        context = TurnContext(SimpleAdapter(), ACTIVITY)
         called = False
 
         async def send_handler(context, activities, next_handler_coroutine):
@@ -193,7 +193,7 @@ class TestBotContext:
 
     @pytest.mark.asyncio
     async def test_should_call_on_update_activity_handler_before_update(self):
-        context = BotContext(SimpleAdapter(), ACTIVITY)
+        context = TurnContext(SimpleAdapter(), ACTIVITY)
         called = False
 
         async def update_handler(context, activity, next_handler_coroutine):
@@ -209,7 +209,7 @@ class TestBotContext:
         assert called is True
 
     def test_get_conversation_reference_should_return_valid_reference(self):
-        reference = BotContext.get_conversation_reference(ACTIVITY)
+        reference = TurnContext.get_conversation_reference(ACTIVITY)
 
         assert reference.activity_id == ACTIVITY.id
         assert reference.user == ACTIVITY.from_property
@@ -219,8 +219,8 @@ class TestBotContext:
         assert reference.service_url == ACTIVITY.service_url
 
     def test_apply_conversation_reference_should_return_prepare_reply_when_is_incoming_is_False(self):
-        reference = BotContext.get_conversation_reference(ACTIVITY)
-        reply = BotContext.apply_conversation_reference(Activity(type='message', text='reply'), reference)
+        reference = TurnContext.get_conversation_reference(ACTIVITY)
+        reply = TurnContext.apply_conversation_reference(Activity(type='message', text='reply'), reference)
 
         assert reply.recipient == ACTIVITY.from_property
         assert reply.from_property == ACTIVITY.recipient
@@ -229,8 +229,8 @@ class TestBotContext:
         assert reply.channel_id == ACTIVITY.channel_id
 
     def test_apply_conversation_reference_when_is_incoming_is_True_should_not_prepare_a_reply(self):
-        reference = BotContext.get_conversation_reference(ACTIVITY)
-        reply = BotContext.apply_conversation_reference(Activity(type='message', text='reply'), reference, True)
+        reference = TurnContext.get_conversation_reference(ACTIVITY)
+        reply = TurnContext.apply_conversation_reference(Activity(type='message', text='reply'), reference, True)
 
         assert reply.recipient == ACTIVITY.recipient
         assert reply.from_property == ACTIVITY.from_property
