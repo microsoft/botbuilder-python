@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 import asyncio
-from botbuilder.core import BotContext, ConversationState, UserState, MemoryStorage
+from botbuilder.core import TurnContext, ConversationState, UserState, MemoryStorage
 from botbuilder.schema import ActivityTypes
 
 from adapter import ConsoleAdapter
@@ -22,7 +22,7 @@ conversation_state = ConversationState(memory)
 adapter.use(conversation_state)
 
 
-async def logic(context: BotContext):
+async def logic(context: TurnContext):
     if context.activity.type == ActivityTypes.message:
         state = await conversation_state.get(context)
 

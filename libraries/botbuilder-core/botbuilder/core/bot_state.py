@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from .bot_context import BotContext
+from .turn_context import TurnContext
 from .middleware_set import Middleware
 from .storage import calculate_change_hash, StoreItem, StorageKeyFactory, Storage
 
@@ -27,7 +27,7 @@ class BotState(Middleware):
         await self.write(context)
         return logic_results
 
-    async def read(self, context: BotContext, force: bool=False):
+    async def read(self, context: TurnContext, force: bool=False):
         """
         Reads in and caches the current state object for a turn.
         :param context:
@@ -47,7 +47,7 @@ class BotState(Middleware):
 
         return cached['state']
 
-    async def write(self, context: BotContext, force: bool=False):
+    async def write(self, context: TurnContext, force: bool=False):
         """
         Saves the cached state object if it's been changed.
         :param context:
@@ -67,7 +67,7 @@ class BotState(Middleware):
             cached['hash'] = calculate_change_hash(cached['state'])
             context.services[self.state_key] = cached
 
-    async def clear(self, context: BotContext):
+    async def clear(self, context: TurnContext):
         """
         Clears the current state object for a turn.
         :param context:
@@ -78,7 +78,7 @@ class BotState(Middleware):
             cached['state'] = StoreItem()
             context.services[self.state_key] = cached
 
-    async def get(self, context: BotContext):
+    async def get(self, context: TurnContext):
         """
         Returns a cached state object or undefined if not cached.
         :param context:

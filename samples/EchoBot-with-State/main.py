@@ -8,7 +8,7 @@ This sample shows how to create a simple EchoBot with state.
 
 from aiohttp import web
 from botbuilder.schema import (Activity, ActivityTypes)
-from botbuilder.core import (BotFrameworkAdapter, BotFrameworkAdapterSettings, BotContext,
+from botbuilder.core import (BotFrameworkAdapter, BotFrameworkAdapterSettings, TurnContext,
                              ConversationState, MemoryStorage, UserState)
 
 APP_ID = ''
@@ -40,7 +40,7 @@ async def create_reply_activity(request_activity, text) -> Activity:
         service_url=request_activity.service_url)
 
 
-async def handle_message(context: BotContext) -> web.Response:
+async def handle_message(context: TurnContext) -> web.Response:
     # Access the state for the conversation between the user and the bot.
     state = await conversation_state.get(context)
 
@@ -54,7 +54,7 @@ async def handle_message(context: BotContext) -> web.Response:
     return web.Response(status=202)
 
 
-async def handle_conversation_update(context: BotContext) -> web.Response:
+async def handle_conversation_update(context: TurnContext) -> web.Response:
     if context.activity.members_added[0].id != context.activity.recipient.id:
         response = await create_reply_activity(context.activity, 'Welcome to the Echo Adapter Bot!')
         await context.send_activity(response)
@@ -65,7 +65,7 @@ async def unhandled_activity() -> web.Response:
     return web.Response(status=404)
 
 
-async def request_handler(context: BotContext) -> web.Response:
+async def request_handler(context: TurnContext) -> web.Response:
     if context.activity.type == 'message':
         return await handle_message(context)
     elif context.activity.type == 'conversationUpdate':

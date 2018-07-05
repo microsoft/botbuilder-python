@@ -3,7 +3,7 @@
 
 from aiohttp import web
 from botbuilder.schema import (Activity, ActivityTypes)
-from botbuilder.core import (BotFrameworkAdapter, BotFrameworkAdapterSettings, BotContext)
+from botbuilder.core import (BotFrameworkAdapter, BotFrameworkAdapterSettings, TurnContext)
 
 APP_ID = ''
 APP_PASSWORD = ''
@@ -23,13 +23,13 @@ async def create_reply_activity(request_activity, text) -> Activity:
         service_url=request_activity.service_url)
 
 
-async def handle_message(context: BotContext) -> web.Response:
+async def handle_message(context: TurnContext) -> web.Response:
     response = await create_reply_activity(context.request, 'You said %s.' % context.request.text)
     await context.send_activity(response)
     return web.Response(status=202)
 
 
-async def handle_conversation_update(context: BotContext) -> web.Response:
+async def handle_conversation_update(context: TurnContext) -> web.Response:
     if context.request.members_added[0].id != context.request.recipient.id:
         response = await create_reply_activity(context.request, 'Welcome to the Echo Adapter Bot!')
         await context.send_activity(response)
@@ -40,7 +40,7 @@ async def unhandled_activity() -> web.Response:
     return web.Response(status=404)
 
 
-async def request_handler(context: BotContext) -> web.Response:
+async def request_handler(context: TurnContext) -> web.Response:
     if context.request.type == 'message':
         return await handle_message(context)
     elif context.request.type == 'conversationUpdate':

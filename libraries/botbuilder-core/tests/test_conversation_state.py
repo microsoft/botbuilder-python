@@ -3,7 +3,7 @@
 
 import pytest
 
-from botbuilder.core import BotContext, MemoryStorage, TestAdapter, ConversationState
+from botbuilder.core import TurnContext, MemoryStorage, TestAdapter, ConversationState
 from botbuilder.schema import Activity, ConversationAccount
 
 RECEIVED_MESSAGE = Activity(type='message',
@@ -24,7 +24,7 @@ END_OF_CONVERSATION = Activity(type='endOfConversation',
 class TestConversationState:
     storage = MemoryStorage()
     adapter = TestAdapter()
-    context = BotContext(adapter, RECEIVED_MESSAGE)
+    context = TurnContext(adapter, RECEIVED_MESSAGE)
     middleware = ConversationState(storage)
 
     @pytest.mark.asyncio
@@ -62,7 +62,7 @@ class TestConversationState:
 
     @pytest.mark.asyncio
     async def test_should_reject_with_error_if_channel_id_is_missing(self):
-        context = BotContext(self.adapter, MISSING_CHANNEL_ID)
+        context = TurnContext(self.adapter, MISSING_CHANNEL_ID)
 
         async def next_middleware():
             assert False, 'should not have called next_middleware'
@@ -78,7 +78,7 @@ class TestConversationState:
 
     @pytest.mark.asyncio
     async def test_should_reject_with_error_if_conversation_is_missing(self):
-        context = BotContext(self.adapter, MISSING_CONVERSATION)
+        context = TurnContext(self.adapter, MISSING_CONVERSATION)
 
         async def next_middleware():
             assert False, 'should not have called next_middleware'

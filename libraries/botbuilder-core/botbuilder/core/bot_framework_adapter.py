@@ -13,7 +13,7 @@ from botframework.connector.auth import (MicrosoftAppCredentials,
 
 from . import __version__
 from .bot_adapter import BotAdapter
-from .bot_context import BotContext
+from .turn_context import TurnContext
 
 USER_AGENT = f"Microsoft-BotFramework/3.1 (BotBuilder Python/{__version__})"
 
@@ -42,7 +42,7 @@ class BotFrameworkAdapter(BotAdapter):
         :param logic:
         :return:
         """
-        request = BotContext.apply_conversation_reference(Activity(), reference, is_incoming=True)
+        request = TurnContext.apply_conversation_reference(Activity(), reference, is_incoming=True)
         context = self.create_context(request)
         return await self.run_middleware(context, logic)
 
@@ -63,7 +63,7 @@ class BotFrameworkAdapter(BotAdapter):
             client = self.create_connector_client(reference.service_url)
 
             resource_response = await client.conversations.create_conversation_async(parameters)
-            request = BotContext.apply_conversation_reference(Activity(), reference, is_incoming=True)
+            request = TurnContext.apply_conversation_reference(Activity(), reference, is_incoming=True)
             request.conversation = ConversationAccount(id=resource_response.id)
             if resource_response.service_url:
                 request.service_url = resource_response.service_url
@@ -107,7 +107,7 @@ class BotFrameworkAdapter(BotAdapter):
         :param activity:
         :return:
         """
-        return BotContext(self, activity)
+        return TurnContext(self, activity)
 
     @staticmethod
     async def parse_request(req):
@@ -148,7 +148,7 @@ class BotFrameworkAdapter(BotAdapter):
             if is_valid_activity:
                 return req
 
-    async def update_activity(self, context: BotContext, activity: Activity):
+    async def update_activity(self, context: TurnContext, activity: Activity):
         """
         Replaces an activity that was previously sent to a channel. It should be noted that not all
         channels support this feature.
@@ -165,7 +165,7 @@ class BotFrameworkAdapter(BotAdapter):
         except Exception as e:
             raise e
 
-    async def delete_activity(self, context: BotContext, conversation_reference: ConversationReference):
+    async def delete_activity(self, context: TurnContext, conversation_reference: ConversationReference):
         """
         Deletes an activity that was previously sent to a channel. It should be noted that not all
         channels support this feature.
@@ -180,7 +180,7 @@ class BotFrameworkAdapter(BotAdapter):
         except Exception as e:
             raise e
 
-    async def send_activities(self, context: BotContext, activities: List[Activity]):
+    async def send_activities(self, context: TurnContext, activities: List[Activity]):
         try:
             for activity in activities:
                 if activity.type == 'delay':
@@ -198,7 +198,7 @@ class BotFrameworkAdapter(BotAdapter):
         except Exception as e:
             raise e
 
-    async def delete_conversation_member(self, context: BotContext, member_id: str) -> None:
+    async def delete_conversation_member(self, context: TurnContext, member_id: str) -> None:
         """
         Deletes a member from the current conversation.
         :param context:
@@ -220,7 +220,7 @@ class BotFrameworkAdapter(BotAdapter):
         except Exception as e:
             raise e
 
-    async def get_activity_members(self, context: BotContext, activity_id: str):
+    async def get_activity_members(self, context: TurnContext, activity_id: str):
         """
         Lists the members of a given activity.
         :param context:
@@ -244,7 +244,7 @@ class BotFrameworkAdapter(BotAdapter):
         except Exception as e:
             raise e
 
-    async def get_conversation_members(self, context: BotContext):
+    async def get_conversation_members(self, context: TurnContext):
         """
         Lists the members of a current conversation.
         :param context:

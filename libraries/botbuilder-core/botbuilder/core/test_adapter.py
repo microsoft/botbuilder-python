@@ -6,7 +6,7 @@ import inspect
 from datetime import datetime
 from typing import Coroutine, List
 from copy import copy
-from botbuilder.core import BotAdapter, BotContext
+from botbuilder.core import BotAdapter, TurnContext
 from botbuilder.schema import (ActivityTypes, Activity, ConversationAccount,
                                ConversationReference, ChannelAccount, ResourceResponse)
 
@@ -109,7 +109,7 @@ class TestAdapter(BotAdapter):
             request.id = str(self._next_id)
 
         # Create context object and run middleware
-        context = BotContext(self, request)
+        context = TurnContext(self, request)
         return await self.run_middleware(context, self.logic)
 
     async def send(self, user_says):

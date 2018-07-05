@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from .bot_context import BotContext
+from .turn_context import TurnContext
 from .bot_state import BotState
 from .storage import Storage
 
@@ -30,7 +30,7 @@ class UserState(BotState):
 
         super(UserState, self).__init__(storage, call_get_storage_key)
 
-    def get_storage_key(self, context: BotContext) -> str:
+    def get_storage_key(self, context: TurnContext) -> str:
         """
         Returns the storage key for the current user state.
         :param context:
