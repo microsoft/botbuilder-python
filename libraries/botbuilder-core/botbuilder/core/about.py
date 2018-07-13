@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 __title__ = 'botbuilder-core'
-__version__ = '4.0.0.a5'
+__version__ = '4.0.0.a6'
 __uri__ = 'https://www.github.com/Microsoft/botbuilder-python'
 __author__ = 'Microsoft'
 __description__ = 'Microsoft Bot Framework Bot Builder'
