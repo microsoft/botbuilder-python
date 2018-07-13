@@ -1,5 +1,5 @@
 git+https://github.com/Azure/msrest-for-python.git@a997e97cd926c1eedfe4e5a3a52a637313fbd4e4
-botbuilder-schema>=4.0.0.a5
+botbuilder-schema>=4.0.0.a6
 requests>=2.18.1
 PyJWT==1.5.3
 cryptography==2.1.4
