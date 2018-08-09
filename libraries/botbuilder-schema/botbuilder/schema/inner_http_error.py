@@ -12,22 +12,21 @@
 from msrest.serialization import Model
 
 
-class TextHighlight(Model):
-    """Refers to a substring of content within another field.
+class InnerHttpError(Model):
+    """Object representing inner http error.
 
-    :param text: Defines the snippet of text to highlight
-    :type text: str
-    :param occurrence: Occurrence of the text field within the referenced
-     text, if multiple exist.
-    :type occurrence: int
+    :param status_code: HttpStatusCode from failed request
+    :type status_code: int
+    :param body: Body from failed request
+    :type body: object
     """
 
     _attribute_map = {
-        'text': {'key': 'text', 'type': 'str'},
-        'occurrence': {'key': 'occurrence', 'type': 'int'},
+        'status_code': {'key': 'statusCode', 'type': 'int'},
+        'body': {'key': 'body', 'type': 'object'},
     }
 
     def __init__(self, **kwargs):
-        super(TextHighlight, self).__init__(**kwargs)
-        self.text = kwargs.get('text', None)
-        self.occurrence = kwargs.get('occurrence', None)
+        super(InnerHttpError, self).__init__(**kwargs)
+        self.status_code = kwargs.get('status_code', None)
+        self.body = kwargs.get('body', None)

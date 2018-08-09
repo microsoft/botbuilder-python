@@ -13,7 +13,7 @@ from msrest.serialization import Model
 
 
 class AttachmentInfo(Model):
-    """Metdata for an attachment.
+    """Metadata for an attachment.
 
     :param name: Name of the attachment
     :type name: str

@@ -19,14 +19,18 @@ class Error(Model):
     :type code: str
     :param message: Error message
     :type message: str
+    :param inner_http_error: Error from inner http call
+    :type inner_http_error: ~botframework.connector.models.InnerHttpError
     """
 
     _attribute_map = {
         'code': {'key': 'code', 'type': 'str'},
         'message': {'key': 'message', 'type': 'str'},
+        'inner_http_error': {'key': 'innerHttpError', 'type': 'InnerHttpError'},
     }
 
     def __init__(self, **kwargs):
         super(Error, self).__init__(**kwargs)
         self.code = kwargs.get('code', None)
         self.message = kwargs.get('message', None)
+        self.inner_http_error = kwargs.get('inner_http_error', None)

@@ -12,22 +12,21 @@
 from msrest.serialization import Model
 
 
-class TextHighlight(Model):
-    """Refers to a substring of content within another field.
+class PagedMembersResult(Model):
+    """Page of members.
 
-    :param text: Defines the snippet of text to highlight
-    :type text: str
-    :param occurrence: Occurrence of the text field within the referenced
-     text, if multiple exist.
-    :type occurrence: int
+    :param continuation_token: Paging token
+    :type continuation_token: str
+    :param members: The Channel Accounts.
+    :type members: list[~botframework.connector.models.ChannelAccount]
     """
 
     _attribute_map = {
-        'text': {'key': 'text', 'type': 'str'},
-        'occurrence': {'key': 'occurrence', 'type': 'int'},
+        'continuation_token': {'key': 'continuationToken', 'type': 'str'},
+        'members': {'key': 'members', 'type': '[ChannelAccount]'},
     }
 
     def __init__(self, **kwargs):
-        super(TextHighlight, self).__init__(**kwargs)
-        self.text = kwargs.get('text', None)
-        self.occurrence = kwargs.get('occurrence', None)
+        super(PagedMembersResult, self).__init__(**kwargs)
+        self.continuation_token = kwargs.get('continuation_token', None)
+        self.members = kwargs.get('members', None)

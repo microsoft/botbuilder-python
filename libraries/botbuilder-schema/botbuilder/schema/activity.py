@@ -16,109 +16,129 @@ class Activity(Model):
     """An Activity is the basic communication type for the Bot Framework 3.0
     protocol.
 
-    :param type: The type of the activity. Possible values include: 'message',
-     'contactRelationUpdate', 'conversationUpdate', 'typing', 'ping',
+    :param type: Contains the activity type. Possible values include:
+     'message', 'contactRelationUpdate', 'conversationUpdate', 'typing',
      'endOfConversation', 'event', 'invoke', 'deleteUserData', 'messageUpdate',
      'messageDelete', 'installationUpdate', 'messageReaction', 'suggestion',
-     'trace'
+     'trace', 'handoff'
     :type type: str or ~botframework.connector.models.ActivityTypes
-    :param id: ID of this activity
+    :param id: Contains an ID that uniquely identifies the activity on the
+     channel.
     :type id: str
-    :param timestamp: UTC Time when message was sent (set by service)
+    :param timestamp: Contains the date and time that the message was sent, in
+     UTC, expressed in ISO-8601 format.
     :type timestamp: datetime
-    :param local_timestamp: Local time when message was sent (set by client,
-     Ex: 2016-09-23T13:07:49.4714686-07:00)
+    :param local_timestamp: Contains the date and time that the message was
+     sent, in local time, expressed in ISO-8601 format.
+     For example, 2016-09-23T13:07:49.4714686-07:00.
     :type local_timestamp: datetime
-    :param service_url: Service endpoint where operations concerning the
-     activity may be performed
+    :param service_url: Contains the URL that specifies the channel's service
+     endpoint. Set by the channel.
     :type service_url: str
-    :param channel_id: ID of the channel where the activity was sent
+    :param channel_id: Contains an ID that uniquely identifies the channel.
+     Set by the channel.
     :type channel_id: str
-    :param from_property: Sender address
+    :param from_property: Identifies the sender of the message.
     :type from_property: ~botframework.connector.models.ChannelAccount
-    :param conversation: Conversation
+    :param conversation: Identifies the conversation to which the activity
+     belongs.
     :type conversation: ~botframework.connector.models.ConversationAccount
-    :param recipient: (Outbound to bot only) Bot's address that received the
-     message
+    :param recipient: Identifies the recipient of the message.
     :type recipient: ~botframework.connector.models.ChannelAccount
     :param text_format: Format of text fields Default:markdown. Possible
      values include: 'markdown', 'plain', 'xml'
     :type text_format: str or ~botframework.connector.models.TextFormatTypes
-    :param attachment_layout: Hint for how to deal with multiple attachments.
-     Default:list. Possible values include: 'list', 'carousel'
+    :param attachment_layout: The layout hint for multiple attachments.
+     Default: list. Possible values include: 'list', 'carousel'
     :type attachment_layout: str or
      ~botframework.connector.models.AttachmentLayoutTypes
-    :param members_added: Members added to the conversation
+    :param members_added: The collection of members added to the conversation.
     :type members_added: list[~botframework.connector.models.ChannelAccount]
-    :param members_removed: Members removed from the conversation
+    :param members_removed: The collection of members removed from the
+     conversation.
     :type members_removed: list[~botframework.connector.models.ChannelAccount]
-    :param reactions_added: Reactions added to the activity
+    :param reactions_added: The collection of reactions added to the
+     conversation.
     :type reactions_added:
      list[~botframework.connector.models.MessageReaction]
-    :param reactions_removed: Reactions removed from the activity
+    :param reactions_removed: The collection of reactions removed from the
+     conversation.
     :type reactions_removed:
      list[~botframework.connector.models.MessageReaction]
-    :param topic_name: The conversation's updated topic name
+    :param topic_name: The updated topic name of the conversation.
     :type topic_name: str
-    :param history_disclosed: True if prior history of the channel is
-     disclosed
+    :param history_disclosed: Indicates whether the prior history of the
+     channel is disclosed.
     :type history_disclosed: bool
-    :param locale: The language code of the Text field
+    :param locale: A locale name for the contents of the text field.
+     The locale name is a combination of an ISO 639 two- or three-letter
+     culture code associated with a language
+     and an ISO 3166 two-letter subculture code associated with a country or
+     region.
+     The locale name can also correspond to a valid BCP-47 language tag.
     :type locale: str
-    :param text: Content for the message
+    :param text: The text content of the message.
     :type text: str
-    :param speak: SSML Speak for TTS audio response
+    :param speak: The text to speak.
     :type speak: str
-    :param input_hint: Input hint to the channel on what the bot is expecting.
-     Possible values include: 'acceptingInput', 'ignoringInput',
+    :param input_hint: Indicates whether your bot is accepting,
+     expecting, or ignoring user input after the message is delivered to the
+     client. Possible values include: 'acceptingInput', 'ignoringInput',
      'expectingInput'
     :type input_hint: str or ~botframework.connector.models.InputHints
-    :param summary: Text to display if the channel cannot render cards
+    :param summary: The text to display if the channel cannot render cards.
     :type summary: str
-    :param suggested_actions: SuggestedActions are used to provide
-     keyboard/quickreply like behavior in many clients
+    :param suggested_actions: The suggested actions for the activity.
     :type suggested_actions: ~botframework.connector.models.SuggestedActions
     :param attachments: Attachments
     :type attachments: list[~botframework.connector.models.Attachment]
-    :param entities: Collection of Entity objects, each of which contains
-     metadata about this activity. Each Entity object is typed.
+    :param entities: Represents the entities that were mentioned in the
+     message.
     :type entities: list[~botframework.connector.models.Entity]
-    :param channel_data: Channel-specific payload
+    :param channel_data: Contains channel-specific content.
     :type channel_data: object
-    :param action: ContactAdded/Removed action
+    :param action: Indicates whether the recipient of a contactRelationUpdate
+     was added or removed from the sender's contact list.
     :type action: str
-    :param reply_to_id: The original ID this message is a response to
+    :param reply_to_id: Contains the ID of the message to which this message
+     is a reply.
     :type reply_to_id: str
-    :param label: Descriptive label
+    :param label: A descriptive label for the activity.
     :type label: str
-    :param value_type: Unique string which identifies the shape of the value
-     object
+    :param value_type: The type of the activity's value object.
     :type value_type: str
-    :param value: Open-ended value
+    :param value: A value that is associated with the activity.
     :type value: object
-    :param name: Name of the operation to invoke or the name of the event
+    :param name: The name of the operation associated with an invoke or event
+     activity.
     :type name: str
-    :param relates_to: Reference to another conversation or activity
+    :param relates_to: A reference to another conversation or activity.
     :type relates_to: ~botframework.connector.models.ConversationReference
-    :param code: Code indicating why the conversation has ended. Possible
-     values include: 'unknown', 'completedSuccessfully', 'userCancelled',
-     'botTimedOut', 'botIssuedInvalidMessage', 'channelFailed'
+    :param code: The a code for endOfConversation activities that indicates
+     why the conversation ended. Possible values include: 'unknown',
+     'completedSuccessfully', 'userCancelled', 'botTimedOut',
+     'botIssuedInvalidMessage', 'channelFailed'
     :type code: str or ~botframework.connector.models.EndOfConversationCodes
-    :param expiration: DateTime to expire the activity as ISO 8601 encoded
-     datetime
+    :param expiration: The time at which the activity should be considered to
+     be "expired" and should not be presented to the recipient.
     :type expiration: datetime
-    :param importance: Importance of this activity
-     {Low|Normal|High}, null value indicates Normal importance see
-     ActivityImportance)
-    :type importance: str
-    :param delivery_mode: Hint to describe how this activity should be
-     delivered.
-     Currently: null or "Default" = default delivery
-     "Notification" = notification semantics
-    :type delivery_mode: str
-    :param text_highlights: TextHighlight in the activity represented in the
-     ReplyToId property
+    :param importance: The importance of the activity. Possible values
+     include: 'low', 'normal', 'high'
+    :type importance: str or ~botframework.connector.models.ActivityImportance
+    :param delivery_mode: A delivery hint to  signal to the recipient
+     alternate delivery paths for the activity.
+     The default delivery mode is "default". Possible values include: 'normal',
+     'notification'
+    :type delivery_mode: str or ~botframework.connector.models.DeliveryModes
+    :param listen_for: List of phrases and references that speech and language
+     priming systems should listen for
+    :type listen_for: list[str]
+    :param text_highlights: The collection of text fragments to highlight when
+     the activity contains a ReplyToId value.
     :type text_highlights: list[~botframework.connector.models.TextHighlight]
+    :param semantic_action: An optional programmatic action accompanying this
+     request
+    :type semantic_action: ~botframework.connector.models.SemanticAction
     """
 
     _attribute_map = {
@@ -159,7 +179,9 @@ class Activity(Model):
         'expiration': {'key': 'expiration', 'type': 'iso-8601'},
         'importance': {'key': 'importance', 'type': 'str'},
         'delivery_mode': {'key': 'deliveryMode', 'type': 'str'},
+        'listen_for': {'key': 'listenFor', 'type': '[str]'},
         'text_highlights': {'key': 'textHighlights', 'type': '[TextHighlight]'},
+        'semantic_action': {'key': 'semanticAction', 'type': 'SemanticAction'},
     }
 
     def __init__(self, **kwargs):
@@ -201,4 +223,6 @@ class Activity(Model):
         self.expiration = kwargs.get('expiration', None)
         self.importance = kwargs.get('importance', None)
         self.delivery_mode = kwargs.get('delivery_mode', None)
+        self.listen_for = kwargs.get('listen_for', None)
         self.text_highlights = kwargs.get('text_highlights', None)
+        self.semantic_action = kwargs.get('semantic_action', None)

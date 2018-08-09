@@ -12,6 +12,7 @@
 try:
     from .attachment_view_py3 import AttachmentView
     from .attachment_info_py3 import AttachmentInfo
+    from .inner_http_error_py3 import InnerHttpError
     from .error_py3 import Error
     from .error_response_py3 import ErrorResponse, ErrorResponseException
     from .channel_account_py3 import ChannelAccount
@@ -23,12 +24,14 @@ try:
     from .entity_py3 import Entity
     from .conversation_reference_py3 import ConversationReference
     from .text_highlight_py3 import TextHighlight
+    from .semantic_action_py3 import SemanticAction
     from .activity_py3 import Activity
     from .conversation_parameters_py3 import ConversationParameters
     from .conversation_resource_response_py3 import ConversationResourceResponse
     from .conversation_members_py3 import ConversationMembers
     from .conversations_result_py3 import ConversationsResult
     from .resource_response_py3 import ResourceResponse
+    from .paged_members_result_py3 import PagedMembersResult
     from .attachment_data_py3 import AttachmentData
     from .card_image_py3 import CardImage
     from .hero_card_py3 import HeroCard
@@ -70,6 +73,7 @@ try:
 except (SyntaxError, ImportError):
     from .attachment_view import AttachmentView
     from .attachment_info import AttachmentInfo
+    from .inner_http_error import InnerHttpError
     from .error import Error
     from .error_response import ErrorResponse, ErrorResponseException
     from .channel_account import ChannelAccount
@@ -81,12 +85,14 @@ except (SyntaxError, ImportError):
     from .entity import Entity
     from .conversation_reference import ConversationReference
     from .text_highlight import TextHighlight
+    from .semantic_action import SemanticAction
     from .activity import Activity
     from .conversation_parameters import ConversationParameters
     from .conversation_resource_response import ConversationResourceResponse
     from .conversation_members import ConversationMembers
     from .conversations_result import ConversationsResult
     from .resource_response import ResourceResponse
+    from .paged_members_result import PagedMembersResult
     from .attachment_data import AttachmentData
     from .card_image import CardImage
     from .hero_card import HeroCard
@@ -134,14 +140,16 @@ from .connector_client_enums import (
     InputHints,
     ActionTypes,
     EndOfConversationCodes,
+    ActivityImportance,
+    DeliveryModes,
     ContactRelationUpdateActionTypes,
     InstallationUpdateActionTypes,
-    ActivityImportance,
 )
 
 __all__ = [
     'AttachmentView',
     'AttachmentInfo',
+    'InnerHttpError',
     'Error',
     'ErrorResponse', 'ErrorResponseException',
     'ChannelAccount',
@@ -153,12 +161,14 @@ __all__ = [
     'Entity',
     'ConversationReference',
     'TextHighlight',
+    'SemanticAction',
     'Activity',
     'ConversationParameters',
     'ConversationResourceResponse',
     'ConversationMembers',
     'ConversationsResult',
     'ResourceResponse',
+    'PagedMembersResult',
     'AttachmentData',
     'CardImage',
     'HeroCard',
@@ -205,7 +215,8 @@ __all__ = [
     'InputHints',
     'ActionTypes',
     'EndOfConversationCodes',
+    'ActivityImportance',
+    'DeliveryModes',
     'ContactRelationUpdateActionTypes',
     'InstallationUpdateActionTypes',
-    'ActivityImportance',
 ]

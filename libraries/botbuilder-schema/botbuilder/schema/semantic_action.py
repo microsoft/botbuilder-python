@@ -12,22 +12,21 @@
 from msrest.serialization import Model
 
 
-class TextHighlight(Model):
-    """Refers to a substring of content within another field.
+class SemanticAction(Model):
+    """Represents a reference to a programmatic action.
 
-    :param text: Defines the snippet of text to highlight
-    :type text: str
-    :param occurrence: Occurrence of the text field within the referenced
-     text, if multiple exist.
-    :type occurrence: int
+    :param id: ID of this action
+    :type id: str
+    :param entities: Entities associated with this action
+    :type entities: dict[str, object]
     """
 
     _attribute_map = {
-        'text': {'key': 'text', 'type': 'str'},
-        'occurrence': {'key': 'occurrence', 'type': 'int'},
+        'id': {'key': 'id', 'type': 'str'},
+        'entities': {'key': 'entities', 'type': '{object}'},
     }
 
     def __init__(self, **kwargs):
-        super(TextHighlight, self).__init__(**kwargs)
-        self.text = kwargs.get('text', None)
-        self.occurrence = kwargs.get('occurrence', None)
+        super(SemanticAction, self).__init__(**kwargs)
+        self.id = kwargs.get('id', None)
+        self.entities = kwargs.get('entities', None)

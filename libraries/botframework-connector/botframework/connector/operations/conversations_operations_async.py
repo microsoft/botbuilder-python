@@ -10,6 +10,7 @@
 # --------------------------------------------------------------------------
 
 from msrest.pipeline import ClientRawResponse
+from msrest.exceptions import HttpOperationError
 
 from .. import models
 from .conversations_operations import ConversationsOperations as _ConversationsOperations
@@ -56,15 +57,13 @@ class ConversationsOperations(_ConversationsOperations):
 
         # Construct headers
         header_parameters = {}
-        header_parameters['Content-Type'] = 'application/json; charset=utf-8'
+        header_parameters['Accept'] = 'application/json'
         if custom_headers:
             header_parameters.update(custom_headers)
 
-        body_content = None
         # Construct and send request
-        request = self._client.get(url, query_parameters)
-        response = await self._client.async_send(
-            request, header_parameters, body_content, stream=False, **operation_config)
+        request = self._client.get(url, query_parameters, header_parameters)
+        response = await self._client.async_send(request, stream=False, **operation_config)
 
         if response.status_code not in [200]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -89,8 +88,7 @@ class ConversationsOperations(_ConversationsOperations):
         * Bot being the bot creating the conversation
         * IsGroup set to true if this is not a direct message (default is
         false)
-        * Members array contining the members you want to have be in the
-        conversation.
+        * Array containing the members to include in the conversation
         The return value is a ResourceResponse which contains a conversation id
         which is suitable for use
         in the message payload and REST API uris.
@@ -126,6 +124,7 @@ class ConversationsOperations(_ConversationsOperations):
 
         # Construct headers
         header_parameters = {}
+        header_parameters['Accept'] = 'application/json'
         header_parameters['Content-Type'] = 'application/json; charset=utf-8'
         if custom_headers:
             header_parameters.update(custom_headers)
@@ -134,9 +133,8 @@ class ConversationsOperations(_ConversationsOperations):
         body_content = self._serialize.body(parameters, 'ConversationParameters')
 
         # Construct and send request
-        request = self._client.post(url, query_parameters)
-        response = await self._client.async_send(
-            request, header_parameters, body_content, stream=False, **operation_config)
+        request = self._client.post(url, query_parameters, header_parameters, body_content)
+        response = await self._client.async_send(request, stream=False, **operation_config)
 
         if response.status_code not in [200, 201, 202]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -163,7 +161,7 @@ class ConversationsOperations(_ConversationsOperations):
         This method allows you to send an activity to the end of a
         conversation.
         This is slightly different from ReplyToActivity().
-        * SendToConverstion(conversationId) - will append the activity to the
+        * SendToConversation(conversationId) - will append the activity to the
         end of the conversation according to the timestamp or semantics of the
         channel.
         * ReplyToActivity(conversationId,ActivityId) - adds the activity as a
@@ -201,6 +199,7 @@ class ConversationsOperations(_ConversationsOperations):
 
         # Construct headers
         header_parameters = {}
+        header_parameters['Accept'] = 'application/json'
         header_parameters['Content-Type'] = 'application/json; charset=utf-8'
         if custom_headers:
             header_parameters.update(custom_headers)
@@ -209,9 +208,8 @@ class ConversationsOperations(_ConversationsOperations):
         body_content = self._serialize.body(activity, 'Activity')
 
         # Construct and send request
-        request = self._client.post(url, query_parameters)
-        response = await self._client.async_send(
-            request, header_parameters, body_content, stream=False, **operation_config)
+        request = self._client.post(url, query_parameters, header_parameters, body_content)
+        response = await self._client.async_send(request, stream=False, **operation_config)
 
         if response.status_code not in [200, 201, 202]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -271,6 +269,7 @@ class ConversationsOperations(_ConversationsOperations):
 
         # Construct headers
         header_parameters = {}
+        header_parameters['Accept'] = 'application/json'
         header_parameters['Content-Type'] = 'application/json; charset=utf-8'
         if custom_headers:
             header_parameters.update(custom_headers)
@@ -279,9 +278,8 @@ class ConversationsOperations(_ConversationsOperations):
         body_content = self._serialize.body(activity, 'Activity')
 
         # Construct and send request
-        request = self._client.put(url, query_parameters)
-        response = await self._client.async_send(
-            request, header_parameters, body_content, stream=False, **operation_config)
+        request = self._client.put(url, query_parameters, header_parameters, body_content)
+        response = await self._client.async_send(request, stream=False, **operation_config)
 
         if response.status_code not in [200, 201, 202]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -307,7 +305,7 @@ class ConversationsOperations(_ConversationsOperations):
 
         This method allows you to reply to an activity.
         This is slightly different from SendToConversation().
-        * SendToConverstion(conversationId) - will append the activity to the
+        * SendToConversation(conversationId) - will append the activity to the
         end of the conversation according to the timestamp or semantics of the
         channel.
         * ReplyToActivity(conversationId,ActivityId) - adds the activity as a
@@ -348,6 +346,7 @@ class ConversationsOperations(_ConversationsOperations):
 
         # Construct headers
         header_parameters = {}
+        header_parameters['Accept'] = 'application/json'
         header_parameters['Content-Type'] = 'application/json; charset=utf-8'
         if custom_headers:
             header_parameters.update(custom_headers)
@@ -356,9 +355,8 @@ class ConversationsOperations(_ConversationsOperations):
         body_content = self._serialize.body(activity, 'Activity')
 
         # Construct and send request
-        request = self._client.post(url, query_parameters)
-        response = await self._client.async_send(
-            request, header_parameters, body_content, stream=False, **operation_config)
+        request = self._client.post(url, query_parameters, header_parameters, body_content)
+        response = await self._client.async_send(request, stream=False, **operation_config)
 
         if response.status_code not in [200, 201, 202]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -413,15 +411,12 @@ class ConversationsOperations(_ConversationsOperations):
 
         # Construct headers
         header_parameters = {}
-        header_parameters['Content-Type'] = 'application/json; charset=utf-8'
         if custom_headers:
             header_parameters.update(custom_headers)
 
-        body_content = None
         # Construct and send request
-        request = self._client.delete(url, query_parameters)
-        response = await self._client.async_send(
-            request, header_parameters, body_content, stream=False, **operation_config)
+        request = self._client.delete(url, query_parameters, header_parameters)
+        response = await self._client.async_send(request, stream=False, **operation_config)
 
         if response.status_code not in [200, 202]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -435,7 +430,7 @@ class ConversationsOperations(_ConversationsOperations):
             self, conversation_id, *, custom_headers=None, raw=False, **operation_config):
         """GetConversationMembers.
 
-        Enumerate the members of a converstion.
+        Enumerate the members of a conversation.
         This REST API takes a ConversationId and returns an array of
         ChannelAccount objects representing the members of the conversation.
 
@@ -464,15 +459,13 @@ class ConversationsOperations(_ConversationsOperations):
 
         # Construct headers
         header_parameters = {}
-        header_parameters['Content-Type'] = 'application/json; charset=utf-8'
+        header_parameters['Accept'] = 'application/json'
         if custom_headers:
             header_parameters.update(custom_headers)
 
-        body_content = None
         # Construct and send request
-        request = self._client.get(url, query_parameters)
-        response = await self._client.async_send(
-            request, header_parameters, body_content, stream=False, **operation_config)
+        request = self._client.get(url, query_parameters, header_parameters)
+        response = await self._client.async_send(request, stream=False, **operation_config)
 
         if response.status_code not in [200]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -488,11 +481,85 @@ class ConversationsOperations(_ConversationsOperations):
         return deserialized
     get_conversation_members_async.metadata = {'url': '/v3/conversations/{conversationId}/members'}
 
+    async def get_conversation_paged_members_async(
+            self, conversation_id, page_size=None, continuation_token=None, *, custom_headers=None, raw=False, **operation_config):
+        """GetConversationPagedMembers.
+
+        Enumerate the members of a conversation one page at a time.
+        This REST API takes a ConversationId. Optionally a pageSize and/or
+        continuationToken can be provided. It returns a PagedMembersResult,
+        which contains an array
+        of ChannelAccounts representing the members of the conversation and a
+        continuation token that can be used to get more values.
+        One page of ChannelAccounts records are returned with each call. The
+        number of records in a page may vary between channels and calls. The
+        pageSize parameter can be used as
+        a suggestion. If there are no additional results the response will not
+        contain a continuation token. If there are no members in the
+        conversation the Members will be empty or not present in the response.
+        A response to a request that has a continuation token from a prior
+        request may rarely return members from a previous request.
+
+        :param conversation_id: Conversation ID
+        :type conversation_id: str
+        :param page_size: Suggested page size
+        :type page_size: int
+        :param continuation_token: Continuation Token
+        :type continuation_token: str
+        :param dict custom_headers: headers that will be added to the request
+        :param bool raw: returns the direct response alongside the
+         deserialized response
+        :param operation_config: :ref:`Operation configuration
+         overrides<msrest:optionsforoperations>`.
+        :return: PagedMembersResult or ClientRawResponse if raw=true
+        :rtype: ~botframework.connector.models.PagedMembersResult or
+         ~msrest.pipeline.ClientRawResponse
+        :raises:
+         :class:`HttpOperationError<msrest.exceptions.HttpOperationError>`
+        """
+        # Construct URL
+        url = self.get_conversation_paged_members_async.metadata['url']
+        path_format_arguments = {
+            'conversationId': self._serialize.url("conversation_id", conversation_id, 'str')
+        }
+        url = self._client.format_url(url, **path_format_arguments)
+
+        # Construct parameters
+        query_parameters = {}
+        if page_size is not None:
+            query_parameters['pageSize'] = self._serialize.query("page_size", page_size, 'int')
+        if continuation_token is not None:
+            query_parameters['continuationToken'] = self._serialize.query("continuation_token", continuation_token, 'str')
+
+        # Construct headers
+        header_parameters = {}
+        header_parameters['Accept'] = 'application/json'
+        if custom_headers:
+            header_parameters.update(custom_headers)
+
+        # Construct and send request
+        request = self._client.get(url, query_parameters, header_parameters)
+        response = await self._client.async_send(request, stream=False, **operation_config)
+
+        if response.status_code not in [200]:
+            raise HttpOperationError(self._deserialize, response)
+
+        deserialized = None
+        if response.status_code == 200:
+            deserialized = self._deserialize('PagedMembersResult', response)
+
+        if raw:
+            client_raw_response = ClientRawResponse(deserialized, response)
+            return client_raw_response
+
+        return deserialized
+    get_conversation_paged_members_async.metadata = {'url': '/v3/conversations/{conversationId}/pagedmembers'}
+
     async def delete_conversation_member_async(
             self, conversation_id, member_id, *, custom_headers=None, raw=False, **operation_config):
         """DeleteConversationMember.
 
-        Deletes a member from a converstion.
+        Deletes a member from a conversation.
         This REST API takes a ConversationId and a memberId (of type string)
         and removes that member from the conversation. If that member was the
         last member
@@ -525,15 +592,12 @@ class ConversationsOperations(_ConversationsOperations):
 
         # Construct headers
         header_parameters = {}
-        header_parameters['Content-Type'] = 'application/json; charset=utf-8'
         if custom_headers:
             header_parameters.update(custom_headers)
 
-        body_content = None
         # Construct and send request
-        request = self._client.delete(url, query_parameters)
-        response = await self._client.async_send(
-            request, header_parameters, body_content, stream=False, **operation_config)
+        request = self._client.delete(url, query_parameters, header_parameters)
+        response = await self._client.async_send(request, stream=False, **operation_config)
 
         if response.status_code not in [200, 204]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -580,15 +644,13 @@ class ConversationsOperations(_ConversationsOperations):
 
         # Construct headers
         header_parameters = {}
-        header_parameters['Content-Type'] = 'application/json; charset=utf-8'
+        header_parameters['Accept'] = 'application/json'
         if custom_headers:
             header_parameters.update(custom_headers)
 
-        body_content = None
         # Construct and send request
-        request = self._client.get(url, query_parameters)
-        response = await self._client.async_send(
-            request, header_parameters, body_content, stream=False, **operation_config)
+        request = self._client.get(url, query_parameters, header_parameters)
+        response = await self._client.async_send(request, stream=False, **operation_config)
 
         if response.status_code not in [200]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -641,6 +703,7 @@ class ConversationsOperations(_ConversationsOperations):
 
         # Construct headers
         header_parameters = {}
+        header_parameters['Accept'] = 'application/json'
         header_parameters['Content-Type'] = 'application/json; charset=utf-8'
         if custom_headers:
             header_parameters.update(custom_headers)
@@ -649,9 +712,8 @@ class ConversationsOperations(_ConversationsOperations):
         body_content = self._serialize.body(attachment_upload, 'AttachmentData')
 
         # Construct and send request
-        request = self._client.post(url, query_parameters)
-        response = await self._client.async_send(
-            request, header_parameters, body_content, stream=False, **operation_config)
+        request = self._client.post(url, query_parameters, header_parameters, body_content)
+        response = await self._client.async_send(request, stream=False, **operation_config)
 
         if response.status_code not in [200, 201, 202]:
             raise models.ErrorResponseException(self._deserialize, response)

@@ -13,7 +13,7 @@ from msrest.serialization import Model
 
 
 class OAuthCard(Model):
-    """A card representing a request to peform a sign in via OAuth.
+    """A card representing a request to perform a sign in via OAuth.
 
     :param text: Text for signin request
     :type text: str

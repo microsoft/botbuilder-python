@@ -24,7 +24,6 @@ class ActivityTypes(str, Enum):
     contact_relation_update = "contactRelationUpdate"
     conversation_update = "conversationUpdate"
     typing = "typing"
-    ping = "ping"
     end_of_conversation = "endOfConversation"
     event = "event"
     invoke = "invoke"
@@ -35,6 +34,7 @@ class ActivityTypes(str, Enum):
     message_reaction = "messageReaction"
     suggestion = "suggestion"
     trace = "trace"
+    handoff = "handoff"
 
 
 class TextFormatTypes(str, Enum):
@@ -88,6 +88,19 @@ class EndOfConversationCodes(str, Enum):
     channel_failed = "channelFailed"
 
 
+class ActivityImportance(str, Enum):
+
+    low = "low"
+    normal = "normal"
+    high = "high"
+
+
+class DeliveryModes(str, Enum):
+
+    normal = "normal"
+    notification = "notification"
+
+
 class ContactRelationUpdateActionTypes(str, Enum):
 
     add = "add"
@@ -98,10 +111,3 @@ class InstallationUpdateActionTypes(str, Enum):
 
     add = "add"
     remove = "remove"
-
-
-class ActivityImportance(str, Enum):
-
-    low = "low"
-    normal = "normal"
-    high = "high"
