@@ -1,6 +1,6 @@
 ---
 name: Python SDK Feature Request
-about: Suggest an feature for the Bot Builder Python SDK
+about: Suggest a feature for the Bot Builder Python SDK
 
 ---
 
