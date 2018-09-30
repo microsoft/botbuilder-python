@@ -1,0 +1,16 @@
+{
+    "name": "EchoBot-with-CosmosState",
+    "description": "Simple echo bot with state in CosmosDB.",
+    "path": "C:\\Work\\bots\\botbuilder-python\\samples\\Auth-Bot\\EchoBot-with-CosmosState.bot",
+    "secretKey": "",
+    "services": [
+        {
+            "appId": "",
+            "id": "http://localhost:9000",
+            "type": "endpoint",
+            "appPassword": "",
+            "endpoint": "http://localhost:9000",
+            "name": "EchoBot-with-CosmosState"
+        }
+    ]
+}
