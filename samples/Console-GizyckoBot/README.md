@@ -8,8 +8,8 @@ git clone https://github.com/Microsoft/botbuilder-python.git
 
 
 ### Visual studio code
-- open `botbuilder-python\samples\Console-EchoBot` folder
-- Bring up a terminal, navigate to `botbuilder-python\samples\Console-EchoBot` folder
+- open `botbuilder-python\samples\Console-GizyckoBot` folder
+- Bring up a terminal, navigate to `botbuilder-python\samples\Console-GizyckoBot` folder
 - type 'python main.py'
 
 
