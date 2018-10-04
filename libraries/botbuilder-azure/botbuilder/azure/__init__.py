@@ -6,7 +6,8 @@
 # --------------------------------------------------------------------------
 
 from .about import __version__
-from .cosmosdb_storage import CosmosDbStorage
+from .cosmosdb_storage import CosmosDbStorage, CosmosDbConfig
 
 __all__ = ['CosmosDbStorage',
+           'CosmosDbConfig',
            '__version__']

@@ -1,18 +1,15 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-"""
-This sample shows how to create a simple EchoBot with state in CosmosDB.
-"""
+"""This sample shows how to create a simple EchoBot with state in CosmosDB."""
 
 
 from aiohttp import web
-import json
 from botbuilder.schema import (Activity, ActivityTypes)
-from botbuilder.core import (BotFrameworkAdapter, BotFrameworkAdapterSettings, TurnContext,
-                             ConversationState, MemoryStorage, UserState)
-
-from botbuilder.azure import (CosmosDbStorage)
+from botbuilder.core import (BotFrameworkAdapter,
+                             BotFrameworkAdapterSettings, TurnContext,
+                             ConversationState)
+from botbuilder.azure import (CosmosDbStorage, CosmosDbConfig)
 
 APP_ID = ''
 APP_PASSWORD = ''
@@ -21,10 +18,8 @@ SETTINGS = BotFrameworkAdapterSettings(APP_ID, APP_PASSWORD)
 ADAPTER = BotFrameworkAdapter(SETTINGS)
 CONFIG_FILE = 'samples\\EchoBot-with-CosmosState\\credentials_real.json'
 
-# Create MemoryStorage, UserState and ConversationState
-
-config = json.load(open(CONFIG_FILE))
-cosmos = CosmosDbStorage(config)
+# Create CosmosStorage and ConversationState
+cosmos = CosmosDbStorage(CosmosDbConfig(filename=CONFIG_FILE))
 # Commented out user_state because it's not being used.
 # user_state = UserState(memory)
 conversation_state = ConversationState(cosmos)
@@ -50,15 +45,16 @@ async def handle_message(context: TurnContext) -> web.Response:
     # Access the state for the conversation between the user and the bot.
     state = await conversation_state.get(context)
     previous = None
-    if hasattr(state, 'previous_text'): 
+    if hasattr(state, 'previous_text'):
         previous = state.previous_text
     if hasattr(state, 'counter'):
-        state.counter = int(state.counter) + 1
+        state.counter += 1
     else:
         state.counter = 1
     state.previous_text = context.activity.text
     if previous:
-        response_text = f'{state.counter}: You said {context.activity.text}. Earlier you said {previous}'
+        response_text = f'{state.counter}: You said {context.activity.text}. \
+            Earlier you said {previous}'
     else:
         response_text = f'{state.counter}: You said {context.activity.text}.'
     response = await create_reply_activity(context.activity, response_text)
@@ -68,7 +64,8 @@ async def handle_message(context: TurnContext) -> web.Response:
 
 async def handle_conversation_update(context: TurnContext) -> web.Response:
     if context.activity.members_added[0].id != context.activity.recipient.id:
-        response = await create_reply_activity(context.activity, 'Welcome to the Echo Adapter Bot!')
+        response = await create_reply_activity(context.activity, 'Welcome to \
+            the Echo Adapter Bot!')
         await context.send_activity(response)
     return web.Response(status=200)
 
@@ -89,9 +86,11 @@ async def request_handler(context: TurnContext) -> web.Response:
 async def messages(req: web.web_request) -> web.Response:
     body = await req.json()
     activity = Activity().deserialize(body)
-    auth_header = req.headers['Authorization'] if 'Authorization' in req.headers else ''
+    auth_header = (req.headers['Authorization']
+                   if 'Authorization' in req.headers else '')
     try:
-        return await ADAPTER.process_activity(activity, auth_header, request_handler)
+        return await ADAPTER.process_activity(activity,
+                                              auth_header, request_handler)
     except Exception as e:
         raise e
 
