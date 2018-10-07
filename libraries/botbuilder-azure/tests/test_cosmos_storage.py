@@ -8,7 +8,7 @@ from botbuilder.azure import (CosmosDbStorage, CosmosDbConfig)
 # local cosmosdb emulator instance cosmos_db_config
 cosmos_db_config = CosmosDbConfig(
     endpoint='https://localhost:8081',
-    masterkey='<key for emulator>',
+    masterkey='C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==',
     database='test-db',
     container='bot-storage'
 )
