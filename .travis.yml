@@ -4,6 +4,7 @@ python:
   - "3.6"
 
 install:
+  - pip install -e ./libraries/botbuilder-azure
   - pip install -e ./libraries/botbuilder-schema
   - pip install -e ./libraries/botframework-connector
   - pip install -e ./libraries/botbuilder-core
