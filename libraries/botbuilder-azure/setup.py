@@ -6,7 +6,7 @@ import os
 
 NAME = "botbuilder-azure"
 VERSION = "0.1"
-REQUIRES = ['azure.cosmos==3.0.0',
+REQUIRES = ['azure-cosmos==3.0.0',
             'botbuilder-schema>=4.0.0.a6',
             'botframework-connector>=4.0.0.a6']
 
