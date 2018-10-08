@@ -4,6 +4,9 @@ Bots support multi-modal conversations so you can add media to messages sent by 
 
 This sample shows how to use different types of rich cards.
 
+## PREREQUISITES
+- Python 3.5 or above
+
 ## To try this sample
 - Clone the repository
 ```bash
