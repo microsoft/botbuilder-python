@@ -9,8 +9,8 @@ git clone https://github.com/Microsoft/botbuilder-python.git
 
 ### Visual studio code
 - Activate your desired virtual environment
-- Open `botbuilder-python\samples\EchoBot-with-State` folder
-- Bring up a terminal, navigate to `botbuilder-python\samples\EchoBot-with-CosmosState` folder
+- Open `botbuilder-python/samples/EchoBot-with-CosmosState` folder
+- Bring up a terminal, navigate to `botbuilder-python/samples/EchoBot-with-CosmosState` folder
 - In the terminal, type `pip install -r requirements.txt`
 - In the terminal, type `python main.py`
 

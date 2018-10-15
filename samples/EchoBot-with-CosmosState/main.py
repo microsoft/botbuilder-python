@@ -16,7 +16,7 @@ APP_PASSWORD = ''
 PORT = 9000
 SETTINGS = BotFrameworkAdapterSettings(APP_ID, APP_PASSWORD)
 ADAPTER = BotFrameworkAdapter(SETTINGS)
-CONFIG_FILE = 'samples\\EchoBot-with-CosmosState\\credentials_real.json'
+CONFIG_FILE = 'sample_credentials_file.json'
 
 # Create CosmosStorage and ConversationState
 cosmos = CosmosDbStorage(CosmosDbConfig(filename=CONFIG_FILE))

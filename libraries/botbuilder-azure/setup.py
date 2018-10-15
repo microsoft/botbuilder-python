@@ -1,11 +1,9 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from setuptools import setup
 import os
+from setuptools import setup
 
-NAME = "botbuilder-azure"
-VERSION = "0.1"
 REQUIRES = ['azure-cosmos==3.0.0',
             'botbuilder-schema>=4.0.0.a6',
             'botframework-connector>=4.0.0.a6']

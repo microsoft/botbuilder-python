@@ -1,7 +1,6 @@
 {
     "name": "EchoBot-with-CosmosState",
     "description": "Simple echo bot with state in CosmosDB.",
-    "path": "C:\\Work\\bots\\botbuilder-python\\samples\\Auth-Bot\\EchoBot-with-CosmosState.bot",
     "secretKey": "",
     "services": [
         {
