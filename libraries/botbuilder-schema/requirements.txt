@@ -1,1 +1,0 @@
-git+https://github.com/Azure/msrest-for-python.git@a997e97cd926c1eedfe4e5a3a52a637313fbd4e4
