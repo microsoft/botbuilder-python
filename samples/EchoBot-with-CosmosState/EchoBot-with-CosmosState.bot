@@ -1,0 +1,15 @@
+{
+    "name": "EchoBot-with-CosmosState",
+    "description": "Simple echo bot with state in CosmosDB.",
+    "secretKey": "",
+    "services": [
+        {
+            "appId": "",
+            "id": "http://localhost:9000",
+            "type": "endpoint",
+            "appPassword": "",
+            "endpoint": "http://localhost:9000",
+            "name": "EchoBot-with-CosmosState"
+        }
+    ]
+}

@@ -1,0 +1,5 @@
+{
+  "tests/test_cosmos_storage.py": true,
+  "tests/test_cosmos_storage.py::TestCosmosDbStorage::()::test_cosmos_storage_write_should_overwrite_cached_value_with_valid_newer_e_tag": true,
+  "tests/test_cosmos_storage.py::TestCosmosDbStorage::()::test_cosmos_storage_write_should_raise_a_key_error_with_older_e_tag": true
+}

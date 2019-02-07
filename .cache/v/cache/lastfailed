@@ -1,0 +1,7 @@
+{
+  "libraries/botbuilder-azure/tests/test_cosmos_storage.py": true,
+  "libraries/botframework-connector/tests/test_attachments.py": true,
+  "libraries/botframework-connector/tests/test_attachments_async.py": true,
+  "libraries/botframework-connector/tests/test_conversations.py": true,
+  "libraries/botframework-connector/tests/test_conversations_async.py": true
+}
