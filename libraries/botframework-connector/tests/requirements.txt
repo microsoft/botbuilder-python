@@ -1,4 +1,4 @@
-pytest-cov=2.6.0
+pytest-cov==2.6.0
 pytest>=3.2.0
 azure-devtools>=0.4.1
 pytest-asyncio
