@@ -1,10 +1,11 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import os
 from setuptools import setup
 
 NAME = "botbuilder-schema"
-VERSION = "4.0.0.a6"
+VERSION = os.environ["packageVersion"] if "packageVersion" in os.environ else "4.0.0.a6"
 REQUIRES = ["msrest==0.4.29"]
 
 setup(
