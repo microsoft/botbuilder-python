@@ -42,8 +42,8 @@ class Activity(Model):
     :param channel_id: Contains an ID that uniquely identifies the channel.
      Set by the channel.
     :type channel_id: str
-    :param from: Identifies the sender of the message.
-    :type from: ~botframework.connector.models.ChannelAccount
+    :param from_property: Identifies the sender of the message.
+    :type from_property: ~botframework.connector.models.ChannelAccount
     :param conversation: Identifies the conversation to which the activity
      belongs.
     :type conversation: ~botframework.connector.models.ConversationAccount
@@ -153,7 +153,7 @@ class Activity(Model):
         'local_timezone': {'key': 'localTimezone', 'type': 'str'},
         'service_url': {'key': 'serviceUrl', 'type': 'str'},
         'channel_id': {'key': 'channelId', 'type': 'str'},
-        'from': {'key': 'from', 'type': 'ChannelAccount'},
+        'from_property': {'key': 'from', 'type': 'ChannelAccount'},
         'conversation': {'key': 'conversation', 'type': 'ConversationAccount'},
         'recipient': {'key': 'recipient', 'type': 'ChannelAccount'},
         'text_format': {'key': 'textFormat', 'type': 'str'},
@@ -189,7 +189,7 @@ class Activity(Model):
         'semantic_action': {'key': 'semanticAction', 'type': 'SemanticAction'},
     }
 
-    def __init__(self, *, type=None, id: str=None, timestamp=None, local_timestamp=None, local_timezone: str=None, service_url: str=None, channel_id: str=None, from=None, conversation=None, recipient=None, text_format=None, attachment_layout=None, members_added=None, members_removed=None, reactions_added=None, reactions_removed=None, topic_name: str=None, history_disclosed: bool=None, locale: str=None, text: str=None, speak: str=None, input_hint=None, summary: str=None, suggested_actions=None, attachments=None, entities=None, channel_data=None, action: str=None, reply_to_id: str=None, label: str=None, value_type: str=None, value=None, name: str=None, relates_to=None, code=None, expiration=None, importance=None, delivery_mode=None, listen_for=None, text_highlights=None, semantic_action=None, **kwargs) -> None:
+    def __init__(self, *, type=None, id: str=None, timestamp=None, local_timestamp=None, local_timezone: str=None, service_url: str=None, channel_id: str=None, from_property=None, conversation=None, recipient=None, text_format=None, attachment_layout=None, members_added=None, members_removed=None, reactions_added=None, reactions_removed=None, topic_name: str=None, history_disclosed: bool=None, locale: str=None, text: str=None, speak: str=None, input_hint=None, summary: str=None, suggested_actions=None, attachments=None, entities=None, channel_data=None, action: str=None, reply_to_id: str=None, label: str=None, value_type: str=None, value=None, name: str=None, relates_to=None, code=None, expiration=None, importance=None, delivery_mode=None, listen_for=None, text_highlights=None, semantic_action=None, **kwargs) -> None:
         super(Activity, self).__init__(**kwargs)
         self.type = type
         self.id = id
@@ -198,7 +198,7 @@ class Activity(Model):
         self.local_timezone = local_timezone
         self.service_url = service_url
         self.channel_id = channel_id
-        self.from = from
+        self.from_property = from_property
         self.conversation = conversation
         self.recipient = recipient
         self.text_format = text_format

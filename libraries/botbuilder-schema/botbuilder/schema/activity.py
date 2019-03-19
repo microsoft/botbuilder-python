@@ -42,8 +42,8 @@ class Activity(Model):
     :param channel_id: Contains an ID that uniquely identifies the channel.
      Set by the channel.
     :type channel_id: str
-    :param from: Identifies the sender of the message.
-    :type from: ~botframework.connector.models.ChannelAccount
+    :param from_property: Identifies the sender of the message.
+    :type from_property: ~botframework.connector.models.ChannelAccount
     :param conversation: Identifies the conversation to which the activity
      belongs.
     :type conversation: ~botframework.connector.models.ConversationAccount
@@ -153,7 +153,7 @@ class Activity(Model):
         'local_timezone': {'key': 'localTimezone', 'type': 'str'},
         'service_url': {'key': 'serviceUrl', 'type': 'str'},
         'channel_id': {'key': 'channelId', 'type': 'str'},
-        'from': {'key': 'from', 'type': 'ChannelAccount'},
+        'from_property': {'key': 'from', 'type': 'ChannelAccount'},
         'conversation': {'key': 'conversation', 'type': 'ConversationAccount'},
         'recipient': {'key': 'recipient', 'type': 'ChannelAccount'},
         'text_format': {'key': 'textFormat', 'type': 'str'},
@@ -198,7 +198,7 @@ class Activity(Model):
         self.local_timezone = kwargs.get('local_timezone', None)
         self.service_url = kwargs.get('service_url', None)
         self.channel_id = kwargs.get('channel_id', None)
-        self.from = kwargs.get('from', None)
+        self.from_property = kwargs.get('from_property', None)
         self.conversation = kwargs.get('conversation', None)
         self.recipient = kwargs.get('recipient', None)
         self.text_format = kwargs.get('text_format', None)
