@@ -9,12 +9,8 @@
 # regenerated.
 # --------------------------------------------------------------------------
 
-try:
-    from .attachments_operations_async import AttachmentsOperations
-    from .conversations_operations_async import ConversationsOperations
-except (SyntaxError, ImportError):
-    from .attachments_operations import AttachmentsOperations
-    from .conversations_operations import ConversationsOperations
+from .attachments_operations import AttachmentsOperations
+from .conversations_operations import ConversationsOperations
 
 __all__ = [
     'AttachmentsOperations',

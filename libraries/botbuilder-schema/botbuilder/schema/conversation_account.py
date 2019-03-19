@@ -26,6 +26,9 @@ class ConversationAccount(Model):
     :type id: str
     :param name: Display friendly name
     :type name: str
+    :param aad_object_id: This account's object ID within Azure Active
+     Directory (AAD)
+    :type aad_object_id: str
     :param role: Role of the entity behind the account (Example: User, Bot,
      etc.). Possible values include: 'user', 'bot'
     :type role: str or ~botframework.connector.models.RoleTypes
@@ -36,6 +39,7 @@ class ConversationAccount(Model):
         'conversation_type': {'key': 'conversationType', 'type': 'str'},
         'id': {'key': 'id', 'type': 'str'},
         'name': {'key': 'name', 'type': 'str'},
+        'aad_object_id': {'key': 'aadObjectId', 'type': 'str'},
         'role': {'key': 'role', 'type': 'str'},
     }
 
@@ -45,4 +49,5 @@ class ConversationAccount(Model):
         self.conversation_type = kwargs.get('conversation_type', None)
         self.id = kwargs.get('id', None)
         self.name = kwargs.get('name', None)
+        self.aad_object_id = kwargs.get('aad_object_id', None)
         self.role = kwargs.get('role', None)

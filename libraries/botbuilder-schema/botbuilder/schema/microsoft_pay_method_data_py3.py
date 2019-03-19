@@ -15,8 +15,8 @@ from msrest.serialization import Model
 class MicrosoftPayMethodData(Model):
     """W3C Payment Method Data for Microsoft Pay.
 
-    :param mechant_id: Microsoft Pay Merchant ID
-    :type mechant_id: str
+    :param merchant_id: Microsoft Pay Merchant ID
+    :type merchant_id: str
     :param supported_networks: Supported payment networks (e.g., "visa" and
      "mastercard")
     :type supported_networks: list[str]
@@ -25,13 +25,13 @@ class MicrosoftPayMethodData(Model):
     """
 
     _attribute_map = {
-        'mechant_id': {'key': 'mechantId', 'type': 'str'},
+        'merchant_id': {'key': 'merchantId', 'type': 'str'},
         'supported_networks': {'key': 'supportedNetworks', 'type': '[str]'},
         'supported_types': {'key': 'supportedTypes', 'type': '[str]'},
     }
 
-    def __init__(self, *, mechant_id: str=None, supported_networks=None, supported_types=None, **kwargs) -> None:
+    def __init__(self, *, merchant_id: str=None, supported_networks=None, supported_types=None, **kwargs) -> None:
         super(MicrosoftPayMethodData, self).__init__(**kwargs)
-        self.mechant_id = mechant_id
+        self.merchant_id = merchant_id
         self.supported_networks = supported_networks
         self.supported_types = supported_types

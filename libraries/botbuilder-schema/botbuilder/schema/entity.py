@@ -13,9 +13,9 @@ from msrest.serialization import Model
 
 
 class Entity(Model):
-    """Object of schema.org types.
+    """Metadata object pertaining to an activity.
 
-    :param type: Entity Type (typically from schema.org types)
+    :param type: Type of this entity (RFC 3987 IRI)
     :type type: str
     """
 

@@ -23,7 +23,8 @@ class MediaCard(Model):
     :type text: str
     :param image: Thumbnail placeholder
     :type image: ~botframework.connector.models.ThumbnailUrl
-    :param media: Media URLs for this card
+    :param media: Media URLs for this card. When this field contains more than
+     one URL, each URL is an alternative format of the same content.
     :type media: list[~botframework.connector.models.MediaUrl]
     :param buttons: Actions on this card
     :type buttons: list[~botframework.connector.models.CardAction]
@@ -35,9 +36,13 @@ class MediaCard(Model):
     :param autostart: Should the client automatically start playback of media
      in this card (default:true)
     :type autostart: bool
-    :param aspect: Aspect ratio of thumbnail/media placeholder, allowed values
+    :param aspect: Aspect ratio of thumbnail/media placeholder. Allowed values
      are "16:9" and "4:3"
     :type aspect: str
+    :param duration: Describes the length of the media content without
+     requiring a receiver to open the content. Formatted as an ISO 8601
+     Duration field.
+    :type duration: str
     :param value: Supplementary parameter for this card
     :type value: object
     """
@@ -53,10 +58,11 @@ class MediaCard(Model):
         'autoloop': {'key': 'autoloop', 'type': 'bool'},
         'autostart': {'key': 'autostart', 'type': 'bool'},
         'aspect': {'key': 'aspect', 'type': 'str'},
+        'duration': {'key': 'duration', 'type': 'str'},
         'value': {'key': 'value', 'type': 'object'},
     }
 
-    def __init__(self, *, title: str=None, subtitle: str=None, text: str=None, image=None, media=None, buttons=None, shareable: bool=None, autoloop: bool=None, autostart: bool=None, aspect: str=None, value=None, **kwargs) -> None:
+    def __init__(self, *, title: str=None, subtitle: str=None, text: str=None, image=None, media=None, buttons=None, shareable: bool=None, autoloop: bool=None, autostart: bool=None, aspect: str=None, duration: str=None, value=None, **kwargs) -> None:
         super(MediaCard, self).__init__(**kwargs)
         self.title = title
         self.subtitle = subtitle
@@ -68,4 +74,5 @@ class MediaCard(Model):
         self.autoloop = autoloop
         self.autostart = autostart
         self.aspect = aspect
+        self.duration = duration
         self.value = value

@@ -13,20 +13,21 @@ from msrest.serialization import Model
 
 
 class TextHighlight(Model):
-    """TextHighlight.
+    """Refers to a substring of content within another field.
 
-    :param text: plain text fragment to highlight
+    :param text: Defines the snippet of text to highlight
     :type text: str
-    :param occurence: index of occurence of the Text (Starting at 1)
-    :type occurence: int
+    :param occurrence: Occurrence of the text field within the referenced
+     text, if multiple exist.
+    :type occurrence: int
     """
 
     _attribute_map = {
         'text': {'key': 'text', 'type': 'str'},
-        'occurence': {'key': 'occurence', 'type': 'int'},
+        'occurrence': {'key': 'occurrence', 'type': 'int'},
     }
 
-    def __init__(self, *, text: str=None, occurence: int=None, **kwargs) -> None:
+    def __init__(self, *, text: str=None, occurrence: int=None, **kwargs) -> None:
         super(TextHighlight, self).__init__(**kwargs)
         self.text = text
-        self.occurence = occurence
+        self.occurrence = occurrence

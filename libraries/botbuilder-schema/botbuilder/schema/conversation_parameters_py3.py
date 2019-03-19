@@ -25,7 +25,7 @@ class ConversationParameters(Model):
      the channel)
     :type topic_name: str
     :param activity: (Optional) When creating a new conversation, use this
-     activity as the intial message to the conversation
+     activity as the initial message to the conversation
     :type activity: ~botframework.connector.models.Activity
     :param channel_data: Channel specific payload for creating the
      conversation

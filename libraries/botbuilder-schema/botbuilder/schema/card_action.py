@@ -32,6 +32,8 @@ class CardAction(Model):
     :param value: Supplementary parameter for action. Content of this property
      depends on the ActionType
     :type value: object
+    :param channel_data: Channel-specific data associated with this action
+    :type channel_data: object
     """
 
     _attribute_map = {
@@ -41,6 +43,7 @@ class CardAction(Model):
         'text': {'key': 'text', 'type': 'str'},
         'display_text': {'key': 'displayText', 'type': 'str'},
         'value': {'key': 'value', 'type': 'object'},
+        'channel_data': {'key': 'channelData', 'type': 'object'},
     }
 
     def __init__(self, **kwargs):
@@ -51,3 +54,4 @@ class CardAction(Model):
         self.text = kwargs.get('text', None)
         self.display_text = kwargs.get('display_text', None)
         self.value = kwargs.get('value', None)
+        self.channel_data = kwargs.get('channel_data', None)
