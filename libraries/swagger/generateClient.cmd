@@ -6,12 +6,6 @@ echo [91mCalling this command script has removed those sections of code.[0m
 
 @echo on
 call npx autorest README.md --python --use=".\node_modules\@microsoft.azure\autorest.python"
-
-
-pushd generated
-call npx replace "FROM_PROPERTY" "FROM" . --recursive --include="*.py"
-call npx replace "from_property" "from" . --recursive --include="*.py"
-popd
 @echo off
 
 rd /s /q ..\botbuilder-schema\botbuilder\schema
