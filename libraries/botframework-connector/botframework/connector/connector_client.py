@@ -10,38 +10,13 @@
 # --------------------------------------------------------------------------
 
 from msrest.service_client import SDKClient
-from msrest import Configuration, Serializer, Deserializer
-from .version import VERSION
+from msrest import Serializer, Deserializer
+
+from ._configuration import ConnectorClientConfiguration
 from msrest.exceptions import HttpOperationError
-from .operations.attachments_operations import AttachmentsOperations
-from .operations.conversations_operations import ConversationsOperations
+from .operations import AttachmentsOperations
+from .operations import ConversationsOperations
 from . import models
-
-
-class ConnectorClientConfiguration(Configuration):
-    """Configuration for ConnectorClient
-    Note that all parameters used to create this instance are saved as instance
-    attributes.
-
-    :param credentials: Subscription credentials which uniquely identify
-     client subscription.
-    :type credentials: None
-    :param str base_url: Service URL
-    """
-
-    def __init__(
-            self, credentials, base_url=None):
-
-        if credentials is None:
-            raise ValueError("Parameter 'credentials' must not be None.")
-        if not base_url:
-            base_url = 'https://api.botframework.com'
-
-        super(ConnectorClientConfiguration, self).__init__(base_url)
-
-        self.add_user_agent('botframework-connector/{}'.format(VERSION))
-
-        self.credentials = credentials
 
 
 class ConnectorClient(SDKClient):

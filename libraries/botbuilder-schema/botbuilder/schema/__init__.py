@@ -10,206 +10,206 @@
 # --------------------------------------------------------------------------
 
 try:
-    from .attachment_view_py3 import AttachmentView
-    from .attachment_info_py3 import AttachmentInfo
-    from .inner_http_error_py3 import InnerHttpError
-    from .error_py3 import Error
-    from .error_response_py3 import ErrorResponse, ErrorResponseException
-    from .channel_account_py3 import ChannelAccount
-    from .conversation_account_py3 import ConversationAccount
-    from .message_reaction_py3 import MessageReaction
-    from .card_action_py3 import CardAction
-    from .suggested_actions_py3 import SuggestedActions
-    from .attachment_py3 import Attachment
-    from .entity_py3 import Entity
-    from .conversation_reference_py3 import ConversationReference
-    from .text_highlight_py3 import TextHighlight
-    from .semantic_action_py3 import SemanticAction
-    from .activity_py3 import Activity
-    from .conversation_parameters_py3 import ConversationParameters
-    from .conversation_resource_response_py3 import ConversationResourceResponse
-    from .conversation_members_py3 import ConversationMembers
-    from .conversations_result_py3 import ConversationsResult
-    from .resource_response_py3 import ResourceResponse
-    from .transcript_py3 import Transcript
-    from .paged_members_result_py3 import PagedMembersResult
-    from .attachment_data_py3 import AttachmentData
-    from .card_image_py3 import CardImage
-    from .hero_card_py3 import HeroCard
-    from .thumbnail_url_py3 import ThumbnailUrl
-    from .media_url_py3 import MediaUrl
-    from .animation_card_py3 import AnimationCard
-    from .audio_card_py3 import AudioCard
-    from .basic_card_py3 import BasicCard
-    from .media_card_py3 import MediaCard
-    from .fact_py3 import Fact
-    from .receipt_item_py3 import ReceiptItem
-    from .receipt_card_py3 import ReceiptCard
-    from .signin_card_py3 import SigninCard
-    from .oauth_card_py3 import OAuthCard
-    from .thumbnail_card_py3 import ThumbnailCard
-    from .video_card_py3 import VideoCard
-    from .geo_coordinates_py3 import GeoCoordinates
-    from .mention_py3 import Mention
-    from .place_py3 import Place
-    from .thing_py3 import Thing
-    from .media_event_value_py3 import MediaEventValue
-    from .token_request_py3 import TokenRequest
-    from .token_response_py3 import TokenResponse
-    from .microsoft_pay_method_data_py3 import MicrosoftPayMethodData
-    from .payment_address_py3 import PaymentAddress
-    from .payment_currency_amount_py3 import PaymentCurrencyAmount
-    from .payment_item_py3 import PaymentItem
-    from .payment_shipping_option_py3 import PaymentShippingOption
-    from .payment_details_modifier_py3 import PaymentDetailsModifier
-    from .payment_details_py3 import PaymentDetails
-    from .payment_method_data_py3 import PaymentMethodData
-    from .payment_options_py3 import PaymentOptions
-    from .payment_request_py3 import PaymentRequest
-    from .payment_response_py3 import PaymentResponse
-    from .payment_request_complete_py3 import PaymentRequestComplete
-    from .payment_request_complete_result_py3 import PaymentRequestCompleteResult
-    from .payment_request_update_py3 import PaymentRequestUpdate
-    from .payment_request_update_result_py3 import PaymentRequestUpdateResult
+    from ._models_py3 import Activity
+    from ._models_py3 import AnimationCard
+    from ._models_py3 import Attachment
+    from ._models_py3 import AttachmentData
+    from ._models_py3 import AttachmentInfo
+    from ._models_py3 import AttachmentView
+    from ._models_py3 import AudioCard
+    from ._models_py3 import BasicCard
+    from ._models_py3 import CardAction
+    from ._models_py3 import CardImage
+    from ._models_py3 import ChannelAccount
+    from ._models_py3 import ConversationAccount
+    from ._models_py3 import ConversationMembers
+    from ._models_py3 import ConversationParameters
+    from ._models_py3 import ConversationReference
+    from ._models_py3 import ConversationResourceResponse
+    from ._models_py3 import ConversationsResult
+    from ._models_py3 import Entity
+    from ._models_py3 import Error
+    from ._models_py3 import ErrorResponse, ErrorResponseException
+    from ._models_py3 import Fact
+    from ._models_py3 import GeoCoordinates
+    from ._models_py3 import HeroCard
+    from ._models_py3 import InnerHttpError
+    from ._models_py3 import MediaCard
+    from ._models_py3 import MediaEventValue
+    from ._models_py3 import MediaUrl
+    from ._models_py3 import Mention
+    from ._models_py3 import MessageReaction
+    from ._models_py3 import MicrosoftPayMethodData
+    from ._models_py3 import OAuthCard
+    from ._models_py3 import PagedMembersResult
+    from ._models_py3 import PaymentAddress
+    from ._models_py3 import PaymentCurrencyAmount
+    from ._models_py3 import PaymentDetails
+    from ._models_py3 import PaymentDetailsModifier
+    from ._models_py3 import PaymentItem
+    from ._models_py3 import PaymentMethodData
+    from ._models_py3 import PaymentOptions
+    from ._models_py3 import PaymentRequest
+    from ._models_py3 import PaymentRequestComplete
+    from ._models_py3 import PaymentRequestCompleteResult
+    from ._models_py3 import PaymentRequestUpdate
+    from ._models_py3 import PaymentRequestUpdateResult
+    from ._models_py3 import PaymentResponse
+    from ._models_py3 import PaymentShippingOption
+    from ._models_py3 import Place
+    from ._models_py3 import ReceiptCard
+    from ._models_py3 import ReceiptItem
+    from ._models_py3 import ResourceResponse
+    from ._models_py3 import SemanticAction
+    from ._models_py3 import SigninCard
+    from ._models_py3 import SuggestedActions
+    from ._models_py3 import TextHighlight
+    from ._models_py3 import Thing
+    from ._models_py3 import ThumbnailCard
+    from ._models_py3 import ThumbnailUrl
+    from ._models_py3 import TokenRequest
+    from ._models_py3 import TokenResponse
+    from ._models_py3 import Transcript
+    from ._models_py3 import VideoCard
 except (SyntaxError, ImportError):
-    from .attachment_view import AttachmentView
-    from .attachment_info import AttachmentInfo
-    from .inner_http_error import InnerHttpError
-    from .error import Error
-    from .error_response import ErrorResponse, ErrorResponseException
-    from .channel_account import ChannelAccount
-    from .conversation_account import ConversationAccount
-    from .message_reaction import MessageReaction
-    from .card_action import CardAction
-    from .suggested_actions import SuggestedActions
-    from .attachment import Attachment
-    from .entity import Entity
-    from .conversation_reference import ConversationReference
-    from .text_highlight import TextHighlight
-    from .semantic_action import SemanticAction
-    from .activity import Activity
-    from .conversation_parameters import ConversationParameters
-    from .conversation_resource_response import ConversationResourceResponse
-    from .conversation_members import ConversationMembers
-    from .conversations_result import ConversationsResult
-    from .resource_response import ResourceResponse
-    from .transcript import Transcript
-    from .paged_members_result import PagedMembersResult
-    from .attachment_data import AttachmentData
-    from .card_image import CardImage
-    from .hero_card import HeroCard
-    from .thumbnail_url import ThumbnailUrl
-    from .media_url import MediaUrl
-    from .animation_card import AnimationCard
-    from .audio_card import AudioCard
-    from .basic_card import BasicCard
-    from .media_card import MediaCard
-    from .fact import Fact
-    from .receipt_item import ReceiptItem
-    from .receipt_card import ReceiptCard
-    from .signin_card import SigninCard
-    from .oauth_card import OAuthCard
-    from .thumbnail_card import ThumbnailCard
-    from .video_card import VideoCard
-    from .geo_coordinates import GeoCoordinates
-    from .mention import Mention
-    from .place import Place
-    from .thing import Thing
-    from .media_event_value import MediaEventValue
-    from .token_request import TokenRequest
-    from .token_response import TokenResponse
-    from .microsoft_pay_method_data import MicrosoftPayMethodData
-    from .payment_address import PaymentAddress
-    from .payment_currency_amount import PaymentCurrencyAmount
-    from .payment_item import PaymentItem
-    from .payment_shipping_option import PaymentShippingOption
-    from .payment_details_modifier import PaymentDetailsModifier
-    from .payment_details import PaymentDetails
-    from .payment_method_data import PaymentMethodData
-    from .payment_options import PaymentOptions
-    from .payment_request import PaymentRequest
-    from .payment_response import PaymentResponse
-    from .payment_request_complete import PaymentRequestComplete
-    from .payment_request_complete_result import PaymentRequestCompleteResult
-    from .payment_request_update import PaymentRequestUpdate
-    from .payment_request_update_result import PaymentRequestUpdateResult
-from .connector_client_enums import (
-    RoleTypes,
-    ActivityTypes,
-    TextFormatTypes,
-    AttachmentLayoutTypes,
-    MessageReactionTypes,
-    InputHints,
+    from ._models import Activity
+    from ._models import AnimationCard
+    from ._models import Attachment
+    from ._models import AttachmentData
+    from ._models import AttachmentInfo
+    from ._models import AttachmentView
+    from ._models import AudioCard
+    from ._models import BasicCard
+    from ._models import CardAction
+    from ._models import CardImage
+    from ._models import ChannelAccount
+    from ._models import ConversationAccount
+    from ._models import ConversationMembers
+    from ._models import ConversationParameters
+    from ._models import ConversationReference
+    from ._models import ConversationResourceResponse
+    from ._models import ConversationsResult
+    from ._models import Entity
+    from ._models import Error
+    from ._models import ErrorResponse, ErrorResponseException
+    from ._models import Fact
+    from ._models import GeoCoordinates
+    from ._models import HeroCard
+    from ._models import InnerHttpError
+    from ._models import MediaCard
+    from ._models import MediaEventValue
+    from ._models import MediaUrl
+    from ._models import Mention
+    from ._models import MessageReaction
+    from ._models import MicrosoftPayMethodData
+    from ._models import OAuthCard
+    from ._models import PagedMembersResult
+    from ._models import PaymentAddress
+    from ._models import PaymentCurrencyAmount
+    from ._models import PaymentDetails
+    from ._models import PaymentDetailsModifier
+    from ._models import PaymentItem
+    from ._models import PaymentMethodData
+    from ._models import PaymentOptions
+    from ._models import PaymentRequest
+    from ._models import PaymentRequestComplete
+    from ._models import PaymentRequestCompleteResult
+    from ._models import PaymentRequestUpdate
+    from ._models import PaymentRequestUpdateResult
+    from ._models import PaymentResponse
+    from ._models import PaymentShippingOption
+    from ._models import Place
+    from ._models import ReceiptCard
+    from ._models import ReceiptItem
+    from ._models import ResourceResponse
+    from ._models import SemanticAction
+    from ._models import SigninCard
+    from ._models import SuggestedActions
+    from ._models import TextHighlight
+    from ._models import Thing
+    from ._models import ThumbnailCard
+    from ._models import ThumbnailUrl
+    from ._models import TokenRequest
+    from ._models import TokenResponse
+    from ._models import Transcript
+    from ._models import VideoCard
+from ._connector_client_enums import (
     ActionTypes,
-    EndOfConversationCodes,
     ActivityImportance,
-    DeliveryModes,
+    ActivityTypes,
+    AttachmentLayoutTypes,
     ContactRelationUpdateActionTypes,
+    DeliveryModes,
+    EndOfConversationCodes,
+    InputHints,
     InstallationUpdateActionTypes,
+    MessageReactionTypes,
+    RoleTypes,
+    TextFormatTypes,
 )
 
 __all__ = [
-    'AttachmentView',
-    'AttachmentInfo',
-    'InnerHttpError',
-    'Error',
-    'ErrorResponse', 'ErrorResponseException',
-    'ChannelAccount',
-    'ConversationAccount',
-    'MessageReaction',
-    'CardAction',
-    'SuggestedActions',
-    'Attachment',
-    'Entity',
-    'ConversationReference',
-    'TextHighlight',
-    'SemanticAction',
     'Activity',
-    'ConversationParameters',
-    'ConversationResourceResponse',
-    'ConversationMembers',
-    'ConversationsResult',
-    'ResourceResponse',
-    'Transcript',
-    'PagedMembersResult',
-    'AttachmentData',
-    'CardImage',
-    'HeroCard',
-    'ThumbnailUrl',
-    'MediaUrl',
     'AnimationCard',
+    'Attachment',
+    'AttachmentData',
+    'AttachmentInfo',
+    'AttachmentView',
     'AudioCard',
     'BasicCard',
-    'MediaCard',
+    'CardAction',
+    'CardImage',
+    'ChannelAccount',
+    'ConversationAccount',
+    'ConversationMembers',
+    'ConversationParameters',
+    'ConversationReference',
+    'ConversationResourceResponse',
+    'ConversationsResult',
+    'Entity',
+    'Error',
+    'ErrorResponse', 'ErrorResponseException',
     'Fact',
-    'ReceiptItem',
-    'ReceiptCard',
-    'SigninCard',
-    'OAuthCard',
-    'ThumbnailCard',
-    'VideoCard',
     'GeoCoordinates',
-    'Mention',
-    'Place',
-    'Thing',
+    'HeroCard',
+    'InnerHttpError',
+    'MediaCard',
     'MediaEventValue',
-    'TokenRequest',
-    'TokenResponse',
+    'MediaUrl',
+    'Mention',
+    'MessageReaction',
     'MicrosoftPayMethodData',
+    'OAuthCard',
+    'PagedMembersResult',
     'PaymentAddress',
     'PaymentCurrencyAmount',
-    'PaymentItem',
-    'PaymentShippingOption',
-    'PaymentDetailsModifier',
     'PaymentDetails',
+    'PaymentDetailsModifier',
+    'PaymentItem',
     'PaymentMethodData',
     'PaymentOptions',
     'PaymentRequest',
-    'PaymentResponse',
     'PaymentRequestComplete',
     'PaymentRequestCompleteResult',
     'PaymentRequestUpdate',
     'PaymentRequestUpdateResult',
+    'PaymentResponse',
+    'PaymentShippingOption',
+    'Place',
+    'ReceiptCard',
+    'ReceiptItem',
+    'ResourceResponse',
+    'SemanticAction',
+    'SigninCard',
+    'SuggestedActions',
+    'TextHighlight',
+    'Thing',
+    'ThumbnailCard',
+    'ThumbnailUrl',
+    'TokenRequest',
+    'TokenResponse',
+    'Transcript',
+    'VideoCard',
     'RoleTypes',
     'ActivityTypes',
     'TextFormatTypes',

@@ -9,8 +9,8 @@
 # regenerated.
 # --------------------------------------------------------------------------
 
-from .attachments_operations import AttachmentsOperations
-from .conversations_operations import ConversationsOperations
+from ._attachments_operations import AttachmentsOperations
+from ._conversations_operations import ConversationsOperations
 
 __all__ = [
     'AttachmentsOperations',
