@@ -7,5 +7,13 @@
 
 from .about import __version__
 
-__all__ = [
+from .dialog_context import DialogContext
+from .dialog import Dialog
+from .dialog_set import DialogSet
+from .dialog_state import DialogState
+
+__all__ = ['Dialog',
+           'DialogContext',
+           'DialogSet',
+           'DialogState',
            '__version__']

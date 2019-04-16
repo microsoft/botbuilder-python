@@ -6,11 +6,12 @@ from setuptools import setup
 
 REQUIRES = [
     'botbuilder-schema>=4.0.0.a6',
-    'botframework-connector>=4.0.0.a6']
+    'botframework-connector>=4.0.0.a6',
+    'botbuilder-core>=4.0.0.a6']
 
 root = os.path.abspath(os.path.dirname(__file__))
 
-with open(os.path.join(root, 'botbuilder', 'core', 'about.py')) as f:
+with open(os.path.join(root, 'botbuilder', 'dialogs', 'about.py')) as f:
     package_info = {}
     info = f.read()
     exec(info, package_info)
@@ -21,11 +22,12 @@ setup(
     url=package_info['__uri__'],
     author=package_info['__author__'],
     description=package_info['__description__'],
-    keywords=['BotBuilderCore', 'bots', 'ai', 'botframework', 'botbuilder'],
+    keywords=['BotBuilderDialogs', 'bots', 'ai', 'botframework', 'botbuilder'],
     long_description=package_info['__summary__'],
     license=package_info['__license__'],
-    packages=['botbuilder.core'],
+    packages=['botbuilder.dialogs'],
     install_requires=REQUIRES,
+    include_package_data=True,
     classifiers=[
         'Programming Language :: Python :: 3.6',
         'Intended Audience :: Developers',
