@@ -7,19 +7,20 @@ from .storage import Storage
 
 
 class ConversationState(BotState):
-    """
+    """Conversation State
     Reads and writes conversation state for your bot to storage.
     """
 
     no_key_error_message = 'ConversationState: channelId and/or conversation missing from context.activity.'
 
     def __init__(self, storage: Storage, namespace: str=''):
+        """Creates a new ConversationState instance.
+        Parameters
+        ----------
+        storage : Storage
+            Where to store 
+        namespace: str
         """
-        Creates a new ConversationState instance.
-        :param storage:
-        :param namespace:
-        """
-
         def call_get_storage_key(context):
             key = self.get_storage_key(context)
             if key is None:

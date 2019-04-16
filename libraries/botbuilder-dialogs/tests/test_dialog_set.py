@@ -5,15 +5,21 @@
 import unittest
 from botbuilder.core import BotAdapter
 from botbuilder.dialogs import DialogSet
+from botbuilder.core import MemoryStorage, ConversationState
+from botbuilder.core.state_property_accessor import StatePropertyAccessor
 
 
 class DialogSetTests(unittest.TestCase):
-    def DialogSet_ConstructorValid():
+    def test_DialogSet_ConstructorValid(self):
         storage = MemoryStorage();
-        convoState = ConversationState(storage);
-        dialogStateProperty = convoState.create_property("dialogstate");
-        ds = DialogSet(dialogStateProperty);
+        conv = ConversationState(storage)
+        accessor = conv.create_property("dialogstate")
+        ds = DialogSet(accessor);
+        self.assertNotEqual(ds, None)
     
-    def DialogSet_ConstructorNullProperty():
-        ds = DialogSet(null);
+    def test_DialogSet_ConstructorNoneProperty(self):
+        self.assertRaises(TypeError, lambda:DialogSet(None))
+
+        
+        
 

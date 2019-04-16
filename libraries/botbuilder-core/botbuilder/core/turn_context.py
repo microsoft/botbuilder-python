@@ -31,6 +31,14 @@ class TurnContext(object):
             raise TypeError('TurnContext must be instantiated with an adapter.')
         if self.activity is None:
             raise TypeError('TurnContext must be instantiated with a request parameter of type Activity.')
+        
+        # TODO: Make real turn-state-collection
+        self.turn_state = []
+
+    
+    @property
+    def turn_state(self):
+        self.turn_state
 
     def copy_to(self, context: 'TurnContext') -> None:
         """
