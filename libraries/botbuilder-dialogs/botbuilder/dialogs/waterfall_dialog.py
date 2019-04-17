@@ -6,7 +6,12 @@ import uuid
 from typing import Dict
 from .dialog_reason import DialogReason
 from .dialog import Dialog
-from botbuilder.dialogs.dialog_turn_result import DialogTurnResult
+from .dialog_turn_result import DialogTurnResult
+from .dialog_context import DialogContext
+from .dialog_instance import DialogInstance
+from .waterfall_step_context import WaterfallStepContext
+from botbuilder.core import TurnContext
+
 
 class WaterfallDialog(Dialog):
     PersistedOptions = "options"
@@ -56,7 +61,7 @@ class WaterfallDialog(Dialog):
         # Run first stepkinds
         return await run_step(dc, 0, DialogReason.BeginCalled, None) 
     
-    async def continue_dialog(self, dc: DialogContext, reason: DialogReason, result: Object) -> DialogTurnResult:
+    async def continue_dialog(self, dc: DialogContext, reason: DialogReason, result: object) -> DialogTurnResult:
         if not dc:
             raise TypeError('WaterfallDialog.continue_dialog(): dc cannot be None.')
         
@@ -85,7 +90,7 @@ class WaterfallDialog(Dialog):
         # TODO: Add telemetry logging
         return await self._steps[step_context.index](step_context)
     
-    async def run_steps(self, dc: DialogContext, index: int, reason: DialogReason, result: Object) -> DialogTurnResult:
+    async def run_steps(self, dc: DialogContext, index: int, reason: DialogReason, result: object) -> DialogTurnResult:
         if not dc:
             raise TypeError('WaterfallDialog.run_steps(): dc cannot be None.')
         if index < _steps.size:

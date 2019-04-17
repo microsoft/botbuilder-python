@@ -10,6 +10,7 @@ from botbuilder.dialogs.dialog_set import DialogSet
 from botbuilder.dialogs.waterfall_dialog import WaterfallDialog
 from botbuilder.dialogs.waterfall_step_context import WaterfallStepContext
 from botbuilder.dialogs.dialog_turn_result import DialogTurnResult
+from botbuilder.dialogs.dialog_context import DialogContext
 
 async def Waterfall2_Step1(step_context: WaterfallStepContext) -> DialogTurnResult:
     await step_context.context.send_activity("step1")
