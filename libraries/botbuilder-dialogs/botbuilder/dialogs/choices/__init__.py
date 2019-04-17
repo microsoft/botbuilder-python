@@ -6,5 +6,6 @@
 # --------------------------------------------------------------------------
 
 from .channel import Channel
+from .choice_factory_options import ChoiceFactoryOptions
 
-__all__ = ["Channel"]
+__all__ = ["Channel", "ChoiceFactoryOptions"]
