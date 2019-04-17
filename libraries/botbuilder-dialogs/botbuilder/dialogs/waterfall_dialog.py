@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from __future__ import annotations # For PEP563
+
 import uuid
 from typing import Dict
 from .dialog_reason import DialogReason
@@ -22,7 +22,7 @@ class WaterfallDialog(Dialog):
             self._steps = steps
 
     # TODO: Add WaterfallStep class
-    def add_step(self, step) -> WaterfallDialog:
+    def add_step(self, step):
         """Adds a new step to the waterfall.
         Parameters
         ----------
