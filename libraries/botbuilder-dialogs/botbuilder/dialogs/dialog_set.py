@@ -7,7 +7,7 @@ from .dialog_turn_result import DialogTurnResult
 from .dialog_reason import DialogReason
 from botbuilder.core.turn_context import TurnContext
 from botbuilder.core.state_property_accessor import StatePropertyAccessor
-
+from typing import Dict
 
 
 class DialogSet():
@@ -20,7 +20,7 @@ class DialogSet():
         self._dialog_state = dialog_state
         # self.__telemetry_client = NullBotTelemetryClient.Instance;
 
-        self._dialogs = []
+        self._dialogs: Dict[str, object] = {}
 
     
     async def add(self, dialog: Dialog):
@@ -35,7 +35,7 @@ class DialogSet():
             raise TypeError("DialogSet.Add(): A dialog with an id of '%s' already added." % dialog.id)
 
         # dialog.telemetry_client = this._telemetry_client;
-        _dialogs[dialog.id] = dialog
+        self._dialogs[dialog.id] = dialog
 
         return self
 
@@ -45,7 +45,7 @@ class DialogSet():
         if not _dialog_state:
             raise RuntimeError("DialogSet.CreateContextAsync(): DialogSet created with a null IStatePropertyAccessor.")
         
-        state = await _dialog_state.get(turn_context, lambda: DialogState())
+        state = await self._dialog_state.get(turn_context, lambda: DialogState())
 
         return DialogContext(self, turn_context, state)
 

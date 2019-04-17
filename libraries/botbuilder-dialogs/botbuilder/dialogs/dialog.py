@@ -4,9 +4,12 @@ from abc import ABC, abstractmethod
 
 from botbuilder.core.turn_context import TurnContext
 from .dialog_reason import DialogReason
-
+from .dialog_turn_status import DialogTurnStatus
+from .dialog_turn_result import DialogTurnResult
 
 class Dialog(ABC):
+    end_of_turn = DialogTurnResult(DialogTurnStatus.Waiting);
+    
     def __init__(self, dialog_id: str):
         if dialog_id == None or not dialog_id.strip():
             raise TypeError('Dialog(): dialogId cannot be None.')

@@ -5,3 +5,4 @@ botbuilder-core>=4.0.0.a6
 requests>=2.18.1
 PyJWT==1.5.3
 cryptography==2.1.4
+asynciounittest==1.1.0
