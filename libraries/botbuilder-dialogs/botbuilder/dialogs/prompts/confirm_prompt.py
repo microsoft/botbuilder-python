@@ -1,5 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+
 from botbuilder.core.turn_context import TurnContext
 from botbuilder.schema.connector_client_enums import ActivityTypes
 
@@ -51,31 +52,31 @@ class ConfirmPrompt(Prompt):
         if not turn_context:
             raise TypeError('ConfirmPrompt.on_prompt(): turn_context cannot be None.')
         
-            result = PromptRecognizerResult();
-            if turn_context.activity.type == ActivityTypes.message:
-                # Recognize utterance
-                message = turn_context.activity
-                culture = determine_culture(turn_context.activity)
-                results = ChoiceRecognizer.recognize_boolean(message.text, culture)
-                if results.Count > 0:
-                    first = results[0];
-                    if "value" in first.Resolution:
-                        result.Succeeded = true;
-                        result.Value = first.Resolution["value"].str;
-                else:
-                    # First check whether the prompt was sent to the user with numbers - if it was we should recognize numbers
-                    defaults = choice_defaults[culture];
-                    opts = choice_options if choice_options != None else defaults[2]
+        result = PromptRecognizerResult();
+        if turn_context.activity.type == ActivityTypes.message:
+            # Recognize utterance
+            message = turn_context.activity
+            culture = determine_culture(turn_context.activity)
+            results = ChoiceRecognizer.recognize_boolean(message.text, culture)
+            if results.Count > 0:
+                first = results[0];
+                if "value" in first.Resolution:
+                    result.Succeeded = true;
+                    result.Value = first.Resolution["value"].str;
+            else:
+                # First check whether the prompt was sent to the user with numbers - if it was we should recognize numbers
+                defaults = choice_defaults[culture];
+                opts = choice_options if choice_options != None else defaults[2]
 
-                    # This logic reflects the fact that IncludeNumbers is nullable and True is the default set in Inline style
-                    if opts.include_numbers.has_value or opts.include_numbers.value:
-                        # The text may be a number in which case we will interpret that as a choice.
-                        confirmChoices = confirm_choices if confirm_choices != None else (defaults[0], defaults[1])
-                        choices = { confirmChoices[0], confirmChoices[1] };
-                        secondAttemptResults = ChoiceRecognizers.recognize_choices(message.text, choices);
-                        if len(secondAttemptResults) > 0:
-                            result.succeeded = True
-                            result.value = secondAttemptResults[0].resolution.index == 0;
+                # This logic reflects the fact that IncludeNumbers is nullable and True is the default set in Inline style
+                if opts.include_numbers.has_value or opts.include_numbers.value:
+                    # The text may be a number in which case we will interpret that as a choice.
+                    confirmChoices = confirm_choices if confirm_choices != None else (defaults[0], defaults[1])
+                    choices = { confirmChoices[0], confirmChoices[1] };
+                    secondAttemptResults = ChoiceRecognizers.recognize_choices(message.text, choices);
+                    if len(secondAttemptResults) > 0:
+                        result.succeeded = True
+                        result.value = secondAttemptResults[0].resolution.index == 0;
 
         return result;
         
