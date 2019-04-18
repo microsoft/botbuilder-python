@@ -9,7 +9,7 @@ from .prompt_recognizer_result import PromptRecognizerResult
 """ Contextual information passed to a custom `PromptValidator`.
 """
 class PromptValidatorContext():
-    def __init__(self, turn_context: TurnContext, recognized: PromptRecognizerResult, state: Dict[str, Object], options: PromptOptions): 
+    def __init__(self, turn_context: TurnContext, recognized: PromptRecognizerResult, state: Dict[str, object], options: PromptOptions): 
         """Creates contextual information passed to a custom `PromptValidator`.
         Parameters
         ----------

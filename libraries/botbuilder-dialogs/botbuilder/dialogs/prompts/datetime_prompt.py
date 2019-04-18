@@ -2,11 +2,15 @@
 # Licensed under the MIT License.
 
 from typing import Dict
-from botbuilder.schema.connector_client_enums import ActivityTypes
-from .date_time_resolution import DateTimeResolution
+from botbuilder.core.turn_context import TurnContext
+from botbuilder.schema import (ActivityTypes, Activity)
+from .datetime_resolution import DateTimeResolution
+from .prompt import Prompt
+from .prompt_options import PromptOptions
+from .prompt_recognizer_result import PromptRecognizerResult
 
 class DateTimePrompt(Prompt):
-    def __init__(self, dialog_id: str, validator: PromptValidator = None, default_locale: str = None):
+    def __init__(self, dialog_id: str, validator: object = None, default_locale: str = None):
         super(DateTimePrompt, self).__init__(dialog_id, validator)
         self._default_locale = default_locale;
         
@@ -16,7 +20,7 @@ class DateTimePrompt(Prompt):
         """
         return self._default_locale
         
-    @id.setter
+    @default_locale.setter
     def default_locale(self, value: str) -> None:
         """Gets the locale used if `TurnContext.activity.locale` is not specified.
 
@@ -24,7 +28,7 @@ class DateTimePrompt(Prompt):
         """
         self._default_locale = value
         
-    async def on_prompt(self, turn_context: TurnContext, state: Dict[string, object], options: PromptOptions, is_retry: bool):
+    async def on_prompt(self, turn_context: TurnContext, state: Dict[str, object], options: PromptOptions, is_retry: bool):
         if not turn_context:
             raise TypeError('DateTimePrompt.on_prompt(): turn_context cannot be None.')
         if not options:

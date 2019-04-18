@@ -1,22 +1,25 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from botbuilder.dialogs.dialog_turn_result import DialogTurnResult
-from botbuilder.dialogs.dialog_context import DialogContext
+from typing import Dict
 from .prompt_options import PromptOptions
-from botbuilder.schema.connector_client_enums import InputHints, ActivityTypes
-from botbuilder.dialogs.dialog_reason import DialogReason
+from ..dialog_reason import DialogReason
+from ..dialog import Dialog
+from ..dialog_instance import DialogInstance
+from ..dialog_turn_result import DialogTurnResult
+from ..dialog_context import DialogContext
 from botbuilder.core.turn_context import TurnContext
-from botbuilder.dialogs.dialog_instance import DialogInstance
+from botbuilder.schema import InputHints, ActivityTypes
+
 from abc import abstractmethod
-from botbuilder.schema.activity import Activity
+from botbuilder.schema import Activity
 
 """ Base class for all prompts.
 """
 class Prompt(Dialog):
     persisted_options = "options";
     persisted_state = "state";    
-    def __init__(self, dialog_id: str, validator: Object = None):
+    def __init__(self, dialog_id: str, validator: object = None):
         """Creates a new Prompt instance.
         Parameters
         ----------
@@ -31,7 +34,7 @@ class Prompt(Dialog):
         
         self._validator = validator;
 
-    async def begin_dialog(self, dc: DialogContext, options: Object) -> DialogTurnResult:
+    async def begin_dialog(self, dc: DialogContext, options: object) -> DialogTurnResult:
         if not dc:
             raise TypeError('Prompt(): dc cannot be None.')
         if not options is PromptOptions:
@@ -46,7 +49,7 @@ class Prompt(Dialog):
         # Initialize prompt state
         state = dc.active_dialog.state;
         state[persisted_options] = options;
-        state[persisted_state] = Dict[str, Object]
+        state[persisted_state] = Dict[str, object]
 
         # Send initial prompt
         await on_prompt(dc.context, state[persisted_state], state[persisted_options], False)
@@ -84,7 +87,7 @@ class Prompt(Dialog):
                 await on_prompt(dc.context, state, options, true)
             return Dialog.end_of_turn;
        
-    async def resume_dialog(self, dc: DialogContext, reason: DialogReason, result: Object) -> DialogTurnResult:
+    async def resume_dialog(self, dc: DialogContext, reason: DialogReason, result: object) -> DialogTurnResult:
         # Prompts are typically leaf nodes on the stack but the dev is free to push other dialogs
         # on top of the stack which will result in the prompt receiving an unexpected call to
         # dialog_resume() when the pushed on dialog ends.

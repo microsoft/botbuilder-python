@@ -8,7 +8,7 @@ class PromptRecognizerResult():
         """Creates result returned by a prompts recognizer function.
         """
         self._succeeded : bool = False
-        self._value : Object = None
+        self._value : object = None
         
     @property
     def succeeded(self) -> bool:
@@ -16,7 +16,7 @@ class PromptRecognizerResult():
         """
         return self._succeeded
 
-    @id.setter
+    @succeeded.setter
     def succeeded(self, value: bool) -> None:
         """Sets the whether the users utterance was successfully recognized
         Parameters
@@ -27,13 +27,13 @@ class PromptRecognizerResult():
         self._succeeded = value
 
     @property
-    def value(self) -> Object:
+    def value(self) -> object:
         """Gets the value that was recognized if succeeded is `True` 
         """
         return self._value
 
-    @id.setter
-    def value(self, value: Object) -> None:
+    @value.setter
+    def value(self, value: object) -> None:
         """Sets the value that was recognized (if succeeded is `True`)
         Parameters
         ----------

@@ -1,17 +1,19 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from botbuilder.schema.activity import Activity
+from botbuilder.schema import Activity
+
 
 class PromptOptions:
+
     def __init__(self):
         self._prompt: Activity = None 
         self._retry_prompt: Activity = None
         # TODO: Replace with Choice Object once ported
         self._choices: [] = None
         # TODO: Replace with ListStyle Object once ported
-        self._style: Object = None
-        self._validations: Object = None
+        self._style: object = None
+        self._validations: object = None
         self._number_of_attempts: int = 0
         
     @property
@@ -20,7 +22,7 @@ class PromptOptions:
         """
         return self._prompt
 
-    @id.setter
+    @prompt.setter
     def prompt(self, value: Activity) -> None:
         """Sets the initial prompt to send the user as Activity.
         Parameters
@@ -36,7 +38,7 @@ class PromptOptions:
         """
         return self._retry_prompt
 
-    @id.setter
+    @retry_prompt.setter
     def retry_prompt(self, value: Activity) -> None:
         """Sets the retry prompt to send the user as Activity.
         Parameters
@@ -47,13 +49,13 @@ class PromptOptions:
         self._retry_prompt = value
         
     @property
-    def choices(self) -> Object:
+    def choices(self) -> object:
         """Gets the list of choices associated with the prompt.
         """
         return self._choices
 
-    @id.setter
-    def choices(self, value: Object) -> None:
+    @choices.setter
+    def choices(self, value: object) -> None:
         """Sets the list of choices associated with the prompt.
         Parameters
         ----------
@@ -63,13 +65,13 @@ class PromptOptions:
         self._choices = value
         
     @property
-    def style(self) -> Object:
+    def style(self) -> object:
         """Gets the ListStyle for a ChoicePrompt.
         """
         return self._style
 
-    @id.setter
-    def style(self, value: Object) -> None:
+    @style.setter
+    def style(self, value: object) -> None:
         """Sets the ListStyle for a ChoicePrompt.
         Parameters
         ----------
@@ -79,13 +81,13 @@ class PromptOptions:
         self._style = value
 
     @property
-    def validations(self) -> Object:
+    def validations(self) -> object:
         """Gets additional validation rules to pass the prompts validator routine.
         """
         return self._validations
 
-    @id.setter
-    def validations(self, value: Object) -> None:
+    @validations.setter
+    def validations(self, value: object) -> None:
         """Sets additional validation rules to pass the prompts validator routine.
         Parameters
         ----------
@@ -100,7 +102,7 @@ class PromptOptions:
         """
         return self._number_of_attempts
 
-    @id.setter
+    @number_of_attempts.setter
     def number_of_attempts(self, value: int) -> None:
         """Sets the count of the number of times the prompt has retried.
         Parameters
@@ -109,5 +111,4 @@ class PromptOptions:
             Count of the number of times the prompt has retried.
         """
         self._number_of_attempts = value
-
         
