@@ -6,17 +6,18 @@ import inspect
 from datetime import datetime
 from typing import Coroutine, List
 from copy import copy
-from botbuilder.core import BotAdapter, TurnContext
+from ..bot_adapter import BotAdapter
+from ..turn_contect import TurnContext 
 from botbuilder.schema import (ActivityTypes, Activity, ConversationAccount,
                                ConversationReference, ChannelAccount, ResourceResponse)
 
 
 class TestAdapter(BotAdapter):
-    def __init__(self, logic: Coroutine=None, template: ConversationReference=None):
+    def __init__(self, logic: Coroutine=None, conversation: ConversationReference=None, send_trace_activity: bool = False):
         """
         Creates a new TestAdapter instance.
         :param logic:
-        :param template:
+        :param conversation: A reference to the conversation to begin the adapter state with.
         """
         super(TestAdapter, self).__init__()
         self.logic = logic
@@ -102,7 +103,6 @@ class TestAdapter(BotAdapter):
             if value is not None and key != 'additional_properties':
                 setattr(request, key, value)
 
-        if not request.type:
             request.type = ActivityTypes.message
         if not request.id:
             self._next_id += 1
@@ -112,12 +112,12 @@ class TestAdapter(BotAdapter):
         context = TurnContext(self, request)
         return await self.run_middleware(context, self.logic)
 
-    async def send(self, user_says):
+    async def send(self, user_says) -> object:
         """
         Sends something to the bot. This returns a new `TestFlow` instance which can be used to add
         additional steps for inspecting the bots reply and then sending additional activities.
         :param user_says:
-        :return:
+        :return: A new instance of the TestFlow object 
         """
         return TestFlow(await self.receive_activity(user_says), self)
 

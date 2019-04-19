@@ -10,23 +10,18 @@ from .prompt import Prompt
 from .prompt_options import PromptOptions
 from .prompt_recognizer_result import PromptRecognizerResult
 
-class choice_default:
-    def __init__(self, affirm: Choice, negate: Choice, opts: ChoiceFactoryOptions):
-        self.affirm = affirm
-        self.negate = negate
-        self.opts = opts
 
 class ConfirmPrompt(Prompt):
     # TODO: Fix to reference recognizer to use proper constants
     choice_defaults : Dict[str, object] = { 
-         'English': choice_default(Choice("Si"), Choice("No"), ChoiceFactoryOptions(", ", " o ", ", o ", True)),
-         'Dutch': choice_default(Choice("Ja"), Choice("Nee"), ChoiceFactoryOptions(", ", " of ", ", of ", True)),
-         'English': choice_default(Choice("Yes"), Choice("No"), ChoiceFactoryOptions(", ", " or ", ", or ", True)),
-         'French': choice_default(Choice("Oui"), Choice("Non"), ChoiceFactoryOptions(", ", " ou ", ", ou ", True)),
-         'German': choice_default(Choice("Ja"), Choice("Nein"), ChoiceFactoryOptions(", ", " oder ", ", oder ", True)),
-         'Japanese': choice_default(Choice("はい"), Choice("いいえ"), ChoiceFactoryOptions("、 ", " または ", "、 または ", True)),
-         'Portuguese': choice_default(Choice("Sim"), Choice("Não"), ChoiceFactoryOptions(", ", " ou ", ", ou ", True)),
-         'Chinese': choice_default(Choice("是的"), Choice("不"), ChoiceFactoryOptions("， ", " 要么 ",  "， 要么 ", True))
+         'English': (Choice("Si"), Choice("No"), ChoiceFactoryOptions(", ", " o ", ", o ", True)),
+         'Dutch': (Choice("Ja"), Choice("Nee"), ChoiceFactoryOptions(", ", " of ", ", of ", True)),
+         'English': (Choice("Yes"), Choice("No"), ChoiceFactoryOptions(", ", " or ", ", or ", True)),
+         'French': (Choice("Oui"), Choice("Non"), ChoiceFactoryOptions(", ", " ou ", ", ou ", True)),
+         'German': (Choice("Ja"), Choice("Nein"), ChoiceFactoryOptions(", ", " oder ", ", oder ", True)),
+         'Japanese': (Choice("はい"), Choice("いいえ"), ChoiceFactoryOptions("、 ", " または ", "、 または ", True)),
+         'Portuguese': (Choice("Sim"), Choice("Não"), ChoiceFactoryOptions(", ", " ou ", ", ou ", True)),
+         'Chinese': (Choice("是的"), Choice("不"), ChoiceFactoryOptions("， ", " 要么 ",  "， 要么 ", True))
         }    
         
     # TODO: PromptValidator

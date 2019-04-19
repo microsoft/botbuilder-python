@@ -1,5 +1,9 @@
 import asyncio
-from botbuilder.schema import ActivityTypes, TurnContext, ChannelAccount
+from botbuilder.schema import ( 
+                            ActivityTypes, 
+                            ChannelAccount 
+                            )
+from .turn_context import TurnContext
 
 
 class ActivityHandler:

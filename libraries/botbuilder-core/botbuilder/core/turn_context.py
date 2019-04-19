@@ -4,8 +4,13 @@
 import asyncio
 from copy import copy
 from uuid import uuid4
-from typing import List, Callable, Union
-from botbuilder.schema import Activity, ConversationReference, ResourceResponse
+from typing import List, Callable, Union, Dict
+from botbuilder.schema import (
+                            Activity, 
+                            ConversationReference, 
+                            ResourceResponse
+                            )
+from .assertions import BotAssert
 
 
 class TurnContext(object):
@@ -32,13 +37,13 @@ class TurnContext(object):
         if self.activity is None:
             raise TypeError('TurnContext must be instantiated with a request parameter of type Activity.')
         
-        # TODO: Make real turn-state-collection
-        self.turn_state = []
+        self._turn_state = {}
 
     
     @property
-    def turn_state(self):
-        self.turn_state
+    def turn_state(self) -> Dict[str, object]:
+        return self._turn_state
+
 
     def copy_to(self, context: 'TurnContext') -> None:
         """

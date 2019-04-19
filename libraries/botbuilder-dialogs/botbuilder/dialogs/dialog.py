@@ -15,11 +15,11 @@ class Dialog(ABC):
             raise TypeError('Dialog(): dialogId cannot be None.')
         
         self.telemetry_client = None; # TODO: Make this NullBotTelemetryClient()
-        self.__id = dialog_id;
+        self._id = dialog_id;
 
     @property
-    def id(self):
-        return self.__id;
+    def id(self) -> str:
+        return self._id;
 
     @abstractmethod
     async def begin_dialog(self, dc, options: object = None):

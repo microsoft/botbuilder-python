@@ -6,14 +6,28 @@
 # --------------------------------------------------------------------------
 
 from .about import __version__
-
+from .component_dialog import ComponentDialog
 from .dialog_context import DialogContext
-from .dialog import Dialog
+from .dialog_instance import DialogInstance
+from .dialog_reason import DialogReason
 from .dialog_set import DialogSet
 from .dialog_state import DialogState
+from .dialog_turn_result import DialogTurnResult
+from .dialog_turn_status import DialogTurnStatus
+from .dialog import Dialog
+from .waterfall_dialog import WaterfallDialog
+from .waterfall_step_context import WaterfallStepContext
 
-__all__ = ['Dialog',
-           'DialogContext',
+__all__ = [
+           'ComponentDialog',
+           'DialogContext',           
+           'DialogInstance',
+           'DialogReason',           
            'DialogSet',
            'DialogState',
+           'DialogTurnResult',           
+           'DialogTurnStatus',
+           'Dialog',
+           'WaterfallDialog',
+           'WaterfallStepContext'           
            '__version__']
