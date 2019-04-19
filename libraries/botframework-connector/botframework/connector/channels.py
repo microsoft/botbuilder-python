@@ -1,56 +1,57 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from enum import Enum
 
-class Channels(object):
+class Channels(str, Enum):
     """
     Ids of channels supported by the Bot Builder.
     """
 
-    Console = "console"
+    console = "console"
     """Console channel."""
 
-    Cortana = "cortana"
+    cortana = "cortana"
     """Cortana channel."""
 
-    Directline = "directline"
+    direct_line = "directline"
     """Direct Line channel."""
 
-    Email = "email"
+    email = "email"
     """Email channel."""
 
-    Emulator = "emulator"
+    emulator = "emulator"
     """Emulator channel."""
 
-    Facebook = "facebook"
+    facebook = "facebook"
     """Facebook channel."""
 
-    Groupme = "groupme"
+    groupme = "groupme"
     """Group Me channel."""
 
-    Kik = "kik"
+    kik = "kik"
     """Kik channel."""
 
-    Line = "line"
+    line = "line"
     """Line channel."""
 
-    Msteams = "msteams"
+    ms_teams = "msteams"
     """MS Teams channel."""
 
-    Skype = "skype"
+    skype = "skype"
     """Skype channel."""
 
-    Skypeforbusiness = "skypeforbusiness"
+    skype_for_business = "skypeforbusiness"
     """Skype for Business channel."""
 
-    Slack = "slack"
+    slack = "slack"
     """Slack channel."""
 
-    Sms = "sms"
+    sms = "sms"
     """SMS (Twilio) channel."""
 
-    Telegram = "telegram"
+    telegram = "telegram"
     """Telegram channel."""
 
-    Webchat = "webchat"
+    webchat = "webchat"
     """WebChat channel."""

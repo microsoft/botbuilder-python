@@ -7,10 +7,12 @@ from botbuilder.schema import CardAction
 
 
 class Choice(object):
-    def __init__(self, value: str = None):
-        self._value = value
-        self._action = None
-        self._synonyms = None
+    def __init__(
+        self, value: str = None, action: CardAction = None, synonyms: List[str] = None
+    ):
+        self._value: str = value
+        self._action: CardAction = action
+        self._synonyms: List[str] = synonyms
 
     @property
     def value(self) -> str:

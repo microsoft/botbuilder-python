@@ -9,5 +9,5 @@ from botframework.connector import Channels
 
 class ChannelTest(unittest.TestCase):
     def test_supports_suggested_actions(self):
-        actual = Channel.supports_suggested_actions(Channels.Facebook, 5)
+        actual = Channel.supports_suggested_actions(Channels.facebook, 5)
         self.assertTrue(actual)

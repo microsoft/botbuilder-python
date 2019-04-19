@@ -24,17 +24,17 @@ class Channel(object):
 
         max_actions = {
             # https://developers.facebook.com/docs/messenger-platform/send-messages/quick-replies
-            Channels.Facebook: 10,
-            Channels.Skype: 10,
+            Channels.facebook: 10,
+            Channels.skype: 10,
             # https://developers.line.biz/en/reference/messaging-api/#items-object
-            Channels.Line: 13,
+            Channels.line: 13,
             # https://dev.kik.com/#/docs/messaging#text-response-object
-            Channels.Kik: 20,
-            Channels.Telegram: 100,
-            Channels.Slack: 100,
-            Channels.Emulator: 100,
-            Channels.Directline: 100,
-            Channels.Webchat: 100,
+            Channels.kik: 20,
+            Channels.telegram: 100,
+            Channels.slack: 100,
+            Channels.emulator: 100,
+            Channels.direct_line: 100,
+            Channels.webchat: 100,
         }
         return button_cnt <= max_actions[channel_id] if channel_id in max_actions else False
 
@@ -51,15 +51,15 @@ class Channel(object):
         """
 
         max_actions = {
-            Channels.Facebook: 3,
-            Channels.Skype: 3,
-            Channels.Msteams: 3,
-            Channels.Line: 99,
-            Channels.Slack: 100,
-            Channels.Emulator: 100,
-            Channels.Directline: 100,
-            Channels.Webchat: 100,
-            Channels.Cortana: 100,
+            Channels.facebook: 3,
+            Channels.skype: 3,
+            Channels.ms_teams: 3,
+            Channels.line: 99,
+            Channels.slack: 100,
+            Channels.emulator: 100,
+            Channels.direct_line: 100,
+            Channels.webchat: 100,
+            Channels.cortana: 100,
         }
         return button_cnt <= max_actions[channel_id] if channel_id in max_actions else False
 
@@ -74,7 +74,7 @@ class Channel(object):
             bool: True if the Channel has a Message Feed, False if it does not.
         """
 
-        return False if channel_id == Channels.Cortana else True
+        return False if channel_id == Channels.cortana else True
 
     @staticmethod
     def max_action_title_length(channel_id: str) -> int:
@@ -100,7 +100,7 @@ class Channel(object):
             str: The Channel Id from the Turn Context's Activity.
         """
 
-        if turn_context.activity.channelId is None:
+        if turn_context.activity.channel_id is None:
             return ""
         else:
-            return turn_context.activity.channelId
+            return turn_context.activity.channel_id

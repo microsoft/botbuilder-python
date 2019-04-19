@@ -12,46 +12,46 @@ from . import Channel, Choice, ChoiceFactoryOptions
 class ChoiceFactory:
     @staticmethod
     def for_channel(
-        channelId: str,
+        channel_id: str,
         choices: List[Choice],
         text: str = None,
         speak: str = None,
         options: ChoiceFactoryOptions = None,
     ) -> Activity:
-        if channelId is None:
-            channelId = ""
+        if channel_id is None:
+            channel_id = ""
 
         if choices is None:
             choices = []
 
         # Find maximum title length
-        maxTitleLength = 0
+        max_title_length = 0
         for choice in choices:
             if choice.action is not None and choice.action.title not in (None, ""):
                 l = len(choice.action.title)
             else:
                 l = len(choice.value)
 
-            if l > maxTitleLength:
-                maxTitleLength = l
+            if l > max_title_length:
+                max_title_length = l
 
         # Determine list style
-        supportsSuggestedActions = Channel.supports_suggested_actions(
-            channelId, len(choices)
+        supports_suggested_actions = Channel.supports_suggested_actions(
+            channel_id, len(choices)
         )
-        supportsCardActions = Channel.supports_card_actions(channelId, len(choices))
-        maxActionTitleLength = Channel.max_action_title_length(channelId)
-        longTitles = maxTitleLength > maxActionTitleLength
+        supports_card_actions = Channel.supports_card_actions(channel_id, len(choices))
+        max_action_title_length = Channel.max_action_title_length(channel_id)
+        long_titles = max_title_length > max_action_title_length
 
-        if not longTitles and not supportsSuggestedActions and supportsCardActions:
+        if not long_titles and not supports_suggested_actions and supports_card_actions:
             # SuggestedActions is the preferred approach, but for channels that don't
             # support them (e.g. Teams, Cortana) we should use a HeroCard with CardActions
-            return HeroCard(choices, text, speak)
-        elif not longTitles and supportsSuggestedActions:
+            return ChoiceFactory.hero_card(choices, text, speak)
+        elif not long_titles and supports_suggested_actions:
             # We always prefer showing choices using suggested actions. If the titles are too long, however,
             # we'll have to show them as a text list.
             return ChoiceFactory.suggested_action(choices, text, speak)
-        elif not longTitles and len(choices) <= 3:
+        elif not long_titles and len(choices) <= 3:
             # If the titles are short and there are 3 or less choices we'll use an inline list.
             return ChoiceFactory.inline(choices, text, speak, options)
         else:
@@ -80,21 +80,21 @@ class ChoiceFactory:
 
         # Format list of choices
         connector = ""
-        txtBuilder: List[str] = [text]
-        txtBuilder.append(" ")
+        txt_builder: List[str] = [text]
+        txt_builder.append(" ")
         for index, choice in enumerate(choices):
             title = (
                 choice.action.title
                 if (choice.action is not None and choice.action.title is not None)
                 else choice.value
             )
-            txtBuilder.append(connector)
+            txt_builder.append(connector)
             if opt.include_numbers is True:
-                txtBuilder.append("(")
-                txtBuilder.append(f"{index + 1}")
-                txtBuilder.append(") ")
+                txt_builder.append("(")
+                txt_builder.append(f"{index + 1}")
+                txt_builder.append(") ")
 
-            txtBuilder.append(title)
+            txt_builder.append(title)
             if index == (len(choices) - 2):
                 connector = opt.inline_or if index == 0 else opt.inline_or_more
                 connector = connector or ""
@@ -103,7 +103,7 @@ class ChoiceFactory:
 
         # Return activity with choices as an inline list.
         return MessageFactory.text(
-            "".join(txtBuilder), speak, InputHints.expecting_input
+            "".join(txt_builder), speak, InputHints.expecting_input
         )
 
     @staticmethod
@@ -115,34 +115,38 @@ class ChoiceFactory:
     ):
         if choices is None:
             choices = []
-        options = options or ChoiceFactoryOptions()
+        if options is None:
+            options = ChoiceFactoryOptions()
 
-        includeNumbers = options.IncludeNumbers or True
+        if options.include_numbers is None:
+            include_numbers = True
+        else:
+            include_numbers = options.include_numbers
 
         # Format list of choices
         connector = ""
-        txtBuilder = [text]
-        txtBuilder.append("\n\n   ")
+        txt_builder = [text]
+        txt_builder.append("\n\n   ")
 
         for index, choice in enumerate(choices):
             title = (
-                choice.Action.Title
-                if choice.Action is not None and choice.Action.Title is not None
-                else choice.Value
+                choice.action.title
+                if choice.action is not None and choice.action.title is not None
+                else choice.value
             )
 
-            txtBuilder.append(connector)
-            if includeNumbers:
-                txtBuilder.append(index + 1)
-                txtBuilder.append(". ")
+            txt_builder.append(connector)
+            if include_numbers:
+                txt_builder.append(f"{index + 1}")
+                txt_builder.append(". ")
             else:
-                txtBuilder.append("- ")
+                txt_builder.append("- ")
 
-            txtBuilder.append(title)
+            txt_builder.append(title)
             connector = "\n   "
 
         # Return activity with choices as a numbered list.
-        txt = "".join(txtBuilder)
+        txt = "".join(txt_builder)
         return MessageFactory.text(txt, speak, InputHints.expecting_input)
 
     @staticmethod
@@ -161,15 +165,13 @@ class ChoiceFactory:
     def hero_card(
         choices: List[Choice], text: str = None, speak: str = None
     ) -> Activity:
-        attachments = [
-            CardFactory.hero_card(
-                HeroCard(text=text, buttons=ChoiceFactory._extract_actions(choices))
-            )
-        ]
+        attachment = CardFactory.hero_card(
+            HeroCard(text=text, buttons=ChoiceFactory._extract_actions(choices))
+        )
 
         # Return activity with choices as HeroCard with buttons
         return MessageFactory.attachment(
-            attachments, None, speak, InputHints.expecting_input
+            attachment, None, speak, InputHints.expecting_input
         )
 
     @staticmethod
@@ -185,11 +187,11 @@ class ChoiceFactory:
             choices = []
         card_actions: List[CardAction] = []
         for choice in choices:
-            if choice.Action is not None:
-                card_action = choice.Action
+            if choice.action is not None:
+                card_action = choice.action
             else:
                 card_action = CardAction(
-                    type=ActionTypes.im_back, value=choice.Value, title=choice.Value
+                    type=ActionTypes.im_back, value=choice.value, title=choice.value
                 )
 
             card_actions.append(card_action)
