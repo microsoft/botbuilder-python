@@ -26,7 +26,7 @@ class PromptValidatorContext():
             Original set of options passed to the prompt by the calling dialog.
             
         """
-        self._context = turn_context;
+        self._context = turn_context
         self._recognized = recognized
         self._state = state
         self._options = options

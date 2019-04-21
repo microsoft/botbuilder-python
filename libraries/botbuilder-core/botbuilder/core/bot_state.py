@@ -22,10 +22,10 @@ class CachedBotState:
 
     @property
     def state(self) -> Dict[str, object]:
-        return self._state;
+        return self._state
     @state.setter
     def state(self, state: Dict[str, object]):
-        self._state = State
+        self._state = self._state
         
     @property
     def hash(self) -> str:
@@ -37,7 +37,7 @@ class CachedBotState:
 
     @property
     def is_changed(self) -> bool:
-        return hash != compute_hash(state)
+        return hash != self.compute_hash(self._state)
 
     def compute_hash(self, obj: object) -> str:
         # TODO: Should this be compatible with C# JsonConvert.SerializeObject ?
@@ -59,7 +59,7 @@ class BotState(PropertyManager):
         """
         if not name:
             raise TypeError('BotState.create_property(): BotState cannot be None.')
-        return BotStatePropertyAccessor(self, name);
+        return BotStatePropertyAccessor(self, name)
 
 
     async def load(self, turn_context: TurnContext, force: bool = False) -> None:
@@ -90,9 +90,9 @@ class BotState(PropertyManager):
         
         if force or (cached_state != None and cached_state.is_changed == True):
             storage_key = self.get_storage_key(turn_context)
-            changes : Dict[str, object] = { key: cached_state.state }
+            changes : Dict[str, object] = { storage_key: cached_state.state }
             await self._storage.write(changes)
-            cached_state.hash = cached_state.compute_hash()
+            cached_state.hash = cached_state.compute_hash(cached_state.state)
             
     async def clear_state(self, turn_context: TurnContext):
         """
@@ -108,7 +108,7 @@ class BotState(PropertyManager):
         #  Explicitly setting the hash will mean IsChanged is always true. And that will force a Save.
         cache_value = CachedBotState()
         cache_value.hash = ''
-        turn_context.turn_state[self._context_service_key] = cache_value;
+        turn_context.turn_state[self._context_service_key] = cache_value
 
     async def delete(self, turn_context: TurnContext) -> None:
         """
@@ -122,7 +122,7 @@ class BotState(PropertyManager):
         
         turn_context.turn_state.pop(self._context_service_key)
             
-        storage_key = get_storage_key(turn_context)
+        storage_key = self.get_storage_key(turn_context)
         await self._storage.delete({ storage_key })
         
     @abstractmethod
@@ -140,7 +140,7 @@ class BotState(PropertyManager):
         # This allows this to work with value types
         return cached_state.state[property_name]
 
-    async def delete_property(self, turn_context: TurnContext, property_name: str) -> None:
+    async def delete_property_value(self, turn_context: TurnContext, property_name: str) -> None:
         """
         Deletes a property from the state cache in the turn context.
         
@@ -172,88 +172,6 @@ class BotState(PropertyManager):
         cached_state = turn_context.turn_state.get(self._context_service_key)
         cached_state.state[property_name] = value
         
-        
-    
-    async def read(self, context: TurnContext, force: bool=False):
-        """
-        Reads in and caches the current state object for a turn.
-        :param context:
-        :param force:
-        :return:
-        """
-        cached = context.services.get(self.state_key)
-
-        if force or cached is None or ('state' in cached and cached['state'] is None):
-            key = self._context_storage_key(context)
-            items = await self.storage.read([key])
-            state = items.get(key, StoreItem())
-            hash_state = calculate_change_hash(state)
-
-            context.services[self.state_key] = {'state': state, 'hash': hash_state}
-            return state
-
-        return cached['state']
-
-    async def write(self, context: TurnContext, force: bool=False):
-        """
-        Saves the cached state object if it's been changed.
-        :param context:
-        :param force:
-        :return:
-        """
-        cached = context.services.get(self.state_key)
-
-        if force or (cached is not None and cached.get('hash', None) != calculate_change_hash(cached['state'])):
-            key = self._context_storage_key(context)
-
-            if cached is None:
-                cached = {'state': StoreItem(e_tag='*'), 'hash': ''}
-            changes = {key: cached['state']}
-            await self.storage.write(changes)
-
-            cached['hash'] = calculate_change_hash(cached['state'])
-            context.services[self.state_key] = cached
-
-
-    async def get(self, context: TurnContext, default_value_factory: Callable):
-        """
-        Get the property value. 
-        The semantics are intended to be lazy, note the use of load at the start.
-        
-        :param context: The context object for this turn.
-        :param default_value_factory: Defines the default value. Invoked when no value
-         been set for the requested state property.  If defaultValueFactory is 
-         defined as None, a TypeError exception will be thrown if the underlying 
-         property is not set.
-        :return:
-        """
-        await _bot_state.load(turn_context, False)
-        try:
-            return await _bot_state.get_property_value(turn_context, name)
-        except:
-            if default_value_factory == None:
-                raise TypeError('BotState.get(): default_value_factory None and cannot set property.')
-            result = default_value_factory();
-            
-            # save default value for any further calls
-            await set(turn_context, result)
-            return result
-        
-    async def set(self, turn_context: TurnContext, value: object) -> None:
-        """
-        Set the property value. 
-        The semantics are intended to be lazy, note the use of load at the start. 
-        
-        :param context: The context object for this turn.
-        :param value: The value to set. 
-        :return: None
-        """
-        await self._bot_state.load(turn_context, False)
-        await self._bot_state.set_property_value(turn_context, name)
-
-        
-
-
 class BotStatePropertyAccessor(StatePropertyAccessor):
     def __init__(self, bot_state: BotState, name: str):
         self._bot_state = bot_state
@@ -261,16 +179,17 @@ class BotStatePropertyAccessor(StatePropertyAccessor):
         
     @property
     def name(self) -> str:
-        return self._name;
+        return self._name
     
     async def delete(self, turn_context: TurnContext) -> None:
         await self._bot_state.load(turn_context, False)
-        await self._bot_state.delete_property_value(turn_context, name)
+        await self._bot_state.delete_property_value(turn_context, self._name)
         
     async def get(self, turn_context: TurnContext, default_value_factory) -> object:
         await self._bot_state.load(turn_context, False)
         try:
-            return await _bot_state.get_property_value(turn_context, name)
+            result = await _bot_state.get_property_value(turn_context, name)
+            return result
         except:
             # ask for default value from factory
             if not default_value_factory:

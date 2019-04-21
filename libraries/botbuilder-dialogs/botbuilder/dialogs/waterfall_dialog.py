@@ -3,7 +3,10 @@
 
 
 import uuid
-from typing import Dict
+from typing import ( 
+                    Dict, 
+                    Coroutine, 
+                    List)
 from .dialog_reason import DialogReason
 from .dialog import Dialog
 from .dialog_turn_result import DialogTurnResult
@@ -11,6 +14,7 @@ from .dialog_context import DialogContext
 from .dialog_instance import DialogInstance
 from .waterfall_step_context import WaterfallStepContext
 from botbuilder.core import TurnContext
+from botbuilder.schema import ActivityTypes
 from typing import Coroutine, List
 
 
@@ -25,6 +29,8 @@ class WaterfallDialog(Dialog):
         if not steps:
             self._steps = []
         else:
+            if not isinstance(steps, list):
+                raise TypeError('WaterfallDialog(): steps must be list of steps')
             self._steps = steps
 
     # TODO: Add WaterfallStep class
@@ -73,7 +79,7 @@ class WaterfallDialog(Dialog):
         return await self.resume_dialog(dc, DialogReason.ContinueCalled, dc.context.activity.text)
     
     async def resume_dialog(self, dc: DialogContext, reason: DialogReason, result: object):
-        if not dc:
+        if dc is None:
             raise TypeError('WaterfallDialog.resume_dialog(): dc cannot be None.')
         
         # Increment step index and run step
@@ -82,7 +88,7 @@ class WaterfallDialog(Dialog):
         # Future Me: 
         # If issues with CosmosDB, see https://github.com/Microsoft/botbuilder-dotnet/issues/871
         # for hints.
-        return self.run_step(dc, state[StepIndex] + 1, reason, result)
+        return self.run_step(dc, state[self.StepIndex] + 1, reason, result)
     
     async def end_dialog(self, turn_context: TurnContext, instance: DialogInstance, reason: DialogReason):
         # TODO: Add telemetry logging

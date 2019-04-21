@@ -1,25 +1,20 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import aiounittest
+from botbuilder.dialogs import ( DialogSet, ComponentDialog) 
+from botbuilder.core import ConversationState, MemoryStorage
 
-import unittest
-from botbuilder.core import BotAdapter
-from botbuilder.dialogs import DialogSet
-from botbuilder.core import MemoryStorage, ConversationState
-from botbuilder.core.state_property_accessor import StatePropertyAccessor
+class DialogSetTests(aiounittest.AsyncTestCase):
+    def test_dialogset_constructor_valid(self):
+        convo_state = ConversationState(MemoryStorage())
+        dialog_state_property = convo_state.create_property("dialogstate")
+        ds = DialogSet(dialog_state_property)
+        assert ds is not None
 
-
-class DialogSetTests(unittest.TestCase):
-    def test_DialogSet_ConstructorValid(self):
-        storage = MemoryStorage();
-        conv = ConversationState(storage)
-        accessor = conv.create_property("dialogstate")
-        ds = DialogSet(accessor);
-        self.assertNotEqual(ds, None)
-    
-    def test_DialogSet_ConstructorNoneProperty(self):
+    def test_dialogset_constructor_null_property(self):
         self.assertRaises(TypeError, lambda:DialogSet(None))
 
-        
-        
+    def test_dialogset_constructor_null_from_componentdialog(self):
+        ComponentDialog("MyId")
 

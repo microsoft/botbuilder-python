@@ -36,24 +36,29 @@ class MemoryStorage(Storage):
             # iterate over the changes
             for (key, change) in changes.items():
                 new_value = change
-                old_value = None
+                old_state = None
+                old_state_etag = ""
 
                 # Check if the a matching key already exists in self.memory
                 # If it exists then we want to cache its original value from memory
                 if key in self.memory:
-                    old_value = self.memory[key]
-
-                write_changes = self.__should_write_changes(old_value, new_value)
-
-                if write_changes:
+                    old_state = self.memory[key]
+                    if "eTag" in old_state:
+                        old_state_etag = old_state["eTag"]
+                
+                new_state = new_value
+                
+                # Set ETag if applicable
+                if isinstance(new_value, StoreItem):
                     new_store_item = new_value
-                    if new_store_item is not None:
-                        self._e_tag += 1
-                        new_store_item.e_tag = str(self._e_tag)
-                    self.memory[key] = new_store_item
-                else:
-                    raise KeyError("MemoryStorage.write(): `e_tag` conflict or changes do not implement ABC"
-                                   " `StoreItem`.")
+                    if not old_state_etag is StoreItem:
+                        if not new_store_item is "*" and new_store_item.e_tag != old_state_etag:
+                            raise Exception("Etag conflict.\nOriginal: %s\r\nCurrent: {%s}" % \
+                                            (new_store_item.e_tag, old_state_etag) )
+                    new_state.e_tag = str(self._e_tag)
+                    self._e_tag += 1
+                self.memory[key] = new_state
+                
         except Exception as e:
             raise e
 

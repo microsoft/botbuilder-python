@@ -26,7 +26,7 @@ class WaterfallStepContext(DialogContext):
         return self._index
     @property
     def options(self) -> object:
-        return self._options;
+        return self._options
     @property
     def reason(self)->DialogReason:
         return self._reason

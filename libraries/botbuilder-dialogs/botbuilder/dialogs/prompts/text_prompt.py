@@ -6,6 +6,7 @@ from botbuilder.core.turn_context import TurnContext
 from botbuilder.schema import (ActivityTypes, Activity)
 from .datetime_resolution import DateTimeResolution
 from .prompt import Prompt
+from .confirm_prompt import ConfirmPrompt
 from .prompt_options import PromptOptions
 from .prompt_recognizer_result import PromptRecognizerResult
 
@@ -13,7 +14,7 @@ from .prompt_recognizer_result import PromptRecognizerResult
 class TextPrompt(Prompt):
     # TODO: PromptValidator
     def __init__(self, dialog_id: str, validator: object):
-        super(ConfirmPrompt, self).__init__(dialog_id, validator)
+        super(TextPrompt, self).__init__(dialog_id, validator)
 
     async def on_prompt(self, turn_context: TurnContext, state: Dict[str, object], options: PromptOptions, is_retry: bool):
         if not turn_context:
@@ -38,4 +39,4 @@ class TextPrompt(Prompt):
             if message.text != None:
                 result.succeeded = True
                 result.value = message.text
-        return result;
+        return result

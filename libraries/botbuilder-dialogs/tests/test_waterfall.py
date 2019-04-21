@@ -13,6 +13,7 @@ from botbuilder.core import (
                             TurnContext
                             )
 from botbuilder.dialogs import (
+                                Dialog,
                                 DialogSet,
                                 WaterfallDialog,
                                 WaterfallStepContext,
@@ -52,47 +53,49 @@ class WaterfallTests(aiounittest.AsyncTestCase):
     def test_watterfall_add_none_step(self):
         waterfall = WaterfallDialog("test")
         self.assertRaises(TypeError, (lambda:waterfall.add_step(None)))
-        
-    async def notest_execute_sequence_waterfall_steps(self):
-        
+    async def test_waterfall_with_set_instead_of_array(self):
+        self.assertRaises(TypeError, lambda:WaterfallDialog('a', { 1, 2 }))
 
+
+    # TODO:WORK IN PROGRESS        
+    async def no_test_execute_sequence_waterfall_steps(self):
         # Create new ConversationState with MemoryStorage and register the state as middleware.
         convo_state = ConversationState(MemoryStorage())
         
         # Create a DialogState property, DialogSet and register the WaterfallDialog.
-        dialog_state = convo_state.create_property('dialogState');
-        dialogs = DialogSet(dialog_state);
+        dialog_state = convo_state.create_property('dialogState')
+        dialogs = DialogSet(dialog_state)
         async def step1(step) -> DialogTurnResult:
             assert(step, 'hey!')
-            await step.context.sendActivity('bot responding.')
+            await step.context.send_activity('bot responding.')
             return Dialog.end_of_turn
         
         async def step2(step) -> DialogTurnResult:
             assert(step)
             return await step.end_dialog('ending WaterfallDialog.')
 
-        mydialog = WaterfallDialog('a', { step1, step2 })
+        mydialog = WaterfallDialog('test', [ step1, step2 ])
         await dialogs.add(mydialog)
         
         # Initialize TestAdapter
         async def exec_test(turn_context: TurnContext) -> None:
+
             dc = await dialogs.create_context(turn_context)
             results = await dc.continue_dialog(dc, None, None)
             if results.status == DialogTurnStatus.Empty:
-                await dc.begin_dialog('a')
+                await dc.begin_dialog('test')
             else:
-                if result.status == DialogTurnStatus.Complete:
+                if results.status == DialogTurnStatus.Complete:
                     await turn_context.send_activity(results.result)
             await convo_state.save_changes(turn_context)
             
         adapt = TestAdapter(exec_test)
 
-        await adapt.send(begin_message)
-        await adapt.assert_reply('bot responding')
-        await adapt.send('continue')
-        await adapt.assert_reply('ending WaterfallDialog.')
-        
-       
+        tf = TestFlow(None, adapt)
+        tf2 = await tf.send(begin_message)
+        tf3 = await tf2.assert_reply('bot responding.')
+        tf4 = await tf3.send('continue')
+        tf5 = await tf4.assert_reply('ending WaterfallDialog.')
         
     async def test_waterfall_callback(self):
         convo_state = ConversationState(MemoryStorage())

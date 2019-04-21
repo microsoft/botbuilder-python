@@ -1,8 +1,10 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import copy
 from typing import Dict
 from .prompt_options import PromptOptions
+from .prompt_validator_context import PromptValidatorContext
 from ..dialog_reason import DialogReason
 from ..dialog import Dialog
 from ..dialog_instance import DialogInstance
@@ -17,8 +19,8 @@ from botbuilder.schema import Activity
 """ Base class for all prompts.
 """
 class Prompt(Dialog):
-    persisted_options = "options";
-    persisted_state = "state";    
+    persisted_options = "options"
+    persisted_state = "state"
     def __init__(self, dialog_id: str, validator: object = None):
         """Creates a new Prompt instance.
         Parameters
@@ -32,7 +34,7 @@ class Prompt(Dialog):
         """
         super(Prompt, self).__init__(str)
         
-        self._validator = validator;
+        self._validator = validator
 
     async def begin_dialog(self, dc: DialogContext, options: object) -> DialogTurnResult:
         if not dc:
@@ -44,15 +46,15 @@ class Prompt(Dialog):
             options.prompt.input_hint = InputHints.expecting_input
 
         if options.RetryPrompt != None and not options.prompt.input_hint:
-            options.retry_prompt.input_hint = InputHints.expecting_input;
+            options.retry_prompt.input_hint = InputHints.expecting_input
        
         # Initialize prompt state
-        state = dc.active_dialog.state;
-        state[persisted_options] = options;
-        state[persisted_state] = Dict[str, object]
+        state = dc.active_dialog.state
+        state[self.persisted_options] = options
+        state[self.persisted_state] = Dict[str, object]
 
         # Send initial prompt
-        await on_prompt(dc.context, state[persisted_state], state[persisted_options], False)
+        await self.on_prompt(dc.context, state[self.persisted_state], state[self.persisted_options], False)
         
         return Dialog.end_of_turn
 
@@ -62,19 +64,19 @@ class Prompt(Dialog):
         
         # Don't do anything for non-message activities
         if dc.context.activity.type != ActivityTypes.message:
-            return Dialog.end_of_turn;
+            return Dialog.end_of_turn
 
         # Perform base recognition
         instance = dc.active_dialog
-        state = instance.state[persisted_state]
-        options = instance.State[persisted_options]
-        recognized = await on_recognize(dc.context, state, options)
+        state = instance.state[self.persisted_state]
+        options = instance.State[self.persisted_options]
+        recognized = await self.on_recognize(dc.context, state, options)
 
         # Validate the return value
-        is_valid = False;
-        if _validator != None:
+        is_valid = False
+        if self._validator != None:
             prompt_context = PromptValidatorContext(dc.Context, recognized, state, options)
-            is_valid = await _validator(promptContext)
+            is_valid = await self._validator(prompt_context)
             options.number_of_attempts += 1
         else:
             if recognized.succeeded:
@@ -84,8 +86,8 @@ class Prompt(Dialog):
             return await dc.end_dialog(recognized.value)
         else:
             if not dc.context.responded:
-                await on_prompt(dc.context, state, options, true)
-            return Dialog.end_of_turn;
+                await on_prompt(dc.context, state, options, True)
+            return Dialog.end_of_turn
        
     async def resume_dialog(self, dc: DialogContext, reason: DialogReason, result: object) -> DialogTurnResult:
         # Prompts are typically leaf nodes on the stack but the dev is free to push other dialogs
@@ -93,13 +95,13 @@ class Prompt(Dialog):
         # dialog_resume() when the pushed on dialog ends.
         # To avoid the prompt prematurely ending we need to implement this method and
         # simply re-prompt the user.
-        await reprompt_dialog(dc.context, dc.active_dialog)
+        await self.reprompt_dialog(dc.context, dc.active_dialog)
         return Dialog.end_of_turn        
     
     async def reprompt_dialog(self, turn_context: TurnContext, instance: DialogInstance):
-        state = instance.state[persisted_state]
-        options = instance.state[persisted_options]
-        await on_prompt(turn_context, state, options, False)
+        state = instance.state[self.persisted_state]
+        options = instance.state[self.persisted_options]
+        await self.on_prompt(turn_context, state, options, False)
     
     @abstractmethod
     async def on_prompt(self, turn_context: TurnContext, state: Dict[str, object], options: PromptOptions, is_retry: bool):
@@ -132,8 +134,8 @@ class Prompt(Dialog):
             return None
         def list_style_none() -> Activity:
             activity = Activity()
-            activity.text = text;
-            return activity;
+            activity.text = text
+            return activity
         def default() -> Activity:
             # return ChoiceFactory.for_channel(channel_id, choices, text, None, options);
             return None
@@ -151,19 +153,19 @@ class Prompt(Dialog):
         # Update prompt with text, actions and attachments
         if not prompt:
             # clone the prompt the set in the options (note ActivityEx has Properties so this is the safest mechanism)
-            prompt = copy(prompt);
+            prompt = copy.copy(prompt)
 
-            prompt.text = msg.text;
+            prompt.text = msg.text
 
             if (msg.suggested_actions != None and msg.suggested_actions.actions != None
                 and len(msg.suggested_actions.actions) > 0):
                 prompt.suggested_actions = msg.suggested_actions
 
             if msg.attachments != None and len(msg.attachments) > 0:
-                prompt.attachments = msg.attachments;
+                prompt.attachments = msg.attachments
 
-            return prompt;
+            return prompt
         else:
             # TODO: Update to InputHints.ExpectingInput;
             msg.input_hint = None
-            return msg;
+            return msg

@@ -1,6 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
-
+import inspect
 from .dialog import Dialog
 from .dialog_state import DialogState
 from .dialog_turn_result import DialogTurnResult
@@ -16,9 +16,22 @@ from typing import Dict
 
 class DialogSet():
 
-    def __init__(self, dialog_state: StatePropertyAccessor):
+    def __init__(self, dialog_state: StatePropertyAccessor = None):
         if dialog_state is None:
-            raise TypeError('DialogSet(): dialog_state cannot be None.')
+            frame = inspect.currentframe().f_back
+            try:
+                # try to access the caller's "self"
+                try:
+                    self_obj = frame.f_locals['self']
+                except KeyError:
+                    raise TypeError('DialogSet(): dialog_state cannot be None.')
+                # Only ComponentDialog can initialize with None dialog_state
+                if not type(self_obj).__name__ is "ComponentDialog":
+                    raise TypeError('DialogSet(): dialog_state cannot be None.')
+            finally:
+                # make sure to clean up the frame at the end to avoid ref cycles
+                del frame
+                
         self._dialog_state = dialog_state
         # self.__telemetry_client = NullBotTelemetryClient.Instance;
 
@@ -59,10 +72,14 @@ class DialogSet():
         :return: The dialog if found, otherwise null.
         """
         if (not dialog_id):
-            raise TypeError('DialogContext.find(): dialog_id cannot be None.');
+            raise TypeError('DialogContext.find(): dialog_id cannot be None.')
 
         if dialog_id in self._dialogs:
             return self._dialogs[dialog_id]
 
         return None
 
+    def __str__(self):
+        if len(self._dialogs) <= 0:
+            return "dialog set empty!"
+        return ' '.join(map(str, self._dialogs.keys()))

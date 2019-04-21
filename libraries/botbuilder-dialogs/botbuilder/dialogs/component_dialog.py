@@ -12,6 +12,7 @@ from .dialog_turn_result import DialogTurnResult
 from .dialog_state import DialogState
 from .dialog_turn_status import DialogTurnStatus
 from .dialog_reason import DialogReason
+from .dialog_set import DialogSet
 from .dialog_instance import DialogInstance
 
 
@@ -27,6 +28,7 @@ class ComponentDialog(Dialog):
         self._dialogs = DialogSet()
 
     # TODO: Add TelemetryClient
+
     
     @property
     def initial_dialog_id(self) -> str:
@@ -52,30 +54,30 @@ class ComponentDialog(Dialog):
         
         # Start the inner dialog.
         dialog_state = DialogState()
-        outer_dc.active_dialog.state[persisted_dialog_state] = dialog_state
-        inner_dc = DialogContext(_dialogs, outer_dc.context, dialog_state)
+        outer_dc.active_dialog.state[self.persisted_dialog_state] = dialog_state
+        inner_dc = DialogContext(self._dialogs, outer_dc.context, dialog_state)
         inner_dc.parent = outer_dc
-        turn_result = await on_begin_dialog(inner_dc, options)
+        turn_result = await self.on_begin_dialog(inner_dc, options)
 
         # Check for end of inner dialog
-        if turnResult.Status != DialogTurnStatus.Waiting:
+        if turn_result.status != DialogTurnStatus.Waiting:
             # Return result to calling dialog
-            return await EndComponentAsync(outerDc, turnResult.Result, cancellationToken).ConfigureAwait(false);
+            return await self.end_component(outer_dc, turn_result.result)
         else:
             # Just signal waiting
-            return Dialog.EndOfTurn;
+            return Dialog.end_of_turn
         
     async def continue_dialog(self, outer_dc: DialogContext) -> DialogTurnResult:
         if outer_dc is None:
             raise TypeError('ComponentDialog.begin_dialog(): outer_dc cannot be None.')
         # Continue execution of inner dialog.
-        dialog_state = outer_dc.active_dialog.state[persisted_dialog_state]
-        inner_dc = DialogContext(_dialogs, outer_dc.context, dialog_state)
+        dialog_state = outer_dc.active_dialog.state[self.persisted_dialog_state]
+        inner_dc = DialogContext(self._dialogs, outer_dc.context, dialog_state)
         inner_dc.parent = outer_dc
-        turn_result = await on_continue_dialog(inner_dc)
+        turn_result = await self.on_continue_dialog(inner_dc)
         
         if turn_result.status != DialogTurnStatus.Waiting:
-            return await end_component(outer_dc, turn_result.result)
+            return await self.end_component(outer_dc, turn_result.result)
         else:
             return Dialog.end_of_turn
        
@@ -85,26 +87,26 @@ class ComponentDialog(Dialog):
         # resume_dialog() when the pushed on dialog ends.
         # To avoid the container prematurely ending we need to implement this method and simply
         # ask our inner dialog stack to re-prompt.
-        await reprompt_dialog(outer_dc.context, outer_dc.active_dialog)
+        await self.reprompt_dialog(outer_dc.context, outer_dc.active_dialog)
         return Dialog.end_of_turn
         
     async def reprompt_dialog(self, turn_context: TurnContext, instance: DialogInstance) -> None:
         # Delegate to inner dialog.
-        dialog_state = instance.state[persisted_dialog_state]
-        inner_dc = DialogContext(_dialogs, turn_context, dialogState)
+        dialog_state = instance.state[self.persisted_dialog_state]
+        inner_dc = DialogContext(self._dialogs, turn_context, dialog_state)
         await inner_dc.reprompt_dialog()
 
         # Notify component
-        await on_reprompt_dialog(turn_context, instance)
+        await self.on_reprompt_dialog(turn_context, instance)
 
 
     async def end_dialog(self, turn_context: TurnContext, instance: DialogInstance, reason: DialogReason) -> None:
         # Forward cancel to inner dialogs
         if reason == DialogReason.CancelCalled:
-            dialog_state = instance.State[persisted_dialog_state]
-            inner_dc = DialogContext(_dialogs, turn_context, dialog_state)
+            dialog_state = instance.State[self.persisted_dialog_state]
+            inner_dc = DialogContext(self._dialogs, turn_context, dialog_state)
             await inner_dc.cancel_all_dialogs()
-        await on_end_dialog(turn_context, instance, reason)
+        await self.on_end_dialog(turn_context, instance, reason)
 
     def add_dialog(self, dialog: Dialog) -> object:
         """
@@ -113,23 +115,23 @@ class ComponentDialog(Dialog):
         :param dialog: The dialog to add.
         :return: The updated ComponentDialog
         """
-        self._dialogs.Add(dialog);
-        if not tnitial_dialog_id:
-            initial_dialog_id = dialog.id
+        self._dialogs.add(dialog)
+        if not self.initial_dialog_id:
+            self.initial_dialog_id = dialog.id
         return self
 
-    def find_dialog(dialog_id: str ) -> Dialog:
+    def find_dialog(self, dialog_id: str ) -> Dialog:
         """
         Finds a dialog by ID.
         Adding a new dialog will inherit the BotTelemetryClient of the ComponentDialog.
         :param dialog_id: The dialog to add.
         :return: The dialog; or None if there is not a match for the ID.
         """
-        return _dialogs.Find(dialogId);
+        return self._dialogs.find(dialog_id)
 
 
     async def on_begin_dialog(self, inner_dc: DialogContext, options: object) -> DialogTurnResult:
-        return inner_dc.begin_dialog(initial_dialog_id, options)
+        return inner_dc.begin_dialog(self.initial_dialog_id, options)
 
     async def on_continue_dialog(self, inner_dc: DialogContext) -> DialogTurnResult:
         return inner_dc.continue_dialog()

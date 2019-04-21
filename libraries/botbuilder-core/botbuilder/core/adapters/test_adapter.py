@@ -199,7 +199,9 @@ class TestFlow(object):
         :param timeout:
         :return:
         """
+        
         def default_inspector(reply, description=None):
+
             if isinstance(expected, Activity):
                 validate_activity(reply, expected)
             else:
@@ -250,6 +252,7 @@ def validate_activity(activity, expected) -> None:
     :return:
     """
     iterable_expected = vars(expected).items()
+
     for attr, value in iterable_expected:
         if value is not None and attr != 'additional_properties':
             assert value == getattr(activity, attr)

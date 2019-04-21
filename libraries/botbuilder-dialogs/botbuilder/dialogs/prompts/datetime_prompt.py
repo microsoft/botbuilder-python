@@ -12,7 +12,7 @@ from .prompt_recognizer_result import PromptRecognizerResult
 class DateTimePrompt(Prompt):
     def __init__(self, dialog_id: str, validator: object = None, default_locale: str = None):
         super(DateTimePrompt, self).__init__(dialog_id, validator)
-        self._default_locale = default_locale;
+        self._default_locale = default_locale
         
     @property
     def default_locale(self) -> str:
@@ -48,16 +48,18 @@ class DateTimePrompt(Prompt):
         if turn_context.activity.type == ActivityTypes.message:
             # Recognize utterance
             message = turn_context.activity
-            culture = determine_culture(turn_context.activity)
+            # TODO: English contsant needs to be ported.
+            culture = message.locale if message.locale != None else "English"
+            # TOOD: Port Choice Recognizer
             results = ChoiceRecognizer.recognize_boolean(message.text, culture)
             if results.Count > 0:
-                result.succeeded = True;
+                result.succeeded = True
                 result.value = []
                 values = results[0]
                 for value in values:
-                    result.value.append(read_resolution(value))
+                    result.value.append(self.read_resolution(value))
         
-        return result;
+        return result
         
     def read_resolution(self, resolution: Dict[str, str]) -> DateTimeResolution:
         result = DateTimeResolution()

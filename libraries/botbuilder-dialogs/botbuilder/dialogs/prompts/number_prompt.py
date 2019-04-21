@@ -14,7 +14,7 @@ class NumberPrompt(Prompt):
     # TODO: PromptValidator
     def __init__(self, dialog_id: str, validator: object, default_locale: str):
         super(ConfirmPrompt, self).__init__(dialog_id, validator)
-        self._default_locale = default_locale;
+        self._default_locale = default_locale
         
     @property
     def default_locale(self) -> str:
@@ -54,9 +54,10 @@ class NumberPrompt(Prompt):
             
             # TODO: Fix constant English with correct constant from text recognizer
             culture = turn_context.activity.locale if turn_context.activity.locale != None else 'English'
+            # TODO: Port ChoiceRecognizer
             results = ChoiceRecognizer.recognize_number(message.text, culture)
             if results.Count > 0:
-                result.succeeded = True;
+                result.succeeded = True
                 result.value = results[0].resolution["value"]
         
-        return result;
+        return result

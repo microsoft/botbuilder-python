@@ -19,7 +19,7 @@ from .text_prompt import TextPrompt
 __all__ = ["ConfirmPrompt",
            "DateTimePrompt",
            "DateTimeResolution",
-           "NumbersPrompt",
+           "NumberPrompt",
            "PromptOptions",
            "PromptRecognizerResult",
            "PromptValidatorContext",

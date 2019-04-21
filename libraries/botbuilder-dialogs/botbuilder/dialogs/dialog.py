@@ -8,18 +8,18 @@ from .dialog_turn_status import DialogTurnStatus
 from .dialog_turn_result import DialogTurnResult
 
 class Dialog(ABC):
-    end_of_turn = DialogTurnResult(DialogTurnStatus.Waiting);
+    end_of_turn = DialogTurnResult(DialogTurnStatus.Waiting)
     
     def __init__(self, dialog_id: str):
         if dialog_id == None or not dialog_id.strip():
             raise TypeError('Dialog(): dialogId cannot be None.')
         
         self.telemetry_client = None; # TODO: Make this NullBotTelemetryClient()
-        self._id = dialog_id;
+        self._id = dialog_id
 
     @property
     def id(self) -> str:
-        return self._id;
+        return self._id
 
     @abstractmethod
     async def begin_dialog(self, dc, options: object = None):
@@ -40,7 +40,7 @@ class Dialog(ABC):
         :return:
         """
         # By default just end the current dialog.
-        return await dc.EndDialog(None);
+        return await dc.EndDialog(None)
 
     async def resume_dialog(self, dc, reason: DialogReason, result: object):
         """
@@ -55,7 +55,7 @@ class Dialog(ABC):
         :return:
         """
         # By default just end the current dialog.
-        return await dc.EndDialog(result);
+        return await dc.EndDialog(result)
 
     # TODO: instance is DialogInstance
     async def reprompt_dialog(self, context: TurnContext, instance):
@@ -64,7 +64,7 @@ class Dialog(ABC):
         :return:
         """
         # No-op by default
-        return;
+        return
     # TODO: instance is DialogInstance
     async def end_dialog(self, context: TurnContext, instance):
         """
@@ -72,4 +72,4 @@ class Dialog(ABC):
         :return:
         """
         # No-op by default
-        return;
+        return
