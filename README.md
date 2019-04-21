@@ -3,6 +3,7 @@
 
 [![Build Status](https://travis-ci.org/Microsoft/botbuilder-python.svg?branch=master)](https://travis-ci.org/Microsoft/botbuilder-python)
 [![Build status](https://fuselabs.visualstudio.com/SDK_v4/_apis/build/status/SDK_v4-Python-package-CI)](https://fuselabs.visualstudio.com/SDK_v4/_build/latest?definitionId=431)
+[![codecov](https://codecov.io/gh/PSNAppz/botbuilder-python/branch/master/graph/badge.svg)](https://codecov.io/gh/PSNAppz/botbuilder-python)
 [![roadmap badge](https://img.shields.io/badge/visit%20the-roadmap-blue.svg)](https://github.com/Microsoft/botbuilder-python/wiki/Roadmap)
 
 This repository contains code for the Python version of the [Microsoft Bot Builder SDK](https://github.com/Microsoft/botbuilder). The Bot Builder SDK v4 is the latest SDK for building bot applications. This Python version is in **Preview** state and is being actively developed. 
