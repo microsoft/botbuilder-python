@@ -9,5 +9,9 @@ install:
   - pip install -e ./libraries/botbuilder-core
   - pip install -e ./libraries/botbuilder-azure
   - pip install -r ./libraries/botframework-connector/tests/requirements.txt
+  - pip install codecov
 
 script: pytest
+
+after_success:
+  - codecov
