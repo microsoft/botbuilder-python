@@ -86,7 +86,7 @@ class Prompt(Dialog):
             return await dc.end_dialog(recognized.value)
         else:
             if not dc.context.responded:
-                await on_prompt(dc.context, state, options, True)
+                await self.on_prompt(dc.context, state, options, True)
             return Dialog.end_of_turn
        
     async def resume_dialog(self, dc: DialogContext, reason: DialogReason, result: object) -> DialogTurnResult:

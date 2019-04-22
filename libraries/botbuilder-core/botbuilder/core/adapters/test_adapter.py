@@ -7,7 +7,7 @@ from datetime import datetime
 from typing import Coroutine, List
 from copy import copy
 from ..bot_adapter import BotAdapter
-from ..turn_contect import TurnContext 
+from ..turn_context import TurnContext 
 from botbuilder.schema import (ActivityTypes, Activity, ConversationAccount,
                                ConversationReference, ChannelAccount, ResourceResponse)
 
@@ -33,10 +33,10 @@ class TestAdapter(BotAdapter):
             recipient=ChannelAccount(id='bot', name='Bot'),
             conversation=ConversationAccount(id='Convo1')
         )
-        if template is not None:
-            self.template.service_url = template.service_url
-            self.template.conversation = template.conversation
-            self.template.channel_id = template.channel_id
+        if self.template is not None:
+            self.template.service_url = self.template.service_url
+            self.template.conversation = self.template.conversation
+            self.template.channel_id = self.template.channel_id
 
     async def send_activities(self, context, activities: List[Activity]):
         """
@@ -199,12 +199,16 @@ class TestFlow(object):
         :param timeout:
         :return:
         """
-        
+        print('ASSERT REPLY')
         def default_inspector(reply, description=None):
-
+            print('HELLOOOO FROM THE INSPECTOR...........')
             if isinstance(expected, Activity):
                 validate_activity(reply, expected)
             else:
+                print('EXPECTED')
+                print(expected)
+                #print('REPLYTEXT')
+                #print(reply.text)
                 assert reply.type == 'message', description + f" type == {reply.type}"
                 assert reply.text == expected, description + f" text == {reply.text}"
 
@@ -238,9 +242,9 @@ class TestFlow(object):
                 else:
                     await asyncio.sleep(0.05)
                     await wait_for_activity()
-
+            print('IN WAIT FOR PREVIOUS BEFORE WAIT FOR ACTIVITY')
             await wait_for_activity()
-
+        print('IN ASSERTREPLY BEFORE invoking new TESTFLOW')
         return TestFlow(await test_flow_previous(), self.adapter)
 
 

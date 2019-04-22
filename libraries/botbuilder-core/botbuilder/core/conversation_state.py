@@ -13,7 +13,7 @@ class ConversationState(BotState):
 
     no_key_error_message = 'ConversationState: channelId and/or conversation missing from context.activity.'
 
-    def __init__(self, storage: Storage, namespace: str=''):
+    def __init__(self, storage: Storage):
         """Creates a new ConversationState instance.
         Parameters
         ----------
@@ -28,8 +28,8 @@ class ConversationState(BotState):
             else:
                 return key
 
-        super(ConversationState, self).__init__(storage, call_get_storage_key)
-        self.namespace = namespace
+        super(ConversationState, self).__init__(storage, 'ConversationState')
+
 
     def get_storage_key(self, context: TurnContext):
         activity = context.activity
@@ -38,5 +38,5 @@ class ConversationState(BotState):
 
         storage_key = None
         if channel_id and conversation_id:
-            storage_key = f"conversation/{channel_id}/{conversation_id}/{self.namespace}"
+            storage_key = "%s/conversations/%s" % (channel_id,conversation_id)
         return storage_key
