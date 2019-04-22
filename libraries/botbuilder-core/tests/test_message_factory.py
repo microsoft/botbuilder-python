@@ -35,7 +35,7 @@ def assert_attachments(activity: Activity, count: int, types: List[str] = None):
             assert attachment.content_type == types[idx], f'attachment[{idx}] has invalid content_type'
 
 
-class TestMessageFactory:
+class TestMessageFactory(aiounittest.AsyncTestCase):
 
     suggested_actions = [CardAction(title='a', type=ActionTypes.im_back, value='a'),
                          CardAction(title='b', type=ActionTypes.im_back, value='b'),

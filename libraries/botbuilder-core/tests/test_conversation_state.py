@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import pytest
+import aiounittest
 
 from botbuilder.core import TurnContext, MemoryStorage, TestAdapter, ConversationState
 from botbuilder.schema import Activity, ConversationAccount
@@ -27,7 +27,7 @@ class TestConversationState:
     context = TurnContext(adapter, RECEIVED_MESSAGE)
     middleware = ConversationState(storage)
 
-    @pytest.mark.asyncio
+    
     async def test_should_load_and_save_state_from_storage(self):
         key = None
 
@@ -45,7 +45,7 @@ class TestConversationState:
         assert key in items, 'Saved state not found in storage.'
         assert items[key].test == 'foo', 'Missing test value in stored state.'
 
-    @pytest.mark.asyncio
+    
     async def test_should_ignore_any_activities_that_are_not_endOfConversation(self):
         key = None
 
@@ -60,7 +60,7 @@ class TestConversationState:
         items = await self.storage.read([key])
         assert hasattr(items[key], 'test'), 'state cleared and should not have been'
 
-    @pytest.mark.asyncio
+    
     async def test_should_reject_with_error_if_channel_id_is_missing(self):
         context = TurnContext(self.adapter, MISSING_CHANNEL_ID)
 
@@ -76,7 +76,7 @@ class TestConversationState:
         else:
             raise AssertionError('Should not have completed and not raised AttributeError.')
 
-    @pytest.mark.asyncio
+    
     async def test_should_reject_with_error_if_conversation_is_missing(self):
         context = TurnContext(self.adapter, MISSING_CONVERSATION)
 

@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import pytest
+import aiounittest
 
 from botbuilder.core import TurnContext, MemoryStorage, StoreItem, TestAdapter, UserState
 from botbuilder.schema import Activity, ChannelAccount
@@ -18,13 +18,13 @@ MISSING_FROM_PROPERTY = Activity(type='message',
                                  channel_id='test')
 
 
-class TestUserState:
+class TestUserState(aiounittest.AsyncTestCase):
     storage = MemoryStorage()
     adapter = TestAdapter()
     context = TurnContext(adapter, RECEIVED_MESSAGE)
     middleware = UserState(storage)
 
-    @pytest.mark.asyncio
+    
     async def test_should_load_and_save_state_from_storage(self):
 
         async def next_middleware():
@@ -39,7 +39,7 @@ class TestUserState:
         assert key in items, 'Saved state not found in storage'
         assert items[key].test == 'foo', 'Missing test value in stored state.'
 
-    @pytest.mark.asyncio
+    
     async def test_should_reject_with_error_if_channel_id_is_missing(self):
         context = TurnContext(self.adapter, MISSING_CHANNEL_ID)
 
@@ -53,7 +53,7 @@ class TestUserState:
         else:
             raise AssertionError('Should not have completed and not raised AttributeError.')
 
-    @pytest.mark.asyncio
+    
     async def test_should_reject_with_error_if_from_property_is_missing(self):
         context = TurnContext(self.adapter, MISSING_FROM_PROPERTY)
 

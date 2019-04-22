@@ -1,21 +1,21 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import pytest
+import aiounittest
 
 from botbuilder.core import AnonymousReceiveMiddleware, MiddlewareSet, Middleware
 
 
-class TestMiddlewareSet:
+class TestMiddlewareSet(aiounittest.AsyncTestCase):
 
-    @pytest.mark.asyncio
+    
     async def test_no_middleware(self):
         middleware_set = MiddlewareSet()
 
         # This shouldn't explode.
         await middleware_set.receive_activity(None)
 
-    @pytest.mark.asyncio
+    
     async def test_no_middleware_with_callback(self):
         callback_complete = False
 
@@ -28,7 +28,7 @@ class TestMiddlewareSet:
         await middleware_set.receive_activity_with_status(None, runs_after_pipeline)
         assert callback_complete
 
-    @pytest.mark.asyncio
+    
     async def test_middleware_set_receive_activity_internal(self):
 
         class PrintMiddleware(object):
@@ -57,7 +57,7 @@ class TestMiddlewareSet:
 
         await middleware_set.receive_activity_internal('Bye', request_handler)
 
-    @pytest.mark.asyncio
+    
     async def test_middleware_run_in_order(self):
         called_first = False
         called_second = False
@@ -84,7 +84,7 @@ class TestMiddlewareSet:
         assert called_first
         assert called_second
 
-    @pytest.mark.asyncio
+    
     async def test_run_one_middleware(self):
         called_first = False
         finished_pipeline = False
@@ -106,7 +106,7 @@ class TestMiddlewareSet:
         assert called_first
         assert finished_pipeline
 
-    @pytest.mark.asyncio
+    
     async def test_run_empty_pipeline(self):
         ran_empty_pipeline = False
         middleware_set = MiddlewareSet()
@@ -118,7 +118,7 @@ class TestMiddlewareSet:
         await middleware_set.receive_activity_with_status(None, runs_after_pipeline)
         assert ran_empty_pipeline
 
-    @pytest.mark.asyncio
+    
     async def test_two_middleware_one_does_not_call_next(self):
         called_first = False
         called_second = False
@@ -147,7 +147,7 @@ class TestMiddlewareSet:
         assert not called_second
         assert not called_all_middleware
 
-    @pytest.mark.asyncio
+    
     async def test_one_middleware_does_not_call_next(self):
         called_first = False
         finished_pipeline = False
@@ -169,7 +169,7 @@ class TestMiddlewareSet:
         assert called_first
         assert not finished_pipeline
 
-    @pytest.mark.asyncio
+    
     async def test_anonymous_middleware(self):
         did_run = False
 
@@ -186,7 +186,7 @@ class TestMiddlewareSet:
         await middleware_set.receive_activity(None)
         assert did_run
 
-    @pytest.mark.asyncio
+    
     async def test_anonymous_two_middleware_and_in_order(self):
         called_first = False
         called_second = False
@@ -211,7 +211,7 @@ class TestMiddlewareSet:
         assert called_first
         assert called_second
 
-    @pytest.mark.asyncio
+    
     async def test_mixed_middleware_anonymous_first(self):
         called_regular_middleware = False
         called_anonymous_middleware = False
@@ -238,7 +238,7 @@ class TestMiddlewareSet:
         assert called_regular_middleware
         assert called_anonymous_middleware
 
-    @pytest.mark.asyncio
+    
     async def test_mixed_middleware_anonymous_last(self):
         called_regular_middleware = False
         called_anonymous_middleware = False

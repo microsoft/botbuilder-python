@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import pytest
+import aiounittest
 from botbuilder.schema import Activity, ConversationReference
 from botbuilder.core import TurnContext, TestAdapter
 from datetime import datetime
@@ -11,8 +11,8 @@ UPDATED_ACTIVITY = Activity(type='message', text='update')
 DELETED_ACTIVITY_REFERENCE = ConversationReference(activity_id='1234')
 
 
-class TestTestAdapter:
-    @pytest.mark.asyncio
+class TestTestAdapter(aiounittest.AsyncTestCase):
+    
     async def test_should_call_bog_logic_when_receive_activity_is_called(self):
         async def logic(context: TurnContext):
             assert context
@@ -28,7 +28,7 @@ class TestTestAdapter:
         adapter = TestAdapter(logic)
         await adapter.receive_activity('test')
 
-    @pytest.mark.asyncio
+    
     async def test_should_support_receive_activity_with_activity(self):
         async def logic(context: TurnContext):
             assert context.activity.type == 'message'
@@ -36,7 +36,7 @@ class TestTestAdapter:
         adapter = TestAdapter(logic)
         await adapter.receive_activity(Activity(type='message', text='test'))
 
-    @pytest.mark.asyncio
+    
     async def test_should_set_activity_type_when_receive_activity_receives_activity_without_type(self):
         async def logic(context: TurnContext):
             assert context.activity.type == 'message'
@@ -44,7 +44,7 @@ class TestTestAdapter:
         adapter = TestAdapter(logic)
         await adapter.receive_activity(Activity(text='test'))
 
-    @pytest.mark.asyncio
+    
     async def test_should_support_custom_activity_id_in_receive_activity(self):
         async def logic(context: TurnContext):
             assert context.activity.id == 'myId'
@@ -53,21 +53,21 @@ class TestTestAdapter:
         adapter = TestAdapter(logic)
         await adapter.receive_activity(Activity(type='message', text='test', id='myId'))
 
-    @pytest.mark.asyncio
+    
     async def test_should_call_bot_logic_when_send_is_called(self):
         async def logic(context: TurnContext):
                 assert context.activity.text == 'test'
         adapter = TestAdapter(logic)
         await adapter.send('test')
 
-    @pytest.mark.asyncio
+    
     async def test_should_send_and_receive_when_test_is_called(self):
         async def logic(context: TurnContext):
             await context.send_activity(RECEIVED_MESSAGE)
         adapter = TestAdapter(logic)
         await adapter.test('test', 'received')
 
-    @pytest.mark.asyncio
+    
     async def test_should_send_and_throw_assertion_error_when_test_is_called(self):
         async def logic(context: TurnContext):
             await context.send_activity(RECEIVED_MESSAGE)
@@ -79,7 +79,7 @@ class TestTestAdapter:
         else:
             raise AssertionError('Assertion error should have been raised')
 
-    @pytest.mark.asyncio
+    
     async def test_tests_should_call_test_for_each_tuple(self):
         counter = 0
 
@@ -92,7 +92,7 @@ class TestTestAdapter:
         await adapter.tests(('test', '1'), ('test', '2'), ('test', '3'))
         assert counter == 3
 
-    @pytest.mark.asyncio
+    
     async def test_tests_should_call_test_for_each_list(self):
         counter = 0
 
@@ -105,7 +105,7 @@ class TestTestAdapter:
         await adapter.tests(['test', '1'], ['test', '2'], ['test', '3'])
         assert counter == 3
 
-    @pytest.mark.asyncio
+    
     async def test_should_assert_reply_after_send(self):
         async def logic(context: TurnContext):
             await context.send_activity(RECEIVED_MESSAGE)
@@ -114,7 +114,7 @@ class TestTestAdapter:
         test_flow = await adapter.send('test')
         await test_flow.assert_reply('received')
 
-    @pytest.mark.asyncio
+    
     async def test_should_support_context_update_activity_call(self):
         async def logic(context: TurnContext):
             await context.update_activity(UPDATED_ACTIVITY)
@@ -125,7 +125,7 @@ class TestTestAdapter:
         assert len(adapter.updated_activities) == 1
         assert adapter.updated_activities[0].text == UPDATED_ACTIVITY.text
 
-    @pytest.mark.asyncio
+    
     async def test_should_support_context_delete_activity_call(self):
         async def logic(context: TurnContext):
             await context.delete_activity(DELETED_ACTIVITY_REFERENCE)

@@ -1,9 +1,9 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+import aiounittest
 
-import pytest
-
-from botbuilder.core import TurnContext, BotState, MemoryStorage, TestAdapter
+from botbuilder.core import TurnContext, BotState, MemoryStorage
+from botbuilder.core.adapters import TestAdapter
 from botbuilder.schema import Activity
 
 RECEIVED_MESSAGE = Activity(type='message',
@@ -21,18 +21,18 @@ def key_factory(context):
     return STORAGE_KEY
 
 
-class TestBotState:
+class TestBotState(aiounittest.AsyncTestCase):
     storage = MemoryStorage()
     adapter = TestAdapter()
     context = TurnContext(adapter, RECEIVED_MESSAGE)
     middleware = BotState(storage, key_factory)
 
-    @pytest.mark.asyncio
+    
     async def test_should_return_undefined_from_get_if_nothing_cached(self):
         state = await self.middleware.get(self.context)
         assert state is None, 'state returned'
 
-    @pytest.mark.asyncio
+    
     async def test_should_load_and_save_state_from_storage(self):
 
         async def next_middleware():
@@ -45,8 +45,6 @@ class TestBotState:
         assert STORAGE_KEY in items, 'saved state not found in storage.'
         assert items[STORAGE_KEY].test == 'foo', 'Missing test value in stored state.'
 
-    @pytest.mark.skipif(True, reason='skipping while goal of test is investigated, test currently fails')
-    @pytest.mark.asyncio
     async def test_should_force_read_of_state_from_storage(self):
         async def next_middleware():
             state = cached_state(self.context, self.middleware.state_key)
@@ -60,7 +58,7 @@ class TestBotState:
 
         await self.middleware.on_process_request(self.context, next_middleware)
 
-    @pytest.mark.asyncio
+
     async def test_should_clear_state_storage(self):
 
         async def next_middleware():
@@ -73,7 +71,6 @@ class TestBotState:
         items = await self.storage.read([STORAGE_KEY])
         assert not hasattr(items[STORAGE_KEY], 'test'), 'state not cleared from storage.'
 
-    @pytest.mark.asyncio
     async def test_should_force_immediate_write_of_state_to_storage(self):
         async def next_middleware():
             state = cached_state(self.context, self.middleware.state_key)
@@ -85,23 +82,21 @@ class TestBotState:
             assert items[STORAGE_KEY].test == 'foo', 'state not immediately flushed.'
         await self.middleware.on_process_request(self.context, next_middleware)
 
-    @pytest.mark.asyncio
     async def test_should_read_from_storage_if_cached_state_missing(self):
         self.context.services[self.middleware.state_key] = None
         state = await self.middleware.read(self.context)
         assert state.test == 'foo', 'state not loaded'
 
-    @pytest.mark.asyncio
     async def test_should_read_from_cache(self):
         state = await self.middleware.read(self.context)
         assert state.test == 'foo', 'state not loaded'
 
-    @pytest.mark.asyncio
+        
     async def test_should_force_write_to_storage_of_an_empty_state_object(self):
         self.context.services[self.middleware.state_key] = None
         await self.middleware.write(self.context, True)
 
-    @pytest.mark.asyncio
+    
     async def test_should_noop_calls_to_clear_when_nothing_cached(self):
         self.context.services[self.middleware.state_key] = None
         await self.middleware.clear(self.context)
