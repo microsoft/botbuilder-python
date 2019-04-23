@@ -3,7 +3,10 @@
 
 
 import aiounittest
-from botbuilder.core.test_adapter import TestAdapter, TestFlow
+from botbuilder.core.adapters import (
+                                    TestAdapter, 
+                                    TestFlow
+                                    )
 from botbuilder.schema import ( 
                                 Activity 
                                 )
@@ -24,7 +27,7 @@ from botbuilder.dialogs import (
 
 class MyWaterfallDialog(WaterfallDialog):    
     def __init__(self, id: str):
-        super(WaterfallDialog, self).__init__(id)
+        super(MyWaterfallDialog, self).__init__(id)
         async def Waterfall2_Step1(step_context: WaterfallStepContext) -> DialogTurnResult:
             await step_context.context.send_activity("step1")
             return Dialog.end_of_turn
@@ -66,12 +69,12 @@ class WaterfallTests(aiounittest.AsyncTestCase):
         dialog_state = convo_state.create_property('dialogState')
         dialogs = DialogSet(dialog_state)
         async def step1(step) -> DialogTurnResult:
-            assert(step, 'hey!')
+            print('IN STEP 1')
             await step.context.send_activity('bot responding.')
             return Dialog.end_of_turn
         
         async def step2(step) -> DialogTurnResult:
-            assert(step)
+            print('IN STEP 2')
             return await step.end_dialog('ending WaterfallDialog.')
 
         mydialog = WaterfallDialog('test', [ step1, step2 ])
@@ -87,6 +90,7 @@ class WaterfallTests(aiounittest.AsyncTestCase):
             else:
                 if results.status == DialogTurnStatus.Complete:
                     await turn_context.send_activity(results.result)
+            print('SAVING CONVERSATION')
             await convo_state.save_changes(turn_context)
             
         adapt = TestAdapter(exec_test)

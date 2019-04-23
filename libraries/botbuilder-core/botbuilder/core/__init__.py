@@ -11,11 +11,13 @@ from .assertions import BotAssert
 from .bot_adapter import BotAdapter
 from .bot_framework_adapter import BotFrameworkAdapter, BotFrameworkAdapterSettings
 from .bot_state import BotState
+from .bot_telemetry_client import BotTelemetryClient
 from .card_factory import CardFactory
 from .conversation_state import ConversationState
 from .memory_storage import MemoryStorage
 from .message_factory import MessageFactory
 from .middleware_set import AnonymousReceiveMiddleware, Middleware, MiddlewareSet
+from .null_telemetry_client import NullTelemetryClient
 from .state_property_accessor import StatePropertyAccessor
 from .state_property_info import StatePropertyInfo
 from .storage import Storage, StoreItem, StorageKeyFactory, calculate_change_hash
@@ -36,6 +38,7 @@ __all__ = ['ActivityHandler',
            'MessageFactory',
            'Middleware',
            'MiddlewareSet',
+           'NullBotTelemetryClient',
            'StatePropertyAccessor',
            'StatePropertyInfo',
            'Storage',

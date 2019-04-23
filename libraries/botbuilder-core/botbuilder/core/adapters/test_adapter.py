@@ -199,16 +199,10 @@ class TestFlow(object):
         :param timeout:
         :return:
         """
-        print('ASSERT REPLY')
         def default_inspector(reply, description=None):
-            print('HELLOOOO FROM THE INSPECTOR...........')
             if isinstance(expected, Activity):
                 validate_activity(reply, expected)
             else:
-                print('EXPECTED')
-                print(expected)
-                #print('REPLYTEXT')
-                #print(reply.text)
                 assert reply.type == 'message', description + f" type == {reply.type}"
                 assert reply.text == expected, description + f" text == {reply.text}"
 
@@ -242,9 +236,7 @@ class TestFlow(object):
                 else:
                     await asyncio.sleep(0.05)
                     await wait_for_activity()
-            print('IN WAIT FOR PREVIOUS BEFORE WAIT FOR ACTIVITY')
             await wait_for_activity()
-        print('IN ASSERTREPLY BEFORE invoking new TESTFLOW')
         return TestFlow(await test_flow_previous(), self.adapter)
 
 
