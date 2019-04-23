@@ -9,7 +9,7 @@ from .storage import Storage, StoreItem
 class MemoryStorage(Storage):
     def __init__(self, dictionary=None):
         super(MemoryStorage, self).__init__()
-        self.memory = dictionary or {}
+        self.memory = dictionary if dictionary is not None else {}
         self._e_tag = 0
 
     async def delete(self, keys: List[str]):

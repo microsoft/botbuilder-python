@@ -35,15 +35,11 @@ class CachedBotState:
     
     @hash.setter
     def hash(self, hash: str):
-<<<<<<< HEAD
-        self._hash = hash 
-=======
         self._hash = hash
->>>>>>> work-in-progress
 
     @property
     def is_changed(self) -> bool:
-        return hash != self.compute_hash(self._state)
+        return self.hash != self.compute_hash(self._state)
 
     def compute_hash(self, obj: object) -> str:
         # TODO: Should this be compatible with C# JsonConvert.SerializeObject ?
@@ -148,8 +144,6 @@ class BotState(PropertyManager):
         # This allows this to work with value types
         return cached_state.state[property_name]
 
-
-
     async def delete_property_value(self, turn_context: TurnContext, property_name: str) -> None:
         """
         Deletes a property from the state cache in the turn context.
@@ -164,7 +158,7 @@ class BotState(PropertyManager):
         if not property_name:
             raise TypeError('BotState.delete_property(): property_name cannot be None.')
         cached_state = turn_context.turn_state.get(self._context_service_key)
-        cached_state.state.remove(property_name)
+        del cached_state.state[property_name]
 
     async def set_property_value(self, turn_context: TurnContext, property_name: str, value: object) -> None:
         """
@@ -196,16 +190,9 @@ class BotStatePropertyAccessor(StatePropertyAccessor):
         await self._bot_state.load(turn_context, False)
         await self._bot_state.delete_property_value(turn_context, self._name)
         
-<<<<<<< HEAD
-    async def get(self, turn_context: TurnContext, default_value_factory = None) -> object:
-        await self._bot_state.load(turn_context, False)
-        try:
-=======
     async def get(self, turn_context: TurnContext, default_value_factory : Callable = None) -> object:
         await self._bot_state.load(turn_context, False)
-        try:
-            
->>>>>>> work-in-progress
+        try:            
             result = await self._bot_state.get_property_value(turn_context, self._name)
             return result
         except:
