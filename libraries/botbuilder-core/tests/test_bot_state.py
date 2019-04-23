@@ -53,9 +53,15 @@ class TestBotState(aiounittest.AsyncTestCase):
         """Verify storage not called when no changes are made"""
         # Mock a storage provider, which counts read/writes
         dictionary = {}
+
+        async def mock_write_result(self):
+            return
+        async def mock_read_result(self):
+            return {}
+
         mock_storage = MemoryStorage(dictionary)
-        mock_storage.write = MagicMock(return_value= 1)
-        mock_storage.read = MagicMock(return_value= 1)
+        mock_storage.write = MagicMock(side_effect= mock_write_result)
+        mock_storage.read = MagicMock(side_effect= mock_read_result)
 
         # Arrange
         user_state = UserState(mock_storage)
@@ -72,6 +78,7 @@ class TestBotState(aiounittest.AsyncTestCase):
         self.assertEqual(mock_storage.write.call_count, 0)       # Set on property should not bump
         await user_state.save_changes(context)
         self.assertEqual(mock_storage.write.call_count, 1)       # Explicit save should bump
+        #import pdb; pdb.set_trace()
         valueA = await propertyA.get(context)
         self.assertEqual("there", valueA)
         self.assertEqual(mock_storage.write.call_count, 1)       # Gets should not bump

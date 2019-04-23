@@ -33,7 +33,7 @@ class CachedBotState:
     
     @hash.setter
     def hash(self, hash: str):
-        self._hash = hash; 
+        self._hash = hash 
 
     @property
     def is_changed(self) -> bool:
@@ -186,10 +186,10 @@ class BotStatePropertyAccessor(StatePropertyAccessor):
         await self._bot_state.load(turn_context, False)
         await self._bot_state.delete_property_value(turn_context, self._name)
         
-    async def get(self, turn_context: TurnContext, default_value_factory) -> object:
+    async def get(self, turn_context: TurnContext, default_value_factory = None) -> object:
         await self._bot_state.load(turn_context, False)
         try:
-            result = await _bot_state.get_property_value(turn_context, name)
+            result = await self._bot_state.get_property_value(turn_context, self._name)
             return result
         except:
             # ask for default value from factory
@@ -202,4 +202,4 @@ class BotStatePropertyAccessor(StatePropertyAccessor):
         
     async def set(self, turn_context: TurnContext, value: object) -> None:
         await self._bot_state.load(turn_context, False)
-        await self._bot_state.set_property_value(turn_context, self.name, value)
+        await self._bot_state.set_property_value(turn_context, self._name, value)
