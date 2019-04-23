@@ -1,10 +1,13 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 import aiounittest
+from unittest.mock import MagicMock
 
-from botbuilder.core import TurnContext, BotState, MemoryStorage
+from botbuilder.core import TurnContext, BotState, MemoryStorage, UserState
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.schema import Activity
+
+from .test_utilities import TestUtilities
 
 RECEIVED_MESSAGE = Activity(type='message',
                             text='received')
@@ -28,75 +31,57 @@ class TestBotState(aiounittest.AsyncTestCase):
     middleware = BotState(storage, key_factory)
 
     
-    async def test_should_return_undefined_from_get_if_nothing_cached(self):
-        state = await self.middleware.get(self.context)
-        assert state is None, 'state returned'
+    def test_state_empty_name(self):
+        #Arrange
+        dictionary = {}
+        user_state = UserState(MemoryStorage(dictionary))
 
+        #Act
+        with self.assertRaises(TypeError) as _:
+            user_state.create_property('')
     
-    async def test_should_load_and_save_state_from_storage(self):
+    def test_state_none_name(self):
+        #Arrange
+        dictionary = {}
+        user_state = UserState(MemoryStorage(dictionary))
 
-        async def next_middleware():
-            state = cached_state(self.context, self.middleware.state_key)
-            assert state is not None, 'state not loaded'
-            state.test = 'foo'
-
-        await self.middleware.on_process_request(self.context, next_middleware)
-        items = await self.storage.read([STORAGE_KEY])
-        assert STORAGE_KEY in items, 'saved state not found in storage.'
-        assert items[STORAGE_KEY].test == 'foo', 'Missing test value in stored state.'
-
-    async def test_should_force_read_of_state_from_storage(self):
-        async def next_middleware():
-            state = cached_state(self.context, self.middleware.state_key)
-            assert state.test == 'foo', 'invalid initial state'
-            del state.test
-
-            # items will not have the attribute 'test'
-            items = await self.middleware.read(self.context, True)
-            # Similarly, the returned value from cached_state will also not have the attribute 'test'
-            assert cached_state(self.context, self.middleware.state_key).test == 'foo', 'state not reloaded'
-
-        await self.middleware.on_process_request(self.context, next_middleware)
-
-
-    async def test_should_clear_state_storage(self):
-
-        async def next_middleware():
-            assert cached_state(self.context, self.middleware.state_key).test == 'foo', 'invalid initial state'
-            await self.middleware.clear(self.context)
-            cached_state_data = cached_state(self.context, self.middleware.state_key)
-            assert not hasattr(cached_state_data, 'test'), 'state not cleared on context.'
-
-        await self.middleware.on_process_request(self.context, next_middleware)
-        items = await self.storage.read([STORAGE_KEY])
-        assert not hasattr(items[STORAGE_KEY], 'test'), 'state not cleared from storage.'
-
-    async def test_should_force_immediate_write_of_state_to_storage(self):
-        async def next_middleware():
-            state = cached_state(self.context, self.middleware.state_key)
-            assert not hasattr(state, 'test'), 'invalid initial state'
-            state.test = 'foo'
-
-            await self.middleware.write(self.context, True)
-            items = await self.storage.read([STORAGE_KEY])
-            assert items[STORAGE_KEY].test == 'foo', 'state not immediately flushed.'
-        await self.middleware.on_process_request(self.context, next_middleware)
-
-    async def test_should_read_from_storage_if_cached_state_missing(self):
-        self.context.services[self.middleware.state_key] = None
-        state = await self.middleware.read(self.context)
-        assert state.test == 'foo', 'state not loaded'
-
-    async def test_should_read_from_cache(self):
-        state = await self.middleware.read(self.context)
-        assert state.test == 'foo', 'state not loaded'
-
-        
-    async def test_should_force_write_to_storage_of_an_empty_state_object(self):
-        self.context.services[self.middleware.state_key] = None
-        await self.middleware.write(self.context, True)
-
+        #Act
+        with self.assertRaises(TypeError) as _:
+            user_state.create_property(None)
     
-    async def test_should_noop_calls_to_clear_when_nothing_cached(self):
-        self.context.services[self.middleware.state_key] = None
-        await self.middleware.clear(self.context)
+    async def test_storage_not_called_no_changes(self):
+        """Verify storage not called when no changes are made"""
+        # Mock a storage provider, which counts read/writes
+        dictionary = {}
+        mock_storage = MemoryStorage(dictionary)
+        mock_storage.write = MagicMock(return_value= 1)
+        mock_storage.read = MagicMock(return_value= 1)
+
+        # Arrange
+        user_state = UserState(mock_storage)
+        context = TestUtilities.create_empty_context()
+
+        # Act
+        propertyA = user_state.create_property("propertyA")
+        self.assertEqual(mock_storage.write.call_count, 0)
+        await user_state.save_changes(context)
+        await propertyA.set(context, "hello")
+        self.assertEqual(mock_storage.read.call_count, 1)       # Initial save bumps count
+        self.assertEqual(mock_storage.write.call_count, 0)       # Initial save bumps count
+        await propertyA.set(context, "there")
+        self.assertEqual(mock_storage.write.call_count, 0)       # Set on property should not bump
+        await user_state.save_changes(context)
+        self.assertEqual(mock_storage.write.call_count, 1)       # Explicit save should bump
+        valueA = await propertyA.get(context)
+        self.assertEqual("there", valueA)
+        self.assertEqual(mock_storage.write.call_count, 1)       # Gets should not bump
+        await user_state.save_changes(context)
+        self.assertEqual(mock_storage.write.call_count, 1)
+        await propertyA.DeleteAsync(context)   # Delete alone no bump
+        self.assertEqual(mock_storage.write.call_count, 1)
+        await user_state.save_changes(context)  # Save when dirty should bump
+        self.assertEqual(mock_storage.write.call_count, 2)
+        self.assertEqual(mock_storage.read.call_count, 1)
+        await user_state.save_changes(context)  # Save not dirty should not bump
+        self.assertEqual(mock_storage.write.call_count, 2)
+        self.assertEqual(mock_storage.read.call_count, 1)

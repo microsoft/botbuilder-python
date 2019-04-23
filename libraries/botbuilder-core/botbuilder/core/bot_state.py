@@ -58,7 +58,7 @@ class BotState(PropertyManager):
         :return: If successful, the state property accessor created.
         """
         if not name:
-            raise TypeError('BotState.create_property(): BotState cannot be None.')
+            raise TypeError('BotState.create_property(): BotState cannot be None or empty.')
         return BotStatePropertyAccessor(self, name)
 
 
@@ -172,6 +172,7 @@ class BotState(PropertyManager):
         cached_state = turn_context.turn_state.get(self._context_service_key)
         cached_state.state[property_name] = value
         
+##
 class BotStatePropertyAccessor(StatePropertyAccessor):
     def __init__(self, bot_state: BotState, name: str):
         self._bot_state = bot_state
