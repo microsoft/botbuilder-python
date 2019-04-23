@@ -61,7 +61,7 @@ class WaterfallTests(aiounittest.AsyncTestCase):
 
 
     # TODO:WORK IN PROGRESS        
-    async def no_test_execute_sequence_waterfall_steps(self):
+    async def test_execute_sequence_waterfall_steps(self):
         # Create new ConversationState with MemoryStorage and register the state as middleware.
         convo_state = ConversationState(MemoryStorage())
         
@@ -69,12 +69,10 @@ class WaterfallTests(aiounittest.AsyncTestCase):
         dialog_state = convo_state.create_property('dialogState')
         dialogs = DialogSet(dialog_state)
         async def step1(step) -> DialogTurnResult:
-            print('IN STEP 1')
             await step.context.send_activity('bot responding.')
             return Dialog.end_of_turn
         
         async def step2(step) -> DialogTurnResult:
-            print('IN STEP 2')
             return await step.end_dialog('ending WaterfallDialog.')
 
         mydialog = WaterfallDialog('test', [ step1, step2 ])
@@ -84,13 +82,12 @@ class WaterfallTests(aiounittest.AsyncTestCase):
         async def exec_test(turn_context: TurnContext) -> None:
 
             dc = await dialogs.create_context(turn_context)
-            results = await dc.continue_dialog(dc, None, None)
+            results = await dc.continue_dialog()
             if results.status == DialogTurnStatus.Empty:
                 await dc.begin_dialog('test')
             else:
                 if results.status == DialogTurnStatus.Complete:
                     await turn_context.send_activity(results.result)
-            print('SAVING CONVERSATION')
             await convo_state.save_changes(turn_context)
             
         adapt = TestAdapter(exec_test)

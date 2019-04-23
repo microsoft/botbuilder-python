@@ -67,7 +67,7 @@ class WaterfallDialog(Dialog):
         # Run first stepkinds
         return await self.run_step(dc, 0, DialogReason.BeginCalled, None) 
     
-    async def continue_dialog_ext(self, dc: DialogContext, reason: DialogReason, result: object) -> DialogTurnResult:
+    async def continue_dialog(self, dc: DialogContext = None, reason: DialogReason = None, result: object = NotImplementedError) -> DialogTurnResult:
         if not dc:
             raise TypeError('WaterfallDialog.continue_dialog(): dc cannot be None.')
         
@@ -86,7 +86,7 @@ class WaterfallDialog(Dialog):
         # Future Me: 
         # If issues with CosmosDB, see https://github.com/Microsoft/botbuilder-dotnet/issues/871
         # for hints.
-        return self.run_step(dc, state[self.StepIndex] + 1, reason, result)
+        return await self.run_step(dc, state[self.StepIndex] + 1, reason, result)
     
     async def end_dialog(self, turn_context: TurnContext, instance: DialogInstance, reason: DialogReason):
         if reason is DialogReason.CancelCalled:

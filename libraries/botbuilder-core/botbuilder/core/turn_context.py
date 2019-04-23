@@ -136,6 +136,7 @@ class TurnContext(object):
         :return:
         """
         reference = TurnContext.get_conversation_reference(self.activity)
+
         output = [TurnContext.apply_conversation_reference(
             Activity(text=a, type='message') if isinstance(a, str) else a, reference)
             for a in activity_or_text]

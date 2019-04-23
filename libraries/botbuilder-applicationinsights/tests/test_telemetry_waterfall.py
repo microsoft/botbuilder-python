@@ -37,7 +37,7 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
         dialog.telemetry_client = None
         self.assertEqual(type(dialog.telemetry_client), NullTelemetryClient)
 
-    async def no_test_execute_sequence_waterfall_steps(self):
+    async def test_execute_sequence_waterfall_steps(self):
         # Create new ConversationState with MemoryStorage and register the state as middleware.
         convo_state = ConversationState(MemoryStorage())
         
@@ -45,12 +45,10 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
         dialog_state = convo_state.create_property('dialogState')
         dialogs = DialogSet(dialog_state)
         async def step1(step) -> DialogTurnResult:
-            print('IN STEP 1')
             await step.context.send_activity('bot responding.')
             return Dialog.end_of_turn
         
         async def step2(step) -> DialogTurnResult:
-            print('IN STEP 2')
             return await step.end_dialog('ending WaterfallDialog.')
 
         mydialog = WaterfallDialog('test', [ step1, step2 ])
