@@ -2,10 +2,11 @@
 # Licensed under the MIT License.
 from abc import ABC, abstractmethod
 
-from botbuilder.core.turn_context import TurnContext
+from botbuilder.core import (TurnContext, NullTelemetryClient, BotTelemetryClient)
 from .dialog_reason import DialogReason
 from .dialog_turn_status import DialogTurnStatus
 from .dialog_turn_result import DialogTurnResult
+
 
 class Dialog(ABC):
     end_of_turn = DialogTurnResult(DialogTurnStatus.Waiting)
@@ -14,12 +15,29 @@ class Dialog(ABC):
         if dialog_id == None or not dialog_id.strip():
             raise TypeError('Dialog(): dialogId cannot be None.')
         
-        self.telemetry_client = None; # TODO: Make this NullBotTelemetryClient()
+        self._telemetry_client = NullTelemetryClient()
         self._id = dialog_id
 
     @property
     def id(self) -> str:
         return self._id
+
+    @property
+    def telemetry_client(self) -> BotTelemetryClient:
+        """
+        Gets the telemetry client for logging events.
+        """
+        return self._telemetry_client
+
+    @telemetry_client.setter
+    def telemetry_client(self, value: BotTelemetryClient) -> None:
+        """
+        Sets the telemetry client for logging events.
+        """
+        if value is None:
+            self._telemetry_client = NullTelemetryClient()
+        else:
+            self._telemetry_client = value
 
     @abstractmethod
     async def begin_dialog(self, dc, options: object = None):
@@ -40,7 +58,7 @@ class Dialog(ABC):
         :return:
         """
         # By default just end the current dialog.
-        return await dc.EndDialog(None)
+        return await dc.end_dialog(None)
 
     async def resume_dialog(self, dc, reason: DialogReason, result: object):
         """

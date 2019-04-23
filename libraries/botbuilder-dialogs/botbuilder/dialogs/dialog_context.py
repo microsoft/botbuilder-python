@@ -126,7 +126,7 @@ class DialogContext():
         return await self.begin_dialog(dialog_id, options)
 
 
-    async def continue_dialog(self, dc, reason: DialogReason, result: object):
+    async def continue_dialog(self):
         """
         Continues execution of the active dialog, if there is one, by passing the context object to
         its `Dialog.continue_dialog()` method. You can check `turn_context.responded` after the call completes
@@ -161,7 +161,7 @@ class DialogContext():
         await self.end_active_dialog(DialogReason.EndCalled)
 
         # Resume previous dialog
-        if not self.active_dialog:
+        if self.active_dialog != None:
             # Look up dialog
             dialog = await self.find_dialog(self.active_dialog.id)
             if not dialog:

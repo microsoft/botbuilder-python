@@ -12,6 +12,8 @@ from abc import abstractmethod
 from typing import Callable, Dict
 
 
+
+
 class CachedBotState:
     """
     Internal cached bot state.
@@ -33,7 +35,7 @@ class CachedBotState:
     
     @hash.setter
     def hash(self, hash: str):
-        self._hash = hash; 
+        self._hash = hash
 
     @property
     def is_changed(self) -> bool:
@@ -70,8 +72,10 @@ class BotState(PropertyManager):
         """
         if turn_context == None:
             raise TypeError('BotState.load(): turn_context cannot be None.')
+        
         cached_state = turn_context.turn_state.get(self._context_service_key)
         storage_key = self.get_storage_key(turn_context)
+        
         if (force or not cached_state or not cached_state.state) :
             items = await self._storage.read([storage_key])
             val = items.get(storage_key)
@@ -140,6 +144,8 @@ class BotState(PropertyManager):
         # This allows this to work with value types
         return cached_state.state[property_name]
 
+
+
     async def delete_property_value(self, turn_context: TurnContext, property_name: str) -> None:
         """
         Deletes a property from the state cache in the turn context.
@@ -185,10 +191,11 @@ class BotStatePropertyAccessor(StatePropertyAccessor):
         await self._bot_state.load(turn_context, False)
         await self._bot_state.delete_property_value(turn_context, self._name)
         
-    async def get(self, turn_context: TurnContext, default_value_factory) -> object:
+    async def get(self, turn_context: TurnContext, default_value_factory : Callable = None) -> object:
         await self._bot_state.load(turn_context, False)
         try:
-            result = await _bot_state.get_property_value(turn_context, name)
+            
+            result = await self._bot_state.get_property_value(turn_context, self._name)
             return result
         except:
             # ask for default value from factory
@@ -201,4 +208,4 @@ class BotStatePropertyAccessor(StatePropertyAccessor):
         
     async def set(self, turn_context: TurnContext, value: object) -> None:
         await self._bot_state.load(turn_context, False)
-        await self._bot_state.set_property_value(turn_context, self.name, value)
+        await self._bot_state.set_property_value(turn_context, self._name, value)

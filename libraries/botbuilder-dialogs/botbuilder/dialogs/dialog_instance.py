@@ -39,7 +39,6 @@ class DialogInstance:
         :param:
         :return Dict[str, object]:
         """
-
         return self._state
 
     @state.setter
@@ -50,4 +49,12 @@ class DialogInstance:
         :param value: The instance's persisted state.
         :return:
         """
+        
         self._state = value
+
+    def __str__(self):
+        result = "\ndialog_instance_id: %s\n" % self.id
+        if not self._state is None:
+            for key, value in self._state.items():
+                result += "   {} ({})\n".format(key, str(value))
+        return result
