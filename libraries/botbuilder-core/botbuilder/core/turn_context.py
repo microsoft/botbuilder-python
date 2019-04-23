@@ -30,7 +30,7 @@ class TurnContext(object):
             self._on_send_activities: Callable[[]] = []
             self._on_update_activity: Callable[[]] = []
             self._on_delete_activity: Callable[[]] = []
-            self._responded = {'responded': False}
+            self._responded : bool = False
 
         if self.adapter is None:
             raise TypeError('TurnContext must be instantiated with an adapter.')
@@ -77,19 +77,19 @@ class TurnContext(object):
             self._activity = value
 
     @property
-    def responded(self):
+    def responded(self) -> bool:
         """
         If `true` at least one response has been sent for the current turn of conversation.
         :return:
         """
-        return self._responded['responded']
+        return self._responded
 
     @responded.setter
-    def responded(self, value):
-        if not value:
+    def responded(self, value: bool):
+        if value == False:
             raise ValueError('TurnContext: cannot set TurnContext.responded to False.')
         else:
-            self._responded['responded'] = True
+            self._responded = True
 
     @property
     def services(self):

@@ -233,7 +233,7 @@ class DialogContext():
         if instance != None:
             # Look up dialog
             dialog = await self.find_dialog(instance.id)
-            if not dialog:
+            if dialog != None:
                 # Notify dialog of end
                 await dialog.end_dialog(self.context, instance, reason)
 

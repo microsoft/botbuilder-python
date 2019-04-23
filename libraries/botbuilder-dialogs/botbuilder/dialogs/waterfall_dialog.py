@@ -60,10 +60,9 @@ class WaterfallDialog(Dialog):
         state[self.PersistedInstanceId] = instance_id
         
         properties = {}
-        properties['dialog_id'] = id
-        properties['instance_id'] = instance_id
+        properties['DialogId'] = self.id
+        properties['InstanceId'] = instance_id
         self.telemetry_client.track_event("WaterfallStart", properties)
-
         # Run first stepkinds
         return await self.run_step(dc, 0, DialogReason.BeginCalled, None) 
     
@@ -88,7 +87,7 @@ class WaterfallDialog(Dialog):
         # for hints.
         return await self.run_step(dc, state[self.StepIndex] + 1, reason, result)
     
-    async def end_dialog(self, turn_context: TurnContext, instance: DialogInstance, reason: DialogReason):
+    async def end_dialog(self, turn_context: TurnContext, instance: DialogInstance, reason: DialogReason) -> None:
         if reason is DialogReason.CancelCalled:
             index = instance.state[self.StepIndex]
             step_name = self.get_step_name(index)
@@ -101,21 +100,23 @@ class WaterfallDialog(Dialog):
             self.telemetry_client.track_event("WaterfallCancel", properties)
         else:
             if reason is DialogReason.EndCalled:
+
                 instance_id = str(instance.state[self.PersistedInstanceId])
                 properties = {
-                    "DialogId", self.id,
-                    "InstanceId", instance_id
+                    "DialogId": self.id,
+                    "InstanceId": instance_id
                 }
-                self.telemetry_client.track_event("WaterfallCancel", properties)
+                self.telemetry_client.track_event("WaterfallComplete", properties)
+        
         return 
     
     async def on_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
         step_name = self.get_step_name(step_context.index)
         instance_id = str(step_context.active_dialog.state[self.PersistedInstanceId])
         properties = {
-                "DialogId", self.id,
-                "StepName", step_name,
-                "InstanceId", instance_id 
+                "DialogId": self.id,
+                "StepName": step_name,
+                "InstanceId": instance_id 
             }
         self.telemetry_client.track_event("WaterfallStep", properties)
         return await self._steps[step_context.index](step_context)
@@ -135,7 +136,7 @@ class WaterfallDialog(Dialog):
             return await self.on_step(step_context)
         else:
             # End of waterfall so just return any result to parent
-            return dc.end_dialog(result)
+            return await dc.end_dialog(result)
 
     def get_step_name(self, index: int) -> str:
         """
@@ -143,7 +144,7 @@ class WaterfallDialog(Dialog):
         """
         step_name = self._steps[index].__qualname__
 
-        if not step_name:
+        if not step_name or ">" in step_name :
             step_name = f"Step{index + 1}of{len(self._steps)}"
 
         return step_name

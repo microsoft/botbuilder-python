@@ -39,7 +39,7 @@ class CachedBotState:
 
     @property
     def is_changed(self) -> bool:
-        return hash != self.compute_hash(self._state)
+        return self.hash != self.compute_hash(self._state)
 
     def compute_hash(self, obj: object) -> str:
         # TODO: Should this be compatible with C# JsonConvert.SerializeObject ?

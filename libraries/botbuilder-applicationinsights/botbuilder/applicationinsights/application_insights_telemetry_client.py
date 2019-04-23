@@ -3,7 +3,7 @@
 import sys
 import traceback
 from applicationinsights import TelemetryClient
-from .bot_telemetry_client import BotTelemetryClient, TelemetryDataPointType
+from botbuilder.core.bot_telemetry_client import BotTelemetryClient, TelemetryDataPointType
 from typing import Dict
 
 class ApplicationInsightsTelemetryClient(BotTelemetryClient):
