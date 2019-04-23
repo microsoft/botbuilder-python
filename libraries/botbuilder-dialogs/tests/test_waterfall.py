@@ -61,7 +61,7 @@ class WaterfallTests(aiounittest.AsyncTestCase):
 
 
     # TODO:WORK IN PROGRESS        
-    async def test_execute_sequence_waterfall_steps(self):
+    async def no_test_execute_sequence_waterfall_steps(self):
         # Create new ConversationState with MemoryStorage and register the state as middleware.
         convo_state = ConversationState(MemoryStorage())
         
