@@ -2,6 +2,7 @@ import asyncio
 
 from botbuilder.core import ActivityHandler, ConversationState, UserState, TurnContext
 from botbuilder.dialogs import Dialog
+from helpers.dialog_helper import DialogHelper
 
 class DialogBot(ActivityHandler):
 
@@ -26,4 +27,4 @@ class DialogBot(ActivityHandler):
         await self.user_state.save_changes(turn_context, False)
     
     async def on_message_activity(self, turn_context: TurnContext):
-        await self.dialog.run(turn_context, self.conversation_state.create_property("DialogState"))
+        await DialogHelper.run_dialog(self.dialog, turn_context, self.conversation_state.create_property("DialogState"))
