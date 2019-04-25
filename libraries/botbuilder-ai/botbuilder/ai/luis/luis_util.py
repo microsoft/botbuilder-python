@@ -17,67 +17,67 @@ class LuisUtil:
     Utility functions used to extract and transform data from Luis SDK
     """
 
-    _metadataKey: str = "$instance"
+    _metadata_key: str = "$instance"
 
     @staticmethod
     def normalized_intent(intent: str) -> str:
         return intent.replace(".", "_").replace(" ", "_")
 
     @staticmethod
-    def get_intents(luisResult: LuisResult) -> Dict[str, IntentScore]:
-        if luisResult.intents:
+    def get_intents(luis_result: LuisResult) -> Dict[str, IntentScore]:
+        if luis_result.intents:
             return {
                 LuisUtil.normalized_intent(i.intent): IntentScore(i.score or 0)
-                for i in luisResult.intents
+                for i in luis_result.intents
             }
         else:
             return {
                 LuisUtil.normalized_intent(
-                    luisResult.top_scoring_intent.intent
-                ): IntentScore(luisResult.top_scoring_intent.score or 0)
+                    luis_result.top_scoring_intent.intent
+                ): IntentScore(luis_result.top_scoring_intent.score or 0)
             }
 
     @staticmethod
     def extract_entities_and_metadata(
         entities: List[EntityModel],
-        compositeEntities: List[CompositeEntityModel],
+        composite_entities: List[CompositeEntityModel],
         verbose: bool,
     ) -> Dict:
-        entitiesAndMetadata = {}
+        entities_and_metadata = {}
         if verbose:
-            entitiesAndMetadata[LuisUtil._metadataKey] = {}
+            entities_and_metadata[LuisUtil._metadata_key] = {}
 
-        compositeEntityTypes = set()
+        composite_entity_types = set()
 
         # We start by populating composite entities so that entities covered by them are removed from the entities list
-        if compositeEntities:
-            compositeEntityTypes = set(ce.parent_type for ce in compositeEntities)
+        if composite_entities:
+            composite_entity_types = set(ce.parent_type for ce in composite_entities)
             current = entities
-            for compositeEntity in compositeEntities:
+            for compositeEntity in composite_entities:
                 current = LuisUtil.populate_composite_entity_model(
-                    compositeEntity, current, entitiesAndMetadata, verbose
+                    compositeEntity, current, entities_and_metadata, verbose
                 )
             entities = current
 
         for entity in entities:
             # we'll address composite entities separately
-            if entity.type in compositeEntityTypes:
+            if entity.type in composite_entity_types:
                 continue
 
             LuisUtil.add_property(
-                entitiesAndMetadata,
+                entities_and_metadata,
                 LuisUtil.extract_normalized_entity_name(entity),
                 LuisUtil.extract_entity_value(entity),
             )
 
             if verbose:
                 LuisUtil.add_property(
-                    entitiesAndMetadata[LuisUtil._metadataKey],
+                    entities_and_metadata[LuisUtil._metadata_key],
                     LuisUtil.extract_normalized_entity_name(entity),
                     LuisUtil.extract_entity_metadata(entity),
                 )
 
-        return entitiesAndMetadata
+        return entities_and_metadata
 
     @staticmethod
     def number(value: object) -> Union(int, float):
@@ -95,23 +95,23 @@ class LuisUtil:
     @staticmethod
     def extract_entity_value(entity: EntityModel) -> object:
         if (
-            entity.AdditionalProperties is None
-            or "resolution" not in entity.AdditionalProperties
+            entity.additional_properties is None
+            or "resolution" not in entity.additional_properties
         ):
             return entity.entity
 
-        resolution = entity.AdditionalProperty["resolution"]
-        if entity.Type.startswith("builtin.datetime."):
+        resolution = entity.additional_properties["resolution"]
+        if entity.type.startswith("builtin.datetime."):
             return resolution
-        elif entity.Type.startswith("builtin.datetimeV2."):
+        elif entity.type.startswith("builtin.datetimeV2."):
             if not resolution.values:
                 return resolution
 
-            resolutionValues = resolution.values
+            resolution_values = resolution.values
             val_type = resolution.values[0].type
-            timexes = [val.timex for val in resolutionValues]
-            distinctTimexes = list(set(timexes))
-            return {"type": val_type, "timex": distinctTimexes}
+            timexes = [val.timex for val in resolution_values]
+            distinct_timexes = list(set(timexes))
+            return {"type": val_type, "timex": distinct_timexes}
         else:
             if entity.type in {"builtin.number", "builtin.ordinal"}:
                 return LuisUtil.number(resolution.value)
@@ -135,7 +135,6 @@ class LuisUtil:
 
                 obj["units"] = units
                 return obj
-
             else:
                 return resolution.value or resolution.values
 
@@ -148,11 +147,11 @@ class LuisUtil:
             type=entity.type,
         )
 
-        if entity.AdditionalProperties is not None:
-            if "score" in entity.AdditionalProperties:
-                obj["score"] = float(entity.AdditionalProperties["score"])
+        if entity.additional_properties is not None:
+            if "score" in entity.additional_properties:
+                obj["score"] = float(entity.additional_properties["score"])
 
-            resolution = entity.AdditionalProperties.get("resolution")
+            resolution = entity.additional_properties.get("resolution")
             if resolution is not None and resolution.subtype is not None:
                 obj["subtype"] = resolution.subtype
 
@@ -172,9 +171,9 @@ class LuisUtil:
             type = type[8:]
 
         role = (
-            entity.AdditionalProperties["role"]
-            if entity.AdditionalProperties is not None
-            and "role" in entity.AdditionalProperties
+            entity.additional_properties["role"]
+            if entity.additional_properties is not None
+            and "role" in entity.additional_properties
             else ""
         )
         if role and not role.isspace():
@@ -184,87 +183,87 @@ class LuisUtil:
 
     @staticmethod
     def populate_composite_entity_model(
-        compositeEntity: CompositeEntityModel,
+        composite_entity: CompositeEntityModel,
         entities: List[EntityModel],
-        entitiesAndMetadata: Dict,
+        entities_and_metadata: Dict,
         verbose: bool,
     ) -> List[EntityModel]:
-        childrenEntites = {}
-        childrenEntitiesMetadata = {}
+        children_entities = {}
+        children_entities_metadata = {}
         if verbose:
-            childrenEntites[LuisUtil._metadataKey] = {}
+            children_entities[LuisUtil._metadata_key] = {}
 
         # This is now implemented as O(n^2) search and can be reduced to O(2n) using a map as an optimization if n grows
-        compositeEntityMetadata = next(
+        composite_entity_metadata = next(
             (
                 e
                 for e in entities
-                if e.type == compositeEntity.parent_type
-                and e.entity == compositeEntity.value
+                if e.type == composite_entity.parent_type
+                and e.entity == composite_entity.value
             ),
             None,
         )
 
         # This is an error case and should not happen in theory
-        if compositeEntityMetadata is None:
+        if composite_entity_metadata is None:
             return entities
 
         if verbose:
-            childrenEntitiesMetadata = LuisUtil.extract_entity_metadata(
-                compositeEntityMetadata
+            children_entities_metadata = LuisUtil.extract_entity_metadata(
+                composite_entity_metadata
             )
-            childrenEntites[LuisUtil._metadataKey] = {}
+            children_entities[LuisUtil._metadata_key] = {}
 
-        coveredSet: Set[EntityModel] = set()
-        for child in compositeEntity.Children:
+        covered_set: Set[EntityModel] = set()
+        for child in composite_entity.children:
             for entity in entities:
                 # We already covered this entity
-                if entity in coveredSet:
+                if entity in covered_set:
                     continue
 
                 # This entity doesn't belong to this composite entity
                 if child.Type != entity.Type or not LuisUtil.composite_contains_entity(
-                    compositeEntityMetadata, entity
+                    composite_entity_metadata, entity
                 ):
                     continue
 
                 # Add to the set to ensure that we don't consider the same child entity more than once per composite
-                coveredSet.add(entity)
+                covered_set.add(entity)
                 LuisUtil.add_property(
-                    childrenEntites,
+                    children_entities,
                     LuisUtil.extract_normalized_entity_name(entity),
                     LuisUtil.extract_entity_value(entity),
                 )
 
                 if verbose:
                     LuisUtil.add_property(
-                        childrenEntites[LuisUtil._metadataKey],
+                        children_entities[LuisUtil._metadata_key],
                         LuisUtil.extract_normalized_entity_name(entity),
                         LuisUtil.extract_entity_metadata(entity),
                     )
 
         LuisUtil.add_property(
-            entitiesAndMetadata,
-            LuisUtil.extract_normalized_entity_name(compositeEntityMetadata),
-            childrenEntites,
+            entities_and_metadata,
+            LuisUtil.extract_normalized_entity_name(composite_entity_metadata),
+            children_entities,
         )
         if verbose:
             LuisUtil.add_property(
-                entitiesAndMetadata[LuisUtil._metadataKey],
-                LuisUtil.extract_normalized_entity_name(compositeEntityMetadata),
-                childrenEntitiesMetadata,
+                entities_and_metadata[LuisUtil._metadata_key],
+                LuisUtil.extract_normalized_entity_name(composite_entity_metadata),
+                children_entities_metadata,
             )
 
         # filter entities that were covered by this composite entity
-        return [entity for entity in entities if entity not in coveredSet]
+        return [entity for entity in entities if entity not in covered_set]
 
     @staticmethod
     def composite_contains_entity(
-        compositeEntityMetadata: EntityModel, entity: EntityModel
+        composite_entity_metadata: EntityModel, entity: EntityModel
     ) -> bool:
         return (
-            entity.StartIndex >= compositeEntityMetadata.StartIndex
-            and entity.EndIndex <= compositeEntityMetadata.EndIndex
+            entity.start_index >= composite_entity_metadata.start_index
+            and entity.end_index <= composite_entity_metadata.end_index
         )
 
     @staticmethod
@@ -278,11 +277,8 @@ class LuisUtil:
 
     @staticmethod
     def add_properties(luis: LuisResult, result: RecognizerResult) -> None:
-        if luis.SentimentAnalysis is not None:
-            result.Properties.Add(
-                "sentiment",
-                {
-                    "label": luis.SentimentAnalysis.Label,
-                    "score": luis.SentimentAnalysis.Score,
-                },
-            )
+        if luis.sentiment_analysis is not None:
+            result.properties["sentiment"] = {
+                "label": luis.sentiment_analysis.label,
+                "score": luis.sentiment_analysis.score,
+            }
