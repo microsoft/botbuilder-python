@@ -25,7 +25,7 @@ class ConfirmPrompt(Prompt):
         }    
         
     # TODO: PromptValidator
-    def __init__(self, dialog_id: str, validator: object, default_locale: str):
+    def __init__(self, dialog_id: str, validator: object = None, default_locale: str = None):
         super(ConfirmPrompt, self).__init__(dialog_id, validator)
         if dialog_id is None:
             raise TypeError('ConfirmPrompt(): dialog_id cannot be None.')

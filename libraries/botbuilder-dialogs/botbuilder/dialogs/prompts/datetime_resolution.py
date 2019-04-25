@@ -2,9 +2,9 @@
 # Licensed under the MIT License.
 
 class DateTimeResolution:
-    def __init__(self):
-        self.value = None
-        self.start = None
-        self.end = None
-        self.timex = None
+    def __init__(self, value: str = None, start: str = None, end: str = None, timex: str = None):
+        self.value = value
+        self.start = start
+        self.end = end
+        self.timex = timex
         
