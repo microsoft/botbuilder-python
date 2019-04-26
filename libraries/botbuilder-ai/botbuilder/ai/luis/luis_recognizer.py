@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 import json
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Union
 
 from azure.cognitiveservices.language.luis.runtime import LUISRuntimeClient
 from azure.cognitiveservices.language.luis.runtime.models import LuisResult
@@ -39,7 +39,7 @@ class LuisRecognizer(object):
 
     def __init__(
         self,
-        application: LuisApplication,
+        application: Union[LuisApplication, str],
         prediction_options: LuisPredictionOptions = None,
         include_api_results: bool = False,
     ):
@@ -54,19 +54,22 @@ class LuisRecognizer(object):
         :raises TypeError:
         """
 
-        if application is None:
-            raise TypeError("LuisRecognizer.__init__(): application cannot be None.")
-        self._application = application
+        if isinstance(application, LuisApplication):
+            self._application = application
+        elif isinstance(application, str):
+            self._application = LuisApplication.from_application_endpoint(application)
+        else:
+            raise TypeError("LuisRecognizer.__init__(): application is not an instance of LuisApplication or str.")
 
         self._options = prediction_options or LuisPredictionOptions()
 
         self._include_api_results = include_api_results
 
-        self._telemetry_client = self._options.TelemetryClient
-        self._log_personal_information = self._options.LogPersonalInformation
+        self._telemetry_client = self._options.telemetry_client
+        self._log_personal_information = self._options.log_personal_information
 
-        credentials = CognitiveServicesCredentials(application.EndpointKey)
-        self._runtime = LUISRuntimeClient(application.endpoint, credentials)
+        credentials = CognitiveServicesCredentials(self._application.endpoint_key)
+        self._runtime = LUISRuntimeClient(self._application.endpoint, credentials)
 
     @property
     def log_personal_information(self) -> bool:

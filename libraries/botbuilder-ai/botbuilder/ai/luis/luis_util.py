@@ -80,7 +80,7 @@ class LuisUtil:
         return entities_and_metadata
 
     @staticmethod
-    def number(value: object) -> Union(int, float):
+    def number(value: object) -> Union[int, float]:
         if value is None:
             return None
 
