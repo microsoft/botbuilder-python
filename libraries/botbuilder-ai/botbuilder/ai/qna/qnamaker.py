@@ -10,97 +10,19 @@ from typing import Dict, List, Tuple
 from enum import Enum
 
 import asyncio
-from abc import ABC, abstractmethod
 
-# from . import(
-#     QnATelemetryConstants
-# )
+from .metadata import Metadata
+from .query_result import QueryResult
+from .qnamaker_endpoint import QnAMakerEndpoint
+from .qnamaker_options import QnAMakerOptions
+from .qnamaker_telemetry_client import QnAMakerTelemetryClient
+from .qna_telemetry_constants import QnATelemetryConstants
+from .qnamaker_trace_info import QnAMakerTraceInfo
 
 QNAMAKER_TRACE_TYPE = 'https://www.qnamaker.ai/schemas/trace'
 QNAMAKER_TRACE_NAME = 'QnAMaker'
 QNAMAKER_TRACE_LABEL = 'QnAMaker Trace'
 
-class Metadata:
-    def __init__(self, name, value):
-        self.name = name
-        self.value = value
-
-class QueryResult:
-    def __init__(self, questions: str, answer: str, score: float, metadata: [Metadata], source: str, id: int):
-        self.questions = questions,
-        self.answer = answer,
-        self.score = score,
-        self.metadata = Metadata,
-        self.source = source
-        self.id = id
-
-class QnAMakerEndpoint:
-    def __init__(self, knowledge_base_id: str, endpoint_key: str, host: str):
-        self.knowledge_base_id = knowledge_base_id
-        self.endpoint_key = endpoint_key
-        self.host = host
-
-# figure out if 300 milliseconds is ok for python requests library...or 100000
-class QnAMakerOptions:
-    def __init__(self, score_threshold: float = 0.0, timeout: int = 0, top: int = 0, strict_filters: [Metadata] = []):
-        self.score_threshold = score_threshold
-        self.timeout = timeout
-        self.top = top
-        self.strict_filters = strict_filters
-
-class QnATelemetryConstants(str, Enum):
-    """
-    The IBotTelemetryClient event and property names that logged by default.
-    """
-
-    qna_message_event = 'QnaMessage'
-    """Event name"""
-    knowledge_base_id_property = 'knowledgeBaseId'
-    answer_property = 'answer'
-    article_found_property = 'articleFound'
-    channel_id_property = 'channelId'
-    conversation_id_property = 'conversationId'
-    question_property = 'question'
-    matched_question_property = 'matchedQuestion'
-    question_id_property = 'questionId'
-    score_metric = 'score'
-    username_property = 'username'
-
-class QnAMakerTelemetryClient(ABC):
-    def __init__(
-        self, 
-        log_personal_information: bool, 
-        telemetry_client: BotTelemetryClient
-    ):
-        self.log_personal_information = log_personal_information,
-        self.telemetry_client = telemetry_client
-    
-    @abstractmethod
-    def get_answers(
-        self, 
-        context: TurnContext, 
-        options: QnAMakerOptions = None, 
-        telemetry_properties: Dict[str,str] = None, 
-        telemetry_metrics: Dict[str, float] = None
-    ):
-        raise NotImplementedError('QnAMakerTelemetryClient.get_answers(): is not implemented.')
-
-class QnAMakerTraceInfo:
-    def __init__(
-        self, 
-        message: Activity, 
-        query_results: [QueryResult], 
-        knowledge_base_id, 
-        score_threshold, 
-        top, 
-        strict_filters
-    ):
-        self.message = message,
-        self.query_results = query_results,
-        self.knowledge_base_id = knowledge_base_id,
-        self.score_threshold = score_threshold,
-        self.top = top,
-        self.strict_filters = strict_filters
 
 class QnAMaker(QnAMakerTelemetryClient):
     def __init__(
