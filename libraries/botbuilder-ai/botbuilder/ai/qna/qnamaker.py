@@ -6,30 +6,19 @@ from botbuilder.core import BotAdapter, BotTelemetryClient, NullTelemetryClient,
 # import http.client, urllib.parse, json, time, urllib.request
 import json, requests
 from copy import copy
-from typing import Dict
+from typing import Dict, List, Tuple
+from enum import Enum
+
 import asyncio
 from abc import ABC, abstractmethod
+
+# from . import(
+#     QnATelemetryConstants
+# )
 
 QNAMAKER_TRACE_TYPE = 'https://www.qnamaker.ai/schemas/trace'
 QNAMAKER_TRACE_NAME = 'QnAMaker'
 QNAMAKER_TRACE_LABEL = 'QnAMaker Trace'
-
-# DELETE YO
-class SimpleAdapter(BotAdapter):
-    async def send_activities(self, context, activities):
-        responses = []
-        for (idx, activity) in enumerate(activities):
-            responses.append(ResourceResponse(id='5678'))
-        return responses
-
-    async def update_activity(self, context, activity):
-        assert context is not None
-        assert activity is not None
-
-    async def delete_activity(self, context, reference):
-        assert context is not None
-        assert reference is not None
-        assert reference.activity_id == '1234'
 
 ACTIVITY = Activity(id='1234',
                     type='message',
@@ -69,17 +58,53 @@ class QnAMakerOptions:
         self.top = top
         self.strict_filters = strict_filters
 
+class QnATelemetryConstants(str, Enum):
+    """
+    The IBotTelemetryClient event and property names that logged by default.
+    """
+
+    qna_message_event = 'QnaMessage'
+    """Event name"""
+    knowledge_base_id_property = 'knowledgeBaseId'
+    answer_property = 'answer'
+    article_found_property = 'articleFound'
+    channel_id_property = 'channelId'
+    conversation_id_property = 'conversationId'
+    question_property = 'question'
+    matched_question_property = 'matchedQuestion'
+    question_id_property = 'questionId'
+    score_metric = 'score'
+    username_property = 'username'
+
 class QnAMakerTelemetryClient(ABC):
-    def __init__(self, log_personal_information: bool, telemetry_client: BotTelemetryClient):
+    def __init__(
+        self, 
+        log_personal_information: bool, 
+        telemetry_client: BotTelemetryClient
+    ):
         self.log_personal_information = log_personal_information,
         self.telemetry_client = telemetry_client
     
     @abstractmethod
-    def get_answers(self, context: TurnContext, options: QnAMakerOptions = None, telemetry_properties: Dict[str,str] = None, telemetry_metrics: Dict[str, int] = None):
+    def get_answers(
+        self, 
+        context: TurnContext, 
+        options: QnAMakerOptions = None, 
+        telemetry_properties: Dict[str,str] = None, 
+        telemetry_metrics: Dict[str, float] = None
+    ):
         raise NotImplementedError('QnAMakerTelemetryClient.get_answers(): is not implemented.')
 
 class QnAMakerTraceInfo:
-    def __init__(self, message, query_results, knowledge_base_id, score_threshold, top, strict_filters):
+    def __init__(
+        self, 
+        message: Activity, 
+        query_results: [QueryResult], 
+        knowledge_base_id, 
+        score_threshold, 
+        top, 
+        strict_filters
+    ):
         self.message = message,
         self.query_results = query_results,
         self.knowledge_base_id = knowledge_base_id,
@@ -87,17 +112,91 @@ class QnAMakerTraceInfo:
         self.top = top,
         self.strict_filters = strict_filters
 
-class QnAMaker():
-    def __init__(self, endpoint: QnAMakerEndpoint, options: QnAMakerOptions = QnAMakerOptions()):
+class QnAMaker(QnAMakerTelemetryClient):
+    def __init__(
+        self, 
+        endpoint: QnAMakerEndpoint, 
+        options: QnAMakerOptions = QnAMakerOptions(), 
+        telemetry_client: BotTelemetryClient = None, 
+        log_personal_information: bool = None
+    ):
         self._endpoint = endpoint
         self._is_legacy_protocol: bool = self._endpoint.host.endswith('v3.0')
         self._options: QnAMakerOptions = options
-        self.validate_options(self._options)
+        self._telemetry_client = telemetry_client or NullTelemetryClient()
+        self._log_personal_information = log_personal_information or False
 
+        self.validate_options(self._options)
     
-    async def get_answers(self, context: TurnContext, options: QnAMakerOptions = None):
-        # don't forget to add timeout
-        # maybe omit metadata boost?
+    @property
+    def log_personal_information(self) -> bool:
+        """Gets a value indicating whether to log personal information that came from the user to telemetry.
+        
+        :return: If True, personal information is logged to Telemetry; otherwise the properties will be filtered.
+        :rtype: bool
+        """
+
+        return self._log_personal_information
+
+    @log_personal_information.setter
+    def log_personal_information(self, value: bool) -> None:
+        """Sets a value indicating whether to log personal information that came from the user to telemetry.
+        
+        :param value: If True, personal information is logged to Telemetry; otherwise the properties will be filtered.
+        :type value: bool
+        :return:
+        :rtype: None
+        """
+
+        self._log_personal_information = value
+
+    @property
+    def telemetry_client(self) -> BotTelemetryClient:
+        """Gets the currently configured BotTelemetryClient that logs the event.
+        
+        :return: The BotTelemetryClient being used to log events.
+        :rtype: BotTelemetryClient
+        """
+
+        return self._telemetry_client
+
+    @telemetry_client.setter
+    def telemetry_client(self, value: BotTelemetryClient):
+        """Sets the currently configured BotTelemetryClient that logs the event.
+        
+        :param value: The BotTelemetryClient being used to log events.
+        :type value: BotTelemetryClient
+        """
+
+        self._telemetry_client = value
+
+    async def on_qna_result(self):
+        # event_data = await fill_qna_event()
+        pass
+
+    async def fill_qna_event(
+        self,
+        query_results: [QueryResult],
+        turn_context: TurnContext,
+        telemetry_properties: Dict[str,str] = None,
+        telemetry_metrics: Dict[str,float] = None
+    ) -> Tuple[ Dict[str, str], Dict[str,int] ]:
+        
+        properties: Dict[str,str] = dict()
+        metrics: Dict[str, float] = dict()
+
+        properties[QnATelemetryConstants.knowledge_base_id_property] = self._endpoint.knowledge_base_id
+
+        pass
+
+    async def get_answers(
+        self, 
+        context: TurnContext, 
+        options: QnAMakerOptions = None, 
+        telemetry_properties: Dict[str,str] = None,
+        telemetry_metrics: Dict[str,int] = None
+    ):
+        # add timeout
         hydrated_options = self.hydrate_options(options)
         self.validate_options(hydrated_options)
         
@@ -124,7 +223,7 @@ class QnAMaker():
         if not options.strict_filters:
             options.strict_filters = [Metadata]
     
-    def hydrate_options(self, query_options: QnAMakerOptions):
+    def hydrate_options(self, query_options: QnAMakerOptions) -> QnAMakerOptions:
         hydrated_options = copy(self._options)
 
         if query_options:
@@ -139,11 +238,11 @@ class QnAMaker():
 
         return hydrated_options
     
-    def query_qna_service(self, message_activity: Activity, options: QnAMakerOptions):
+    def query_qna_service(self, message_activity: Activity, options: QnAMakerOptions) -> [QueryResult]:
         url = f'{ self._endpoint.host }/knowledgebases/{ self._endpoint.knowledge_base_id }/generateAnswer'
 
         question = {
-            'question': context.activity.text,
+            'question': message_activity.text,
             'top': options.top,
             'scoreThreshold': options.score_threshold,
             'strictFilters': options.strict_filters
@@ -179,7 +278,7 @@ class QnAMaker():
 
         await turn_context.send_activity(trace_activity)
     
-    def format_qna_result(self, qna_result: requests.Response, options: QnAMakerOptions):
+    def format_qna_result(self, qna_result: requests.Response, options: QnAMakerOptions) -> [QueryResult]:
         result = qna_result.json()
 
         answers_within_threshold = [
@@ -203,58 +302,8 @@ class QnAMaker():
             headers['Ocp-Apim-Subscription-Key'] = self._endpoint.endpoint_key
         else:
             headers['Authorization'] = f'EndpointKey {self._endpoint.endpoint_key}'
+        
         # need user-agent header
+        
         return headers
         
-
-        
-
-  
-    
-adapter = SimpleAdapter()
-context = TurnContext(adapter, ACTIVITY)
-
-endpointy = QnAMakerEndpoint('a090f9f3-2f8e-41d1-a581-4f7a49269a0c', '4a439d5b-163b-47c3-b1d1-168cc0db5608', 'https://ashleyNlpBot1-qnahost.azurewebsites.net/qnamaker')
-qna = QnAMaker(endpointy)
-optionsies = QnAMakerOptions(top=3, strict_filters=[{'name': 'movie', 'value': 'disney'}])
-
-loop = asyncio.get_event_loop()
-r = loop.run_until_complete((qna.get_answers(context, optionsies)))
-loop.close()
-
-# result = qna.get_answers(context)
-# print(type(result))
-# print(r)
-
-print('donesies!')
-
-# context2 = TurnContext(adapter, ACTIVITY)
-# print(context2.__dict__.update({'test': '1'}))
-
-# qna_ressy = {
-#     'answers': [
-#         {
-#             'questions': ['hi', 'greetings', 'good morning', 'good evening'],
-#             'answer': 'Hello!',
-#             'score': 100.0,
-#             'id': 1,
-#             'source': 'QnAMaker.tsv',
-#             'metadata': []
-#         },
-#         {
-#             'questions': ['hi', 'greetings', 'good morning', 'good evening'],
-#             'answer': 'hi!',
-#             'score': 80.0,
-#             'id': 1,
-#             'source': 'QnAMaker.tsv',
-#             'metadata': []
-#         }
-#     ],
-#     'debugInfo': None
-# }
-
-# my_first_ans = qna_ressy['answers'][0]
-
-# my_query = QueryResult(**my_first_ans)
-
-# print(my_query)

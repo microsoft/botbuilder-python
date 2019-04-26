@@ -2,5 +2,9 @@
 # Licensed under the MIT License.
 
 from .qnamaker import QnAMaker
+from .qna_telemetry_constants import QnATelemetryConstants
 
-__all__ = ["QnAMaker"]
+__all__ = [
+    "QnAMaker",
+    "QnATelemetryConstants"
+]
