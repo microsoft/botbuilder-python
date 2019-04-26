@@ -7,7 +7,9 @@ from typing import List, Tuple
 from uuid import uuid4
 from botbuilder.schema import Activity, ChannelAccount, ResourceResponse, ConversationAccount
 from botbuilder.core import BotAdapter, BotTelemetryClient, NullTelemetryClient, TurnContext
-from botbuilder.ai.qna import QnAMakerEndpoint, QnAMaker, QnAMakerOptions
+from botbuilder.ai.qna import QnAMakerEndpoint, QnAMaker, QnAMakerOptions, QnATelemetryConstants
+
+
 # DELETE YO
 ACTIVITY = Activity(id='1234',
                     type='message',

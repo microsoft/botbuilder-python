@@ -1,14 +1,11 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from botbuilder.schema import Activity, ChannelAccount, ResourceResponse, ConversationAccount
-from botbuilder.core import BotAdapter, BotTelemetryClient, NullTelemetryClient, TurnContext
-# import http.client, urllib.parse, json, time, urllib.request
+from botbuilder.schema import Activity
+from botbuilder.core import BotTelemetryClient, NullTelemetryClient, TurnContext
 from copy import copy
 import json, requests
 from typing import Dict, List, NamedTuple
-
-import asyncio
 
 from .metadata import Metadata
 from .query_result import QueryResult
@@ -28,30 +25,41 @@ from .qnamaker_trace_info import QnAMakerTraceInfo
 #     QnAMakerTraceInfo
 # )
 
-QNAMAKER_TRACE_TYPE = 'https://www.qnamaker.ai/schemas/trace'
 QNAMAKER_TRACE_NAME = 'QnAMaker'
 QNAMAKER_TRACE_LABEL = 'QnAMaker Trace'
+QNAMAKER_TRACE_TYPE = 'https://www.qnamaker.ai/schemas/trace'
 
 class EventData(NamedTuple):
     properties: Dict[str, str]
     metrics: Dict[str, float]
 
 class QnAMaker(QnAMakerTelemetryClient):
+    """ 
+    Class used to query a QnA Maker knowledge base for answers. 
+    """
+
     def __init__(
         self, 
         endpoint: QnAMakerEndpoint, 
-        options: QnAMakerOptions = QnAMakerOptions(), 
+        options: QnAMakerOptions = None, 
         telemetry_client: BotTelemetryClient = None, 
         log_personal_information: bool = None
     ):
+        if not isinstance(endpoint, QnAMakerEndpoint):
+            raise TypeError('QnAMaker.__init__(): endpoint is not an instance of QnAMakerEndpoint')
+
+        if endpoint.host.endswith('v2.0'):
+            raise ValueError('v2.0 of QnA Maker service is no longer supported in the Bot Framework. Please upgrade your QnA Maker service at www.qnamaker.ai.')
+
         self._endpoint = endpoint
         self._is_legacy_protocol: bool = self._endpoint.host.endswith('v3.0')
-        self._options: QnAMakerOptions = options
+
+        self._options: QnAMakerOptions = options or QnAMakerOptions()
+        self.validate_options(self._options)
+
         self._telemetry_client = telemetry_client or NullTelemetryClient()
         self._log_personal_information = log_personal_information or False
 
-        self.validate_options(self._options)
-    
     @property
     def log_personal_information(self) -> bool:
         """Gets a value indicating whether to log personal information that came from the user to telemetry.
@@ -103,7 +111,6 @@ class QnAMaker(QnAMakerTelemetryClient):
     ):
         event_data = await self.fill_qna_event(query_results, turn_context, telemetry_properties, telemetry_metrics)
 
-        # Track the event.
         self.telemetry_client.track_event(
             name = QnATelemetryConstants.qna_message_event,
             properties = event_data.properties,
@@ -117,7 +124,14 @@ class QnAMaker(QnAMakerTelemetryClient):
         telemetry_properties: Dict[str,str] = None,
         telemetry_metrics: Dict[str,float] = None
     ) -> EventData:
-        
+        """
+        Fills the event properties and metrics for the QnaMessage event for telemetry.
+
+        :return: A tuple of event data properties and metrics that will be sent to the BotTelemetryClient.track_event() method for the QnAMessage event. The properties and metrics returned the standard properties logged with any properties passed from the get_answers() method.
+
+        :rtype: EventData
+        """
+
         properties: Dict[str,str] = dict()
         metrics: Dict[str, float] = dict()
 
@@ -126,7 +140,7 @@ class QnAMaker(QnAMakerTelemetryClient):
         text: str = turn_context.activity.text
         userName: str = turn_context.activity.from_property.name
 
-        # Use the LogPersonalInformation flag to toggle logging PII data; text is a common example.
+        # Use the LogPersonalInformation flag to toggle logging PII data; text and username are common examples.
         if self.log_personal_information:
             if text:
                 properties[QnATelemetryConstants.question_property] = text
@@ -145,6 +159,7 @@ class QnAMaker(QnAMakerTelemetryClient):
                 QnATelemetryConstants.score_metric: query_result.score,
                 QnATelemetryConstants.article_found_property: 'true'
             }
+
             properties.update(result_properties)
         else:
             no_match_properties = {
@@ -153,7 +168,7 @@ class QnAMaker(QnAMakerTelemetryClient):
                 QnATelemetryConstants.answer_property : 'No Qna Answer matched',
                 QnATelemetryConstants.article_found_property : 'false'
             }
-
+            
             properties.update(no_match_properties)
 
         # Additional Properties can override "stock" properties.
@@ -172,8 +187,16 @@ class QnAMaker(QnAMakerTelemetryClient):
         options: QnAMakerOptions = None, 
         telemetry_properties: Dict[str,str] = None,
         telemetry_metrics: Dict[str,int] = None
-    ):
-        # add timeout
+    ) -> [QueryResult]:
+        """
+        Generates answers from the knowledge base.
+        
+        :return: A list of answers for the user's query, sorted in decreasing order of ranking score.
+        
+        :rtype: [QueryResult]
+        """
+
+
         hydrated_options = self.hydrate_options(options)
         self.validate_options(hydrated_options)
         
@@ -190,17 +213,24 @@ class QnAMaker(QnAMakerTelemetryClient):
         if not options.top:
             options.top = 1
         
-        # write range error for if scorethreshold < 0 or > 1
+        if options.score_threshold < 0 or options.score_threshold > 1:
+            raise ValueError('Score threshold should be a value between 0 and 1')
 
-        if not options.timeout:
-            options.timeout = 100000 # check timeout units in requests module
-        
-        # write range error for if top < 1
+        if options.top < 1:
+            raise ValueError('QnAMakerOptions.top should be an integer greater than 0')
         
         if not options.strict_filters:
             options.strict_filters = [Metadata]
     
     def hydrate_options(self, query_options: QnAMakerOptions) -> QnAMakerOptions:
+        """
+        Combines QnAMakerOptions passed into the QnAMaker constructor with the options passed as arguments into get_answers().
+        
+        :return: QnAMakerOptions with options passed into constructor overwritten by new options passed into get_answers()
+
+        :rtype: QnAMakerOptions
+        """
+
         hydrated_options = copy(self._options)
 
         if query_options:
@@ -267,6 +297,8 @@ class QnAMaker(QnAMakerTelemetryClient):
         ]
         sorted_answers = sorted(answers_within_threshold, key = lambda ans: ans['score'], reverse = True)
 
+        # The old version of the protocol returns the id in a field called qnaId
+        # The following translates this old structure to the new
         if self._is_legacy_protocol:
             for answer in answers_within_threshold:
                 answer['id'] = answer.pop('qnaId', None)
@@ -286,4 +318,3 @@ class QnAMaker(QnAMakerTelemetryClient):
         # need user-agent header
         
         return headers
-        
