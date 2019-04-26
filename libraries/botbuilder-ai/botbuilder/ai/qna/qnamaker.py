@@ -20,16 +20,6 @@ QNAMAKER_TRACE_TYPE = 'https://www.qnamaker.ai/schemas/trace'
 QNAMAKER_TRACE_NAME = 'QnAMaker'
 QNAMAKER_TRACE_LABEL = 'QnAMaker Trace'
 
-ACTIVITY = Activity(id='1234',
-                    type='message',
-                    text='up',
-                    from_property=ChannelAccount(id='user', name='User Name'),
-                    recipient=ChannelAccount(id='bot', name='Bot Name'),
-                    conversation=ConversationAccount(id='convo', name='Convo Name'),
-                    channel_id='UnitTest',
-                    service_url='https://example.org'
-                    )
-
 class Metadata:
     def __init__(self, name, value):
         self.name = name
