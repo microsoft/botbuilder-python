@@ -9,14 +9,14 @@ class LuisPredictionOptions(object):
     Optional parameters for a LUIS prediction request.
     """
 
-    def __init__(self):
+    def __init__(self, timeout: float = 100000):
         self._bing_spell_check_subscription_key: str = None
         self._include_all_intents: bool = None
         self._include_instance_data: bool = None
         self._log: bool = None
         self._spell_check: bool = None
         self._staging: bool = None
-        self._timeout: float = 100000
+        self._timeout: float = timeout
         self._timezone_offset: float = None
         self._telemetry_client: BotTelemetryClient = NullTelemetryClient()
         self._log_personal_information: bool = False

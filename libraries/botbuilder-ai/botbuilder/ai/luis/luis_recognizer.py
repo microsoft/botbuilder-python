@@ -59,7 +59,9 @@ class LuisRecognizer(object):
         elif isinstance(application, str):
             self._application = LuisApplication.from_application_endpoint(application)
         else:
-            raise TypeError("LuisRecognizer.__init__(): application is not an instance of LuisApplication or str.")
+            raise TypeError(
+                "LuisRecognizer.__init__(): application is not an instance of LuisApplication or str."
+            )
 
         self._options = prediction_options or LuisPredictionOptions()
 
@@ -146,7 +148,7 @@ class LuisRecognizer(object):
 
         return top_intent or default_intent
 
-    async def recognize(
+    def recognize(
         self,
         turn_context: TurnContext,
         telemetry_properties: Dict[str, str] = None,
@@ -164,11 +166,11 @@ class LuisRecognizer(object):
         :rtype: RecognizerResult
         """
 
-        return await self._recognize_internal(
+        return self._recognize_internal(
             turn_context, telemetry_properties, telemetry_metrics
         )
 
-    async def on_recognizer_result(
+    def on_recognizer_result(
         self,
         recognizer_result: RecognizerResult,
         turn_context: TurnContext,
@@ -187,7 +189,7 @@ class LuisRecognizer(object):
         :param telemetry_metrics: Dict[str, float], optional
         """
 
-        properties = await self.fill_luis_event_properties(
+        properties = self.fill_luis_event_properties(
             recognizer_result, turn_context, telemetry_properties
         )
 
@@ -205,7 +207,7 @@ class LuisRecognizer(object):
         if intent_names:
             intent_name = intent_names[0]
             if intents[intent_name] is not None:
-                intent_score = "{:.2f}".format(intents[intent_name])
+                intent_score = "{:.2f}".format(intents[intent_name].score)
 
         return intent_name, intent_score
 
@@ -244,12 +246,12 @@ class LuisRecognizer(object):
 
         # Add the intent score and conversation id properties
         properties: Dict[str, str] = {
-            LuisTelemetryConstants.application_id_property: self._application.ApplicationId,
+            LuisTelemetryConstants.application_id_property: self._application.application_id,
             LuisTelemetryConstants.intent_property: intent_name,
             LuisTelemetryConstants.intent_score_property: intent_score,
             LuisTelemetryConstants.intent2_property: intent2_name,
             LuisTelemetryConstants.intent_score2_property: intent2_score,
-            LuisTelemetryConstants.from_id_property: turn_context.Activity.From.Id,
+            LuisTelemetryConstants.from_id_property: turn_context.activity.from_property.id,
         }
 
         sentiment = recognizer_result.properties.get("sentiment")
@@ -280,7 +282,7 @@ class LuisRecognizer(object):
 
         return properties
 
-    async def _recognize_internal(
+    def _recognize_internal(
         self,
         turn_context: TurnContext,
         telemetry_properties: Dict[str, str],
@@ -301,7 +303,7 @@ class LuisRecognizer(object):
                 text=utterance, intents={"": IntentScore(score=1.0)}, entities={}
             )
         else:
-            luis_result = await self._runtime.prediction.resolve(
+            luis_result = self._runtime.prediction.resolve(
                 self._application.application_id,
                 utterance,
                 timezoneOffset=self._options.timezone_offset,
@@ -329,21 +331,8 @@ class LuisRecognizer(object):
                 recognizer_result.properties["luisResult"] = luis_result
 
         # Log telemetry
-        await self.on_recognizer_result(
+        self.on_recognizer_result(
             recognizer_result, turn_context, telemetry_properties, telemetry_metrics
         )
 
-        trace_info = {
-            "recognizerResult": recognizer_result,
-            "luisModel": {"ModelID": self._application.application_id},
-            "luisOptions": self._options,
-            "luisResult": luis_result,
-        }
-
-        await turn_context.trace_activity_async(
-            "LuisRecognizer",
-            trace_info,
-            LuisRecognizer.luis_trace_type,
-            LuisRecognizer.luis_trace_label,
-        )
         return recognizer_result
