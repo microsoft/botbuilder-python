@@ -160,7 +160,7 @@ class LuisUtil:
     @staticmethod
     def extract_normalized_entity_name(entity: EntityModel) -> str:
         # Type::Role -> Role
-        type = entity.Type.split(":")[-1]
+        type = entity.type.split(":")[-1]
         if type.startswith("builtin.datetimeV2."):
             type = "datetime"
 
