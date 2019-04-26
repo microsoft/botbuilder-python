@@ -62,7 +62,7 @@ class BotFrameworkAdapter(BotAdapter):
             parameters = ConversationParameters(bot=reference.bot)
             client = self.create_connector_client(reference.service_url)
 
-            resource_response = await client.conversations.create_conversation_async(parameters)
+            resource_response = await client.conversations.create_conversation(parameters)
             request = TurnContext.apply_conversation_reference(Activity(), reference, is_incoming=True)
             request.conversation = ConversationAccount(id=resource_response.id)
             if resource_response.service_url:
@@ -158,7 +158,7 @@ class BotFrameworkAdapter(BotAdapter):
         """
         try:
             client = self.create_connector_client(activity.service_url)
-            return await client.conversations.update_activity_async(
+            return await client.conversations.update_activity(
                 activity.conversation.id,
                 activity.conversation.activity_id,
                 activity)
@@ -175,7 +175,7 @@ class BotFrameworkAdapter(BotAdapter):
         """
         try:
             client = self.create_connector_client(conversation_reference.service_url)
-            await client.conversations.delete_activity_async(conversation_reference.conversation.id,
+            await client.conversations.delete_activity(conversation_reference.conversation.id,
                                                              conversation_reference.activity_id)
         except Exception as e:
             raise e
@@ -194,7 +194,7 @@ class BotFrameworkAdapter(BotAdapter):
                         await asyncio.sleep(delay_in_ms)
                 else:
                     client = self.create_connector_client(activity.service_url)
-                    await client.conversations.send_to_conversation_async(activity.conversation.id, activity)
+                    await client.conversations.send_to_conversation(activity.conversation.id, activity)
         except Exception as e:
             raise e
 
@@ -214,7 +214,7 @@ class BotFrameworkAdapter(BotAdapter):
             service_url = context.activity.service_url
             conversation_id = context.activity.conversation.id
             client = self.create_connector_client(service_url)
-            return await client.conversations.delete_conversation_member_async(conversation_id, member_id)
+            return await client.conversations.delete_conversation_member(conversation_id, member_id)
         except AttributeError as attr_e:
             raise attr_e
         except Exception as e:
@@ -240,7 +240,7 @@ class BotFrameworkAdapter(BotAdapter):
             service_url = context.activity.service_url
             conversation_id = context.activity.conversation.id
             client = self.create_connector_client(service_url)
-            return await client.conversations.get_activity_members_async(conversation_id, activity_id)
+            return await client.conversations.get_activity_members(conversation_id, activity_id)
         except Exception as e:
             raise e
 
@@ -259,7 +259,7 @@ class BotFrameworkAdapter(BotAdapter):
             service_url = context.activity.service_url
             conversation_id = context.activity.conversation.id
             client = self.create_connector_client(service_url)
-            return await client.conversations.get_conversation_members_async(conversation_id)
+            return await client.conversations.get_conversation_members(conversation_id)
         except Exception as e:
             raise e
 
@@ -273,7 +273,7 @@ class BotFrameworkAdapter(BotAdapter):
         :return:
         """
         client = self.create_connector_client(service_url)
-        return await client.conversations.get_conversations_async(continuation_token)
+        return await client.conversations.get_conversations(continuation_token)
 
     def create_connector_client(self, service_url: str) -> ConnectorClient:
         """

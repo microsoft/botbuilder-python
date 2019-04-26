@@ -6,15 +6,15 @@ from botbuilder.schema import Activity
 
 class PromptOptions:
 
-    def __init__(self):
-        self._prompt: Activity = None 
-        self._retry_prompt: Activity = None
+    def __init__(self, prompt: Activity = None, retry_prompt: Activity = None, choices: [] = None, style: object = None, validations: object = None, number_of_attempts: int = 0):
+        self._prompt: prompt 
+        self._retry_prompt: retry_prompt
         # TODO: Replace with Choice Object once ported
-        self._choices: [] = None
+        self._choices: choices
         # TODO: Replace with ListStyle Object once ported
-        self._style: object = None
-        self._validations: object = None
-        self._number_of_attempts: int = 0
+        self._style = style
+        self._validations = validations
+        self._number_of_attempts = validations
         
     @property
     def prompt(self) -> Activity:

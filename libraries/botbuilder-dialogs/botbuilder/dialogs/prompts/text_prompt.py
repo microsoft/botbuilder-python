@@ -2,8 +2,8 @@
 # Licensed under the MIT License.
 
 from typing import Dict
-from botbuilder.core.turn_context import TurnContext
-from botbuilder.schema import (ActivityTypes, Activity)
+from botbuilder.core import TurnContext
+from botbuilder.schema import ActivityTypes, Activity
 from .datetime_resolution import DateTimeResolution
 from .prompt import Prompt
 from .confirm_prompt import ConfirmPrompt
@@ -13,7 +13,7 @@ from .prompt_recognizer_result import PromptRecognizerResult
 
 class TextPrompt(Prompt):
     # TODO: PromptValidator
-    def __init__(self, dialog_id: str, validator: object):
+    def __init__(self, dialog_id: str, validator: object = None):
         super(TextPrompt, self).__init__(dialog_id, validator)
 
     async def on_prompt(self, turn_context: TurnContext, state: Dict[str, object], options: PromptOptions, is_retry: bool):
