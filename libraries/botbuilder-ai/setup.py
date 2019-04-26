@@ -38,5 +38,5 @@ setup(
         "Operating System :: OS Independent",
         "Development Status :: 3 - Alpha",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
-    ],
+    ]
 )
