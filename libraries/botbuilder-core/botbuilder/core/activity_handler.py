@@ -29,9 +29,9 @@ class ActivityHandler:
 
     async def on_conversation_update_activity(self, turn_context: TurnContext):
         if turn_context.activity.members_added is not None and len(turn_context.activity.members_added) > 0:
-            return await self.on_members_added_activity(turn_context)
+            return await self.on_members_added_activity(turn_context.activity.members_added, turn_context)
         elif turn_context.activity.members_removed is not None and len(turn_context.activity.members_removed) > 0:
-            return await self.on_members_removed_activity(turn_context)
+            return await self.on_members_removed_activity(turn_context.activity.members_removed, turn_context)
         return
 
     async def on_members_added_activity(self, members_added: ChannelAccount, turn_context: TurnContext):
