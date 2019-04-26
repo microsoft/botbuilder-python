@@ -36,4 +36,6 @@ class SimpleAdapter(BotAdapter):
         assert reference.activity_id == '1234'
 
 class QnaApplicationTest(aiounittest.AsyncTestCase):
-    pass
+
+    async def test_initial_test(self):
+        pass

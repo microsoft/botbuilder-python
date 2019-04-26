@@ -4,10 +4,9 @@
 from botbuilder.schema import Activity, ChannelAccount, ResourceResponse, ConversationAccount
 from botbuilder.core import BotAdapter, BotTelemetryClient, NullTelemetryClient, TurnContext
 # import http.client, urllib.parse, json, time, urllib.request
-import json, requests
 from copy import copy
-from typing import Dict, List, Tuple
-from enum import Enum
+import json, requests
+from typing import Dict, List, NamedTuple
 
 import asyncio
 
@@ -19,10 +18,23 @@ from .qnamaker_telemetry_client import QnAMakerTelemetryClient
 from .qna_telemetry_constants import QnATelemetryConstants
 from .qnamaker_trace_info import QnAMakerTraceInfo
 
+# from . import (
+#     Metadata, 
+#     QueryResult, 
+#     QnAMakerEndpoint, 
+#     QnAMakerOptions, 
+#     QnAMakerTelemetryClient, 
+#     QnATelemetryConstants, 
+#     QnAMakerTraceInfo
+# )
+
 QNAMAKER_TRACE_TYPE = 'https://www.qnamaker.ai/schemas/trace'
 QNAMAKER_TRACE_NAME = 'QnAMaker'
 QNAMAKER_TRACE_LABEL = 'QnAMaker Trace'
 
+class EventData(NamedTuple):
+    properties: Dict[str, str]
+    metrics: Dict[str, float]
 
 class QnAMaker(QnAMakerTelemetryClient):
     def __init__(
@@ -82,24 +94,77 @@ class QnAMaker(QnAMakerTelemetryClient):
 
         self._telemetry_client = value
 
-    async def on_qna_result(self):
-        # event_data = await fill_qna_event()
-        pass
+    async def on_qna_result(
+        self,
+        query_results: [QueryResult],
+        turn_context: TurnContext,
+        telemetry_properties: Dict[str, str] = None,
+        telemetry_metrics: Dict[str, float] = None
+    ):
+        event_data = await self.fill_qna_event(query_results, turn_context, telemetry_properties, telemetry_metrics)
 
-    async def fill_qna_event(
+        # Track the event.
+        self.telemetry_client.track_event(
+            name = QnATelemetryConstants.qna_message_event,
+            properties = event_data.properties,
+            measurements = event_data.metrics
+        )
+
+    def fill_qna_event(
         self,
         query_results: [QueryResult],
         turn_context: TurnContext,
         telemetry_properties: Dict[str,str] = None,
         telemetry_metrics: Dict[str,float] = None
-    ) -> Tuple[ Dict[str, str], Dict[str,int] ]:
+    ) -> EventData:
         
         properties: Dict[str,str] = dict()
         metrics: Dict[str, float] = dict()
 
         properties[QnATelemetryConstants.knowledge_base_id_property] = self._endpoint.knowledge_base_id
 
-        pass
+        text: str = turn_context.activity.text
+        userName: str = turn_context.activity.from_property.name
+
+        # Use the LogPersonalInformation flag to toggle logging PII data; text is a common example.
+        if self.log_personal_information:
+            if text:
+                properties[QnATelemetryConstants.question_property] = text
+            
+            if userName:
+                properties[QnATelemetryConstants.username_property] = userName
+
+        # Fill in Qna Results (found or not).
+        if len(query_results) > 0:
+            query_result = query_results[0]
+
+            result_properties = {
+                QnATelemetryConstants.matched_question_property: json.dumps(query_result.questions),
+                QnATelemetryConstants.question_id_property: str(query_result.id),
+                QnATelemetryConstants.answer_property: query_result.answer,
+                QnATelemetryConstants.score_metric: query_result.score,
+                QnATelemetryConstants.article_found_property: 'true'
+            }
+            properties.update(result_properties)
+        else:
+            no_match_properties = {
+                QnATelemetryConstants.matched_question_property : 'No Qna Question matched',
+                QnATelemetryConstants.question_id_property : 'No Qna Question Id matched',
+                QnATelemetryConstants.answer_property : 'No Qna Answer matched',
+                QnATelemetryConstants.article_found_property : 'false'
+            }
+
+            properties.update(no_match_properties)
+
+        # Additional Properties can override "stock" properties.
+        if telemetry_properties:
+            properties.update(telemetry_properties)
+
+        # Additional Metrics can override "stock" metrics.
+        if telemetry_metrics:
+            metrics.update(telemetry_metrics)
+        
+        return EventData(properties=properties, metrics=metrics)
 
     async def get_answers(
         self, 
@@ -139,7 +204,10 @@ class QnAMaker(QnAMakerTelemetryClient):
         hydrated_options = copy(self._options)
 
         if query_options:
-            if (query_options.score_threshold != hydrated_options.score_threshold and query_options.score_threshold):
+            if (
+                query_options.score_threshold != hydrated_options.score_threshold 
+                and query_options.score_threshold
+            ):
                 hydrated_options.score_threshold = query_options.score_threshold
             
             if (query_options.top != hydrated_options.top and query_options.top != 0):
