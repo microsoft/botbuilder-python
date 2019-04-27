@@ -252,6 +252,56 @@ class LuisRecognizerTest(unittest.TestCase):
         self.assertEqual(22, result.entities["$instance"]["Airline"][0]["endIndex"])
         self.assertEqual("dl", result.entities["$instance"]["Airline"][0]["text"])
 
+    def test_multiple_intents_composite_entity_model(self):
+        utterance: str = "Please deliver it to 98033 WA"
+        response_path: str = "MultipleIntents_CompositeEntityModel.json"
+
+        result = LuisRecognizerTest._get_recognizer_result(utterance, response_path)
+
+        self.assertIsNotNone(result)
+        self.assertIsNotNone(result.text)
+        self.assertEqual(utterance, result.text)
+        self.assertIsNotNone(result.intents)
+        self.assertIsNotNone(result.intents["Delivery"])
+        self.assertIsNotNone(result.entities)
+        self.assertIsNone(result.entities.get("number"))
+        self.assertIsNone(result.entities.get("State"))
+        self.assertIsNotNone(result.entities["Address"])
+        self.assertEqual(98033, result.entities["Address"][0]["number"][0])
+        self.assertEqual("wa", result.entities["Address"][0]["State"][0])
+        self.assertIsNotNone(result.entities["$instance"])
+        self.assertIsNone(result.entities["$instance"].get("number"))
+        self.assertIsNone(result.entities["$instance"].get("State"))
+        self.assertIsNotNone(result.entities["$instance"]["Address"])
+        self.assertEqual(21, result.entities["$instance"]["Address"][0]["startIndex"])
+        self.assertEqual(29, result.entities["$instance"]["Address"][0]["endIndex"])
+        self.assert_score(result.entities["$instance"]["Address"][0]["score"])
+        self.assertIsNotNone(result.entities["Address"][0]["$instance"])
+        self.assertIsNotNone(result.entities["Address"][0]["$instance"]["number"])
+        self.assertEqual(
+            21, result.entities["Address"][0]["$instance"]["number"][0]["startIndex"]
+        )
+        self.assertEqual(
+            26, result.entities["Address"][0]["$instance"]["number"][0]["endIndex"]
+        )
+        self.assertEqual(
+            "98033", result.entities["Address"][0]["$instance"]["number"][0]["text"]
+        )
+        self.assertIsNotNone(result.entities["Address"][0]["$instance"]["State"])
+        self.assertEqual(
+            27, result.entities["Address"][0]["$instance"]["State"][0]["startIndex"]
+        )
+        self.assertEqual(
+            29, result.entities["Address"][0]["$instance"]["State"][0]["endIndex"]
+        )
+        self.assertEqual(
+            "wa", result.entities["Address"][0]["$instance"]["State"][0]["text"]
+        )
+        self.assertEqual("WA", result.text[27:29])
+        self.assert_score(
+            result.entities["Address"][0]["$instance"]["State"][0]["score"]
+        )
+
     def assert_score(self, score: float):
         self.assertTrue(score >= 0)
         self.assertTrue(score <= 1)

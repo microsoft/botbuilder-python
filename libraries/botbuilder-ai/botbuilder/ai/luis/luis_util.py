@@ -214,7 +214,7 @@ class LuisUtil:
             )
             children_entities[LuisUtil._metadata_key] = {}
 
-        covered_set: Set[EntityModel] = set()
+        covered_set: List[EntityModel] = []
         for child in composite_entity.children:
             for entity in entities:
                 # We already covered this entity
@@ -222,13 +222,13 @@ class LuisUtil:
                     continue
 
                 # This entity doesn't belong to this composite entity
-                if child.Type != entity.Type or not LuisUtil.composite_contains_entity(
+                if child.type != entity.type or not LuisUtil.composite_contains_entity(
                     composite_entity_metadata, entity
                 ):
                     continue
 
                 # Add to the set to ensure that we don't consider the same child entity more than once per composite
-                covered_set.add(entity)
+                covered_set.append(entity)
                 LuisUtil.add_property(
                     children_entities,
                     LuisUtil.extract_normalized_entity_name(entity),
