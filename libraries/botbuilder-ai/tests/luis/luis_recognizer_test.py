@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 import json
 import unittest
 from os import path
@@ -151,7 +154,7 @@ class LuisRecognizerTest(unittest.TestCase):
         self.assertIsNotNone(result.entities)
         self.assertEqual(0, len(result.entities))
 
-    def test_MultipleIntents_PrebuiltEntity(self):
+    def test_multiple_intents_prebuilt_entity(self):
         utterance: str = "Please deliver February 2nd 2001"
         response_path: str = "MultipleIntents_PrebuiltEntity.json"
 
@@ -187,6 +190,67 @@ class LuisRecognizerTest(unittest.TestCase):
         self.assertEqual(
             "february 2nd 2001", result.entities["$instance"]["datetime"][0]["text"]
         )
+
+    def test_multiple_intents_prebuilt_entities_with_multi_values(self):
+        utterance: str = "Please deliver February 2nd 2001 in room 201"
+        response_path: str = "MultipleIntents_PrebuiltEntitiesWithMultiValues.json"
+
+        result = LuisRecognizerTest._get_recognizer_result(utterance, response_path)
+
+        self.assertIsNotNone(result)
+        self.assertIsNotNone(result.text)
+        self.assertEqual(utterance, result.text)
+        self.assertIsNotNone(result.intents)
+        self.assertIsNotNone(result.intents["Delivery"])
+        self.assertIsNotNone(result.entities)
+        self.assertIsNotNone(result.entities["number"])
+        self.assertEqual(2, len(result.entities["number"]))
+        self.assertTrue(201 in map(int, result.entities["number"]))
+        self.assertTrue(2001 in map(int, result.entities["number"]))
+        self.assertIsNotNone(result.entities["datetime"][0])
+        self.assertEqual("2001-02-02", result.entities["datetime"][0]["timex"][0])
+
+    def test_multiple_intents_list_entity_with_single_value(self):
+        utterance: str = "I want to travel on united"
+        response_path: str = "MultipleIntents_ListEntityWithSingleValue.json"
+
+        result = LuisRecognizerTest._get_recognizer_result(utterance, response_path)
+
+        self.assertIsNotNone(result)
+        self.assertIsNotNone(result.text)
+        self.assertEqual(utterance, result.text)
+        self.assertIsNotNone(result.intents)
+        self.assertIsNotNone(result.intents["Travel"])
+        self.assertIsNotNone(result.entities)
+        self.assertIsNotNone(result.entities["Airline"])
+        self.assertEqual("United", result.entities["Airline"][0][0])
+        self.assertIsNotNone(result.entities["$instance"])
+        self.assertIsNotNone(result.entities["$instance"]["Airline"])
+        self.assertEqual(20, result.entities["$instance"]["Airline"][0]["startIndex"])
+        self.assertEqual(26, result.entities["$instance"]["Airline"][0]["endIndex"])
+        self.assertEqual("united", result.entities["$instance"]["Airline"][0]["text"])
+
+    def test_multiple_intents_list_entity_with_multi_values(self):
+        utterance: str = "I want to travel on DL"
+        response_path: str = "MultipleIntents_ListEntityWithMultiValues.json"
+
+        result = LuisRecognizerTest._get_recognizer_result(utterance, response_path)
+
+        self.assertIsNotNone(result)
+        self.assertIsNotNone(result.text)
+        self.assertEqual(utterance, result.text)
+        self.assertIsNotNone(result.intents)
+        self.assertIsNotNone(result.intents["Travel"])
+        self.assertIsNotNone(result.entities)
+        self.assertIsNotNone(result.entities["Airline"])
+        self.assertEqual(2, len(result.entities["Airline"][0]))
+        self.assertTrue("Delta" in result.entities["Airline"][0])
+        self.assertTrue("Virgin" in result.entities["Airline"][0])
+        self.assertIsNotNone(result.entities["$instance"])
+        self.assertIsNotNone(result.entities["$instance"]["Airline"])
+        self.assertEqual(20, result.entities["$instance"]["Airline"][0]["startIndex"])
+        self.assertEqual(22, result.entities["$instance"]["Airline"][0]["endIndex"])
+        self.assertEqual("dl", result.entities["$instance"]["Airline"][0]["text"])
 
     def assert_score(self, score: float):
         self.assertTrue(score >= 0)

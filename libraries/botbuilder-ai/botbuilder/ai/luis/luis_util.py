@@ -114,9 +114,9 @@ class LuisUtil:
             return {"type": val_type, "timex": distinct_timexes}
         else:
             if entity.type in {"builtin.number", "builtin.ordinal"}:
-                return LuisUtil.number(resolution.value)
+                return LuisUtil.number(resolution["value"])
             elif entity.type == "builtin.percentage":
-                svalue = str(resolution.value)
+                svalue = str(resolution["value"])
                 if svalue.endswith("%"):
                     svalue = svalue[:-1]
 
@@ -128,7 +128,7 @@ class LuisUtil:
                 "builtin.temperature",
             }:
                 units = str(resolution.unit)
-                val = LuisUtil.number(resolution.value)
+                val = LuisUtil.number(resolution["value"])
                 obj = {}
                 if val is not None:
                     obj["number"] = val
@@ -136,7 +136,7 @@ class LuisUtil:
                 obj["units"] = units
                 return obj
             else:
-                return resolution.value or resolution.values
+                return resolution.get("value") or resolution.get("values")
 
     @staticmethod
     def extract_entity_metadata(entity: EntityModel) -> Dict:
