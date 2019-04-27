@@ -1,5 +1,6 @@
 import json
 import unittest
+from os import path
 from unittest.mock import Mock, patch
 
 import requests
@@ -128,9 +129,53 @@ class LuisRecognizerTest(unittest.TestCase):
         self.assertEqual(15, result.entities["$instance"]["Name"][0]["endIndex"])
         self.assert_score(result.entities["$instance"]["Name"][0]["score"])
 
+    def test_null_utterance(self):
+        utterance: str = None
+        response_path: str = "SingleIntent_SimplyEntity.json"  # The path is irrelevant in this case
+
+        result = LuisRecognizerTest._get_recognizer_result(utterance, response_path)
+
+        self.assertIsNotNone(result)
+        self.assertIsNone(result.altered_text)
+        self.assertEqual(utterance, result.text)
+        self.assertIsNotNone(result.intents)
+        self.assertEqual(1, len(result.intents))
+        self.assertIsNotNone(result.intents[""])
+        self.assertEqual(result.get_top_scoring_intent(), ("", 1.0))
+        self.assertIsNotNone(result.entities)
+        self.assertEqual(0, len(result.entities))
+
     def assert_score(self, score: float):
         self.assertTrue(score >= 0)
         self.assertTrue(score <= 1)
+
+    @classmethod
+    def _get_recognizer_result(cls, utterance: str, response_file: str):
+        curr_dir = path.dirname(path.abspath(__file__))
+        response_path = path.join(curr_dir, "test_data", response_file)
+
+        with open(response_path, "r", encoding="utf-8") as f:
+            response_str = f.read()
+        response_json = json.loads(response_str)
+
+        my_app = LuisApplication(
+            LuisRecognizerTest._luisAppId,
+            LuisRecognizerTest._subscriptionKey,
+            endpoint="",
+        )
+        recognizer = LuisRecognizer(my_app, prediction_options=None)
+        context = LuisRecognizerTest._get_context(utterance)
+        response = Mock(spec=Response)
+        response.status_code = 200
+        response.headers = {}
+        response.reason = ""
+        with patch("requests.Session.send", return_value=response):
+            with patch(
+                "msrest.serialization.Deserializer._unpack_content",
+                return_value=response_json,
+            ):
+                result = recognizer.recognize(context)
+                return result
 
     @classmethod
     def _get_luis_recognizer(
