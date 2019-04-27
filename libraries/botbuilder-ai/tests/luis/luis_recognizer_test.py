@@ -7,7 +7,13 @@ import requests
 from msrest import Deserializer
 from requests.models import Response
 
-from botbuilder.ai.luis import LuisApplication, LuisPredictionOptions, LuisRecognizer
+from botbuilder.ai.luis import (
+    LuisApplication,
+    LuisPredictionOptions,
+    LuisRecognizer,
+    RecognizerResult,
+    TopIntent,
+)
 from botbuilder.core import TurnContext
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.schema import (
@@ -144,6 +150,43 @@ class LuisRecognizerTest(unittest.TestCase):
         self.assertEqual(result.get_top_scoring_intent(), ("", 1.0))
         self.assertIsNotNone(result.entities)
         self.assertEqual(0, len(result.entities))
+
+    def test_MultipleIntents_PrebuiltEntity(self):
+        utterance: str = "Please deliver February 2nd 2001"
+        response_path: str = "MultipleIntents_PrebuiltEntity.json"
+
+        result = LuisRecognizerTest._get_recognizer_result(utterance, response_path)
+
+        self.assertIsNotNone(result)
+        self.assertEqual(utterance, result.text)
+        self.assertIsNotNone(result.intents)
+        self.assertTrue(len(result.intents) > 1)
+        self.assertIsNotNone(result.intents["Delivery"])
+        self.assertTrue(
+            result.intents["Delivery"].score > 0
+            and result.intents["Delivery"].score <= 1
+        )
+        self.assertEqual("Delivery", result.get_top_scoring_intent().intent)
+        self.assertTrue(result.get_top_scoring_intent().score > 0)
+        self.assertIsNotNone(result.entities)
+        self.assertIsNotNone(result.entities["number"])
+        self.assertEqual(2001, int(result.entities["number"][0]))
+        self.assertIsNotNone(result.entities["ordinal"])
+        self.assertEqual(2, int(result.entities["ordinal"][0]))
+        self.assertIsNotNone(result.entities["datetime"][0])
+        self.assertEqual("2001-02-02", result.entities["datetime"][0]["timex"][0])
+        self.assertIsNotNone(result.entities["$instance"]["number"])
+        self.assertEqual(
+            28, int(result.entities["$instance"]["number"][0]["startIndex"])
+        )
+        self.assertEqual(32, int(result.entities["$instance"]["number"][0]["endIndex"]))
+        self.assertEqual("2001", result.text[28:32])
+        self.assertIsNotNone(result.entities["$instance"]["datetime"])
+        self.assertEqual(15, result.entities["$instance"]["datetime"][0]["startIndex"])
+        self.assertEqual(32, result.entities["$instance"]["datetime"][0]["endIndex"])
+        self.assertEqual(
+            "february 2nd 2001", result.entities["$instance"]["datetime"][0]["text"]
+        )
 
     def assert_score(self, score: float):
         self.assertTrue(score >= 0)

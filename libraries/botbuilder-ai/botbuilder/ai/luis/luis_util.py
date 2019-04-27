@@ -104,12 +104,12 @@ class LuisUtil:
         if entity.type.startswith("builtin.datetime."):
             return resolution
         elif entity.type.startswith("builtin.datetimeV2."):
-            if not resolution.values:
+            if not resolution["values"]:
                 return resolution
 
-            resolution_values = resolution.values
-            val_type = resolution.values[0].type
-            timexes = [val.timex for val in resolution_values]
+            resolution_values = resolution["values"]
+            val_type = resolution["values"][0]["type"]
+            timexes = [val["timex"] for val in resolution_values]
             distinct_timexes = list(set(timexes))
             return {"type": val_type, "timex": distinct_timexes}
         else:
@@ -152,8 +152,8 @@ class LuisUtil:
                 obj["score"] = float(entity.additional_properties["score"])
 
             resolution = entity.additional_properties.get("resolution")
-            if resolution is not None and resolution.subtype is not None:
-                obj["subtype"] = resolution.subtype
+            if resolution is not None and resolution.get("subtype") is not None:
+                obj["subtype"] = resolution["subtype"]
 
         return obj
 

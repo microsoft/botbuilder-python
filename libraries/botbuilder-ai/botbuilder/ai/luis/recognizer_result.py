@@ -1,9 +1,16 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from typing import Dict, NamedTuple, Tuple
+from typing import Dict, NamedTuple
 
 from . import IntentScore
+
+
+class TopIntent(NamedTuple):
+    """The top scoring intent and its score."""
+
+    intent: str
+    score: float
 
 
 class RecognizerResult:
@@ -137,22 +144,20 @@ class RecognizerResult:
 
         self._properties = value
 
-    def get_top_scoring_intent(
-        self
-    ) -> NamedTuple("TopIntent", intent=str, score=float):
+    def get_top_scoring_intent(self) -> TopIntent:
         """Return the top scoring intent and its score.
         
         :return: Intent and score.
-        :rtype: NamedTuple("TopIntent", intent=str, score=float)
+        :rtype: TopIntent
         """
 
         if self.intents is None:
             raise TypeError("result.intents can't be None")
 
-        top_intent: Tuple[str, float] = ("", 0.0)
+        top_intent = TopIntent(intent="", score=0.0)
         for intent_name, intent_score in self.intents.items():
             score = intent_score.score
             if score > top_intent[1]:
-                top_intent = (intent_name, score)
+                top_intent = TopIntent(intent_name, score)
 
         return top_intent
