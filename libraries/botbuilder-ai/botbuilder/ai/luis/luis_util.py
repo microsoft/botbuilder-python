@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from collections import OrderedDict
 from typing import Dict, List, Set, Union
 
 from azure.cognitiveservices.language.luis.runtime.models import (
@@ -110,7 +111,7 @@ class LuisUtil:
             resolution_values = resolution["values"]
             val_type = resolution["values"][0]["type"]
             timexes = [val["timex"] for val in resolution_values]
-            distinct_timexes = list(set(timexes))
+            distinct_timexes = list(OrderedDict.fromkeys(timexes))
             return {"type": val_type, "timex": distinct_timexes}
         else:
             if entity.type in {"builtin.number", "builtin.ordinal"}:

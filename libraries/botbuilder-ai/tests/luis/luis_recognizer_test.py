@@ -302,16 +302,49 @@ class LuisRecognizerTest(unittest.TestCase):
             result.entities["Address"][0]["$instance"]["State"][0]["score"]
         )
 
-    def assert_score(self, score: float):
+    def test_multiple_date_time_entities(self):
+        utterance: str = "Book a table on Friday or tomorrow at 5 or tomorrow at 4"
+        response_path: str = "MultipleDateTimeEntities.json"
+
+        result = LuisRecognizerTest._get_recognizer_result(utterance, response_path)
+
+        self.assertIsNotNone(result.entities["datetime"])
+        self.assertEqual(3, len(result.entities["datetime"]))
+        self.assertEqual(1, len(result.entities["datetime"][0]["timex"]))
+        self.assertEqual("XXXX-WXX-5", result.entities["datetime"][0]["timex"][0])
+        self.assertEqual(1, len(result.entities["datetime"][0]["timex"]))
+        self.assertEqual(2, len(result.entities["datetime"][1]["timex"]))
+        self.assertEqual(2, len(result.entities["datetime"][2]["timex"]))
+        self.assertTrue(result.entities["datetime"][1]["timex"][0].endswith("T05"))
+        self.assertTrue(result.entities["datetime"][1]["timex"][1].endswith("T17"))
+        self.assertTrue(result.entities["datetime"][2]["timex"][0].endswith("T04"))
+        self.assertTrue(result.entities["datetime"][2]["timex"][1].endswith("T16"))
+        self.assertEqual(3, len(result.entities["$instance"]["datetime"]))
+
+    def test_v1_datetime_resolution(self):
+        utterance: str = "at 4"
+        response_path: str = "V1DatetimeResolution.json"
+
+        result = LuisRecognizerTest._get_recognizer_result(utterance, response_path)
+
+        self.assertIsNotNone(result.entities["datetime_time"])
+        self.assertEqual(1, len(result.entities["datetime_time"]))
+        self.assertEqual("ampm", result.entities["datetime_time"][0]["comment"])
+        self.assertEqual("T04", result.entities["datetime_time"][0]["time"])
+        self.assertEqual(1, len(result.entities["$instance"]["datetime_time"]))
+
+    def assert_score(self, score: float) -> None:
         self.assertTrue(score >= 0)
         self.assertTrue(score <= 1)
 
     @classmethod
-    def _get_recognizer_result(cls, utterance: str, response_file: str):
+    def _get_recognizer_result(
+        cls, utterance: str, response_file: str
+    ) -> RecognizerResult:
         curr_dir = path.dirname(path.abspath(__file__))
         response_path = path.join(curr_dir, "test_data", response_file)
 
-        with open(response_path, "r", encoding="utf-8") as f:
+        with open(response_path, "r", encoding="utf-8-sig") as f:
             response_str = f.read()
         response_json = json.loads(response_str)
 
