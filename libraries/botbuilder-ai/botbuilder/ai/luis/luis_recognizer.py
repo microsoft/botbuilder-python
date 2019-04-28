@@ -115,11 +115,9 @@ class LuisRecognizer(object):
 
         self._telemetry_client = value
 
+    @staticmethod
     def top_intent(
-        self,
-        results: RecognizerResult,
-        default_intent: str = "None",
-        min_score: float = 0.0,
+        results: RecognizerResult, default_intent: str = "None", min_score: float = 0.0
     ) -> str:
         """Returns the name of the top scoring intent from a set of LUIS results.
         
@@ -140,10 +138,10 @@ class LuisRecognizer(object):
         top_intent: str = None
         top_score: float = -1.0
         if results.intents:
-            for intent, intent_score in results.intents.items():
-                score = float(intent_score)
+            for intent_name, intent_score in results.intents.items():
+                score = intent_score.score
                 if score > top_score and score >= min_score:
-                    top_intent = intent
+                    top_intent = intent_name
                     top_score = score
 
         return top_intent or default_intent

@@ -5,10 +5,13 @@ import os
 from setuptools import setup
 
 REQUIRES = [
-	'aiounittest>=1.1.0',
     'botbuilder-schema>=4.0.0.a6',
     'botframework-connector>=4.0.0.a6',
     'botbuilder-core>=4.0.0.a6']
+
+TEST_REQUIRES = [
+    'aiounittest>=1.1.0'
+]
 
 root = os.path.abspath(os.path.dirname(__file__))
 
@@ -27,7 +30,8 @@ setup(
     long_description=package_info['__summary__'],
     license=package_info['__license__'],
     packages=['botbuilder.dialogs'],
-    install_requires=REQUIRES,
+    install_requires=REQUIRES + TEST_REQUIRES,
+    tests_require=TEST_REQUIRES,
     include_package_data=True,
     classifiers=[
         'Programming Language :: Python :: 3.6',

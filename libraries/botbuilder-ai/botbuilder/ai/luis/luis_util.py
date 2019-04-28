@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from collections import OrderedDict
 from typing import Dict, List, Set, Union
 
 from azure.cognitiveservices.language.luis.runtime.models import (
@@ -104,19 +105,19 @@ class LuisUtil:
         if entity.type.startswith("builtin.datetime."):
             return resolution
         elif entity.type.startswith("builtin.datetimeV2."):
-            if not resolution.values:
+            if not resolution["values"]:
                 return resolution
 
-            resolution_values = resolution.values
-            val_type = resolution.values[0].type
-            timexes = [val.timex for val in resolution_values]
-            distinct_timexes = list(set(timexes))
+            resolution_values = resolution["values"]
+            val_type = resolution["values"][0]["type"]
+            timexes = [val["timex"] for val in resolution_values]
+            distinct_timexes = list(OrderedDict.fromkeys(timexes))
             return {"type": val_type, "timex": distinct_timexes}
         else:
             if entity.type in {"builtin.number", "builtin.ordinal"}:
-                return LuisUtil.number(resolution.value)
+                return LuisUtil.number(resolution["value"])
             elif entity.type == "builtin.percentage":
-                svalue = str(resolution.value)
+                svalue = str(resolution["value"])
                 if svalue.endswith("%"):
                     svalue = svalue[:-1]
 
@@ -128,7 +129,7 @@ class LuisUtil:
                 "builtin.temperature",
             }:
                 units = str(resolution.unit)
-                val = LuisUtil.number(resolution.value)
+                val = LuisUtil.number(resolution["value"])
                 obj = {}
                 if val is not None:
                     obj["number"] = val
@@ -136,7 +137,7 @@ class LuisUtil:
                 obj["units"] = units
                 return obj
             else:
-                return resolution.value or resolution.values
+                return resolution.get("value") or resolution.get("values")
 
     @staticmethod
     def extract_entity_metadata(entity: EntityModel) -> Dict:
@@ -152,8 +153,8 @@ class LuisUtil:
                 obj["score"] = float(entity.additional_properties["score"])
 
             resolution = entity.additional_properties.get("resolution")
-            if resolution is not None and resolution.subtype is not None:
-                obj["subtype"] = resolution.subtype
+            if resolution is not None and resolution.get("subtype") is not None:
+                obj["subtype"] = resolution["subtype"]
 
         return obj
 
@@ -214,7 +215,7 @@ class LuisUtil:
             )
             children_entities[LuisUtil._metadata_key] = {}
 
-        covered_set: Set[EntityModel] = set()
+        covered_set: List[EntityModel] = []
         for child in composite_entity.children:
             for entity in entities:
                 # We already covered this entity
@@ -222,13 +223,13 @@ class LuisUtil:
                     continue
 
                 # This entity doesn't belong to this composite entity
-                if child.Type != entity.Type or not LuisUtil.composite_contains_entity(
+                if child.type != entity.type or not LuisUtil.composite_contains_entity(
                     composite_entity_metadata, entity
                 ):
                     continue
 
                 # Add to the set to ensure that we don't consider the same child entity more than once per composite
-                covered_set.add(entity)
+                covered_set.append(entity)
                 LuisUtil.add_property(
                     children_entities,
                     LuisUtil.extract_normalized_entity_name(entity),
