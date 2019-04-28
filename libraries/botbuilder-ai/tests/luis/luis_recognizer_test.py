@@ -11,6 +11,7 @@ from msrest import Deserializer
 from requests.models import Response
 
 from botbuilder.ai.luis import (
+    IntentScore,
     LuisApplication,
     LuisPredictionOptions,
     LuisRecognizer,
@@ -31,6 +32,12 @@ class LuisRecognizerTest(unittest.TestCase):
     _luisAppId: str = "b31aeaf3-3511-495b-a07f-571fc873214b"
     _subscriptionKey: str = "048ec46dc58e495482b0c447cfdbd291"
     _endpoint: str = "https://westus.api.cognitive.microsoft.com"
+
+    def __init__(self, *args, **kwargs):
+        super(LuisRecognizerTest, self).__init__(*args, **kwargs)
+        self._mocked_results: RecognizerResult = RecognizerResult(
+            intents={"Test": IntentScore(score=0.2), "Greeting": IntentScore(score=0.4)}
+        )
 
     def test_luis_recognizer_construction(self):
         # Arrange
@@ -332,6 +339,33 @@ class LuisRecognizerTest(unittest.TestCase):
         self.assertEqual("ampm", result.entities["datetime_time"][0]["comment"])
         self.assertEqual("T04", result.entities["datetime_time"][0]["time"])
         self.assertEqual(1, len(result.entities["$instance"]["datetime_time"]))
+
+    def test_top_intent_returns_top_intent(self):
+        greeting_intent: str = LuisRecognizer.top_intent(self._mocked_results)
+        self.assertEqual(greeting_intent, "Greeting")
+
+    def test_top_intent_returns_default_intent_if_min_score_is_higher(self):
+        default_intent: str = LuisRecognizer.top_intent(
+            self._mocked_results, min_score=0.5
+        )
+        self.assertEqual(default_intent, "None")
+
+    def test_top_intent_returns_default_intent_if_provided(self):
+        default_intent: str = LuisRecognizer.top_intent(
+            self._mocked_results, "Test2", 0.5
+        )
+        self.assertEqual(default_intent, "Test2")
+
+    def test_top_intent_throws_type_error_if_results_is_none(self):
+        none_results: RecognizerResult = None
+        with self.assertRaises(TypeError):
+            LuisRecognizer.top_intent(none_results)
+
+    def test_top_intent_returns_top_intent_if_score_equals_min_score(self):
+        default_intent: str = LuisRecognizer.top_intent(
+            self._mocked_results, min_score=0.4
+        )
+        self.assertEqual(default_intent, "Greeting")
 
     def assert_score(self, score: float) -> None:
         self.assertTrue(score >= 0)

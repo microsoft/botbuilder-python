@@ -23,12 +23,12 @@ class RecognizerResult:
         text: str = None,
         altered_text: str = None,
         intents: Dict[str, IntentScore] = None,
-        entities: Dict = None,
+        entities: Dict[str, object] = None,
     ):
         self._text: str = text
         self._altered_text: str = altered_text
         self._intents: Dict[str, IntentScore] = intents
-        self._entities: Dict = entities
+        self._entities: Dict[str, object] = entities
         self._properties: Dict[str, object] = {}
 
     @property
