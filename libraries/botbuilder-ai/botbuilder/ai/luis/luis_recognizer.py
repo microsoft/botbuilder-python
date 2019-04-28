@@ -72,6 +72,7 @@ class LuisRecognizer(object):
 
         credentials = CognitiveServicesCredentials(self._application.endpoint_key)
         self._runtime = LUISRuntimeClient(self._application.endpoint, credentials)
+        self._runtime.config.add_user_agent(LuisUtil.get_user_agent())
 
     @property
     def log_personal_information(self) -> bool:
