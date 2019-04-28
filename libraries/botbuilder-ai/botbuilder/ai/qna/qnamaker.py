@@ -15,16 +15,6 @@ from .qnamaker_telemetry_client import QnAMakerTelemetryClient
 from .qna_telemetry_constants import QnATelemetryConstants
 from .qnamaker_trace_info import QnAMakerTraceInfo
 
-# from . import (
-#     Metadata, 
-#     QueryResult, 
-#     QnAMakerEndpoint, 
-#     QnAMakerOptions, 
-#     QnAMakerTelemetryClient, 
-#     QnATelemetryConstants, 
-#     QnAMakerTraceInfo
-# )
-
 QNAMAKER_TRACE_NAME = 'QnAMaker'
 QNAMAKER_TRACE_LABEL = 'QnAMaker Trace'
 QNAMAKER_TRACE_TYPE = 'https://www.qnamaker.ai/schemas/trace'
