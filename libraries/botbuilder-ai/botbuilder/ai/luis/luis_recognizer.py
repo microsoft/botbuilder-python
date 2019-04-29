@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 import json
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Union
 
 from azure.cognitiveservices.language.luis.runtime import LUISRuntimeClient
 from azure.cognitiveservices.language.luis.runtime.models import LuisResult
@@ -39,7 +39,7 @@ class LuisRecognizer(object):
 
     def __init__(
         self,
-        application: LuisApplication,
+        application: Union[LuisApplication, str],
         prediction_options: LuisPredictionOptions = None,
         include_api_results: bool = False,
     ):
@@ -54,19 +54,26 @@ class LuisRecognizer(object):
         :raises TypeError:
         """
 
-        if application is None:
-            raise TypeError("LuisRecognizer.__init__(): application cannot be None.")
-        self._application = application
+        if isinstance(application, LuisApplication):
+            self._application = application
+        elif isinstance(application, str):
+            self._application = LuisApplication.from_application_endpoint(application)
+        else:
+            raise TypeError(
+                "LuisRecognizer.__init__(): application is not an instance of LuisApplication or str."
+            )
 
         self._options = prediction_options or LuisPredictionOptions()
 
         self._include_api_results = include_api_results
 
-        self._telemetry_client = self._options.TelemetryClient
-        self._log_personal_information = self._options.LogPersonalInformation
+        self._telemetry_client = self._options.telemetry_client
+        self._log_personal_information = self._options.log_personal_information
 
-        credentials = CognitiveServicesCredentials(application.EndpointKey)
-        self._runtime = LUISRuntimeClient(application.endpoint, credentials)
+        credentials = CognitiveServicesCredentials(self._application.endpoint_key)
+        self._runtime = LUISRuntimeClient(self._application.endpoint, credentials)
+        self._runtime.config.add_user_agent(LuisUtil.get_user_agent())
+        self._runtime.config.connection.timeout = self._options.timeout // 1000
 
     @property
     def log_personal_information(self) -> bool:
@@ -110,11 +117,9 @@ class LuisRecognizer(object):
 
         self._telemetry_client = value
 
+    @staticmethod
     def top_intent(
-        self,
-        results: RecognizerResult,
-        default_intent: str = "None",
-        min_score: float = 0.0,
+        results: RecognizerResult, default_intent: str = "None", min_score: float = 0.0
     ) -> str:
         """Returns the name of the top scoring intent from a set of LUIS results.
         
@@ -135,15 +140,15 @@ class LuisRecognizer(object):
         top_intent: str = None
         top_score: float = -1.0
         if results.intents:
-            for intent, intent_score in results.intents.items():
-                score = float(intent_score)
+            for intent_name, intent_score in results.intents.items():
+                score = intent_score.score
                 if score > top_score and score >= min_score:
-                    top_intent = intent
+                    top_intent = intent_name
                     top_score = score
 
         return top_intent or default_intent
 
-    async def recognize(
+    def recognize(
         self,
         turn_context: TurnContext,
         telemetry_properties: Dict[str, str] = None,
@@ -161,11 +166,11 @@ class LuisRecognizer(object):
         :rtype: RecognizerResult
         """
 
-        return await self._recognize_internal(
+        return self._recognize_internal(
             turn_context, telemetry_properties, telemetry_metrics
         )
 
-    async def on_recognizer_result(
+    def on_recognizer_result(
         self,
         recognizer_result: RecognizerResult,
         turn_context: TurnContext,
@@ -184,7 +189,7 @@ class LuisRecognizer(object):
         :param telemetry_metrics: Dict[str, float], optional
         """
 
-        properties = await self.fill_luis_event_properties(
+        properties = self.fill_luis_event_properties(
             recognizer_result, turn_context, telemetry_properties
         )
 
@@ -202,7 +207,7 @@ class LuisRecognizer(object):
         if intent_names:
             intent_name = intent_names[0]
             if intents[intent_name] is not None:
-                intent_score = "{:.2f}".format(intents[intent_name])
+                intent_score = "{:.2f}".format(intents[intent_name].score)
 
         return intent_name, intent_score
 
@@ -241,12 +246,12 @@ class LuisRecognizer(object):
 
         # Add the intent score and conversation id properties
         properties: Dict[str, str] = {
-            LuisTelemetryConstants.application_id_property: self._application.ApplicationId,
+            LuisTelemetryConstants.application_id_property: self._application.application_id,
             LuisTelemetryConstants.intent_property: intent_name,
             LuisTelemetryConstants.intent_score_property: intent_score,
             LuisTelemetryConstants.intent2_property: intent2_name,
             LuisTelemetryConstants.intent_score2_property: intent2_score,
-            LuisTelemetryConstants.from_id_property: turn_context.Activity.From.Id,
+            LuisTelemetryConstants.from_id_property: turn_context.activity.from_property.id,
         }
 
         sentiment = recognizer_result.properties.get("sentiment")
@@ -277,7 +282,7 @@ class LuisRecognizer(object):
 
         return properties
 
-    async def _recognize_internal(
+    def _recognize_internal(
         self,
         turn_context: TurnContext,
         telemetry_properties: Dict[str, str],
@@ -298,7 +303,7 @@ class LuisRecognizer(object):
                 text=utterance, intents={"": IntentScore(score=1.0)}, entities={}
             )
         else:
-            luis_result = await self._runtime.prediction.resolve(
+            luis_result = self._runtime.prediction.resolve(
                 self._application.application_id,
                 utterance,
                 timezoneOffset=self._options.timezone_offset,
@@ -326,21 +331,8 @@ class LuisRecognizer(object):
                 recognizer_result.properties["luisResult"] = luis_result
 
         # Log telemetry
-        await self.on_recognizer_result(
+        self.on_recognizer_result(
             recognizer_result, turn_context, telemetry_properties, telemetry_metrics
         )
 
-        trace_info = {
-            "recognizerResult": recognizer_result,
-            "luisModel": {"ModelID": self._application.application_id},
-            "luisOptions": self._options,
-            "luisResult": luis_result,
-        }
-
-        await turn_context.trace_activity_async(
-            "LuisRecognizer",
-            trace_info,
-            LuisRecognizer.luis_trace_type,
-            LuisRecognizer.luis_trace_label,
-        )
         return recognizer_result

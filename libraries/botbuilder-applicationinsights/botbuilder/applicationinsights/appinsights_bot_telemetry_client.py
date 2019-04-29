@@ -5,36 +5,24 @@ import traceback
 from applicationinsights import TelemetryClient
 from botbuilder.core.bot_telemetry_client import BotTelemetryClient, TelemetryDataPointType
 from typing import Dict
-from .integration_post_data import IntegrationPostData
 
-class ApplicationInsightsTelemetryClient(BotTelemetryClient):
-    
+class AppinsightsBotTelemetryClient(BotTelemetryClient):
+
     def __init__(self, instrumentation_key:str):
         self._instrumentation_key = instrumentation_key
-        self._client = TelemetryClient(self._instrumentation_key)
-        # Telemetry Processor
-        def telemetry_processor(data, context):
-            post_data = IntegrationPostData().activity_json
-            # Override session and user id
-            from_prop = post_data['from'] if 'from' in post_data else None
-            user_id = from_prop['id'] if from_prop != None else None
-            channel_id = post_data['channelId'] if 'channelId' in post_data else None
-            conversation = post_data['conversation'] if 'conversation' in post_data else None
-            conversation_id = conversation['id'] if 'id' in conversation else None
-            context.user.id = channel_id + user_id
-            context.session.id = conversation_id
 
-            # Additional bot-specific properties
-            if 'activityId' in post_data:
-                data.properties["activityId"] = post_data['activityId']
-            if 'channelId' in post_data:
-                data.properties["channelId"] = post_data['channelId'] 
-            if 'activityType' in post_data:
-                data.properties["activityType"] = post_data['activityType']
+        self._context = TelemetryContext()
+        context.instrumentation_key = self._instrumentation_key
+        # context.user.id = 'BOTID'        # telemetry_channel.context.session.
+        # context.session.id = 'BOTSESSION'
 
-        self._client.add_telemetry_processor(telemetry_processor)
+        # set up channel with context
+        self._channel = TelemetryChannel(context)
+        # telemetry_channel.context.properties['my_property'] = 'my_value'
+
+        self._client = TelemetryClient(self._instrumentation_key, self._channel)
         
-
+    
     def track_pageview(self, name: str, url:str, duration: int = 0, properties : Dict[str, object]=None, 
                         measurements: Dict[str, object]=None) -> None:
         """
@@ -132,11 +120,4 @@ class ApplicationInsightsTelemetryClient(BotTelemetryClient):
         """
         self._client.track_dependency(name, data, type, target, duration, success, result_code, properties,
                                         measurements, dependency_id)
-
-    def flush(self):
-        """Flushes data in the queue. Data in the queue will be sent either immediately irrespective of what sender is
-        being used.
-        """
-        self._client.flush()
-
 

@@ -6,11 +6,11 @@ from setuptools import setup
 
 REQUIRES = [
     "aiounittest>=1.1.0",
-    "azure-cognitiveservices-language-luis==0.1.0",
+    "azure-cognitiveservices-language-luis==0.2.0",
     "botbuilder-schema>=4.0.0.a6",
-    #"botframework-connector>=4.0.0.a6",
     "botbuilder-core>=4.0.0.a6",
 ]
+
 
 root = os.path.abspath(os.path.dirname(__file__))
 
@@ -38,5 +38,5 @@ setup(
         "Operating System :: OS Independent",
         "Development Status :: 3 - Alpha",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
-    ],
+    ]
 )

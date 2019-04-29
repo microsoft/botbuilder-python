@@ -1,0 +1,50 @@
+{
+    "answers": [
+        {
+            "questions": [
+                "up"
+            ],
+            "answer": "is a movie",
+            "score": 100,
+            "id": 3,
+            "source": "Editorial",
+            "metadata": [
+                {
+                    "name": "movie",
+                    "value": "disney"
+                }
+            ]
+        },
+        {
+            "questions": [
+                "up"
+            ],
+            "answer": "2nd answer",
+            "score": 100,
+            "id": 4,
+            "source": "Editorial",
+            "metadata": [
+                {
+                    "name": "movie",
+                    "value": "disney"
+                }
+            ]
+        },
+        {
+            "questions": [
+                "up"
+            ],
+            "answer": "3rd answer",
+            "score": 100,
+            "id": 5,
+            "source": "Editorial",
+            "metadata": [
+                {
+                    "name": "movie",
+                    "value": "disney"
+                }
+            ]
+        }
+    ],
+    "debugInfo": null
+}

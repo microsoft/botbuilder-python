@@ -9,21 +9,21 @@ class LuisPredictionOptions(object):
     Optional parameters for a LUIS prediction request.
     """
 
-    def __init__(self):
+    def __init__(self, timeout: float = 100000):
         self._bing_spell_check_subscription_key: str = None
         self._include_all_intents: bool = None
         self._include_instance_data: bool = None
         self._log: bool = None
         self._spell_check: bool = None
         self._staging: bool = None
-        self._timeout: float = 100000
+        self._timeout: float = timeout
         self._timezone_offset: float = None
         self._telemetry_client: BotTelemetryClient = NullTelemetryClient()
         self._log_personal_information: bool = False
 
     @property
     def bing_spell_check_subscription_key(self) -> str:
-        """Gets or sets the Bing Spell Check subscription key.
+        """Gets the Bing Spell Check subscription key.
         
         :return: The Bing Spell Check subscription key.
         :rtype: str
@@ -33,7 +33,7 @@ class LuisPredictionOptions(object):
 
     @bing_spell_check_subscription_key.setter
     def bing_spell_check_subscription_key(self, value: str) -> None:
-        """Gets or sets the Bing Spell Check subscription key.
+        """Sets the Bing Spell Check subscription key.
         
         :param value: The Bing Spell Check subscription key.
         :type value: str
@@ -45,7 +45,7 @@ class LuisPredictionOptions(object):
 
     @property
     def include_all_intents(self) -> bool:
-        """Gets or sets whether all intents come back or only the top one.
+        """Gets whether all intents come back or only the top one.
         
         :return: True for returning all intents.
         :rtype: bool
@@ -55,7 +55,7 @@ class LuisPredictionOptions(object):
 
     @include_all_intents.setter
     def include_all_intents(self, value: bool) -> None:
-        """Gets or sets whether all intents come back or only the top one.
+        """Sets whether all intents come back or only the top one.
         
         :param value: True for returning all intents.
         :type value: bool
@@ -67,7 +67,7 @@ class LuisPredictionOptions(object):
 
     @property
     def include_instance_data(self) -> bool:
-        """Gets or sets a value indicating whether or not instance data should be included in response.
+        """Gets a value indicating whether or not instance data should be included in response.
         
         :return: A value indicating whether or not instance data should be included in response.
         :rtype: bool
@@ -77,7 +77,7 @@ class LuisPredictionOptions(object):
 
     @include_instance_data.setter
     def include_instance_data(self, value: bool) -> None:
-        """Gets or sets a value indicating whether or not instance data should be included in response.
+        """Sets a value indicating whether or not instance data should be included in response.
         
         :param value: A value indicating whether or not instance data should be included in response.
         :type value: bool
@@ -89,7 +89,7 @@ class LuisPredictionOptions(object):
 
     @property
     def log(self) -> bool:
-        """Gets or sets if queries should be logged in LUIS.
+        """Gets if queries should be logged in LUIS.
         
         :return: If queries should be logged in LUIS.
         :rtype: bool
@@ -99,7 +99,7 @@ class LuisPredictionOptions(object):
 
     @log.setter
     def log(self, value: bool) -> None:
-        """Gets or sets if queries should be logged in LUIS.
+        """Sets if queries should be logged in LUIS.
         
         :param value: If queries should be logged in LUIS.
         :type value: bool
@@ -111,7 +111,7 @@ class LuisPredictionOptions(object):
 
     @property
     def spell_check(self) -> bool:
-        """Gets or sets whether to spell check queries.
+        """Gets whether to spell check queries.
         
         :return: Whether to spell check queries.
         :rtype: bool
@@ -121,7 +121,7 @@ class LuisPredictionOptions(object):
 
     @spell_check.setter
     def spell_check(self, value: bool) -> None:
-        """Gets or sets whether to spell check queries.
+        """Sets whether to spell check queries.
         
         :param value: Whether to spell check queries.
         :type value: bool
@@ -133,7 +133,7 @@ class LuisPredictionOptions(object):
 
     @property
     def staging(self) -> bool:
-        """Gets or sets whether to use the staging endpoint.
+        """Gets whether to use the staging endpoint.
         
         :return: Whether to use the staging endpoint.
         :rtype: bool
@@ -143,7 +143,7 @@ class LuisPredictionOptions(object):
 
     @staging.setter
     def staging(self, value: bool) -> None:
-        """Gets or sets whether to use the staging endpoint.
+        """Sets whether to use the staging endpoint.
 
         
         :param value: Whether to use the staging endpoint.
@@ -156,7 +156,7 @@ class LuisPredictionOptions(object):
 
     @property
     def timeout(self) -> float:
-        """Gets or sets the time in milliseconds to wait before the request times out.
+        """Gets the time in milliseconds to wait before the request times out.
         
         :return: The time in milliseconds to wait before the request times out. Default is 100000 milliseconds.
         :rtype: float
@@ -166,7 +166,7 @@ class LuisPredictionOptions(object):
 
     @timeout.setter
     def timeout(self, value: float) -> None:
-        """Gets or sets the time in milliseconds to wait before the request times out.
+        """Sets the time in milliseconds to wait before the request times out.
         
         :param value: The time in milliseconds to wait before the request times out. Default is 100000 milliseconds.
         :type value: float
@@ -178,7 +178,7 @@ class LuisPredictionOptions(object):
 
     @property
     def timezone_offset(self) -> float:
-        """Gets or sets the time zone offset.
+        """Gets the time zone offset.
         
         :return: The time zone offset.
         :rtype: float
@@ -188,7 +188,7 @@ class LuisPredictionOptions(object):
 
     @timezone_offset.setter
     def timezone_offset(self, value: float) -> None:
-        """Gets or sets the time zone offset.
+        """Sets the time zone offset.
         
         :param value: The time zone offset.
         :type value: float
@@ -200,7 +200,7 @@ class LuisPredictionOptions(object):
 
     @property
     def telemetry_client(self) -> BotTelemetryClient:
-        """Gets or sets the IBotTelemetryClient used to log the LuisResult event.
+        """Gets the BotTelemetryClient used to log the LuisResult event.
         
         :return: The client used to log telemetry events.
         :rtype: BotTelemetryClient
@@ -210,7 +210,7 @@ class LuisPredictionOptions(object):
 
     @telemetry_client.setter
     def telemetry_client(self, value: BotTelemetryClient) -> None:
-        """Gets or sets the IBotTelemetryClient used to log the LuisResult event.
+        """Sets the BotTelemetryClient used to log the LuisResult event.
         
         :param value: The client used to log telemetry events.
         :type value: BotTelemetryClient
@@ -222,7 +222,7 @@ class LuisPredictionOptions(object):
 
     @property
     def log_personal_information(self) -> bool:
-        """Gets or sets a value indicating whether to log personal information that came from the user to telemetry.
+        """Gets a value indicating whether to log personal information that came from the user to telemetry.
         
         :return: If true, personal information is logged to Telemetry; otherwise the properties will be filtered.
         :rtype: bool
@@ -232,7 +232,7 @@ class LuisPredictionOptions(object):
 
     @log_personal_information.setter
     def log_personal_information(self, value: bool) -> None:
-        """Gets or sets a value indicating whether to log personal information that came from the user to telemetry.
+        """Sets a value indicating whether to log personal information that came from the user to telemetry.
         
         :param value: If true, personal information is logged to Telemetry; otherwise the properties will be filtered.
         :type value: bool
