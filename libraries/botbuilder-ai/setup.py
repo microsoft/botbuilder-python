@@ -11,6 +11,7 @@ REQUIRES = [
     "botbuilder-core>=4.0.0.a6",
 ]
 
+
 root = os.path.abspath(os.path.dirname(__file__))
 
 with open(os.path.join(root, "botbuilder", "ai", "about.py")) as f:
