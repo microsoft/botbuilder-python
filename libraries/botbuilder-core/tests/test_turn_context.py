@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import pytest
+import aiounittest
 
 from botbuilder.schema import Activity, ChannelAccount, ResourceResponse, ConversationAccount
 from botbuilder.core import BotAdapter, TurnContext
@@ -39,7 +39,7 @@ class SimpleAdapter(BotAdapter):
         assert reference.activity_id == '1234'
 
 
-class TestBotContext:
+class TestBotContext(aiounittest.AsyncTestCase):
     def test_should_create_context_with_request_and_adapter(self):
         context = TurnContext(SimpleAdapter(), ACTIVITY)
 
@@ -125,7 +125,7 @@ class TestBotContext:
         except Exception as e:
             raise e
 
-    @pytest.mark.asyncio
+    
     async def test_should_call_on_delete_activity_handlers_before_deletion(self):
         context = TurnContext(SimpleAdapter(), ACTIVITY)
         called = False
@@ -142,7 +142,7 @@ class TestBotContext:
         await context.delete_activity(ACTIVITY.id)
         assert called is True
 
-    @pytest.mark.asyncio
+    
     async def test_should_call_multiple_on_delete_activity_handlers_in_order(self):
         context = TurnContext(SimpleAdapter(), ACTIVITY)
         called_first = False
@@ -174,7 +174,7 @@ class TestBotContext:
         assert called_first is True
         assert called_second is True
 
-    @pytest.mark.asyncio
+    
     async def test_should_call_send_on_activities_handler_before_send(self):
         context = TurnContext(SimpleAdapter(), ACTIVITY)
         called = False
@@ -191,7 +191,7 @@ class TestBotContext:
         await context.send_activity(ACTIVITY)
         assert called is True
 
-    @pytest.mark.asyncio
+    
     async def test_should_call_on_update_activity_handler_before_update(self):
         context = TurnContext(SimpleAdapter(), ACTIVITY)
         called = False

@@ -53,6 +53,8 @@ class StoreItem(ABC):
             [f" '{attr}': '{getattr(self, attr)}'" for attr in non_magic_attributes]) + ' }'
         return output
 
+    
+
 
 StorageKeyFactory = Callable[[TurnContext], str]
 

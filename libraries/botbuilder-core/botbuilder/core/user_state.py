@@ -28,7 +28,7 @@ class UserState(BotState):
             else:
                 return key
 
-        super(UserState, self).__init__(storage, call_get_storage_key)
+        super(UserState, self).__init__(storage, "UserState")
 
     def get_storage_key(self, context: TurnContext) -> str:
         """
@@ -42,5 +42,5 @@ class UserState(BotState):
 
         storage_key = None
         if channel_id and user_id:
-            storage_key = f"user/{channel_id}/{user_id}/{self.namespace}"
+            storage_key = "%s/users/%s" % (channel_id, user_id)
         return storage_key

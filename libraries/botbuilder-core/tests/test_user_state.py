@@ -1,9 +1,10 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import pytest
+import aiounittest
 
-from botbuilder.core import TurnContext, MemoryStorage, StoreItem, TestAdapter, UserState
+from botbuilder.core import TurnContext, MemoryStorage, StoreItem, UserState
+from botbuilder.core.adapters import TestAdapter
 from botbuilder.schema import Activity, ChannelAccount
 
 RECEIVED_MESSAGE = Activity(type='message',
@@ -18,28 +19,30 @@ MISSING_FROM_PROPERTY = Activity(type='message',
                                  channel_id='test')
 
 
-class TestUserState:
+class TestUserState(aiounittest.AsyncTestCase):
     storage = MemoryStorage()
     adapter = TestAdapter()
     context = TurnContext(adapter, RECEIVED_MESSAGE)
-    middleware = UserState(storage)
+    user_state = UserState(storage)
 
-    @pytest.mark.asyncio
+    
     async def test_should_load_and_save_state_from_storage(self):
+        await self.user_state.load(self.context)
+        key = self.user_state.get_storage_key(self.context)
+        state = self.user_state.get(self.context)
 
-        async def next_middleware():
-            state = await self.middleware.get(self.context)
-            assert isinstance(state, StoreItem), 'State not loaded'
-            state.test = 'foo'
+        assert state is not None, 'State not loaded'
+        assert key, 'Key not found'
 
-        await self.middleware.on_process_request(self.context, next_middleware)
-        key = self.middleware.get_storage_key(self.context)
-        assert type(key) == str, 'Key not found'
+        state['test'] = 'foo'
+        await self.user_state.save_changes(self.context)
+
         items = await self.storage.read([key])
+        
         assert key in items, 'Saved state not found in storage'
-        assert items[key].test == 'foo', 'Missing test value in stored state.'
+        assert items[key]['test'] == 'foo', 'Missing saved value in stored storage'
 
-    @pytest.mark.asyncio
+    
     async def test_should_reject_with_error_if_channel_id_is_missing(self):
         context = TurnContext(self.adapter, MISSING_CHANNEL_ID)
 
@@ -47,13 +50,13 @@ class TestUserState:
             assert False, 'Should not have called next_middleware'
 
         try:
-            await self.middleware.on_process_request(context, next_middleware)
+            await self.user_state.on_process_request(context, next_middleware)
         except AttributeError:
             pass
         else:
             raise AssertionError('Should not have completed and not raised AttributeError.')
 
-    @pytest.mark.asyncio
+    
     async def test_should_reject_with_error_if_from_property_is_missing(self):
         context = TurnContext(self.adapter, MISSING_FROM_PROPERTY)
 
@@ -61,7 +64,7 @@ class TestUserState:
             assert False, 'Should not have called next_middleware'
 
         try:
-            await self.middleware.on_process_request(context, next_middleware)
+            await self.user_state.on_process_request(context, next_middleware)
         except AttributeError:
             pass
         else:
