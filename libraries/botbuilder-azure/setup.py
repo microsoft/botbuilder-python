@@ -7,7 +7,7 @@ from setuptools import setup
 REQUIRES = ['azure-cosmos>=3.0.0',
             'botbuilder-schema>=4.0.0.a6',
             'botframework-connector>=4.0.0.a6']
-TEST_REQUIRES = ['aiounittests>=1.1.0']
+TEST_REQUIRES = ['aiounittest>=1.1.0']
 
 root = os.path.abspath(os.path.dirname(__file__))
 
