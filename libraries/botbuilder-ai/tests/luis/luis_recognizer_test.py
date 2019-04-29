@@ -387,16 +387,17 @@ class LuisRecognizerTest(unittest.TestCase):
 
     @classmethod
     def _get_recognizer_result(
-        cls, utterance: str, response_file: str, bot_adapter: BotAdapter = TestAdapter()
+        cls,
+        utterance: str,
+        response_file: str,
+        bot_adapter: BotAdapter = TestAdapter(),
+        verbose: bool = False,
+        options: LuisPredictionOptions = None,
     ) -> Tuple[LuisRecognizer, RecognizerResult]:
         response_json = LuisRecognizerTest._get_json_for_file(response_file)
-
-        my_app = LuisApplication(
-            LuisRecognizerTest._luisAppId,
-            LuisRecognizerTest._subscriptionKey,
-            endpoint="",
+        recognizer = LuisRecognizerTest._get_luis_recognizer(
+            verbose=verbose, options=options
         )
-        recognizer = LuisRecognizer(my_app, prediction_options=None)
         context = LuisRecognizerTest._get_context(utterance, bot_adapter)
         response = Mock(spec=Response)
         response.status_code = 200
@@ -425,7 +426,9 @@ class LuisRecognizerTest(unittest.TestCase):
         cls, verbose: bool = False, options: LuisPredictionOptions = None
     ) -> LuisRecognizer:
         luis_app = LuisApplication(cls._luisAppId, cls._subscriptionKey, cls._endpoint)
-        return LuisRecognizer(luis_app, options, verbose)
+        return LuisRecognizer(
+            luis_app, prediction_options=options, include_api_results=verbose
+        )
 
     @staticmethod
     def _get_context(utterance: str, bot_adapter: BotAdapter) -> TurnContext:
