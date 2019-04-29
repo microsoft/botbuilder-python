@@ -32,7 +32,7 @@ from botbuilder.schema import (
     ConversationAccount,
 )
 
-from .null_adapter import NullAdapter
+from null_adapter import NullAdapter
 
 
 class LuisRecognizerTest(unittest.TestCase):
