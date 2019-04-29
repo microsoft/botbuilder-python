@@ -7,7 +7,7 @@ from botbuilder.core import TurnContext, BotState, MemoryStorage, UserState
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.schema import Activity
 
-from .test_utilities import TestUtilities
+from test_utilities import TestUtilities
 
 RECEIVED_MESSAGE = Activity(type='message',
                             text='received')
@@ -287,8 +287,8 @@ class TestBotState(aiounittest.AsyncTestCase):
         property_b2 = user_state2.create_property("property-b")
 
         await user_state2.load(context)
-        await property_a.set(context, "hello-2")
-        await property_b.set(context, "world-2")
+        await property_a2.set(context, "hello-2")
+        await property_b2.set(context, "world-2")
         await user_state2.save_changes(context)
 
         # Assert 2
@@ -326,8 +326,8 @@ class TestBotState(aiounittest.AsyncTestCase):
         property_b2 = user_state2.create_property("property-b")
 
         await user_state2.load(context)
-        await property_a.set(context, "hello-2")
-        await property_b.delete(context)
+        await property_a2.set(context, "hello-2")
+        await property_b2.delete(context)
         await user_state2.save_changes(context)
 
         # Assert 2

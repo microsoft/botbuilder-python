@@ -3,7 +3,8 @@
 
 import aiounittest
 from botbuilder.schema import Activity, ConversationReference
-from botbuilder.core import TurnContext, TestAdapter
+from botbuilder.core import TurnContext
+from botbuilder.core.adapters import TestAdapter
 from datetime import datetime
 
 RECEIVED_MESSAGE = Activity(type='message', text='received')

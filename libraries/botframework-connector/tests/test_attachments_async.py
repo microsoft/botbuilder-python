@@ -9,7 +9,7 @@ from botbuilder.schema import *
 from botframework.connector.aio import ConnectorClient
 from botframework.connector.auth import MicrosoftAppCredentials
 
-from .authentication_stub import MicrosoftTokenAuthenticationStub
+from authentication_stub import MicrosoftTokenAuthenticationStub
 
 SERVICE_URL = 'https://slack.botframework.com'
 CHANNEL_ID = 'slack'
