@@ -18,27 +18,6 @@ from botbuilder.core import BotAdapter, BotTelemetryClient, NullTelemetryClient,
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.schema import Activity, ActivityTypes, ChannelAccount, ResourceResponse, ConversationAccount
 
-# from botbuilder.ai.qna import (
-#     Metadata,
-#     QnAMakerEndpoint,
-#     QnAMaker,
-#     QnAMakerOptions,
-#     QnATelemetryConstants,
-#     QueryResult
-# )
-# from botbuilder.core import (BotAdapter,
-#     BotTelemetryClient,
-#     NullTelemetryClient, 
-#     TurnContext
-# )
-# from botbuilder.core.adapters import TestAdapter
-# from botbuilder.schema import (Activity,
-#     ActivityTypes,
-#     ChannelAccount,
-#     ResourceResponse,
-#     ConversationAccount
-# )
-
 
 class QnaApplicationTest(aiounittest.AsyncTestCase):
     _knowledge_base_id: str = 'a090f9f3-2f8e-41d1-a581-4f7a49269a0c'
@@ -167,6 +146,25 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         self.assertEqual(expected_strict_filters[0].name, actual_options.strict_filters[0].name)
         self.assertEqual(expected_strict_filters[0].value, actual_options.strict_filters[0].value)
 
+    async def test_returns_answer(self):
+        # Arrange
+        question: str = 'how do I clean the stove?'
+        response_path: str = 'ReturnsAnswer.json'
+
+        # Act
+        result = await QnaApplicationTest._get_service_result(
+            question, 
+            response_path
+        )
+
+        first_answer = result['answers'][0]
+
+        #Assert
+        self.assertIsNotNone(result)
+        self.assertEqual(1, len(result['answers']))
+        self.assertTrue(question in first_answer['questions'])
+        self.assertEqual('BaseCamp: You can use a damp rag to clean around the Power Pack', first_answer['answer'])
+
 
     async def test_returns_answer_using_options(self):
         # Arrange
@@ -209,7 +207,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         response_file: str,
         bot_adapter: BotAdapter = TestAdapter(),
         options: QnAMakerOptions = None
-    ) -> [QueryResult]:
+    ) -> [dict]:
         response_json =  QnaApplicationTest._get_json_for_file(response_file)
         
         qna = QnAMaker(QnaApplicationTest.tests_endpoint)
