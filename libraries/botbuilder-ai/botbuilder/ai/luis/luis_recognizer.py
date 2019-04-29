@@ -14,7 +14,7 @@ from botbuilder.core import (
     NullTelemetryClient,
     TurnContext,
 )
-from botbuilder.schema import ActivityTypes
+from botbuilder.schema import Activity, ActivityTypes, ChannelAccount
 
 from . import (
     IntentScore,
@@ -23,6 +23,7 @@ from . import (
     LuisTelemetryConstants,
     RecognizerResult,
 )
+from .activity_util import ActivityUtil
 from .luis_util import LuisUtil
 
 
@@ -148,7 +149,7 @@ class LuisRecognizer(object):
 
         return top_intent or default_intent
 
-    def recognize(
+    async def recognize(
         self,
         turn_context: TurnContext,
         telemetry_properties: Dict[str, str] = None,
@@ -166,7 +167,7 @@ class LuisRecognizer(object):
         :rtype: RecognizerResult
         """
 
-        return self._recognize_internal(
+        return await self._recognize_internal(
             turn_context, telemetry_properties, telemetry_metrics
         )
 
@@ -282,7 +283,7 @@ class LuisRecognizer(object):
 
         return properties
 
-    def _recognize_internal(
+    async def _recognize_internal(
         self,
         turn_context: TurnContext,
         telemetry_properties: Dict[str, str],
@@ -306,11 +307,11 @@ class LuisRecognizer(object):
             luis_result = self._runtime.prediction.resolve(
                 self._application.application_id,
                 utterance,
-                timezoneOffset=self._options.timezone_offset,
+                timezone_offset=self._options.timezone_offset,
                 verbose=self._options.include_all_intents,
                 staging=self._options.staging,
-                spellCheck=self._options.spell_check,
-                bingSpellCheckSubscriptionKey=self._options.bing_spell_check_subscription_key,
+                spell_check=self._options.spell_check,
+                bing_spell_check_subscription_key=self._options.bing_spell_check_subscription_key,
                 log=self._options.log if self._options.log is not None else True,
             )
 
@@ -334,5 +335,22 @@ class LuisRecognizer(object):
         self.on_recognizer_result(
             recognizer_result, turn_context, telemetry_properties, telemetry_metrics
         )
+
+        trace_info: Dict[str, object] = {
+            "recognizerResult": recognizer_result,
+            "luisModel": {"ModelID": self._application.application_id},
+            "luisOptions": self._options,
+            "luisResult": luis_result,
+        }
+
+        trace_activity = ActivityUtil.create_trace(
+            turn_context.activity,
+            "LuisRecognizer",
+            trace_info,
+            LuisRecognizer.luis_trace_type,
+            LuisRecognizer.luis_trace_label,
+        )
+
+        await turn_context.send_activity(trace_activity)
 
         return recognizer_result
