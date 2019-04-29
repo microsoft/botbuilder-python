@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import platform
 from collections import OrderedDict
 from typing import Dict, List, Set, Union
 
@@ -10,6 +11,7 @@ from azure.cognitiveservices.language.luis.runtime.models import (
     LuisResult,
 )
 
+from .. import __title__, __version__
 from . import IntentScore, RecognizerResult
 
 
@@ -283,3 +285,13 @@ class LuisUtil:
                 "label": luis.sentiment_analysis.label,
                 "score": luis.sentiment_analysis.score,
             }
+
+    @staticmethod
+    def get_user_agent():
+        package_user_agent = f"{__title__}/{__version__}"
+        uname = platform.uname()
+        os_version = f"{uname.machine}-{uname.system}-{uname.version}"
+        py_version = f"Python,Version={platform.python_version()}"
+        platform_user_agent = f"({os_version}; {py_version})"
+        user_agent = f"{package_user_agent} {platform_user_agent}"
+        return user_agent
