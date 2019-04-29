@@ -45,7 +45,7 @@ class QnAMaker(QnAMakerTelemetryClient):
         self._is_legacy_protocol: bool = self._endpoint.host.endswith('v3.0')
 
         self._options: QnAMakerOptions = options or QnAMakerOptions()
-        self.validate_options(self._options)
+        self._validate_options(self._options)
 
         self._telemetry_client = telemetry_client or NullTelemetryClient()
         self._log_personal_information = log_personal_information or False
@@ -187,16 +187,16 @@ class QnAMaker(QnAMakerTelemetryClient):
         """
 
 
-        hydrated_options = self.hydrate_options(options)
-        self.validate_options(hydrated_options)
+        hydrated_options = self._hydrate_options(options)
+        self._validate_options(hydrated_options)
         
-        result = self.query_qna_service(context.activity, hydrated_options)
+        result = self._query_qna_service(context.activity, hydrated_options)
         
-        await self.emit_trace_info(context, result, hydrated_options)
+        await self._emit_trace_info(context, result, hydrated_options)
 
         return result
 
-    def validate_options(self, options: QnAMakerOptions):
+    def _validate_options(self, options: QnAMakerOptions):
         if not options.score_threshold:
             options.score_threshold = 0.3
         
@@ -210,9 +210,9 @@ class QnAMaker(QnAMakerTelemetryClient):
             raise ValueError('QnAMakerOptions.top should be an integer greater than 0')
         
         if not options.strict_filters:
-            options.strict_filters = [Metadata]
+            options.strict_filters = []
     
-    def hydrate_options(self, query_options: QnAMakerOptions) -> QnAMakerOptions:
+    def _hydrate_options(self, query_options: QnAMakerOptions) -> QnAMakerOptions:
         """
         Combines QnAMakerOptions passed into the QnAMaker constructor with the options passed as arguments into get_answers().
         
@@ -238,7 +238,7 @@ class QnAMaker(QnAMakerTelemetryClient):
 
         return hydrated_options
     
-    def query_qna_service(self, message_activity: Activity, options: QnAMakerOptions) -> [QueryResult]:
+    def _query_qna_service(self, message_activity: Activity, options: QnAMakerOptions) -> [QueryResult]:
         url = f'{ self._endpoint.host }/knowledgebases/{ self._endpoint.knowledge_base_id }/generateAnswer'
 
         question = {
@@ -250,15 +250,15 @@ class QnAMaker(QnAMakerTelemetryClient):
         
         serialized_content = json.dumps(question)
 
-        headers = self.get_headers()
+        headers = self._get_headers()
 
         response = requests.post(url, data=serialized_content, headers=headers)
         
-        result = self.format_qna_result(response, options)
+        result = self._format_qna_result(response, options)
         
         return result
     
-    async def emit_trace_info(self, turn_context: TurnContext, result: [QueryResult], options: QnAMakerOptions):
+    async def _emit_trace_info(self, turn_context: TurnContext, result: [QueryResult], options: QnAMakerOptions):
         trace_info = QnAMakerTraceInfo(
             message = turn_context.activity,
             query_results = result,
@@ -278,7 +278,7 @@ class QnAMaker(QnAMakerTelemetryClient):
 
         await turn_context.send_activity(trace_activity)
     
-    def format_qna_result(self, qna_result: requests.Response, options: QnAMakerOptions) -> [QueryResult]:
+    def _format_qna_result(self, qna_result: requests.Response, options: QnAMakerOptions) -> [QueryResult]:
         result = qna_result.json()
 
         answers_within_threshold = [
@@ -297,7 +297,7 @@ class QnAMaker(QnAMakerTelemetryClient):
 
         return answers_as_query_results
 
-    def get_headers(self):
+    def _get_headers(self):
         headers = { 'Content-Type': 'application/json' }
 
         if self._is_legacy_protocol:
