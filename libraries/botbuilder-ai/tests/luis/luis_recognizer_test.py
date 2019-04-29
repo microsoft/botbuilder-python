@@ -59,6 +59,17 @@ class LuisRecognizerTest(unittest.TestCase):
         self.assertEqual("048ec46dc58e495482b0c447cfdbd291", app.endpoint_key)
         self.assertEqual("https://westus.api.cognitive.microsoft.com", app.endpoint)
 
+    def test_luis_recognizer_timeout(self):
+        endpoint = "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/b31aeaf3-3511-495b-a07f-571fc873214b?verbose=true&timezoneOffset=-360&subscription-key=048ec46dc58e495482b0c447cfdbd291&q="
+        expected_timeout = 300
+        options_with_timeout = LuisPredictionOptions(timeout=expected_timeout * 1000)
+
+        recognizer_with_timeout = LuisRecognizer(endpoint, options_with_timeout)
+
+        self.assertEqual(
+            expected_timeout, recognizer_with_timeout._runtime.config.connection.timeout
+        )
+
     def test_none_endpoint(self):
         # Arrange
         my_app = LuisApplication(
@@ -354,6 +365,21 @@ class LuisRecognizerTest(unittest.TestCase):
 
         # And that we added the bot.builder package details.
         self.assertTrue("botbuilder-ai/4" in user_agent)
+
+    def test_telemetry_construction(self):
+        # Arrange
+        # Note this is NOT a real LUIS application ID nor a real LUIS subscription-key
+        # theses are GUIDs edited to look right to the parsing and validation code.
+        endpoint = "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/b31aeaf3-3511-495b-a07f-571fc873214b?verbose=true&timezoneOffset=-360&subscription-key=048ec46dc58e495482b0c447cfdbd291&q="
+
+        # Act
+        recognizer = LuisRecognizer(endpoint)
+
+        # Assert
+        app = recognizer._application
+        self.assertEqual("b31aeaf3-3511-495b-a07f-571fc873214b", app.application_id)
+        self.assertEqual("048ec46dc58e495482b0c447cfdbd291", app.endpoint_key)
+        self.assertEqual("https://westus.api.cognitive.microsoft.com", app.endpoint)
 
     def assert_score(self, score: float) -> None:
         self.assertTrue(score >= 0)
