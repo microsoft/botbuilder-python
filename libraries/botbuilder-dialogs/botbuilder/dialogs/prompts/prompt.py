@@ -12,6 +12,7 @@ from ..dialog_turn_result import DialogTurnResult
 from ..dialog_context import DialogContext
 from botbuilder.core.turn_context import TurnContext
 from botbuilder.schema import InputHints, ActivityTypes
+from botbuilder.dialogs.choices import ChoiceFactory
 
 from abc import abstractmethod
 from botbuilder.schema import Activity
@@ -32,7 +33,7 @@ class Prompt(Dialog):
             (Optional) custom validator used to provide additional validation and 
             re-prompting logic for the prompt.
         """
-        super(Prompt, self).__init__(str)
+        super(Prompt, self).__init__(dialog_id)
         
         self._validator = validator
 
@@ -121,28 +122,23 @@ class Prompt(Dialog):
         # Create temporary msg
         # TODO: fix once ChoiceFactory complete
         def inline() -> Activity:
-            # return ChoiceFactory.inline(choices, text, null, options)
-            return None
-        def list() -> Activity:
-            # return ChoiceFactory.list(choices, text, null, options)
-            return None
+            return ChoiceFactory.inline(choices, text, None, options)
+        def list_style() -> Activity:
+            return ChoiceFactory.list_style(choices, text, None, options)
         def suggested_action() -> Activity:
-            # return ChoiceFactory.suggested_action(choices, text)
-            return None
+            return ChoiceFactory.suggested_action(choices, text)
         def hero_card() -> Activity:
-            # return ChoiceFactory.hero_card(choices, text)
-            return None
+            return ChoiceFactory.hero_card(choices, text)
         def list_style_none() -> Activity:
             activity = Activity()
             activity.text = text
             return activity
         def default() -> Activity:
-            # return ChoiceFactory.for_channel(channel_id, choices, text, None, options);
-            return None
+            return ChoiceFactory.for_channel(channel_id, choices, text, None, options)
         switcher = {
             # ListStyle.inline
             1: inline,
-            2: list,
+            2: list_style,
             3: suggested_action,
             4: hero_card,
             5: list_style_none

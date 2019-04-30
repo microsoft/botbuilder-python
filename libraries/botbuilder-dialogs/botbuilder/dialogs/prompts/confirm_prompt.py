@@ -4,8 +4,7 @@
 from typing import Dict
 from botbuilder.core.turn_context import TurnContext
 from botbuilder.schema import (ActivityTypes, Activity)
-from botbuilder.dialogs.choices import Choice
-from botbuilder.dialogs.choices import ChoiceFactoryOptions
+from botbuilder.dialogs.choices import Choice, ChoiceFactoryOptions, ListStyle
 from .prompt import Prompt
 from .prompt_options import PromptOptions
 from .prompt_recognizer_result import PromptRecognizerResult
@@ -32,7 +31,7 @@ class ConfirmPrompt(Prompt):
         # TODO: Port ListStyle
         self.style = ListStyle.auto
         # TODO: Import defaultLocale
-        self.default_locale = defaultLocale
+        self.default_locale = default_locale
         self.choice_options = None
         self.confirm_choices = None
         

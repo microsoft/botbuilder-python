@@ -106,6 +106,7 @@ class DialogContext():
         self._stack.append(instance)
         
         # Call dialog's begin_dialog() method
+        import pdb; pdb.set_trace()
         return await dialog.begin_dialog(self, options)
 
     # TODO: Fix options: PromptOptions instead of object
@@ -196,7 +197,7 @@ class DialogContext():
         dialog = await self.dialogs.find(dialog_id)
 
         if (dialog == None and self.parent != None):
-            dialog = self.parent.find_dialog(dialog_id)
+            dialog = await self.parent.find_dialog(dialog_id)
         return dialog
 
     async def replace_dialog(self, dialog_id: str, options: object = None) -> DialogTurnResult:

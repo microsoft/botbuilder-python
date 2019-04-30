@@ -26,7 +26,8 @@ class DialogSet():
                 except KeyError:
                     raise TypeError('DialogSet(): dialog_state cannot be None.')
                 # Only ComponentDialog can initialize with None dialog_state
-                if not type(self_obj).__name__ is "ComponentDialog":
+                from .component_dialog import ComponentDialog
+                if not isinstance(self_obj, ComponentDialog):
                     raise TypeError('DialogSet(): dialog_state cannot be None.')
             finally:
                 # make sure to clean up the frame at the end to avoid ref cycles
@@ -39,7 +40,7 @@ class DialogSet():
 
     
     
-    async def add(self, dialog: Dialog):
+    def add(self, dialog: Dialog):
         """
         Adds a new dialog to the set and returns the added dialog.
         :param dialog: The dialog to add.

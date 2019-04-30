@@ -131,10 +131,10 @@ class ComponentDialog(Dialog):
 
 
     async def on_begin_dialog(self, inner_dc: DialogContext, options: object) -> DialogTurnResult:
-        return inner_dc.begin_dialog(self.initial_dialog_id, options)
+        return await inner_dc.begin_dialog(self.initial_dialog_id, options)
 
     async def on_continue_dialog(self, inner_dc: DialogContext) -> DialogTurnResult:
-        return inner_dc.continue_dialog()
+        return await inner_dc.continue_dialog()
 
     async def on_end_dialog(self, context: TurnContext, instance: DialogInstance, reason: DialogReason) -> None:
         return
@@ -143,4 +143,4 @@ class ComponentDialog(Dialog):
         return 
 
     async def end_component(self, outer_dc: DialogContext, result: object) -> DialogTurnResult:
-        return outer_dc.end_dialog(result)
+        return await outer_dc.end_dialog(result)

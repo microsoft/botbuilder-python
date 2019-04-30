@@ -107,7 +107,7 @@ class ChoiceFactory:
         )
 
     @staticmethod
-    def list(
+    def list_style(
         choices: List[Choice],
         text: str = None,
         speak: str = None,

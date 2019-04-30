@@ -29,7 +29,7 @@ from botbuilder.dialogs import (
                                 DialogContext,
                                 DialogTurnStatus
                                 )
-from unittest.mock import patch, Mock
+from unittest.mock import patch
 from unittest import skip
 
 begin_message = Activity()
@@ -45,8 +45,7 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
         # assert
         self.assertEqual(type(dialog.telemetry_client), NullTelemetryClient)
 
-    @skip('Pending Telemetry mock')
-    @patch('test_telemetry_waterfall.ApplicationInsightsTelemetryClient')
+    @patch('botbuilder.applicationinsights.ApplicationInsightsTelemetryClient')
     async def test_execute_sequence_waterfall_steps(self, MockTelemetry):
         # arrange
 
@@ -99,9 +98,8 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
                             ('WaterfallStep', {'DialogId':'test', 'StepName':'Step2of2'})
                             ]
         self.assert_telemetry_calls(telemetry, telemetry_calls)
-
-    @skip('Pending Telemetry mock')     
-    @patch('test_telemetry_waterfall.ApplicationInsightsTelemetryClient')
+    
+    @patch('botbuilder.applicationinsights.ApplicationInsightsTelemetryClient')
     async def test_ensure_end_dialog_called(self, MockTelemetry):
         # arrange
 
@@ -151,7 +149,8 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
                             ('WaterfallComplete', {'DialogId':'test'}),
                             ('WaterfallStart', {'DialogId':'test'}),
                             ('WaterfallStep', {'DialogId':'test', 'StepName':'Step1of2'}),                            
-                            ]
+        ]
+        print(str(telemetry.track_event.call_args_list))
         self.assert_telemetry_calls(telemetry, telemetry_calls)
 
 
