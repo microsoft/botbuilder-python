@@ -5,11 +5,13 @@ import platform
 from collections import OrderedDict
 from typing import Dict, List, Set, Union
 
+import azure.cognitiveservices.language.luis.runtime.models as runtime_models
 from azure.cognitiveservices.language.luis.runtime.models import (
     CompositeEntityModel,
     EntityModel,
     LuisResult,
 )
+from msrest import Serializer
 
 from .. import __title__, __version__
 from . import IntentScore, RecognizerResult
@@ -45,7 +47,7 @@ class LuisUtil:
         entities: List[EntityModel],
         composite_entities: List[CompositeEntityModel],
         verbose: bool,
-    ) -> Dict:
+    ) -> Dict[str, object]:
         entities_and_metadata = {}
         if verbose:
             entities_and_metadata[LuisUtil._metadata_key] = {}
@@ -295,3 +297,15 @@ class LuisUtil:
         platform_user_agent = f"({os_version}; {py_version})"
         user_agent = f"{package_user_agent} {platform_user_agent}"
         return user_agent
+
+    @staticmethod
+    def luis_result_as_dict(luis_result: LuisResult) -> Dict[str, object]:
+        if luis_result is None:
+            return None
+
+        client_models = {
+            k: v for k, v in runtime_models.__dict__.items() if isinstance(v, type)
+        }
+        serializer = Serializer(client_models)
+        d = serializer.body(luis_result, "LuisResult")
+        return d

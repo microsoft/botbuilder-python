@@ -336,11 +336,26 @@ class LuisRecognizer(object):
             recognizer_result, turn_context, telemetry_properties, telemetry_metrics
         )
 
+        await self._emit_trace_info(turn_context, luis_result, recognizer_result)
+
+        return recognizer_result
+
+    async def _emit_trace_info(
+        self,
+        turn_context: TurnContext,
+        luis_result: LuisResult,
+        recognizer_result: RecognizerResult,
+    ) -> None:
+        luis_result_dict = LuisUtil.luis_result_as_dict(luis_result)
+
+        # compat: libs in other languages - for luisResult
         trace_info: Dict[str, object] = {
-            "recognizerResult": recognizer_result,
+            "recognizerResult": recognizer_result._as_dict(
+                memo={"luisResult": luis_result_dict}
+            ),
             "luisModel": {"ModelID": self._application.application_id},
-            "luisOptions": self._options,
-            "luisResult": luis_result,
+            "luisOptions": {"Staging": self._options.staging},
+            "luisResult": luis_result_dict,
         }
 
         trace_activity = ActivityUtil.create_trace(
@@ -352,5 +367,3 @@ class LuisRecognizer(object):
         )
 
         await turn_context.send_activity(trace_activity)
-
-        return recognizer_result
