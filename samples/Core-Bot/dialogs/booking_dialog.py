@@ -16,7 +16,7 @@ class BookingDialog(CancelAndHelpDialog):
 
         ]))
 
-        self.initial_dialog_id(WaterfallDialog.__name__)
+        self.initial_dialog_id = WaterfallDialog.__name__
     
     """
     If a destination city has not been provided, prompt for one.

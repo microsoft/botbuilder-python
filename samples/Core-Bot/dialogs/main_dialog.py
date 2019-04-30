@@ -16,7 +16,7 @@ class MainDialog(ComponentDialog):
 
         self.add_dialog(TextPrompt(TextPrompt.__name__))
         self.add_dialog(BookingDialog())
-        self.add_dialog(WaterfallDialog(WaterfallDialog.__name__, [
+        self.add_dialog(WaterfallDialog('WFDialog', [
 
         ]))
     

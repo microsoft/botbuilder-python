@@ -34,8 +34,11 @@ async def messages(req: web.Request) -> web.Response:
     body = await req.json()
     activity = Activity().deserialize(body)
     auth_header = req.headers['Authorization'] if 'Authorization' in req.headers else ''
+    async def aux_func(turn_context):
+        await bot.on_turn(turn_context)
+
     try:
-        return await ADAPTER.process_activity(activity, auth_header, lambda turn_context: await bot.on_turn(turn_context))
+        return await ADAPTER.process_activity(activity, auth_header, aux_func)
     except Exception as e:
         raise e
 

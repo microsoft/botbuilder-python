@@ -9,12 +9,12 @@ class DateResolverDialog(CancelAndHelpDialog):
         super(DateResolverDialog, self).__init__(dialog_id or DateResolverDialog.__name__)
 
         self.add_dialog(DateTimePrompt(DateTimePrompt.__name__, DateResolverDialog.datetime_prompt_validator))
-        self.add_dialog(WaterfallDialog(WaterfallDialog.__name__, [
+        self.add_dialog(WaterfallDialog(WaterfallDialog.__name__ + '2', [
             self.initialStep,
             self.finalStep
         ]))
 
-        self.initial_dialog_id(WaterfallDialog.__name__)
+        self.initial_dialog_id = WaterfallDialog.__name__ + '2'
     
     async def initialStep(self,step_context: WaterfallStepContext) -> DialogTurnResult:
         timex = step_context.options.date
