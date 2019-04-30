@@ -3,16 +3,17 @@
 
 import json
 from os import path
-from typing import Tuple
-from unittest.mock import Mock, patch
+from typing import Dict, Tuple
+from unittest import mock
+from unittest.mock import MagicMock, Mock
 
-import requests
 from aiounittest import AsyncTestCase
 from azure.cognitiveservices.language.luis.runtime import LUISRuntimeClient
 from azure.cognitiveservices.language.luis.runtime.luis_runtime_client import (
     LUISRuntimeClientConfiguration,
 )
 from msrest import Deserializer
+from requests import Session
 from requests.models import Response
 
 from botbuilder.ai.luis import (
@@ -23,7 +24,7 @@ from botbuilder.ai.luis import (
     RecognizerResult,
     TopIntent,
 )
-from botbuilder.core import BotAdapter, TurnContext
+from botbuilder.core import BotAdapter, BotTelemetryClient, TurnContext
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.schema import (
     Activity,
@@ -31,8 +32,8 @@ from botbuilder.schema import (
     ChannelAccount,
     ConversationAccount,
 )
-
 from null_adapter import NullAdapter
+from telemetry_override_recognizer import TelemetryOverrideRecognizer
 
 
 class LuisRecognizerTest(AsyncTestCase):
@@ -339,6 +340,43 @@ class LuisRecognizerTest(AsyncTestCase):
         self.assertEqual("T04", result.entities["datetime_time"][0]["time"])
         self.assertEqual(1, len(result.entities["$instance"]["datetime_time"]))
 
+    async def test_trace_activity(self):
+        # Arrange
+        utterance: str = "My name is Emad"
+        response_path: str = "TraceActivity.json"
+
+        # add async support to magic mock.
+        async def async_magic():
+            pass
+
+        MagicMock.__await__ = lambda x: async_magic().__await__()
+
+        # Act
+        with mock.patch.object(TurnContext, "send_activity") as mock_send_activity:
+            await LuisRecognizerTest._get_recognizer_result(utterance, response_path)
+            trace_activity: Activity = mock_send_activity.call_args[0][0]
+
+        # Assert
+        self.assertIsNotNone(trace_activity)
+        self.assertEqual(LuisRecognizer.luis_trace_type, trace_activity.value_type)
+        self.assertEqual(LuisRecognizer.luis_trace_label, trace_activity.label)
+
+        luis_trace_info = trace_activity.value
+        self.assertIsNotNone(luis_trace_info)
+        self.assertIsNotNone(luis_trace_info["recognizerResult"])
+        self.assertIsNotNone(luis_trace_info["luisResult"])
+        self.assertIsNotNone(luis_trace_info["luisOptions"])
+        self.assertIsNotNone(luis_trace_info["luisModel"])
+
+        recognizer_result: RecognizerResult = luis_trace_info["recognizerResult"]
+        self.assertEqual(utterance, recognizer_result["text"])
+        self.assertIsNotNone(recognizer_result["intents"]["SpecifyName"])
+        self.assertEqual(utterance, luis_trace_info["luisResult"]["query"])
+        self.assertEqual(
+            LuisRecognizerTest._luisAppId, luis_trace_info["luisModel"]["ModelID"]
+        )
+        self.assertIsNone(luis_trace_info["luisOptions"]["Staging"])
+
     def test_top_intent_returns_top_intent(self):
         greeting_intent: str = LuisRecognizer.top_intent(self._mocked_results)
         self.assertEqual(greeting_intent, "Greeting")
@@ -399,6 +437,134 @@ class LuisRecognizerTest(AsyncTestCase):
         self.assertEqual("048ec46dc58e495482b0c447cfdbd291", app.endpoint_key)
         self.assertEqual("https://westus.api.cognitive.microsoft.com", app.endpoint)
 
+    async def test_telemetry_override_on_log_async(self):
+        # Arrange
+        utterance: str = "please book from May 5 to June 6"
+        response_path: str = "MultipleDateTimeEntities.json"  # it doesn't matter to use which file.
+        telemetry_client = mock.create_autospec(BotTelemetryClient)
+        options = LuisPredictionOptions(
+            telemetry_client=telemetry_client, log_personal_information=False
+        )
+        telemetry_properties: Dict[str, str] = {"test": "testvalue", "foo": "foovalue"}
+
+        # Act
+        await LuisRecognizerTest._get_recognizer_result(
+            utterance,
+            response_path,
+            bot_adapter=NullAdapter(),
+            options=options,
+            telemetry_properties=telemetry_properties,
+        )
+
+        # Assert
+        self.assertEqual(1, telemetry_client.track_event.call_count)
+        args = telemetry_client.track_event.call_args[0]
+        self.assertEqual("LuisResult", args[0])
+        self.assertTrue("applicationId" in args[1])
+        self.assertTrue("intent" in args[1])
+        self.assertTrue("intentScore" in args[1])
+        self.assertTrue("fromId" in args[1])
+        self.assertTrue("entities" in args[1])
+
+    async def test_telemetry_pii_logged_async(self):
+        # Arrange
+        utterance: str = "please book from May 5 to June 6"
+        response_path: str = "MultipleDateTimeEntities.json"  # it doesn't matter to use which file.
+        telemetry_client = mock.create_autospec(BotTelemetryClient)
+        options = LuisPredictionOptions(
+            telemetry_client=telemetry_client, log_personal_information=True
+        )
+
+        # Act
+        await LuisRecognizerTest._get_recognizer_result(
+            utterance,
+            response_path,
+            bot_adapter=NullAdapter(),
+            options=options,
+            telemetry_properties=None,
+        )
+
+        # Assert
+        self.assertEqual(1, telemetry_client.track_event.call_count)
+        args = telemetry_client.track_event.call_args[0]
+        self.assertEqual("LuisResult", args[0])
+        self.assertEqual(8, len(args[1]))
+        self.assertTrue("applicationId" in args[1])
+        self.assertTrue("intent" in args[1])
+        self.assertTrue("intentScore" in args[1])
+        self.assertTrue("intent2" in args[1])
+        self.assertTrue("intentScore2" in args[1])
+        self.assertTrue("fromId" in args[1])
+        self.assertTrue("entities" in args[1])
+        self.assertTrue("question" in args[1])
+
+    async def test_telemetry_no_pii_logged_async(self):
+        # Arrange
+        utterance: str = "please book from May 5 to June 6"
+        response_path: str = "MultipleDateTimeEntities.json"  # it doesn't matter to use which file.
+        telemetry_client = mock.create_autospec(BotTelemetryClient)
+        options = LuisPredictionOptions(
+            telemetry_client=telemetry_client, log_personal_information=False
+        )
+
+        # Act
+        await LuisRecognizerTest._get_recognizer_result(
+            utterance,
+            response_path,
+            bot_adapter=NullAdapter(),
+            options=options,
+            telemetry_properties=None,
+        )
+
+        # Assert
+        self.assertEqual(1, telemetry_client.track_event.call_count)
+        args = telemetry_client.track_event.call_args[0]
+        self.assertEqual("LuisResult", args[0])
+        self.assertEqual(7, len(args[1]))
+        self.assertTrue("applicationId" in args[1])
+        self.assertTrue("intent" in args[1])
+        self.assertTrue("intentScore" in args[1])
+        self.assertTrue("intent2" in args[1])
+        self.assertTrue("intentScore2" in args[1])
+        self.assertTrue("fromId" in args[1])
+        self.assertTrue("entities" in args[1])
+        self.assertFalse("question" in args[1])
+
+    async def test_telemetry_override_on_derive_async(self):
+        # Arrange
+        utterance: str = "please book from May 5 to June 6"
+        response_path: str = "MultipleDateTimeEntities.json"  # it doesn't matter to use which file.
+        telemetry_client = mock.create_autospec(BotTelemetryClient)
+        options = LuisPredictionOptions(
+            telemetry_client=telemetry_client, log_personal_information=False
+        )
+        telemetry_properties: Dict[str, str] = {"test": "testvalue", "foo": "foovalue"}
+
+        # Act
+        await LuisRecognizerTest._get_recognizer_result(
+            utterance,
+            response_path,
+            bot_adapter=NullAdapter(),
+            options=options,
+            telemetry_properties=telemetry_properties,
+            recognizer_class=TelemetryOverrideRecognizer,
+        )
+
+        # Assert
+        self.assertEqual(2, telemetry_client.track_event.call_count)
+        call0_args = telemetry_client.track_event.call_args_list[0][0]
+        self.assertEqual("LuisResult", call0_args[0])
+        self.assertTrue("MyImportantProperty" in call0_args[1])
+        self.assertTrue(call0_args[1]["MyImportantProperty"] == "myImportantValue")
+        self.assertTrue("test" in call0_args[1])
+        self.assertTrue(call0_args[1]["test"] == "testvalue")
+        self.assertTrue("foo" in call0_args[1])
+        self.assertTrue(call0_args[1]["foo"] == "foovalue")
+        call1_args = telemetry_client.track_event.call_args_list[1][0]
+        self.assertEqual("MySecondEvent", call1_args[0])
+        self.assertTrue("MyImportantProperty2" in call1_args[1])
+        self.assertTrue(call1_args[1]["MyImportantProperty2"] == "myImportantValue2")
+
     def assert_score(self, score: float) -> None:
         self.assertTrue(score >= 0)
         self.assertTrue(score <= 1)
@@ -409,24 +575,27 @@ class LuisRecognizerTest(AsyncTestCase):
         utterance: str,
         response_file: str,
         bot_adapter: BotAdapter = TestAdapter(),
-        verbose: bool = False,
         options: LuisPredictionOptions = None,
+        include_api_results: bool = False,
+        telemetry_properties: Dict[str, str] = None,
+        recognizer_class: type = LuisRecognizer,
     ) -> Tuple[LuisRecognizer, RecognizerResult]:
         response_json = LuisRecognizerTest._get_json_for_file(response_file)
         recognizer = LuisRecognizerTest._get_luis_recognizer(
-            verbose=verbose, options=options
+            recognizer_class, include_api_results=include_api_results, options=options
         )
         context = LuisRecognizerTest._get_context(utterance, bot_adapter)
         response = Mock(spec=Response)
         response.status_code = 200
         response.headers = {}
         response.reason = ""
-        with patch("requests.Session.send", return_value=response):
-            with patch(
-                "msrest.serialization.Deserializer._unpack_content",
-                return_value=response_json,
+        with mock.patch.object(Session, "send", return_value=response):
+            with mock.patch.object(
+                Deserializer, "_unpack_content", return_value=response_json
             ):
-                result = await recognizer.recognize(context)
+                result = await recognizer.recognize(
+                    context, telemetry_properties=telemetry_properties
+                )
                 return recognizer, result
 
     @classmethod
@@ -441,11 +610,16 @@ class LuisRecognizerTest(AsyncTestCase):
 
     @classmethod
     def _get_luis_recognizer(
-        cls, verbose: bool = False, options: LuisPredictionOptions = None
+        cls,
+        recognizer_class: type,
+        options: LuisPredictionOptions = None,
+        include_api_results: bool = False,
     ) -> LuisRecognizer:
         luis_app = LuisApplication(cls._luisAppId, cls._subscriptionKey, cls._endpoint)
-        return LuisRecognizer(
-            luis_app, prediction_options=options, include_api_results=verbose
+        return recognizer_class(
+            luis_app,
+            prediction_options=options,
+            include_api_results=include_api_results,
         )
 
     @staticmethod
