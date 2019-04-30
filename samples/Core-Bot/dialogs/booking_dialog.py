@@ -13,7 +13,11 @@ class BookingDialog(CancelAndHelpDialog):
         self.add_dialog(ConfirmPrompt(ConfirmPrompt.__name__))
         self.add_dialog(DateResolverDialog(DateResolverDialog.__name__))
         self.add_dialog(WaterfallDialog(WaterfallDialog.__name__, [
-
+            self.destination_step,
+            self.origin_step,
+            self.travel_date_step,
+            self.confirm_step,
+            self.final_step
         ]))
 
         self.initial_dialog_id = WaterfallDialog.__name__

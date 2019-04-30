@@ -40,13 +40,13 @@ class Prompt(Dialog):
     async def begin_dialog(self, dc: DialogContext, options: object) -> DialogTurnResult:
         if not dc:
             raise TypeError('Prompt(): dc cannot be None.')
-        if not options is PromptOptions:
+        if not isinstance(options, PromptOptions):
             raise TypeError('Prompt(): Prompt options are required for Prompt dialogs.')
         # Ensure prompts have input hint set
         if options.prompt != None and not options.prompt.input_hint:
             options.prompt.input_hint = InputHints.expecting_input
 
-        if options.RetryPrompt != None and not options.prompt.input_hint:
+        if options.retry_prompt != None and not options.prompt.input_hint:
             options.retry_prompt.input_hint = InputHints.expecting_input
        
         # Initialize prompt state
