@@ -69,7 +69,7 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
 
         mydialog = WaterfallDialog('test', [ step1, step2 ])
         mydialog.telemetry_client = telemetry
-        await dialogs.add(mydialog)
+        dialogs.add(mydialog)
         
         # Initialize TestAdapter
         async def exec_test(turn_context: TurnContext) -> None:
@@ -123,7 +123,7 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
 
         mydialog = WaterfallDialog('test', [ step1, step2 ])
         mydialog.telemetry_client = telemetry
-        await dialogs.add(mydialog)
+        dialogs.add(mydialog)
         
         # Initialize TestAdapter
         async def exec_test(turn_context: TurnContext) -> None:

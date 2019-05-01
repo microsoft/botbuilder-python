@@ -100,6 +100,7 @@ class BotState(PropertyManager):
         if force or (cached_state != None and cached_state.is_changed == True):
             storage_key = self.get_storage_key(turn_context)
             changes : Dict[str, object] = { storage_key: cached_state.state }
+            print(changes)
             await self._storage.write(changes)
             cached_state.hash = cached_state.compute_hash(cached_state.state)
             

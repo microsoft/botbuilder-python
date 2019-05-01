@@ -6,6 +6,7 @@ from botbuilder.core import (TurnContext, NullTelemetryClient, BotTelemetryClien
 from .dialog_reason import DialogReason
 from .dialog_turn_status import DialogTurnStatus
 from .dialog_turn_result import DialogTurnResult
+from .dialog_instance import DialogInstance
 
 
 class Dialog(ABC):
@@ -40,7 +41,7 @@ class Dialog(ABC):
             self._telemetry_client = value
 
     @abstractmethod
-    async def begin_dialog(self, dc, options: object = None):
+    async def begin_dialog(self, dc: 'DialogContext', options: object = None):
         """
         Method called when a new dialog has been pushed onto the stack and is being activated.
         :param dc: The dialog context for the current turn of conversation.
@@ -48,7 +49,7 @@ class Dialog(ABC):
         """
         raise NotImplementedError()
 
-    async def continue_dialog(self, dc):
+    async def continue_dialog(self, dc: 'DialogContext'):
         """
         Method called when an instance of the dialog is the "current" dialog and the
         user replies with a new activity. The dialog will generally continue to receive the user's
@@ -60,7 +61,7 @@ class Dialog(ABC):
         # By default just end the current dialog.
         return await dc.end_dialog(None)
 
-    async def resume_dialog(self, dc, reason: DialogReason, result: object):
+    async def resume_dialog(self, dc: 'DialogContext', reason: DialogReason, result: object):
         """
         Method called when an instance of the dialog is being returned to from another
         dialog that was started by the current instance using `begin_dialog()`.
@@ -76,7 +77,7 @@ class Dialog(ABC):
         return await dc.EndDialog(result)
 
     # TODO: instance is DialogInstance
-    async def reprompt_dialog(self, context: TurnContext, instance):
+    async def reprompt_dialog(self, context: TurnContext, instance: DialogInstance):
         """
         :param context:
         :return:
@@ -84,7 +85,7 @@ class Dialog(ABC):
         # No-op by default
         return
     # TODO: instance is DialogInstance
-    async def end_dialog(self, context: TurnContext, instance):
+    async def end_dialog(self, context: TurnContext, instance: DialogInstance, reason: DialogReason):
         """
         :param context:
         :return:

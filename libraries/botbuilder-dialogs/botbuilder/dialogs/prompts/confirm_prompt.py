@@ -13,7 +13,7 @@ from .prompt_recognizer_result import PromptRecognizerResult
 class ConfirmPrompt(Prompt):
     # TODO: Fix to reference recognizer to use proper constants
     choice_defaults : Dict[str, object] = { 
-         'English': (Choice("Si"), Choice("No"), ChoiceFactoryOptions(", ", " o ", ", o ", True)),
+         'Spanish': (Choice("Si"), Choice("No"), ChoiceFactoryOptions(", ", " o ", ", o ", True)),
          'Dutch': (Choice("Ja"), Choice("Nee"), ChoiceFactoryOptions(", ", " of ", ", of ", True)),
          'English': (Choice("Yes"), Choice("No"), ChoiceFactoryOptions(", ", " or ", ", or ", True)),
          'French': (Choice("Oui"), Choice("Non"), ChoiceFactoryOptions(", ", " ou ", ", ou ", True)),
@@ -49,7 +49,7 @@ class ConfirmPrompt(Prompt):
         confirms = self.confirm_choices if self.confirm_choices != None else (defaults[0], defaults[1])
         choices = { confirms[0], confirms[1] }
         if is_retry == True and options.retry_prompt != None:
-            prompt = self.append_choices(options.retry_prompt)  
+            prompt = self.append_choices(options.retry_prompt, channel_id, choices, self.style, choice_opts)  
         else:
             prompt = self.append_choices(options.prompt, channel_id, choices, self.style, choice_opts)
         turn_context.send_activity(prompt)

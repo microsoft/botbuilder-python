@@ -52,7 +52,7 @@ class MainDialog(ComponentDialog):
             # Now we have all the booking details call the booking service.
 
             # If the call to the booking service was successful tell the user.
-
+            import pdb; pdb.set_trace()
             time_property = TimexProperty(result.TravelDate)
             travel_date_msg = time_property.to_natural_language(datetime.now())
             msg = f'I have you booked to {result.destination} from {result.origin} on {travel_date_msg}'

@@ -25,7 +25,7 @@ class MemoryStorage(Storage):
         try:
             for key in keys:
                 if key in self.memory:
-                    data[key] = deepcopy(self.memory[key])
+                    data[key] = self.memory[key]
         except TypeError as e:
             raise e
 
@@ -49,7 +49,7 @@ class MemoryStorage(Storage):
                     elif old_state.e_tag:
                             old_state_etag = old_state.e_tag
                 
-                new_state = deepcopy(new_value)
+                new_state = new_value
                 
                 # Set ETag if applicable
                 if isinstance(new_value, StoreItem):

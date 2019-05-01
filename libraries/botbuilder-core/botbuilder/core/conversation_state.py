@@ -34,6 +34,7 @@ class ConversationState(BotState):
     def get_storage_key(self, context: TurnContext):
         activity = context.activity
         channel_id = getattr(activity, 'channel_id', None)
+        #import pdb; pdb.set_trace()
         conversation_id = getattr(activity.conversation, 'id', None) if hasattr(activity, 'conversation') else None
 
         storage_key = None

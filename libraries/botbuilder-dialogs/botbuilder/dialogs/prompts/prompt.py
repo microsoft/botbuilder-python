@@ -70,7 +70,7 @@ class Prompt(Dialog):
         # Perform base recognition
         instance = dc.active_dialog
         state = instance.state[self.persisted_state]
-        options = instance.State[self.persisted_options]
+        options = instance.state[self.persisted_options]
         recognized = await self.on_recognize(dc.context, state, options)
 
         # Validate the return value
@@ -81,7 +81,7 @@ class Prompt(Dialog):
             options.number_of_attempts += 1
         else:
             if recognized.succeeded:
-                isValid = True
+                is_valid = True
         # Return recognized value or re-prompt
         if is_valid:
             return await dc.end_dialog(recognized.value)
@@ -115,7 +115,7 @@ class Prompt(Dialog):
     # TODO: Fix choices to use Choice object when ported.
     # TODO: Fix style to use ListStyle when ported.
     # TODO: Fix options to use ChoiceFactoryOptions object when ported.
-    def append_choices(self, prompt: Activity, channel_id: str, choices: object, style: object, options : object ) -> Activity:
+    def append_choices(self, prompt: Activity, channel_id: str, choices: object, style: object, options : object = None ) -> Activity:
         # Get base prompt text (if any)
         text = prompt.text if prompt != None and not prompt.text == False else ''
         

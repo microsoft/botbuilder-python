@@ -28,7 +28,9 @@ class BookingDialog(CancelAndHelpDialog):
     async def destination_step(self, step_context: WaterfallStepContext) -> DialogTurnResult: 
         booking_details = step_context.options
 
+        print('destination_step')
         if (booking_details.destination is None): 
+            import pdb; pdb.set_trace()
             return await step_context.prompt(TextPrompt.__name__, PromptOptions(prompt= MessageFactory.text('To what city would you like to travel?')))
         else: 
             return await step_context.next(booking_details.destination)
@@ -39,6 +41,7 @@ class BookingDialog(CancelAndHelpDialog):
     async def origin_step(self, step_context: WaterfallStepContext) -> DialogTurnResult: 
         booking_details = step_context.options
 
+        print('origin_step')
         # Capture the response to the previous step's prompt
         booking_details.destination = step_context.result
         if (booking_details.origin is None): 
@@ -53,6 +56,7 @@ class BookingDialog(CancelAndHelpDialog):
     async def travel_date_step(self, step_context: WaterfallStepContext) -> DialogTurnResult: 
         booking_details = step_context.options
 
+        print('travel_date_step')
         # Capture the results of the previous step
         booking_details.origin = step_context.result
         if (not booking_details.travel_date or self.is_ambiguous(booking_details.travelDate)): 
@@ -66,6 +70,7 @@ class BookingDialog(CancelAndHelpDialog):
     async def confirm_step(self, step_context: WaterfallStepContext) -> DialogTurnResult: 
         booking_details = step_context.options
 
+        print('confirm_step')
         # Capture the results of the previous step
         booking_details.travel_date= step_context.result
         msg = f'Please confirm, I have you traveling to: { booking_details.destination } from: { booking_details.origin } on: { booking_details.travel_date}.'

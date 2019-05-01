@@ -23,6 +23,7 @@ class DialogBot(ActivityHandler):
         await super().on_turn(turn_context)
 
         # Save any state changes that might have occured during the turn.
+        self.dialogState.set(turn_context, turn_context.turn_state['ConversationState'].state['DialogState'])
         await self.conversation_state.save_changes(turn_context, False)
         await self.user_state.save_changes(turn_context, False)
     

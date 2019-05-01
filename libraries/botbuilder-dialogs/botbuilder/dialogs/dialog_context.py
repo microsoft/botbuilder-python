@@ -103,7 +103,7 @@ class DialogContext():
         instance.id = dialog_id
         instance.state = {}
 
-        self._stack.append(instance)
+        self._stack.insert(0,(instance))
         
         # Call dialog's begin_dialog() method
         return await dialog.begin_dialog(self, options)
@@ -138,7 +138,7 @@ class DialogContext():
             # Look up dialog
             dialog = await self.find_dialog(self.active_dialog.id)
             if not dialog:
-                raise Exception("DialogContext.continue_dialog(): Can't continue dialog. A dialog with an id of '%s' wasn't found." % active_dialog.id)
+                raise Exception("DialogContext.continue_dialog(): Can't continue dialog. A dialog with an id of '%s' wasn't found." % self.active_dialog.id)
 
             # Continue execution of dialog
             return await dialog.continue_dialog(self)
@@ -238,4 +238,4 @@ class DialogContext():
                 await dialog.end_dialog(self.context, instance, reason)
 
             # Pop dialog off stack
-            self._stack.pop()
+            self._stack.pop(0)
