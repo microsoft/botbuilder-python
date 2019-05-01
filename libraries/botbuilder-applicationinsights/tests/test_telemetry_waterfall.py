@@ -47,7 +47,7 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
         self.assertEqual(type(dialog.telemetry_client), NullTelemetryClient)
 
 
-    @patch('test_telemetry_waterfall.ApplicationInsightsTelemetryClient')
+    @patch('botbuilder.applicationinsights.ApplicationInsightsTelemetryClient')
     async def test_execute_sequence_waterfall_steps(self, MockTelemetry):
         # arrange
 
@@ -104,7 +104,7 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
         self.assert_telemetry_calls(telemetry, telemetry_calls)
 
     
-    @patch('test_telemetry_waterfall.ApplicationInsightsTelemetryClient')
+    @patch('botbuilder.applicationinsights.ApplicationInsightsTelemetryClient')
     async def test_ensure_end_dialog_called(self, MockTelemetry):
         # arrange
 
