@@ -23,6 +23,7 @@ from botbuilder.core import (
 from botbuilder.dialogs import (
                                 Dialog,
                                 DialogSet,
+                                DialogState,
                                 WaterfallDialog,
                                 WaterfallStepContext,
                                 DialogTurnResult,
@@ -45,8 +46,8 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
         # assert
         self.assertEqual(type(dialog.telemetry_client), NullTelemetryClient)
 
-    @skip('Pending Telemetry mock')
-    @patch('test_telemetry_waterfall.ApplicationInsightsTelemetryClient')
+
+    @patch('botbuilder.applicationinsights.ApplicationInsightsTelemetryClient')
     async def test_execute_sequence_waterfall_steps(self, MockTelemetry):
         # arrange
 
@@ -56,7 +57,7 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
         
         
         # Create a DialogState property, DialogSet and register the WaterfallDialog.
-        dialog_state = convo_state.create_property('dialogState')
+        dialog_state = convo_state.create_property('dialogState') 
         dialogs = DialogSet(dialog_state)
         async def step1(step) -> DialogTurnResult:
             await step.context.send_activity('bot responding.')
@@ -82,6 +83,7 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
             else:
                 if results.status == DialogTurnStatus.Complete:
                     await turn_context.send_activity(results.result)
+            
             await convo_state.save_changes(turn_context)
             
         adapt = TestAdapter(exec_test)
@@ -100,8 +102,8 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
                             ]
         self.assert_telemetry_calls(telemetry, telemetry_calls)
 
-    @skip('Pending Telemetry mock')     
-    @patch('test_telemetry_waterfall.ApplicationInsightsTelemetryClient')
+    
+    @patch('botbuilder.applicationinsights.ApplicationInsightsTelemetryClient')
     async def test_ensure_end_dialog_called(self, MockTelemetry):
         # arrange
 
