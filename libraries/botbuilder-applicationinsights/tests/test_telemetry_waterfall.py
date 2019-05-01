@@ -84,7 +84,6 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
                 if results.status == DialogTurnStatus.Complete:
                     await turn_context.send_activity(results.result)
             
-            await dialog_state.set(turn_context, DialogState(dc.stack))
             await convo_state.save_changes(turn_context)
             
         adapt = TestAdapter(exec_test)
@@ -137,7 +136,6 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
             results = await dc.continue_dialog()
             if turn_context.responded == False:
                 await dc.begin_dialog("test", None)
-            await dialog_state.set(turn_context, DialogState(dc.stack))
             await convo_state.save_changes(turn_context)
             
         adapt = TestAdapter(exec_test)
