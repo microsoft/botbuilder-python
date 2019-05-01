@@ -3,21 +3,35 @@
 
 import json
 import aiounittest, unittest, requests
-from msrest import Deserializer
 from os import path
 from requests.models import Response
 from typing import List, Tuple
 from uuid import uuid4
 from unittest.mock import Mock, patch, MagicMock
 from asyncio import Future
-
-
+from aiohttp import ClientSession, ClientTimeout
 
 from botbuilder.ai.qna import Metadata, QnAMakerEndpoint, QnAMaker, QnAMakerOptions, QnATelemetryConstants, QueryResult
 from botbuilder.core import BotAdapter, BotTelemetryClient, NullTelemetryClient, TurnContext
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.schema import Activity, ActivityTypes, ChannelAccount, ResourceResponse, ConversationAccount
 
+class InterceptRequestClient(ClientSession):
+    def __init__(self, timeout):
+        super().__init__(timeout=timeout.total)
+        self.intercepted_headers = None
+
+ 
+class TestContext(TurnContext):
+    def __init__(self, request):
+        super().__init__(TestAdapter(), request)
+        self.sent: List[Activity] = list()
+
+        self.on_send_activities(self.capture_sent_activities)
+
+    async def capture_sent_activities(self, context: TurnContext, activities, next):
+        self.sent += activities
+        context.responded = True
 
 class QnaApplicationTest(aiounittest.AsyncTestCase):
     _knowledge_base_id: str = 'a090f9f3-2f8e-41d1-a581-4f7a49269a0c'
@@ -26,11 +40,6 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
 
     tests_endpoint = QnAMakerEndpoint(_knowledge_base_id, _endpoint_key, _host)
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # self._mocked_results: QueryResult(
-
-        # )
 
     def test_qnamaker_construction(self):
         # Arrange
@@ -44,7 +53,6 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         self.assertEqual('a090f9f3-2f8e-41d1-a581-4f7a49269a0c', endpoint.knowledge_base_id)
         self.assertEqual('4a439d5b-163b-47c3-b1d1-168cc0db5608', endpoint.endpoint_key)
         self.assertEqual('https://ashleyNlpBot1-qnahost.azurewebsites.net/qnamaker', endpoint.host)
-
 
     def test_endpoint_with_empty_kbid(self):
         empty_kbid = ''
@@ -159,12 +167,17 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
 
         first_answer = result['answers'][0]
 
+        # If question yields no questions in KB
+        # QnAMaker v4.0 API returns 'answer': 'No good match found in KB.' and questions: []
+        no_ans_found_in_kb = False
+        if len(result['answers']) and first_answer['score'] == 0:
+            no_ans_found_in_kb = True
+        
         #Assert
         self.assertIsNotNone(result)
         self.assertEqual(1, len(result['answers']))
-        self.assertTrue(question in first_answer['questions'])
+        self.assertTrue(question in first_answer['questions'] or no_ans_found_in_kb)
         self.assertEqual('BaseCamp: You can use a damp rag to clean around the Power Pack', first_answer['answer'])
-
 
     async def test_returns_answer_using_options(self):
         # Arrange
@@ -192,7 +205,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
 
         # Assert
         self.assertIsNotNone(result)
-        self.assertEqual(has_at_least_1_ans,  len(result['answers']) >= 1 and len(result['answers']) <= options.top)
+        self.assertEqual(has_at_least_1_ans,  len(result) >= 1 and len(result) <= options.top)
         self.assertTrue(question in first_answer['questions'])
         self.assertTrue(first_answer['answer'])
         self.assertEqual('is a movie', first_answer['answer'])
@@ -200,6 +213,75 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         self.assertEqual('movie', first_metadata['name'])
         self.assertEqual('disney', first_metadata['value'])
     
+    async def test_trace_test(self):
+        activity = Activity(
+            type = ActivityTypes.message,
+            text = 'how do I clean the stove?',
+            conversation = ConversationAccount(),
+            recipient = ChannelAccount(),
+            from_property = ChannelAccount(),
+        )
+
+        response_json = QnaApplicationTest._get_json_for_file('ReturnsAnswer.json')
+        qna = QnAMaker(QnaApplicationTest.tests_endpoint)
+
+        context = TestContext(activity)
+        response = Mock(spec=Response)
+        response.status_code = 200
+        response.headers = {}
+        response.reason = ''
+
+        with patch('requests.post', return_value=response):
+            with patch('botbuilder.ai.qna.QnAMaker._format_qna_result', return_value=response_json):
+                result = await qna.get_answers(context)
+                
+                qna_trace_activities = list(filter(lambda act: act.type == 'trace' and act.name == 'QnAMaker', context.sent))
+                trace_activity = qna_trace_activities[0]
+
+                self.assertEqual('trace', trace_activity.type)
+                self.assertEqual('QnAMaker', trace_activity.name)
+                self.assertEqual('QnAMaker Trace', trace_activity.label)
+                self.assertEqual('https://www.qnamaker.ai/schemas/trace', trace_activity.value_type)
+                self.assertEqual(True, hasattr(trace_activity, 'value'))
+                self.assertEqual(True, hasattr(trace_activity.value, 'message'))
+                self.assertEqual(True, hasattr(trace_activity.value, 'query_results'))
+                self.assertEqual(True, hasattr(trace_activity.value, 'score_threshold'))
+                self.assertEqual(True, hasattr(trace_activity.value, 'top'))
+                self.assertEqual(True, hasattr(trace_activity.value, 'strict_filters'))
+                self.assertEqual(self._knowledge_base_id, trace_activity.value.knowledge_base_id[0])
+
+                return result
+
+    async def test_returns_answer_with_timeout(self):
+        question: str = 'how do I clean the stove?'
+        options = QnAMakerOptions(timeout=999999)
+        qna = QnAMaker(QnaApplicationTest.tests_endpoint, options)
+        context = QnaApplicationTest._get_context(question, TestAdapter())
+        response = Mock(spec=Response)
+        response.status_code = 200
+        response.headers = {}
+        response.reason = ''
+        response_json = QnaApplicationTest._get_json_for_file('ReturnsAnswer.json')
+
+        with patch('requests.post', return_value=response):
+            with patch('botbuilder.ai.qna.QnAMaker._format_qna_result', return_value=response_json):
+                result = await qna.get_answers(context, options)
+                
+                self.assertIsNotNone(result)
+                self.assertEqual(options.timeout, qna._options.timeout)
+
+                milisec_to_sec_timeout = options.timeout/1000
+                self.assertEqual(milisec_to_sec_timeout, qna._req_client._timeout.total)
+
+    # Work in progress
+    async def test_user_agent(self):
+        question = 'up'
+        timeout = ClientTimeout(total=300000)
+        intercept_client = InterceptRequestClient(timeout=timeout)
+        qna = QnAMaker(QnaApplicationTest.tests_endpoint)
+        context = QnaApplicationTest._get_context(question, TestAdapter())
+        response = await qna.get_answers(context)
+
     @classmethod
     async def _get_service_result(
         cls,
@@ -212,13 +294,14 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         
         qna = QnAMaker(QnaApplicationTest.tests_endpoint)
         context = QnaApplicationTest._get_context(utterance, bot_adapter)
-        response = Mock(spec=Response)
+
+        response = aiounittest.futurized(Mock(return_value=Response))
         response.status_code = 200
         response.headers = {}
         response.reason = ''
 
-        with patch('requests.post', return_value=response):
-            with patch('botbuilder.ai.qna.QnAMaker._format_qna_result', return_value=response_json):
+        with patch('aiohttp.ClientSession.post', return_value=response):
+            with patch('botbuilder.ai.qna.QnAMaker._query_qna_service', return_value=aiounittest.futurized(response_json)):
                 result = await qna.get_answers(context, options)
 
                 return result
@@ -236,7 +319,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
 
     @staticmethod
     def _get_context(utterance: str, bot_adapter: BotAdapter) -> TurnContext:
-        test_adapter = TestAdapter()
+        test_adapter = bot_adapter or TestAdapter()
         activity = Activity(
             type = ActivityTypes.message,
             text = utterance,
@@ -246,9 +329,6 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         )
 
         return TurnContext(test_adapter, activity)
-
-
-
 
 
 

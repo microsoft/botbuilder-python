@@ -4,7 +4,7 @@
 from botbuilder.schema import Activity
 from botbuilder.core import BotTelemetryClient, NullTelemetryClient, TurnContext
 from copy import copy
-import json, requests
+import aiohttp, json, platform, requests
 from typing import Dict, List, NamedTuple
 
 from .metadata import Metadata
@@ -14,6 +14,8 @@ from .qnamaker_options import QnAMakerOptions
 from .qnamaker_telemetry_client import QnAMakerTelemetryClient
 from .qna_telemetry_constants import QnATelemetryConstants
 from .qnamaker_trace_info import QnAMakerTraceInfo
+
+from .. import __title__, __version__
 
 QNAMAKER_TRACE_NAME = 'QnAMaker'
 QNAMAKER_TRACE_LABEL = 'QnAMaker Trace'
@@ -46,6 +48,9 @@ class QnAMaker(QnAMakerTelemetryClient):
 
         self._options: QnAMakerOptions = options or QnAMakerOptions()
         self._validate_options(self._options)
+        
+        instance_timeout = aiohttp.ClientTimeout(total=self._options.timeout/1000)
+        self._req_client = aiohttp.ClientSession(timeout=instance_timeout)
 
         self._telemetry_client = telemetry_client or NullTelemetryClient()
         self._log_personal_information = log_personal_information or False
@@ -186,11 +191,10 @@ class QnAMaker(QnAMakerTelemetryClient):
         :rtype: [QueryResult]
         """
 
-
         hydrated_options = self._hydrate_options(options)
         self._validate_options(hydrated_options)
         
-        result = self._query_qna_service(context.activity, hydrated_options)
+        result = await self._query_qna_service(context, hydrated_options)
         
         await self._emit_trace_info(context, result, hydrated_options)
 
@@ -211,6 +215,9 @@ class QnAMaker(QnAMakerTelemetryClient):
         
         if not options.strict_filters:
             options.strict_filters = []
+        
+        if not options.timeout:
+            options.timeout = 100000
     
     def _hydrate_options(self, query_options: QnAMakerOptions) -> QnAMakerOptions:
         """
@@ -235,29 +242,55 @@ class QnAMaker(QnAMakerTelemetryClient):
             
             if (len(query_options.strict_filters) > 0):
                 hydrated_options.strict_filters = query_options.strict_filters
+            
+            if (query_options.timeout != hydrated_options.timeout and query_options.timeout):
+                hydrated_options.timeout = query_options.timeout
 
         return hydrated_options
     
-    def _query_qna_service(self, message_activity: Activity, options: QnAMakerOptions) -> [QueryResult]:
+    async def _query_qna_service(self, turn_context: TurnContext, options: QnAMakerOptions) -> [QueryResult]:
         url = f'{ self._endpoint.host }/knowledgebases/{ self._endpoint.knowledge_base_id }/generateAnswer'
-
         question = {
-            'question': message_activity.text,
+            'question': turn_context.activity.text,
             'top': options.top,
             'scoreThreshold': options.score_threshold,
             'strictFilters': options.strict_filters
         }
-        
         serialized_content = json.dumps(question)
-
         headers = self._get_headers()
 
-        response = requests.post(url, data=serialized_content, headers=headers)
+        # Convert miliseconds to seconds (as other BotBuilder SDKs accept timeout value in miliseconds)
+        # aiohttp.ClientSession units are in seconds
+        timeout = aiohttp.ClientTimeout(total=options.timeout/1000)
+
+        async with self._req_client as client:
+            response = await client.post(
+                url, 
+                data = serialized_content, 
+                headers = headers, 
+                timeout = timeout
+            )
+
+            # result = self._format_qna_result(response, options)
+            json_res = await response.json()
+
+            answers_within_threshold = [
+                { **answer,'score': answer['score']/100 } 
+                if answer['score']/100 > options.score_threshold 
+                else {**answer} for answer in json_res['answers'] 
+            ]
+            sorted_answers = sorted(answers_within_threshold, key = lambda ans: ans['score'], reverse = True)
+
+            # The old version of the protocol returns the id in a field called qnaId
+            # The following translates this old structure to the new
+            if self._is_legacy_protocol:
+                for answer in answers_within_threshold:
+                    answer['id'] = answer.pop('qnaId', None)
         
-        result = self._format_qna_result(response, options)
+            answers_as_query_results = list(map(lambda answer: QueryResult(**answer), sorted_answers))
+
+            return answers_as_query_results
         
-        return result
-    
     async def _emit_trace_info(self, turn_context: TurnContext, result: [QueryResult], options: QnAMakerOptions):
         trace_info = QnAMakerTraceInfo(
             message = turn_context.activity,
@@ -278,8 +311,7 @@ class QnAMaker(QnAMakerTelemetryClient):
 
         await turn_context.send_activity(trace_activity)
     
-    def _format_qna_result(self, qna_result: requests.Response, options: QnAMakerOptions) -> [QueryResult]:
-        result = qna_result.json()
+    def _format_qna_result(self, result, options: QnAMakerOptions) -> [QueryResult]:
 
         answers_within_threshold = [
             { **answer,'score': answer['score']/100 } for answer in result['answers'] 
@@ -298,13 +330,24 @@ class QnAMaker(QnAMakerTelemetryClient):
         return answers_as_query_results
 
     def _get_headers(self):
-        headers = { 'Content-Type': 'application/json' }
+        headers = { 
+            'Content-Type': 'application/json',
+            'User-Agent': self.get_user_agent()
+        }
 
         if self._is_legacy_protocol:
             headers['Ocp-Apim-Subscription-Key'] = self._endpoint.endpoint_key
         else:
             headers['Authorization'] = f'EndpointKey {self._endpoint.endpoint_key}'
         
-        # need user-agent header
-        
         return headers
+    
+    def get_user_agent(self):
+        package_user_agent = f'{__title__}/{__version__}'
+        uname = platform.uname()
+        os_version = f'{uname.machine}-{uname.system}-{uname.version}'
+        py_version = f'Python,Version={platform.python_version()}'
+        platform_user_agent = f'({os_version}; {py_version})'
+        user_agent = f'{package_user_agent} {platform_user_agent}'
+        
+        return user_agent

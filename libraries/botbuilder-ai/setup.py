@@ -9,6 +9,7 @@ REQUIRES = [
     "azure-cognitiveservices-language-luis==0.2.0",
     "botbuilder-schema>=4.0.0.a6",
     "botbuilder-core>=4.0.0.a6",
+    "aiohttp>=3.5.4"
 ]
 
 
