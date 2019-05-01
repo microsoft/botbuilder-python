@@ -2,12 +2,12 @@
 # Licensed under the MIT License.
 
 import json
-import unittest
 from os import path
 from typing import Tuple
 from unittest.mock import Mock, patch
 
 import requests
+from aiounittest import AsyncTestCase
 from azure.cognitiveservices.language.luis.runtime import LUISRuntimeClient
 from azure.cognitiveservices.language.luis.runtime.luis_runtime_client import (
     LUISRuntimeClientConfiguration,
@@ -32,10 +32,10 @@ from botbuilder.schema import (
     ConversationAccount,
 )
 
-from .null_adapter import NullAdapter
+from null_adapter import NullAdapter
 
 
-class LuisRecognizerTest(unittest.TestCase):
+class LuisRecognizerTest(AsyncTestCase):
     _luisAppId: str = "b31aeaf3-3511-495b-a07f-571fc873214b"
     _subscriptionKey: str = "048ec46dc58e495482b0c447cfdbd291"
     _endpoint: str = "https://westus.api.cognitive.microsoft.com"
@@ -104,11 +104,13 @@ class LuisRecognizerTest(unittest.TestCase):
         with self.assertRaises(TypeError):
             LuisRecognizer(application=None)
 
-    def test_single_intent_simply_entity(self):
+    async def test_single_intent_simply_entity(self):
         utterance: str = "My name is Emad"
         response_path: str = "SingleIntent_SimplyEntity.json"
 
-        _, result = LuisRecognizerTest._get_recognizer_result(utterance, response_path)
+        _, result = await LuisRecognizerTest._get_recognizer_result(
+            utterance, response_path
+        )
 
         self.assertIsNotNone(result)
         self.assertIsNone(result.altered_text)
@@ -126,11 +128,13 @@ class LuisRecognizerTest(unittest.TestCase):
         self.assertEqual(15, result.entities["$instance"]["Name"][0]["endIndex"])
         self.assert_score(result.entities["$instance"]["Name"][0]["score"])
 
-    def test_null_utterance(self):
+    async def test_null_utterance(self):
         utterance: str = None
         response_path: str = "SingleIntent_SimplyEntity.json"  # The path is irrelevant in this case
 
-        _, result = LuisRecognizerTest._get_recognizer_result(utterance, response_path)
+        _, result = await LuisRecognizerTest._get_recognizer_result(
+            utterance, response_path
+        )
 
         self.assertIsNotNone(result)
         self.assertIsNone(result.altered_text)
@@ -142,11 +146,13 @@ class LuisRecognizerTest(unittest.TestCase):
         self.assertIsNotNone(result.entities)
         self.assertEqual(0, len(result.entities))
 
-    def test_multiple_intents_prebuilt_entity(self):
+    async def test_multiple_intents_prebuilt_entity(self):
         utterance: str = "Please deliver February 2nd 2001"
         response_path: str = "MultipleIntents_PrebuiltEntity.json"
 
-        _, result = LuisRecognizerTest._get_recognizer_result(utterance, response_path)
+        _, result = await LuisRecognizerTest._get_recognizer_result(
+            utterance, response_path
+        )
 
         self.assertIsNotNone(result)
         self.assertEqual(utterance, result.text)
@@ -179,11 +185,13 @@ class LuisRecognizerTest(unittest.TestCase):
             "february 2nd 2001", result.entities["$instance"]["datetime"][0]["text"]
         )
 
-    def test_multiple_intents_prebuilt_entities_with_multi_values(self):
+    async def test_multiple_intents_prebuilt_entities_with_multi_values(self):
         utterance: str = "Please deliver February 2nd 2001 in room 201"
         response_path: str = "MultipleIntents_PrebuiltEntitiesWithMultiValues.json"
 
-        _, result = LuisRecognizerTest._get_recognizer_result(utterance, response_path)
+        _, result = await LuisRecognizerTest._get_recognizer_result(
+            utterance, response_path
+        )
 
         self.assertIsNotNone(result)
         self.assertIsNotNone(result.text)
@@ -198,11 +206,13 @@ class LuisRecognizerTest(unittest.TestCase):
         self.assertIsNotNone(result.entities["datetime"][0])
         self.assertEqual("2001-02-02", result.entities["datetime"][0]["timex"][0])
 
-    def test_multiple_intents_list_entity_with_single_value(self):
+    async def test_multiple_intents_list_entity_with_single_value(self):
         utterance: str = "I want to travel on united"
         response_path: str = "MultipleIntents_ListEntityWithSingleValue.json"
 
-        _, result = LuisRecognizerTest._get_recognizer_result(utterance, response_path)
+        _, result = await LuisRecognizerTest._get_recognizer_result(
+            utterance, response_path
+        )
 
         self.assertIsNotNone(result)
         self.assertIsNotNone(result.text)
@@ -218,11 +228,13 @@ class LuisRecognizerTest(unittest.TestCase):
         self.assertEqual(26, result.entities["$instance"]["Airline"][0]["endIndex"])
         self.assertEqual("united", result.entities["$instance"]["Airline"][0]["text"])
 
-    def test_multiple_intents_list_entity_with_multi_values(self):
+    async def test_multiple_intents_list_entity_with_multi_values(self):
         utterance: str = "I want to travel on DL"
         response_path: str = "MultipleIntents_ListEntityWithMultiValues.json"
 
-        _, result = LuisRecognizerTest._get_recognizer_result(utterance, response_path)
+        _, result = await LuisRecognizerTest._get_recognizer_result(
+            utterance, response_path
+        )
 
         self.assertIsNotNone(result)
         self.assertIsNotNone(result.text)
@@ -240,11 +252,13 @@ class LuisRecognizerTest(unittest.TestCase):
         self.assertEqual(22, result.entities["$instance"]["Airline"][0]["endIndex"])
         self.assertEqual("dl", result.entities["$instance"]["Airline"][0]["text"])
 
-    def test_multiple_intents_composite_entity_model(self):
+    async def test_multiple_intents_composite_entity_model(self):
         utterance: str = "Please deliver it to 98033 WA"
         response_path: str = "MultipleIntents_CompositeEntityModel.json"
 
-        _, result = LuisRecognizerTest._get_recognizer_result(utterance, response_path)
+        _, result = await LuisRecognizerTest._get_recognizer_result(
+            utterance, response_path
+        )
 
         self.assertIsNotNone(result)
         self.assertIsNotNone(result.text)
@@ -290,11 +304,13 @@ class LuisRecognizerTest(unittest.TestCase):
             result.entities["Address"][0]["$instance"]["State"][0]["score"]
         )
 
-    def test_multiple_date_time_entities(self):
+    async def test_multiple_date_time_entities(self):
         utterance: str = "Book a table on Friday or tomorrow at 5 or tomorrow at 4"
         response_path: str = "MultipleDateTimeEntities.json"
 
-        _, result = LuisRecognizerTest._get_recognizer_result(utterance, response_path)
+        _, result = await LuisRecognizerTest._get_recognizer_result(
+            utterance, response_path
+        )
 
         self.assertIsNotNone(result.entities["datetime"])
         self.assertEqual(3, len(result.entities["datetime"]))
@@ -309,11 +325,13 @@ class LuisRecognizerTest(unittest.TestCase):
         self.assertTrue(result.entities["datetime"][2]["timex"][1].endswith("T16"))
         self.assertEqual(3, len(result.entities["$instance"]["datetime"]))
 
-    def test_v1_datetime_resolution(self):
+    async def test_v1_datetime_resolution(self):
         utterance: str = "at 4"
         response_path: str = "V1DatetimeResolution.json"
 
-        _, result = LuisRecognizerTest._get_recognizer_result(utterance, response_path)
+        _, result = await LuisRecognizerTest._get_recognizer_result(
+            utterance, response_path
+        )
 
         self.assertIsNotNone(result.entities["datetime_time"])
         self.assertEqual(1, len(result.entities["datetime_time"]))
@@ -348,11 +366,11 @@ class LuisRecognizerTest(unittest.TestCase):
         )
         self.assertEqual(default_intent, "Greeting")
 
-    def test_user_agent_contains_product_version(self):
+    async def test_user_agent_contains_product_version(self):
         utterance: str = "please book from May 5 to June 6"
         response_path: str = "MultipleDateTimeEntities.json"  # it doesn't matter to use which file.
 
-        recognizer, _ = LuisRecognizerTest._get_recognizer_result(
+        recognizer, _ = await LuisRecognizerTest._get_recognizer_result(
             utterance, response_path, bot_adapter=NullAdapter()
         )
 
@@ -386,17 +404,18 @@ class LuisRecognizerTest(unittest.TestCase):
         self.assertTrue(score <= 1)
 
     @classmethod
-    def _get_recognizer_result(
-        cls, utterance: str, response_file: str, bot_adapter: BotAdapter = TestAdapter()
+    async def _get_recognizer_result(
+        cls,
+        utterance: str,
+        response_file: str,
+        bot_adapter: BotAdapter = TestAdapter(),
+        verbose: bool = False,
+        options: LuisPredictionOptions = None,
     ) -> Tuple[LuisRecognizer, RecognizerResult]:
         response_json = LuisRecognizerTest._get_json_for_file(response_file)
-
-        my_app = LuisApplication(
-            LuisRecognizerTest._luisAppId,
-            LuisRecognizerTest._subscriptionKey,
-            endpoint="",
+        recognizer = LuisRecognizerTest._get_luis_recognizer(
+            verbose=verbose, options=options
         )
-        recognizer = LuisRecognizer(my_app, prediction_options=None)
         context = LuisRecognizerTest._get_context(utterance, bot_adapter)
         response = Mock(spec=Response)
         response.status_code = 200
@@ -407,7 +426,7 @@ class LuisRecognizerTest(unittest.TestCase):
                 "msrest.serialization.Deserializer._unpack_content",
                 return_value=response_json,
             ):
-                result = recognizer.recognize(context)
+                result = await recognizer.recognize(context)
                 return recognizer, result
 
     @classmethod
@@ -425,7 +444,9 @@ class LuisRecognizerTest(unittest.TestCase):
         cls, verbose: bool = False, options: LuisPredictionOptions = None
     ) -> LuisRecognizer:
         luis_app = LuisApplication(cls._luisAppId, cls._subscriptionKey, cls._endpoint)
-        return LuisRecognizer(luis_app, options, verbose)
+        return LuisRecognizer(
+            luis_app, prediction_options=options, include_api_results=verbose
+        )
 
     @staticmethod
     def _get_context(utterance: str, bot_adapter: BotAdapter) -> TurnContext:

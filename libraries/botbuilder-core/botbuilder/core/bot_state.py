@@ -63,6 +63,11 @@ class BotState(PropertyManager):
             raise TypeError('BotState.create_property(): BotState cannot be None or empty.')
         return BotStatePropertyAccessor(self, name)
 
+    def get(self, turn_context: TurnContext) -> Dict[str, object]:
+        cached = turn_context.turn_state.get(self._context_service_key)
+
+        return getattr(cached, 'state', None)
+
 
     async def load(self, turn_context: TurnContext, force: bool = False) -> None:
         """
