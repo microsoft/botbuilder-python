@@ -3,7 +3,7 @@
 
 import json
 from os import path
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Union
 from unittest import mock
 from unittest.mock import MagicMock, Mock
 
@@ -24,6 +24,7 @@ from botbuilder.ai.luis import (
     RecognizerResult,
     TopIntent,
 )
+from botbuilder.ai.luis.luis_util import LuisUtil
 from botbuilder.core import BotAdapter, BotTelemetryClient, TurnContext
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.schema import (
@@ -33,6 +34,7 @@ from botbuilder.schema import (
     ConversationAccount,
 )
 from null_adapter import NullAdapter
+from override_fill_recognizer import OverrideFillRecognizer
 from telemetry_override_recognizer import TelemetryOverrideRecognizer
 
 
@@ -45,6 +47,9 @@ class LuisRecognizerTest(AsyncTestCase):
         super(LuisRecognizerTest, self).__init__(*args, **kwargs)
         self._mocked_results: RecognizerResult = RecognizerResult(
             intents={"Test": IntentScore(score=0.2), "Greeting": IntentScore(score=0.4)}
+        )
+        self._empty_luis_response: Dict[str, object] = json.loads(
+            '{ "query": null, "intents": [], "entities": [] }'
         )
 
     def test_luis_recognizer_construction(self):
@@ -440,7 +445,7 @@ class LuisRecognizerTest(AsyncTestCase):
     async def test_telemetry_override_on_log_async(self):
         # Arrange
         utterance: str = "please book from May 5 to June 6"
-        response_path: str = "MultipleDateTimeEntities.json"  # it doesn't matter to use which file.
+        response_json: Dict[str, object] = self._empty_luis_response
         telemetry_client = mock.create_autospec(BotTelemetryClient)
         options = LuisPredictionOptions(
             telemetry_client=telemetry_client, log_personal_information=False
@@ -450,7 +455,7 @@ class LuisRecognizerTest(AsyncTestCase):
         # Act
         await LuisRecognizerTest._get_recognizer_result(
             utterance,
-            response_path,
+            response_json,
             bot_adapter=NullAdapter(),
             options=options,
             telemetry_properties=telemetry_properties,
@@ -469,7 +474,7 @@ class LuisRecognizerTest(AsyncTestCase):
     async def test_telemetry_pii_logged_async(self):
         # Arrange
         utterance: str = "please book from May 5 to June 6"
-        response_path: str = "MultipleDateTimeEntities.json"  # it doesn't matter to use which file.
+        response_json: Dict[str, object] = self._empty_luis_response
         telemetry_client = mock.create_autospec(BotTelemetryClient)
         options = LuisPredictionOptions(
             telemetry_client=telemetry_client, log_personal_information=True
@@ -478,7 +483,7 @@ class LuisRecognizerTest(AsyncTestCase):
         # Act
         await LuisRecognizerTest._get_recognizer_result(
             utterance,
-            response_path,
+            response_json,
             bot_adapter=NullAdapter(),
             options=options,
             telemetry_properties=None,
@@ -501,7 +506,7 @@ class LuisRecognizerTest(AsyncTestCase):
     async def test_telemetry_no_pii_logged_async(self):
         # Arrange
         utterance: str = "please book from May 5 to June 6"
-        response_path: str = "MultipleDateTimeEntities.json"  # it doesn't matter to use which file.
+        response_json: Dict[str, object] = self._empty_luis_response
         telemetry_client = mock.create_autospec(BotTelemetryClient)
         options = LuisPredictionOptions(
             telemetry_client=telemetry_client, log_personal_information=False
@@ -510,7 +515,7 @@ class LuisRecognizerTest(AsyncTestCase):
         # Act
         await LuisRecognizerTest._get_recognizer_result(
             utterance,
-            response_path,
+            response_json,
             bot_adapter=NullAdapter(),
             options=options,
             telemetry_properties=None,
@@ -533,7 +538,7 @@ class LuisRecognizerTest(AsyncTestCase):
     async def test_telemetry_override_on_derive_async(self):
         # Arrange
         utterance: str = "please book from May 5 to June 6"
-        response_path: str = "MultipleDateTimeEntities.json"  # it doesn't matter to use which file.
+        response_json: Dict[str, object] = self._empty_luis_response
         telemetry_client = mock.create_autospec(BotTelemetryClient)
         options = LuisPredictionOptions(
             telemetry_client=telemetry_client, log_personal_information=False
@@ -543,7 +548,7 @@ class LuisRecognizerTest(AsyncTestCase):
         # Act
         await LuisRecognizerTest._get_recognizer_result(
             utterance,
-            response_path,
+            response_json,
             bot_adapter=NullAdapter(),
             options=options,
             telemetry_properties=telemetry_properties,
@@ -565,22 +570,137 @@ class LuisRecognizerTest(AsyncTestCase):
         self.assertTrue("MyImportantProperty2" in call1_args[1])
         self.assertTrue(call1_args[1]["MyImportantProperty2"] == "myImportantValue2")
 
+    async def test_telemetry_override_fill_async(self):
+        # Arrange
+        utterance: str = "please book from May 5 to June 6"
+        response_json: Dict[str, object] = self._empty_luis_response
+        telemetry_client = mock.create_autospec(BotTelemetryClient)
+        options = LuisPredictionOptions(
+            telemetry_client=telemetry_client, log_personal_information=False
+        )
+        additional_properties: Dict[str, str] = {"test": "testvalue", "foo": "foovalue"}
+        additional_metrics: Dict[str, str] = {"moo": 3.14159, "boo": 2.11}
+
+        # Act
+        await LuisRecognizerTest._get_recognizer_result(
+            utterance,
+            response_json,
+            bot_adapter=NullAdapter(),
+            options=options,
+            telemetry_properties=additional_properties,
+            telemetry_metrics=additional_metrics,
+            recognizer_class=OverrideFillRecognizer,
+        )
+
+        # Assert
+        self.assertEqual(2, telemetry_client.track_event.call_count)
+        call0_args = telemetry_client.track_event.call_args_list[0][0]
+        self.assertEqual("LuisResult", call0_args[0])
+        self.assertTrue("MyImportantProperty" in call0_args[1])
+        self.assertTrue(call0_args[1]["MyImportantProperty"] == "myImportantValue")
+        self.assertTrue("test" in call0_args[1])
+        self.assertTrue(call0_args[1]["test"] == "testvalue")
+        self.assertTrue("foo" in call0_args[1])
+        self.assertTrue(call0_args[1]["foo"] == "foovalue")
+        self.assertTrue("moo" in call0_args[2])
+        self.assertTrue(call0_args[2]["moo"] == 3.14159)
+        self.assertTrue("boo" in call0_args[2])
+        self.assertTrue(call0_args[2]["boo"] == 2.11)
+
+        call1_args = telemetry_client.track_event.call_args_list[1][0]
+        self.assertEqual("MySecondEvent", call1_args[0])
+        self.assertTrue("MyImportantProperty2" in call1_args[1])
+        self.assertTrue(call1_args[1]["MyImportantProperty2"] == "myImportantValue2")
+
+    async def test_telemetry_no_override_async(self):
+        # Arrange
+        utterance: str = "please book from May 5 to June 6"
+        response_json: Dict[str, object] = self._empty_luis_response
+        telemetry_client = mock.create_autospec(BotTelemetryClient)
+        options = LuisPredictionOptions(
+            telemetry_client=telemetry_client, log_personal_information=False
+        )
+
+        # Act
+        await LuisRecognizerTest._get_recognizer_result(
+            utterance, response_json, bot_adapter=NullAdapter(), options=options
+        )
+
+        # Assert
+        self.assertEqual(1, telemetry_client.track_event.call_count)
+        call0_args = telemetry_client.track_event.call_args_list[0][0]
+        self.assertEqual("LuisResult", call0_args[0])
+        self.assertTrue("intent" in call0_args[1])
+        self.assertTrue("intentScore" in call0_args[1])
+        self.assertTrue("fromId" in call0_args[1])
+        self.assertTrue("entities" in call0_args[1])
+
+    async def test_composite1(self):
+        await self._test_json("Composite1.json")
+
+    async def test_composite2(self):
+        await self._test_json("Composite2.json")
+
+    async def test_composite3(self):
+        await self._test_json("Composite3.json")
+
+    async def test_prebuilt_domains(self):
+        await self._test_json("Prebuilt.json")
+
+    async def test_patterns(self):
+        await self._test_json("Patterns.json")
+
     def assert_score(self, score: float) -> None:
         self.assertTrue(score >= 0)
         self.assertTrue(score <= 1)
+
+    async def _test_json(self, response_file: str) -> None:
+        # Arrange
+        expected_json = LuisRecognizerTest._get_json_for_file(response_file)
+        response_json = expected_json["luisResult"]
+        utterance = expected_json.get("text")
+        if utterance is None:
+            utterance = expected_json.get("Text")
+
+        options = LuisPredictionOptions(include_all_intents=True)
+
+        # Act
+        _, result = await LuisRecognizerTest._get_recognizer_result(
+            utterance, response_json, options=options, include_api_results=True
+        )
+
+        # Assert
+        actual_result_json = LuisUtil.recognizer_result_as_dict(result)
+        trimmed_expected = LuisRecognizerTest._remove_none_property(expected_json)
+        trimmed_actual = LuisRecognizerTest._remove_none_property(actual_result_json)
+        self.assertEqual(trimmed_expected, trimmed_actual)
+
+    @staticmethod
+    def _remove_none_property(d: Dict[str, object]) -> Dict[str, object]:
+        for key, value in list(d.items()):
+            if value is None:
+                del d[key]
+            elif isinstance(value, dict):
+                LuisRecognizerTest._remove_none_property(value)
+        return d
 
     @classmethod
     async def _get_recognizer_result(
         cls,
         utterance: str,
-        response_file: str,
+        response_json: Union[str, Dict[str, object]],
         bot_adapter: BotAdapter = TestAdapter(),
         options: LuisPredictionOptions = None,
         include_api_results: bool = False,
         telemetry_properties: Dict[str, str] = None,
+        telemetry_metrics: Dict[str, float] = None,
         recognizer_class: type = LuisRecognizer,
     ) -> Tuple[LuisRecognizer, RecognizerResult]:
-        response_json = LuisRecognizerTest._get_json_for_file(response_file)
+        if isinstance(response_json, str):
+            response_json = LuisRecognizerTest._get_json_for_file(
+                response_file=response_json
+            )
+
         recognizer = LuisRecognizerTest._get_luis_recognizer(
             recognizer_class, include_api_results=include_api_results, options=options
         )
@@ -594,12 +714,12 @@ class LuisRecognizerTest(AsyncTestCase):
                 Deserializer, "_unpack_content", return_value=response_json
             ):
                 result = await recognizer.recognize(
-                    context, telemetry_properties=telemetry_properties
+                    context, telemetry_properties, telemetry_metrics
                 )
                 return recognizer, result
 
     @classmethod
-    def _get_json_for_file(cls, response_file: str) -> object:
+    def _get_json_for_file(cls, response_file: str) -> Dict[str, object]:
         curr_dir = path.dirname(path.abspath(__file__))
         response_path = path.join(curr_dir, "test_data", response_file)
 

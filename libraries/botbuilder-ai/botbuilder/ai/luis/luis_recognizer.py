@@ -346,16 +346,11 @@ class LuisRecognizer(object):
         luis_result: LuisResult,
         recognizer_result: RecognizerResult,
     ) -> None:
-        luis_result_dict = LuisUtil.luis_result_as_dict(luis_result)
-
-        # compat: libs in other languages - for luisResult
         trace_info: Dict[str, object] = {
-            "recognizerResult": recognizer_result._as_dict(
-                memo={"luisResult": luis_result_dict}
-            ),
+            "recognizerResult": LuisUtil.recognizer_result_as_dict(recognizer_result),
             "luisModel": {"ModelID": self._application.application_id},
             "luisOptions": {"Staging": self._options.staging},
-            "luisResult": luis_result_dict,
+            "luisResult": LuisUtil.luis_result_as_dict(luis_result),
         }
 
         trace_activity = ActivityUtil.create_trace(

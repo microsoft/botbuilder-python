@@ -161,24 +161,3 @@ class RecognizerResult:
                 top_intent = TopIntent(intent_name, score)
 
         return top_intent
-
-    def _as_dict(self, memo: Dict[str, object]):
-        # an internal method that returns a dict for json serialization.
-
-        intents: Dict[str, float] = {
-            name: intent_score.score for name, intent_score in self.intents.items()
-        } if self.intents is not None else None
-
-        d: Dict[str, object] = {
-            "text": self.text,
-            "alteredText": self.altered_text,
-            "intents": intents,
-            "entities": self.entities,
-        }
-
-        if self.properties is not None:
-            for key, value in self.properties.items():
-                if key not in d:
-                    d[key] = memo[key] if key in memo else value
-
-        return d

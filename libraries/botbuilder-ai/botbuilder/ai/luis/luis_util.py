@@ -30,7 +30,7 @@ class LuisUtil:
 
     @staticmethod
     def get_intents(luis_result: LuisResult) -> Dict[str, IntentScore]:
-        if luis_result.intents:
+        if luis_result.intents is not None:
             return {
                 LuisUtil.normalized_intent(i.intent): IntentScore(i.score or 0)
                 for i in luis_result.intents
@@ -132,7 +132,7 @@ class LuisUtil:
                 "builtin.currency",
                 "builtin.temperature",
             }:
-                units = str(resolution.unit)
+                units = resolution["unit"]
                 val = LuisUtil.number(resolution["value"])
                 obj = {}
                 if val is not None:
@@ -141,7 +141,8 @@ class LuisUtil:
                 obj["units"] = units
                 return obj
             else:
-                return resolution.get("value") or resolution.get("values")
+                value = resolution.get("value")
+                return value if value is not None else resolution.get("values")
 
     @staticmethod
     def extract_entity_metadata(entity: EntityModel) -> Dict:
@@ -297,6 +298,41 @@ class LuisUtil:
         platform_user_agent = f"({os_version}; {py_version})"
         user_agent = f"{package_user_agent} {platform_user_agent}"
         return user_agent
+
+    @staticmethod
+    def recognizer_result_as_dict(
+        recognizer_result: RecognizerResult
+    ) -> Dict[str, object]:
+        # an internal method that returns a dict for json serialization.
+
+        intents: Dict[str, Dict[str, float]] = {
+            name: LuisUtil.intent_score_as_dict(intent_score)
+            for name, intent_score in recognizer_result.intents.items()
+        } if recognizer_result.intents is not None else None
+
+        d: Dict[str, object] = {
+            "text": recognizer_result.text,
+            "alteredText": recognizer_result.altered_text,
+            "intents": intents,
+            "entities": recognizer_result.entities,
+        }
+
+        if recognizer_result.properties is not None:
+            for key, value in recognizer_result.properties.items():
+                if key not in d:
+                    if isinstance(value, LuisResult):
+                        d[key] = LuisUtil.luis_result_as_dict(value)
+                    else:
+                        d[key] = value
+
+        return d
+
+    @staticmethod
+    def intent_score_as_dict(intent_score: IntentScore) -> Dict[str, float]:
+        if intent_score is None:
+            return None
+
+        return {"score": intent_score.score}
 
     @staticmethod
     def luis_result_as_dict(luis_result: LuisResult) -> Dict[str, object]:
