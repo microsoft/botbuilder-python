@@ -194,7 +194,7 @@ class BotFrameworkAdapter(BotAdapter):
                         await asyncio.sleep(delay_in_ms)
                 else:
                     client = self.create_connector_client(activity.service_url)
-                    await client.conversations.send_to_conversation(activity.conversation.id, activity)
+                    client.conversations.send_to_conversation(activity.conversation.id, activity)
         except Exception as e:
             raise e
 

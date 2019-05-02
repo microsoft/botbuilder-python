@@ -52,13 +52,13 @@ class ChoiceFactoryTest(unittest.TestCase):
         self.assertEqual("select from: (1) red, (2) green, or (3) blue", activity.text)
 
     def test_ShouldRenderChoicesAsAList(self):
-        activity = ChoiceFactory.list(ChoiceFactoryTest.color_choices, "select from:")
+        activity = ChoiceFactory.list_style(ChoiceFactoryTest.color_choices, "select from:")
         self.assertEqual(
             "select from:\n\n   1. red\n   2. green\n   3. blue", activity.text
         )
 
     def test_should_render_unincluded_numbers_choices_as_a_list(self):
-        activity = ChoiceFactory.list(
+        activity = ChoiceFactory.list_style(
             ChoiceFactoryTest.color_choices,
             "select from:",
             options=ChoiceFactoryOptions(include_numbers=False),

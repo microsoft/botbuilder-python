@@ -26,6 +26,7 @@ class ComponentDialog(Dialog):
             raise TypeError('ComponentDialog(): dialog_id cannot be None.')
 
         self._dialogs = DialogSet()
+        self._initial_dialog_id = None
 
     # TODO: Add TelemetryClient
 
@@ -37,7 +38,7 @@ class ComponentDialog(Dialog):
         :param:
         :return str:ID of the dialog this instance is for.
         """
-        return self._id
+        return self._initial_dialog_id
 
     @initial_dialog_id.setter
     def initial_dialog_id(self, value: str) -> None:
@@ -46,7 +47,7 @@ class ComponentDialog(Dialog):
         :param value: ID of the dialog this instance is for.
         :return:
         """
-        self._id = value
+        self._initial_dialog_id = value
 
     async def begin_dialog(self, outer_dc: DialogContext, options: object = None) -> DialogTurnResult:
         if outer_dc is None:
@@ -131,10 +132,10 @@ class ComponentDialog(Dialog):
 
 
     async def on_begin_dialog(self, inner_dc: DialogContext, options: object) -> DialogTurnResult:
-        return inner_dc.begin_dialog(self.initial_dialog_id, options)
+        return await inner_dc.begin_dialog(self.initial_dialog_id, options)
 
     async def on_continue_dialog(self, inner_dc: DialogContext) -> DialogTurnResult:
-        return inner_dc.continue_dialog()
+        return await inner_dc.continue_dialog()
 
     async def on_end_dialog(self, context: TurnContext, instance: DialogInstance, reason: DialogReason) -> None:
         return
@@ -143,4 +144,4 @@ class ComponentDialog(Dialog):
         return 
 
     async def end_component(self, outer_dc: DialogContext, result: object) -> DialogTurnResult:
-        return outer_dc.end_dialog(result)
+        return await outer_dc.end_dialog(result)
