@@ -33,8 +33,8 @@ setup(
     keywords=['BotBuilderApplicationInsights', 'bots', 'ai', 'botframework', 'botbuilder'],
     long_description=package_info['__summary__'],
     license=package_info['__license__'],
-    packages=['botbuilder.applicationinsights'],
-    install_requires=REQUIRES + TESTS_REQUIRES,
+    packages=['botbuilder.applicationinsights','botbuilder.applicationinsights.django' ],
+    install_requires=REQUIRES,
     tests_require=TESTS_REQUIRES,
     include_package_data=True,
     classifiers=[
