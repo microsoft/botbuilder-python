@@ -71,27 +71,6 @@ class TestMemoryStorage(aiounittest.AsyncTestCase):
         data = await storage.read(['user'])
         assert data['user'].counter == 5
 
-    
-    async def test_memory_storage_write_should_raise_a_key_error_with_older_e_tag(self):
-        storage = MemoryStorage()
-        first_item = SimpleStoreItem(e_tag='0')
-
-        await storage.write({'user': first_item})
-
-        updated_item = (await storage.read(['user']))['user']
-        updated_item.counter += 1
-        await storage.write({'user': first_item})
-
-        try:
-            await storage.write({'user': first_item})
-            await storage.read(['user'])
-        except KeyError as _:
-            pass
-        else:
-            raise AssertionError("test_memory_storage_read_should_raise_a_key_error_with_invalid_e_tag(): should have "
-                                 "raised a KeyError with an invalid e_tag.")
-
-    
     async def test_memory_storage_read_with_invalid_key_should_return_empty_dict(self):
         storage = MemoryStorage()
         data = await storage.read(['test'])

@@ -9,17 +9,29 @@ class LuisPredictionOptions(object):
     Optional parameters for a LUIS prediction request.
     """
 
-    def __init__(self, timeout: float = 100000):
-        self._bing_spell_check_subscription_key: str = None
-        self._include_all_intents: bool = None
-        self._include_instance_data: bool = None
-        self._log: bool = None
-        self._spell_check: bool = None
-        self._staging: bool = None
+    def __init__(
+        self,
+        bing_spell_check_subscription_key: str = None,
+        include_all_intents: bool = None,
+        include_instance_data: bool = None,
+        log: bool = None,
+        spell_check: bool = None,
+        staging: bool = None,
+        timeout: float = 100000,
+        timezone_offset: float = None,
+        telemetry_client: BotTelemetryClient = NullTelemetryClient(),
+        log_personal_information: bool = False,
+    ):
+        self._bing_spell_check_subscription_key: str = bing_spell_check_subscription_key
+        self._include_all_intents: bool = include_all_intents
+        self._include_instance_data: bool = include_instance_data
+        self._log: bool = log
+        self._spell_check: bool = spell_check
+        self._staging: bool = staging
         self._timeout: float = timeout
-        self._timezone_offset: float = None
-        self._telemetry_client: BotTelemetryClient = NullTelemetryClient()
-        self._log_personal_information: bool = False
+        self._timezone_offset: float = timezone_offset
+        self._telemetry_client: BotTelemetryClient = telemetry_client
+        self._log_personal_information: bool = log_personal_information
 
     @property
     def bing_spell_check_subscription_key(self) -> str:

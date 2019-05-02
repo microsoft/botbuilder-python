@@ -6,6 +6,7 @@ import gc
 import imp 
 import json
 from botbuilder.schema import Activity
+from botbuilder.applicationinsights.django import retrieve_bot_body
 
 class IntegrationPostData:
     """ 
@@ -44,15 +45,8 @@ class IntegrationPostData:
             return body
         else:
             if self.detect_django():
-                mod = __import__('django.http', fromlist=['http'])
-                http_request = getattr(mod, 'HttpRequest')
-                django_requests = [o for o in gc.get_objects() if isinstance(o, http_request)]
-                django_request_instances = len(django_requests)
-                if django_request_instances != 1:
-                    raise Exception(f'Detected {django_request_instances} instances of Django Requests. Expecting 1.')
-                request = django_requests[0]
-                body_unicode = request.body.decode('utf-8') if request.method == "POST" else None
-                return body_unicode
+                # Retrieve from Middleware cache
+                return retrieve_bot_body()
 
     def body_from_WSGI_environ(self, environ):
         try:
