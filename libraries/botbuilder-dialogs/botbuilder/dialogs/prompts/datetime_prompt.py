@@ -1,8 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from recognizers_date_time import recognize_datetime
-
 from typing import Dict
 from botbuilder.core.turn_context import TurnContext
 from botbuilder.schema import (ActivityTypes, Activity)
@@ -52,7 +50,8 @@ class DateTimePrompt(Prompt):
             message = turn_context.activity
             # TODO: English contsant needs to be ported.
             culture = message.locale if message.locale != None else "English"
-            # TOOD: Port Choice Recognizer
+            # TODO: Move this import to top of file when recognizers package is published
+            from recognizers_date_time import recognize_datetime
             results = recognize_datetime(message.text, culture)
             if len(results) > 0:
                 result.succeeded = True
