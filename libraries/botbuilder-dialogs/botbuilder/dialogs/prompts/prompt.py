@@ -76,8 +76,10 @@ class Prompt(Dialog):
         # Validate the return value
         is_valid = False
         if self._validator != None:
-            prompt_context = PromptValidatorContext(dc.Context, recognized, state, options)
+            prompt_context = PromptValidatorContext(dc.context, recognized, state, options)
             is_valid = await self._validator(prompt_context)
+            if options is None:
+                options = PromptOptions()
             options.number_of_attempts += 1
         else:
             if recognized.succeeded:

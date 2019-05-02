@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from recognizers_date_time import recognize_datetime
+
 from typing import Dict
 from botbuilder.core.turn_context import TurnContext
 from botbuilder.schema import (ActivityTypes, Activity)
@@ -35,10 +37,10 @@ class DateTimePrompt(Prompt):
             raise TypeError('DateTimePrompt.on_prompt(): options cannot be None.')
         
         if is_retry == True and options.retry_prompt != None:
-            prompt = turn_context.send_activity(options.retry_prompt)  
+            await turn_context.send_activity(options.retry_prompt)  
         else:
             if options.prompt != None:
-                turn_context.send_activity(options.prompt)
+                await turn_context.send_activity(options.prompt)
 
     async def on_recognize(self, turn_context: TurnContext, state: Dict[str, object], options: PromptOptions) -> PromptRecognizerResult:
         if not turn_context:
@@ -51,11 +53,11 @@ class DateTimePrompt(Prompt):
             # TODO: English contsant needs to be ported.
             culture = message.locale if message.locale != None else "English"
             # TOOD: Port Choice Recognizer
-            results = ChoiceRecognizer.recognize_boolean(message.text, culture)
-            if results.Count > 0:
+            results = recognize_datetime(message.text, culture)
+            if len(results) > 0:
                 result.succeeded = True
                 result.value = []
-                values = results[0]
+                values = results[0].resolution['values']
                 for value in values:
                     result.value.append(self.read_resolution(value))
         

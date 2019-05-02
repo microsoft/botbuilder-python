@@ -23,6 +23,7 @@ from botbuilder.core import (
 from botbuilder.dialogs import (
                                 Dialog,
                                 DialogSet,
+                                DialogState,
                                 WaterfallDialog,
                                 WaterfallStepContext,
                                 DialogTurnResult,
@@ -55,7 +56,7 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
         
         
         # Create a DialogState property, DialogSet and register the WaterfallDialog.
-        dialog_state = convo_state.create_property('dialogState')
+        dialog_state = convo_state.create_property('dialogState') 
         dialogs = DialogSet(dialog_state)
         async def step1(step) -> DialogTurnResult:
             await step.context.send_activity('bot responding.')
@@ -81,6 +82,7 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
             else:
                 if results.status == DialogTurnStatus.Complete:
                     await turn_context.send_activity(results.result)
+            
             await convo_state.save_changes(turn_context)
             
         adapt = TestAdapter(exec_test)

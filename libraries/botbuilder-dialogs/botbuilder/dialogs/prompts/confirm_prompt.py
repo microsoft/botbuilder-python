@@ -52,7 +52,7 @@ class ConfirmPrompt(Prompt):
             prompt = self.append_choices(options.retry_prompt, channel_id, choices, self.style, choice_opts)  
         else:
             prompt = self.append_choices(options.prompt, channel_id, choices, self.style, choice_opts)
-        turn_context.send_activity(prompt)
+        await turn_context.send_activity(prompt)
         
     async def on_recognize(self, turn_context: TurnContext, state: Dict[str, object], options: PromptOptions) -> PromptRecognizerResult:
         if not turn_context:

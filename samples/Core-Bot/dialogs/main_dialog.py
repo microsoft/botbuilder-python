@@ -6,6 +6,7 @@ from botbuilder.core import MessageFactory
 from .booking_dialog import BookingDialog
 from booking_details import BookingDetails
 from helpers.luis_helper import LuisHelper
+from datatypes_timex_expression.timex import Timex
 
 class MainDialog(ComponentDialog):
 
@@ -52,10 +53,9 @@ class MainDialog(ComponentDialog):
             # Now we have all the booking details call the booking service.
 
             # If the call to the booking service was successful tell the user.
-            import pdb; pdb.set_trace()
-            time_property = TimexProperty(result.TravelDate)
-            travel_date_msg = time_property.to_natural_language(datetime.now())
-            msg = f'I have you booked to {result.destination} from {result.origin} on {travel_date_msg}'
+            #time_property = Timex(result.travel_date)
+            #travel_date_msg = time_property.to_natural_language(datetime.now())
+            msg = f'I have you booked to {result.destination} from {result.origin} on {result.travel_date}'
             await step_context.context.send_activity(MessageFactory.text(msg))
         else:
             await step_context.context.send_activity(MessageFactory.text("Thank you."))

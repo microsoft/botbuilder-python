@@ -11,10 +11,8 @@ from botbuilder.schema import (Activity, ActivityTypes)
 from botbuilder.core import (BotFrameworkAdapter, BotFrameworkAdapterSettings, TurnContext,
                              ConversationState, MemoryStorage, UserState)
 
-#from dialogs import MainDialog
-#from bots import DialogAndWelcomeBot
-from dialogs import NewDialog
-from bots import DialogBot
+from dialogs import MainDialog
+from bots import DialogAndWelcomeBot
 from helpers.dialog_helper import DialogHelper
 
 APP_ID = ''
@@ -29,8 +27,8 @@ memory = MemoryStorage()
 user_state = UserState(memory)
 conversation_state = ConversationState(memory)
 
-dialog = NewDialog()
-bot = DialogBot(conversation_state, user_state, dialog)
+dialog = MainDialog({})
+bot = DialogAndWelcomeBot(conversation_state, user_state, dialog)
 
 async def messages(req: web.Request) -> web.Response:
     body = await req.json()

@@ -2,7 +2,6 @@
 # Licensed under the MIT License.
 
 from typing import Dict, List
-from copy import deepcopy
 from .storage import Storage, StoreItem
 
 

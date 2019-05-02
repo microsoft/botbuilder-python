@@ -3,6 +3,8 @@ from botbuilder.dialogs import WaterfallDialog, DialogTurnResult, WaterfallStepC
 from botbuilder.dialogs.prompts import DateTimePrompt, PromptValidatorContext, PromptOptions, DateTimeResolution
 from .cancel_and_help_dialog import CancelAndHelpDialog
 
+from datatypes_timex_expression.timex import Timex
+
 class DateResolverDialog(CancelAndHelpDialog):
 
     def __init__(self, dialog_id: str = None):
@@ -17,7 +19,7 @@ class DateResolverDialog(CancelAndHelpDialog):
         self.initial_dialog_id = WaterfallDialog.__name__ + '2'
     
     async def initialStep(self,step_context: WaterfallStepContext) -> DialogTurnResult:
-        timex = step_context.options.date
+        timex = step_context.options
 
         prompt_msg = 'On what date would you like to travel?'
         reprompt_msg = "I'm sorry, for best results, please enter your travel date including the month, day and year."
@@ -31,7 +33,7 @@ class DateResolverDialog(CancelAndHelpDialog):
                 ))
         else:
             # We have a Date we just need to check it is unambiguous.
-            if 'definite' in TimexProperty(timex).types:
+            if 'definite' in Timex(timex).types:
                 # This is essentially a "reprompt" of the data we were given up front.
                 return await step_context.prompt(DateTimePrompt.__name__, PromptOptions(prompt= reprompt_msg))
             else:
@@ -42,11 +44,11 @@ class DateResolverDialog(CancelAndHelpDialog):
         return await step_context.end_dialog(timex)
     
     @staticmethod
-    def datetime_prompt_validator(self, prompt_context: PromptValidatorContext) -> bool:
+    async def datetime_prompt_validator(prompt_context: PromptValidatorContext) -> bool:
         if prompt_context.recognized.succeeded:
             timex = prompt_context.recognized.value[0].timex.split('T')[0]
 
             #TODO: Needs TimexProperty
-            return 'definite' in TimexProperty(timex).types
+            return 'definite' in Timex(timex).types
         
         return False

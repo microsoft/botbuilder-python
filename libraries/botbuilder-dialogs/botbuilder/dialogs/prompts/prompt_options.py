@@ -13,7 +13,7 @@ class PromptOptions:
         self._choices= choices
         self._style = style
         self._validations = validations
-        self._number_of_attempts = validations
+        self._number_of_attempts = number_of_attempts
         
     @property
     def prompt(self) -> Activity:
