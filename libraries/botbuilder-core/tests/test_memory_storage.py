@@ -7,7 +7,7 @@ from botbuilder.core import MemoryStorage, StoreItem
 
 
 class SimpleStoreItem(StoreItem):
-    def __init__(self, counter=1, e_tag='0'):
+    def __init__(self, counter=1, e_tag='*'):
         super(SimpleStoreItem, self).__init__()
         self.counter = counter
         self.e_tag = e_tag
@@ -41,33 +41,20 @@ class TestMemoryStorage(aiounittest.AsyncTestCase):
         assert data['user'].counter == 1
         assert len(data.keys()) == 1
         assert storage._e_tag == 1
-        assert int(data['user'].e_tag) == 1
+        assert int(data['user'].e_tag) == 0
 
     
     async def test_memory_storage_write_should_add_new_value(self):
         storage = MemoryStorage()
-        await storage.write({'user': SimpleStoreItem(counter=1)})
+        aux = {'user': SimpleStoreItem(counter=1)}
+        await storage.write(aux)
 
         data = await storage.read(['user'])
         assert 'user' in data
         assert data['user'].counter == 1
-
+        
     
-    async def test_memory_storage_write_should_overwrite_cached_value_with_valid_newer_e_tag(self):
-        storage = MemoryStorage()
-        await storage.write({'user': SimpleStoreItem()})
-        data = await storage.read(['user'])
-
-        try:
-            await storage.write({'user': SimpleStoreItem(counter=2, e_tag='2')})
-            data = await storage.read(['user'])
-            assert data['user'].counter == 2
-            assert int(data['user'].e_tag) == 2
-        except Exception as e:
-            raise e
-
-    
-    async def test_memory_storage_write_should_overwrite_when_new_e_tag_is_an_asterisk(self):
+    async def test_memory_storage_write_should_overwrite_when_new_e_tag_is_an_asterisk_1(self):
         storage = MemoryStorage()
         await storage.write({'user': SimpleStoreItem(e_tag='1')})
 
@@ -76,7 +63,7 @@ class TestMemoryStorage(aiounittest.AsyncTestCase):
         assert data['user'].counter == 10
 
     
-    async def test_memory_storage_write_should_overwrite_when_new_e_tag_is_an_asterisk(self):
+    async def test_memory_storage_write_should_overwrite_when_new_e_tag_is_an_asterisk_2(self):
         storage = MemoryStorage()
         await storage.write({'user': SimpleStoreItem(e_tag='1')})
 
@@ -87,13 +74,18 @@ class TestMemoryStorage(aiounittest.AsyncTestCase):
     
     async def test_memory_storage_write_should_raise_a_key_error_with_older_e_tag(self):
         storage = MemoryStorage()
-        await storage.write({'user': SimpleStoreItem(e_tag='1')})
+        first_item = SimpleStoreItem(e_tag='0')
 
-        await storage.read(['user'])
+        await storage.write({'user': first_item})
+
+        updated_item = (await storage.read(['user']))['user']
+        updated_item.counter += 1
+        await storage.write({'user': first_item})
+
         try:
-            await storage.write({'user': SimpleStoreItem()})
+            await storage.write({'user': first_item})
             await storage.read(['user'])
-        except KeyError as e:
+        except KeyError as _:
             pass
         else:
             raise AssertionError("test_memory_storage_read_should_raise_a_key_error_with_invalid_e_tag(): should have "

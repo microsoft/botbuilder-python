@@ -23,6 +23,7 @@ from botbuilder.core import (
 from botbuilder.dialogs import (
                                 Dialog,
                                 DialogSet,
+                                DialogState,
                                 WaterfallDialog,
                                 WaterfallStepContext,
                                 DialogTurnResult,
@@ -30,6 +31,7 @@ from botbuilder.dialogs import (
                                 DialogTurnStatus
                                 )
 from unittest.mock import patch, Mock
+from unittest import skip
 
 begin_message = Activity()
 begin_message.text = 'begin'
@@ -44,7 +46,8 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
         # assert
         self.assertEqual(type(dialog.telemetry_client), NullTelemetryClient)
 
-    @patch('test_telemetry_waterfall.ApplicationInsightsTelemetryClient')
+
+    @patch('botbuilder.applicationinsights.ApplicationInsightsTelemetryClient')
     async def test_execute_sequence_waterfall_steps(self, MockTelemetry):
         # arrange
 
@@ -54,7 +57,7 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
         
         
         # Create a DialogState property, DialogSet and register the WaterfallDialog.
-        dialog_state = convo_state.create_property('dialogState')
+        dialog_state = convo_state.create_property('dialogState') 
         dialogs = DialogSet(dialog_state)
         async def step1(step) -> DialogTurnResult:
             await step.context.send_activity('bot responding.')
@@ -80,6 +83,8 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
             else:
                 if results.status == DialogTurnStatus.Complete:
                     await turn_context.send_activity(results.result)
+            
+            await dialog_state.set(turn_context, DialogState(dc.stack))
             await convo_state.save_changes(turn_context)
             
         adapt = TestAdapter(exec_test)
@@ -97,8 +102,9 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
                             ('WaterfallStep', {'DialogId':'test', 'StepName':'Step2of2'})
                             ]
         self.assert_telemetry_calls(telemetry, telemetry_calls)
-        
-    @patch('test_telemetry_waterfall.ApplicationInsightsTelemetryClient')
+
+    
+    @patch('botbuilder.applicationinsights.ApplicationInsightsTelemetryClient')
     async def test_ensure_end_dialog_called(self, MockTelemetry):
         # arrange
 
@@ -131,6 +137,7 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
             results = await dc.continue_dialog()
             if turn_context.responded == False:
                 await dc.begin_dialog("test", None)
+            await dialog_state.set(turn_context, DialogState(dc.stack))
             await convo_state.save_changes(turn_context)
             
         adapt = TestAdapter(exec_test)
