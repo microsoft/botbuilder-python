@@ -1,5 +1,8 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
 
-from decimal import *
+from decimal import Decimal
+from copy import copy
 from .timex_parsing import TimexParsing
 from .timex_inference import TimexInference
 from .timex_convert import TimexConvert
@@ -111,28 +114,7 @@ class Timex:
                 delattr(self, '__time')
 
     def clone(self):
-        result = Timex()
-        result.now = self.now
-        result.years = self.years
-        result.months = self.months
-        result.weeks = self.weeks
-        result.days = self.days
-        result.hours = self.hours
-        result.minutes = self.minutes
-        result.seconds = self.seconds
-        result.year = self.year
-        result.month = self.month
-        result.day_of_month = self.day_of_month
-        result.day_of_week = self.day_of_week
-        result.season = self.season
-        result.week_of_year = self.week_of_year
-        result.weekend = self.weekend
-        result.week_of_month = self.week_of_month
-        result.hour = self.hour
-        result.minute = self.minute
-        result.second = self.second
-        result.part_of_day = self.part_of_day
-        return result
+        return copy(self)
 
     def assign_properties(self, source):
         for key, value in source.items():

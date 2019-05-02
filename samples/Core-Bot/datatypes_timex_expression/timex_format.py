@@ -1,3 +1,5 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
 
 from .timex_constants import Constants
 from .timex_helpers import TimexHelpers

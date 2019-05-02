@@ -1,4 +1,9 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
+import math
 from datetime import date, time, timedelta
+from .time import Time
 from .timex import Timex
 from .date_range import DateRange
 from .time_range import TimeRange

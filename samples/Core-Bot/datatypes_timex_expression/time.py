@@ -1,3 +1,7 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
+from math import floor
 
 class Time:
 
@@ -9,8 +13,8 @@ class Time:
     @classmethod
     def fromSeconds(seconds):
         hour = floor(seconds / 3600000)
-        minute = floor((seconds - (Hour * 3600000)) / 60000)
-        second = (seconds - (Hour * 3600000) - (Minute * 60000)) / 1000
+        minute = floor((seconds - (hour * 3600000)) / 60000)
+        second = (seconds - (hour * 3600000) - (minute * 60000)) / 1000
         return Time(hour, minute, second)
     
     def get_time(self):
