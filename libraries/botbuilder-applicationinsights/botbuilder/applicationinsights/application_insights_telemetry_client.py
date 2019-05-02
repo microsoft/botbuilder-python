@@ -7,32 +7,35 @@ from botbuilder.core.bot_telemetry_client import BotTelemetryClient, TelemetryDa
 from typing import Dict
 from .integration_post_data import IntegrationPostData
 
+def bot_telemetry_processor(data, context):
+    post_data = IntegrationPostData().activity_json
+    if post_data is None:
+        return
+    # Override session and user id
+    from_prop = post_data['from'] if 'from' in post_data else None
+    user_id = from_prop['id'] if from_prop != None else None
+    channel_id = post_data['channelId'] if 'channelId' in post_data else None
+    conversation = post_data['conversation'] if 'conversation' in post_data else None
+    conversation_id = conversation['id'] if 'id' in conversation else None
+    context.user.id = channel_id + user_id
+    context.session.id = conversation_id
+
+    # Additional bot-specific properties
+    if 'id' in post_data:
+        data.properties["activityId"] = post_data['id'] 
+    if 'channelId' in post_data:
+        data.properties["channelId"] = post_data['channelId'] 
+    if 'type' in post_data:
+        data.properties["activityType"] = post_data['type']
+
+
 class ApplicationInsightsTelemetryClient(BotTelemetryClient):
     
-    def __init__(self, instrumentation_key:str):
+    def __init__(self, instrumentation_key:str, telemetry_client: TelemetryClient = None):
         self._instrumentation_key = instrumentation_key
-        self._client = TelemetryClient(self._instrumentation_key)
+        self._client = telemetry_client if telemetry_client != None else TelemetryClient(self._instrumentation_key)
         # Telemetry Processor
-        def telemetry_processor(data, context):
-            post_data = IntegrationPostData().activity_json
-            # Override session and user id
-            from_prop = post_data['from'] if 'from' in post_data else None
-            user_id = from_prop['id'] if from_prop != None else None
-            channel_id = post_data['channelId'] if 'channelId' in post_data else None
-            conversation = post_data['conversation'] if 'conversation' in post_data else None
-            conversation_id = conversation['id'] if 'id' in conversation else None
-            context.user.id = channel_id + user_id
-            context.session.id = conversation_id
-
-            # Additional bot-specific properties
-            if 'activityId' in post_data:
-                data.properties["activityId"] = post_data['activityId']
-            if 'channelId' in post_data:
-                data.properties["channelId"] = post_data['channelId'] 
-            if 'activityType' in post_data:
-                data.properties["activityType"] = post_data['activityType']
-
-        self._client.add_telemetry_processor(telemetry_processor)
+        self._client.add_telemetry_processor(bot_telemetry_processor)
         
 
     def track_pageview(self, name: str, url:str, duration: int = 0, properties : Dict[str, object]=None, 

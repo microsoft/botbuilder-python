@@ -99,21 +99,21 @@ class RecognizerResult:
         self._intents = value
 
     @property
-    def entities(self) -> Dict:
+    def entities(self) -> Dict[str, object]:
         """Gets the recognized top-level entities.
         
         :return: Object with each top-level recognized entity as a key.
-        :rtype: Dict
+        :rtype: Dict[str, object]
         """
 
         return self._entities
 
     @entities.setter
-    def entities(self, value: Dict) -> None:
+    def entities(self, value: Dict[str, object]) -> None:
         """Sets the recognized top-level entities.
         
         :param value: Object with each top-level recognized entity as a key.
-        :type value: Dict
+        :type value: Dict[str, object]
         :return:
         :rtype: None
         """
