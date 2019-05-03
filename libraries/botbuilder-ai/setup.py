@@ -28,7 +28,7 @@ setup(
     keywords=["BotBuilderDialogs", "bots", "ai", "botframework", "botbuilder"],
     long_description=package_info["__summary__"],
     license=package_info["__license__"],
-    packages=["botbuilder.ai"],
+    packages=["botbuilder.ai","botbuilder.ai.luis", "botbuilder.ai.qna" ],
     install_requires=REQUIRES,
     include_package_data=True,
     classifiers=[
