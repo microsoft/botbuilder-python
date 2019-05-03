@@ -5,12 +5,15 @@ import os
 from setuptools import setup
 
 REQUIRES = [
-    "aiounittest>=1.1.0",
     "azure-cognitiveservices-language-luis==0.2.0",
     "botbuilder-schema>=4.0.0.a6",
     "botbuilder-core>=4.0.0.a6",
+    "aiohttp>=3.5.4"
 ]
 
+TESTS_REQUIRES = [
+    "aiounittest>=1.1.0"
+]
 
 root = os.path.abspath(os.path.dirname(__file__))
 
@@ -25,11 +28,12 @@ setup(
     url=package_info["__uri__"],
     author=package_info["__author__"],
     description=package_info["__description__"],
-    keywords=["BotBuilderDialogs", "bots", "ai", "botframework", "botbuilder"],
+    keywords="botbuilder-ai LUIS QnAMaker bots ai botframework botbuilder",
     long_description=package_info["__summary__"],
     license=package_info["__license__"],
-    packages=["botbuilder.ai","botbuilder.ai.luis", "botbuilder.ai.qna" ],
+    packages=["botbuilder.ai", "botbuilder.ai.qna", "botbuilder.ai.luis"],
     install_requires=REQUIRES,
+    tests_require=TESTS_REQUIRES,
     include_package_data=True,
     classifiers=[
         "Programming Language :: Python :: 3.6",
