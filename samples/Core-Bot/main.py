@@ -18,7 +18,7 @@ from helpers.dialog_helper import DialogHelper
 
 APP_ID = ''
 APP_PASSWORD = ''
-PORT = 9000
+PORT = 3978
 SETTINGS = BotFrameworkAdapterSettings(APP_ID, APP_PASSWORD)
 ADAPTER = BotFrameworkAdapter(SETTINGS)
 

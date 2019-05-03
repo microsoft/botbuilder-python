@@ -6,8 +6,8 @@ from setuptools import setup
 
 REQUIRES = [
     "azure-cognitiveservices-language-luis==0.2.0",
-    "botbuilder-schema>=4.0.0.a6",
-    "botbuilder-core>=4.0.0.a6",
+    "botbuilder-schema>=4.4.0b1",
+    "botbuilder-core>=4.4.0b1",
     "aiohttp>=3.5.4"
 ]
 
@@ -32,7 +32,7 @@ setup(
     long_description=package_info["__summary__"],
     license=package_info["__license__"],
     packages=["botbuilder.ai", "botbuilder.ai.qna", "botbuilder.ai.luis"],
-    install_requires=REQUIRES,
+    install_requires=REQUIRES + TESTS_REQUIRES,
     tests_require=TESTS_REQUIRES,
     include_package_data=True,
     classifiers=[

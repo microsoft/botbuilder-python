@@ -4,10 +4,10 @@
 import os
 from setuptools import setup
 
-VERSION = os.environ["packageVersion"] if "packageVersion" in os.environ else "4.0.0.a6"
+VERSION = os.environ["packageVersion"] if "packageVersion" in os.environ else "4.4.0b1"
 REQUIRES = [
-    'botbuilder-schema>=4.0.0.a6',
-    'botframework-connector>=4.0.0.a6']
+    'botbuilder-schema>=4.4.0b1',
+    'botframework-connector>=4.4.0b1']
 
 root = os.path.abspath(os.path.dirname(__file__))
 
