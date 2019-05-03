@@ -24,7 +24,13 @@ setup(
               "botframework.connector.auth",
               "botframework.connector.async_mixin",
               "botframework.connector.operations",
-              "botframework.connector.models"
+              "botframework.connector.models",
+              "botframework.connector.aio",
+              "botframework.connector.aio.operations_async",
+              "botframework.connector.token_api",
+              "botframework.connector.token_api.aio",
+              "botframework.connector.token_api.models",
+              "botframework.connector.token_api.operations"
     ],
     include_package_data=True,
     long_description="Microsoft Bot Framework Bot Builder SDK for Python.",
