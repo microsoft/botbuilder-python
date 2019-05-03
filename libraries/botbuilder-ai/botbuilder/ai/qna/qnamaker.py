@@ -179,8 +179,6 @@ class QnAMaker(QnAMakerTelemetryClient):
         
         return EventData(properties=properties, metrics=metrics)
 
-
-
     async def get_answers(
         self, 
         context: TurnContext, 
