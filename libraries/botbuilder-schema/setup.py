@@ -11,7 +11,7 @@ REQUIRES = ["msrest>=0.6.6"]
 setup(
     name=NAME,
     version=VERSION,
-    description="BotBouilder Schema",
+    description="BotBuilder Schema",
     author="Microsoft",
     url="https://github.com/Microsoft/botbuilder-python",
     keywords=["BotBuilderSchema", "bots","ai", "botframework", "botbuilder"],
