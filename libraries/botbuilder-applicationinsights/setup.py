@@ -5,7 +5,7 @@ import os
 from setuptools import setup
 
 REQUIRES = [
-    'applicationinsights >=0.11.9',
+    'applicationinsights>=0.11.9',
     'botbuilder-schema>=4.0.0.a6',
     'botframework-connector>=4.0.0.a6',
     'botbuilder-core>=4.0.0.a6'
@@ -14,7 +14,7 @@ TESTS_REQUIRES = [
     'aiounittest>=1.1.0',
     'django>=2.2', # For samples
     'djangorestframework>=3.9.2', # For samples
-    'flask>-1.0.2' # For samples
+    'flask>=1.0.2' # For samples
     ]
 
 root = os.path.abspath(os.path.dirname(__file__))
