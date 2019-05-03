@@ -5,7 +5,7 @@ import os
 from setuptools import setup
 
 NAME = "botbuilder-schema"
-VERSION = os.environ["packageVersion"] if "packageVersion" in os.environ else "4.0.0.a6"
+VERSION = os.environ["packageVersion"] if "packageVersion" in os.environ else "4.4.0b1"
 REQUIRES = ["msrest>=0.6.6"]
 
 setup(

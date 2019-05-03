@@ -6,9 +6,9 @@ from setuptools import setup
 
 REQUIRES = [
     'applicationinsights>=0.11.9',
-    'botbuilder-schema>=4.0.0.a6',
-    'botframework-connector>=4.0.0.a6',
-    'botbuilder-core>=4.0.0.a6'
+    'botbuilder-schema>=4.4.0b1',
+    'botframework-connector>=4.4.0b1',
+    'botbuilder-core>=4.4.0b1'
     ]
 TESTS_REQUIRES = [
     'aiounittest>=1.1.0',
