@@ -34,7 +34,6 @@ class MemoryStorage(Storage):
         try:
             # iterate over the changes
             for (key, change) in changes.items():
-                #import pdb; pdb.set_trace()
                 new_value = change
                 old_state = None
                 old_state_etag = None

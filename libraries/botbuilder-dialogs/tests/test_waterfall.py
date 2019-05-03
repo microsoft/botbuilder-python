@@ -76,7 +76,7 @@ class WaterfallTests(aiounittest.AsyncTestCase):
             return await step.end_dialog('ending WaterfallDialog.')
 
         mydialog = WaterfallDialog('test', [ step1, step2 ])
-        await dialogs.add(mydialog)
+        dialogs.add(mydialog)
         
         # Initialize TestAdapter
         async def exec_test(turn_context: TurnContext) -> None:
@@ -111,7 +111,7 @@ class WaterfallTests(aiounittest.AsyncTestCase):
             await step.context.send_activity("step3")
       
         steps = [step_callback1, step_callback2, step_callback3]
-        await dialogs.add(WaterfallDialog("test", steps))
+        dialogs.add(WaterfallDialog("test", steps))
         self.assertNotEqual(dialogs, None)
         self.assertEqual(len(dialogs._dialogs), 1)
     
@@ -125,7 +125,7 @@ class WaterfallTests(aiounittest.AsyncTestCase):
         dialog_state = convo_state.create_property("dialogState")
         dialogs = DialogSet(dialog_state)
         
-        await dialogs.add(MyWaterfallDialog("test"))
+        dialogs.add(MyWaterfallDialog("test"))
         self.assertNotEqual(dialogs, None)
         self.assertEqual(len(dialogs._dialogs), 1)
         

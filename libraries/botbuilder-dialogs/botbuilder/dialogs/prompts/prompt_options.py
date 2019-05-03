@@ -2,19 +2,18 @@
 # Licensed under the MIT License.
 
 from botbuilder.schema import Activity
+from botbuilder.dialogs.choices import Choice, ListStyle
 
 
 class PromptOptions:
 
-    def __init__(self, prompt: Activity = None, retry_prompt: Activity = None, choices: [] = None, style: object = None, validations: object = None, number_of_attempts: int = 0):
-        self._prompt: prompt 
-        self._retry_prompt: retry_prompt
-        # TODO: Replace with Choice Object once ported
-        self._choices: choices
-        # TODO: Replace with ListStyle Object once ported
+    def __init__(self, prompt: Activity = None, retry_prompt: Activity = None, choices: [Choice] = None, style: ListStyle = None, validations: object = None, number_of_attempts: int = 0):
+        self._prompt= prompt 
+        self._retry_prompt= retry_prompt
+        self._choices= choices
         self._style = style
         self._validations = validations
-        self._number_of_attempts = validations
+        self._number_of_attempts = number_of_attempts
         
     @property
     def prompt(self) -> Activity:
@@ -49,13 +48,13 @@ class PromptOptions:
         self._retry_prompt = value
         
     @property
-    def choices(self) -> object:
+    def choices(self) -> Choice:
         """Gets the list of choices associated with the prompt.
         """
         return self._choices
 
     @choices.setter
-    def choices(self, value: object) -> None:
+    def choices(self, value: Choice) -> None:
         """Sets the list of choices associated with the prompt.
         Parameters
         ----------
@@ -65,13 +64,13 @@ class PromptOptions:
         self._choices = value
         
     @property
-    def style(self) -> object:
+    def style(self) -> ListStyle:
         """Gets the ListStyle for a ChoicePrompt.
         """
         return self._style
 
     @style.setter
-    def style(self, value: object) -> None:
+    def style(self, value: ListStyle) -> None:
         """Sets the ListStyle for a ChoicePrompt.
         Parameters
         ----------

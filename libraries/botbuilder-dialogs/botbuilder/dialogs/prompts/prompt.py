@@ -12,6 +12,7 @@ from ..dialog_turn_result import DialogTurnResult
 from ..dialog_context import DialogContext
 from botbuilder.core.turn_context import TurnContext
 from botbuilder.schema import InputHints, ActivityTypes
+from botbuilder.dialogs.choices import ChoiceFactory
 
 from abc import abstractmethod
 from botbuilder.schema import Activity
@@ -32,20 +33,20 @@ class Prompt(Dialog):
             (Optional) custom validator used to provide additional validation and 
             re-prompting logic for the prompt.
         """
-        super(Prompt, self).__init__(str)
+        super(Prompt, self).__init__(dialog_id)
         
         self._validator = validator
 
     async def begin_dialog(self, dc: DialogContext, options: object) -> DialogTurnResult:
         if not dc:
             raise TypeError('Prompt(): dc cannot be None.')
-        if not options is PromptOptions:
+        if not isinstance(options, PromptOptions):
             raise TypeError('Prompt(): Prompt options are required for Prompt dialogs.')
         # Ensure prompts have input hint set
         if options.prompt != None and not options.prompt.input_hint:
             options.prompt.input_hint = InputHints.expecting_input
 
-        if options.RetryPrompt != None and not options.prompt.input_hint:
+        if options.retry_prompt != None and not options.prompt.input_hint:
             options.retry_prompt.input_hint = InputHints.expecting_input
        
         # Initialize prompt state
@@ -69,18 +70,20 @@ class Prompt(Dialog):
         # Perform base recognition
         instance = dc.active_dialog
         state = instance.state[self.persisted_state]
-        options = instance.State[self.persisted_options]
+        options = instance.state[self.persisted_options]
         recognized = await self.on_recognize(dc.context, state, options)
 
         # Validate the return value
         is_valid = False
         if self._validator != None:
-            prompt_context = PromptValidatorContext(dc.Context, recognized, state, options)
+            prompt_context = PromptValidatorContext(dc.context, recognized, state, options)
             is_valid = await self._validator(prompt_context)
+            if options is None:
+                options = PromptOptions()
             options.number_of_attempts += 1
         else:
             if recognized.succeeded:
-                isValid = True
+                is_valid = True
         # Return recognized value or re-prompt
         if is_valid:
             return await dc.end_dialog(recognized.value)
@@ -114,35 +117,30 @@ class Prompt(Dialog):
     # TODO: Fix choices to use Choice object when ported.
     # TODO: Fix style to use ListStyle when ported.
     # TODO: Fix options to use ChoiceFactoryOptions object when ported.
-    def append_choices(self, prompt: Activity, channel_id: str, choices: object, style: object, options : object ) -> Activity:
+    def append_choices(self, prompt: Activity, channel_id: str, choices: object, style: object, options : object = None ) -> Activity:
         # Get base prompt text (if any)
         text = prompt.text if prompt != None and not prompt.text == False else ''
         
         # Create temporary msg
         # TODO: fix once ChoiceFactory complete
         def inline() -> Activity:
-            # return ChoiceFactory.inline(choices, text, null, options)
-            return None
-        def list() -> Activity:
-            # return ChoiceFactory.list(choices, text, null, options)
-            return None
+            return ChoiceFactory.inline(choices, text, None, options)
+        def list_style() -> Activity:
+            return ChoiceFactory.list_style(choices, text, None, options)
         def suggested_action() -> Activity:
-            # return ChoiceFactory.suggested_action(choices, text)
-            return None
+            return ChoiceFactory.suggested_action(choices, text)
         def hero_card() -> Activity:
-            # return ChoiceFactory.hero_card(choices, text)
-            return None
+            return ChoiceFactory.hero_card(choices, text)
         def list_style_none() -> Activity:
             activity = Activity()
             activity.text = text
             return activity
         def default() -> Activity:
-            # return ChoiceFactory.for_channel(channel_id, choices, text, None, options);
-            return None
+            return ChoiceFactory.for_channel(channel_id, choices, text, None, options)
         switcher = {
             # ListStyle.inline
             1: inline,
-            2: list,
+            2: list_style,
             3: suggested_action,
             4: hero_card,
             5: list_style_none

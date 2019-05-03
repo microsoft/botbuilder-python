@@ -30,7 +30,7 @@ from botbuilder.dialogs import (
                                 DialogContext,
                                 DialogTurnStatus
                                 )
-from unittest.mock import patch, Mock
+from unittest.mock import patch
 from unittest import skip
 
 begin_message = Activity()
@@ -45,7 +45,6 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
         dialog.telemetry_client = None
         # assert
         self.assertEqual(type(dialog.telemetry_client), NullTelemetryClient)
-
 
     @patch('botbuilder.applicationinsights.ApplicationInsightsTelemetryClient')
     async def test_execute_sequence_waterfall_steps(self, MockTelemetry):
@@ -71,7 +70,7 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
 
         mydialog = WaterfallDialog('test', [ step1, step2 ])
         mydialog.telemetry_client = telemetry
-        await dialogs.add(mydialog)
+        dialogs.add(mydialog)
         
         # Initialize TestAdapter
         async def exec_test(turn_context: TurnContext) -> None:
@@ -101,7 +100,6 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
                             ('WaterfallStep', {'DialogId':'test', 'StepName':'Step2of2'})
                             ]
         self.assert_telemetry_calls(telemetry, telemetry_calls)
-
     
     @patch('botbuilder.applicationinsights.ApplicationInsightsTelemetryClient')
     async def test_ensure_end_dialog_called(self, MockTelemetry):
@@ -127,7 +125,7 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
 
         mydialog = WaterfallDialog('test', [ step1, step2 ])
         mydialog.telemetry_client = telemetry
-        await dialogs.add(mydialog)
+        dialogs.add(mydialog)
         
         # Initialize TestAdapter
         async def exec_test(turn_context: TurnContext) -> None:
@@ -153,7 +151,8 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
                             ('WaterfallComplete', {'DialogId':'test'}),
                             ('WaterfallStart', {'DialogId':'test'}),
                             ('WaterfallStep', {'DialogId':'test', 'StepName':'Step1of2'}),                            
-                            ]
+        ]
+        print(str(telemetry.track_event.call_args_list))
         self.assert_telemetry_calls(telemetry, telemetry_calls)
 
 
