@@ -34,7 +34,7 @@ setup(
     long_description=package_info['__summary__'],
     license=package_info['__license__'],
     packages=['botbuilder.applicationinsights','botbuilder.applicationinsights.django' ],
-    install_requires=REQUIRES,
+    install_requires=REQUIRES + TESTS_REQUIRES,
     tests_require=TESTS_REQUIRES,
     include_package_data=True,
     classifiers=[

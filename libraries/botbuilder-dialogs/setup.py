@@ -34,7 +34,7 @@ setup(
     long_description=package_info['__summary__'],
     license=package_info['__license__'],
     packages=['botbuilder.dialogs', 'botbuilder.dialogs.prompts', 'botbuilder.dialogs.choices'],
-    install_requires=REQUIRES,
+    install_requires=REQUIRES + TEST_REQUIRES,
     tests_require=TEST_REQUIRES,
     include_package_data=True,
     classifiers=[
