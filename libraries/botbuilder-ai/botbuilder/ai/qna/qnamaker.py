@@ -1,11 +1,13 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from aiohttp import ClientSession, ClientTimeout
+
 from botbuilder.schema import Activity
 from botbuilder.core import BotTelemetryClient, NullTelemetryClient, TurnContext
 from copy import copy
-import aiohttp, json, platform, requests
-from typing import Dict, List, NamedTuple
+import json, platform, requests
+from typing import Dict, List, NamedTuple, Union
 
 from .metadata import Metadata
 from .query_result import QueryResult
@@ -33,7 +35,8 @@ class QnAMaker(QnAMakerTelemetryClient):
     def __init__(
         self, 
         endpoint: QnAMakerEndpoint, 
-        options: QnAMakerOptions = None, 
+        options: QnAMakerOptions = None,
+        http_client: ClientSession = None,
         telemetry_client: BotTelemetryClient = None, 
         log_personal_information: bool = None
     ):
@@ -43,16 +46,16 @@ class QnAMaker(QnAMakerTelemetryClient):
         if endpoint.host.endswith('v2.0'):
             raise ValueError('v2.0 of QnA Maker service is no longer supported in the Bot Framework. Please upgrade your QnA Maker service at www.qnamaker.ai.')
 
-        self._endpoint = endpoint
+        self._endpoint: str = endpoint
         self._is_legacy_protocol: bool = self._endpoint.host.endswith('v3.0')
 
-        self._options: QnAMakerOptions = options or QnAMakerOptions()
+        self._options = options or QnAMakerOptions()
         self._validate_options(self._options)
-        
-        instance_timeout = aiohttp.ClientTimeout(total=self._options.timeout/1000)
-        self._req_client = aiohttp.ClientSession(timeout=instance_timeout)
 
-        self._telemetry_client = telemetry_client or NullTelemetryClient()
+        instance_timeout = ClientTimeout(total=self._options.timeout/1000)
+        self._req_client = http_client or ClientSession(timeout=instance_timeout)
+
+        self._telemetry_client: Union[BotTelemetryClient, NullTelemetryClient] = telemetry_client or NullTelemetryClient()
         self._log_personal_information = log_personal_information or False
 
     @property
@@ -176,6 +179,8 @@ class QnAMaker(QnAMakerTelemetryClient):
         
         return EventData(properties=properties, metrics=metrics)
 
+
+
     async def get_answers(
         self, 
         context: TurnContext, 
@@ -261,35 +266,18 @@ class QnAMaker(QnAMakerTelemetryClient):
 
         # Convert miliseconds to seconds (as other BotBuilder SDKs accept timeout value in miliseconds)
         # aiohttp.ClientSession units are in seconds
-        timeout = aiohttp.ClientTimeout(total=options.timeout/1000)
+        timeout = ClientTimeout(total=options.timeout/1000)
 
-        async with self._req_client as client:
-            response = await client.post(
-                url, 
-                data = serialized_content, 
-                headers = headers, 
-                timeout = timeout
-            )
+        response = await self._req_client.post(
+            url, 
+            data = serialized_content, 
+            headers = headers, 
+            timeout = timeout
+        )
 
-            # result = self._format_qna_result(response, options)
-            json_res = await response.json()
+        result = await self._format_qna_result(response, options)
 
-            answers_within_threshold = [
-                { **answer,'score': answer['score']/100 } 
-                if answer['score']/100 > options.score_threshold 
-                else {**answer} for answer in json_res['answers'] 
-            ]
-            sorted_answers = sorted(answers_within_threshold, key = lambda ans: ans['score'], reverse = True)
-
-            # The old version of the protocol returns the id in a field called qnaId
-            # The following translates this old structure to the new
-            if self._is_legacy_protocol:
-                for answer in answers_within_threshold:
-                    answer['id'] = answer.pop('qnaId', None)
-        
-            answers_as_query_results = list(map(lambda answer: QueryResult(**answer), sorted_answers))
-
-            return answers_as_query_results
+        return result
         
     async def _emit_trace_info(self, turn_context: TurnContext, result: [QueryResult], options: QnAMakerOptions):
         trace_info = QnAMakerTraceInfo(
@@ -311,11 +299,13 @@ class QnAMaker(QnAMakerTelemetryClient):
 
         await turn_context.send_activity(trace_activity)
     
-    def _format_qna_result(self, result, options: QnAMakerOptions) -> [QueryResult]:
+    async def _format_qna_result(self, result, options: QnAMakerOptions) -> [QueryResult]:
+        json_res = await result.json()
 
         answers_within_threshold = [
-            { **answer,'score': answer['score']/100 } for answer in result['answers'] 
-            if answer['score']/100 > options.score_threshold
+            { **answer,'score': answer['score']/100 } 
+            if answer['score']/100 > options.score_threshold 
+            else {**answer} for answer in json_res['answers'] 
         ]
         sorted_answers = sorted(answers_within_threshold, key = lambda ans: ans['score'], reverse = True)
 

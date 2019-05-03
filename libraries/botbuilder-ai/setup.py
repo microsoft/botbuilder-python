@@ -32,7 +32,7 @@ setup(
     long_description=package_info["__summary__"],
     license=package_info["__license__"],
     packages=["botbuilder.ai", "botbuilder.ai.qna", "botbuilder.ai.luis"],
-    install_requires=REQUIRES + TESTS_REQUIRES,
+    install_requires=REQUIRES,
     tests_require=TESTS_REQUIRES,
     include_package_data=True,
     classifiers=[

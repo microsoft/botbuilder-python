@@ -15,12 +15,6 @@ from botbuilder.ai.qna import Metadata, QnAMakerEndpoint, QnAMaker, QnAMakerOpti
 from botbuilder.core import BotAdapter, BotTelemetryClient, NullTelemetryClient, TurnContext
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.schema import Activity, ActivityTypes, ChannelAccount, ResourceResponse, ConversationAccount
-
-class InterceptRequestClient(ClientSession):
-    def __init__(self, timeout):
-        super().__init__(timeout=timeout.total)
-        self.intercepted_headers = None
-
  
 class TestContext(TurnContext):
     def __init__(self, request):
@@ -52,9 +46,6 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         endpoint = qna._endpoint
 
         # Assert
-        # self.assertEqual('a090f9f3-2f8e-41d1-a581-4f7a49269a0c', endpoint.knowledge_base_id)
-        # self.assertEqual('4a439d5b-163b-47c3-b1d1-168cc0db5608', endpoint.endpoint_key)
-        # self.assertEqual('https://ashleyNlpBot1-qnahost.azurewebsites.net/qnamaker', endpoint.host)
         self.assertEqual('f028d9k3-7g9z-11d3-d300-2b8x98227q8w', endpoint.knowledge_base_id)
         self.assertEqual('1k997n7w-207z-36p3-j2u1-09tas20ci6011', endpoint.endpoint_key)
         self.assertEqual('https://dummyqnahost.azurewebsites.net/qnamaker', endpoint.host)
@@ -275,19 +266,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
                 self.assertIsNotNone(result)
                 self.assertEqual(options.timeout, qna._options.timeout)
 
-                milisec_to_sec_timeout = options.timeout/1000
-                self.assertEqual(milisec_to_sec_timeout, qna._req_client._timeout.total)
 
-    # Work in progress
-    async def test_user_agent(self):
-        question = 'up'
-        timeout = ClientTimeout(total=300000)
-        intercept_client = InterceptRequestClient(timeout=timeout)
-        qna = QnAMaker(QnaApplicationTest.tests_endpoint)
-        # context = QnaApplicationTest._get_context(question, TestAdapter())
-        # response = await qna.get_answers(context)
-
-        pass
 
     @classmethod
     async def _get_service_result(
@@ -336,9 +315,4 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         )
 
         return TurnContext(test_adapter, activity)
-
-
-
-
-
 
