@@ -5,7 +5,8 @@
 This sample shows how to create a simple EchoBot with state.
 """
 
-
+import yaml
+import os
 from aiohttp import web
 from botbuilder.schema import (Activity, ActivityTypes)
 from botbuilder.core import (BotFrameworkAdapter, BotFrameworkAdapterSettings, TurnContext,
@@ -27,7 +28,11 @@ memory = MemoryStorage()
 user_state = UserState(memory)
 conversation_state = ConversationState(memory)
 
-dialog = MainDialog({})
+relative_path = os.path.abspath(os.path.dirname(__file__))
+path = os.path.join(relative_path, "config.yaml")
+with open(path, 'r') as ymlfile:
+    cfg = yaml.load(ymlfile)
+dialog = MainDialog(cfg['settings'])
 bot = DialogAndWelcomeBot(conversation_state, user_state, dialog)
 
 async def messages(req: web.Request) -> web.Response:
