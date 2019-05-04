@@ -1,5 +1,14 @@
+# ![Bot Framework SDK v4 Python](./doc/media/FrameWorkPython.png)
 
-# Bot Builder SDK v4 (Python) (Preview)
+# Bot Framework SDK v4 (Python) (Preview)
+
+This repository contains code for the Python version of the [Microsoft Bot Framework SDK](https://github.com/Microsoft/botbuilder). The Bot Framework SDK v4 enables developers to model conversation and build sophisticated bot applications using Python.
+
+This repo is part the [Microsoft Bot Framework](https://github.com/Microsoft/botframework) - a comprehensive framework for building enterprise-grade conversational AI experiences.
+
+> See [here][whats-new] to learn more about the new preview features for Bot Framework V4 SDK. 
+
+> See [here][build-2019-whats-new] for a summary of all new features announced at //BUILD 2019
 
 [![Build Status](https://travis-ci.org/Microsoft/botbuilder-python.svg?branch=master)](https://travis-ci.org/Microsoft/botbuilder-python)
 [![Build status](https://fuselabs.visualstudio.com/SDK_v4/_apis/build/status/SDK_v4-Python-package-CI)](https://fuselabs.visualstudio.com/SDK_v4/_build/latest?definitionId=431)
@@ -19,29 +28,20 @@ To get started see the [Azure Bot Service Documentation](https://docs.microsoft.
 
 ## Contributing
 
-This project welcomes contributions and suggestions.  Most contributions require you to agree to a
+## Contributing
+This project welcomes contributions and suggestions. Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
 the rights to use your contribution. For details, visit https://cla.microsoft.com.
-
 When you submit a pull request, a CLA-bot will automatically determine whether you need to provide
 a CLA and decorate the PR appropriately (e.g., label, comment). Simply follow the instructions
 provided by the bot. You will only need to do this once across all repos using our CLA.
-
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
 contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
 ## Reporting Security Issues
-
-Security issues and bugs should be reported privately, via email, to the Microsoft Security
-Response Center (MSRC) at [secure@microsoft.com](mailto:secure@microsoft.com). You should
-receive a response within 24 hours. If for some reason you do not, please follow up via
-email to ensure we received your original message. Further information, including the
-[MSRC PGP](https://technet.microsoft.com/en-us/security/dn606155) key, can be found in
-the [Security TechCenter](https://technet.microsoft.com/en-us/security/default).
+Security issues and bugs should be reported privately, via email, to the Microsoft Security Response Center (MSRC) at [secure@microsoft.com](mailto:secure@microsoft.com). You should receive a response within 24 hours. If for some reason you do not, please follow up via email to ensure we received your original message. Further information, including the [MSRC PGP](https://technet.microsoft.com/en-us/security/dn606155) key, can be found in the [Security TechCenter](https://technet.microsoft.com/en-us/security/default).
 
 ## License
 
 Copyright (c) Microsoft Corporation. All rights reserved.
-
-Licensed under the [MIT](https://github.com/Microsoft/vscode/blob/master/LICENSE.txt) License.
