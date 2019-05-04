@@ -10,6 +10,9 @@ This repo is part the [Microsoft Bot Framework](https://github.com/Microsoft/bot
 
 > See [here][build-2019-whats-new] for a summary of all new features announced at //BUILD 2019
 
+[build-2019-whats-new]:https://github.com/Microsoft/botframework-sdk/blob/master/README.md#bot-framework-sdk-v4---new---version-45-preview
+[whats-new]:https://github.com/Microsoft/botframework-sdk/blob/master/README.md#bot-framework-sdk-v4---new---version-45-preview
+
 [![Build Status](https://travis-ci.org/Microsoft/botbuilder-python.svg?branch=master)](https://travis-ci.org/Microsoft/botbuilder-python)
 [![Build status](https://fuselabs.visualstudio.com/SDK_v4/_apis/build/status/SDK_v4-Python-package-CI)](https://fuselabs.visualstudio.com/SDK_v4/_build/latest?definitionId=431)
 [![roadmap badge](https://img.shields.io/badge/visit%20the-roadmap-blue.svg)](https://github.com/Microsoft/botbuilder-python/wiki/Roadmap)
