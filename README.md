@@ -1,6 +1,6 @@
 # ![Bot Framework SDK v4 Python](./doc/media/FrameWorkPython.png)
 
-# Bot Framework SDK v4 (Python) (Preview)
+# Bot Framework SDK v4 for Python (Preview)
 
 This repository contains code for the Python version of the [Microsoft Bot Framework SDK](https://github.com/Microsoft/botbuilder). The Bot Framework SDK v4 enables developers to model conversation and build sophisticated bot applications using Python.
 
