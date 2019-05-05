@@ -8,10 +8,6 @@ This repository contains code for the Python version of the [Microsoft Bot Frame
 
 This repo is part the [Microsoft Bot Framework](https://github.com/Microsoft/botframework) - a comprehensive framework for building enterprise-grade conversational AI experiences.
 
-> See [here][whats-new] to learn more about the new preview features for Bot Framework V4 SDK. 
-
-> See [here][build-2019-whats-new] for a summary of all new features announced at //BUILD 2019
-
 [build-2019-whats-new]:https://github.com/Microsoft/botframework-sdk/blob/master/README.md#bot-framework-sdk-v4---new---version-45-preview
 [whats-new]:https://github.com/Microsoft/botframework-sdk/blob/master/README.md#bot-framework-sdk-v4---new---version-45-preview
 
@@ -46,7 +42,5 @@ contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additio
 
 ## Reporting Security Issues
 Security issues and bugs should be reported privately, via email, to the Microsoft Security Response Center (MSRC) at [secure@microsoft.com](mailto:secure@microsoft.com). You should receive a response within 24 hours. If for some reason you do not, please follow up via email to ensure we received your original message. Further information, including the [MSRC PGP](https://technet.microsoft.com/en-us/security/dn606155) key, can be found in the [Security TechCenter](https://technet.microsoft.com/en-us/security/default).
-
-## License
 
 Copyright (c) Microsoft Corporation. All rights reserved.
