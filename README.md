@@ -3,19 +3,13 @@
 ### [Click here to find out what's new for //build2019!](https://github.com/Microsoft/botframework/blob/master/whats-new.md#whats-new)
 
 # Bot Framework SDK v4 for Python (Preview)
-
-This repository contains code for the Python version of the [Microsoft Bot Framework SDK](https://github.com/Microsoft/botbuilder). The Bot Framework SDK v4 enables developers to model conversation and build sophisticated bot applications using Python.
-
-This repo is part the [Microsoft Bot Framework](https://github.com/Microsoft/botframework) - a comprehensive framework for building enterprise-grade conversational AI experiences.
-
-[build-2019-whats-new]:https://github.com/Microsoft/botframework-sdk/blob/master/README.md#bot-framework-sdk-v4---new---version-45-preview
-[whats-new]:https://github.com/Microsoft/botframework-sdk/blob/master/README.md#bot-framework-sdk-v4---new---version-45-preview
-
 [![Build Status](https://travis-ci.org/Microsoft/botbuilder-python.svg?branch=master)](https://travis-ci.org/Microsoft/botbuilder-python)
 [![Build status](https://fuselabs.visualstudio.com/SDK_v4/_apis/build/status/SDK_v4-Python-package-CI)](https://fuselabs.visualstudio.com/SDK_v4/_build/latest?definitionId=431)
 [![roadmap badge](https://img.shields.io/badge/visit%20the-roadmap-blue.svg)](https://github.com/Microsoft/botbuilder-python/wiki/Roadmap)
 
-This repository contains code for the Python version of the [Microsoft Bot Builder SDK](https://github.com/Microsoft/botbuilder). The Bot Builder SDK v4 is the latest SDK for building bot applications. This Python version is in **Preview** state and is being actively developed. 
+This repository contains code for the Python version of the [Microsoft Bot Framework SDK](https://github.com/Microsoft/botbuilder). The Bot Framework SDK v4 enables developers to model conversation and build sophisticated bot applications using Python.  This Python version is in **Preview** state and is being actively developed.
+
+This repo is part the [Microsoft Bot Framework](https://github.com/Microsoft/botframework) - a comprehensive framework for building enterprise-grade conversational AI experiences.
 
 In addition to the Python SDK, Bot Builder supports creating bots in other popular programming languages like [.Net SDK](https://github.com/Microsoft/botbuilder-dotnet), [JavaScript](https://github.com/Microsoft/botbuilder-js), and [Java](https://github.com/Microsoft/botbuilder-java). Production bots should be developed using the JavaScript or .Net SDKs.
 
@@ -26,8 +20,6 @@ To get started see the [Azure Bot Service Documentation](https://docs.microsoft.
 - [![PyPI version](https://badge.fury.io/py/botbuilder-core.svg)](https://badge.fury.io/py/botbuilder-core) botbuilder-core
 - [![PyPI version](https://badge.fury.io/py/botbuilder-schema.svg)](https://badge.fury.io/py/botbuilder-schema) botbuilder-schema
 - [![PyPI version](https://badge.fury.io/py/botframework-connector.svg)](https://badge.fury.io/py/botframework-connector) botframework-connector
-
-## Contributing
 
 ## Contributing
 This project welcomes contributions and suggestions. Most contributions require you to agree to a
