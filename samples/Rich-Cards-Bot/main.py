@@ -4,7 +4,8 @@
 """
 This sample shows how to use different types of rich cards.
 """
-
+import os
+import yaml
 
 from aiohttp import web
 from botbuilder.schema import Activity, ActivityTypes
@@ -14,9 +15,14 @@ from botbuilder.core import (BotFrameworkAdapter, BotFrameworkAdapterSettings, T
 from dialogs import MainDialog
 from bots import RichCardsBot
 
+relative_path = os.path.abspath(os.path.dirname(__file__))
+path = os.path.join(relative_path, "config.yaml")
+with open(path, 'r') as ymlfile:
+    cfg = yaml.safe_load(ymlfile)
+
 APP_ID = ''
 APP_PASSWORD = ''
-PORT = 3978
+PORT = cfg['Settings']['Port']
 SETTINGS = BotFrameworkAdapterSettings(APP_ID, APP_PASSWORD)
 ADAPTER = BotFrameworkAdapter(SETTINGS)
 
