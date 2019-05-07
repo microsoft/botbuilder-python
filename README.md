@@ -16,9 +16,13 @@ To get started see the [Azure Bot Service Documentation](https://docs.microsoft.
 
 ## Packages
 
-- [![PyPI version](https://badge.fury.io/py/botbuilder-core.svg)](https://badge.fury.io/py/botbuilder-core) botbuilder-core
-- [![PyPI version](https://badge.fury.io/py/botbuilder-schema.svg)](https://badge.fury.io/py/botbuilder-schema) botbuilder-schema
-- [![PyPI version](https://badge.fury.io/py/botframework-connector.svg)](https://badge.fury.io/py/botframework-connector) botframework-connector
+- [![PyPI version](https://badge.fury.io/py/botbuilder-ai.svg)](https://pypi.org/project/botbuilder-ai/) botbuilder-ai
+- [![PyPI version](https://badge.fury.io/py/botbuilder-applicationinsights.svg)](https://pypi.org/project/botbuilder-applicationinsights/) botframework-applicationinsights
+- [![PyPI version](https://badge.fury.io/py/botbuilder-azure.svg)](https://pypi.org/project/botbuilder-azure/) botbuilder-azure
+- [![PyPI version](https://badge.fury.io/py/botbuilder-core.svg)](https://pypi.org/project/botbuilder-core/) botbuilder-core
+- [![PyPI version](https://badge.fury.io/py/botbuilder-dialogs.svg)](https://pypi.org/project/botbuilder-dialogs/) botbuilder-dialogs
+- [![PyPI version](https://badge.fury.io/py/botbuilder-schema.svg)](https://pypi.org/project/botbuilder-schema/) botbuilder-schema
+- [![PyPI version](https://badge.fury.io/py/botframework-connector.svg)](https://pypi.org/project/botframework-connector/) botframework-connector
 
 ## Contributing
 This project welcomes contributions and suggestions. Most contributions require you to agree to a
