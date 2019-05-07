@@ -3,7 +3,6 @@
 ### [Click here to find out what's new for //build2019!](https://github.com/Microsoft/botframework/blob/master/whats-new.md#whats-new)
 
 # Bot Framework SDK v4 for Python (Preview)
-[![Build Status](https://travis-ci.org/Microsoft/botbuilder-python.svg?branch=master)](https://travis-ci.org/Microsoft/botbuilder-python)
 [![Build status](https://fuselabs.visualstudio.com/SDK_v4/_apis/build/status/SDK_v4-Python-package-CI)](https://fuselabs.visualstudio.com/SDK_v4/_build/latest?definitionId=431)
 [![roadmap badge](https://img.shields.io/badge/visit%20the-roadmap-blue.svg)](https://github.com/Microsoft/botbuilder-python/wiki/Roadmap)
 
@@ -17,9 +16,13 @@ To get started see the [Azure Bot Service Documentation](https://docs.microsoft.
 
 ## Packages
 
-- [![PyPI version](https://badge.fury.io/py/botbuilder-core.svg)](https://badge.fury.io/py/botbuilder-core) botbuilder-core
-- [![PyPI version](https://badge.fury.io/py/botbuilder-schema.svg)](https://badge.fury.io/py/botbuilder-schema) botbuilder-schema
-- [![PyPI version](https://badge.fury.io/py/botframework-connector.svg)](https://badge.fury.io/py/botframework-connector) botframework-connector
+- [![PyPI version](https://badge.fury.io/py/botbuilder-ai.svg)](https://pypi.org/project/botbuilder-ai/) botbuilder-ai
+- [![PyPI version](https://badge.fury.io/py/botbuilder-applicationinsights.svg)](https://pypi.org/project/botbuilder-applicationinsights/) botframework-applicationinsights
+- [![PyPI version](https://badge.fury.io/py/botbuilder-azure.svg)](https://pypi.org/project/botbuilder-azure/) botbuilder-azure
+- [![PyPI version](https://badge.fury.io/py/botbuilder-core.svg)](https://pypi.org/project/botbuilder-core/) botbuilder-core
+- [![PyPI version](https://badge.fury.io/py/botbuilder-dialogs.svg)](https://pypi.org/project/botbuilder-dialogs/) botbuilder-dialogs
+- [![PyPI version](https://badge.fury.io/py/botbuilder-schema.svg)](https://pypi.org/project/botbuilder-schema/) botbuilder-schema
+- [![PyPI version](https://badge.fury.io/py/botframework-connector.svg)](https://pypi.org/project/botframework-connector/) botframework-connector
 
 ## Contributing
 This project welcomes contributions and suggestions. Most contributions require you to agree to a
