@@ -20,7 +20,6 @@ class DialogBot(ActivityHandler):
         self.conversation_state = conversation_state
         self.user_state = user_state
         self.dialog = dialog
-        self.dialogState = self.conversation_state.create_property('DialogState')
 
     async def on_turn(self, turn_context: TurnContext):
         await super().on_turn(turn_context)
