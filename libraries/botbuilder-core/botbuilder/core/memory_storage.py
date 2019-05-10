@@ -2,14 +2,13 @@
 # Licensed under the MIT License.
 
 from typing import Dict, List
-from copy import deepcopy
 from .storage import Storage, StoreItem
 
 
 class MemoryStorage(Storage):
     def __init__(self, dictionary=None):
         super(MemoryStorage, self).__init__()
-        self.memory = dictionary or {}
+        self.memory = dictionary if dictionary is not None else {}
         self._e_tag = 0
 
     async def delete(self, keys: List[str]):
@@ -36,27 +35,34 @@ class MemoryStorage(Storage):
             # iterate over the changes
             for (key, change) in changes.items():
                 new_value = change
-                old_value = None
+                old_state = None
+                old_state_etag = None
 
                 # Check if the a matching key already exists in self.memory
                 # If it exists then we want to cache its original value from memory
                 if key in self.memory:
-                    old_value = self.memory[key]
-
-                write_changes = self.__should_write_changes(old_value, new_value)
-
-                if write_changes:
-                    new_store_item = new_value
-                    if new_store_item is not None:
-                        self._e_tag += 1
-                        new_store_item.e_tag = str(self._e_tag)
-                    self.memory[key] = new_store_item
-                else:
-                    raise KeyError("MemoryStorage.write(): `e_tag` conflict or changes do not implement ABC"
-                                   " `StoreItem`.")
+                    old_state = self.memory[key]
+                    if not isinstance(old_state, StoreItem):
+                        if "eTag" in old_state:
+                            old_state_etag = old_state["eTag"]
+                    elif old_state.e_tag:
+                            old_state_etag = old_state.e_tag
+                
+                new_state = new_value
+                
+                # Set ETag if applicable
+                if isinstance(new_value, StoreItem):
+                    if old_state_etag is not None and new_value.e_tag != "*" and new_value.e_tag < old_state_etag:
+                        raise KeyError("Etag conflict.\nOriginal: %s\r\nCurrent: %s" % \
+                                        (new_value.e_tag, old_state_etag) )
+                    new_state.e_tag = str(self._e_tag)
+                    self._e_tag += 1
+                self.memory[key] = new_state
+                
         except Exception as e:
             raise e
 
+    #TODO: Check if needed, if not remove
     def __should_write_changes(self, old_value: StoreItem, new_value: StoreItem) -> bool:
         """
         Helper method that compares two StoreItems and their e_tags and returns True if the new_value should overwrite

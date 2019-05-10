@@ -1,5 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+import aiounittest
 
 from typing import List
 from botbuilder.core import MessageFactory
@@ -35,7 +36,7 @@ def assert_attachments(activity: Activity, count: int, types: List[str] = None):
             assert attachment.content_type == types[idx], f'attachment[{idx}] has invalid content_type'
 
 
-class TestMessageFactory:
+class TestMessageFactory(aiounittest.AsyncTestCase):
 
     suggested_actions = [CardAction(title='a', type=ActionTypes.im_back, value='a'),
                          CardAction(title='b', type=ActionTypes.im_back, value='b'),

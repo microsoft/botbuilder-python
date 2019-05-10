@@ -9,10 +9,11 @@
 # regenerated.
 # --------------------------------------------------------------------------
 
+from .channels import Channels
 from .connector_client import ConnectorClient
 from .version import VERSION
 
-__all__ = ['ConnectorClient']
+__all__ = ["Channels", "ConnectorClient"]
 
 __version__ = VERSION
 

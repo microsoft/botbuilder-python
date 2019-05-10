@@ -3,10 +3,10 @@
 Microsoft Bot Framework Connector for Python
 ==================================
 
-.. image:: https://travis-ci.org/Microsoft/botbuilder-python.svg?branch=master
-   :target:  https://travis-ci.org/Microsoft/botbuilder-python
+.. image:: https://fuselabs.visualstudio.com/SDK_v4/_apis/build/status/Python/SDK_v4-Python-CI?branchName=master
+   :target:  https://fuselabs.visualstudio.com/SDK_v4/_apis/build/status/Python/SDK_v4-Python-CI
    :align: right
-   :alt: Travis status for master branch
+   :alt: Azure DevOps status for master branch
 .. image:: https://badge.fury.io/py/botframework-connector.svg
    :target: https://badge.fury.io/py/botframework-connector
    :alt: Latest PyPI package version

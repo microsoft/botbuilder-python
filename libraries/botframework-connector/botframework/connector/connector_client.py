@@ -9,51 +9,17 @@
 # regenerated.
 # --------------------------------------------------------------------------
 
-from msrest.service_client import ServiceClient as _ServiceClient
-from msrest import Configuration, Serializer, Deserializer
-from msrest.authentication import Authentication
-from .version import VERSION
+from msrest.service_client import SDKClient
+from msrest import Serializer, Deserializer
+
+from ._configuration import ConnectorClientConfiguration
+from msrest.exceptions import HttpOperationError
 from .operations import AttachmentsOperations
 from .operations import ConversationsOperations
 from . import models
-from .async_mixin import AsyncServiceClientMixin
 
 
-class ServiceClient(_ServiceClient, AsyncServiceClientMixin):
-    def __init__(self, creds, config):
-        super(ServiceClient, self).__init__(creds, config)
-        self.config = config
-        self.creds = creds if creds else Authentication()
-        self._headers = {}
-
-
-class ConnectorClientConfiguration(Configuration):
-    """Configuration for ConnectorClient
-    Note that all parameters used to create this instance are saved as instance
-    attributes.
-
-    :param credentials: Subscription credentials which uniquely identify
-     client subscription.
-    :type credentials: None
-    :param str base_url: Service URL
-    """
-
-    def __init__(
-            self, credentials, base_url=None):
-
-        if credentials is None:
-            raise ValueError("Parameter 'credentials' must not be None.")
-        if not base_url:
-            base_url = 'https://api.botframework.com'
-
-        super(ConnectorClientConfiguration, self).__init__(base_url)
-
-        self.add_user_agent('botframework-connector/{}'.format(VERSION))
-
-        self.credentials = credentials
-
-
-class ConnectorClient(object):
+class ConnectorClient(SDKClient):
     """The Bot Connector REST API allows your bot to send and receive messages to channels configured in the
     [Bot Framework Developer Portal](https://dev.botframework.com). The Connector service uses industry-standard REST
     and JSON over HTTPS.
@@ -86,7 +52,7 @@ class ConnectorClient(object):
             self, credentials, base_url=None):
 
         self.config = ConnectorClientConfiguration(credentials, base_url)
-        self._client = ServiceClient(self.config.credentials, self.config)
+        super(ConnectorClient, self).__init__(self.config.credentials, self.config)
 
         client_models = {k: v for k, v in models.__dict__.items() if isinstance(v, type)}
         self.api_version = 'v3'

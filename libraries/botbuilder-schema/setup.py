@@ -1,16 +1,17 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import os
 from setuptools import setup
 
 NAME = "botbuilder-schema"
-VERSION = "4.0.0.a6"
-REQUIRES = ["msrest==0.4.29"]
+VERSION = os.environ["packageVersion"] if "packageVersion" in os.environ else "4.4.0b1"
+REQUIRES = ["msrest>=0.6.6"]
 
 setup(
     name=NAME,
     version=VERSION,
-    description="BotBouilder Schema",
+    description="BotBuilder Schema",
     author="Microsoft",
     url="https://github.com/Microsoft/botbuilder-python",
     keywords=["BotBuilderSchema", "bots","ai", "botframework", "botbuilder"],

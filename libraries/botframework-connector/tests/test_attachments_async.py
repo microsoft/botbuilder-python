@@ -6,10 +6,10 @@ from azure_devtools.scenario_tests import ReplayableTest
 
 import msrest
 from botbuilder.schema import *
-from botframework.connector import ConnectorClient
+from botframework.connector.aio import ConnectorClient
 from botframework.connector.auth import MicrosoftAppCredentials
 
-from .authentication_stub import MicrosoftTokenAuthenticationStub
+from authentication_stub import MicrosoftTokenAuthenticationStub
 
 SERVICE_URL = 'https://slack.botframework.com'
 CHANNEL_ID = 'slack'
@@ -39,6 +39,12 @@ def read_base64(path_to_file):
         encoded_string = base64.b64encode(image_file.read())
         return encoded_string
 
+async def return_sum(attachment_stream):
+    counter = 0
+    async for _ in attachment_stream:
+        counter += len(_)
+    return counter
+
 auth_token = get_auth_token()
 
 class AttachmentsTest(ReplayableTest):
@@ -59,11 +65,11 @@ class AttachmentsTest(ReplayableTest):
 
         connector = ConnectorClient(self.credentials, base_url=SERVICE_URL)
         response = self.loop.run_until_complete(
-            connector.conversations.upload_attachment_async(CONVERSATION_ID, attachment)
+            connector.conversations.upload_attachment(CONVERSATION_ID, attachment)
         )
         attachment_id = response.id
         attachment_info = self.loop.run_until_complete(
-            connector.attachments.get_attachment_info_async(attachment_id)
+            connector.attachments.get_attachment_info(attachment_id)
         )
 
         assert attachment_info is not None
@@ -75,7 +81,7 @@ class AttachmentsTest(ReplayableTest):
         with pytest.raises(ErrorResponseException) as excinfo:
             connector = ConnectorClient(self.credentials, base_url=SERVICE_URL)
             self.loop.run_until_complete(
-                connector.attachments.get_attachment_info_async('bt13796-GJS4yaxDLI')
+                connector.attachments.get_attachment_info('bt13796-GJS4yaxDLI')
             )
 
         assert ('Not Found' in str(excinfo.value))
@@ -90,20 +96,22 @@ class AttachmentsTest(ReplayableTest):
 
         connector = ConnectorClient(self.credentials, base_url=SERVICE_URL)
         response = self.loop.run_until_complete(
-            connector.conversations.upload_attachment_async(CONVERSATION_ID, attachment)
+            connector.conversations.upload_attachment(CONVERSATION_ID, attachment)
         )
         attachment_id = response.id
         attachment_stream = self.loop.run_until_complete(
-            connector.attachments.get_attachment_async(attachment_id, 'original')
+            connector.attachments.get_attachment(attachment_id, 'original')
         )
 
-        assert len(original) == sum(len(_) for _ in attachment_stream)
+
+
+        assert len(original) == self.loop.run_until_complete(return_sum(attachment_stream))
 
     def test_attachments_get_attachment_view_with_invalid_attachment_id_fails(self):
         with pytest.raises(msrest.exceptions.HttpOperationError) as excinfo:
             connector = ConnectorClient(self.credentials, base_url=SERVICE_URL)
             self.loop.run_until_complete(
-                connector.attachments.get_attachment_async('bt13796-GJS4yaxDLI', 'original')
+                connector.attachments.get_attachment('bt13796-GJS4yaxDLI', 'original')
             )
 
         assert ('Not Found' in str(excinfo.value))
@@ -119,11 +127,11 @@ class AttachmentsTest(ReplayableTest):
         with pytest.raises(msrest.exceptions.HttpOperationError) as excinfo:
             connector = ConnectorClient(self.credentials, base_url=SERVICE_URL)
             response = self.loop.run_until_complete(
-                connector.conversations.upload_attachment_async(CONVERSATION_ID, attachment)
+                connector.conversations.upload_attachment(CONVERSATION_ID, attachment)
             )
             attachment_id = response.id
             attachment_view = self.loop.run_until_complete(
-                connector.attachments.get_attachment_async(attachment_id, 'invalid')
+                connector.attachments.get_attachment(attachment_id, 'invalid')
             )
 
         assert ('not found' in str(excinfo.value))

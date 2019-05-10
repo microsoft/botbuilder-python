@@ -4,8 +4,13 @@
 import asyncio
 from copy import copy
 from uuid import uuid4
-from typing import List, Callable, Union
-from botbuilder.schema import Activity, ConversationReference, ResourceResponse
+from typing import List, Callable, Union, Dict
+from botbuilder.schema import (
+                            Activity, 
+                            ConversationReference, 
+                            ResourceResponse
+                            )
+from .assertions import BotAssert
 
 
 class TurnContext(object):
@@ -25,12 +30,20 @@ class TurnContext(object):
             self._on_send_activities: Callable[[]] = []
             self._on_update_activity: Callable[[]] = []
             self._on_delete_activity: Callable[[]] = []
-            self._responded = {'responded': False}
+            self._responded : bool = False
 
         if self.adapter is None:
             raise TypeError('TurnContext must be instantiated with an adapter.')
         if self.activity is None:
             raise TypeError('TurnContext must be instantiated with a request parameter of type Activity.')
+        
+        self._turn_state = {}
+
+    
+    @property
+    def turn_state(self) -> Dict[str, object]:
+        return self._turn_state
+
 
     def copy_to(self, context: 'TurnContext') -> None:
         """
@@ -64,19 +77,19 @@ class TurnContext(object):
             self._activity = value
 
     @property
-    def responded(self):
+    def responded(self) -> bool:
         """
         If `true` at least one response has been sent for the current turn of conversation.
         :return:
         """
-        return self._responded['responded']
+        return self._responded
 
     @responded.setter
-    def responded(self, value):
-        if not value:
+    def responded(self, value: bool):
+        if value == False:
             raise ValueError('TurnContext: cannot set TurnContext.responded to False.')
         else:
-            self._responded['responded'] = True
+            self._responded = True
 
     @property
     def services(self):
@@ -123,6 +136,7 @@ class TurnContext(object):
         :return:
         """
         reference = TurnContext.get_conversation_reference(self.activity)
+
         output = [TurnContext.apply_conversation_reference(
             Activity(text=a, type='message') if isinstance(a, str) else a, reference)
             for a in activity_or_text]

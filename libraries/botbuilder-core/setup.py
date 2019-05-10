@@ -4,9 +4,10 @@
 import os
 from setuptools import setup
 
+VERSION = os.environ["packageVersion"] if "packageVersion" in os.environ else "4.4.0b1"
 REQUIRES = [
-    'botbuilder-schema>=4.0.0.a6',
-    'botframework-connector>=4.0.0.a6']
+    'botbuilder-schema>=4.4.0b1',
+    'botframework-connector>=4.4.0b1']
 
 root = os.path.abspath(os.path.dirname(__file__))
 
@@ -24,7 +25,7 @@ setup(
     keywords=['BotBuilderCore', 'bots', 'ai', 'botframework', 'botbuilder'],
     long_description=package_info['__summary__'],
     license=package_info['__license__'],
-    packages=['botbuilder.core'],
+    packages=['botbuilder.core', 'botbuilder.core.adapters'],
     install_requires=REQUIRES,
     classifiers=[
         'Programming Language :: Python :: 3.6',
