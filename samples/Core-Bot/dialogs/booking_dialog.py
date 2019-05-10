@@ -7,7 +7,7 @@ from botbuilder.core import MessageFactory
 from .cancel_and_help_dialog import CancelAndHelpDialog
 from .date_resolver_dialog import DateResolverDialog
 
-from datatypes_timex_expression.timex import Timex
+from datatypes_date_time.timex import Timex
 
 class BookingDialog(CancelAndHelpDialog):
 
