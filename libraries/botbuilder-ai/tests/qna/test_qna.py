@@ -5,11 +5,11 @@ import json
 import aiounittest, unittest, requests
 from os import path
 from requests.models import Response
-from typing import List, Tuple
+from typing import List, Tuple, Dict, Union
 from uuid import uuid4
 from unittest.mock import Mock, patch, MagicMock
 from asyncio import Future
-from aiohttp import ClientSession, ClientTimeout
+from aiohttp import ClientSession, ClientTimeout, ClientResponse
 
 from botbuilder.ai.qna import Metadata, QnAMakerEndpoint, QnAMaker, QnAMakerOptions, QnATelemetryConstants, QueryResult
 from botbuilder.core import BotAdapter, BotTelemetryClient, NullTelemetryClient, TurnContext
@@ -35,7 +35,6 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
     _host: str = 'https://dummyqnahost.azurewebsites.net/qnamaker'
 
     tests_endpoint = QnAMakerEndpoint(_knowledge_base_id, _endpoint_key, _host)
-
 
     def test_qnamaker_construction(self):
         # Arrange
@@ -161,19 +160,12 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
             response_path
         )
 
-        first_answer = result['answers'][0]
-
-        # If question yields no questions in KB
-        # QnAMaker v4.0 API returns 'answer': 'No good match found in KB.' and questions: []
-        no_ans_found_in_kb = False
-        if len(result['answers']) and first_answer['score'] == 0:
-            no_ans_found_in_kb = True
+        first_answer = result[0]
         
         #Assert
         self.assertIsNotNone(result)
-        self.assertEqual(1, len(result['answers']))
-        self.assertTrue(question in first_answer['questions'] or no_ans_found_in_kb)
-        self.assertEqual('BaseCamp: You can use a damp rag to clean around the Power Pack', first_answer['answer'])
+        self.assertEqual(1, len(result))
+        self.assertEqual('BaseCamp: You can use a damp rag to clean around the Power Pack', first_answer.answer[0])
 
     async def test_returns_answer_using_options(self):
         # Arrange
@@ -195,19 +187,19 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
             options=options
         )
 
-        first_answer = result['answers'][0]
+        first_answer = result[0]
         has_at_least_1_ans = True
-        first_metadata = first_answer['metadata'][0]
+        first_metadata = first_answer.metadata[0][0]
 
         # Assert
         self.assertIsNotNone(result)
-        self.assertEqual(has_at_least_1_ans,  len(result) >= 1 and len(result) <= options.top)
-        self.assertTrue(question in first_answer['questions'])
-        self.assertTrue(first_answer['answer'])
-        self.assertEqual('is a movie', first_answer['answer'])
-        self.assertTrue(first_answer['score'] >= options.score_threshold)
-        self.assertEqual('movie', first_metadata['name'])
-        self.assertEqual('disney', first_metadata['value'])
+        # self.assertEqual(has_at_least_1_ans,  len(result) >= 1 and len(result) <= options.top)
+        self.assertEqual(has_at_least_1_ans,  len(result) >= 1)
+        self.assertTrue(first_answer.answer[0])
+        self.assertEqual('is a movie', first_answer.answer[0])
+        self.assertTrue(first_answer.score[0] >= options.score_threshold)
+        self.assertEqual('movie', first_metadata.name)
+        self.assertEqual('disney', first_metadata.value)
     
     async def test_trace_test(self):
         activity = Activity(
@@ -222,51 +214,340 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         qna = QnAMaker(QnaApplicationTest.tests_endpoint)
 
         context = TestContext(activity)
-        response = Mock(spec=Response)
-        response.status_code = 200
-        response.headers = {}
-        response.reason = ''
 
-        with patch('aiohttp.ClientSession.post', return_value=response):
-            with patch('botbuilder.ai.qna.QnAMaker._query_qna_service', return_value=aiounittest.futurized(response_json)):
-                result = await qna.get_answers(context)
-                
-                qna_trace_activities = list(filter(lambda act: act.type == 'trace' and act.name == 'QnAMaker', context.sent))
-                trace_activity = qna_trace_activities[0]
+        with patch('aiohttp.ClientSession.post', return_value=aiounittest.futurized(response_json)):
+            result = await qna.get_answers(context)
+            
+            qna_trace_activities = list(filter(lambda act: act.type == 'trace' and act.name == 'QnAMaker', context.sent))
+            trace_activity = qna_trace_activities[0]
 
-                self.assertEqual('trace', trace_activity.type)
-                self.assertEqual('QnAMaker', trace_activity.name)
-                self.assertEqual('QnAMaker Trace', trace_activity.label)
-                self.assertEqual('https://www.qnamaker.ai/schemas/trace', trace_activity.value_type)
-                self.assertEqual(True, hasattr(trace_activity, 'value'))
-                self.assertEqual(True, hasattr(trace_activity.value, 'message'))
-                self.assertEqual(True, hasattr(trace_activity.value, 'query_results'))
-                self.assertEqual(True, hasattr(trace_activity.value, 'score_threshold'))
-                self.assertEqual(True, hasattr(trace_activity.value, 'top'))
-                self.assertEqual(True, hasattr(trace_activity.value, 'strict_filters'))
-                self.assertEqual(self._knowledge_base_id, trace_activity.value.knowledge_base_id[0])
+            self.assertEqual('trace', trace_activity.type)
+            self.assertEqual('QnAMaker', trace_activity.name)
+            self.assertEqual('QnAMaker Trace', trace_activity.label)
+            self.assertEqual('https://www.qnamaker.ai/schemas/trace', trace_activity.value_type)
+            self.assertEqual(True, hasattr(trace_activity, 'value'))
+            self.assertEqual(True, hasattr(trace_activity.value, 'message'))
+            self.assertEqual(True, hasattr(trace_activity.value, 'query_results'))
+            self.assertEqual(True, hasattr(trace_activity.value, 'score_threshold'))
+            self.assertEqual(True, hasattr(trace_activity.value, 'top'))
+            self.assertEqual(True, hasattr(trace_activity.value, 'strict_filters'))
+            self.assertEqual(self._knowledge_base_id, trace_activity.value.knowledge_base_id[0])
 
-                return result
+            return result
 
     async def test_returns_answer_with_timeout(self):
         question: str = 'how do I clean the stove?'
         options = QnAMakerOptions(timeout=999999)
         qna = QnAMaker(QnaApplicationTest.tests_endpoint, options)
         context = QnaApplicationTest._get_context(question, TestAdapter())
-        response = Mock(spec=Response)
-        response.status_code = 200
-        response.headers = {}
-        response.reason = ''
         response_json = QnaApplicationTest._get_json_for_file('ReturnsAnswer.json')
 
-        with patch('aiohttp.ClientSession.post', return_value=response):
-            with patch('botbuilder.ai.qna.QnAMaker._query_qna_service', return_value=aiounittest.futurized(response_json)):
-                result = await qna.get_answers(context, options)
-                
-                self.assertIsNotNone(result)
-                self.assertEqual(options.timeout, qna._options.timeout)
+        with patch('aiohttp.ClientSession.post', return_value=aiounittest.futurized(response_json)):
+            result = await qna.get_answers(context, options)
+            
+            self.assertIsNotNone(result)
+            self.assertEqual(options.timeout, qna._options.timeout)
 
+    async def test_telemetry_returns_answer(self):
+        # Arrange
+        question: str = 'how do I clean the stove?'
+        response_json = QnaApplicationTest._get_json_for_file('ReturnsAnswer.json')
+        telemetry_client = unittest.mock.create_autospec(BotTelemetryClient)
+        log_personal_information = True
+        context = QnaApplicationTest._get_context(question, TestAdapter())
+        qna = QnAMaker(
+            QnaApplicationTest.tests_endpoint, 
+            telemetry_client=telemetry_client, 
+            log_personal_information=log_personal_information
+        )
 
+        # Act
+        with patch('aiohttp.ClientSession.post', return_value = aiounittest.futurized(response_json)):
+            results = await qna.get_answers(context)
+
+            telemetry_args = telemetry_client.track_event.call_args_list[0][1]
+            telemetry_properties = telemetry_args['properties']
+            telemetry_metrics = telemetry_args['measurements']
+            number_of_args = len(telemetry_args)
+            first_answer = telemetry_args['properties'][QnATelemetryConstants.answer_property][0]
+            expected_answer = 'BaseCamp: You can use a damp rag to clean around the Power Pack'
+
+            # Assert - Check Telemetry logged.
+            self.assertEqual(1, telemetry_client.track_event.call_count)
+            self.assertEqual(3, number_of_args)
+            self.assertEqual('QnaMessage', telemetry_args['name'])
+            self.assertTrue('answer' in telemetry_properties)
+            self.assertTrue('knowledgeBaseId' in telemetry_properties)
+            self.assertTrue('matchedQuestion' in telemetry_properties)
+            self.assertTrue('question' in telemetry_properties)
+            self.assertTrue('questionId' in telemetry_properties)
+            self.assertTrue('articleFound' in telemetry_properties)
+            self.assertEqual(expected_answer, first_answer)
+            self.assertTrue('score' in telemetry_metrics)
+            self.assertEqual(1, telemetry_metrics['score'][0])
+
+            # Assert - Validate we didn't break QnA functionality.
+            self.assertIsNotNone(results)
+            self.assertEqual(1, len(results))
+            self.assertEqual(expected_answer, results[0].answer[0])
+            self.assertEqual('Editorial', results[0].source)
+    
+    async def test_telemetry_pii(self):
+        # Arrange
+        question: str = 'how do I clean the stove?'
+        response_json = QnaApplicationTest._get_json_for_file('ReturnsAnswer.json')
+        telemetry_client = unittest.mock.create_autospec(BotTelemetryClient)
+        log_personal_information = False
+        context = QnaApplicationTest._get_context(question, TestAdapter())
+        qna = QnAMaker(
+            QnaApplicationTest.tests_endpoint, 
+            telemetry_client=telemetry_client, 
+            log_personal_information=log_personal_information
+        )
+
+        # Act
+        with patch('aiohttp.ClientSession.post', return_value = aiounittest.futurized(response_json)):
+            results = await qna.get_answers(context)
+
+            telemetry_args = telemetry_client.track_event.call_args_list[0][1]
+            telemetry_properties = telemetry_args['properties']
+            telemetry_metrics = telemetry_args['measurements']
+            number_of_args = len(telemetry_args)
+            first_answer = telemetry_args['properties'][QnATelemetryConstants.answer_property][0]
+            expected_answer = 'BaseCamp: You can use a damp rag to clean around the Power Pack'
+
+            # Assert - Validate PII properties not logged.
+            self.assertEqual(1, telemetry_client.track_event.call_count)
+            self.assertEqual(3, number_of_args)
+            self.assertEqual('QnaMessage', telemetry_args['name'])
+            self.assertTrue('answer' in telemetry_properties)
+            self.assertTrue('knowledgeBaseId' in telemetry_properties)
+            self.assertTrue('matchedQuestion' in telemetry_properties)
+            self.assertTrue('question' not in telemetry_properties)
+            self.assertTrue('questionId' in telemetry_properties)
+            self.assertTrue('articleFound' in telemetry_properties)
+            self.assertEqual(expected_answer, first_answer)
+            self.assertTrue('score' in telemetry_metrics)
+            self.assertEqual(1, telemetry_metrics['score'][0])
+
+            # Assert - Validate we didn't break QnA functionality.
+            self.assertIsNotNone(results)
+            self.assertEqual(1, len(results))
+            self.assertEqual(expected_answer, results[0].answer[0])
+            self.assertEqual('Editorial', results[0].source)
+    
+    async def test_telemetry_override(self):
+        # Arrange
+        question: str = 'how do I clean the stove?'
+        response_json = QnaApplicationTest._get_json_for_file('ReturnsAnswer.json')
+        context = QnaApplicationTest._get_context(question, TestAdapter())
+        options = QnAMakerOptions(top=1)
+        telemetry_client = unittest.mock.create_autospec(BotTelemetryClient)
+        log_personal_information = False
+
+        # Act - Override the QnAMaker object to log custom stuff and honor params passed in.
+        telemetry_properties: Dict[str, str] = { 'id': 'MyId' }
+        qna = QnaApplicationTest.OverrideTelemetry(
+            QnaApplicationTest.tests_endpoint,
+            options,
+            None,
+            telemetry_client,
+            log_personal_information
+        )
+        with patch('aiohttp.ClientSession.post', return_value = aiounittest.futurized(response_json)):
+            results = await qna.get_answers(context, options, telemetry_properties)
+
+            telemetry_args = telemetry_client.track_event.call_args_list
+            first_call_args = telemetry_args[0][0]
+            first_call_properties = first_call_args[1]
+            second_call_args = telemetry_args[1][0]
+            second_call_properties = second_call_args[1]
+            expected_answer = 'BaseCamp: You can use a damp rag to clean around the Power Pack'
+
+            # Assert
+            self.assertEqual(2, telemetry_client.track_event.call_count)
+            self.assertEqual(2, len(first_call_args))
+            self.assertEqual('QnaMessage', first_call_args[0])
+            self.assertEqual(2, len(first_call_properties))
+            self.assertTrue('my_important_property' in first_call_properties)
+            self.assertEqual('my_important_value', first_call_properties['my_important_property'])
+            self.assertTrue('id' in first_call_properties)
+            self.assertEqual('MyId', first_call_properties['id'])
+
+            self.assertEqual('my_second_event', second_call_args[0])
+            self.assertTrue('my_important_property2' in second_call_properties)
+            self.assertEqual('my_important_value2', second_call_properties['my_important_property2'])
+
+            # Validate we didn't break QnA functionality.
+            self.assertIsNotNone(results)
+            self.assertEqual(1, len(results))
+            self.assertEqual(expected_answer, results[0].answer[0])
+            self.assertEqual('Editorial', results[0].source)
+    
+    async def test_telemetry_additional_props_metrics(self):
+        # Arrange
+        question: str = 'how do I clean the stove?'
+        response_json = QnaApplicationTest._get_json_for_file('ReturnsAnswer.json')
+        context = QnaApplicationTest._get_context(question, TestAdapter())
+        options = QnAMakerOptions(top=1)
+        telemetry_client = unittest.mock.create_autospec(BotTelemetryClient)
+        log_personal_information = False
+
+        # Act
+        with patch('aiohttp.ClientSession.post', return_value = aiounittest.futurized(response_json)):
+            qna = QnAMaker(QnaApplicationTest.tests_endpoint, options, None, telemetry_client, log_personal_information)
+            telemetry_properties: Dict[str, str] = { 'my_important_property': 'my_important_value' }
+            telemetry_metrics: Dict[str, float] = { 'my_important_metric': 3.14159 }
+
+            results = await qna.get_answers(context, None, telemetry_properties, telemetry_metrics)
+
+            # Assert - Added properties were added.
+            telemetry_args = telemetry_client.track_event.call_args_list[0][1]
+            telemetry_properties = telemetry_args['properties']
+            expected_answer = 'BaseCamp: You can use a damp rag to clean around the Power Pack'
+
+            self.assertEqual(1, telemetry_client.track_event.call_count)
+            self.assertEqual(3, len(telemetry_args))
+            self.assertEqual('QnaMessage', telemetry_args['name'])
+            self.assertTrue('knowledgeBaseId' in telemetry_properties)
+            self.assertTrue('question' not in telemetry_properties)
+            self.assertTrue('matchedQuestion' in telemetry_properties)
+            self.assertTrue('questionId' in telemetry_properties)
+            self.assertTrue('answer' in telemetry_properties)
+            self.assertTrue(expected_answer, telemetry_properties['answer'][0])
+            self.assertTrue('my_important_property' in telemetry_properties)
+            self.assertEqual('my_important_value', telemetry_properties['my_important_property'])
+
+            tracked_metrics = telemetry_args['measurements']
+
+            self.assertEqual(2, len(tracked_metrics))
+            self.assertTrue('score' in tracked_metrics)
+            self.assertTrue('my_important_metric' in tracked_metrics)
+            self.assertEqual(3.14159, tracked_metrics['my_important_metric'])
+
+            # Assert - Validate we didn't break QnA functionality.
+            self.assertIsNotNone(results)
+            self.assertEqual(1, len(results))
+            self.assertEqual(expected_answer, results[0].answer[0])
+            self.assertEqual('Editorial', results[0].source)
+        
+    async def test_telemetry_additional_props_override(self):
+        question: str = 'how do I clean the stove?'
+        response_json = QnaApplicationTest._get_json_for_file('ReturnsAnswer.json')
+        context = QnaApplicationTest._get_context(question, TestAdapter())
+        options = QnAMakerOptions(top=1)
+        telemetry_client = unittest.mock.create_autospec(BotTelemetryClient)
+        log_personal_information = False
+
+        # Act - Pass in properties during QnA invocation that override default properties
+        # NOTE: We are invoking this with PII turned OFF, and passing a PII property (originalQuestion).
+        qna = QnAMaker(QnaApplicationTest.tests_endpoint, options, None, telemetry_client, log_personal_information)
+        telemetry_properties = {
+            'knowledge_base_id': 'my_important_value',
+            'original_question': 'my_important_value2'
+        }
+        telemetry_metrics = {
+            'score': 3.14159
+        }
+
+        with patch('aiohttp.ClientSession.post', return_value = aiounittest.futurized(response_json)):
+            results = await qna.get_answers(context, None, telemetry_properties, telemetry_metrics)
+
+            # Assert - Added properties were added.
+            tracked_args = telemetry_client.track_event.call_args_list[0][1]
+            tracked_properties = tracked_args['properties']
+            expected_answer = 'BaseCamp: You can use a damp rag to clean around the Power Pack'
+            tracked_metrics = tracked_args['measurements']
+
+            self.assertEqual(1, telemetry_client.track_event.call_count)
+            self.assertEqual(3, len(tracked_args))
+            self.assertEqual('QnaMessage', tracked_args['name'])
+            self.assertTrue('knowledge_base_id' in tracked_properties)
+            self.assertEqual('my_important_value', tracked_properties['knowledge_base_id'])
+            self.assertTrue('original_question' in tracked_properties)
+            self.assertTrue('matchedQuestion' in tracked_properties)
+            self.assertEqual('my_important_value2', tracked_properties['original_question'])
+            self.assertTrue('question' not in tracked_properties)
+            self.assertTrue('questionId' in tracked_properties)
+            self.assertTrue('answer' in tracked_properties)
+            self.assertEqual(expected_answer, tracked_properties['answer'][0])
+            self.assertTrue('my_important_property' not in tracked_properties)
+            self.assertEqual(1, len(tracked_metrics))
+            self.assertTrue('score' in tracked_metrics)
+            self.assertEqual(3.14159, tracked_metrics['score'])
+
+            # Assert - Validate we didn't break QnA functionality.
+            self.assertIsNotNone(results)
+            self.assertEqual(1, len(results))
+            self.assertEqual(expected_answer, results[0].answer[0])
+            self.assertEqual('Editorial', results[0].source)
+
+    async def test_telemetry_fill_props_override(self):
+        # Arrange
+        question: str = 'how do I clean the stove?'
+        response_json = QnaApplicationTest._get_json_for_file('ReturnsAnswer.json')
+        context: TurnContext = QnaApplicationTest._get_context(question, TestAdapter())
+        options = QnAMakerOptions(top=1)
+        telemetry_client = unittest.mock.create_autospec(BotTelemetryClient)
+        log_personal_information = False
+
+        # Act - Pass in properties during QnA invocation that override default properties
+        #       In addition Override with derivation.  This presents an interesting question of order of setting properties.
+        #       If I want to override "originalQuestion" property:
+        #           - Set in "Stock" schema
+        #           - Set in derived QnAMaker class
+        #           - Set in GetAnswersAsync
+        #       Logically, the GetAnswersAync should win.  But ultimately OnQnaResultsAsync decides since it is the last
+        #       code to touch the properties before logging (since it actually logs the event).
+        qna = QnaApplicationTest.OverrideFillTelemetry(
+            QnaApplicationTest.tests_endpoint, 
+            options, 
+            None, 
+            telemetry_client, 
+            log_personal_information
+        )
+        telemetry_properties: Dict[str, str] = {
+            'knowledgeBaseId': 'my_important_value',
+            'matchedQuestion': 'my_important_value2'
+        }
+        telemetry_metrics: Dict[str, float] = {
+            'score': 3.14159
+        }
+
+        with patch('aiohttp.ClientSession.post', return_value = aiounittest.futurized(response_json)):
+            results = await qna.get_answers(context, None, telemetry_properties, telemetry_metrics)
+
+            # Assert - Added properties were added.
+            first_call_args = telemetry_client.track_event.call_args_list[0][0]
+            first_properties = first_call_args[1]
+            expected_answer = 'BaseCamp: You can use a damp rag to clean around the Power Pack'
+            first_metrics = first_call_args[2]
+
+            self.assertEqual(2, telemetry_client.track_event.call_count)
+            self.assertEqual(3, len(first_call_args))
+            self.assertEqual('QnaMessage', first_call_args[0])
+            self.assertEqual(6, len(first_properties))
+            self.assertTrue('knowledgeBaseId' in first_properties)
+            self.assertEqual('my_important_value', first_properties['knowledgeBaseId'])
+            self.assertTrue('matchedQuestion' in first_properties)
+            self.assertEqual('my_important_value2', first_properties['matchedQuestion'])
+            self.assertTrue('questionId' in first_properties)
+            self.assertTrue('answer' in first_properties)
+            self.assertEqual(expected_answer, first_properties['answer'][0])
+            self.assertTrue('articleFound' in first_properties)
+            self.assertTrue('my_important_property' in first_properties)
+            self.assertEqual('my_important_value', first_properties['my_important_property'])
+
+            self.assertEqual(1, len(first_metrics))
+            self.assertTrue('score' in first_metrics)
+            self.assertEqual(3.14159, first_metrics['score'])
+
+            # Assert - Validate we didn't break QnA functionality.
+            self.assertIsNotNone(results)
+            self.assertEqual(1, len(results))
+            self.assertEqual(expected_answer, results[0].answer[0])
+            self.assertEqual('Editorial', results[0].source)
+        
 
     @classmethod
     async def _get_service_result(
@@ -281,16 +562,11 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         qna = QnAMaker(QnaApplicationTest.tests_endpoint)
         context = QnaApplicationTest._get_context(utterance, bot_adapter)
 
-        response = aiounittest.futurized(Mock(return_value=Response))
-        response.status_code = 200
-        response.headers = {}
-        response.reason = ''
+        with patch('aiohttp.ClientSession.post', return_value = aiounittest.futurized(response_json)):
+            result = await qna.get_answers(context, options)
 
-        with patch('aiohttp.ClientSession.post', return_value=response):
-            with patch('botbuilder.ai.qna.QnAMaker._query_qna_service', return_value=aiounittest.futurized(response_json)):
-                result = await qna.get_answers(context, options)
-
-                return result
+            return result
+        
 
     @classmethod
     def _get_json_for_file(cls, response_file: str) -> object:
@@ -304,11 +580,11 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         return response_json
 
     @staticmethod
-    def _get_context(utterance: str, bot_adapter: BotAdapter) -> TurnContext:
+    def _get_context(question: str, bot_adapter: BotAdapter) -> TurnContext:
         test_adapter = bot_adapter or TestAdapter()
         activity = Activity(
             type = ActivityTypes.message,
-            text = utterance,
+            text = question,
             conversation = ConversationAccount(),
             recipient = ChannelAccount(),
             from_property = ChannelAccount(),
@@ -316,3 +592,86 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
 
         return TurnContext(test_adapter, activity)
 
+    class OverrideTelemetry(QnAMaker):
+        def __init__(
+            self, 
+            endpoint: QnAMakerEndpoint,
+            options: QnAMakerOptions,
+            http_client: ClientSession,
+            telemetry_client: BotTelemetryClient,
+            log_personal_information: bool
+        ):
+            super().__init__(
+                endpoint, 
+                options, 
+                http_client, 
+                telemetry_client, 
+                log_personal_information
+            )
+        
+        async def on_qna_result(
+            self,
+            query_results: [QueryResult],
+            context: TurnContext,
+            telemetry_properties: Dict[str, str] = None,
+            telemetry_metrics: Dict[str, float] = None
+        ):
+            properties = telemetry_properties or {}
+
+            # get_answers overrides derived class
+            properties['my_important_property'] = 'my_important_value'
+
+            # Log event
+            self.telemetry_client.track_event(QnATelemetryConstants.qna_message_event, properties)
+
+            # Create 2nd event.
+            second_event_properties = {
+                'my_important_property2': 'my_important_value2'
+            }
+            self.telemetry_client.track_event('my_second_event', second_event_properties)
+
+    class OverrideFillTelemetry(QnAMaker):
+        def __init__(
+            self,
+            endpoint: QnAMakerEndpoint,
+            options: QnAMakerOptions,
+            http_client: ClientSession,
+            telemetry_client: BotTelemetryClient,
+            log_personal_information: bool
+        ):
+            super().__init__(
+                endpoint,
+                options,
+                http_client,
+                telemetry_client,
+                log_personal_information
+            )
+        
+        async def on_qna_result(
+            self,
+            query_results: [QueryResult],
+            context: TurnContext,
+            telemetry_properties: Dict[str, str] = None,
+            telemetry_metrics: Dict[str, float] = None
+        ):
+            event_data = await self.fill_qna_event(query_results, context, telemetry_properties, telemetry_metrics)
+
+            # Add my property.
+            event_data.properties.update({ 'my_important_property': 'my_important_value' })
+
+            # Log QnaMessage event.
+            self.telemetry_client.track_event(
+                QnATelemetryConstants.qna_message_event,
+                event_data.properties,
+                event_data.metrics
+            )
+
+            # Create second event.
+            second_event_properties: Dict[str, str] = {
+                'my_important_property2': 'my_important_value2'
+            }
+            
+            self.telemetry_client.track_event(
+                'MySecondEvent',
+                second_event_properties
+            )

@@ -5,7 +5,7 @@ from .metadata import Metadata
 
 class QueryResult:
     def __init__(self, 
-    questions: str, 
+    questions: [str], 
     answer: str, 
     score: float, 
     metadata: [Metadata], 
@@ -16,7 +16,7 @@ class QueryResult:
         self.questions = questions,
         self.answer = answer,
         self.score = score,
-        self.metadata = Metadata,
+        self.metadata = list(map(lambda meta: Metadata(**meta), metadata)),
         self.source = source
         self.id = id
 
