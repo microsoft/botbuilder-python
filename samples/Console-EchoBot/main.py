@@ -6,35 +6,11 @@ from botbuilder.core import TurnContext, ConversationState, UserState, MemorySto
 from botbuilder.schema import ActivityTypes
 
 from adapter import ConsoleAdapter
+from bot import EchoBot
 
 # Create adapter
 adapter = ConsoleAdapter()
-
-# Create MemoryStorage, UserState and ConversationState
-memory = MemoryStorage()
-# Commented out user_state because it's not being used.
-# user_state = UserState(memory)
-conversation_state = ConversationState(memory)
-
-# Register both State middleware on the adapter.
-# Commented out user_state because it's not being used.
-# adapter.use(user_state)
-adapter.use(conversation_state)
-
-
-async def logic(context: TurnContext):
-    if context.activity.type == ActivityTypes.message:
-        state = await conversation_state.get(context)
-
-        # If our conversation_state already has the 'count' attribute, increment state.count by 1
-        # Otherwise, initialize state.count with a value of 1
-        if hasattr(state, 'count'):
-            state.count += 1
-        else:
-            state.count = 1
-        await context.send_activity(f'{state.count}: You said "{context.activity.text}"')
-    else:
-        await context.send_activity(f'[{context.activity.type} event detected]')
+bot = EchoBot()
 
 loop = asyncio.get_event_loop()
 
@@ -43,7 +19,7 @@ if __name__ == "__main__":
         # Greet user
         print("Hi... I'm an echobot. Whatever you say I'll echo back.")
 
-        loop.run_until_complete(adapter.process_activity(logic))
+        loop.run_until_complete(adapter.process_activity(bot.on_turn))
     except KeyboardInterrupt:
         pass
     finally:

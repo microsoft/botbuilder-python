@@ -1,2 +1,4 @@
-git+https://github.com/Azure/msrest-for-python.git@a997e97cd926c1eedfe4e5a3a52a637313fbd4e4
-botbuilder-core>=4.0.0.a6
+asyncio>=3.4.3
+botbuilder-core>=4.4.0.b1
+botbuilder-schema>=4.4.0.b1
+botframework-connector>=4.4.0.b1

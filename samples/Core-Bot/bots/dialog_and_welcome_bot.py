@@ -1,4 +1,8 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 import json
+import os.path
 
 from typing import List
 from botbuilder.core import CardFactory
@@ -26,12 +30,14 @@ class DialogAndWelcomeBot(DialogBot):
     # Create an attachment message response.
     def create_response(self, activity: Activity, attachment: Attachment):
         response = create_activity_reply(activity)
-        response.Attachments = [attachment]
+        response.attachments = [attachment]
         return response
 
     # Load attachment from file.
     def create_adaptive_card_attachment(self):
-        with open('resources/welcomeCard.json') as f:
+        relative_path = os.path.abspath(os.path.dirname(__file__))
+        path = os.path.join(relative_path, "resources/welcomeCard.json")
+        with open(path) as f:
             card = json.load(f)
 
         return Attachment(

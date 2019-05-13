@@ -5,7 +5,8 @@
 This sample shows how to create a simple EchoBot with state.
 """
 
-
+import yaml
+import os
 from aiohttp import web
 from botbuilder.schema import (Activity, ActivityTypes)
 from botbuilder.core import (BotFrameworkAdapter, BotFrameworkAdapterSettings, TurnContext,
@@ -15,9 +16,14 @@ from dialogs import MainDialog
 from bots import DialogAndWelcomeBot
 from helpers.dialog_helper import DialogHelper
 
+relative_path = os.path.abspath(os.path.dirname(__file__))
+path = os.path.join(relative_path, "config.yaml")
+with open(path, 'r') as ymlfile:
+    cfg = yaml.safe_load(ymlfile)
+
 APP_ID = ''
 APP_PASSWORD = ''
-PORT = 9000
+PORT = cfg['Settings']['Port']
 SETTINGS = BotFrameworkAdapterSettings(APP_ID, APP_PASSWORD)
 ADAPTER = BotFrameworkAdapter(SETTINGS)
 
@@ -27,15 +33,19 @@ memory = MemoryStorage()
 user_state = UserState(memory)
 conversation_state = ConversationState(memory)
 
-dialog = MainDialog({})
+dialog = MainDialog(cfg['Settings'])
 bot = DialogAndWelcomeBot(conversation_state, user_state, dialog)
 
 async def messages(req: web.Request) -> web.Response:
     body = await req.json()
     activity = Activity().deserialize(body)
     auth_header = req.headers['Authorization'] if 'Authorization' in req.headers else ''
+    async def aux_func(turn_context):
+        await bot.on_turn(turn_context)
+
     try:
-        return await ADAPTER.process_activity(activity, auth_header, lambda turn_context: await bot.on_turn(turn_context))
+        await ADAPTER.process_activity(activity, auth_header, aux_func)
+        return web.Response(status=200)
     except Exception as e:
         raise e
 

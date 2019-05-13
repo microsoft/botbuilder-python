@@ -1,0 +1,5 @@
+Settings:
+  Port: 3978
+  LuisAppId: ""
+  LuisAPIKey: ""
+  LuisAPIHostName: ""
