@@ -9,8 +9,8 @@ git clone https://github.com/Microsoft/botbuilder-python.git
 
 ### Visual studio code
 - Activate your desired virtual environment
-- Open `botbuilder-python\samples\EchoBot-with-State` folder
-- Bring up a terminal, navigate to `botbuilder-python\samples\EchoBot-with-State` folder
+- Open `botbuilder-python\samples\State-Management-Bot` folder
+- Bring up a terminal, navigate to `botbuilder-python\samples\State-Management-Bot` folder
 - In the terminal, type `pip install -r requirements.txt`
 - In the terminal, type `python main.py`
 
@@ -19,14 +19,9 @@ git clone https://github.com/Microsoft/botbuilder-python.git
 
 - Install the Bot Framework emulator from [here](https://github.com/Microsoft/BotFramework-Emulator/releases)
 
-### Connect to bot using Bot Framework Emulator **V4**
+### Connect to bot using Bot Framework Emulator
 - Launch Bot Framework Emulator
-- File -> Open bot and navigate to samples\EchoBot-with-State folder
-- Select EchoBot-with-State.bot file
-
-### Connect to bot using Bot Framework Emulator **V3**
-- Launch Bot Framework Emulator
-- Paste this URL in the emulator window - http://localhost:9000
+- Paste this URL in the emulator window - http://localhost:3978/api/messages
 
 
 ## Bot State

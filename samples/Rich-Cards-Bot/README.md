@@ -26,14 +26,9 @@ git clone https://github.com/Microsoft/botbuilder-python.git
 
 - Install the Bot Framework emulator from [here](https://github.com/Microsoft/BotFramework-Emulator/releases)
 
-### Connect to bot using Bot Framework Emulator **V4**
+### Connect to bot using Bot Framework Emulator
 - Launch Bot Framework Emulator
-- File -> Open bot and navigate to samples\Rich-Cards-Bot folder
-- Select Rich-Cards-Bot.bot file
-
-### Connect to bot using Bot Framework Emulator **V3**
-- Launch Bot Framework Emulator
-- Paste this URL in the emulator window - http://localhost:9000/api/messages
+- Paste this URL in the emulator window - http://localhost:3978/api/messages
 
 # Adding media to messages
 A message exchange between user and bot can contain media attachments, such as cards, images, video, audio, and files.
