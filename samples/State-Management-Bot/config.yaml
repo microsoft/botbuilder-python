@@ -1,2 +1,4 @@
 Settings:
   Port: 3978
+  AppId: ""
+  AppPassword: ""

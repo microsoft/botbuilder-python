@@ -20,10 +20,8 @@ path = os.path.join(relative_path, "config.yaml")
 with open(path, 'r') as ymlfile:
     cfg = yaml.safe_load(ymlfile)
 
-APP_ID = ''
-APP_PASSWORD = ''
 PORT = cfg['Settings']['Port']
-SETTINGS = BotFrameworkAdapterSettings(APP_ID, APP_PASSWORD)
+SETTINGS = BotFrameworkAdapterSettings(cfg['Settings']['AppId'], cfg['Settings']['AppPassword'])
 ADAPTER = BotFrameworkAdapter(SETTINGS)
 
 # Create MemoryStorage, UserState and ConversationState

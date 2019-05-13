@@ -3,3 +3,5 @@ Settings:
   LuisAppId: ""
   LuisAPIKey: ""
   LuisAPIHostName: ""
+  AppId: ""
+  AppPassword: ""
