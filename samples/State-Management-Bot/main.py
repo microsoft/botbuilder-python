@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 """
-This sample shows how to create a simple EchoBot with state.
+This sample shows how to manage state in a bot.
 """
 import os
 import yaml
@@ -26,7 +26,6 @@ ADAPTER = BotFrameworkAdapter(SETTINGS)
 # Create MemoryStorage, UserState and ConversationState
 memory = MemoryStorage()
 
-# Commented out user_state because it's not being used.
 user_state = UserState(memory)
 conversation_state = ConversationState(memory)
 

@@ -26,7 +26,7 @@ git clone https://github.com/Microsoft/botbuilder-python.git
 
 - Install the Bot Framework emulator from [here](https://github.com/Microsoft/BotFramework-Emulator/releases)
 
-### Connect to bot using Bot Framework Emulator **V4**
+### Connect to bot using Bot Framework Emulator
 - Launch Bot Framework Emulator
 - Paste this URL in the emulator window - http://localhost:3978/api/messages
 
