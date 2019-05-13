@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 """
-This sample shows how to use different types of rich cards.
+This sample shows how to manage state in a bot.
 """
 import os
 import yaml
@@ -12,8 +12,7 @@ from botbuilder.schema import Activity, ActivityTypes
 from botbuilder.core import (BotFrameworkAdapter, BotFrameworkAdapterSettings, TurnContext,
                              ConversationState, MemoryStorage, UserState, CardFactory)
 
-from dialogs import MainDialog
-from bots import RichCardsBot
+from bots import StateManagementBot
 
 relative_path = os.path.abspath(os.path.dirname(__file__))
 path = os.path.join(relative_path, "config.yaml")
@@ -27,13 +26,10 @@ ADAPTER = BotFrameworkAdapter(SETTINGS)
 # Create MemoryStorage, UserState and ConversationState
 memory = MemoryStorage()
 
-# Commented out user_state because it's not being used.
 user_state = UserState(memory)
 conversation_state = ConversationState(memory)
 
-
-dialog = MainDialog()
-bot = RichCardsBot(conversation_state, user_state, dialog)
+bot = StateManagementBot(conversation_state, user_state)
 
 async def messages(req: web.Request) -> web.Response:
     body = await req.json()

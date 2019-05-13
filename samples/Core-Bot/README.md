@@ -36,7 +36,6 @@ If you wish to create a LUIS application via the CLI, these steps can be found i
 ### Connect to the bot using Bot Framework Emulator
 
 - Launch Bot Framework Emulator
-- File -> Open Bot
 - Enter a Bot URL of `http://localhost:3978/api/messages`
 
 
