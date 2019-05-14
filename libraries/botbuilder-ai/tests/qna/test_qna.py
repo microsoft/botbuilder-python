@@ -193,7 +193,6 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
 
         # Assert
         self.assertIsNotNone(result)
-        # self.assertEqual(has_at_least_1_ans,  len(result) >= 1 and len(result) <= options.top)
         self.assertEqual(has_at_least_1_ans,  len(result) >= 1)
         self.assertTrue(first_answer.answer[0])
         self.assertEqual('is a movie', first_answer.answer[0])
