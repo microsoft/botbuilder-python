@@ -5,9 +5,13 @@ import os
 from setuptools import setup
 
 REQUIRES = [
-    'botbuilder-schema>=4.0.0.a6',
-    'botframework-connector>=4.0.0.a6',
-    'botbuilder-core>=4.0.0.a6']
+    'recognizers-date-time>=1.0.0a1',
+    'recognizers-number-with-unit>=1.0.0a1',
+    'recognizers-number>=1.0.0a2',
+    'recognizers-text>=1.0.0a1', 
+    'botbuilder-schema>=4.4.0b1',
+    'botframework-connector>=4.4.0b1',
+    'botbuilder-core>=4.4.0b1']
 
 TEST_REQUIRES = [
     'aiounittest>=1.1.0'
@@ -29,7 +33,7 @@ setup(
     keywords=['BotBuilderDialogs', 'bots', 'ai', 'botframework', 'botbuilder'],
     long_description=package_info['__summary__'],
     license=package_info['__license__'],
-    packages=['botbuilder.dialogs'],
+    packages=['botbuilder.dialogs', 'botbuilder.dialogs.prompts', 'botbuilder.dialogs.choices'],
     install_requires=REQUIRES + TEST_REQUIRES,
     tests_require=TEST_REQUIRES,
     include_package_data=True,

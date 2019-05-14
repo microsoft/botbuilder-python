@@ -18,11 +18,14 @@ class ActivityHandler:
         if hasattr(turn_context.activity, 'type') and turn_context.activity.type is None:
             raise TypeError('ActivityHandler.on_turn(): turn_context activity must have a non-None type.')
 
-        return {
-            ActivityTypes.message: await self.on_message_activity(turn_context),
-            ActivityTypes.conversation_update: await self.on_conversation_update_activity(turn_context),
-            ActivityTypes.event: await self.on_event_activity(turn_context)
-        }.get(turn_context.activity.type, await self.on_unrecognized_activity_type(turn_context))
+        if turn_context.activity.type == ActivityTypes.message:
+            await self.on_message_activity(turn_context)
+        elif turn_context.activity.type == ActivityTypes.conversation_update:
+            await self.on_conversation_update_activity(turn_context)
+        elif turn_context.activity.type == ActivityTypes.event:
+            await self.on_event_activity(turn_context)
+        else:
+            await self.on_unrecognized_activity_type(turn_context)
 
     async def on_message_activity(self, turn_context: TurnContext):
         return

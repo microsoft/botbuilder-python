@@ -1,0 +1,4 @@
+
+botbuilder-core>=4.4.0b1
+aiohttp>=3.0.0
+pyyaml>=5.1

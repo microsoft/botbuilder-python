@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 from datetime import datetime
 from botbuilder.dialogs import ComponentDialog, DialogSet, DialogTurnStatus, WaterfallDialog, WaterfallStepContext, DialogTurnResult
 from botbuilder.dialogs.prompts import TextPrompt, ConfirmPrompt, PromptOptions
@@ -6,6 +9,7 @@ from botbuilder.core import MessageFactory
 from .booking_dialog import BookingDialog
 from booking_details import BookingDetails
 from helpers.luis_helper import LuisHelper
+from datatypes_date_time.timex import Timex
 
 class MainDialog(ComponentDialog):
 
@@ -16,16 +20,20 @@ class MainDialog(ComponentDialog):
 
         self.add_dialog(TextPrompt(TextPrompt.__name__))
         self.add_dialog(BookingDialog())
-        self.add_dialog(WaterfallDialog(WaterfallDialog.__name__, [
-
+        self.add_dialog(WaterfallDialog('WFDialog', [
+            self.intro_step,
+            self.act_step,
+            self.final_step
         ]))
+
+        self.initial_dialog_id = 'WFDialog'
     
     async def intro_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
         if (not self._configuration.get("LuisAppId", "") or not self._configuration.get("LuisAPIKey", "") or not self._configuration.get("LuisAPIHostName", "")):
             await step_context.context.send_activity(
                 MessageFactory.text("NOTE: LUIS is not configured. To enable all capabilities, add 'LuisAppId', 'LuisAPIKey' and 'LuisAPIHostName' to the appsettings.json file."))
 
-            return await step_context.next()
+            return await step_context.next(None)
         else:
             return await step_context.prompt(TextPrompt.__name__, PromptOptions(prompt = MessageFactory.text("What can I help you with today?")))
 
@@ -48,10 +56,9 @@ class MainDialog(ComponentDialog):
             # Now we have all the booking details call the booking service.
 
             # If the call to the booking service was successful tell the user.
-
-            time_property = TimexProperty(result.TravelDate)
-            travel_date_msg = time_property.to_natural_language(datetime.now())
-            msg = f'I have you booked to {result.destination} from {result.origin} on {travel_date_msg}'
+            #time_property = Timex(result.travel_date)
+            #travel_date_msg = time_property.to_natural_language(datetime.now())
+            msg = f'I have you booked to {result.destination} from {result.origin} on {result.travel_date}'
             await step_context.context.send_activity(MessageFactory.text(msg))
         else:
             await step_context.context.send_activity(MessageFactory.text("Thank you."))
