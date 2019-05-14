@@ -7,7 +7,7 @@ from botbuilder.core import MessageFactory
 from .cancel_and_help_dialog import CancelAndHelpDialog
 from .date_resolver_dialog import DateResolverDialog
 
-from datatypes_timex_expression.timex import Timex
+from datatypes_date_time.timex import Timex
 
 class BookingDialog(CancelAndHelpDialog):
 
@@ -29,6 +29,8 @@ class BookingDialog(CancelAndHelpDialog):
     
     """
     If a destination city has not been provided, prompt for one.
+    :param step_context:
+    :return DialogTurnResult:
     """
     async def destination_step(self, step_context: WaterfallStepContext) -> DialogTurnResult: 
         booking_details = step_context.options
@@ -40,6 +42,8 @@ class BookingDialog(CancelAndHelpDialog):
 
     """
     If an origin city has not been provided, prompt for one.
+    :param step_context:
+    :return DialogTurnResult:
     """
     async def origin_step(self, step_context: WaterfallStepContext) -> DialogTurnResult: 
         booking_details = step_context.options
@@ -54,6 +58,8 @@ class BookingDialog(CancelAndHelpDialog):
     """
     If a travel date has not been provided, prompt for one.
     This will use the DATE_RESOLVER_DIALOG.
+    :param step_context:
+    :return DialogTurnResult:
     """
     async def travel_date_step(self, step_context: WaterfallStepContext) -> DialogTurnResult: 
         booking_details = step_context.options
@@ -67,6 +73,8 @@ class BookingDialog(CancelAndHelpDialog):
 
     """
     Confirm the information the user has provided.
+    :param step_context:
+    :return DialogTurnResult:
     """
     async def confirm_step(self, step_context: WaterfallStepContext) -> DialogTurnResult: 
         booking_details = step_context.options
@@ -80,6 +88,8 @@ class BookingDialog(CancelAndHelpDialog):
 
     """
     Complete the interaction and end the dialog.
+    :param step_context:
+    :return DialogTurnResult:
     """
     async def final_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
 

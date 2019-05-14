@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from aiohttp import ClientSession, ClientTimeout
+from aiohttp import ClientSession, ClientTimeout, ClientResponse
 
 from botbuilder.schema import Activity
 from botbuilder.core import BotTelemetryClient, NullTelemetryClient, TurnContext
@@ -115,7 +115,7 @@ class QnAMaker(QnAMakerTelemetryClient):
             measurements = event_data.metrics
         )
 
-    def fill_qna_event(
+    async def fill_qna_event(
         self,
         query_results: [QueryResult],
         turn_context: TurnContext,
@@ -154,11 +154,11 @@ class QnAMaker(QnAMakerTelemetryClient):
                 QnATelemetryConstants.matched_question_property: json.dumps(query_result.questions),
                 QnATelemetryConstants.question_id_property: str(query_result.id),
                 QnATelemetryConstants.answer_property: query_result.answer,
-                QnATelemetryConstants.score_metric: query_result.score,
                 QnATelemetryConstants.article_found_property: 'true'
             }
-
             properties.update(result_properties)
+
+            metrics[QnATelemetryConstants.score_metric] = query_result.score
         else:
             no_match_properties = {
                 QnATelemetryConstants.matched_question_property : 'No Qna Question matched',
@@ -198,6 +198,8 @@ class QnAMaker(QnAMakerTelemetryClient):
         self._validate_options(hydrated_options)
         
         result = await self._query_qna_service(context, hydrated_options)
+
+        await self.on_qna_result(result, context, telemetry_properties, telemetry_metrics)
         
         await self._emit_trace_info(context, result, hydrated_options)
 
@@ -298,7 +300,9 @@ class QnAMaker(QnAMakerTelemetryClient):
         await turn_context.send_activity(trace_activity)
     
     async def _format_qna_result(self, result, options: QnAMakerOptions) -> [QueryResult]:
-        json_res = await result.json()
+        json_res = result
+        if isinstance(result, ClientResponse):
+            json_res = await result.json()
 
         answers_within_threshold = [
             { **answer,'score': answer['score']/100 } 
@@ -316,7 +320,7 @@ class QnAMaker(QnAMakerTelemetryClient):
         answers_as_query_results = list(map(lambda answer: QueryResult(**answer), sorted_answers))
 
         return answers_as_query_results
-
+        
     def _get_headers(self):
         headers = { 
             'Content-Type': 'application/json',

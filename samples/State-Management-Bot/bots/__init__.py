@@ -1,7 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-Settings:
-  Port: 3978
-  AppId: ""
-  AppPassword: ""
+from .state_management_bot import StateManagementBot
+
+__all__ = ['StateManagementBot']
