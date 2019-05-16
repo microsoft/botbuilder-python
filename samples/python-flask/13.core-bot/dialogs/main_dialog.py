@@ -5,11 +5,10 @@ from datetime import datetime
 from botbuilder.dialogs import ComponentDialog, DialogSet, DialogTurnStatus, WaterfallDialog, WaterfallStepContext, DialogTurnResult
 from botbuilder.dialogs.prompts import TextPrompt, ConfirmPrompt, PromptOptions
 from botbuilder.core import MessageFactory
-
 from .booking_dialog import BookingDialog
 from booking_details import BookingDetails
 from helpers.luis_helper import LuisHelper
-from datatypes_timex_expression.timex import Timex
+from datatypes_date_time.timex import Timex
 
 class MainDialog(ComponentDialog):
 
