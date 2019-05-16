@@ -5,9 +5,7 @@ from botbuilder.core import MessageFactory
 from botbuilder.dialogs import WaterfallDialog, DialogTurnResult, WaterfallStepContext
 from botbuilder.dialogs.prompts import DateTimePrompt, PromptValidatorContext, PromptOptions, DateTimeResolution
 from .cancel_and_help_dialog import CancelAndHelpDialog
-
-from datatypes_timex_expression.timex import Timex
-
+from datatypes_date_time.timex import Timex
 class DateResolverDialog(CancelAndHelpDialog):
 
     def __init__(self, dialog_id: str = None):
