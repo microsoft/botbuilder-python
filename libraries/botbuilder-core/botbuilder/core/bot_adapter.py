@@ -2,16 +2,18 @@
 # Licensed under the MIT License.
 
 from abc import ABC, abstractmethod
-from typing import List, Callable
+from typing import List, Callable, Awaitable
 from botbuilder.schema import Activity, ConversationReference
 
+from .bot_assert import BotAssert
 from .turn_context import TurnContext
 from .middleware_set import MiddlewareSet
 
 
 class BotAdapter(ABC):
-    def __init__(self):
+    def __init__(self, on_turn_error: Callable = None):
         self._middleware = MiddlewareSet()
+        self.on_turn_error = on_turn_error
 
     @abstractmethod
     async def send_activities(self, context: TurnContext, activities: List[Activity]):
@@ -48,7 +50,7 @@ class BotAdapter(ABC):
         """
         self._middleware.use(middleware)
 
-    async def run_middleware(self, context: TurnContext, callback: Callable=None):
+    async def run_middleware(self, context: TurnContext, callback: Callable[[TurnContext], Awaitable]= None):
         """
         Called by the parent class to run the adapters middleware set and calls the passed in `callback()` handler at
         the end of the chain.
@@ -56,4 +58,17 @@ class BotAdapter(ABC):
         :param callback:
         :return:
         """
-        return await self._middleware.receive_activity_with_status(context, callback)
+        BotAssert.context_not_none(context)
+
+        if context.activity is not None:
+            try:
+                return await self._middleware.receive_activity_with_status(context, callback)
+            except Exception as error:
+                if self.on_turn_error is not None:
+                    await self.on_turn_error(context, error)
+                else:
+                    raise error
+        else:
+            # callback to caller on proactive case
+            if callback is not None:
+                await callback(context)

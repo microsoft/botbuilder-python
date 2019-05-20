@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 import asyncio
-from typing import List, Callable
+from typing import List, Callable, Awaitable
 from botbuilder.schema import (Activity, ChannelAccount,
                                ConversationAccount,
                                ConversationParameters, ConversationReference,
@@ -46,7 +46,7 @@ class BotFrameworkAdapter(BotAdapter):
         context = self.create_context(request)
         return await self.run_middleware(context, logic)
 
-    async def create_conversation(self, reference: ConversationReference, logic):
+    async def create_conversation(self, reference: ConversationReference, logic: Callable[[TurnContext], Awaitable]=None):
         """
         Starts a new conversation with a user. This is typically used to Direct Message (DM) a member
         of a group.
