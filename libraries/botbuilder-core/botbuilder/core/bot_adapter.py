@@ -11,7 +11,7 @@ from .middleware_set import MiddlewareSet
 
 
 class BotAdapter(ABC):
-    def __init__(self, on_turn_error: Callable = None):
+    def __init__(self, on_turn_error: Callable[[TurnContext, Exception], Awaitable] = None):
         self._middleware = MiddlewareSet()
         self.on_turn_error = on_turn_error
 
