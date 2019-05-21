@@ -298,17 +298,17 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         telemetry_client = unittest.mock.create_autospec(BotTelemetryClient)
         qna = QnAMaker(QnaApplicationTest.tests_endpoint, telemetry_client=telemetry_client, log_personal_information=True)
         context = QnaApplicationTest._get_context(question, TestAdapter())
-
+        
         # Act
         with patch('aiohttp.ClientSession.post', return_value = aiounittest.futurized(response_json)):
             results = await qna.get_answers(context)
 
             telemetry_args = telemetry_client.track_event.call_args_list[0][1]
             telemetry_properties = telemetry_args['properties']
-            telemetry_metrics = telemetry_args['measurements']
             number_of_args = len(telemetry_args)
-            first_answer = telemetry_args['properties'][QnATelemetryConstants.answer_property][0]
-            expected_answer = 'No good match found in KB.'
+            first_answer = telemetry_args['properties'][QnATelemetryConstants.answer_property]
+            expected_answer = 'No Qna Answer matched'
+            expected_matched_question = 'No Qna Question matched'
 
             # Assert - Check Telemetry logged.
             self.assertEqual(1, telemetry_client.track_event.call_count)
@@ -317,18 +317,16 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
             self.assertTrue('answer' in telemetry_properties)
             self.assertTrue('knowledgeBaseId' in telemetry_properties)
             self.assertTrue('matchedQuestion' in telemetry_properties)
+            self.assertEqual(expected_matched_question, telemetry_properties[QnATelemetryConstants.matched_question_property])
             self.assertTrue('question' in telemetry_properties)
             self.assertTrue('questionId' in telemetry_properties)
             self.assertTrue('articleFound' in telemetry_properties)
             self.assertEqual(expected_answer, first_answer)
-            self.assertTrue('score' in telemetry_metrics)
-            self.assertEqual(0, telemetry_metrics['score'][0])
 
             # Assert - Validate we didn't break QnA functionality.
             self.assertIsNotNone(results)
-            self.assertEqual(1, len(results))
-            self.assertEqual(expected_answer, results[0].answer[0])
-            self.assertEqual(None, results[0].source)
+            self.assertEqual(0, len(results))
+
     
     async def test_telemetry_pii(self):
         # Arrange

@@ -305,9 +305,7 @@ class QnAMaker(QnAMakerTelemetryClient):
             json_res = await result.json()
 
         answers_within_threshold = [
-            { **answer,'score': answer['score']/100 } 
-            if answer['score']/100 > options.score_threshold 
-            else {**answer} for answer in json_res['answers'] 
+            { **answer,'score': answer['score']/100 } for answer in json_res['answers'] if answer['score']/100 > options.score_threshold
         ]
         sorted_answers = sorted(answers_within_threshold, key = lambda ans: ans['score'], reverse = True)
 
