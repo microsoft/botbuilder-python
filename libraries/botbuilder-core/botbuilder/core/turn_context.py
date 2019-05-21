@@ -10,7 +10,6 @@ from botbuilder.schema import (
                             ConversationReference, 
                             ResourceResponse
                             )
-from .assertions import BotAssert
 
 
 class TurnContext(object):

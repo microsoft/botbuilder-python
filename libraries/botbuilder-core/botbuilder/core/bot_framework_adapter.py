@@ -44,7 +44,7 @@ class BotFrameworkAdapter(BotAdapter):
         """
         request = TurnContext.apply_conversation_reference(Activity(), reference, is_incoming=True)
         context = self.create_context(request)
-        return await self.run_middleware(context, logic)
+        return await self.run_pipeline(context, logic)
 
     async def create_conversation(self, reference: ConversationReference, logic: Callable[[TurnContext], Awaitable]=None):
         """
@@ -69,7 +69,7 @@ class BotFrameworkAdapter(BotAdapter):
                 request.service_url = resource_response.service_url
 
             context = self.create_context(request)
-            return await self.run_middleware(context, logic)
+            return await self.run_pipeline(context, logic)
 
         except Exception as e:
             raise e
@@ -90,7 +90,7 @@ class BotFrameworkAdapter(BotAdapter):
         await self.authenticate_request(activity, auth_header)
         context = self.create_context(activity)
 
-        return await self.run_middleware(context, logic)
+        return await self.run_pipeline(context, logic)
 
     async def authenticate_request(self, request: Activity, auth_header: str):
         """

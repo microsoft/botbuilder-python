@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 from typing import List
 
 from botbuilder.schema import Activity, ConversationReference
@@ -12,7 +15,7 @@ class BotAssert():
         Checks that an activity object is not None
         :param activity: The activity object
         """
-        if (activity is None):
+        if activity is None:
             raise TypeError(activity.__class__.__name__)
        
     @staticmethod
@@ -21,7 +24,7 @@ class BotAssert():
         Checks that a context object is not None
         :param turn_context: The context object
         """
-        if (turn_context is None):
+        if turn_context is None:
             raise TypeError(turn_context.__class__.__name__)
        
     @staticmethod
@@ -30,7 +33,7 @@ class BotAssert():
         Checks that a conversation reference object is not None
         :param reference: The conversation reference object
         """
-        if (reference is None):
+        if reference is None:
             raise TypeError(reference.__class__.__name__)
     
     @staticmethod
@@ -39,7 +42,7 @@ class BotAssert():
         Checks that an activity list is not None
         :param activities: The activity list
         """
-        if (activities is None):
+        if activities is None:
             raise TypeError(activities.__class__.__name__)
        
     @staticmethod
@@ -48,7 +51,7 @@ class BotAssert():
         Checks that a middleware object is not None
         :param middleware: The middleware object
         """
-        if (middleware is None):
+        if middleware is None:
             raise TypeError(middleware.__class__.__name__)
        
     @staticmethod
@@ -57,7 +60,7 @@ class BotAssert():
         Checks that a middeware list is not None
         :param activities: The middleware list
         """
-        if (middleware is None):
+        if middleware is None:
             raise TypeError(middleware.__class__.__name__)
        
    

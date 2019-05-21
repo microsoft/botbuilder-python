@@ -7,7 +7,7 @@
 
 from .about import __version__
 from .activity_handler import ActivityHandler
-from .assertions import BotAssert
+from .bot_assert import BotAssert
 from .bot_adapter import BotAdapter
 from .bot_framework_adapter import BotFrameworkAdapter, BotFrameworkAdapterSettings
 from .bot_state import BotState

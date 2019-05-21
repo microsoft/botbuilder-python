@@ -110,7 +110,7 @@ class TestAdapter(BotAdapter):
 
         # Create context object and run middleware
         context = TurnContext(self, request)
-        return await self.run_middleware(context, self.logic)
+        return await self.run_pipeline(context, self.logic)
 
     async def send(self, user_says) -> object:
         """

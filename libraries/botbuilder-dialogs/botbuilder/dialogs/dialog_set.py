@@ -57,7 +57,7 @@ class DialogSet():
         return self
 
     async def create_context(self, turn_context: TurnContext) -> DialogContext:
-        BotAssert.context_not_null(turn_context)
+        BotAssert.context_not_none(turn_context)
         
         if not self._dialog_state:
             raise RuntimeError("DialogSet.CreateContextAsync(): DialogSet created with a null IStatePropertyAccessor.")

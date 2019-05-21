@@ -83,7 +83,7 @@ class ConsoleAdapter(BotAdapter):
 
                 activity = TurnContext.apply_conversation_reference(activity, self.reference, True)
                 context = TurnContext(self, activity)
-                await self.run_middleware(context, logic)
+                await self.run_pipeline(context, logic)
 
     async def send_activities(self, context: TurnContext, activities: List[Activity]):
         """

@@ -50,7 +50,7 @@ class BotAdapter(ABC):
         """
         self._middleware.use(middleware)
 
-    async def run_middleware(self, context: TurnContext, callback: Callable[[TurnContext], Awaitable]= None):
+    async def run_pipeline(self, context: TurnContext, callback: Callable[[TurnContext], Awaitable]= None):
         """
         Called by the parent class to run the adapters middleware set and calls the passed in `callback()` handler at
         the end of the chain.
