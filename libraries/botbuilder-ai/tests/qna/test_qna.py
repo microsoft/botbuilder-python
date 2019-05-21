@@ -291,6 +291,43 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
             self.assertEqual(expected_answer, results[0].answer[0])
             self.assertEqual('Editorial', results[0].source)
     
+    async def test_telemetry_returns_answer_when_no_answer_found_in_kb(self):
+        # Arrange
+        question: str = 'gibberish question'
+        response_json = QnaApplicationTest._get_json_for_file('NoAnswerFoundInKb.json')
+        telemetry_client = unittest.mock.create_autospec(BotTelemetryClient)
+        qna = QnAMaker(QnaApplicationTest.tests_endpoint, telemetry_client=telemetry_client, log_personal_information=True)
+        context = QnaApplicationTest._get_context(question, TestAdapter())
+        
+        # Act
+        with patch('aiohttp.ClientSession.post', return_value = aiounittest.futurized(response_json)):
+            results = await qna.get_answers(context)
+
+            telemetry_args = telemetry_client.track_event.call_args_list[0][1]
+            telemetry_properties = telemetry_args['properties']
+            number_of_args = len(telemetry_args)
+            first_answer = telemetry_args['properties'][QnATelemetryConstants.answer_property]
+            expected_answer = 'No Qna Answer matched'
+            expected_matched_question = 'No Qna Question matched'
+
+            # Assert - Check Telemetry logged.
+            self.assertEqual(1, telemetry_client.track_event.call_count)
+            self.assertEqual(3, number_of_args)
+            self.assertEqual('QnaMessage', telemetry_args['name'])
+            self.assertTrue('answer' in telemetry_properties)
+            self.assertTrue('knowledgeBaseId' in telemetry_properties)
+            self.assertTrue('matchedQuestion' in telemetry_properties)
+            self.assertEqual(expected_matched_question, telemetry_properties[QnATelemetryConstants.matched_question_property])
+            self.assertTrue('question' in telemetry_properties)
+            self.assertTrue('questionId' in telemetry_properties)
+            self.assertTrue('articleFound' in telemetry_properties)
+            self.assertEqual(expected_answer, first_answer)
+
+            # Assert - Validate we didn't break QnA functionality.
+            self.assertIsNotNone(results)
+            self.assertEqual(0, len(results))
+
+    
     async def test_telemetry_pii(self):
         # Arrange
         question: str = 'how do I clean the stove?'
