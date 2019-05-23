@@ -1,5 +1,4 @@
 import pytest
-from aiounittest import AsyncTestCase
 
 from botbuilder.schema import Activity
 from botframework.connector.auth import JwtTokenValidation
