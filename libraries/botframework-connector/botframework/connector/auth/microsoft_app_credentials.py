@@ -5,6 +5,7 @@ from msrest.authentication import (
     BasicTokenAuthentication,
     Authentication)
 import requests
+import aiohttp
 from .constants import Constants
 
 #TODO: Decide to move this to Constants or viceversa (when porting OAuth)
@@ -45,6 +46,9 @@ class _OAuthResponse:
 
 
 class MicrosoftAppCredentials(Authentication):
+    """
+    MicrosoftAppCredentials auth implementation and cache.
+    """
     refreshEndpoint = AUTH_SETTINGS["refreshEndpoint"]
     refreshScope = AUTH_SETTINGS["refreshScope"]
     schema = 'Bearer'
@@ -52,17 +56,29 @@ class MicrosoftAppCredentials(Authentication):
     trustedHostNames = {}
     cache = {}
 
-    def __init__(self, appId: str, password: str, channel_auth_tenant: str = None):
-        self.microsoft_app_id = appId
+    def __init__(self, app_id: str, password: str, channel_auth_tenant: str = None):
+        """
+        Initializes a new instance of MicrosoftAppCredentials class
+        :param app_id: The Microsoft app ID.
+        :param app_password: The Microsoft app password.
+        :param channel_auth_tenant: Optional. The oauth token tenant.
+        """
+        #The configuration property for the Microsoft app ID.
+        self.microsoft_app_id = app_id
+        # The configuration property for the Microsoft app Password.
         self.microsoft_app_password = password
         tenant = (channel_auth_tenant if channel_auth_tenant is not None and len(channel_auth_tenant) > 0
                   else Constants.DEFAULT_CHANNEL_AUTH_TENANT)
         self.oauth_endpoint = (Constants.TO_CHANNEL_FROM_BOT_LOGIN_URL_PREFIX + tenant +
                                Constants.TO_CHANNEL_FROM_BOT_TOKEN_ENDPOINT_PATH)
-        self.token_cache_key = appId + '-cache'
+        self.token_cache_key = app_id + '-cache'
 
-    def signed_session(self):
-        basic_authentication = BasicTokenAuthentication({"access_token": self.get_access_token()})
+    async def signed_session(self) -> requests.Session:
+        """
+        Gets the signed session.
+        :returns: Signed requests.Session object
+        """
+        basic_authentication = BasicTokenAuthentication({"access_token": await self.get_access_token()})
         session = basic_authentication.signed_session()
 
         # If there is no microsoft_app_id and no self.microsoft_app_password, then there shouldn't
@@ -71,7 +87,13 @@ class MicrosoftAppCredentials(Authentication):
             del session.headers['Authorization']
         return session
 
-    def get_access_token(self, force_refresh=False):
+    async def get_access_token(self, force_refresh: bool=False) -> str:
+        """
+        Gets an OAuth access token.
+        :param force_refresh: True to force a refresh of the token; or false to get
+                              a cached token if it exists.
+        :returns: Access token string
+        """
         if self.microsoft_app_id and self.microsoft_app_password:
             if not force_refresh:
                 # check the global cache for the token. If we have it, and it's valid, we're done.
@@ -84,27 +106,37 @@ class MicrosoftAppCredentials(Authentication):
             #   1. The user requested it via the force_refresh parameter
             #   2. We have it, but it's expired
             #   3. We don't have it in the cache.
-            oauth_token = self.refresh_token()
+            oauth_token = await self.refresh_token()
             MicrosoftAppCredentials.cache.setdefault(self.token_cache_key, oauth_token)
             return oauth_token.access_token
         else:
             return ''
 
-    def refresh_token(self):
+    async def refresh_token(self) -> _OAuthResponse:
+        """
+        returns: _OAuthResponse
+        """
         options = {
             'grant_type': 'client_credentials',
             'client_id': self.microsoft_app_id,
             'client_secret': self.microsoft_app_password,
             'scope': MicrosoftAppCredentials.refreshScope}
-        response = requests.post(self.oauth_endpoint, data=options)
-        response.raise_for_status()
-        oauth_response = _OAuthResponse.from_json(response.json())
-        oauth_response.expiration_time = datetime.now() + \
-                                        timedelta(seconds=(oauth_response.expires_in - 300))
+        async with aiohttp.ClientSession() as session:
+            async with session.post(self.oauth_endpoint, data=options) as response:
+                response.raise_for_status()
+                oauth_response = _OAuthResponse.from_json(await response.json())
+                oauth_response.expiration_time = datetime.now() + \
+                                                timedelta(seconds=(oauth_response.expires_in - 300))
         return oauth_response
 
     @staticmethod
     def trust_service_url(service_url: str, expiration=None):
+        """
+        Checks if the service url is for a trusted host or not.
+        :param service_url: The service url.
+        :param expiration: The expiration time after which this service url is not trusted anymore.
+        :returns: True if the host of the service url is trusted; False otherwise.
+        """
         if expiration is None:
             expiration = datetime.now() + timedelta(days=1)
         host = urlparse(service_url).hostname
@@ -113,12 +145,17 @@ class MicrosoftAppCredentials(Authentication):
 
     @staticmethod
     def is_trusted_service(service_url: str) -> bool:
+        """
+        Checks if the service url is for a trusted host or not.
+        :param service_url: The service url.
+        :returns: True if the host of the service url is trusted; False otherwise.
+        """
         host = urlparse(service_url).hostname
         if host is not None:
-            return MicrosoftAppCredentials.is_trusted_url(host)
+            return MicrosoftAppCredentials._is_trusted_url(host)
         return False
 
     @staticmethod
-    def is_trusted_url(host: str) -> bool:
+    def _is_trusted_url(host: str) -> bool:
         expiration = MicrosoftAppCredentials.trustedHostNames.get(host, datetime.min)
         return expiration > (datetime.now() - timedelta(minutes=5))

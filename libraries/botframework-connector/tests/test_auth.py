@@ -14,7 +14,7 @@ class TestAuth:
     
     @pytest.mark.asyncio
     async def test_connector_auth_header_correct_app_id_and_service_url_should_validate(self):
-        header = 'Bearer ' + MicrosoftAppCredentials('2cd87869-38a0-4182-9251-d056e8f0ac24', '2.30Vs3VQLKt974F').get_access_token()
+        header = 'Bearer ' + await MicrosoftAppCredentials('2cd87869-38a0-4182-9251-d056e8f0ac24', '2.30Vs3VQLKt974F').get_access_token()
         credentials = SimpleCredentialProvider('2cd87869-38a0-4182-9251-d056e8f0ac24', '')
         result = await JwtTokenValidation.validate_auth_header(header, credentials, '', 'https://webchat.botframework.com/')
 
@@ -22,7 +22,7 @@ class TestAuth:
 
     @pytest.mark.asyncio
     async def test_connector_auth_header_with_different_bot_app_id_should_not_validate(self):
-        header = 'Bearer ' + MicrosoftAppCredentials('2cd87869-38a0-4182-9251-d056e8f0ac24', '2.30Vs3VQLKt974F').get_access_token()
+        header = 'Bearer ' + await MicrosoftAppCredentials('2cd87869-38a0-4182-9251-d056e8f0ac24', '2.30Vs3VQLKt974F').get_access_token()
         credentials = SimpleCredentialProvider('00000000-0000-0000-0000-000000000000', '')
         with pytest.raises(Exception) as excinfo:
             await JwtTokenValidation.validate_auth_header(header, credentials, '', 'https://webchat.botframework.com/')
@@ -30,7 +30,7 @@ class TestAuth:
 
     @pytest.mark.asyncio
     async def test_connector_auth_header_and_no_credential_should_not_validate(self):
-        header = 'Bearer ' + MicrosoftAppCredentials('2cd87869-38a0-4182-9251-d056e8f0ac24', '2.30Vs3VQLKt974F').get_access_token()
+        header = 'Bearer ' + await MicrosoftAppCredentials('2cd87869-38a0-4182-9251-d056e8f0ac24', '2.30Vs3VQLKt974F').get_access_token()
         credentials = SimpleCredentialProvider('', '')
         with pytest.raises(Exception) as excinfo:
             await JwtTokenValidation.validate_auth_header(header, credentials, '', 'https://webchat.botframework.com/')
@@ -46,7 +46,7 @@ class TestAuth:
 
     @pytest.mark.asyncio
     async def test_emulator_msa_header_correct_app_id_and_service_url_should_validate(self):
-        header = 'Bearer ' + MicrosoftAppCredentials('2cd87869-38a0-4182-9251-d056e8f0ac24', '2.30Vs3VQLKt974F').get_access_token()
+        header = 'Bearer ' + await MicrosoftAppCredentials('2cd87869-38a0-4182-9251-d056e8f0ac24', '2.30Vs3VQLKt974F').get_access_token()
         credentials = SimpleCredentialProvider('2cd87869-38a0-4182-9251-d056e8f0ac24', '')
         result = await JwtTokenValidation.validate_auth_header(header, credentials, '', 'https://webchat.botframework.com/')
 
@@ -54,7 +54,7 @@ class TestAuth:
 
     @pytest.mark.asyncio
     async def test_emulator_msa_header_and_no_credential_should_not_validate(self):
-        header = 'Bearer ' + MicrosoftAppCredentials('2cd87869-38a0-4182-9251-d056e8f0ac24', '2.30Vs3VQLKt974F').get_access_token()
+        header = 'Bearer ' + await MicrosoftAppCredentials('2cd87869-38a0-4182-9251-d056e8f0ac24', '2.30Vs3VQLKt974F').get_access_token()
         credentials = SimpleCredentialProvider('00000000-0000-0000-0000-000000000000', '')
         with pytest.raises(Exception) as excinfo:
             await JwtTokenValidation.validate_auth_header(header, credentials, '', None)
@@ -64,7 +64,7 @@ class TestAuth:
     # Tests with a valid Token and service url; and ensures that Service url is added to Trusted service url list.
     async def test_channel_msa_header_Valid_service_url_should_be_trusted(self):
         activity = Activity(service_url = 'https://smba.trafficmanager.net/amer-client-ss.msg/')
-        header = 'Bearer ' + MicrosoftAppCredentials('2cd87869-38a0-4182-9251-d056e8f0ac24', '2.30Vs3VQLKt974F').get_access_token()
+        header = 'Bearer ' + await MicrosoftAppCredentials('2cd87869-38a0-4182-9251-d056e8f0ac24', '2.30Vs3VQLKt974F').get_access_token()
         credentials = SimpleCredentialProvider('2cd87869-38a0-4182-9251-d056e8f0ac24', '')
 
         await JwtTokenValidation.authenticate_request(activity, header, credentials)
@@ -74,7 +74,7 @@ class TestAuth:
     @pytest.mark.asyncio
     async def test_channel_msa_header_from_user_specified_tenant(self):
         activity = Activity(service_url = 'https://smba.trafficmanager.net/amer-client-ss.msg/')
-        header = 'Bearer ' + MicrosoftAppCredentials('2cd87869-38a0-4182-9251-d056e8f0ac24', '2.30Vs3VQLKt974F', 'microsoft.com').get_access_token(True)
+        header = 'Bearer ' + await MicrosoftAppCredentials('2cd87869-38a0-4182-9251-d056e8f0ac24', '2.30Vs3VQLKt974F', 'microsoft.com').get_access_token(True)
         credentials = SimpleCredentialProvider('2cd87869-38a0-4182-9251-d056e8f0ac24', '')
 
         claims = await JwtTokenValidation.authenticate_request(activity, header, credentials)
@@ -85,7 +85,7 @@ class TestAuth:
     # Tests with a valid Token and invalid service url; and ensures that Service url is NOT added to Trusted service url list.
     async def test_channel_msa_header_invalid_service_url_should_not_be_trusted(self):
         activity = Activity(service_url = 'https://webchat.botframework.com/')
-        header = 'Bearer ' + MicrosoftAppCredentials('2cd87869-38a0-4182-9251-d056e8f0ac24', '2.30Vs3VQLKt974F').get_access_token()
+        header = 'Bearer ' + await MicrosoftAppCredentials('2cd87869-38a0-4182-9251-d056e8f0ac24', '2.30Vs3VQLKt974F').get_access_token()
         credentials = SimpleCredentialProvider('7f74513e-6f96-4dbc-be9d-9a81fea22b88', '')
 
         with pytest.raises(Exception) as excinfo:
