@@ -1,4 +1,5 @@
 import pytest
+from aiounittest import AsyncTestCase
 
 from botbuilder.schema import Activity
 from botframework.connector.auth import JwtTokenValidation
@@ -72,6 +73,16 @@ class TestAuth:
         assert MicrosoftAppCredentials.is_trusted_service('https://smba.trafficmanager.net/amer-client-ss.msg/')
     
     @pytest.mark.asyncio
+    async def test_channel_msa_header_from_user_specified_tenant(self):
+        activity = Activity(service_url = 'https://smba.trafficmanager.net/amer-client-ss.msg/')
+        header = 'Bearer ' + MicrosoftAppCredentials('2cd87869-38a0-4182-9251-d056e8f0ac24', '2.30Vs3VQLKt974F', 'microsoft.com').get_access_token(True)
+        credentials = SimpleCredentialProvider('2cd87869-38a0-4182-9251-d056e8f0ac24', '')
+
+        claims = await JwtTokenValidation.authenticate_request(activity, header, credentials)
+        
+        assert claims.get_claim_value("tid") == '72f988bf-86f1-41af-91ab-2d7cd011db47'
+
+    @pytest.mark.asyncio
     # Tests with a valid Token and invalid service url; and ensures that Service url is NOT added to Trusted service url list.
     async def test_channel_msa_header_invalid_service_url_should_not_be_trusted(self):
         activity = Activity(service_url = 'https://webchat.botframework.com/')
@@ -83,7 +94,7 @@ class TestAuth:
         assert 'Unauthorized' in str(excinfo.value)
         
         assert not MicrosoftAppCredentials.is_trusted_service('https://webchat.botframework.com/')
-    
+
     @pytest.mark.asyncio
     # Tests with no authentication header and makes sure the service URL is not added to the trusted list.
     async def test_channel_authentication_disabled_should_be_anonymous(self):

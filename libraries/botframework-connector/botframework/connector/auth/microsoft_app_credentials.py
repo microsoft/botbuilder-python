@@ -5,7 +5,9 @@ from msrest.authentication import (
     BasicTokenAuthentication,
     Authentication)
 import requests
+from .constants import Constants
 
+#TODO: Decide to move this to Constants or viceversa (when porting OAuth)
 AUTH_SETTINGS = {
     "refreshEndpoint": 'https://login.microsoftonline.com/botframework.com/oauth2/v2.0/token',
     "refreshScope": 'https://api.botframework.com/.default',
@@ -50,9 +52,13 @@ class MicrosoftAppCredentials(Authentication):
     trustedHostNames = {}
     cache = {}
 
-    def __init__(self, appId: str, password: str):
+    def __init__(self, appId: str, password: str, channel_auth_tenant: str = None):
         self.microsoft_app_id = appId
         self.microsoft_app_password = password
+        tenant = (channel_auth_tenant if channel_auth_tenant is not None and len(channel_auth_tenant) > 0
+                  else Constants.DEFAULT_CHANNEL_AUTH_TENANT)
+        self.oauth_endpoint = (Constants.TO_CHANNEL_FROM_BOT_LOGIN_URL_PREFIX + tenant +
+                               Constants.TO_CHANNEL_FROM_BOT_TOKEN_ENDPOINT_PATH)
         self.token_cache_key = appId + '-cache'
 
     def signed_session(self):
@@ -90,7 +96,7 @@ class MicrosoftAppCredentials(Authentication):
             'client_id': self.microsoft_app_id,
             'client_secret': self.microsoft_app_password,
             'scope': MicrosoftAppCredentials.refreshScope}
-        response = requests.post(MicrosoftAppCredentials.refreshEndpoint, data=options)
+        response = requests.post(self.oauth_endpoint, data=options)
         response.raise_for_status()
         oauth_response = _OAuthResponse.from_json(response.json())
         oauth_response.expiration_time = datetime.now() + \
