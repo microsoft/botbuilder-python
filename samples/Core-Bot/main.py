@@ -7,6 +7,7 @@ This sample shows how to create a simple EchoBot with state.
 
 import yaml
 import os
+import sys
 from aiohttp import web
 from botbuilder.schema import (Activity, ActivityTypes)
 from botbuilder.core import (BotFrameworkAdapter, BotFrameworkAdapterSettings, TurnContext,
@@ -30,7 +31,7 @@ async def on_error(context: TurnContext, error: Exception):
     # This check writes out errors to console log
     # NOTE: In production environment, you should consider logging this to Azure
     #       application insights.
-    print(f'\n [on_turn_error]: { error }')
+    print(f'\n [on_turn_error]: { error }', file=sys.stderr)
     # Send a message to the user
     await context.send_activity('Oops. Something went wrong!')
     # Clear out state
