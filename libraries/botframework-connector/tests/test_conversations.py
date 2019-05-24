@@ -1,4 +1,5 @@
 import pytest
+import asyncio
 from azure_devtools.scenario_tests import ReplayableTest
 
 from botbuilder.schema import *
@@ -15,21 +16,21 @@ RECIPIENT_ID = 'U19KH8EHJ:T03CWQ0QB'
 CONVERSATION_ID = 'B21UTEF8S:T03CWQ0QB:D2369CT7C'
 
 
-def get_auth_token():
+async def get_auth_token():
     try:
         from .app_creds_real import MICROSOFT_APP_ID, MICROSOFT_APP_PASSWORD
         # Define a "app_creds_real.py" file with your bot credentials as follows:
         # MICROSOFT_APP_ID = '...'
         # MICROSOFT_APP_PASSWORD = '...'
-        return MicrosoftAppCredentials(
+        return await MicrosoftAppCredentials(
             MICROSOFT_APP_ID,
             MICROSOFT_APP_PASSWORD).get_access_token()
     except ImportError:
         return 'STUB_ACCESS_TOKEN'
 
 
-auth_token = get_auth_token()
-
+loop = asyncio.get_event_loop()
+auth_token = loop.run_until_complete(get_auth_token())
 
 class ConversationTest(ReplayableTest):
     def __init__(self, method_name):
