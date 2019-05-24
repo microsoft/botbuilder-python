@@ -17,6 +17,7 @@ from .dialog_turn_status import DialogTurnStatus
 from .dialog import Dialog
 from .waterfall_dialog import WaterfallDialog
 from .waterfall_step_context import WaterfallStepContext
+from .prompts import *
 
 __all__ = [
            'ComponentDialog',
@@ -29,5 +30,15 @@ __all__ = [
            'DialogTurnStatus',
            'Dialog',
            'WaterfallDialog',
-           'WaterfallStepContext',           
+           'WaterfallStepContext',
+           'ConfirmPrompt',
+           'DateTimePrompt',
+           'DateTimeResolution',
+           'NumberPrompt',
+           'PromptOptions',
+           'PromptRecognizerResult',
+           'PromptValidatorContext',
+           'Prompt', 
+           'PromptOptions',
+           'TextPrompt',           
            '__version__']
