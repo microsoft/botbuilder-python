@@ -5,6 +5,7 @@ from msrest.authentication import (
     Authentication)
 import requests
 import aiohttp
+import asyncio
 from .constants import Constants
 
 #TODO: Decide to move this to Constants or viceversa (when porting OAuth)
@@ -72,12 +73,14 @@ class MicrosoftAppCredentials(Authentication):
                                Constants.TO_CHANNEL_FROM_BOT_TOKEN_ENDPOINT_PATH)
         self.token_cache_key = app_id + '-cache'
 
-    async def signed_session(self) -> requests.Session:
+    def signed_session(self) -> requests.Session:
         """
         Gets the signed session.
         :returns: Signed requests.Session object
         """
-        basic_authentication = BasicTokenAuthentication({"access_token": await self.get_access_token()})
+        auth_token = asyncio.ensure_future(self.get_access_token())
+
+        basic_authentication = BasicTokenAuthentication({"access_token": auth_token})
         session = basic_authentication.signed_session()
 
         # If there is no microsoft_app_id and no self.microsoft_app_password, then there shouldn't
