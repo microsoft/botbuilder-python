@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 from urllib.parse import urlparse
-
 from msrest.authentication import (
     BasicTokenAuthentication,
     Authentication)
@@ -111,7 +110,6 @@ class MicrosoftAppCredentials(Authentication):
             return oauth_token.access_token
         else:
             return ''
-
     async def refresh_token(self) -> _OAuthResponse:
         """
         returns: _OAuthResponse
@@ -122,7 +120,7 @@ class MicrosoftAppCredentials(Authentication):
             'client_secret': self.microsoft_app_password,
             'scope': MicrosoftAppCredentials.refreshScope}
         async with aiohttp.ClientSession() as session:
-            async with session.post(self.oauth_endpoint, data=options) as response:
+            async with session.post(self.oauth_endpoint, data=aiohttp.FormData(options)) as response:
                 response.raise_for_status()
                 oauth_response = _OAuthResponse.from_json(await response.json())
                 oauth_response.expiration_time = datetime.now() + \
