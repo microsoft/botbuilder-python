@@ -16,25 +16,28 @@ RECIPIENT_ID = 'U19KH8EHJ:T03CWQ0QB'
 CONVERSATION_ID = 'B21UTEF8S:T03CWQ0QB:D2369CT7C'
 
 
-def get_auth_token():
+async def get_auth_token():
     try:
         from .app_creds_real import MICROSOFT_APP_PASSWORD, MICROSOFT_APP_ID
         # # Define a "app_creds_real.py" file with your bot credentials as follows:
         # # MICROSOFT_APP_ID = '...'
         # # MICROSOFT_APP_PASSWORD = '...'
-        return MicrosoftAppCredentials(
+        return await MicrosoftAppCredentials(
             MICROSOFT_APP_ID,
             MICROSOFT_APP_PASSWORD).get_access_token()
     except ImportError:
         return 'STUB_ACCESS_TOKEN'
 
 
+loop = asyncio.get_event_loop()
+auth_token = loop.run_until_complete(get_auth_token())
+
 class TestAsyncConversation(ReplayableTest):
 
     def __init__(self, method_name):
         super(TestAsyncConversation, self).__init__(method_name)
         self.loop = asyncio.get_event_loop()
-        self.credentials = MicrosoftTokenAuthenticationStub(get_auth_token())
+        self.credentials = MicrosoftTokenAuthenticationStub(auth_token)
 
     def test_conversations_create_conversation(self):
         to = ChannelAccount(id=RECIPIENT_ID)
