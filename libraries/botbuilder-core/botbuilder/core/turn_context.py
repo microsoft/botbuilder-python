@@ -147,7 +147,9 @@ class TurnContext(object):
             context._responded = True
             return responses
 
-        await self._emit(self._on_send_activities, output, callback(self, output))
+        result = await self._emit(self._on_send_activities, output, callback(self, output))
+
+        return result[0] if len(result) > 0 else ResourceResponse()
 
     async def update_activity(self, activity: Activity):
         """

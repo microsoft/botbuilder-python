@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 from typing import List, Callable, Awaitable
 from botbuilder.schema import Activity, ConversationReference
 
+from . import conversation_reference_extension
 from .bot_assert import BotAssert
 from .turn_context import TurnContext
 from .middleware_set import MiddlewareSet
@@ -49,6 +50,21 @@ class BotAdapter(ABC):
         :return:
         """
         self._middleware.use(middleware)
+        return self
+    
+    async def continue_conversation(self, bot_id: str, reference: ConversationReference, callback: Callable):
+        """
+        Sends a proactive message to a conversation. Call this method to proactively send a message to a conversation.
+        Most _channels require a user to initiate a conversation with a bot before the bot can send activities 
+        to the user.
+        :param bot_id: The application ID of the bot. This paramter is ignored in
+        single tenant the Adpters (Console, Test, etc) but is critical to the BotFrameworkAdapter
+        which is multi-tenant aware. </param>
+        :param reference: A reference to the conversation to continue.</param>
+        :param callback: The method to call for the resulting bot turn.</param>
+        """
+        context = TurnContext(self, conversation_reference_extension.get_continuation_activity(reference))
+        return await self.run_pipeline(context, callback)
 
     async def run_pipeline(self, context: TurnContext, callback: Callable[[TurnContext], Awaitable]= None):
         """

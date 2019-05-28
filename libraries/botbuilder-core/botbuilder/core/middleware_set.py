@@ -10,7 +10,7 @@ from .turn_context import TurnContext
 
 class Middleware(ABC):
     @abstractmethod
-    def on_process_request(self, context: TurnContext, next): pass
+    def on_process_request(self, context: TurnContext, next: Callable): pass
 
 
 class AnonymousReceiveMiddleware(Middleware):
@@ -58,7 +58,7 @@ class MiddlewareSet(Middleware):
 
     async def receive_activity_internal(self, context: TurnContext, callback: Callable[[TurnContext], Awaitable], next_middleware_index: int = 0):
         if next_middleware_index == len(self._middleware):
-            if callback:
+            if callback is not None:
                 return await callback(context)
             else:
                 return None
