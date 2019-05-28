@@ -13,6 +13,7 @@ gi
 from functools import wraps
 import json
 import asyncio
+import sys
 from flask import Flask, jsonify, request, Response
 from botbuilder.schema import (Activity, ActivityTypes)
 from botbuilder.core import (BotFrameworkAdapter, BotFrameworkAdapterSettings, TurnContext,
@@ -28,6 +29,19 @@ app.config.from_object('config.DefaultConfig')
 
 SETTINGS = BotFrameworkAdapterSettings(app.config['APP_ID'], app.config['APP_PASSWORD'])
 ADAPTER = BotFrameworkAdapter(SETTINGS)
+
+# Catch-all for errors.
+async def on_error(context: TurnContext, error: Exception):
+    # This check writes out errors to console log
+    # NOTE: In production environment, you should consider logging this to Azure
+    #       application insights.
+    print(f'\n [on_turn_error]: { error }', file=sys.stderr)
+    # Send a message to the user
+    await context.send_activity('Oops. Something went wrong!')
+    # Clear out state
+    await conversation_state.delete(context)
+
+ADAPTER.on_turn_error = on_error
 
 # Create MemoryStorage, UserState and ConversationState
 memory = MemoryStorage()

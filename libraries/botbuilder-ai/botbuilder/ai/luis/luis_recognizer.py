@@ -290,7 +290,7 @@ class LuisRecognizer(object):
         telemetry_metrics: Dict[str, float],
     ) -> RecognizerResult:
 
-        BotAssert.context_not_null(turn_context)
+        BotAssert.context_not_none(turn_context)
 
         if turn_context.activity.type != ActivityTypes.message:
             return None

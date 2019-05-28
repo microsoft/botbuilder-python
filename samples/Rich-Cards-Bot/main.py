@@ -6,6 +6,7 @@ This sample shows how to use different types of rich cards.
 """
 import os
 import yaml
+import sys
 
 from aiohttp import web
 from botbuilder.schema import Activity, ActivityTypes
@@ -23,6 +24,19 @@ with open(path, 'r') as ymlfile:
 PORT = cfg['Settings']['Port']
 SETTINGS = BotFrameworkAdapterSettings(cfg['Settings']['AppId'], cfg['Settings']['AppPassword'])
 ADAPTER = BotFrameworkAdapter(SETTINGS)
+
+# Catch-all for errors.
+async def on_error(context: TurnContext, error: Exception):
+    # This check writes out errors to console log
+    # NOTE: In production environment, you should consider logging this to Azure
+    #       application insights.
+    print(f'\n [on_turn_error]: { error }', file=sys.stderr)
+    # Send a message to the user
+    await context.send_activity('Oops. Something went wrong!')
+    # Clear out state
+    await conversation_state.delete(context)
+
+ADAPTER.on_turn_error = on_error
 
 # Create MemoryStorage, UserState and ConversationState
 memory = MemoryStorage()

@@ -4,10 +4,11 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
+from . import conversation_reference_extension
 
 from .about import __version__
 from .activity_handler import ActivityHandler
-from .assertions import BotAssert
+from .bot_assert import BotAssert
 from .bot_adapter import BotAdapter
 from .bot_framework_adapter import BotFrameworkAdapter, BotFrameworkAdapterSettings
 from .bot_state import BotState
@@ -35,6 +36,7 @@ __all__ = ['ActivityHandler',
            'calculate_change_hash',
            'CardFactory',
            'ConversationState',
+           'conversation_reference_extension',
            'MemoryStorage',
            'MessageFactory',
            'Middleware',

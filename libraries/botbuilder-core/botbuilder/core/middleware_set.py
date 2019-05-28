@@ -3,13 +3,14 @@
 
 from asyncio import iscoroutinefunction
 from abc import ABC, abstractmethod
+from typing import Awaitable, Callable
 
 from .turn_context import TurnContext
 
 
 class Middleware(ABC):
     @abstractmethod
-    def on_process_request(self, context: TurnContext, next): pass
+    def on_process_request(self, context: TurnContext, next: Callable): pass
 
 
 class AnonymousReceiveMiddleware(Middleware):
@@ -48,16 +49,16 @@ class MiddlewareSet(Middleware):
     async def receive_activity(self, context: TurnContext):
         await self.receive_activity_internal(context, None)
 
-    async def on_process_request(self, context, logic):
+    async def on_process_request(self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]):
         await self.receive_activity_internal(context, None)
         await logic()
 
-    async def receive_activity_with_status(self, context: TurnContext, callback):
+    async def receive_activity_with_status(self, context: TurnContext, callback: Callable[[TurnContext], Awaitable]):
         return await self.receive_activity_internal(context, callback)
 
-    async def receive_activity_internal(self, context, callback, next_middleware_index=0):
+    async def receive_activity_internal(self, context: TurnContext, callback: Callable[[TurnContext], Awaitable], next_middleware_index: int = 0):
         if next_middleware_index == len(self._middleware):
-            if callback:
+            if callback is not None:
                 return await callback(context)
             else:
                 return None

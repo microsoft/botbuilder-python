@@ -4,7 +4,7 @@
 import asyncio
 import inspect
 from datetime import datetime
-from typing import Coroutine, List
+from typing import Coroutine, List, Callable
 from copy import copy
 from ..bot_adapter import BotAdapter
 from ..turn_context import TurnContext 
@@ -77,15 +77,15 @@ class TestAdapter(BotAdapter):
         """
         self.updated_activities.append(activity)
 
-    async def continue_conversation(self, reference, logic):
+    async def continue_conversation(self, bot_id: str, reference: ConversationReference, callback: Callable):
         """
-        The `TestAdapter` doesn't implement `continueConversation()` and will return an error if it's
-        called.
+        The `TestAdapter` just calls parent implementation.
+        :param bot_id
         :param reference:
-        :param logic:
+        :param callback:
         :return:
         """
-        raise NotImplementedError('TestAdapter.continue_conversation(): is not implemented.')
+        await super().continue_conversation(bot_id, reference, callback)
 
     async def receive_activity(self, activity):
         """
@@ -110,7 +110,7 @@ class TestAdapter(BotAdapter):
 
         # Create context object and run middleware
         context = TurnContext(self, request)
-        return await self.run_middleware(context, self.logic)
+        return await self.run_pipeline(context, self.logic)
 
     async def send(self, user_says) -> object:
         """
