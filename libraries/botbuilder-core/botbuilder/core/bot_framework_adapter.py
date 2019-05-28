@@ -19,9 +19,10 @@ USER_AGENT = f"Microsoft-BotFramework/3.1 (BotBuilder Python/{__version__})"
 
 
 class BotFrameworkAdapterSettings(object):
-    def __init__(self, app_id: str, app_password: str):
+    def __init__(self, app_id: str, app_password: str, channel_auth_tenant: str= None):
         self.app_id = app_id
         self.app_password = app_password
+        self.channel_auth_tenant = channel_auth_tenant
 
 
 class BotFrameworkAdapter(BotAdapter):
@@ -29,7 +30,8 @@ class BotFrameworkAdapter(BotAdapter):
     def __init__(self, settings: BotFrameworkAdapterSettings):
         super(BotFrameworkAdapter, self).__init__()
         self.settings = settings or BotFrameworkAdapterSettings('', '')
-        self._credentials = MicrosoftAppCredentials(self.settings.app_id, self.settings.app_password)
+        self._credentials = MicrosoftAppCredentials(self.settings.app_id, self.settings.app_password,
+                                                    self.settings.channel_auth_tenant)
         self._credential_provider = SimpleCredentialProvider(self.settings.app_id, self.settings.app_password)
 
     async def continue_conversation(self, reference: ConversationReference, logic):
