@@ -20,7 +20,14 @@ def retrieve_bot_body():
 
 class BotTelemetryMiddleware():
     """
-    Save off the POST body to later populate bot properties
+    Save off the POST body to later populate bot-specific properties to
+    add to Application Insights.
+
+    Example activating MIDDLEWARE in Django settings:
+    MIDDLEWARE = [
+        'botbuilder.applicationinsights.django.BotTelemetryMiddleware', # Ideally add somewhere near top
+        ...
+        ]
     """
     def __init__(self, get_response):
         self.get_response = get_response
@@ -30,13 +37,11 @@ class BotTelemetryMiddleware():
         return self.get_response(request)
 
     def process_request(self, request):
+        # Bot Service doesn't handle anything over 256k
+        # TODO: Add length check 
         body_unicode = request.body.decode('utf-8') if request.method == "POST" else None
         # Sanity check JSON
         if body_unicode != None:
-            try:
-                body = json.loads(body_unicode)
-            except:
-                return
             # Integration layer expecting just the json text.
             _request_bodies[current_thread().ident] = body_unicode
 

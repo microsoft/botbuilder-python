@@ -7,10 +7,40 @@ from botbuilder.core.bot_telemetry_client import BotTelemetryClient, TelemetryDa
 from typing import Dict
 from .integration_post_data import IntegrationPostData
 
-def bot_telemetry_processor(data, context):
+def bot_telemetry_processor(data, context) -> bool:
+    """ Application Insights Telemetry Processor for Bot
+    Traditional Web user and session ID's don't apply for Bots.  This processor
+    replaces the identifiers to be consistent with Bot Framework's notion of
+    user and session id's.
+
+    Each event that gets logged (with this processor added) will contain additional
+    properties.
+
+    The following properties are replaced:
+     - context.user.id    - The user ID that Application Insights uses to identify
+                            a unique user.
+     - context.session.id - The session ID that APplication Insights uses to
+                            identify a unique session.
+
+     In addition, the additional data properties are added:
+     - activityId - The Bot Framework's Activity ID which represents a unique
+                    message identifier.
+     - channelId - The Bot Framework "Channel" (ie, slack/facebook/directline/etc)
+     - activityType - The Bot Framework message classification (ie, message)
+    
+
+    :param data: Data from Application Insights
+    :type data: telemetry item
+    :param context: Context from Application Insights
+    :type context: context object
+    :returns:  bool -- determines if the event is passed to the server (False = Filtered).
+    """
     post_data = IntegrationPostData().activity_json
     if post_data is None:
-        return
+        # If there is no body (not a BOT request or not configured correctly).
+        # We *could* filter here, but we're allowing event to go through.
+        return True
+        
     # Override session and user id
     from_prop = post_data['from'] if 'from' in post_data else None
     user_id = from_prop['id'] if from_prop != None else None
@@ -27,6 +57,7 @@ def bot_telemetry_processor(data, context):
         data.properties["channelId"] = post_data['channelId'] 
     if 'type' in post_data:
         data.properties["activityType"] = post_data['type']
+    return True
 
 
 class ApplicationInsightsTelemetryClient(BotTelemetryClient):
@@ -70,7 +101,7 @@ class ApplicationInsightsTelemetryClient(BotTelemetryClient):
         :param properties: the set of custom properties the client wants attached to this data item. (defaults to: None)
         :param measurements: the set of custom measurements the client wants to attach to this data item. (defaults to: None)
         """
-        self._client.track_event(name, properties, measurements)
+        self._client.track_event(name, properties = properties, measurements = measurements)
 
     def track_metric(self, name: str, value: float, type: TelemetryDataPointType =None, 
                     count: int =None, min: float=None, max: float=None, std_dev: float=None,
