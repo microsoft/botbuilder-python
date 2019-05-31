@@ -1,0 +1,13 @@
+name: aml-python-bot
+channels:
+  - conda-forge
+dependencies:
+  - python=3.6.2
+  - pip:
+    - azureml-core
+    - azureml-contrib-services
+    - botframework-connector>=4.4.0.b1
+    - botbuilder-schema>=4.4.0.b1
+    - botbuilder-core>=4.4.0.b1
+    - botbuilder-dialogs>=4.4.0.b1
+    - botbuilder-ai>=4.4.0.b1
