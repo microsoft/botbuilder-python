@@ -1,5 +1,6 @@
 #!/bin/bash
 service_name=""
+endpoint=""
 resource_group=""
 subscription_name=""
 aad_app_name="displayName"
@@ -19,4 +20,10 @@ aad_app_id=`az ad app create \
     --available-to-other-tenants \
     | jq '.appid'
 
-./scripts/deploy.sh ${service_name} ${resource_group} ${aad_app_id} ${aad_app_password}
+az bot create \
+    --resource-group ${resource_group} \
+    --name ${service_name}  \
+    --kind registration \
+    --endpoint https://${endpoint}.eastus2.cloudapp.azure.com/api/v1/service/${service_name}/score \
+    --appid ${aad_app_id} \
+    --password ${aad_app_password}
