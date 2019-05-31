@@ -1,0 +1,22 @@
+#!/bin/bash
+service_name=""
+resource_group=""
+subscription_name=""
+aad_app_name="displayName"
+aad_app_password="AtLeastSixteenCharacters_0"
+
+appid="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+password=""
+
+# curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+az account set -s  ${subscription_name}
+
+# Create AAD App
+aad_app_id=`az ad app create \
+    --display-name ${aad_app_name} \
+    --password ${aad_app_password} \
+    --available-to-other-tenants \
+    | jq '.appid'
+
+./scripts/deploy.sh ${service_name} ${resource_group} ${aad_app_id} ${aad_app_password}
