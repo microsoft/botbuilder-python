@@ -140,7 +140,8 @@ class TurnContext(object):
             Activity(text=a, type='message') if isinstance(a, str) else a, reference)
             for a in activity_or_text]
         for activity in output:
-            activity.input_hint = 'acceptingInput'
+            if not activity.input_hint:
+                activity.input_hint = 'acceptingInput'
 
         async def callback(context: 'TurnContext', output):
             responses = await context.adapter.send_activities(context, output)
