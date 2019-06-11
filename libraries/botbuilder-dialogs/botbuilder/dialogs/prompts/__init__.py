@@ -6,6 +6,7 @@
 # --------------------------------------------------------------------------
 
 from .activity_prompt import ActivityPrompt
+from .attachment_prompt import AttachmentPrompt
 from .confirm_prompt import ConfirmPrompt
 from .datetime_prompt import DateTimePrompt
 from .datetime_resolution import DateTimeResolution
@@ -17,14 +18,17 @@ from .prompt import Prompt
 from .prompt_options import PromptOptions
 from .text_prompt import TextPrompt
 
-__all__ = ["ActivityPrompt",
-           "ConfirmPrompt",
-           "DateTimePrompt",
-           "DateTimeResolution",
-           "NumberPrompt",
-           "PromptOptions",
-           "PromptRecognizerResult",
-           "PromptValidatorContext",
-           "Prompt", 
-           "PromptOptions",
-           "TextPrompt"]
+__all__ = [
+    "ActivityPrompt",
+    "AttachmentPrompt",
+    "ConfirmPrompt",
+    "DateTimePrompt",
+    "DateTimeResolution",
+    "NumberPrompt",
+    "PromptOptions",
+    "PromptRecognizerResult",
+    "PromptValidatorContext",
+    "Prompt", 
+    "PromptOptions",
+    "TextPrompt"
+]

@@ -1,11 +1,15 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+
 import aiounittest
 from botbuilder.dialogs.prompts import ActivityPrompt, NumberPrompt, PromptOptions, PromptRecognizerResult
 from botbuilder.schema import Activity, InputHints
 
 from botbuilder.core.turn_context import TurnContext
 from botbuilder.core.adapters import TestAdapter
+
+class SimpleActivityPrompt(ActivityPrompt):
+    pass
 
 class ActivityPromptTests(aiounittest.AsyncTestCase):
     async def test_does_the_things(self):
@@ -22,3 +26,11 @@ class ActivityPromptTests(aiounittest.AsyncTestCase):
         print('placeholder print')
 
         pass
+
+    # def test_activity_prompt_with_empty_id_should_fail(self):
+    #     empty_id = ''
+    #     text_prompt = SimpleActivityPrompt(empty_id, self.validator)
+    
+    # async def validator(self):
+    #     return True
+        

@@ -14,7 +14,6 @@ from .prompt_validator_context import PromptValidatorContext
 
 
 class ActivityPrompt(Dialog, ABC):
-# class ActivityPrompt(ABC):
     """
     Waits for an activity to be received.
 
