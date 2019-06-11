@@ -19,7 +19,7 @@ from botbuilder.schema import (Activity, ActivityTypes,
                                ResourceResponse, ConversationReference)
 
 from application import SETTINGS
-from lost_and_found.bots import ActivityHandler
+from my_bot.bots import ActivityHandler
 
 
 class StringAdapter(BotAdapter):
