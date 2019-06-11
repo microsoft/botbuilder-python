@@ -19,22 +19,6 @@ from .middleware_set import Middleware
 USER_AGENT = f"Microsoft-BotFramework/3.1 (BotBuilder Python/{__version__})"
 
 
-class TenantIdWorkaroundForTeamsMiddleware(Middleware):
-    """
-    Middleware to assign tenant_id from channelData to Conversation.tenant_id.
-    MS Teams currently sends the tenant ID in channelData and the correct behavior is to expose this value in Activity.Conversation.tenant_id.
-    This code copies the tenant ID from channelData to Activity.Conversation.tenant_id.
-    Once MS Teams sends the tenant_id in the Conversation property, this middleware can be removed.
-    """
-    async def on_process_request(self, context: TurnContext, next: Callable[[TurnContext], Awaitable]):
-        if Channels.ms_teams == context.activity.channel_id and context.activity.conversation is not None and not context.activity.conversation.tenant_id:
-            teams_channel_data = context.activity.channel_data
-            if teams_channel_data.get("tenant", {}).get("id", None):
-                context.activity.conversation.tenant_id = str(teams_channel_data["tenant"]["id"])
-
-        await next()
-
-
 class BotFrameworkAdapterSettings(object):
     def __init__(self, app_id: str, app_password: str, channel_auth_tenant: str= None):
         self.app_id = app_id
@@ -50,8 +34,6 @@ class BotFrameworkAdapter(BotAdapter):
         self._credentials = MicrosoftAppCredentials(self.settings.app_id, self.settings.app_password,
                                                     self.settings.channel_auth_tenant)
         self._credential_provider = SimpleCredentialProvider(self.settings.app_id, self.settings.app_password)
-
-        self.use(TenantIdWorkaroundForTeamsMiddleware())
 
     async def continue_conversation(self, reference: ConversationReference, logic):
         """

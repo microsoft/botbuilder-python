@@ -4,6 +4,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Callable, Awaitable
 from botbuilder.schema import Activity, ConversationReference
+from botframework.connector import Channels
 
 from . import conversation_reference_extension
 from .bot_assert import BotAssert
@@ -77,6 +78,19 @@ class BotAdapter(ABC):
         BotAssert.context_not_none(context)
 
         if context.activity is not None:
+
+            # Middleware to assign tenant_id from channelData to Conversation.tenant_id.
+            # MS Teams currently sends the tenant ID in channelData and the correct behavior is to expose 
+            # this value in Activity.Conversation.tenant_id.
+            # This code copies the tenant ID from channelData to Activity.Conversation.tenant_id.
+            # Once MS Teams sends the tenant_id in the Conversation property, this middleware can be removed.
+            if (Channels.ms_teams == context.activity.channel_id and context.activity.conversation is not None
+                    and not context.activity.conversation.tenant_id):
+                teams_channel_data = context.activity.channel_data
+                if teams_channel_data.get("tenant", {}).get("id", None):
+                    context.activity.conversation.tenant_id = str(teams_channel_data["tenant"]["id"])
+
+
             try:
                 return await self._middleware.receive_activity_with_status(context, callback)
             except Exception as error:
