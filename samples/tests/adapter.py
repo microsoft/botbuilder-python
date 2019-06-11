@@ -18,8 +18,8 @@ from botbuilder.schema import (Activity, ActivityTypes,
                                ChannelAccount, ConversationAccount,
                                ResourceResponse, ConversationReference)
 
-from application import PAX_SETTINGS, DAX_SETTINGS
-from lost_and_found.bots import PAXActivityHandler, DAXActivityHandler
+from application import SETTINGS
+from lost_and_found.bots import ActivityHandler
 
 
 class StringAdapter(BotAdapter):
@@ -155,7 +155,7 @@ async def string_test_struc(msgs, answers, file='test'):
     :param answers: Array of expected Bot Outputs
     :param file: temp file used to test async output, each test should use a different file
     """
-    bot = ActivityHandler(MEMORY, PAX_SETTINGS, LOOP)
+    bot = ActivityHandler(MEMORY, SETTINGS, LOOP)
     adapter = StringAdapter(file=file)
 
     await adapter.process_activities(msgs, bot.on_turn)
