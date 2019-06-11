@@ -6,10 +6,12 @@ from typing import List, Callable, Awaitable
 from botbuilder.schema import (Activity, ChannelAccount,
                                ConversationAccount,
                                ConversationParameters, ConversationReference,
-                               ConversationsResult, ConversationResourceResponse)
+                               ConversationsResult, ConversationResourceResponse,
+                               TokenResponse)
 from botframework.connector import ConnectorClient
 from botframework.connector.auth import (MicrosoftAppCredentials,
                                          JwtTokenValidation, SimpleCredentialProvider)
+from botframework.connector.token_api import TokenApiClient
 
 from . import __version__
 from .bot_adapter import BotAdapter
@@ -19,10 +21,14 @@ USER_AGENT = f"Microsoft-BotFramework/3.1 (BotBuilder Python/{__version__})"
 
 
 class BotFrameworkAdapterSettings(object):
-    def __init__(self, app_id: str, app_password: str, channel_auth_tenant: str= None):
+    def __init__(self, app_id: str, app_password: str, channel_auth_tenant: str = None, oauth_endpoint: str = None,
+                 open_id_metadata: str = None, channel_service: str = None):
         self.app_id = app_id
         self.app_password = app_password
         self.channel_auth_tenant = channel_auth_tenant
+        self.oauth_endpoint = oauth_endpoint
+        self.open_id_metadata = open_id_metadata
+        self.channel_service = channel_service
 
 
 class BotFrameworkAdapter(BotAdapter):
@@ -33,6 +39,7 @@ class BotFrameworkAdapter(BotAdapter):
         self._credentials = MicrosoftAppCredentials(self.settings.app_id, self.settings.app_password,
                                                     self.settings.channel_auth_tenant)
         self._credential_provider = SimpleCredentialProvider(self.settings.app_id, self.settings.app_password)
+        self._is_emulating_oauth_cards = False
 
     async def continue_conversation(self, reference: ConversationReference, logic):
         """
@@ -277,6 +284,23 @@ class BotFrameworkAdapter(BotAdapter):
         client = self.create_connector_client(service_url)
         return await client.conversations.get_conversations(continuation_token)
 
+    async def get_user_token(self, context: TurnContext, connection_name: str, magic_code: str) -> TokenResponse:
+        if context.activity.from_property is None or not context.activity.from_property.id:
+            raise Exception('BotFrameworkAdapter.get_user_token(): missing from or from.id')
+        if not connection_name:
+        	raise Exception('get_user_token() requires a connection_name but none was provided.')
+        
+        """this.checkEmulatingOAuthCards(context)
+        const userId: string = context.activity.from.id
+        const url: string = this.oauthApiUrl(context)
+        const client: TokenApiClient = this.createTokenApiClient(url)
+
+        const result: TokenApiModels.UserTokenGetTokenResponse = await client.userToken.getToken(userId, connection_name, { code: magicCode, channelId: context.activity.channelId })"""
+        if (result is None or result.token is None or result._response.status == 404):
+            return None
+        else:
+            return result
+
     def create_connector_client(self, service_url: str) -> ConnectorClient:
         """
         Allows for mocking of the connector client in unit tests.
@@ -286,3 +310,11 @@ class BotFrameworkAdapter(BotAdapter):
         client = ConnectorClient(self._credentials, base_url=service_url)
         client.config.add_user_agent(USER_AGENT)
         return client
+    
+    def oauth_api_url(self, context_or_service_url: TurnContext):
+        pass
+
+    def check_emulating_oauth_cards(self, context: TurnContext):
+        if (not self._is_emulating_oauth_cards and context.activity.channel_id == 'emulator'
+            and (not self._credentials.microsoft_app_id or not self._credentials.microsoft_app_password)):
+            self._is_emulating_oauth_cards = True
