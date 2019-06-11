@@ -5,7 +5,7 @@ import aiounittest
 from botbuilder.dialogs.prompts import AttachmentPrompt, PromptOptions, PromptRecognizerResult
 from botbuilder.schema import Activity, InputHints
 
-from botbuilder.core.turn_context import TurnContext
+from botbuilder.core import TurnContext, ConversationState
 from botbuilder.core.adapters import TestAdapter
 
 class AttachmentPromptTests(aiounittest.AsyncTestCase):
@@ -19,5 +19,5 @@ class AttachmentPromptTests(aiounittest.AsyncTestCase):
         with self.assertRaises(TypeError):
             AttachmentPrompt(None)
     
+    # TODO other tests require TestFlow
     
-
