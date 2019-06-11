@@ -7,25 +7,7 @@ Test Suite
 
 import pytest
 
-from application import app
-from tests.adapters import pax_string_test_struc
-
-
-@pytest.fixture()
-def client(request):
-    """
-    Web Client Fixture used by Flask based tests
-
-    :param request: Provided Flask Fixture
-    """
-
-    test_client = app.test_client()
-
-    def teardown():
-        pass  # databases and resources have to be freed at the end. But so far we don't have anything
-
-    request.addfinalizer(teardown)
-    return test_client
+from tests.adapters import string_test_struc
 
 
 @pytest.mark.asyncio
