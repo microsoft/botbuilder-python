@@ -628,6 +628,8 @@ class ConversationAccount(Model):
     :param role: Role of the entity behind the account (Example: User, Bot,
      etc.). Possible values include: 'user', 'bot'
     :type role: str or ~botframework.connector.models.RoleTypes
+    :param tenant_id: This conversation's tenant ID
+    :type tenant_id: str
     """
 
     _attribute_map = {
@@ -637,6 +639,7 @@ class ConversationAccount(Model):
         'name': {'key': 'name', 'type': 'str'},
         'aad_object_id': {'key': 'aadObjectId', 'type': 'str'},
         'role': {'key': 'role', 'type': 'str'},
+        'tenant_id': {'key': 'tenantID', 'type': 'str'},
     }
 
     def __init__(self, **kwargs):
@@ -647,6 +650,7 @@ class ConversationAccount(Model):
         self.name = kwargs.get('name', None)
         self.aad_object_id = kwargs.get('aad_object_id', None)
         self.role = kwargs.get('role', None)
+        self.tenant_id = kwargs.get('tenant_id', None)
 
 
 class ConversationMembers(Model):
@@ -687,6 +691,8 @@ class ConversationParameters(Model):
     :param channel_data: Channel specific payload for creating the
      conversation
     :type channel_data: object
+    :param tenant_id: (Optional) The tenant ID in which the conversation should be created
+    :type tenant_id: str
     """
 
     _attribute_map = {
@@ -696,6 +702,7 @@ class ConversationParameters(Model):
         'topic_name': {'key': 'topicName', 'type': 'str'},
         'activity': {'key': 'activity', 'type': 'Activity'},
         'channel_data': {'key': 'channelData', 'type': 'object'},
+        'tenant_id': {'key': 'tenantID', 'type': 'str'},
     }
 
     def __init__(self, **kwargs):
@@ -706,6 +713,7 @@ class ConversationParameters(Model):
         self.topic_name = kwargs.get('topic_name', None)
         self.activity = kwargs.get('activity', None)
         self.channel_data = kwargs.get('channel_data', None)
+        self.tenant_id = kwargs.get('tenant_id', None)
 
 
 class ConversationReference(Model):

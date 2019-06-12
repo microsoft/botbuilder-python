@@ -628,6 +628,8 @@ class ConversationAccount(Model):
     :param role: Role of the entity behind the account (Example: User, Bot,
      etc.). Possible values include: 'user', 'bot'
     :type role: str or ~botframework.connector.models.RoleTypes
+    :param tenant_id: This conversation's tenant ID
+    :type tenant_id: str
     """
 
     _attribute_map = {
@@ -637,9 +639,10 @@ class ConversationAccount(Model):
         'name': {'key': 'name', 'type': 'str'},
         'aad_object_id': {'key': 'aadObjectId', 'type': 'str'},
         'role': {'key': 'role', 'type': 'str'},
+        'tenant_id': {'key': 'tenantID', 'type': 'str'},
     }
 
-    def __init__(self, *, is_group: bool=None, conversation_type: str=None, id: str=None, name: str=None, aad_object_id: str=None, role=None, **kwargs) -> None:
+    def __init__(self, *, is_group: bool=None, conversation_type: str=None, id: str=None, name: str=None, aad_object_id: str=None, role=None, tenant_id=None, **kwargs) -> None:
         super(ConversationAccount, self).__init__(**kwargs)
         self.is_group = is_group
         self.conversation_type = conversation_type
@@ -647,6 +650,7 @@ class ConversationAccount(Model):
         self.name = name
         self.aad_object_id = aad_object_id
         self.role = role
+        self.tenant_id = tenant_id
 
 
 class ConversationMembers(Model):
@@ -687,6 +691,8 @@ class ConversationParameters(Model):
     :param channel_data: Channel specific payload for creating the
      conversation
     :type channel_data: object
+    :param tenant_id: (Optional) The tenant ID in which the conversation should be created
+    :type tenant_id: str
     """
 
     _attribute_map = {
@@ -696,9 +702,10 @@ class ConversationParameters(Model):
         'topic_name': {'key': 'topicName', 'type': 'str'},
         'activity': {'key': 'activity', 'type': 'Activity'},
         'channel_data': {'key': 'channelData', 'type': 'object'},
+        'tenant_id': {'key': 'tenantID', 'type': 'str'},
     }
 
-    def __init__(self, *, is_group: bool=None, bot=None, members=None, topic_name: str=None, activity=None, channel_data=None, **kwargs) -> None:
+    def __init__(self, *, is_group: bool=None, bot=None, members=None, topic_name: str=None, activity=None, channel_data=None, tenant_id=None, **kwargs) -> None:
         super(ConversationParameters, self).__init__(**kwargs)
         self.is_group = is_group
         self.bot = bot
@@ -706,6 +713,7 @@ class ConversationParameters(Model):
         self.topic_name = topic_name
         self.activity = activity
         self.channel_data = channel_data
+        self.tenant_id = tenant_id
 
 
 class ConversationReference(Model):
