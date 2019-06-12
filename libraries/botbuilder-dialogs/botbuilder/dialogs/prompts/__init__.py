@@ -11,6 +11,8 @@ from .confirm_prompt import ConfirmPrompt
 from .datetime_prompt import DateTimePrompt
 from .datetime_resolution import DateTimeResolution
 from .number_prompt import NumberPrompt
+from .oauth_prompt import OAuthPrompt
+from .oauth_prompt_settings import OAuthPromptSettings
 from .prompt_options import PromptOptions
 from .prompt_recognizer_result import PromptRecognizerResult
 from .prompt_validator_context import PromptValidatorContext
@@ -25,6 +27,8 @@ __all__ = [
     "DateTimePrompt",
     "DateTimeResolution",
     "NumberPrompt",
+    "OAuthPrompt",
+    "OAuthPromptSettings",
     "PromptOptions",
     "PromptRecognizerResult",
     "PromptValidatorContext",

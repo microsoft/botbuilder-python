@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 from botbuilder.dialogs import Dialog
+from .oauth_prompt_settings import OAuthPromptSettings
 
 class OAuthPrompt(Dialog):
     """
@@ -34,6 +35,12 @@ class OAuthPrompt(Dialog):
     You can then start the prompt from a waterfall step using either `DialogContext.begin()` or `DialogContext.prompt()`.
     The user will be prompted to sign in as needed and their access token will be passed as an argument to the callers next waterfall step.
     """
-    # TODO OAuthPromptSettings to set type hint for settings parameter
-    def __init__(self, dialog_id: str, settings, validator=None):
+    
+    def __init__(self, dialog_id: str, settings: OAuthPromptSettings, validator=None):
         super().__init__(dialog_id)
+        
+        if not settings:
+            raise TypeError('OAuthPrompt requires OAuthPromptSettings.')
+        
+        self._settings = settings
+        self._validator = validator
