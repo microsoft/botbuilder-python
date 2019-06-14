@@ -4,9 +4,9 @@ class Claim:
         self.value = value
 
 class ClaimsIdentity:
-    def __init__(self, claims: dict, isAuthenticated: bool):
+    def __init__(self, claims: dict, is_authenticated: bool):
         self.claims = claims
-        self.isAuthenticated = isAuthenticated
+        self.is_authenticated = is_authenticated
 
     def get_claim_value(self, claim_type: str):
         return self.claims.get(claim_type)
