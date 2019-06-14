@@ -302,7 +302,7 @@ class LuisRecognizer(object):
         luis_result: LuisResult = None
 
         if luis_prediction_options:
-            options = self._merge_options(self._options, luis_prediction_options)
+            options = self._merge_options(luis_prediction_options)
         else: 
             options = self._options
 
@@ -372,8 +372,9 @@ class LuisRecognizer(object):
         await turn_context.send_activity(trace_activity)
 
     def _merge_options(
-        defaultOptions,
+        self,
         userDefinedOptions
     ) -> LuisPredictionOptions:
-        mergedOptions = defaultOptions.__dict__.update(userDefinedOptions.__dict__)
+        mergedOptions = LuisPredictionOptions()
+        mergedOptions.__dict__.update(userDefinedOptions.__dict__)
         return mergedOptions
