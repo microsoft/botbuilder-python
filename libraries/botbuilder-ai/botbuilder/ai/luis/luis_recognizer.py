@@ -373,8 +373,8 @@ class LuisRecognizer(object):
 
     def _merge_options(
         self,
-        userDefinedOptions: LuisPredictionOptions
+        user_defined_options: LuisPredictionOptions
     ) -> LuisPredictionOptions:
         merged_options = LuisPredictionOptions()
-        merged_options.__dict__.update(userDefinedOptions.__dict__)
+        merged_options.__dict__.update(user_defined_options.__dict__)
         return merged_options
