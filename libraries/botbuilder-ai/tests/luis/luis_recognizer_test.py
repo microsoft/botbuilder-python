@@ -635,6 +635,42 @@ class LuisRecognizerTest(AsyncTestCase):
         self.assertTrue("fromId" in call0_args[1])
         self.assertTrue("entities" in call0_args[1])
 
+    def test_pass_luis_prediction_options_to_recognizer(self):
+        # Arrange
+        my_app = LuisApplication(
+            LuisRecognizerTest._luisAppId,
+            LuisRecognizerTest._subscriptionKey,
+            endpoint=None,
+        )
+
+        luis_prediction_options = LuisPredictionOptions(
+            log_personal_information=True, include_all_intents=True, include_instance_data=True
+        )
+
+        # Assert
+        recognizer = LuisRecognizer(my_app)
+        merged_options = recognizer._merge_options(luis_prediction_options)
+        self.assertTrue(merged_options.log_personal_information)
+        self.assertTrue(merged_options.include_all_intents)
+        self.assertTrue(merged_options.include_instance_data)
+        self.assertFalse(recognizer._options.log_personal_information)
+        self.assertFalse(recognizer._options.include_all_intents)
+        self.assertFalse(recognizer._options.include_instance_data)
+
+    def test_dont_pass_luis_prediction_options_to_recognizer(self):
+        # Arrange
+        my_app = LuisApplication(
+            LuisRecognizerTest._luisAppId,
+            LuisRecognizerTest._subscriptionKey,
+            endpoint=None,
+        )
+
+        # Assert
+        recognizer = LuisRecognizer(my_app)
+        self.assertFalse(recognizer._options.log_personal_information)
+        self.assertFalse(recognizer._options.include_all_intents)
+        self.assertFalse(recognizer._options.include_instance_data)
+
     async def test_composite1(self):
         await self._test_json("Composite1.json")
 
