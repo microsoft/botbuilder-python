@@ -29,12 +29,12 @@ class Activity(Model):
     :param timestamp: Contains the date and time that the message was sent, in
      UTC, expressed in ISO-8601 format.
     :type timestamp: datetime
-    :param local_timestamp: Contains the date and time that the message was
-     sent, in local time, expressed in ISO-8601 format.
+    :param local_timestamp: Contains the local date and time of the message
+     expressed in ISO-8601 format.
      For example, 2016-09-23T13:07:49.4714686-07:00.
     :type local_timestamp: datetime
-    :param local_timezone: Contains the name of the timezone in which the
-     message, in local time, expressed in IANA Time Zone database format.
+    :param local_timezone: Contains the name of the local timezone of the message,
+     expressed in IANA Time Zone database format.
      For example, America/Los_Angeles.
     :type local_timezone: str
     :param service_url: Contains the URL that specifies the channel's service
@@ -144,6 +144,11 @@ class Activity(Model):
     :param semantic_action: An optional programmatic action accompanying this
      request
     :type semantic_action: ~botframework.connector.models.SemanticAction
+    :param caller_id: A string containing an IRI identifying the caller of a
+     bot. This field is not intended to be transmitted over the wire, but is
+     instead populated by bots and clients based on cryptographically 
+     verifiable data that asserts the identity of the callers (e.g. tokens).
+    :type caller_id: str
     """
 
     _attribute_map = {
@@ -188,9 +193,10 @@ class Activity(Model):
         'listen_for': {'key': 'listenFor', 'type': '[str]'},
         'text_highlights': {'key': 'textHighlights', 'type': '[TextHighlight]'},
         'semantic_action': {'key': 'semanticAction', 'type': 'SemanticAction'},
+        'caller_id': {'key': 'callerId', 'type': 'str'},
     }
 
-    def __init__(self, *, type=None, id: str=None, timestamp=None, local_timestamp=None, local_timezone: str=None, service_url: str=None, channel_id: str=None, from_property=None, conversation=None, recipient=None, text_format=None, attachment_layout=None, members_added=None, members_removed=None, reactions_added=None, reactions_removed=None, topic_name: str=None, history_disclosed: bool=None, locale: str=None, text: str=None, speak: str=None, input_hint=None, summary: str=None, suggested_actions=None, attachments=None, entities=None, channel_data=None, action: str=None, reply_to_id: str=None, label: str=None, value_type: str=None, value=None, name: str=None, relates_to=None, code=None, expiration=None, importance=None, delivery_mode=None, listen_for=None, text_highlights=None, semantic_action=None, **kwargs) -> None:
+    def __init__(self, *, type=None, id: str=None, timestamp=None, local_timestamp=None, local_timezone: str=None, service_url: str=None, channel_id: str=None, from_property=None, conversation=None, recipient=None, text_format=None, attachment_layout=None, members_added=None, members_removed=None, reactions_added=None, reactions_removed=None, topic_name: str=None, history_disclosed: bool=None, locale: str=None, text: str=None, speak: str=None, input_hint=None, summary: str=None, suggested_actions=None, attachments=None, entities=None, channel_data=None, action: str=None, reply_to_id: str=None, label: str=None, value_type: str=None, value=None, name: str=None, relates_to=None, code=None, expiration=None, importance=None, delivery_mode=None, listen_for=None, text_highlights=None, semantic_action=None, caller_id: str=None, **kwargs) -> None:
         super(Activity, self).__init__(**kwargs)
         self.type = type
         self.id = id
@@ -233,7 +239,7 @@ class Activity(Model):
         self.listen_for = listen_for
         self.text_highlights = text_highlights
         self.semantic_action = semantic_action
-
+        self.caller_id = caller_id
 
 class AnimationCard(Model):
     """An animation card (Ex: gif or short video clip).
@@ -388,9 +394,9 @@ class AttachmentInfo(Model):
 class AttachmentView(Model):
     """Attachment View name and size.
 
-    :param view_id: Content type of the attachment
+    :param view_id: Id of the attachment
     :type view_id: str
-    :param size: Name of the attachment
+    :param size: Size of the attachment
     :type size: int
     """
 
@@ -609,7 +615,7 @@ class ChannelAccount(Model):
 
 
 class ConversationAccount(Model):
-    """Channel account information for a conversation.
+    """Conversation account represents the identity of the conversation within a channel.
 
     :param is_group: Indicates whether the conversation contains more than two
      participants at the time the activity was generated
@@ -1790,17 +1796,21 @@ class SemanticAction(Model):
     :type id: str
     :param entities: Entities associated with this action
     :type entities: dict[str, ~botframework.connector.models.Entity]
+    :param state: State of this action. Allowed values: `start`, `continue`, `done`
+    :type state: str or ~botframework.connector.models.SemanticActionStates
     """
 
     _attribute_map = {
         'id': {'key': 'id', 'type': 'str'},
         'entities': {'key': 'entities', 'type': '{Entity}'},
+        'state': {'key': 'state', 'type': 'str'},
     }
 
-    def __init__(self, *, id: str=None, entities=None, **kwargs) -> None:
+    def __init__(self, *, id: str=None, entities=None, state=None, **kwargs) -> None:
         super(SemanticAction, self).__init__(**kwargs)
         self.id = id
         self.entities = entities
+        self.state = state
 
 
 class SigninCard(Model):
@@ -1974,19 +1984,23 @@ class TokenResponse(Model):
     :param expiration: Expiration for the token, in ISO 8601 format (e.g.
      "2007-04-05T14:30Z")
     :type expiration: str
+    :param channel_id: The channelId of the TokenResponse
+    :type channel_id: str    
     """
 
     _attribute_map = {
         'connection_name': {'key': 'connectionName', 'type': 'str'},
         'token': {'key': 'token', 'type': 'str'},
         'expiration': {'key': 'expiration', 'type': 'str'},
+        'channel_id': {'key': 'channelId', 'type': 'str'},        
     }
 
-    def __init__(self, *, connection_name: str=None, token: str=None, expiration: str=None, **kwargs) -> None:
+    def __init__(self, *, connection_name: str=None, token: str=None, expiration: str=None, channel_id: str=None, **kwargs) -> None:
         super(TokenResponse, self).__init__(**kwargs)
         self.connection_name = connection_name
         self.token = token
         self.expiration = expiration
+        self.channel_id = channel_id
 
 
 class Transcript(Model):
