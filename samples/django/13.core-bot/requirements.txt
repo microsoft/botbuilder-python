@@ -1,5 +1,4 @@
 Django>=2.2.1
-asyncio>=3.4.3
 botframework-connector>=4.4.0.b1
 botbuilder-schema>=4.4.0.b1
 botbuilder-core>=4.4.0.b1
