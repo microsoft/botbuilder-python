@@ -3,7 +3,7 @@
 
 import aiounittest
 import unittest
-from copy import copy
+from copy import copy, deepcopy
 from unittest.mock import Mock
 
 from botbuilder.core import BotFrameworkAdapter, BotFrameworkAdapterSettings, TurnContext
@@ -144,6 +144,35 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
 
         await adapter.process_activity(incoming_message, '', aux_func_assert_context)
         self.assertTrue(called, 'bot logic not called.')
+    
+    async def test_should_update_activity(self):
+        adapter = AdapterUnderTest()
+        context = TurnContext(adapter, incoming_message)
+        self.assertTrue(await adapter.update_activity(context, incoming_message), 'Activity not updated.')
+
+    async def test_should_fail_to_update_activity_if_serviceUrl_missing(self):
+        adapter = AdapterUnderTest()
+        context = TurnContext(adapter, incoming_message)
+        cpy = deepcopy(incoming_message)
+        cpy.service_url = None
+        with self.assertRaises(Exception) as _:
+            await adapter.update_activity(context, cpy)
+
+    async def test_should_fail_to_update_activity_if_conversation_missing(self):
+        adapter = AdapterUnderTest()
+        context = TurnContext(adapter, incoming_message)
+        cpy = deepcopy(incoming_message)
+        cpy.conversation = None
+        with self.assertRaises(Exception) as _:
+            await adapter.update_activity(context, cpy)
+
+    async def test_should_fail_to_update_activity_if_activity_id_missing(self):
+        adapter = AdapterUnderTest()
+        context = TurnContext(adapter, incoming_message)
+        cpy = deepcopy(incoming_message)
+        cpy.id = None
+        with self.assertRaises(Exception) as _:
+            await adapter.update_activity(context, cpy)
 
     async def test_should_migrate_tenant_id_for_msteams(self):
         incoming = TurnContext.apply_conversation_reference(

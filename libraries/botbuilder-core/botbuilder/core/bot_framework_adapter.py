@@ -181,9 +181,9 @@ class BotFrameworkAdapter(BotAdapter):
         """
         try:
             client = self.create_connector_client(activity.service_url)
-            return await client.conversations.update_activity(
+            return client.conversations.update_activity(
                 activity.conversation.id,
-                activity.conversation.activity_id,
+                activity.id,
                 activity)
         except Exception as e:
             raise e
