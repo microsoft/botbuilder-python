@@ -15,6 +15,7 @@ from .bot_state import BotState
 from .bot_telemetry_client import BotTelemetryClient
 from .card_factory import CardFactory
 from .conversation_state import ConversationState
+from .invoke_response import InvokeResponse
 from .memory_storage import MemoryStorage
 from .message_factory import MessageFactory
 from .middleware_set import AnonymousReceiveMiddleware, Middleware, MiddlewareSet
@@ -37,6 +38,7 @@ __all__ = ['ActivityHandler',
            'CardFactory',
            'ConversationState',
            'conversation_reference_extension',
+           'InvokeResponse',
            'MemoryStorage',
            'MessageFactory',
            'Middleware',

@@ -35,7 +35,6 @@ __all__ = [
            'DateTimePrompt',
            'DateTimeResolution',
            'NumberPrompt',
-           'PromptOptions',
            'PromptRecognizerResult',
            'PromptValidatorContext',
            'Prompt', 

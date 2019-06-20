@@ -61,5 +61,5 @@ class JwtTokenValidation:
                 return await ChannelValidation.authenticate_channel_token(auth_header, credentials, channel_id)
     
     @staticmethod
-    async def is_government(channel_service: str) -> bool:
+    def is_government(channel_service: str) -> bool:
         return channel_service and channel_service.lower() == GovernmentConstants.CHANNEL_SERVICE
