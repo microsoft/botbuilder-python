@@ -6,7 +6,7 @@ from botbuilder.dialogs import ComponentDialog, WaterfallDialog, \
 from botbuilder.dialogs.prompts import TextPrompt, PromptOptions
 from botbuilder.core import MessageFactory
 from booking_details import BookingDetails
-from helpers.language_helper import LanguageHelper
+from helpers.luis_helper import LuisHelper
 from .booking_dialog import BookingDialog
 
 class MainDialog(ComponentDialog):
@@ -39,7 +39,7 @@ class MainDialog(ComponentDialog):
         # In this sample we only have a single Intent we are concerned with.
         # However, typically a scenario will have multiple different Intents
         # each corresponding to starting a different child Dialog.
-        booking_details = await LanguageHelper.excecute_query(self._configuration,\
+        booking_details = await LuisHelper.execute_luis_query(self._configuration,\
              step_context.context) if step_context.result is not None else BookingDetails()
 
 

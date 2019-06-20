@@ -1,10 +1,11 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
-"""Helpers module."""
 
-from . import activity_helper, language_helper, dialog_helper
+"""Helpers module."""
+from . import activity_helper, luis_helper, dialog_helper
 
 __all__ = [
     'activity_helper',
     'dialog_helper',
     'luis_helper']
+    

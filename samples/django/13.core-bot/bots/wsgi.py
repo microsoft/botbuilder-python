@@ -12,9 +12,8 @@ https://docs.djangoproject.com/en/2.2/howto/deployment/wsgi/
 """
 
 import os
-
 from django.core.wsgi import get_wsgi_application
 
+# pylint:disable=invalid-name
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'bots.settings')
-
 application = get_wsgi_application()

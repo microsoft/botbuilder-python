@@ -9,6 +9,7 @@ from django.core.management.commands.runserver import Command as runserver
 import config
 
 def main():
+    """Django's command-line utility for administrative tasks."""
     runserver.default_port = config.DefaultConfig.PORT
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'bots.settings')
     try:
