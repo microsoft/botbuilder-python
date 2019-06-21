@@ -1,24 +1,25 @@
 
-==============================
-BotBuilder-Core SDK for Python
-==============================
+============================
+BotBuilder-AI SDK for Python
+============================
 
 .. image:: https://fuselabs.visualstudio.com/SDK_v4/_apis/build/status/Python/SDK_v4-Python-CI?branchName=master
    :target:  https://fuselabs.visualstudio.com/SDK_v4/_apis/build/status/Python/SDK_v4-Python-CI
    :align: right
    :alt: Azure DevOps status for master branch
-.. image:: https://badge.fury.io/py/botbuilder-core.svg
-   :target: https://badge.fury.io/py/botbuilder-core
+.. image:: https://badge.fury.io/py/botbuilder-ai.svg
+   :target: https://badge.fury.io/py/botbuilder-ai
    :alt: Latest PyPI package version
 
-Within the Bot Framework, BotBuilder-core enables you to build bots that exchange messages with users on channels that are configured in the Bot Framework Portal.
+Cognitive services extensions for Microsoft BotBuilder.
+
 
 How to Install
 ==============
 
 .. code-block:: python
   
-  pip install botbuilder-core
+  pip install botbuilder-ai
 
 
 Documentation/Wiki

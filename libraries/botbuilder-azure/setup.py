@@ -16,6 +16,9 @@ with open(os.path.join(root, 'botbuilder', 'azure', 'about.py')) as f:
     info = f.read()
     exec(info, package_info)
 
+with open(os.path.join(root, 'README.rst'), encoding='utf-8') as f:
+    long_description = f.read()
+
 setup(
     name=package_info['__title__'],
     version=package_info['__version__'],
@@ -24,13 +27,14 @@ setup(
     description=package_info['__description__'],
     keywords=['BotBuilderAzure', 'bots', 'ai',
               'botframework', 'botbuilder', 'azure'],
-    long_description=package_info['__summary__'],
+    long_description=long_description,
+    long_description_content_type='text/x-rst',
     license=package_info['__license__'],
     packages=['botbuilder.azure'],
     install_requires=REQUIRES + TEST_REQUIRES,
     tests_require=TEST_REQUIRES,
     classifiers=[
-        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
