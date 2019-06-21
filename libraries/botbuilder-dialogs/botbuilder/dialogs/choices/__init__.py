@@ -11,6 +11,7 @@ from .choice_factory_options import ChoiceFactoryOptions
 from .choice_factory import ChoiceFactory
 from .found_choice import FoundChoice
 from .list_style import ListStyle
+from .model_result import ModelResult
 
 __all__ = [
     "Channel",
@@ -18,5 +19,6 @@ __all__ = [
     "ChoiceFactory",
     "ChoiceFactoryOptions",
     "FoundChoice",
-    "ListStyle"
+    "ListStyle",
+    "ModelResult"
 ]
