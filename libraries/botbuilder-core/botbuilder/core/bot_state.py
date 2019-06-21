@@ -3,7 +3,7 @@
 
 from .turn_context import TurnContext
 from .middleware_set import Middleware
-from .storage import calculate_change_hash, StoreItem, StorageKeyFactory, Storage
+from .storage import calculate_change_hash, StorageKeyFactory, Storage
 from .property_manager import PropertyManager
 from botbuilder.core.state_property_accessor import StatePropertyAccessor
 from botbuilder.core import turn_context

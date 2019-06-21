@@ -9,7 +9,7 @@ Django generates *code* to create projects (`django-admin startproject`) and app
 
 File | | Description
 --- | ---
-all_tests.sh | Runs our current test matrix of python/django versions.  Current matrix is python (3.6) and django (2.2). 
+all_tests.sh | Runs our current test matrix of python/django versions.  Current matrix is python (3.7) and django (2.2). 
 README.md | This file.
 run_test.sh | Runs specific python/django version to create project, copy replacement files and runs tests.
 template.html | Template file
