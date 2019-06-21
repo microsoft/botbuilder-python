@@ -8,7 +8,7 @@ from unittest.mock import Mock
 
 from botbuilder.core import BotFrameworkAdapter, BotFrameworkAdapterSettings, TurnContext
 from botbuilder.schema import Activity, ActivityTypes, ConversationAccount, ConversationReference, ChannelAccount
-from botframework.connector import ConnectorClient
+from botframework.connector.aio import ConnectorClient
 from botframework.connector.auth import ClaimsIdentity
 
 reference = ConversationReference(
@@ -60,33 +60,33 @@ class AdapterUnderTest(BotFrameworkAdapter):
         self.tester.assertIsNotNone(service_url, 'create_connector_client() not passed service_url.')
         connector_client_mock = Mock()
 
-        def mock_reply_to_activity(conversation_id, activity_id, activity):
+        async def mock_reply_to_activity(conversation_id, activity_id, activity):
             nonlocal self
             self.tester.assertIsNotNone(conversation_id, 'reply_to_activity not passed conversation_id')
             self.tester.assertIsNotNone(activity_id, 'reply_to_activity not passed activity_id')
             self.tester.assertIsNotNone(activity, 'reply_to_activity not passed activity')
             return not self.fail_auth
 
-        def mock_send_to_conversation(conversation_id, activity):
+        async def mock_send_to_conversation(conversation_id, activity):
             nonlocal self
             self.tester.assertIsNotNone(conversation_id, 'send_to_conversation not passed conversation_id')
             self.tester.assertIsNotNone(activity, 'send_to_conversation not passed activity')
             return not self.fail_auth
 
-        def mock_update_activity(conversation_id, activity_id, activity):
+        async def mock_update_activity(conversation_id, activity_id, activity):
             nonlocal self
             self.tester.assertIsNotNone(conversation_id, 'update_activity not passed conversation_id')
             self.tester.assertIsNotNone(activity_id, 'update_activity not passed activity_id')
             self.tester.assertIsNotNone(activity, 'update_activity not passed activity')
             return not self.fail_auth
 
-        def mock_delete_activity(conversation_id, activity_id):
+        async def mock_delete_activity(conversation_id, activity_id):
             nonlocal self
             self.tester.assertIsNotNone(conversation_id, 'delete_activity not passed conversation_id')
             self.tester.assertIsNotNone(activity_id, 'delete_activity not passed activity_id')
             return not self.fail_auth
 
-        def mock_create_conversation(parameters):
+        async def mock_create_conversation(parameters):
             nonlocal self
             self.tester.assertIsNotNone(parameters, 'create_conversation not passed parameters')
             return not self.fail_auth
