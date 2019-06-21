@@ -11,7 +11,7 @@ from booking_details import BookingDetails
 class LuisHelper:
     """LUIS helper implementation."""
     @staticmethod
-    async def excecute_luis_query(configuration: dict, turn_context: TurnContext) -> BookingDetails:
+    async def execute_luis_query(configuration: dict, turn_context: TurnContext) -> BookingDetails:
         """Invoke LUIS service to perform prediction/evaluation of utterance."""
         booking_details = BookingDetails()
 
