@@ -9,6 +9,14 @@ from .channel import Channel
 from .choice import Choice
 from .choice_factory_options import ChoiceFactoryOptions
 from .choice_factory import ChoiceFactory
+from .found_choice import FoundChoice
 from .list_style import ListStyle
 
-__all__ = ["Channel", "Choice", "ChoiceFactory", "ChoiceFactoryOptions", "ListStyle"]
+__all__ = [
+    "Channel",
+    "Choice",
+    "ChoiceFactory",
+    "ChoiceFactoryOptions",
+    "FoundChoice",
+    "ListStyle"
+]
