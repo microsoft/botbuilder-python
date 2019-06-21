@@ -46,7 +46,7 @@ class Prompt(Dialog):
         if options.prompt != None and not options.prompt.input_hint:
             options.prompt.input_hint = InputHints.expecting_input
 
-        if options.retry_prompt != None and not options.prompt.input_hint:
+        if options.retry_prompt != None and not options.retry_prompt.input_hint:
             options.retry_prompt.input_hint = InputHints.expecting_input
        
         # Initialize prompt state

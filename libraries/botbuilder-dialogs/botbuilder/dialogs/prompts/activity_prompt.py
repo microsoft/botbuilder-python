@@ -2,11 +2,11 @@
 # Licensed under the MIT License.
 
 from abc import ABC, abstractmethod
-from typing import Dict
+from typing import Callable, Dict
 
 from botbuilder.core import TurnContext
-from botbuilder.dialogs import Dialog, DialogContext, DialogInstance, DialogReason
-from botbuilder.schema import Activity, InputHints
+from botbuilder.dialogs import Dialog, DialogContext, DialogInstance, DialogReason, DialogTurnResult
+from botbuilder.schema import Activity, ActivityTypes, InputHints
 
 from .prompt_options import PromptOptions
 from .prompt_recognizer_result import PromptRecognizerResult
@@ -23,68 +23,83 @@ class ActivityPrompt(Dialog, ABC):
     """
     persisted_options = "options"
     persisted_state = "state"
-    # !!! build out PromptValidator class to give type to validator parameter here
-    def __init__(self, dialog_id: str, validator ):
+
+    def __init__(self, dialog_id: str, validator: Callable[[PromptValidatorContext], bool]):
         """
         Initializes a new instance of the ActivityPrompt class.
 
         Parameters:
-
+        ----------
         dialog_id (str): Unique ID of the dialog within its parent DialogSet or ComponentDialog.
 
-        validator (PromptValidator): Validator that will be called each time a new activity is received.
+        validator: Validator that will be called each time a new activity is received.
         """
         self._validator = validator
 
-        persisted_options: str = 'options'
-        persisted_state: str = 'state'
-    
-    async def begin_dialog(self, dc: DialogContext, opt: PromptOptions):
+    async def begin_dialog(self, dc: DialogContext, options: PromptOptions) -> DialogTurnResult:
+        if not dc:
+            raise TypeError('ActivityPrompt.begin_dialog(): dc cannot be None.')
+        if not isinstance(options, PromptOptions):
+            raise TypeError('ActivityPrompt.begin_dialog(): Prompt options are required for ActivityPrompts.')
+        
         # Ensure prompts have input hint set
-        opt: PromptOptions = PromptOptions(**opt)
-        if opt and hasattr(opt, 'prompt') and not hasattr(opt.prompt, 'input_hint'):
-            opt.prompt.input_hint = InputHints.expecting_input
+        if options.prompt != None and not options.prompt.input_hint:
+            options.prompt.input_hint = InputHints.expecting_input
 
-        if opt and hasattr(opt, 'retry_prompt') and not hasattr(opt.retry_prompt, 'input_hint'):
-            opt.prompt.retry_prompt = InputHints.expecting_input
+        if options.retry_prompt != None and not options.retry_prompt.input_hint:
+            options.retry_prompt.input_hint = InputHints.expecting_input
 
         # Initialize prompt state
         state: Dict[str, object] = dc.active_dialog.state
-        state[self.persisted_options] = opt
-        state[self.persisted_state] = {}
+        state[self.persisted_options] = options
+        state[self.persisted_state] = Dict[str, object]
 
         # Send initial prompt
         await self.on_prompt(
             dc.context, 
             state[self.persisted_state], 
-            state[self.persisted_options]
+            state[self.persisted_options],
+            False
         )
 
         return Dialog.end_of_turn
 
-    async def continue_dialog(self, dc: DialogContext):
+    async def continue_dialog(self, dc: DialogContext) -> DialogTurnResult:
+        if not dc:
+            raise TypeError('ActivityPrompt.continue_dialog(): DialogContext cannot be None.')
+            
         # Perform base recognition
         instance = dc.active_dialog
         state: Dict[str, object] = instance.state[self.persisted_state]
         options: Dict[str, object] = instance.state[self.persisted_options]
-
         recognized: PromptRecognizerResult = await self.on_recognize(dc.context, state, options)
 
         # Validate the return value
-        prompt_context = PromptValidatorContext(
-            dc.context,
-            recognized,
-            state,
-            options
-        )
+        is_valid = False
+        if self._validator != None:
+            prompt_context = PromptValidatorContext(
+                dc.context,
+                recognized,
+                state,
+                options
+            )
+            is_valid = await self._validator(prompt_context)
 
-        is_valid = await self._validator(prompt_context)
+            if options is None:
+                options = PromptOptions()
 
+            options.number_of_attempts += 1
+        elif recognized.succeeded:
+                is_valid = True
+            
         # Return recognized value or re-prompt
         if is_valid:
             return await dc.end_dialog(recognized.value)
         else:
-            return Dialog.end_of_turn
+            if dc.context.activity.type == ActivityTypes.message and not dc.context.responded:
+                await self.on_prompt(dc.context, state, options, True)
+
+        return Dialog.end_of_turn
 
     async def resume_dialog(self, dc: DialogContext, reason: DialogReason, result: object = None):
         """
@@ -101,7 +116,7 @@ class ActivityPrompt(Dialog, ABC):
     async def reprompt_dialog(self, context: TurnContext, instance: DialogInstance):
         state: Dict[str, object] = instance.state[self.persisted_state]
         options: PromptOptions = instance.state[self.persisted_options]
-        await self.on_prompt(context, state, options, True)
+        await self.on_prompt(context, state, options, False)
 
     async def on_prompt(
         self, 
@@ -110,6 +125,19 @@ class ActivityPrompt(Dialog, ABC):
         options: PromptOptions,
         isRetry: bool = False
     ):
+        """
+        Called anytime the derived class should send the user a prompt.
+
+        Parameters:
+        ----------
+        context: Context for the current turn of conversation with the user.
+
+        state: Additional state being persisted for the prompt.
+
+        options: Options that the prompt started with in the call to `DialogContext.prompt()`.
+
+        isRetry: If `true` the users response wasn't recognized and the re-prompt should be sent.
+        """
         if isRetry and options.retry_prompt:
             options.retry_prompt.input_hint = InputHints.expecting_input
             await context.send_activity(options.retry_prompt)

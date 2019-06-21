@@ -10,6 +10,4 @@ from botbuilder.core.adapters import TestAdapter
 
 class OAuthPromptTests(aiounittest.AsyncTestCase):
     async def test_does_the_things(self):
-        setty = OAuthPromptSettings('cxn namey', 'title of sign-in button')
-
-        print('placeholder print')
+      pass
