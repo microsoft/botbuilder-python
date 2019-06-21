@@ -5,7 +5,6 @@ from msrest.authentication import (
     Authentication)
 import requests
 import aiohttp
-import asyncio
 from .constants import Constants
 
 #TODO: Decide to move this to Constants or viceversa (when porting OAuth)
@@ -78,7 +77,7 @@ class MicrosoftAppCredentials(Authentication):
         Gets the signed session.
         :returns: Signed requests.Session object
         """
-        auth_token = asyncio.ensure_future(self.get_access_token())
+        auth_token = self.get_access_token()
 
         basic_authentication = BasicTokenAuthentication({"access_token": auth_token})
         session = basic_authentication.signed_session()
@@ -89,7 +88,7 @@ class MicrosoftAppCredentials(Authentication):
             del session.headers['Authorization']
         return session
 
-    async def get_access_token(self, force_refresh: bool=False) -> str:
+    def get_access_token(self, force_refresh: bool=False) -> str:
         """
         Gets an OAuth access token.
         :param force_refresh: True to force a refresh of the token; or false to get
@@ -108,12 +107,12 @@ class MicrosoftAppCredentials(Authentication):
             #   1. The user requested it via the force_refresh parameter
             #   2. We have it, but it's expired
             #   3. We don't have it in the cache.
-            oauth_token = await self.refresh_token()
+            oauth_token = self.refresh_token()
             MicrosoftAppCredentials.cache.setdefault(self.token_cache_key, oauth_token)
             return oauth_token.access_token
         else:
             return ''
-    async def refresh_token(self) -> _OAuthResponse:
+    def refresh_token(self) -> _OAuthResponse:
         """
         returns: _OAuthResponse
         """
@@ -122,12 +121,13 @@ class MicrosoftAppCredentials(Authentication):
             'client_id': self.microsoft_app_id,
             'client_secret': self.microsoft_app_password,
             'scope': MicrosoftAppCredentials.refreshScope}
-        async with aiohttp.ClientSession() as session:
-            async with session.post(self.oauth_endpoint, data=aiohttp.FormData(options)) as response:
-                response.raise_for_status()
-                oauth_response = _OAuthResponse.from_json(await response.json())
-                oauth_response.expiration_time = datetime.now() + \
-                                                timedelta(seconds=(oauth_response.expires_in - 300))
+        response = requests.post(MicrosoftAppCredentials.refreshEndpoint, data=options)
+        response.raise_for_status()
+
+        oauth_response = _OAuthResponse.from_json(response.json())
+        oauth_response.expiration_time = datetime.now() + \
+            timedelta(seconds=(oauth_response.expires_in - 300))
+
         return oauth_response
 
     @staticmethod

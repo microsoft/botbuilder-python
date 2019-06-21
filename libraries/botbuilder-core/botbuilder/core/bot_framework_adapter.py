@@ -339,7 +339,7 @@ class BotFrameworkAdapter(BotAdapter):
         url = self.oauth_api_url(context)
         client = self.create_token_api_client(url)
 
-        result = await client.user_token.get_token(
+        result = client.user_token.get_token(
             user_id, 
             connection_name,
             context.activity.channel_id,
@@ -347,7 +347,7 @@ class BotFrameworkAdapter(BotAdapter):
         )
 
         #TODO check form of response
-        if (result is None or result.token is None or result._response.status == 404):
+        if result is None or result.token is None:
             return None
         else:
             return result
@@ -361,7 +361,7 @@ class BotFrameworkAdapter(BotAdapter):
         self.check_emulating_oauth_cards(context)
         url = self.oauth_api_url(context)
         client = self.create_token_api_client(url)
-        await client.user_token.sign_out(
+        client.user_token.sign_out(
             user_id,
             connection_name,
             context.activity.channel_id
@@ -382,7 +382,7 @@ class BotFrameworkAdapter(BotAdapter):
         final_state = base64.b64encode(state.serialize().encode(encoding='UTF-8', errors='strict')).decode()
         
         #TODO check form of response
-        return await client.bot_sign_in.get_sign_in_url(final_state)
+        return client.bot_sign_in.get_sign_in_url(final_state)
     
     async def get_token_status(self, context: TurnContext, user_id: str= None, include_filter: str= None) -> List[TokenStatus]:
         if (not user_id and (not context.activity.from_property or not context.activity.from_property.id)):
@@ -394,7 +394,7 @@ class BotFrameworkAdapter(BotAdapter):
         client = self.create_token_api_client(url)
         
         #TODO check form of response
-        return await client.user_token.get_token_status(user_id, context.activity.channel_id, include_filter)
+        return client.user_token.get_token_status(user_id, context.activity.channel_id, include_filter)
     
     async def get_aad_tokens(self, context: TurnContext, connection_name: str, resource_urls: List[str]) -> Dict[str, TokenResponse]:
         if (not context.activity.from_property or not context.activity.from_property.id):
@@ -406,7 +406,7 @@ class BotFrameworkAdapter(BotAdapter):
         client = self.create_token_api_client(url)
 
         #TODO check form of response
-        return await client.user_token.get_aad_tokens(user_id, connection_name, context.activity.channel_id, resource_urls)
+        return client.user_token.get_aad_tokens(user_id, connection_name, context.activity.channel_id, resource_urls)
     
     def create_connector_client(self, service_url: str) -> ConnectorClient:
         """

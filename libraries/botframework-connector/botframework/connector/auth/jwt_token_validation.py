@@ -28,7 +28,7 @@ class JwtTokenValidation:
             is_auth_disabled = await credentials.is_authentication_disabled()
             if is_auth_disabled:
                 # We are on the anonymous code path.
-                return
+                return ClaimsIdentity({}, True)
 
             # No Auth Header. Auth is required. Request is not authorized.
             raise Exception('Unauthorized Access. Request is not authorized')
@@ -61,5 +61,5 @@ class JwtTokenValidation:
                 return await ChannelValidation.authenticate_channel_token(auth_header, credentials, channel_id)
     
     @staticmethod
-    async def is_government(channel_service: str) -> bool:
+    def is_government(channel_service: str) -> bool:
         return channel_service and channel_service.lower() == GovernmentConstants.CHANNEL_SERVICE
