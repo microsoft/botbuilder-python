@@ -36,7 +36,7 @@ setup(
     long_description="Microsoft Bot Framework Bot Builder SDK for Python.",
     license='MIT',
     classifiers=[
-        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',

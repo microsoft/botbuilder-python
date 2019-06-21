@@ -78,7 +78,7 @@ You can find more information on the botbuilder-python project by visiting our `
 Requirements
 ============
 
-* `Python >= 3.6.4`_
+* `Python >= 3.7.3`_
 
 
 Source Code
@@ -121,7 +121,7 @@ Licensed under the MIT_ License.
 
 .. _API Reference: https://docs.microsoft.com/en-us/Bot-Framework/rest-api/bot-framework-rest-connector-api-reference
 .. _Wiki: https://github.com/Microsoft/botbuilder-python/wiki
-.. _Python >= 3.6.4: https://www.python.org/downloads/
+.. _Python >= 3.7.3: https://www.python.org/downloads/
 .. _MIT: https://github.com/Microsoft/vscode/blob/master/LICENSE.txt
 .. _Microsoft Open Source Code of Conduct: https://opensource.microsoft.com/codeofconduct/
 .. _Code of Conduct FAQ: https://opensource.microsoft.com/codeofconduct/faq/

@@ -30,7 +30,7 @@ setup(
     install_requires=REQUIRES + TEST_REQUIRES,
     tests_require=TEST_REQUIRES,
     classifiers=[
-        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',

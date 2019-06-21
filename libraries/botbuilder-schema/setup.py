@@ -21,7 +21,7 @@ setup(
     packages=["botbuilder.schema"],
     include_package_data=True,
     classifiers=[
-        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
