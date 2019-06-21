@@ -3,12 +3,12 @@
 
 import aiounittest
 import unittest
-from copy import copy
+from copy import copy, deepcopy
 from unittest.mock import Mock
 
 from botbuilder.core import BotFrameworkAdapter, BotFrameworkAdapterSettings, TurnContext
 from botbuilder.schema import Activity, ActivityTypes, ConversationAccount, ConversationReference, ChannelAccount
-from botframework.connector import ConnectorClient
+from botframework.connector.aio import ConnectorClient
 from botframework.connector.auth import ClaimsIdentity
 
 reference = ConversationReference(
@@ -60,33 +60,33 @@ class AdapterUnderTest(BotFrameworkAdapter):
         self.tester.assertIsNotNone(service_url, 'create_connector_client() not passed service_url.')
         connector_client_mock = Mock()
 
-        def mock_reply_to_activity(conversation_id, activity_id, activity):
+        async def mock_reply_to_activity(conversation_id, activity_id, activity):
             nonlocal self
             self.tester.assertIsNotNone(conversation_id, 'reply_to_activity not passed conversation_id')
             self.tester.assertIsNotNone(activity_id, 'reply_to_activity not passed activity_id')
             self.tester.assertIsNotNone(activity, 'reply_to_activity not passed activity')
             return not self.fail_auth
 
-        def mock_send_to_conversation(conversation_id, activity):
+        async def mock_send_to_conversation(conversation_id, activity):
             nonlocal self
             self.tester.assertIsNotNone(conversation_id, 'send_to_conversation not passed conversation_id')
             self.tester.assertIsNotNone(activity, 'send_to_conversation not passed activity')
             return not self.fail_auth
 
-        def mock_update_activity(conversation_id, activity_id, activity):
+        async def mock_update_activity(conversation_id, activity_id, activity):
             nonlocal self
             self.tester.assertIsNotNone(conversation_id, 'update_activity not passed conversation_id')
             self.tester.assertIsNotNone(activity_id, 'update_activity not passed activity_id')
             self.tester.assertIsNotNone(activity, 'update_activity not passed activity')
             return not self.fail_auth
 
-        def mock_delete_activity(conversation_id, activity_id):
+        async def mock_delete_activity(conversation_id, activity_id):
             nonlocal self
             self.tester.assertIsNotNone(conversation_id, 'delete_activity not passed conversation_id')
             self.tester.assertIsNotNone(activity_id, 'delete_activity not passed activity_id')
             return not self.fail_auth
 
-        def mock_create_conversation(parameters):
+        async def mock_create_conversation(parameters):
             nonlocal self
             self.tester.assertIsNotNone(parameters, 'create_conversation not passed parameters')
             return not self.fail_auth
@@ -144,6 +144,35 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
 
         await adapter.process_activity(incoming_message, '', aux_func_assert_context)
         self.assertTrue(called, 'bot logic not called.')
+    
+    async def test_should_update_activity(self):
+        adapter = AdapterUnderTest()
+        context = TurnContext(adapter, incoming_message)
+        self.assertTrue(await adapter.update_activity(context, incoming_message), 'Activity not updated.')
+
+    async def test_should_fail_to_update_activity_if_serviceUrl_missing(self):
+        adapter = AdapterUnderTest()
+        context = TurnContext(adapter, incoming_message)
+        cpy = deepcopy(incoming_message)
+        cpy.service_url = None
+        with self.assertRaises(Exception) as _:
+            await adapter.update_activity(context, cpy)
+
+    async def test_should_fail_to_update_activity_if_conversation_missing(self):
+        adapter = AdapterUnderTest()
+        context = TurnContext(adapter, incoming_message)
+        cpy = deepcopy(incoming_message)
+        cpy.conversation = None
+        with self.assertRaises(Exception) as _:
+            await adapter.update_activity(context, cpy)
+
+    async def test_should_fail_to_update_activity_if_activity_id_missing(self):
+        adapter = AdapterUnderTest()
+        context = TurnContext(adapter, incoming_message)
+        cpy = deepcopy(incoming_message)
+        cpy.id = None
+        with self.assertRaises(Exception) as _:
+            await adapter.update_activity(context, cpy)
 
     async def test_should_migrate_tenant_id_for_msteams(self):
         incoming = TurnContext.apply_conversation_reference(

@@ -11,7 +11,7 @@ BASEDIR=$(pwd)
 
 # Django/python compatibility matrix...
 if $PYTHON -c "import sys; sys.exit(1 if (sys.version_info.major == 3 and sys.version_info.minor == 6) else 0)"; then
-    echo "[Error] Environment should be configured with Python 3.6!" 1>&2
+    echo "[Error] Environment should be configured with Python 3.7!" 1>&2
 	exit 2
 fi
 # Add more versions here (space delimited).
