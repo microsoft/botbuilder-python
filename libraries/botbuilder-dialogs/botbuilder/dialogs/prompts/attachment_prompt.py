@@ -18,7 +18,7 @@ class AttachmentPrompt(Prompt):
     By default the prompt will return to the calling dialog an `[Attachment]`
     """
 
-    def __init__(self, dialog_id: str, validator: Callable[List[Attachment], bool]):
+    def __init__(self, dialog_id: str, validator: Callable[[Attachment], bool]):
         super().__init__(dialog_id, validator)
     
     async def on_prompt(

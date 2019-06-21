@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 import aiounittest
-from botbuilder.dialogs.prompts import OAuthPrompt, OAuthPromptSettings
+from botbuilder.dialogs.prompts import OAuthPromptSettings
 from botbuilder.schema import Activity, InputHints
 
 from botbuilder.core.turn_context import TurnContext
