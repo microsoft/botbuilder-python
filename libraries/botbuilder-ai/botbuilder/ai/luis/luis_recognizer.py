@@ -154,6 +154,7 @@ class LuisRecognizer(object):
         turn_context: TurnContext,
         telemetry_properties: Dict[str, str] = None,
         telemetry_metrics: Dict[str, float] = None,
+        luis_prediction_options: LuisPredictionOptions = None
     ) -> RecognizerResult:
         """Return results of the analysis (Suggested actions and intents).
         
@@ -168,7 +169,7 @@ class LuisRecognizer(object):
         """
 
         return await self._recognize_internal(
-            turn_context, telemetry_properties, telemetry_metrics
+            turn_context, telemetry_properties, telemetry_metrics, luis_prediction_options
         )
 
     def on_recognizer_result(
@@ -288,6 +289,7 @@ class LuisRecognizer(object):
         turn_context: TurnContext,
         telemetry_properties: Dict[str, str],
         telemetry_metrics: Dict[str, float],
+        luis_prediction_options: LuisPredictionOptions = None
     ) -> RecognizerResult:
 
         BotAssert.context_not_none(turn_context)
@@ -299,6 +301,11 @@ class LuisRecognizer(object):
         recognizer_result: RecognizerResult = None
         luis_result: LuisResult = None
 
+        if luis_prediction_options:
+            options = self._merge_options(luis_prediction_options)
+        else: 
+            options = self._options
+
         if not utterance or utterance.isspace():
             recognizer_result = RecognizerResult(
                 text=utterance, intents={"": IntentScore(score=1.0)}, entities={}
@@ -307,12 +314,12 @@ class LuisRecognizer(object):
             luis_result = self._runtime.prediction.resolve(
                 self._application.application_id,
                 utterance,
-                timezone_offset=self._options.timezone_offset,
-                verbose=self._options.include_all_intents,
-                staging=self._options.staging,
-                spell_check=self._options.spell_check,
-                bing_spell_check_subscription_key=self._options.bing_spell_check_subscription_key,
-                log=self._options.log if self._options.log is not None else True,
+                timezone_offset=options.timezone_offset,
+                verbose=options.include_all_intents,
+                staging=options.staging,
+                spell_check=options.spell_check,
+                bing_spell_check_subscription_key=options.bing_spell_check_subscription_key,
+                log=options.log if options.log is not None else True,
             )
 
             recognizer_result = RecognizerResult(
@@ -322,8 +329,8 @@ class LuisRecognizer(object):
                 entities=LuisUtil.extract_entities_and_metadata(
                     luis_result.entities,
                     luis_result.composite_entities,
-                    self._options.include_instance_data
-                    if self._options.include_instance_data is not None
+                    options.include_instance_data
+                    if options.include_instance_data is not None
                     else True,
                 ),
             )
@@ -336,7 +343,7 @@ class LuisRecognizer(object):
             recognizer_result, turn_context, telemetry_properties, telemetry_metrics
         )
 
-        await self._emit_trace_info(turn_context, luis_result, recognizer_result)
+        await self._emit_trace_info(turn_context, luis_result, recognizer_result, options)
 
         return recognizer_result
 
@@ -345,11 +352,12 @@ class LuisRecognizer(object):
         turn_context: TurnContext,
         luis_result: LuisResult,
         recognizer_result: RecognizerResult,
+        options: LuisPredictionOptions
     ) -> None:
         trace_info: Dict[str, object] = {
             "recognizerResult": LuisUtil.recognizer_result_as_dict(recognizer_result),
             "luisModel": {"ModelID": self._application.application_id},
-            "luisOptions": {"Staging": self._options.staging},
+            "luisOptions": {"Staging": options.staging},
             "luisResult": LuisUtil.luis_result_as_dict(luis_result),
         }
 
@@ -362,3 +370,11 @@ class LuisRecognizer(object):
         )
 
         await turn_context.send_activity(trace_activity)
+
+    def _merge_options(
+        self,
+        user_defined_options: LuisPredictionOptions
+    ) -> LuisPredictionOptions:
+        merged_options = LuisPredictionOptions()
+        merged_options.__dict__.update(user_defined_options.__dict__)
+        return merged_options

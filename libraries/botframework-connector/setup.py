@@ -12,6 +12,11 @@ REQUIRES = [
     "PyJWT>=1.5.3",
     "botbuilder-schema>=4.4.0b1"]
 
+root = os.path.abspath(os.path.dirname(__file__))
+
+with open(os.path.join(root, 'README.rst'), encoding='utf-8') as f:
+    long_description = f.read()
+
 setup(
     name=NAME,
     version=VERSION,
@@ -33,10 +38,11 @@ setup(
               "botframework.connector.token_api.operations"
     ],
     include_package_data=True,
-    long_description="Microsoft Bot Framework Bot Builder SDK for Python.",
+    long_description=long_description,
+    long_description_content_type='text/x-rst',
     license='MIT',
     classifiers=[
-        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',

@@ -7,7 +7,8 @@ from botbuilder.schema import (Activity, ChannelAccount,
                                ConversationAccount,
                                ConversationParameters, ConversationReference,
                                ConversationsResult, ConversationResourceResponse)
-from botframework.connector import ConnectorClient, Channels
+from botframework.connector import Channels
+from botframework.connector.aio import ConnectorClient
 from botframework.connector.auth import (MicrosoftAppCredentials,
                                          JwtTokenValidation, SimpleCredentialProvider)
 
@@ -183,7 +184,7 @@ class BotFrameworkAdapter(BotAdapter):
             client = self.create_connector_client(activity.service_url)
             return await client.conversations.update_activity(
                 activity.conversation.id,
-                activity.conversation.activity_id,
+                activity.id,
                 activity)
         except Exception as e:
             raise e
@@ -217,7 +218,7 @@ class BotFrameworkAdapter(BotAdapter):
                         await asyncio.sleep(delay_in_ms)
                 else:
                     client = self.create_connector_client(activity.service_url)
-                    client.conversations.send_to_conversation(activity.conversation.id, activity)
+                    await client.conversations.send_to_conversation(activity.conversation.id, activity)
         except Exception as e:
             raise e
 

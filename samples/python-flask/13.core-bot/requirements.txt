@@ -1,5 +1,4 @@
 Flask>=1.0.2
-asyncio>=3.4.3
 requests>=2.18.1
 botframework-connector>=4.4.0.b1
 botbuilder-schema>=4.4.0.b1
