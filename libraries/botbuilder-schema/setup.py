@@ -8,6 +8,11 @@ NAME = "botbuilder-schema"
 VERSION = os.environ["packageVersion"] if "packageVersion" in os.environ else "4.4.0b1"
 REQUIRES = ["msrest>=0.6.6"]
 
+root = os.path.abspath(os.path.dirname(__file__))
+
+with open(os.path.join(root, 'README.rst'), encoding='utf-8') as f:
+    long_description = f.read()
+
 setup(
     name=NAME,
     version=VERSION,
@@ -15,7 +20,8 @@ setup(
     author="Microsoft",
     url="https://github.com/Microsoft/botbuilder-python",
     keywords=["BotBuilderSchema", "bots","ai", "botframework", "botbuilder"],
-    long_description="This package contains the schema classes for using the Bot Framework.",
+    long_description=long_description,
+    long_description_content_type='text/x-rst',
     license='MIT',
     install_requires=REQUIRES,
     packages=["botbuilder.schema"],

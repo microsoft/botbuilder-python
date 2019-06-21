@@ -17,7 +17,7 @@ This sample **requires** prerequisites in order to run.
 
 This bot uses [LUIS](https://www.luis.ai), an AI based cognitive service, to implement language understanding.
 
-### Install Python 3.6
+### Install Python 3.7
 
 
 ### Create a LUIS Application to enable language understanding

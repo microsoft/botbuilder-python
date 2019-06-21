@@ -24,6 +24,9 @@ with open(os.path.join(root, 'botbuilder', 'dialogs', 'about.py')) as f:
     info = f.read()
     exec(info, package_info)
 
+with open(os.path.join(root, 'README.rst'), encoding='utf-8') as f:
+    long_description = f.read()
+
 setup(
     name=package_info['__title__'],
     version=package_info['__version__'],
@@ -31,7 +34,8 @@ setup(
     author=package_info['__author__'],
     description=package_info['__description__'],
     keywords=['BotBuilderDialogs', 'bots', 'ai', 'botframework', 'botbuilder'],
-    long_description=package_info['__summary__'],
+    long_description=long_description,
+    long_description_content_type='text/x-rst',
     license=package_info['__license__'],
     packages=['botbuilder.dialogs', 'botbuilder.dialogs.prompts', 'botbuilder.dialogs.choices'],
     install_requires=REQUIRES + TEST_REQUIRES,

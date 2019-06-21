@@ -1,28 +1,24 @@
 
 =============================================
-BotBuilder-ApplicationInsights SDK for Python
+BotBuilder-Azure SDK for Python
 =============================================
 
 .. image:: https://fuselabs.visualstudio.com/SDK_v4/_apis/build/status/Python/SDK_v4-Python-CI?branchName=master
    :target:  https://fuselabs.visualstudio.com/SDK_v4/_apis/build/status/Python/SDK_v4-Python-CI
    :align: right
    :alt: Azure DevOps status for master branch
-.. image:: https://badge.fury.io/py/botbuilder-applicationinsights.svg
-   :target: https://badge.fury.io/py/botbuilder-applicationinsights
+.. image:: https://badge.fury.io/py/botbuilder-dialogs.svg
+   :target: https://badge.fury.io/py/botbuilder-dialogs
    :alt: Latest PyPI package version
 
-Within the Bot Framework, BotBuilder-ApplicationInsights enables the Azure Application Insights service.
-
-Application Insights is an extensible Application Performance Management (APM) service for developers on multiple platforms. 
-Use it to monitor your live bot application. It includes powerful analytics tools to help you diagnose issues and to understand 
-what users actually do with your bot.
+Azure extensions for Microsoft BotBuilder.
 
 How to Install
 ==============
 
 .. code-block:: python
   
-  pip install botbuilder-applicationinsights
+  pip install botbuilder-azure
 
 
 Documentation/Wiki
