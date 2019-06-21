@@ -8,53 +8,35 @@ This sample shows how to create a bot that demonstrates the following:
 - Implement a multi-turn conversation using Dialogs.
 - Handle user interruptions for such things as `Help` or `Cancel`.
 - Prompt for and validate requests for information from the user.
-gi
 """
-from functools import wraps
-import json
-import asyncio
-import sys
-from flask import Flask, jsonify, request, Response
-from botbuilder.schema import (Activity, ActivityTypes)
-from botbuilder.core import (BotFrameworkAdapter, BotFrameworkAdapterSettings, TurnContext,
-                             ConversationState, MemoryStorage, UserState)
 
+import asyncio
+
+from flask import Flask, request, Response
+from botbuilder.core import (BotFrameworkAdapter, BotFrameworkAdapterSettings,
+                             ConversationState, MemoryStorage, UserState)
+from botbuilder.schema import (Activity)
 from dialogs import MainDialog
 from bots import DialogAndWelcomeBot
-from helpers.dialog_helper import DialogHelper
 
-loop = asyncio.get_event_loop()
-app = Flask(__name__, instance_relative_config=True)
-app.config.from_object('config.DefaultConfig')
+LOOP = asyncio.get_event_loop()
+APP = Flask(__name__, instance_relative_config=True)
+APP.config.from_object('config.DefaultConfig')
 
-SETTINGS = BotFrameworkAdapterSettings(app.config['APP_ID'], app.config['APP_PASSWORD'])
+SETTINGS = BotFrameworkAdapterSettings(APP.config['APP_ID'], APP.config['APP_PASSWORD'])
 ADAPTER = BotFrameworkAdapter(SETTINGS)
 
-# Catch-all for errors.
-async def on_error(context: TurnContext, error: Exception):
-    # This check writes out errors to console log
-    # NOTE: In production environment, you should consider logging this to Azure
-    #       application insights.
-    print(f'\n [on_turn_error]: { error }', file=sys.stderr)
-    # Send a message to the user
-    await context.send_activity('Oops. Something went wrong!')
-    # Clear out state
-    await conversation_state.delete(context)
-
-ADAPTER.on_turn_error = on_error
-
 # Create MemoryStorage, UserState and ConversationState
-memory = MemoryStorage()
+MEMORY = MemoryStorage()
+USER_STATE = UserState(MEMORY)
+CONVERSATION_STATE = ConversationState(MEMORY)
+DIALOG = MainDialog(APP.config)
+BOT = DialogAndWelcomeBot(CONVERSATION_STATE, USER_STATE, DIALOG)
 
-user_state = UserState(memory)
-conversation_state = ConversationState(memory)
 
-dialog = MainDialog(app.config)
-bot = DialogAndWelcomeBot(conversation_state, user_state, dialog)
-
-@app.route('/api/messages', methods = ['POST'])
+@APP.route('/api/messages', methods=['POST'])
 def messages():
-    
+    """Main bot message handler."""
     if request.headers['Content-Type'] == 'application/json':
         body = request.json
     else:
@@ -62,19 +44,19 @@ def messages():
 
     activity = Activity().deserialize(body)
     auth_header = request.headers['Authorization'] if 'Authorization' in request.headers else ''
-    
+
     async def aux_func(turn_context):
-        asyncio.ensure_future(bot.on_turn(turn_context), loop=loop)
+        asyncio.ensure_future(BOT.on_turn(turn_context))
     try:
-        task = asyncio.ensure_future(ADAPTER.process_activity(activity, auth_header, aux_func), loop=loop)
-        loop.run_until_complete(task)
+        task = LOOP.create_task(ADAPTER.process_activity(activity, auth_header, aux_func))
+        LOOP.run_until_complete(task)
         return Response(status=201)
-    except Exception as e:
-        raise e
+    except Exception as exception:
+        raise exception
 
-if __name__ == "__main__" :
+
+if __name__ == "__main__":
     try:
-        app.run(debug=True, port=app.config["PORT"])
-    except Exception as e:
-        raise e
-
+        APP.run(debug=True, port=APP.config["PORT"])  # nosec debug
+    except Exception as exception:
+        raise exception
