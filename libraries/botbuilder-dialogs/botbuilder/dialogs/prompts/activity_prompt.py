@@ -34,6 +34,8 @@ class ActivityPrompt(Dialog, ABC):
 
         validator: Validator that will be called each time a new activity is received.
         """
+        Dialog.__init__(self, dialog_id)
+        
         self._validator = validator
 
     async def begin_dialog(self, dc: DialogContext, options: PromptOptions) -> DialogTurnResult:

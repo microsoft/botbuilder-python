@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from typing import Dict
+from typing import Callable, Dict
 
 from botbuilder.schema import ActivityTypes, Attachment, InputHints
 from botbuilder.core import TurnContext
@@ -15,11 +15,10 @@ class AttachmentPrompt(Prompt):
     """
     Prompts a user to upload attachments like images.
 
-    By default the prompt will return to the calling dialog a [Attachment]
+    By default the prompt will return to the calling dialog an `[Attachment]`
     """
 
-    # TODO need to define validator PromptValidator type
-    def __init__(self, dialog_id: str, validator=None):
+    def __init__(self, dialog_id: str, validator: Callable[[[Attachment]], bool]):
         super().__init__(dialog_id, validator)
     
     async def on_prompt(
@@ -30,7 +29,7 @@ class AttachmentPrompt(Prompt):
         isRetry: bool
     ):
         if not context:
-            raise TypeError('AttachmentPrompt.on_prompt(): context cannot be None.')
+            raise TypeError('AttachmentPrompt.on_prompt(): TurnContext cannot be None.')
 
         if not isinstance(options, PromptOptions):
             raise TypeError('AttachmentPrompt.on_prompt(): PromptOptions are required for Attachment Prompt dialogs.')
