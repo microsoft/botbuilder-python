@@ -9,8 +9,6 @@ from datatypes_date_time.timex import Timex
 from .cancel_and_help_dialog import CancelAndHelpDialog
 from .date_resolver_dialog import DateResolverDialog
 
-
-
 class BookingDialog(CancelAndHelpDialog):
     """Flight booking implementation."""
 
