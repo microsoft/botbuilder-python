@@ -14,11 +14,17 @@
                 "description": "Active Directory App Password, set as MicrosoftAppPassword in the Web App's Application Settings."
             }
         },
-        "newWebAppName": {
+        "botId": {
             "type": "string",
-            "defaultValue": "",
             "metadata": {
-                "description": "The globally unique name of the Web App. Defaults to the value passed in for \"botId\"."
+                "description": "The globally unique and immutable bot ID. Also used to configure the displayName of the bot, which is mutable."
+            }
+        },
+        "botSku": {
+            "defaultValue": "F0",
+            "type": "string",
+            "metadata": {
+                "description": "The pricing tier of the Bot Service Registration. Acceptable values are F0 and S1."
             }
         },
         "newAppServicePlanName": {
@@ -46,22 +52,43 @@
             "metadata": {
                 "description": "The location of the App Service Plan."
             }
+        },
+        "existingAppServicePlan": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Name of the existing App Service Plan used to create the Web App for the bot."
+            }
+        },
+        "newWebAppName": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "The globally unique name of the Web App. Defaults to the value passed in for \"botId\"."
+            }
         }
     },
     "variables": {
+        "defaultAppServicePlanName": "[if(empty(parameters('existingAppServicePlan')), 'createNewAppServicePlan', parameters('existingAppServicePlan'))]",
+        "useExistingAppServicePlan": "[not(equals(variables('defaultAppServicePlanName'), 'createNewAppServicePlan'))]",
+        "servicePlanName": "[if(variables('useExistingAppServicePlan'), parameters('existingAppServicePlan'), parameters('newAppServicePlanName'))]",
         "publishingUsername": "[concat('$', parameters('newWebAppName'))]",
-        "resourcesLocation": "[parameters('appServicePlanLocation')]"
+        "resourcesLocation": "[parameters('appServicePlanLocation')]",
+        "webAppName": "[if(empty(parameters('newWebAppName')), parameters('botId'), parameters('newWebAppName'))]",
+        "siteHost": "[concat(variables('webAppName'), '.azurewebsites.net')]",
+        "botEndpoint": "[concat('https://', variables('siteHost'), '/api/messages')]"
     },
     "resources": [
         {
+            "comments": "Create a new Linux App Service Plan if no existing App Service Plan name was passed in.",
             "type": "Microsoft.Web/serverfarms",
             "apiVersion": "2016-09-01",
-            "name": "[parameters('newAppServicePlanName')]",
+            "name": "[variables('servicePlanName')]",
             "location": "[variables('resourcesLocation')]",
             "sku": "[parameters('newAppServicePlanSku')]",
             "kind": "linux",
             "properties": {
-                "name": "[parameters('newAppServicePlanName')]",
+                "name": "[variables('servicePlanName')]",
                 "perSiteScaling": false,
                 "reserved": true,
                 "targetWorkerCount": 0,
@@ -69,12 +96,13 @@
             }
         },
         {
+            "comments": "Create a Web App using a Linux App Service Plan",
             "type": "Microsoft.Web/sites",
             "apiVersion": "2016-08-01",
-            "name": "[parameters('newWebAppName')]",
+            "name": "[variables('webAppName')]",
             "location": "[variables('resourcesLocation')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', parameters('newAppServicePlanName'))]"
+                "[resourceId('Microsoft.Web/serverfarms/', variables('servicePlanName'))]"
             ],
             "kind": "app,linux",
             "properties": {
@@ -91,7 +119,7 @@
                         "hostType": "Repository"
                     }
                 ],
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('newAppServicePlanName'))]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('servicePlanName'))]",
                 "reserved": true,
                 "scmSiteAlsoStopped": false,
                 "clientAffinityEnabled": false,
@@ -114,17 +142,23 @@
                             "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
                             "value": "true"
                         }
-                    ]
+                    ],
+                    "cors": {
+                        "allowedOrigins": [
+                            "https://botservice.hosting.portal.azure.net",
+                            "https://hosting.onecloud.azure-test.net/"
+                        ]
+                    }
                 }
             }
         },
         {
             "type": "Microsoft.Web/sites/config",
             "apiVersion": "2016-08-01",
-            "name": "[concat(parameters('newWebAppName'), '/web')]",
-            "location": "West US",
+            "name": "[concat(variables('webAppName'), '/web')]",
+            "location": "[variables('resourcesLocation')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('newWebAppName'))]"
+                "[resourceId('Microsoft.Web/sites', variables('webAppName'))]"
             ],
             "properties": {
                 "numberOfWorkers": 1,
@@ -155,7 +189,7 @@
                 "use32BitWorkerProcess": true,
                 "webSocketsEnabled": false,
                 "alwaysOn": false,
-                "appCommandLine": "gunicorn --bind=0.0.0.0 --timeout 600 main:app",
+                "appCommandLine": "",
                 "managedPipelineMode": "Integrated",
                 "virtualApplications": [
                     {
@@ -180,6 +214,29 @@
                 "ftpsState": "AllAllowed",
                 "reservedInstanceCount": 0
             }
+        },
+        {
+            "apiVersion": "2017-12-01",
+            "type": "Microsoft.BotService/botServices",
+            "name": "[parameters('botId')]",
+            "location": "global",
+            "kind": "bot",
+            "sku": {
+                "name": "[parameters('botSku')]"
+            },
+            "properties": {
+                "name": "[parameters('botId')]",
+                "displayName": "[parameters('botId')]",
+                "endpoint": "[variables('botEndpoint')]",
+                "msaAppId": "[parameters('appId')]",
+                "developerAppInsightsApplicationId": null,
+                "developerAppInsightKey": null,
+                "publishingCredentials": null,
+                "storageResourceId": null
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites/', variables('webAppName'))]"
+            ]
         }
     ]
 }
