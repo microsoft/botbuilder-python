@@ -1,27 +1,27 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+"""Implements bot Activity handler."""
 
-import asyncio
-
-from botbuilder.core import ActivityHandler, ConversationState, UserState, TurnContext
+from botbuilder.core import ActivityHandler, ConversationState, UserState, TurnContext, \
+    BotTelemetryClient, NullTelemetryClient
 from botbuilder.dialogs import Dialog
 from helpers.dialog_helper import DialogHelper
-from botbuilder.core import BotTelemetryClient, NullTelemetryClient
 
 class DialogBot(ActivityHandler):
-
-    def __init__(self, conversation_state: ConversationState, user_state: UserState, dialog: Dialog, telemetry_client: BotTelemetryClient):
+    """Main activity handler for the bot."""
+    def __init__(self, conversation_state: ConversationState, user_state: UserState,
+                 dialog: Dialog, telemetry_client: BotTelemetryClient):
         if conversation_state is None:
             raise Exception('[DialogBot]: Missing parameter. conversation_state is required')
         if user_state is None:
             raise Exception('[DialogBot]: Missing parameter. user_state is required')
         if dialog is None:
             raise Exception('[DialogBot]: Missing parameter. dialog is required')
-        
+
         self.conversation_state = conversation_state
         self.user_state = user_state
         self.dialog = dialog
-        self.dialogState = self.conversation_state.create_property('DialogState')
+        self.dialogState = self.conversation_state.create_property('DialogState') # pylint:disable=invalid-name
         self.telemetry_client = telemetry_client
 
     async def on_turn(self, turn_context: TurnContext):
@@ -30,9 +30,11 @@ class DialogBot(ActivityHandler):
         # Save any state changes that might have occured during the turn.
         await self.conversation_state.save_changes(turn_context, False)
         await self.user_state.save_changes(turn_context, False)
-    
+
     async def on_message_activity(self, turn_context: TurnContext):
-        await DialogHelper.run_dialog(self.dialog, turn_context, self.conversation_state.create_property("DialogState"))
+        # pylint:disable=invalid-name
+        await DialogHelper.run_dialog(self.dialog, turn_context,
+                                      self.conversation_state.create_property("DialogState"))
 
     @property
     def telemetry_client(self) -> BotTelemetryClient:
@@ -41,6 +43,7 @@ class DialogBot(ActivityHandler):
         """
         return self._telemetry_client
 
+    # pylint:disable=attribute-defined-outside-init
     @telemetry_client.setter
     def telemetry_client(self, value: BotTelemetryClient) -> None:
         """
