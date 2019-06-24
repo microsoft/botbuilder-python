@@ -4,6 +4,7 @@ __pycache__/
 
 # Virtual environment
 env*/
+venv*/
 
 # PTVS analysis
 .ptvs/

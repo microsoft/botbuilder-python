@@ -1,0 +1,195 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
+import aiounittest
+import unittest
+from copy import copy, deepcopy
+from unittest.mock import Mock
+
+from botbuilder.core import BotFrameworkAdapter, BotFrameworkAdapterSettings, TurnContext
+from botbuilder.schema import Activity, ActivityTypes, ConversationAccount, ConversationReference, ChannelAccount
+from botframework.connector.aio import ConnectorClient
+from botframework.connector.auth import ClaimsIdentity
+
+reference = ConversationReference(
+    activity_id='1234',
+    channel_id='test',
+    service_url='https://example.org/channel',
+    user=ChannelAccount(
+        id='user',
+        name='User Name'
+    ),
+    bot=ChannelAccount(
+        id='bot',
+        name='Bot Name'
+    ),
+    conversation=ConversationAccount(
+        id='convo1'
+    )
+)
+
+test_activity = Activity(text='test', type=ActivityTypes.message)
+
+incoming_message = TurnContext.apply_conversation_reference(copy(test_activity), reference, True)
+outgoing_message = TurnContext.apply_conversation_reference(copy(test_activity), reference)
+incoming_invoke = TurnContext.apply_conversation_reference(Activity(type=ActivityTypes.invoke), reference, True)
+
+
+class AdapterUnderTest(BotFrameworkAdapter):
+
+    def __init__(self, settings=None):
+        super().__init__(settings)
+        self.tester = aiounittest.AsyncTestCase()
+        self.fail_auth = False
+        self.fail_operation = False
+        self.expect_auth_header = ''
+        self.new_service_url = None
+
+    def aux_test_authenticate_request(self, request: Activity, auth_header: str):
+        return super().authenticate_request(request, auth_header)
+
+    def aux_test_create_connector_client(self, service_url: str):
+        return super().create_connector_client(service_url)
+
+    async def authenticate_request(self, request: Activity, auth_header: str):
+        self.tester.assertIsNotNone(request, 'authenticate_request() not passed request.')
+        self.tester.assertEqual(auth_header, self.expect_auth_header, 'authenticateRequest() not passed expected authHeader.')
+        return not self.fail_auth
+
+    def create_connector_client(self, service_url: str) -> ConnectorClient:
+        self.tester.assertIsNotNone(service_url, 'create_connector_client() not passed service_url.')
+        connector_client_mock = Mock()
+
+        async def mock_reply_to_activity(conversation_id, activity_id, activity):
+            nonlocal self
+            self.tester.assertIsNotNone(conversation_id, 'reply_to_activity not passed conversation_id')
+            self.tester.assertIsNotNone(activity_id, 'reply_to_activity not passed activity_id')
+            self.tester.assertIsNotNone(activity, 'reply_to_activity not passed activity')
+            return not self.fail_auth
+
+        async def mock_send_to_conversation(conversation_id, activity):
+            nonlocal self
+            self.tester.assertIsNotNone(conversation_id, 'send_to_conversation not passed conversation_id')
+            self.tester.assertIsNotNone(activity, 'send_to_conversation not passed activity')
+            return not self.fail_auth
+
+        async def mock_update_activity(conversation_id, activity_id, activity):
+            nonlocal self
+            self.tester.assertIsNotNone(conversation_id, 'update_activity not passed conversation_id')
+            self.tester.assertIsNotNone(activity_id, 'update_activity not passed activity_id')
+            self.tester.assertIsNotNone(activity, 'update_activity not passed activity')
+            return not self.fail_auth
+
+        async def mock_delete_activity(conversation_id, activity_id):
+            nonlocal self
+            self.tester.assertIsNotNone(conversation_id, 'delete_activity not passed conversation_id')
+            self.tester.assertIsNotNone(activity_id, 'delete_activity not passed activity_id')
+            return not self.fail_auth
+
+        async def mock_create_conversation(parameters):
+            nonlocal self
+            self.tester.assertIsNotNone(parameters, 'create_conversation not passed parameters')
+            return not self.fail_auth
+
+        connector_client_mock.conversations.reply_to_activity.side_effect = mock_reply_to_activity
+        connector_client_mock.conversations.send_to_conversation.side_effect = mock_send_to_conversation
+        connector_client_mock.conversations.update_activity.side_effect = mock_update_activity
+        connector_client_mock.conversations.delete_activity.side_effect = mock_delete_activity
+        connector_client_mock.conversations.create_conversation.side_effect = mock_create_conversation
+
+        return connector_client_mock
+
+
+async def process_activity(channel_id: str, channel_data_tenant_id: str, conversation_tenant_id: str):
+    activity = None
+    mock_claims = unittest.mock.create_autospec(ClaimsIdentity)
+    mock_credential_provider = unittest.mock.create_autospec(BotFrameworkAdapterSettings)
+
+    sut = BotFrameworkAdapter(mock_credential_provider)
+
+    async def aux_func(context):
+        nonlocal activity
+        activity = context.Activity
+
+    await sut.process_activity(
+        Activity(
+            channel_id=channel_id,
+            service_url="https://smba.trafficmanager.net/amer/",
+            channel_data={"tenant": {"id": channel_data_tenant_id}},
+            conversation=ConversationAccount(
+                tenant_id=conversation_tenant_id
+            ),
+        ),
+        mock_claims,
+        aux_func)
+    return activity
+
+
+class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
+
+    def test_should_create_connector_client(self):
+        adapter = AdapterUnderTest()
+        client = adapter.aux_test_create_connector_client(reference.service_url)
+        self.assertIsNotNone(client, 'client not returned.')
+        self.assertIsNotNone(client.conversations, 'invalid client returned.')
+
+    async def test_should_process_activity(self):
+        called = False
+        adapter = AdapterUnderTest()
+
+        async def aux_func_assert_context(context):
+            self.assertIsNotNone(context, 'context not passed.')
+            nonlocal called
+            called = True
+
+        await adapter.process_activity(incoming_message, '', aux_func_assert_context)
+        self.assertTrue(called, 'bot logic not called.')
+    
+    async def test_should_update_activity(self):
+        adapter = AdapterUnderTest()
+        context = TurnContext(adapter, incoming_message)
+        self.assertTrue(await adapter.update_activity(context, incoming_message), 'Activity not updated.')
+
+    async def test_should_fail_to_update_activity_if_serviceUrl_missing(self):
+        adapter = AdapterUnderTest()
+        context = TurnContext(adapter, incoming_message)
+        cpy = deepcopy(incoming_message)
+        cpy.service_url = None
+        with self.assertRaises(Exception) as _:
+            await adapter.update_activity(context, cpy)
+
+    async def test_should_fail_to_update_activity_if_conversation_missing(self):
+        adapter = AdapterUnderTest()
+        context = TurnContext(adapter, incoming_message)
+        cpy = deepcopy(incoming_message)
+        cpy.conversation = None
+        with self.assertRaises(Exception) as _:
+            await adapter.update_activity(context, cpy)
+
+    async def test_should_fail_to_update_activity_if_activity_id_missing(self):
+        adapter = AdapterUnderTest()
+        context = TurnContext(adapter, incoming_message)
+        cpy = deepcopy(incoming_message)
+        cpy.id = None
+        with self.assertRaises(Exception) as _:
+            await adapter.update_activity(context, cpy)
+
+    async def test_should_migrate_tenant_id_for_msteams(self):
+        incoming = TurnContext.apply_conversation_reference(
+            activity=Activity(
+                type=ActivityTypes.message,
+                text='foo',
+                channel_data={'tenant': {'id': '1234'}}
+            ),
+            reference=reference,
+            is_incoming=True
+        )
+
+        incoming.channel_id = 'msteams'
+        adapter = AdapterUnderTest()
+
+        async def aux_func_assert_tenant_id_copied(context):
+            self.assertEquals(context.activity.conversation.tenant_id, '1234', 'should have copied tenant id from '
+                                                                               'channel_data to conversation address')
+
+        await adapter.process_activity(incoming, '', aux_func_assert_tenant_id_copied)
