@@ -23,7 +23,7 @@ class Token:
 
         normalized: A normalized version of the token. This can include things like lower casing or stemming.
         """
-        self.start = start,
-        self.end = end,
-        self.text = text,
+        self.start = start
+        self.end = end
+        self.text = text
         self.normalized = normalized

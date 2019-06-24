@@ -31,7 +31,7 @@ class FindValuesOptions:
 
         tokenizer: (Optional) Tokenizer to use when parsing the utterance and values being recognized.
         """
-        self.allow_partial_matches = allow_partial_matches,
-        self.locale = locale,
-        self.max_token_distance = max_token_distance,
+        self.allow_partial_matches = allow_partial_matches
+        self.locale = locale
+        self.max_token_distance = max_token_distance
         self.tokenizer = tokenizer

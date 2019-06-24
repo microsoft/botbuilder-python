@@ -26,8 +26,8 @@ class ModelResult:
 
         resolution: The recognized entity object.
         """
-        self.text = text,
-        self.start = start,
-        self.end = end,
-        self.type_name = type_name,
+        self.text = text
+        self.start = start
+        self.end = end
+        self.type_name = type_name
         self.resolution = resolution

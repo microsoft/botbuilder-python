@@ -24,7 +24,7 @@ class FoundChoice:
 
         synonym: (Optional) The synonym that was matched.
         """
-        self.value = value,
-        self.index = index,
-        self.score = score,
+        self.value = value
+        self.index = index
+        self.score = score
         self.synonym = synonym
