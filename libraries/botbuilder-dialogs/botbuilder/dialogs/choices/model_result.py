@@ -20,7 +20,7 @@ class ModelResult:
 
         start: Start character position of the recognized substring.
 
-        end: THe end character position of the recognized substring.
+        end: The end character position of the recognized substring.
 
         type_name: The type of the entity that was recognized.
 

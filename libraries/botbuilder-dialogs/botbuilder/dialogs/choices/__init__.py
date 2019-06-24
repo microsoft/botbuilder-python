@@ -13,6 +13,7 @@ from .find_choices_options import FindChoicesOptions, FindValuesOptions
 from .found_choice import FoundChoice
 from .list_style import ListStyle
 from .model_result import ModelResult
+from .sorted_value import SortedValue
 from .token import Token
 
 __all__ = [
@@ -25,5 +26,6 @@ __all__ = [
     "FoundChoice",
     "ListStyle",
     "ModelResult",
+    "SortedValue",
     "Token"
 ]
