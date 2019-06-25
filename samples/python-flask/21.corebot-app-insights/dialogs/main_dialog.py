@@ -60,7 +60,6 @@ class MainDialog(ComponentDialog):
         """Use language understanding to gather details about booking."""
         # Call LUIS and gather any potential booking details. (Note the TurnContext
         # has the response to the prompt.)
-        print(f'LUIS HEKOPE: {self.telemetry_client._instrumentation_key}')
         booking_details = await LuisHelper.execute_luis_query(self._configuration,\
             step_context.context, self.telemetry_client) if step_context.result is not None\
             else BookingDetails() # pylint: disable=bad-continuation
