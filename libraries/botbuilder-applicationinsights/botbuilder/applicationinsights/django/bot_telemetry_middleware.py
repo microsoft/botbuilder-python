@@ -1,26 +1,32 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
-import sys
-import json
+"""Bot Telemetry Middleware."""
+
 from threading import current_thread
 
 # Map of thread id => POST body text
-_request_bodies = {}
+_REQUEST_BODIES = {}
 
 def retrieve_bot_body():
     """ retrieve_bot_body
     Retrieve the POST body text from temporary cache.
-    The POST body corresponds with the thread id and should resides in 
+    The POST body corresponds with the thread id and should resides in
     cache just for lifetime of request.
-
-    TODO: Add cleanup job to kill orphans
     """
-    result = _request_bodies.pop(current_thread().ident, None)
+    result = _REQUEST_BODIES.pop(current_thread().ident, None)
     return result
 
 class BotTelemetryMiddleware():
     """
-    Save off the POST body to later populate bot properties
+    Save off the POST body to later populate bot-specific properties to
+    add to Application Insights.
+
+    Example activating MIDDLEWARE in Django settings:
+    MIDDLEWARE = [
+        # Ideally add somewhere near top
+        'botbuilder.applicationinsights.django.BotTelemetryMiddleware',
+        ...
+        ]
     """
     def __init__(self, get_response):
         self.get_response = get_response
@@ -29,15 +35,13 @@ class BotTelemetryMiddleware():
         self.process_request(request)
         return self.get_response(request)
 
-    def process_request(self, request):
+    def process_request(self, request) -> bool:
+        """Process the incoming Django request."""
+        # Bot Service doesn't handle anything over 256k
+        # TODO: Add length check
         body_unicode = request.body.decode('utf-8') if request.method == "POST" else None
         # Sanity check JSON
-        if body_unicode != None:
-            try:
-                body = json.loads(body_unicode)
-            except:
-                return
+        if body_unicode is not None:
             # Integration layer expecting just the json text.
-            _request_bodies[current_thread().ident] = body_unicode
-
-    
+            _REQUEST_BODIES[current_thread().ident] = body_unicode
+        return True

@@ -1,5 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+"""Bot Framework Application Insights integration package info."""
 
 import os
 
