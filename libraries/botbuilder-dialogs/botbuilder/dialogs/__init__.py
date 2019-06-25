@@ -35,6 +35,8 @@ __all__ = [
            'DateTimePrompt',
            'DateTimeResolution',
            'NumberPrompt',
+           'OAuthPrompt',
+           'OAuthPromptSettings',
            'PromptRecognizerResult',
            'PromptValidatorContext',
            'Prompt', 
