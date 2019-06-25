@@ -17,7 +17,7 @@ This sample **requires** prerequisites in order to run.
 
 This bot uses [LUIS](https://www.luis.ai), an AI based cognitive service, to implement language understanding.
 
-### Install Python 3.6
+### Install Python 3.7
 
 
 ### Create a LUIS Application to enable language understanding
@@ -25,6 +25,11 @@ This bot uses [LUIS](https://www.luis.ai), an AI based cognitive service, to imp
 LUIS language model setup, training, and application configuration steps can be found [here](https://docs.microsoft.com/azure/bot-service/bot-builder-howto-v4-luis?view=azure-bot-service-4.0&tabs=cs).
 
 If you wish to create a LUIS application via the CLI, these steps can be found in the [README-LUIS.md](README-LUIS.md).
+
+## Running the sample
+- Run `pip install -r requirements.txt` to install all dependencies
+- Update LuisAppId, LuisAPIKey and LuisAPIHostName in `config.yaml` with the information retrieved from the [LUIS portal](https://www.luis.ai)
+- Run `python main.py`
 
 
 ## Testing the bot using Bot Framework Emulator

@@ -7,13 +7,15 @@ from botbuilder.schema import (Activity, ChannelAccount,
                                ConversationAccount,
                                ConversationParameters, ConversationReference,
                                ConversationsResult, ConversationResourceResponse)
-from botframework.connector import ConnectorClient
+from botframework.connector import Channels
+from botframework.connector.aio import ConnectorClient
 from botframework.connector.auth import (MicrosoftAppCredentials,
                                          JwtTokenValidation, SimpleCredentialProvider)
 
 from . import __version__
 from .bot_adapter import BotAdapter
 from .turn_context import TurnContext
+from .middleware_set import Middleware
 
 USER_AGENT = f"Microsoft-BotFramework/3.1 (BotBuilder Python/{__version__})"
 
@@ -64,6 +66,14 @@ class BotFrameworkAdapter(BotAdapter):
             parameters = ConversationParameters(bot=reference.bot)
             client = self.create_connector_client(reference.service_url)
 
+            # Mix in the tenant ID if specified. This is required for MS Teams.
+            if reference.conversation is not None and reference.conversation.tenant_id:
+                # Putting tenant_id in channel_data is a temporary while we wait for the Teams API to be updated
+                parameters.channel_data = {'tenant': {'id': reference.conversation.tenant_id}}
+
+                # Permanent solution is to put tenant_id in parameters.tenant_id
+                parameters.tenant_id = reference.conversation.tenant_id
+
             resource_response = await client.conversations.create_conversation(parameters)
             request = TurnContext.apply_conversation_reference(Activity(), reference, is_incoming=True)
             request.conversation = ConversationAccount(id=resource_response.id)
@@ -85,13 +95,25 @@ class BotFrameworkAdapter(BotAdapter):
         :param auth_header:
         :param logic:
         :return:
-        """
+        """       
         activity = await self.parse_request(req)
         auth_header = auth_header or ''
 
         await self.authenticate_request(activity, auth_header)
         context = self.create_context(activity)
 
+        # Fix to assign tenant_id from channelData to Conversation.tenant_id.
+        # MS Teams currently sends the tenant ID in channelData and the correct behavior is to expose 
+        # this value in Activity.Conversation.tenant_id.
+        # This code copies the tenant ID from channelData to Activity.Conversation.tenant_id.
+        # Once MS Teams sends the tenant_id in the Conversation property, this code can be removed.
+        if (Channels.ms_teams == context.activity.channel_id and context.activity.conversation is not None
+                and not context.activity.conversation.tenant_id):
+            teams_channel_data = context.activity.channel_data
+            if teams_channel_data.get("tenant", {}).get("id", None):
+                context.activity.conversation.tenant_id = str(teams_channel_data["tenant"]["id"])
+        
+        
         return await self.run_pipeline(context, logic)
 
     async def authenticate_request(self, request: Activity, auth_header: str):
@@ -123,12 +145,12 @@ class BotFrameworkAdapter(BotAdapter):
             if not isinstance(activity.type, str):
                 raise TypeError('BotFrameworkAdapter.parse_request(): invalid or missing activity type.')
             return True
-
         if not isinstance(req, Activity):
             # If the req is a raw HTTP Request, try to deserialize it into an Activity and return the Activity.
-            if hasattr(req, 'body'):
+            if getattr(req, 'body_exists', False):
                 try:
-                    activity = Activity().deserialize(req.body)
+                    body = await req.json()
+                    activity = Activity().deserialize(body)
                     is_valid_activity = await validate_activity(activity)
                     if is_valid_activity:
                         return activity
@@ -162,7 +184,7 @@ class BotFrameworkAdapter(BotAdapter):
             client = self.create_connector_client(activity.service_url)
             return await client.conversations.update_activity(
                 activity.conversation.id,
-                activity.conversation.activity_id,
+                activity.id,
                 activity)
         except Exception as e:
             raise e
@@ -196,7 +218,7 @@ class BotFrameworkAdapter(BotAdapter):
                         await asyncio.sleep(delay_in_ms)
                 else:
                     client = self.create_connector_client(activity.service_url)
-                    client.conversations.send_to_conversation(activity.conversation.id, activity)
+                    await client.conversations.send_to_conversation(activity.conversation.id, activity)
         except Exception as e:
             raise e
 
