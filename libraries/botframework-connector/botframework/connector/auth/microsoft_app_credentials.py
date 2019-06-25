@@ -112,6 +112,7 @@ class MicrosoftAppCredentials(Authentication):
             return oauth_token.access_token
         else:
             return ''
+
     def refresh_token(self) -> _OAuthResponse:
         """
         returns: _OAuthResponse
@@ -121,7 +122,8 @@ class MicrosoftAppCredentials(Authentication):
             'client_id': self.microsoft_app_id,
             'client_secret': self.microsoft_app_password,
             'scope': MicrosoftAppCredentials.refreshScope}
-        response = requests.post(MicrosoftAppCredentials.refreshEndpoint, data=options)
+
+        response = requests.post(self.oauth_endpoint, data=options)
         response.raise_for_status()
 
         oauth_response = _OAuthResponse.from_json(response.json())

@@ -188,7 +188,7 @@ class OAuthPrompt(Dialog):
                     await context.send_activity(Activity(type='invokeResponse', value=InvokeResponse(404)))
             except Exception:
                 context.send_activity(Activity(type='invokeResponse', value=InvokeResponse(500)))
-        elif context.activity.type == ActivityTypes.message:
+        elif context.activity.type == ActivityTypes.message and context.activity.text:
             match = re.match(r'(?<!\d)\d{6}(?!\d)', context.activity.text)
             if match:
                 token = await self.get_user_token(context, match[0])

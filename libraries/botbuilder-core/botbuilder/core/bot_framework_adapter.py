@@ -9,8 +9,7 @@ from botbuilder.schema import (Activity, ChannelAccount,
                                ConversationParameters, ConversationReference,
                                ConversationsResult, ConversationResourceResponse,
                                TokenResponse)
-from botframework.connector import (Channels, EmulatorApiClient,
-                               ConversationsResult, ConversationResourceResponse)
+from botframework.connector import Channels, EmulatorApiClient
 from botframework.connector.aio import ConnectorClient
 from botframework.connector.auth import (MicrosoftAppCredentials,
                                          JwtTokenValidation, SimpleCredentialProvider)
@@ -22,6 +21,7 @@ from . import __version__
 from .bot_adapter import BotAdapter
 from .turn_context import TurnContext
 from .middleware_set import Middleware
+from .user_token_provider import UserTokenProvider
 
 USER_AGENT = f"Microsoft-BotFramework/3.1 (BotBuilder Python/{__version__})"
 OAUTH_ENDPOINT = 'https://api.botframework.com'
@@ -54,7 +54,8 @@ class BotFrameworkAdapterSettings(object):
         self.channel_service = channel_service
 
 
-class BotFrameworkAdapter(BotAdapter):
+class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
+    _INVOKE_RESPONSE_KEY = 'BotFrameworkAdapter.InvokeResponse'
 
     def __init__(self, settings: BotFrameworkAdapterSettings):
         super(BotFrameworkAdapter, self).__init__()
@@ -247,6 +248,11 @@ class BotFrameworkAdapter(BotAdapter):
                         raise Exception('activity.value was not found.')
                     else:
                         await asyncio.sleep(delay_in_ms)
+                elif activity.type == 'invokeResponse':
+                    context.turn_state.add(self._INVOKE_RESPONSE_KEY)
+                elif activity.reply_to_id:
+                    client = self.create_connector_client(activity.service_url)
+                    await client.conversations.reply_to_activity(activity.conversation.id, activity.reply_to_id, activity)
                 else:
                     client = self.create_connector_client(activity.service_url)
                     await client.conversations.send_to_conversation(activity.conversation.id, activity)
