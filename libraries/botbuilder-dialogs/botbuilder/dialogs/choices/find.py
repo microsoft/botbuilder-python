@@ -1,12 +1,13 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from typing import List, Union
+from typing import Callable, List, Union
 
 from .choice import Choice
 from .find_choices_options import FindChoicesOptions, FindValuesOptions
 from .model_result import ModelResult
 from .sorted_value import SortedValue
+from .token import Token
 
 class Find:
     """ Contains methods for matching user input against a list of choices """
@@ -64,4 +65,4 @@ class Find:
         # Search for each value within the utterance.
         matches: [ModelResult] = []
         opt = options if options else FindValuesOptions()
-        # tokenizer = opt.tokenizer if opt.tokenizer else 
+        # tokenizer: Callable[[str, str], List[Token]] = opt.tokenizer if opt.tokenizer else 
