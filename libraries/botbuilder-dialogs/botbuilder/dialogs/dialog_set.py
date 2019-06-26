@@ -1,17 +1,14 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 import inspect
+from typing import Dict
+
+from botbuilder.core import (TurnContext, BotAssert, StatePropertyAccessor)
 from .dialog import Dialog
 from .dialog_state import DialogState
 from .dialog_turn_result import DialogTurnResult
 from .dialog_reason import DialogReason
 from .dialog_context import DialogContext
-from botbuilder.core import (
-                            TurnContext,
-                            BotAssert,
-                            StatePropertyAccessor
-                            )
-from typing import Dict
 
 
 class DialogSet():
