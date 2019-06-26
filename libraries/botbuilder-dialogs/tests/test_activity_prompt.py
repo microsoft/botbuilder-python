@@ -36,20 +36,6 @@ class SimpleActivityPrompt(ActivityPrompt):
 
 
 class ActivityPromptTests(aiounittest.AsyncTestCase):
-    async def test_does_the_things(self):
-        my_activity = Activity(type='message', text='I am activity message!')
-        my_retry_prompt = Activity(type='message', id='ididretry', text='retry text hurrr')
-        options = PromptOptions(prompt=my_activity, retry_prompt=my_retry_prompt)
-        activity_prompty = ActivityPrompt('myId', 'validator thing')
-
-        my_context = TurnContext(TestAdapter(), my_activity)
-        my_state = {'stringy': {'nestedkey': 'nestedvalue'} }
-        
-        await activity_prompty.on_prompt(my_context, state=my_state, options=options, is_retry=True)
-
-        print('placeholder print')
-
-        pass
 
     def test_activity_prompt_with_empty_id_should_fail(self):
         empty_id = ''
