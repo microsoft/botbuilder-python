@@ -4,6 +4,7 @@
 
 import os
 
+""" Bot Configuration """
 class DefaultConfig(object):
     """ Bot Configuration """
     PORT = 3978
