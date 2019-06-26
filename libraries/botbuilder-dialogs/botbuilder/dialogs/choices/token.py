@@ -19,7 +19,7 @@ class Token:
 
         end: The index of the last character of the token within the outer input string.
 
-        text: The original next of the token.
+        text: The original text of the token.
 
         normalized: A normalized version of the token. This can include things like lower casing or stemming.
         """

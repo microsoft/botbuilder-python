@@ -53,7 +53,7 @@ class Find:
                     synonyms.append( SortedValue(value=synonym, index=index) )
         
         # Find synonyms in utterance and map back to their choices_list
-        # WRITE FindValues()!!
+        return Find._find_values(utterance, synonyms, options)
     
     @staticmethod
     def _find_values(
@@ -86,10 +86,63 @@ class Find:
             searched_tokens = tokenizer(entry.value.strip(), opt.locale)
 
             while start_pos < len(tokens):
-                # match = 
-                # write match_value
-                pass
-    
+                match: Union[ModelResult, None] = Find._match_value(
+                    tokens,
+                    max_distance,
+                    opt,
+                    entry.index,
+                    entry.value,
+                    searched_tokens,
+                    start_pos
+                )
+                
+                if match != None:
+                    start_pos = match.end + 1
+                    matches.append(match)
+                else:
+                    break
+            
+        # Sort matches by score descending
+        sorted_matches = sorted(
+            matches,
+            key = lambda model_result: model_result.resolution.score,
+            reverse = True
+        )
+
+        # Filter out duplicate matching indexes and overlapping characters
+        # - The start & end positions are token positions and need to be translated to
+        # character positions before returning. We also need to populate the "text"
+        # field as well.
+        results: List[ModelResult] = []
+        found_indexes = set()
+        used_tokens = set()
+
+        for match in sorted_matches:
+            # Apply filters.
+            add = match.resolution.index not in found_indexes
+
+            for i in range(match.start, match.end + 1):
+                if i in used_tokens:
+                    add = False
+                    break
+            
+            # Add to results
+            if add:
+                # Update filter info
+                found_indexes.add(match.resolution.index)
+
+                for i in range(match.start, match.end + 1):
+                    used_tokens.add(i)
+
+                # Translate start & end and populate text field
+                match.start = tokens[match.start].start
+                match.end = tokens[match.end].end
+                match.text = utterance[match.start : match.end + 1]
+                results.append(match)
+        
+        # Return the results sorted by position in the utterance
+        return sorted(results, key = lambda model_result: model_result.start)
+
     @staticmethod
     def _match_value(
         source_tokens: List[Token],
@@ -99,7 +152,7 @@ class Find:
         value: str,
         searched_tokens: List[Token],
         start_pos: int
-    ) -> ModelResult:
+    ) -> Union[ModelResult, None]:
         # Match value to utterance and calculate total deviation.
         # - The tokens are matched in order so "second last" will match in
         #   "the second from last one" but not in "the last from the second one".
@@ -154,7 +207,7 @@ class Find:
 
             # Format result
             result = ModelResult(
-                text = 'FILLER - FIND ACTUAL TEXT TO PLACE',
+                text = '',
                 start = start,
                 end = end,
                 type_name = "value",
