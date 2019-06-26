@@ -20,6 +20,7 @@ from botbuilder.schema import Activity
 """ Base class for all prompts.
 """
 class Prompt(Dialog):
+    ATTEMPT_COUNT_KEY = "AttemptCount"
     persisted_options = "options"
     persisted_state = "state"
     def __init__(self, dialog_id: str, validator: object = None):
@@ -52,7 +53,7 @@ class Prompt(Dialog):
         # Initialize prompt state
         state = dc.active_dialog.state
         state[self.persisted_options] = options
-        state[self.persisted_state] = Dict[str, object]
+        state[self.persisted_state] = {}
 
         # Send initial prompt
         await self.on_prompt(dc.context, state[self.persisted_state], state[self.persisted_options], False)
