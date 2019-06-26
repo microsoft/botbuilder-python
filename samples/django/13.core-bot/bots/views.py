@@ -33,14 +33,15 @@ def messages(request):
 
     bot_app = apps.get_app_config('bots')
     bot = bot_app.bot
+    loop = bot_app.LOOP
     adapter = bot_app.ADAPTER
 
     async def aux_func(turn_context):
         await bot.on_turn(turn_context)
 
     try:
-        task = asyncio.ensure_future(adapter.process_activity(activity, auth_header, aux_func), loop=bot_app.LOOP)
-        bot_app.LOOP.run_until_complete(task)
+        task = asyncio.ensure_future(adapter.process_activity(activity, auth_header, aux_func), loop=loop)
+        loop.run_until_complete(task)
         return HttpResponse(status=201)
     except Exception as exception:
         raise exception
