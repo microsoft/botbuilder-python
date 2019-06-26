@@ -4,6 +4,7 @@
 """ Bot initialization """
 # pylint: disable=line-too-long
 import sys
+import asyncio
 from django.apps import AppConfig
 from botbuilder.core import (BotFrameworkAdapter, BotFrameworkAdapterSettings, TurnContext, ConversationState, MemoryStorage, UserState)
 from dialogs import MainDialog
@@ -17,6 +18,7 @@ class BotConfig(AppConfig):
 
     SETTINGS = BotFrameworkAdapterSettings(appConfig.APP_ID, appConfig.APP_PASSWORD)
     ADAPTER = BotFrameworkAdapter(SETTINGS)
+    LOOP = asyncio.get_event_loop()
 
     # Create MemoryStorage, UserState and ConversationState
     memory = MemoryStorage()
