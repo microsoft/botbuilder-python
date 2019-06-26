@@ -103,7 +103,7 @@ class TestAdapter(BotAdapter):
             if value is not None and key != 'additional_properties':
                 setattr(request, key, value)
 
-            request.type = ActivityTypes.message
+        request.type = request.type or ActivityTypes.message
         if not request.id:
             self._next_id += 1
             request.id = str(self._next_id)

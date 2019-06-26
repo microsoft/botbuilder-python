@@ -6,8 +6,6 @@ from .prompt_options import PromptOptions
 from .prompt_recognizer_result import PromptRecognizerResult
 
 
-""" Contextual information passed to a custom `PromptValidator`.
-"""
 class PromptValidatorContext():
     def __init__(self, turn_context: TurnContext, recognized: PromptRecognizerResult, state: Dict[str, object], options: PromptOptions): 
         """Creates contextual information passed to a custom `PromptValidator`.
@@ -71,3 +69,11 @@ class PromptValidatorContext():
         The validator can extend this interface to support additional prompt options.
         """
         return self._options
+
+    @property
+    def attempt_count(self) -> int:
+        """
+        Gets the number of times the prompt has been executed.
+        """
+        from botbuilder.dialogs.prompts import Prompt
+        return self._state.get(Prompt.ATTEMPT_COUNT_KEY, 0)

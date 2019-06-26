@@ -8,6 +8,7 @@ from botbuilder.core import TurnContext
 from botbuilder.dialogs import Dialog, DialogContext, DialogInstance, DialogReason, DialogTurnResult
 from botbuilder.schema import Activity, ActivityTypes, InputHints
 
+from .prompt import Prompt
 from .prompt_options import PromptOptions
 from .prompt_recognizer_result import PromptRecognizerResult
 from .prompt_validator_context import PromptValidatorContext
@@ -36,6 +37,8 @@ class ActivityPrompt(Dialog, ABC):
         """
         Dialog.__init__(self, dialog_id)
         
+        if validator is None:
+            raise TypeError('validator was expected but received None')
         self._validator = validator
 
     async def begin_dialog(self, dc: DialogContext, options: PromptOptions) -> DialogTurnResult:
@@ -45,16 +48,18 @@ class ActivityPrompt(Dialog, ABC):
             raise TypeError('ActivityPrompt.begin_dialog(): Prompt options are required for ActivityPrompts.')
         
         # Ensure prompts have input hint set
-        if options.prompt != None and not options.prompt.input_hint:
+        if options.prompt is not None and not options.prompt.input_hint:
             options.prompt.input_hint = InputHints.expecting_input
 
-        if options.retry_prompt != None and not options.retry_prompt.input_hint:
+        if options.retry_prompt is not None and not options.retry_prompt.input_hint:
             options.retry_prompt.input_hint = InputHints.expecting_input
 
         # Initialize prompt state
         state: Dict[str, object] = dc.active_dialog.state
         state[self.persisted_options] = options
-        state[self.persisted_state] = Dict[str, object]
+        state[self.persisted_state] = {
+            Prompt.ATTEMPT_COUNT_KEY: 0
+        }
 
         # Send initial prompt
         await self.on_prompt(
@@ -76,9 +81,12 @@ class ActivityPrompt(Dialog, ABC):
         options: Dict[str, object] = instance.state[self.persisted_options]
         recognized: PromptRecognizerResult = await self.on_recognize(dc.context, state, options)
 
+        # Increment attempt count
+        state[Prompt.ATTEMPT_COUNT_KEY] += 1
+
         # Validate the return value
         is_valid = False
-        if self._validator != None:
+        if self._validator is not None:
             prompt_context = PromptValidatorContext(
                 dc.context,
                 recognized,
@@ -125,7 +133,7 @@ class ActivityPrompt(Dialog, ABC):
         context: TurnContext, 
         state: Dict[str, dict], 
         options: PromptOptions,
-        isRetry: bool = False
+        is_retry: bool = False
     ):
         """
         Called anytime the derived class should send the user a prompt.
@@ -140,11 +148,11 @@ class ActivityPrompt(Dialog, ABC):
 
         isRetry: If `true` the users response wasn't recognized and the re-prompt should be sent.
         """
-        if isRetry and options.retry_prompt:
+        if is_retry and options.retry_prompt:
             options.retry_prompt.input_hint = InputHints.expecting_input
             await context.send_activity(options.retry_prompt)
         elif options.prompt:
-            options.prompt = InputHints.expecting_input
+            options.prompt.input_hint = InputHints.expecting_input
             await context.send_activity(options.prompt)
     
     async def on_recognize(
