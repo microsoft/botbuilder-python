@@ -112,6 +112,9 @@ class TestAdapter(BotAdapter):
         context = TurnContext(self, request)
         return await self.run_pipeline(context, self.logic)
 
+    def get_next_activity(self) -> Activity:
+        return self.activity_buffer.pop(0)
+
     async def send(self, user_says) -> object:
         """
         Sends something to the bot. This returns a new `TestFlow` instance which can be used to add
