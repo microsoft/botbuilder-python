@@ -28,7 +28,7 @@ class Tokenizer:
         i: int = 0
 
         while i < length:
-            # Get botht he UNICODE value of the current character and the complete character itself
+            # Get both the UNICODE value of the current character and the complete character itself
             # which can potentially be multiple segments
             code_point = ord(text[i])
             char = chr(code_point)
