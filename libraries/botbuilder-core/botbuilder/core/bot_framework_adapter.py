@@ -27,6 +27,7 @@ USER_AGENT = f"Microsoft-BotFramework/3.1 (BotBuilder Python/{__version__})"
 OAUTH_ENDPOINT = 'https://api.botframework.com'
 US_GOV_OAUTH_ENDPOINT = 'https://api.botframework.azure.us'
 
+
 class TokenExchangeState(Model):
     _attribute_map = {
         'connection_name': {'key': 'connectionName', 'type': 'str'},
@@ -35,7 +36,8 @@ class TokenExchangeState(Model):
         'ms_app_id': {'key': 'msAppId', 'type': 'str'},
     }
 
-    def __init__(self, *, connection_name: str= None, conversation: ConversationReference= None, bot_url: str= None, ms_app_id: str= None, **kwargs) -> None:
+    def __init__(self, *, connection_name: str = None, conversation: ConversationReference = None, bot_url: str = None,
+                 ms_app_id: str = None, **kwargs) -> None:
         super(TokenExchangeState, self).__init__(**kwargs)
         self.connection_name = connection_name
         self.conversation = conversation
@@ -79,7 +81,8 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         context = self.create_context(request)
         return await self.run_pipeline(context, logic)
 
-    async def create_conversation(self, reference: ConversationReference, logic: Callable[[TurnContext], Awaitable]=None):
+    async def create_conversation(self, reference: ConversationReference,
+                                  logic: Callable[[TurnContext], Awaitable] = None):
         """
         Starts a new conversation with a user. This is typically used to Direct Message (DM) a member
         of a group.
@@ -124,7 +127,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         :param auth_header:
         :param logic:
         :return:
-        """       
+        """
         activity = await self.parse_request(req)
         auth_header = auth_header or ''
 
@@ -141,8 +144,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             teams_channel_data = context.activity.channel_data
             if teams_channel_data.get("tenant", {}).get("id", None):
                 context.activity.conversation.tenant_id = str(teams_channel_data["tenant"]["id"])
-        
-        
+
         return await self.run_pipeline(context, logic)
 
     async def authenticate_request(self, request: Activity, auth_header: str):
@@ -177,6 +179,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             if not isinstance(activity.type, str):
                 raise TypeError('BotFrameworkAdapter.parse_request(): invalid or missing activity type.')
             return True
+
         if not isinstance(req, Activity):
             # If the req is a raw HTTP Request, try to deserialize it into an Activity and return the Activity.
             if getattr(req, 'body_exists', False):
@@ -232,7 +235,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         try:
             client = self.create_connector_client(conversation_reference.service_url)
             await client.conversations.delete_activity(conversation_reference.conversation.id,
-                                                             conversation_reference.activity_id)
+                                                       conversation_reference.activity_id)
         except Exception as e:
             raise e
 
@@ -252,7 +255,8 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                     context.turn_state.add(self._INVOKE_RESPONSE_KEY)
                 elif activity.reply_to_id:
                     client = self.create_connector_client(activity.service_url)
-                    await client.conversations.reply_to_activity(activity.conversation.id, activity.reply_to_id, activity)
+                    await client.conversations.reply_to_activity(activity.conversation.id, activity.reply_to_id,
+                                                                 activity)
                 else:
                     client = self.create_connector_client(activity.service_url)
                     await client.conversations.send_to_conversation(activity.conversation.id, activity)
@@ -324,7 +328,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         except Exception as e:
             raise e
 
-    async def get_conversations(self, service_url: str, continuation_token: str=None):
+    async def get_conversations(self, service_url: str, continuation_token: str = None):
         """
         Lists the Conversations in which this bot has participated for a given channel server. The channel server
         returns results in pages and each page will include a `continuationToken` that can be used to fetch the next
@@ -340,32 +344,32 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         if context.activity.from_property is None or not context.activity.from_property.id:
             raise Exception('BotFrameworkAdapter.get_user_token(): missing from or from.id')
         if not connection_name:
-        	raise Exception('get_user_token() requires a connection_name but none was provided.')
-        
+            raise Exception('get_user_token() requires a connection_name but none was provided.')
+
         self.check_emulating_oauth_cards(context)
-        user_id= context.activity.from_property.id
+        user_id = context.activity.from_property.id
         url = self.oauth_api_url(context)
         client = self.create_token_api_client(url)
 
         result = client.user_token.get_token(
-            user_id, 
+            user_id,
             connection_name,
             context.activity.channel_id,
             magic_code
         )
 
-        #TODO check form of response
+        # TODO check form of response
         if result is None or result.token is None:
             return None
         else:
             return result
 
-    async def sign_out_user(self, context: TurnContext, connection_name: str= None, user_id: str= None) -> str:
+    async def sign_out_user(self, context: TurnContext, connection_name: str = None, user_id: str = None) -> str:
         if not context.activity.from_property or not context.activity.from_property.id:
             raise Exception('BotFrameworkAdapter.sign_out_user(): missing from_property or from_property.id')
         if not user_id:
             user_id = context.activity.from_property.id
-        
+
         self.check_emulating_oauth_cards(context)
         url = self.oauth_api_url(context)
         client = self.create_token_api_client(url)
@@ -374,48 +378,50 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             connection_name,
             context.activity.channel_id
         )
-    
+
     async def get_oauth_sign_in_link(self, context: TurnContext, connection_name: str) -> str:
         self.check_emulating_oauth_cards(context)
         conversation = TurnContext.get_conversation_reference(context.activity)
         url = self.oauth_api_url(context)
         client = self.create_token_api_client(url)
         state = TokenExchangeState(
-            connection_name= connection_name,
-            conversation= conversation,
-            ms_app_id= client.config.credentials.app_id
+            connection_name=connection_name,
+            conversation=conversation,
+            ms_app_id=client.config.credentials.app_id
         )
 
-        #TODO check proper encoding error handling
+        # TODO check proper encoding error handling
         final_state = base64.b64encode(state.serialize().encode(encoding='UTF-8', errors='strict')).decode()
-        
-        #TODO check form of response
+
+        # TODO check form of response
         return client.bot_sign_in.get_sign_in_url(final_state)
-    
-    async def get_token_status(self, context: TurnContext, user_id: str= None, include_filter: str= None) -> List[TokenStatus]:
+
+    async def get_token_status(self, context: TurnContext, user_id: str = None, include_filter: str = None) -> List[
+        TokenStatus]:
         if (not user_id and (not context.activity.from_property or not context.activity.from_property.id)):
             raise Exception('BotFrameworkAdapter.get_token_status(): missing from_property or from_property.id')
-        
+
         self.check_emulating_oauth_cards(context)
         user_id = user_id or context.activity.from_property.id
         url = self.oauth_api_url(context)
         client = self.create_token_api_client(url)
-        
-        #TODO check form of response
+
+        # TODO check form of response
         return client.user_token.get_token_status(user_id, context.activity.channel_id, include_filter)
-    
-    async def get_aad_tokens(self, context: TurnContext, connection_name: str, resource_urls: List[str]) -> Dict[str, TokenResponse]:
+
+    async def get_aad_tokens(self, context: TurnContext, connection_name: str, resource_urls: List[str]) -> Dict[
+        str, TokenResponse]:
         if (not context.activity.from_property or not context.activity.from_property.id):
             raise Exception('BotFrameworkAdapter.get_aad_tokens(): missing from_property or from_property.id')
-        
+
         self.check_emulating_oauth_cards(context)
         user_id = context.activity.from_property.id
         url = self.oauth_api_url(context)
         client = self.create_token_api_client(url)
 
-        #TODO check form of response
+        # TODO check form of response
         return client.user_token.get_aad_tokens(user_id, connection_name, context.activity.channel_id, resource_urls)
-    
+
     def create_connector_client(self, service_url: str) -> ConnectorClient:
         """
         Allows for mocking of the connector client in unit tests.
@@ -425,7 +431,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         client = ConnectorClient(self._credentials, base_url=service_url)
         client.config.add_user_agent(USER_AGENT)
         return client
-    
+
     def create_token_api_client(self, service_url: str) -> TokenApiClient:
         client = TokenApiClient(
             self._credentials,
@@ -434,27 +440,27 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         client.config.add_user_agent(USER_AGENT)
 
         return client
-    
+
     async def emulate_oauth_cards(self, context_or_service_url: Union[TurnContext, str], emulate: bool):
         self._is_emulating_oauth_cards = emulate
         url = self.oauth_api_url(context_or_service_url)
         await EmulatorApiClient.emulate_oauth_cards(self._credentials, url, emulate)
-        
+
     def oauth_api_url(self, context_or_service_url: Union[TurnContext, str]) -> str:
         url = None
         if self._is_emulating_oauth_cards:
             url = (context_or_service_url.activity.service_url if isinstance(context_or_service_url, object)
-                    else context_or_service_url)
+                   else context_or_service_url)
         else:
             if self.settings.oauth_endpoint:
                 url = self.settings.oauth_endpoint
             else:
                 url = (US_GOV_OAUTH_ENDPOINT if JwtTokenValidation.is_government(self.settings.channel_service)
-                        else OAUTH_ENDPOINT)
+                       else OAUTH_ENDPOINT)
 
         return url
 
     def check_emulating_oauth_cards(self, context: TurnContext):
         if (not self._is_emulating_oauth_cards and context.activity.channel_id == 'emulator'
-            and (not self._credentials.microsoft_app_id or not self._credentials.microsoft_app_password)):
+                and (not self._credentials.microsoft_app_id or not self._credentials.microsoft_app_password)):
             self._is_emulating_oauth_cards = True

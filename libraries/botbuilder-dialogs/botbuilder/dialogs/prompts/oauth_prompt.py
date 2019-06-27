@@ -7,12 +7,14 @@ from typing import Union, Awaitable, Callable
 
 from botbuilder.core import CardFactory, MessageFactory, InvokeResponse, TurnContext
 from botbuilder.dialogs import Dialog, DialogContext, DialogTurnResult
-from botbuilder.schema import Activity, ActivityTypes, ActionTypes, CardAction, InputHints, SigninCard, OAuthCard, TokenResponse
+from botbuilder.schema import Activity, ActivityTypes, ActionTypes, CardAction, InputHints, SigninCard, OAuthCard, \
+    TokenResponse
 from botframework.connector import Channels
 from .prompt_options import PromptOptions
 from .oauth_prompt_settings import OAuthPromptSettings
 from .prompt_validator_context import PromptValidatorContext
 from .prompt_recognizer_result import PromptRecognizerResult
+
 
 class OAuthPrompt(Dialog):
     """
@@ -39,7 +41,8 @@ class OAuthPrompt(Dialog):
     The user will be prompted to sign in as needed and their access token will be passed as an argument to the callers next waterfall step.
     """
 
-    def __init__(self, dialog_id: str, settings: OAuthPromptSettings, validator: Callable[[PromptValidatorContext], Awaitable[bool]]=None):
+    def __init__(self, dialog_id: str, settings: OAuthPromptSettings,
+                 validator: Callable[[PromptValidatorContext], Awaitable[bool]] = None):
         super().__init__(dialog_id)
         self._validator = validator
 
@@ -48,35 +51,35 @@ class OAuthPrompt(Dialog):
 
         self._settings = settings
         self._validator = validator
-    
-    async def begin_dialog(self, dialog_context: DialogContext, options: PromptOptions= None) -> DialogTurnResult:
+
+    async def begin_dialog(self, dialog_context: DialogContext, options: PromptOptions = None) -> DialogTurnResult:
         if dialog_context is None:
             raise TypeError(f'OAuthPrompt.begin_dialog: Expected DialogContext but got NoneType instead')
-        
+
         options = options or PromptOptions()
-        
-        #Ensure prompts have input hint set
+
+        # Ensure prompts have input hint set
         if options.prompt and not options.prompt.input_hint:
             options.prompt.input_hint = InputHints.expecting_input
-        
+
         if options.retry_prompt and not options.retry_prompt.input_hint:
             options.prompt.input_hint = InputHints.expecting_input
-        
-        #Initialize prompt state
+
+        # Initialize prompt state
         timeout = self._settings.timeout if isinstance(self._settings.timeout, int) else 900000
         state = dialog_context.active_dialog.state
         state['state'] = {}
         state['options'] = options
-        state['expires'] = datetime.now() + timedelta(seconds=timeout/1000)
+        state['expires'] = datetime.now() + timedelta(seconds=timeout / 1000)
 
         output = await self.get_user_token(dialog_context.context)
-        
+
         if output is not None:
             return await dialog_context.end_dialog(output)
         else:
             await self.send_oauth_card(dialog_context.context, options.prompt)
             return Dialog.end_of_turn
-    
+
     async def continue_dialog(self, dialog_context: DialogContext) -> DialogTurnResult:
         # Recognize token
         recognized = await self._recognize_token(dialog_context.context)
@@ -91,7 +94,7 @@ class OAuthPrompt(Dialog):
         else:
             if state['state'].get('attemptCount') is None:
                 state['state']['attemptCount'] = 1
-            
+
             # Validate the return value
             is_valid = False
             if self._validator is not None:
@@ -104,7 +107,7 @@ class OAuthPrompt(Dialog):
                 ))
             elif recognized.succeeded:
                 is_valid = True
-            
+
             # Return recognized value or re-prompt
             if is_valid:
                 return await dialog_context.end_dialog(recognized.value)
@@ -112,10 +115,10 @@ class OAuthPrompt(Dialog):
                 # Send retry prompt
                 if not dialog_context.context.responded and is_message and state['options'].retry_prompt is not None:
                     await dialog_context.context.send_activity(state['options'].retry_prompt)
-                
+
                 return Dialog.end_of_turn
 
-    async def get_user_token(self, context: TurnContext, code: str= None) -> TokenResponse:
+    async def get_user_token(self, context: TurnContext, code: str = None) -> TokenResponse:
         adapter = context.adapter
 
         # Validate adapter type
@@ -133,47 +136,48 @@ class OAuthPrompt(Dialog):
 
         return await adapter.sign_out_user(context, self._settings.connection_name)
 
-    async def send_oauth_card(self, context: TurnContext, prompt: Union[Activity, str]= None):
+    async def send_oauth_card(self, context: TurnContext, prompt: Union[Activity, str] = None):
         if not isinstance(prompt, Activity):
             prompt = MessageFactory.text(prompt or '', None, InputHints.expecting_input)
         else:
             prompt.input_hint = prompt.input_hint or InputHints.expecting_input
-        
+
         prompt.attachments = prompt.attachments or []
 
         if self._channel_suppports_oauth_card(context.activity.channel_id):
             if not any(att.content_type == CardFactory.content_types.oauth_card for att in prompt.attachments):
                 prompt.attachments.append(CardFactory.oauth_card(OAuthCard(
-                    text= self._settings.text,
-                    connection_name= self._settings.connection_name,
-                    buttons= [
+                    text=self._settings.text,
+                    connection_name=self._settings.connection_name,
+                    buttons=[
                         CardAction(
-                            title= self._settings.title,
-                            text= self._settings.text,
-                            type= ActionTypes.signin
+                            title=self._settings.title,
+                            text=self._settings.text,
+                            type=ActionTypes.signin
                         )
                     ]
                 )))
         else:
             if not any(att.content_type == CardFactory.content_types.signin_card for att in prompt.attachments):
                 if not hasattr(context.adapter, 'get_oauth_sign_in_link'):
-                    raise Exception('OAuthPrompt.send_oauth_card(): get_oauth_sign_in_link() not supported by the current adapter')
+                    raise Exception(
+                        'OAuthPrompt.send_oauth_card(): get_oauth_sign_in_link() not supported by the current adapter')
 
                 link = await context.adapter.get_oauth_sign_in_link(context, self._settings.connection_name)
                 prompt.attachments.append(CardFactory.signin_card(SigninCard(
-                    text= self._settings.text,
-                    buttons= [
+                    text=self._settings.text,
+                    buttons=[
                         CardAction(
-                            title= self._settings.title,
-                            value= link,
-                            type= ActionTypes.signin
+                            title=self._settings.title,
+                            value=link,
+                            type=ActionTypes.signin
                         )
                     ]
                 )))
-        
+
         # Send prompt
         await context.send_activity(prompt)
-    
+
     async def _recognize_token(self, context: TurnContext) -> PromptRecognizerResult:
         token = None
         if self._is_token_response_event(context):
@@ -192,19 +196,19 @@ class OAuthPrompt(Dialog):
             match = re.match(r'(?<!\d)\d{6}(?!\d)', context.activity.text)
             if match:
                 token = await self.get_user_token(context, match[0])
-        
+
         return PromptRecognizerResult(True, token) if token is not None else PromptRecognizerResult()
-    
+
     def _is_token_response_event(self, context: TurnContext) -> bool:
         activity = context.activity
 
         return activity.type == ActivityTypes.event and activity.name == 'tokens/response'
-    
+
     def _is_teams_verification_invoke(self, context: TurnContext) -> bool:
         activity = context.activity
 
         return activity.type == ActivityTypes.invoke and activity.name == 'signin/verifyState'
-    
+
     def _channel_suppports_oauth_card(self, channel_id: str) -> bool:
         if channel_id in [
             Channels.ms_teams,
@@ -213,5 +217,5 @@ class OAuthPrompt(Dialog):
             Channels.skype_for_business
         ]:
             return False
-        
+
         return True

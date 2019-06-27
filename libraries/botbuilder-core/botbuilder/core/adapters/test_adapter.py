@@ -1,9 +1,9 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-#TODO: enable this in the future
-#With python 3.7 the line below will allow to do Postponed Evaluation of Annotations. See PEP 563
-#from __future__ import annotations
+# TODO: enable this in the future
+# With python 3.7 the line below will allow to do Postponed Evaluation of Annotations. See PEP 563
+# from __future__ import annotations
 
 import asyncio
 import inspect
@@ -11,14 +11,15 @@ from datetime import datetime
 from typing import Coroutine, Dict, List, Callable, Union
 from copy import copy
 from ..bot_adapter import BotAdapter
-from ..turn_context import TurnContext 
+from ..turn_context import TurnContext
 from ..user_token_provider import UserTokenProvider
 from botbuilder.schema import (ActivityTypes, Activity, ConversationAccount,
                                ConversationReference, ChannelAccount, ResourceResponse,
                                TokenResponse)
 
+
 class UserToken:
-    def __init__(self, connection_name: str= None, user_id: str= None, channel_id: str= None, token: str= None):
+    def __init__(self, connection_name: str = None, user_id: str = None, channel_id: str = None, token: str = None):
         self.connection_name = connection_name
         self.user_id = user_id
         self.channel_id = channel_id
@@ -30,14 +31,16 @@ class UserToken:
                 self.user_id == rhs.user_id and
                 self.channel_id == rhs.channel_id)
 
+
 class TokenMagicCode:
-    def __init__(self, key: UserToken= None, magic_code: str= None):
+    def __init__(self, key: UserToken = None, magic_code: str = None):
         self.key = key
-        self.magic_code = magic_code 
+        self.magic_code = magic_code
 
 
 class TestAdapter(BotAdapter, UserTokenProvider):
-    def __init__(self, logic: Coroutine=None, conversation: ConversationReference=None, send_trace_activity: bool = False):
+    def __init__(self, logic: Coroutine = None, conversation: ConversationReference = None,
+                 send_trace_activity: bool = False):
         """
         Creates a new TestAdapter instance.
         :param logic:
@@ -72,10 +75,12 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         :param activities:
         :return:
         """
+
         def id_mapper(activity):
             self.activity_buffer.append(activity)
             self._next_id += 1
             return ResourceResponse(id=str(self._next_id))
+
         """This if-else code is temporary until the BotAdapter and Bot/TurnContext are revamped."""
         if type(activities) == list:
             responses = [id_mapper(activity) for activity in activities]
@@ -122,7 +127,7 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         """
         if type(activity) == str:
             activity = Activity(type='message', text=activity)
-        # Initialize request
+        # Initialize request.
         request = copy(self.template)
 
         for key, value in vars(activity).items():
@@ -134,7 +139,7 @@ class TestAdapter(BotAdapter, UserTokenProvider):
             self._next_id += 1
             request.id = str(self._next_id)
 
-        # Create context object and run middleware
+        # Create context object and run middleware.
         context = TurnContext(self, request)
         return await self.run_pipeline(context, self.logic)
 
@@ -177,7 +182,7 @@ class TestAdapter(BotAdapter, UserTokenProvider):
                 if len(arg) == 4:
                     timeout = arg[3]
             await self.test(arg[0], arg[1], description, timeout)
-    
+
     def add_user_token(self, connection_name: str, channel_id: str, user_id: str, token: str, magic_code: str = None):
         key = UserToken()
         key.channel_id = channel_id
@@ -193,19 +198,19 @@ class TestAdapter(BotAdapter, UserTokenProvider):
             mc.magic_code = magic_code
             self._magic_codes.append(mc)
 
-    async def get_user_token(self, context: TurnContext, connection_name: str, magic_code: str= None) -> TokenResponse:
-        key= UserToken()
+    async def get_user_token(self, context: TurnContext, connection_name: str, magic_code: str = None) -> TokenResponse:
+        key = UserToken()
         key.channel_id = context.activity.channel_id
         key.connection_name = connection_name
         key.user_id = context.activity.from_property.id
 
-        if (magic_code):
+        if magic_code:
             magic_code_record = list(filter(lambda x: key.equals_key(x.key), self._magic_codes))
-            if (magic_code_record and len(magic_code_record) > 0 and magic_code_record[0].magic_code == magic_code):
-                # move the token to long term dictionary
+            if magic_code_record and len(magic_code_record) > 0 and magic_code_record[0].magic_code == magic_code:
+                # Move the token to long term dictionary.
                 self.add_user_token(connection_name, key.channel_id, key.user_id, magic_code_record[0].key.token)
 
-                # remove from the magic code list
+                # Remove from the magic code list.
                 idx = self._magic_codes.index(magic_code_record[0])
                 self._magic_codes = [self._magic_codes.pop(idx)]
 
@@ -213,30 +218,31 @@ class TestAdapter(BotAdapter, UserTokenProvider):
 
         if match and len(match) > 0:
             return TokenResponse(
-                connection_name= match[0].connection_name,
-                token= match[0].token,
-                expiration= None
+                connection_name=match[0].connection_name,
+                token=match[0].token,
+                expiration=None
             )
         else:
-            # not found
+            # Not found.
             return None
-    
+
     async def sign_out_user(self, context: TurnContext, connection_name: str):
         channel_id = context.activity.channel_id
         user_id = context.activity.from_property.id
-        
+
         new_records = []
         for token in self._user_tokens:
             if (token.channel_id != channel_id or
-                    token.user_id != user_id or 
+                    token.user_id != user_id or
                     (connection_name and connection_name != token.connection_name)):
                 new_records.append(token)
         self._user_tokens = new_records
-    
+
     async def get_oauth_sign_in_link(self, context: TurnContext, connection_name: str) -> str:
-        return f'https://fake.com/oauthsignin/{ connection_name }/{ context.activity.channel_id }/{ context.activity.from_property.id }'
-    
-    async def get_aad_tokens(self, context: TurnContext, connection_name: str, resource_urls: List[str]) -> Dict[str, TokenResponse]:
+        return f'https://fake.com/oauthsignin/{connection_name}/{context.activity.channel_id}/{context.activity.from_property.id}'
+
+    async def get_aad_tokens(self, context: TurnContext, connection_name: str, resource_urls: List[str]) -> Dict[
+        str, TokenResponse]:
         return None
 
 
@@ -270,6 +276,7 @@ class TestFlow(object):
         :param user_says:
         :return:
         """
+
         async def new_previous():
             nonlocal self, user_says
             if callable(self.previous):
@@ -278,7 +285,8 @@ class TestFlow(object):
 
         return TestFlow(await new_previous(), self.adapter)
 
-    async def assert_reply(self, expected: Union[str, Activity, Callable[[Activity, str], None]], description=None, timeout=None) -> 'TestFlow':
+    async def assert_reply(self, expected: Union[str, Activity, Callable[[Activity, str], None]], description=None,
+                           timeout=None) -> 'TestFlow':
         """
         Generates an assertion if the bots response doesn't match the expected text/activity.
         :param expected:
@@ -286,6 +294,7 @@ class TestFlow(object):
         :param timeout:
         :return:
         """
+
         def default_inspector(reply, description=None):
             if isinstance(expected, Activity):
                 validate_activity(reply, expected)
@@ -309,7 +318,7 @@ class TestFlow(object):
                 nonlocal expected, timeout
                 current = datetime.now()
                 if (current - start).total_seconds() * 1000 > timeout:
-                    if  isinstance(expected, Activity):
+                    if isinstance(expected, Activity):
                         expecting = expected.text
                     elif callable(expected):
                         expecting = inspect.getsourcefile(expected)
@@ -327,7 +336,9 @@ class TestFlow(object):
                 else:
                     await asyncio.sleep(0.05)
                     await wait_for_activity()
+
             await wait_for_activity()
+
         return TestFlow(await test_flow_previous(), self.adapter)
 
 

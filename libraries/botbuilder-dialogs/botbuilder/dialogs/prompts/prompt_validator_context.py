@@ -5,11 +5,13 @@ from botbuilder.core.turn_context import TurnContext
 from .prompt_options import PromptOptions
 from .prompt_recognizer_result import PromptRecognizerResult
 
-
 """ Contextual information passed to a custom `PromptValidator`.
 """
-class PromptValidatorContext():
-    def __init__(self, turn_context: TurnContext, recognized: PromptRecognizerResult, state: Dict[str, object], options: PromptOptions, attempt_count: int= None): 
+
+
+class PromptValidatorContext:
+    def __init__(self, turn_context: TurnContext, recognized: PromptRecognizerResult, state: Dict[str, object],
+                 options: PromptOptions, attempt_count: int = None):
         """Creates contextual information passed to a custom `PromptValidator`.
         Parameters
         ----------

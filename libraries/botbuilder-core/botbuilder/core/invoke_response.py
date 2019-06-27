@@ -1,6 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
-   
+
 class InvokeResponse:
     """
     Tuple class containing an HTTP Status Code and a JSON Serializable
@@ -9,7 +9,7 @@ class InvokeResponse:
     the JSON Serialized content from the Body property.
     """
 
-    def __init__(self, status: int= None, body: object= None):
+    def __init__(self, status: int = None, body: object = None):
         """
         Gets or sets the HTTP status and/or body code for the response
         :param status: The HTTP status code.

@@ -10,18 +10,19 @@ from botbuilder.dialogs.prompts import OAuthPrompt
 
 def create_reply(activity):
     return Activity(
-        type= ActivityTypes.message,
-        from_property= ChannelAccount(id= activity.recipient.id, name= activity.recipient.name),
-        recipient= ChannelAccount(id= activity.from_property.id, name= activity.from_property.name ),
-        reply_to_id= activity.id,
-        service_url= activity.service_url,
-        channel_id= activity.channel_id,
-        conversation= ConversationAccount(is_group= activity.conversation.is_group, id= activity.conversation.id, name= activity.conversation.name)
+        type=ActivityTypes.message,
+        from_property=ChannelAccount(id=activity.recipient.id, name=activity.recipient.name),
+        recipient=ChannelAccount(id=activity.from_property.id, name=activity.from_property.name),
+        reply_to_id=activity.id,
+        service_url=activity.service_url,
+        channel_id=activity.channel_id,
+        conversation=ConversationAccount(is_group=activity.conversation.is_group, id=activity.conversation.id,
+                                         name=activity.conversation.name)
     )
 
 
 class OAuthPromptTests(aiounittest.AsyncTestCase):
-    
+
     async def test_should_call_oauth_prompt(self):
         connection_name = "myConnection"
         token = "abc123"
@@ -37,7 +38,7 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
                     await turn_context.send_activity('Logged in.')
                 else:
                     await turn_context.send_activity('Failed')
-            
+
             await convo_state.save_changes(turn_context)
 
         # Initialize TestAdapter.
@@ -50,13 +51,13 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
         dialog_state = convo_state.create_property('dialogState')
         dialogs = DialogSet(dialog_state)
         dialogs.add(OAuthPrompt('prompt', OAuthPromptSettings(
-                connection_name,
-                'Login',
-                None,
-                300000
-            )))
+            connection_name,
+            'Login',
+            None,
+            300000
+        )))
 
-        async def inspector(activity: Activity, description: str= None):
+        async def inspector(activity: Activity, description: str = None):
 
             self.assertTrue(len(activity.attachments) == 1)
             self.assertTrue(activity.attachments[0].content_type == CardFactory.content_types.oauth_card)
@@ -94,11 +95,10 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
             elif results.status == DialogTurnStatus.Complete:
                 if results.result.token:
                     await turn_context.send_activity('Logged in.')
-                
+
                 else:
                     await turn_context.send_activity('Failed')
-                
-            
+
             await convo_state.save_changes(turn_context)
 
         # Initialize TestAdapter.
@@ -117,9 +117,9 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
             300000
         )))
 
-        def inspector(activity: Activity, description: str= None):
-            assert(len(activity.attachments) == 1)
-            assert(activity.attachments[0].content_type == CardFactory.content_types.oauth_card)
+        def inspector(activity: Activity, description: str = None):
+            assert (len(activity.attachments) == 1)
+            assert (activity.attachments[0].content_type == CardFactory.content_types.oauth_card)
 
             # send a mock EventActivity back to the bot with the token
             adapter.add_user_token(connection_name, activity.channel_id, activity.recipient.id, token, magic_code)
@@ -128,7 +128,7 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
         step2 = await step1.assert_reply(inspector)
         step3 = await step2.send(magic_code)
         await step3.assert_reply('Logged in.')
-    
+
     async def test_oauth_prompt_doesnt_detect_code_in_begin_dialog(self):
         connection_name = "myConnection"
         token = "abc123"
@@ -136,7 +136,8 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
 
         async def exec_test(turn_context: TurnContext):
             # Add a magic code to the adapter preemptively so that we can test if the message that triggers BeginDialogAsync uses magic code detection
-            adapter.add_user_token(connection_name, turn_context.activity.channel_id, turn_context.activity.from_property.id, token, magic_code)
+            adapter.add_user_token(connection_name, turn_context.activity.channel_id,
+                                   turn_context.activity.from_property.id, token, magic_code)
 
             dc = await dialogs.create_context(turn_context)
 
@@ -146,9 +147,8 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
                 # If magicCode is detected when prompting, this will end the dialog and return the token in tokenResult
                 token_result = await dc.prompt('prompt', PromptOptions())
                 if isinstance(token_result.result, TokenResponse):
-                    self.assertTrue(False) 
-                
-            
+                    self.assertTrue(False)
+
             await convo_state.save_changes(turn_context)
 
         # Initialize TestAdapter.
@@ -167,9 +167,9 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
             300000
         )))
 
-        def inspector(activity: Activity, description: str= None):
-            assert(len(activity.attachments) == 1)
-            assert(activity.attachments[0].content_type == CardFactory.content_types.oauth_card)
+        def inspector(activity: Activity, description: str = None):
+            assert (len(activity.attachments) == 1)
+            assert (activity.attachments[0].content_type == CardFactory.content_types.oauth_card)
 
         step1 = await adapter.send('Hello')
         await step1.assert_reply(inspector)
