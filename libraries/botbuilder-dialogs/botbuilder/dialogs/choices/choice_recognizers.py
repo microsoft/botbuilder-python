@@ -22,6 +22,14 @@ class ChoiceRecognizers:
         """
         Matches user input against a list of choices.
 
+        This is layered above the `Find.find_choices()` function, and adds logic to let the user specify
+        their choice by index (they can say "one to pick `choice[0]`) or ordinal position (they can say "the second one" to pick `choice[1]`.)
+        The user's utterance is recognized in the following order:
+
+        - By name using `find_choices()`
+        - By 1's based ordinal position.
+        - By 1's based index position.
+
         Parameters:
         -----------
 
@@ -42,6 +50,7 @@ class ChoiceRecognizers:
         # - We only want to use a single strategy for returning results to avoid issues where utterances
         # like the "the third one" or "the red one" or "the first division book" would miss-recognize as
         # a numerical index or ordinal as well
+        # TODO complete when recgonizers-numbers is published
         locale = options.locale if options.locale else 'FILL IN WITH RECOGNIZERS-NUMBER (C# Recognizers.Text.Culture.English)'
         matched = Find.find_choices(utterance, choices, options)
 
