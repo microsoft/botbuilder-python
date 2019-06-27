@@ -28,7 +28,7 @@ class Tokenizer:
         i: int = 0
 
         while i < length:
-            # Get botht he UNICODE value of the current character and the complete character itself
+            # Get both the UNICODE value of the current character and the complete character itself
             # which can potentially be multiple segments
             code_point = ord(text[i])
             char = chr(code_point)
@@ -45,11 +45,11 @@ class Tokenizer:
                 token = None
                 tokens.append(Token(
                     start = i,
-                    end = i + (len(char) - 1),
+                    end = i,
                     text = char,
                     normalized = char
                 ))
-            elif token == None:
+            elif token is None:
                 # Start a new token
                 token = Token(
                     start = i,
@@ -61,9 +61,9 @@ class Tokenizer:
                 # Add onto current token
                 token.text += char
             
-            i += len(char)
+            i += 1
         
-        Tokenizer._append_token(tokens, token, length)
+        Tokenizer._append_token(tokens, token, length - 1)
         
         return tokens
                 
