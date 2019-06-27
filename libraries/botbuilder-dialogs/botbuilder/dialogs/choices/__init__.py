@@ -16,6 +16,7 @@ from .list_style import ListStyle
 from .model_result import ModelResult
 from .sorted_value import SortedValue
 from .token import Token
+from .tokenizer import Tokenizer
 
 __all__ = [
     "Channel",
@@ -28,5 +29,6 @@ __all__ = [
     "ListStyle",
     "ModelResult",
     "SortedValue",
-    "Token"
+    "Token",
+    "Tokenizer"
 ]

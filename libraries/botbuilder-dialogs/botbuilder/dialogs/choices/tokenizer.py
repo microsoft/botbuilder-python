@@ -45,11 +45,11 @@ class Tokenizer:
                 token = None
                 tokens.append(Token(
                     start = i,
-                    end = i + (len(char) - 1),
+                    end = i,
                     text = char,
                     normalized = char
                 ))
-            elif token == None:
+            elif token is None:
                 # Start a new token
                 token = Token(
                     start = i,
@@ -61,9 +61,9 @@ class Tokenizer:
                 # Add onto current token
                 token.text += char
             
-            i += len(char)
+            i += 1
         
-        Tokenizer._append_token(tokens, token, length)
+        Tokenizer._append_token(tokens, token, length - 1)
         
         return tokens
                 
