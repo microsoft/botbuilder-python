@@ -5,7 +5,7 @@ import re
 from datetime import datetime, timedelta
 from typing import Union, Awaitable, Callable
 
-from botbuilder.core import CardFactory, MessageFactory, InvokeResponse, TurnContext
+from botbuilder.core import CardFactory, MessageFactory, InvokeResponse, TurnContext, UserTokenProvider
 from botbuilder.dialogs import Dialog, DialogContext, DialogTurnResult
 from botbuilder.schema import Activity, ActivityTypes, ActionTypes, CardAction, InputHints, SigninCard, OAuthCard, \
     TokenResponse
@@ -72,7 +72,11 @@ class OAuthPrompt(Dialog):
         state['options'] = options
         state['expires'] = datetime.now() + timedelta(seconds=timeout / 1000)
 
-        output = await self.get_user_token(dialog_context.context)
+        if not isinstance(dialog_context.context.adapter, UserTokenProvider):
+            raise TypeError("OAuthPrompt.get_user_token(): not supported by the current adapter")
+
+        output = await dialog_context.context.adapter.get_user_token(dialog_context.context,
+                                                                     self._settings.connection_name, None)
 
         if output is not None:
             return await dialog_context.end_dialog(output)

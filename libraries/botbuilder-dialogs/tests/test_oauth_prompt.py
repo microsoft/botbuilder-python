@@ -171,5 +171,5 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
             assert (len(activity.attachments) == 1)
             assert (activity.attachments[0].content_type == CardFactory.content_types.oauth_card)
 
-        step1 = await adapter.send('Hello')
+        step1 = await adapter.send(magic_code)
         await step1.assert_reply(inspector)
