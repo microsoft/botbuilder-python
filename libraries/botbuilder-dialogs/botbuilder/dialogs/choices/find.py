@@ -5,30 +5,32 @@ from typing import Callable, List, Union
 
 from .choice import Choice
 from .find_choices_options import FindChoicesOptions, FindValuesOptions
+from .found_choice import FoundChoice
 from .found_value import FoundValue
 from .model_result import ModelResult
 from .sorted_value import SortedValue
 from .token import Token
 from .tokenizer import Tokenizer
 
+
 class Find:
     """ Contains methods for matching user input against a list of choices """
-    
+
     @staticmethod
     def find_choices(
-        utterance: str,
-        choices: [ Union[str, Choice] ],
-        options: FindChoicesOptions = None
+            utterance: str,
+            choices: [Union[str, Choice]],
+            options: FindChoicesOptions = None
     ):
         """ Matches user input against a list of choices """
 
         if not choices:
             raise TypeError('Find: choices cannot be None. Must be a [str] or [Choice].')
-        
+
         opt = options if options else FindChoicesOptions()
 
         # Normalize list of choices
-        choices_list = [ Choice(value=choice) if isinstance(choice, str) else choice for choice in choices ]
+        choices_list = [Choice(value=choice) if isinstance(choice, str) else choice for choice in choices]
 
         # Build up full list of synonyms to search over.
         # - Each entry in the list contains the index of the choice it belongs to which will later be
@@ -39,33 +41,49 @@ class Find:
             choice = choices_list[index]
 
             if not opt.no_value:
-                synonyms.append( SortedValue(value=choice.value, index=index) )
-            
+                synonyms.append(SortedValue(value=choice.value, index=index))
+
             if (
-                getattr(choice, 'action', False) and 
-                getattr(choice.action, 'title', False) and 
-                not opt.no_value
+                    getattr(choice, 'action', False) and
+                    getattr(choice.action, 'title', False) and
+                    not opt.no_value
             ):
-                synonyms.append( SortedValue(value=choice.action.title, index=index) )
-            
-            if choice.synonyms != None:
+                synonyms.append(SortedValue(value=choice.action.title, index=index))
+
+            if choice.synonyms is not None:
                 for synonym in synonyms:
-                    synonyms.append( SortedValue(value=synonym, index=index) )
-        
+                    synonyms.append(SortedValue(value=synonym, index=index))
+
+        def found_choice_constructor(value_model: ModelResult) -> ModelResult:
+            choice = choices_list[value_model.resolution.index]
+
+            return ModelResult(
+                start=value_model.start,
+                end=value_model.end,
+                type_name='choice',
+                text=value_model.text,
+                resolution=FoundChoice(
+                    value=choice.value,
+                    index=value_model.resolution.index,
+                    score=value_model.resolution.score,
+                    synonym=value_model.resolution.value,
+                )
+            )
+
         # Find synonyms in utterance and map back to their choices_list
-        return Find._find_values(utterance, synonyms, options)
-    
+        return list(map(found_choice_constructor, Find.find_values(utterance, synonyms, options)))
+
     @staticmethod
-    def _find_values(
-        utterance: str,
-        values: List[SortedValue],
-        options: FindValuesOptions = None
+    def find_values(
+            utterance: str,
+            values: List[SortedValue],
+            options: FindValuesOptions = None
     ):
         # Sort values in descending order by length, so that the longest value is searchd over first.
         sorted_values = sorted(
             values,
-            key = lambda sorted_val: len(sorted_val.value),
-            reverse = True
+            key=lambda sorted_val: len(sorted_val.value),
+            reverse=True
         )
 
         # Search for each value within the utterance.
@@ -73,7 +91,7 @@ class Find:
         opt = options if options else FindValuesOptions()
         tokenizer: Callable[[str, str], List[Token]] = opt.tokenizer if opt.tokenizer else Tokenizer.default_tokenizer
         tokens = tokenizer(utterance, opt.locale)
-        max_distance = opt.max_token_distance if opt.max_token_distance != None else 2
+        max_distance = opt.max_token_distance if opt.max_token_distance is not None else 2
 
         for i in range(len(sorted_values)):
             entry = sorted_values[i]
@@ -95,18 +113,18 @@ class Find:
                     searched_tokens,
                     start_pos
                 )
-                
-                if match != None:
+
+                if match is not None:
                     start_pos = match.end + 1
                     matches.append(match)
                 else:
                     break
-            
+
         # Sort matches by score descending
         sorted_matches = sorted(
             matches,
-            key = lambda model_result: model_result.resolution.score,
-            reverse = True
+            key=lambda model_result: model_result.resolution.score,
+            reverse=True
         )
 
         # Filter out duplicate matching indexes and overlapping characters
@@ -125,7 +143,7 @@ class Find:
                 if i in used_tokens:
                     add = False
                     break
-            
+
             # Add to results
             if add:
                 # Update filter info
@@ -137,21 +155,21 @@ class Find:
                 # Translate start & end and populate text field
                 match.start = tokens[match.start].start
                 match.end = tokens[match.end].end
-                match.text = utterance[match.start : match.end + 1]
+                match.text = utterance[match.start: match.end + 1]
                 results.append(match)
-        
+
         # Return the results sorted by position in the utterance
-        return sorted(results, key = lambda model_result: model_result.start)
+        return sorted(results, key=lambda model_result: model_result.start)
 
     @staticmethod
     def _match_value(
-        source_tokens: List[Token],
-        max_distance: int,
-        options: FindValuesOptions,
-        index: int,
-        value: str,
-        searched_tokens: List[Token],
-        start_pos: int
+            source_tokens: List[Token],
+            max_distance: int,
+            options: FindValuesOptions,
+            index: int,
+            value: str,
+            searched_tokens: List[Token],
+            start_pos: int
     ) -> Union[ModelResult, None]:
         # Match value to utterance and calculate total deviation.
         # - The tokens are matched in order so "second last" will match in
@@ -180,16 +198,16 @@ class Find:
                     # Update start & end position that will track the span of the utterance that's matched.
                     if (start < 0):
                         start = pos
-                    
+
                     end = pos
-        
+
         # Calculate score and format result
         # - The start & end positions and the results text field will be corrected by the caller.
         result: ModelResult = None
 
         if (
-            matched > 0 and
-            (matched == len(searched_tokens) or options.allow_partial_matches)
+                matched > 0 and
+                (matched == len(searched_tokens) or options.allow_partial_matches)
         ):
             # Percentage of tokens matched. If matching "second last" in
             # "the second form last one" the completeness would be 1.0 since
@@ -207,28 +225,27 @@ class Find:
 
             # Format result
             result = ModelResult(
-                text = '',
-                start = start,
-                end = end,
-                type_name = "value",
-                resolution = FoundValue(
-                    value = value,
-                    index = index,
-                    score = score
+                text='',
+                start=start,
+                end=end,
+                type_name="value",
+                resolution=FoundValue(
+                    value=value,
+                    index=index,
+                    score=score
                 )
             )
-        
+
         return result
-    
+
     @staticmethod
     def _index_of_token(
-        tokens: List[Token],
-        token: Token,
-        start_pos: int
+            tokens: List[Token],
+            token: Token,
+            start_pos: int
     ) -> int:
         for i in range(start_pos, len(tokens)):
             if tokens[i].normalized == token.normalized:
                 return i
-        
-        return -1
 
+        return -1
