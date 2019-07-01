@@ -15,7 +15,7 @@ cosmos_db_config = CosmosDbConfig(
     database='test-db',
     container='bot-storage'
 )
-emulator_running = True
+emulator_running = False
 
 
 async def reset():
