@@ -18,8 +18,9 @@ import azure.cosmos.errors as cosmos_errors
 class CosmosDbConfig:
     """The class for CosmosDB configuration for the Azure Bot Framework."""
 
-    def __init__(self, endpoint: str = None, masterkey: str = None, database: str = None, partition_key: str = None,
-                 database_creation_options: dict = None, container_creation_options: dict = None, **kwargs):
+    def __init__(self, endpoint: str = None, masterkey: str = None, database: str = None, container: str = None,
+                 partition_key: str = None, database_creation_options: dict = None,
+                 container_creation_options: dict = None, **kwargs):
         """Create the Config object.
 
         :param endpoint:
@@ -29,16 +30,16 @@ class CosmosDbConfig:
         :param filename:
         :return CosmosDbConfig:
         """
-        self.__config_file = kwargs.pop('filename', None)
+        self.__config_file = kwargs.get('filename')
         if self.__config_file:
             kwargs = json.load(open(self.__config_file))
-        self.endpoint = endpoint
-        self.masterkey = masterkey
-        self.database = database
-        self.container = kwargs.pop('container', 'bot_container')
-        self.partition_key = partition_key
-        self.database_creation_options = database_creation_options
-        self.container_creation_options = container_creation_options
+        self.endpoint = endpoint or kwargs.get('endpoint')
+        self.masterkey = masterkey or kwargs.get('masterkey')
+        self.database = database or kwargs.get('database', 'bot_db')
+        self.container = container or kwargs.get('container', 'bot_container')
+        self.partition_key = partition_key or kwargs.get('partition_key')
+        self.database_creation_options = database_creation_options or kwargs.get('database_creation_options')
+        self.container_creation_options = container_creation_options or kwargs.get('container_creation_options')
 
 
 class CosmosDbStorage(Storage):
@@ -189,7 +190,7 @@ class CosmosDbStorage(Storage):
         doc = result.get('document')
         # readd the e_tag from Cosmos
         if result.get('_etag'):
-            doc['e_tag'] = result['e_tag']
+            doc['e_tag'] = result['_etag']
         # create and return the StoreItem
         return StoreItem(**doc)
 
