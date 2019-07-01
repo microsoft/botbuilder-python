@@ -8,6 +8,7 @@ Part of the Azure Bot Framework in Python.
 # Licensed under the MIT License.
 
 from typing import Dict, List
+from threading import Semaphore
 import json
 from botbuilder.core.storage import Storage, StoreItem
 import azure.cosmos.cosmos_client as cosmos_client
@@ -17,7 +18,8 @@ import azure.cosmos.errors as cosmos_errors
 class CosmosDbConfig:
     """The class for CosmosDB configuration for the Azure Bot Framework."""
 
-    def __init__(self, **kwargs):
+    def __init__(self, endpoint: str = None, masterkey: str = None, database: str = None, partition_key: str = None,
+                 database_creation_options: dict = None, container_creation_options: dict = None, **kwargs):
         """Create the Config object.
 
         :param endpoint:
@@ -30,10 +32,13 @@ class CosmosDbConfig:
         self.__config_file = kwargs.pop('filename', None)
         if self.__config_file:
             kwargs = json.load(open(self.__config_file))
-        self.endpoint = kwargs.pop('endpoint')
-        self.masterkey = kwargs.pop('masterkey')
-        self.database = kwargs.pop('database', 'bot_db')
+        self.endpoint = endpoint
+        self.masterkey = masterkey
+        self.database = database
         self.container = kwargs.pop('container', 'bot_container')
+        self.partition_key = partition_key
+        self.database_creation_options = database_creation_options
+        self.container_creation_options = container_creation_options
 
 
 class CosmosDbStorage(Storage):
@@ -54,6 +59,9 @@ class CosmosDbStorage(Storage):
         # the presence of the db and container or creates them
         self.db = None
         self.container = None
+        self._database_creation_options = config.database_creation_options
+        self._container_creation_options = config.container_creation_options
+        self.__semaphore = Semaphore()
 
     async def read(self, keys: List[str]) -> Dict[str, object]:
         """Read storeitems from storage.
@@ -80,7 +88,12 @@ class CosmosDbStorage(Storage):
                         f"SELECT c.id, c.realId, c.document, c._etag FROM c WHERE c.id in ({parameter_sequence})",
                     "parameters": parameters
                 }
-                options = {'enableCrossPartitionQuery': True}
+
+                if self.config.partition_key:
+                    options = {'partitionKey': self.config.partition_key}
+                else:
+                    options = {'enableCrossPartitionQuery': True}
+
                 # run the query and store the results as a list
                 results = list(
                     self.client.QueryItems(
@@ -147,10 +160,17 @@ class CosmosDbStorage(Storage):
             # check if the database and container exists and if not create
             if not self.__container_exists:
                 self.__create_db_and_container()
+
+            options = {}
+            if self.config.partition_key:
+                options['partitionKey'] = self.config.partition_key
+
             # call the function for each key
             for k in keys:
                 self.client.DeleteItem(
-                    document_link=self.__item_link(self.__sanitize_key(k)))
+                    document_link=self.__item_link(self.__sanitize_key(k)),
+                    options=options
+                )
                 # print(res)
         except cosmos_errors.HTTPFailure as h:
             # print(h.status_code)
@@ -241,14 +261,15 @@ class CosmosDbStorage(Storage):
 
     def __create_db_and_container(self):
         """Call the get or create methods."""
-        db_id = self.config.database
-        container_name = self.config.container
-        self.db = self.__get_or_create_database(self.client, db_id)
-        self.container = self.__get_or_create_container(
-            self.client, container_name
-        )
+        with self.__semaphore:
+            db_id = self.config.database
+            container_name = self.config.container
+            self.db = self._get_or_create_database(self.client, db_id)
+            self.container = self._get_or_create_container(
+                self.client, container_name
+            )
 
-    def __get_or_create_database(self, doc_client, id) -> str:
+    def _get_or_create_database(self, doc_client, id) -> str:
         """Return the database link.
 
         Check if the database exists or create the db.
@@ -269,10 +290,10 @@ class CosmosDbStorage(Storage):
             return dbs[0]['id']
         else:
             # create the database if it didn't exist
-            res = doc_client.CreateDatabase({'id': id})
+            res = doc_client.CreateDatabase({'id': id}, self._database_creation_options)
             return res['id']
 
-    def __get_or_create_container(self, doc_client, container) -> str:
+    def _get_or_create_container(self, doc_client, container) -> str:
         """Return the container link.
 
         Check if the container exists or create the container.
@@ -297,5 +318,8 @@ class CosmosDbStorage(Storage):
         else:
             # Create a container if it didn't exist
             res = doc_client.CreateContainer(
-                self.__database_link, {'id': container})
+                self.__database_link,
+                {'id': container},
+                self._container_creation_options
+            )
             return res['id']

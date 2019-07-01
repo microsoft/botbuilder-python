@@ -2,8 +2,10 @@
 # Licensed under the MIT License.
 
 import pytest
+from azure.cosmos.cosmos_client import CosmosClient
 from botbuilder.core import StoreItem
 from botbuilder.azure import CosmosDbStorage, CosmosDbConfig
+from unittest.mock import Mock
 
 # local cosmosdb emulator instance cosmos_db_config
 cosmos_db_config = CosmosDbConfig(
@@ -14,11 +16,23 @@ cosmos_db_config = CosmosDbConfig(
 )
 emulator_running = False
 
+
 async def reset():
     storage = CosmosDbStorage(cosmos_db_config)
     storage.client.DeleteDatabase(
         database_link='dbs/' + cosmos_db_config.database,
         ignore_errors=True)
+
+
+def get_mock_client(id: str = '1'):
+    mock = CosmosClient(cosmos_db_config.endpoint, {'masterKey': cosmos_db_config.masterkey})
+
+    mock.QueryDatabases = Mock(return_value=[])
+    mock.QueryContainers = Mock(return_value=[])
+    mock.CreateDatabase = Mock(return_value={'id': id})
+    mock.CreateContainer = Mock(return_value={'id': id})
+
+    return mock
 
 
 class SimpleStoreItem(StoreItem):
@@ -37,9 +51,33 @@ class TestCosmosDbStorage:
         except Exception as e:
             assert e
 
+    @pytest.mark.asyncio
+    async def test_creation_request_options_era_being_called(self):
+        test_config = CosmosDbConfig(
+            endpoint='https://localhost:8081',
+            masterkey='C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==',
+            database='test-db',
+            container='bot-storage',
+            database_creation_options={'OfferThroughput': 1000},
+            container_creation_options={'OfferThroughput': 500}
+        )
+
+        storage = CosmosDbStorage(test_config)
+        test_id = '1'
+        storage.db = test_id
+        client = get_mock_client(id=test_id)
+
+        assert storage._get_or_create_database(doc_client=client, id=test_id), test_id
+        client.CreateDatabase.assert_called_with({'id': test_id}, test_config.database_creation_options)
+        assert storage._get_or_create_container(doc_client=client, id=test_id), test_id
+        client.CreateContainer.assert_called_with('dbs/'+test_id, {'id': test_id},
+                                                  test_config.container_creation_options)
+
+
     @pytest.mark.skipif(not emulator_running, reason='Needs the emulator to run.')
     async def test_cosmos_storage_init_should_work_with_just_endpoint_and_key(self):
-        storage = CosmosDbStorage(CosmosDbConfig(endpoint=cosmos_db_config.endpoint, masterkey=cosmos_db_config.masterkey))
+        storage = CosmosDbStorage(
+            CosmosDbConfig(endpoint=cosmos_db_config.endpoint, masterkey=cosmos_db_config.masterkey))
         await storage.write({'user': SimpleStoreItem()})
         data = await storage.read(['user'])
         assert 'user' in data
@@ -113,9 +151,9 @@ class TestCosmosDbStorage:
         storage = CosmosDbStorage(cosmos_db_config)
         await storage.write(
             {'batch1': SimpleStoreItem(counter=1),
-            'batch2': SimpleStoreItem(counter=1),
-            'batch3': SimpleStoreItem(counter=1)}
-            )
+             'batch2': SimpleStoreItem(counter=1),
+             'batch3': SimpleStoreItem(counter=1)}
+        )
         data = await storage.read(['batch1', 'batch2', 'batch3'])
         assert len(data.keys()) == 3
         assert data['batch1']
@@ -169,12 +207,13 @@ class TestCosmosDbStorage:
         assert len(data.keys()) == 0
 
     @pytest.mark.skipif(not emulator_running, reason='Needs the emulator to run.')
-    async def test_cosmos_storage_delete_should_delete_values_when_given_multiple_valid_keys_and_ignore_other_data(self):
+    async def test_cosmos_storage_delete_should_delete_values_when_given_multiple_valid_keys_and_ignore_other_data(
+            self):
         await reset()
         storage = CosmosDbStorage(cosmos_db_config)
         await storage.write({'test': SimpleStoreItem(),
-                                 'test2': SimpleStoreItem(counter=2),
-                                 'test3': SimpleStoreItem(counter=3)})
+                             'test2': SimpleStoreItem(counter=2),
+                             'test3': SimpleStoreItem(counter=3)})
 
         await storage.delete(['test', 'test2'])
         data = await storage.read(['test', 'test2', 'test3'])
