@@ -78,7 +78,7 @@ class Find:
             utterance: str,
             values: List[SortedValue],
             options: FindValuesOptions = None
-    ):
+    ) -> List[ModelResult]:
         # Sort values in descending order by length, so that the longest value is searchd over first.
         sorted_values = sorted(
             values,

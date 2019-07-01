@@ -57,7 +57,7 @@ _similar_values: List[SortedValue] = [
 
 
 class ChoiceRecognizersTest(aiounittest.AsyncTestCase):
-    # Find.find_choices
+    # Find.find_values
 
     def test_should_find_a_simple_value_in_a_single_word_utterance(self):
         found = Find.find_values('red', _color_values)
@@ -114,8 +114,27 @@ class ChoiceRecognizersTest(aiounittest.AsyncTestCase):
         found = Find.find_choices(None, _color_choices)
         assert len(found) == 0
 
+    # ChoiceRecognizers.recognize_choices
+
     def test_should_find_a_choice_in_an_utterance_by_name(self):
+        # found = 
         pass
 
     def test_should_find_a_choice_in_an_utterance_by_ordinal_position(self):
         pass
+    
+    def test_should_find_multiple_choices_in_an_utterance_by_ordinal_position(self):
+        pass
+    
+    def test_should_find_a_choice_in_an_utterance_by_numerical_index_digit(self):
+        pass
+    
+    def test_should_find_a_choice_in_an_utterance_by_numerical_index_text(self):
+        pass
+    
+    def test_should_find_multiple_choices_in_an_utterance_by_numerical_index(self):
+        pass
+    
+    def test_should_accept_null_utterance_in_recognize_choices(self):
+        pass
+    
