@@ -14,7 +14,7 @@ import azure.cosmos.cosmos_client as cosmos_client
 import azure.cosmos.errors as cosmos_errors
 
 
-class CosmosDbConfig():
+class CosmosDbConfig:
     """The class for CosmosDB configuration for the Azure Bot Framework."""
 
     def __init__(self, **kwargs):
@@ -49,13 +49,13 @@ class CosmosDbStorage(Storage):
         self.client = cosmos_client.CosmosClient(
             self.config.endpoint,
             {'masterKey': self.config.masterkey}
-            )
+        )
         # these are set by the functions that check 
         # the presence of the db and container or creates them
         self.db = None
         self.container = None
 
-    async def read(self, keys: List[str]) -> dict:
+    async def read(self, keys: List[str]) -> Dict[str, object]:
         """Read storeitems from storage.
 
         :param keys:
@@ -65,35 +65,34 @@ class CosmosDbStorage(Storage):
             # check if the database and container exists and if not create
             if not self.__container_exists:
                 self.__create_db_and_container()
-            if len(keys) > 0:
+            if keys:
                 # create the parameters object
                 parameters = [
                     {'name': f'@id{i}', 'value': f'{self.__sanitize_key(key)}'}
                     for i, key in enumerate(keys)
-                    ]
+                ]
                 # get the names of the params
                 parameter_sequence = ','.join(param.get('name')
                                               for param in parameters)
                 # create the query
                 query = {
                     "query":
-                    f"SELECT c.id, c.realId, c.document, c._etag \
-FROM c WHERE c.id in ({parameter_sequence})",
+                        f"SELECT c.id, c.realId, c.document, c._etag FROM c WHERE c.id in ({parameter_sequence})",
                     "parameters": parameters
-                    }
+                }
                 options = {'enableCrossPartitionQuery': True}
                 # run the query and store the results as a list
                 results = list(
                     self.client.QueryItems(
                         self.__container_link, query, options)
-                    )
+                )
                 # return a dict with a key and a StoreItem
                 return {
                     r.get('realId'): self.__create_si(r) for r in results
-                    }
+                }
             else:
-                raise Exception('cosmosdb_storage.read(): \
-provide at least one key')
+                # No keys passed in, no result to return.
+                return {}
         except TypeError as e:
             raise e
 
@@ -122,16 +121,16 @@ provide at least one key')
                         database_or_Container_link=self.__container_link,
                         document=doc,
                         options={'disableAutomaticIdGeneration': True}
-                        )
+                    )
                 # if we have an etag, do opt. concurrency replace
-                elif(len(e_tag) > 0):
+                elif (len(e_tag) > 0):
                     access_condition = {'type': 'IfMatch', 'condition': e_tag}
                     self.client.ReplaceItem(
                         document_link=self.__item_link(
                             self.__sanitize_key(key)),
                         new_document=doc,
                         options={'accessCondition': access_condition}
-                        )
+                    )
                 # error when there is no e_tag
                 else:
                     raise Exception('cosmosdb_storage.write(): etag missing')
@@ -169,7 +168,8 @@ provide at least one key')
         # get the document item from the result and turn into a dict
         doc = result.get('document')
         # readd the e_tag from Cosmos
-        doc['e_tag'] = result.get('_etag')
+        if result.get('_etag'):
+            doc['e_tag'] = result['e_tag']
         # create and return the StoreItem
         return StoreItem(**doc)
 
@@ -183,10 +183,10 @@ provide at least one key')
         """
         # read the content
         non_magic_attr = ([attr for attr in dir(si)
-                          if not attr.startswith('_') or attr.__eq__('e_tag')])
+                           if not attr.startswith('_') or attr.__eq__('e_tag')])
         # loop through attributes and write and return a dict
         return ({attr: getattr(si, attr)
-                for attr in non_magic_attr})
+                 for attr in non_magic_attr})
 
     def __sanitize_key(self, key) -> str:
         """Return the sanitized key.
@@ -202,9 +202,9 @@ provide at least one key')
         # Unicode code point of the character and return the new string
         return ''.join(
             map(
-                lambda x: '*'+str(ord(x)) if x in bad_chars else x, key
-                )
+                lambda x: '*' + str(ord(x)) if x in bad_chars else x, key
             )
+        )
 
     def __item_link(self, id) -> str:
         """Return the item link of a item in the container.
@@ -246,7 +246,7 @@ provide at least one key')
         self.db = self.__get_or_create_database(self.client, db_id)
         self.container = self.__get_or_create_container(
             self.client, container_name
-            )
+        )
 
     def __get_or_create_database(self, doc_client, id) -> str:
         """Return the database link.
