@@ -25,7 +25,7 @@ async def reset():
 
 
 def get_mock_client(id: str = '1'):
-    mock = CosmosClient(cosmos_db_config.endpoint, {'masterKey': cosmos_db_config.masterkey})
+    mock = MockClient()
 
     mock.QueryDatabases = Mock(return_value=[])
     mock.QueryContainers = Mock(return_value=[])
@@ -33,6 +33,11 @@ def get_mock_client(id: str = '1'):
     mock.CreateContainer = Mock(return_value={'id': id})
 
     return mock
+
+
+class MockClient(CosmosClient):
+    def __init__(self):
+        pass
 
 
 class SimpleStoreItem(StoreItem):
@@ -62,14 +67,14 @@ class TestCosmosDbStorage:
             container_creation_options={'OfferThroughput': 500}
         )
 
-        storage = CosmosDbStorage(test_config)
         test_id = '1'
-        storage.db = test_id
         client = get_mock_client(id=test_id)
+        storage = CosmosDbStorage(test_config, client)
+        storage.db = test_id
 
         assert storage._get_or_create_database(doc_client=client, id=test_id), test_id
         client.CreateDatabase.assert_called_with({'id': test_id}, test_config.database_creation_options)
-        assert storage._get_or_create_container(doc_client=client, id=test_id), test_id
+        assert storage._get_or_create_container(doc_client=client, container=test_id), test_id
         client.CreateContainer.assert_called_with('dbs/'+test_id, {'id': test_id},
                                                   test_config.container_creation_options)
 
