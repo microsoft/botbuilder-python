@@ -44,14 +44,14 @@ class CosmosDbConfig:
 class CosmosDbStorage(Storage):
     """The class for CosmosDB middleware for the Azure Bot Framework."""
 
-    def __init__(self, config: CosmosDbConfig):
+    def __init__(self, config: CosmosDbConfig, client: cosmos_client.CosmosClient = None):
         """Create the storage object.
 
         :param config:
         """
         super(CosmosDbStorage, self).__init__()
         self.config = config
-        self.client = cosmos_client.CosmosClient(
+        self.client = client or cosmos_client.CosmosClient(
             self.config.endpoint,
             {'masterKey': self.config.masterkey}
         )
