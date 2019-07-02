@@ -4,7 +4,7 @@ from typing import List
 
 import aiounittest
 
-from botbuilder.dialogs.choices import SortedValue, Find, FindValuesOptions
+from botbuilder.dialogs.choices import ChoiceRecognizers, Find, FindValuesOptions, SortedValue
 
 
 def assert_result(result, start, end, text):
@@ -117,24 +117,42 @@ class ChoiceRecognizersTest(aiounittest.AsyncTestCase):
     # ChoiceRecognizers.recognize_choices
 
     def test_should_find_a_choice_in_an_utterance_by_name(self):
-        # found = 
-        pass
+        found = ChoiceRecognizers.recognize_choices('the red one please.', _color_choices)
+        assert len(found) == 1
+        assert_result(found[0], 4, 6, 'red')
+        assert_choice(found[0], 'red', 0, 1.0, 'red')
 
     def test_should_find_a_choice_in_an_utterance_by_ordinal_position(self):
-        pass
+        found = ChoiceRecognizers.recognize_choices('the first one please.', _color_choices)
+        assert len(found) == 1
+        assert_result(found[0], 4, 8, 'first')
+        assert_choice(found[0], 'red', 0, 1.0)
     
     def test_should_find_multiple_choices_in_an_utterance_by_ordinal_position(self):
-        pass
+        found = ChoiceRecognizers.recognize_choices('the first and third one please', _color_choices)
+        assert len(found) == 2
+        assert_choice(found[0], 'red', 0, 1.0)
+        assert_choice(found[1], 'blue', 2, 1.0)
     
     def test_should_find_a_choice_in_an_utterance_by_numerical_index_digit(self):
-        pass
+        found = ChoiceRecognizers.recognize_choices('1', _color_choices)
+        assert len(found) == 1
+        assert_result(found[0], 0, 0, '1')
+        assert_choice(found[0], 'red', 0, 1.0)
     
     def test_should_find_a_choice_in_an_utterance_by_numerical_index_text(self):
-        pass
+        found = ChoiceRecognizers.recognize_choices('one', _color_choices)
+        assert len(found) == 1
+        assert_result(found[0], 0, 2, 'one')
+        assert_choice(found[0], 'red', 0, 1.0)
     
     def test_should_find_multiple_choices_in_an_utterance_by_numerical_index(self):
-        pass
+        found = ChoiceRecognizers.recognize_choices('option one and 3.', _color_choices)
+        assert len(found) == 2
+        assert_choice(found[0], 'red', 0, 1.0)
+        assert_choice(found[1], 'blue', 2, 1.0)
     
     def test_should_accept_null_utterance_in_recognize_choices(self):
-        pass
+        found = ChoiceRecognizers.recognize_choices(None, _color_choices)
+        assert len(found) == 0
     

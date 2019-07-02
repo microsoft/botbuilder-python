@@ -20,7 +20,7 @@ class ChoiceRecognizers:
             utterance: str,
             choices: List[Union[str, Choice]],
             options: FindChoicesOptions = None
-    ) -> ModelResult:
+    ) -> List[ModelResult]:
         """
         Matches user input against a list of choices.
 
@@ -55,13 +55,13 @@ class ChoiceRecognizers:
         # - We only want to use a single strategy for returning results to avoid issues where utterances
         #   like the "the third one" or "the red one" or "the first division book" would miss-recognize as
         #   a numerical index or ordinal as well.
-        locale = options.locale if options.locale else Culture.English
+        locale = options.locale if (options and options.locale) else Culture.English
         matched = Find.find_choices(utterance, choices_list, options)
         if len(matched) == 0:
             # Next try finding by ordinal
             matches =  ChoiceRecognizers._recognize_ordinal(utterance, locale)
             
-            if len(matches > 0):
+            if len(matches) > 0:
                 for match in matches:
                     ChoiceRecognizers._match_choice_by_index(choices_list, matched, match)
             else:
@@ -75,9 +75,8 @@ class ChoiceRecognizers:
             # - The results from find_choices() are already properly sorted so we just need this
             #   for ordinal & numerical lookups.
             matched = sorted(
-                matches,
-                key=lambda model_result: model_result.start,
-                reverse=True
+                matched,
+                key=lambda model_result: model_result.start
             )
         
         return matched
@@ -129,7 +128,7 @@ class ChoiceRecognizers:
             type_name='choice',
             text=value_model.text,
             resolution=FoundChoice(
-                value=value_model.resolution.value,
+                value=value_model.resolution['value'],
                 index=0,
                 score=1.0,
             )
