@@ -1,10 +1,11 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from typing import Callable, Dict, List
+from recognizers_text import Culture
+from typing import Callable, Dict, List, Union
 
 from botbuilder.core import TurnContext
-from botbuilder.dialogs.choices import Choice, ChoiceFactory, ChoiceFactoryOptions, FindChoicesOptions, ListStyle
+from botbuilder.dialogs.choices import Choice, ChoiceFactory, ChoiceFactoryOptions, ChoiceRecognizers, FindChoicesOptions, ListStyle
 from botbuilder.dialogs.prompts import Prompt, PromptOptions, PromptValidatorContext, PromptRecognizerResult
 from botbuilder.schema import Activity, ActivityTypes
 
@@ -14,16 +15,15 @@ class ChoicePrompt(Prompt):
 
     By default the prompt will return to the calling dialog a `FoundChoice` object containing the choice that was selected.
     """
-    # TODO in C#, Recognizers.Text.Culture (Spanish, Dutch, English, etc.) are used as keys instead of hard-coded strings 'es-es', 'nl-nl', 'en-us', etc.
     _default_choice_options: Dict[str, ChoiceFactoryOptions] = {
-        'es-es': ChoiceFactoryOptions(inline_separator = ', ', inline_or = ' o ', include_numbers = True),
-        'nl-nl': ChoiceFactoryOptions(inline_separator = ', ', inline_or = ' of ', include_numbers = True),
-        'en-us': ChoiceFactoryOptions(inline_separator = ', ', inline_or = ' or ', include_numbers = True),
-        'fr-fr': ChoiceFactoryOptions(inline_separator = ', ', inline_or = ' ou ', include_numbers = True),
-        'de-de': ChoiceFactoryOptions(inline_separator = ', ', inline_or = ' oder ', include_numbers = True),
-        'ja-jp': ChoiceFactoryOptions(inline_separator = '、 ', inline_or = ' または ', include_numbers = True),
-        'pt-br': ChoiceFactoryOptions(inline_separator = ', ', inline_or = ' ou ', include_numbers = True),
-        'zh-cn': ChoiceFactoryOptions(inline_separator = '， ', inline_or = ' 要么 ', include_numbers = True),
+        Culture.English: ChoiceFactoryOptions(inline_separator = ', ', inline_or = ' o ', include_numbers = True),
+        Culture.Dutch: ChoiceFactoryOptions(inline_separator = ', ', inline_or = ' of ', include_numbers = True),
+        Culture.English: ChoiceFactoryOptions(inline_separator = ', ', inline_or = ' or ', include_numbers = True),
+        Culture.French: ChoiceFactoryOptions(inline_separator = ', ', inline_or = ' ou ', include_numbers = True),
+        Culture.German: ChoiceFactoryOptions(inline_separator = ', ', inline_or = ' oder ', include_numbers = True),
+        Culture.Japanese: ChoiceFactoryOptions(inline_separator = '、 ', inline_or = ' または ', include_numbers = True),
+        Culture.Portuguese: ChoiceFactoryOptions(inline_separator = ', ', inline_or = ' ou ', include_numbers = True),
+        Culture.Chinese: ChoiceFactoryOptions(inline_separator = '， ', inline_or = ' 要么 ', include_numbers = True),
     }
 
     def __init__(
@@ -53,14 +53,13 @@ class ChoicePrompt(Prompt):
             raise TypeError('ChoicePrompt.on_prompt(): options cannot be None.')
         
         # Determine culture
-        culture = turn_context.activity.locale if turn_context.activity.locale else self.default_locale
+        culture: Union[str, None] = turn_context.activity.locale if turn_context.activity.locale else self.default_locale
         
         if (not culture or culture not in ChoicePrompt._default_choice_options):
-            # TODO replace with recognizers constant
-            culture = 'en-us'
+            culture = Culture.English
         
         # Format prompt to send
-        choices: List[Choice] = self.choice_options.choices if self.choice_options.choices else []
+        choices: List[Choice] = options.choices if options.choices else []
         channel_id: str = turn_context.activity.channel_id
         choice_options: ChoiceFactoryOptions = self.choice_options if self.choice_options else ChoicePrompt._default_choice_options[culture]
         choice_style = options.style if options.style else self.style
@@ -98,10 +97,14 @@ class ChoicePrompt(Prompt):
         result: PromptRecognizerResult = PromptRecognizerResult()
 
         if turn_context.activity.type == ActivityTypes.message:
-            activity = turn_context.activity
-            utterance = activity.text
-            opt = self.recognizer_options if self.recognizer_options else FindChoicesOptions()
-            # TODO use recognizers constant for English
-            opt.locale = activity.locale if activity.locale else (self.default_locale or 'en-us')
-            # TODO complete when ChoiceRecognizers is complete -- pending publishing of new recognizers-numbers bits
+            activity: Activity = turn_context.activity
+            utterance: str = activity.text
+            opt: FindChoicesOptions = self.recognizer_options if self.recognizer_options else FindChoicesOptions()
+            opt.locale = activity.locale if activity.locale else (self.default_locale or Culture.English)
+            results = ChoiceRecognizers.recognize_choices(utterance, choices, opt)
             
+            if results is not None and len(results) > 0:
+                result.succeeded = True
+                result.value = results[0].resolution
+        
+        return result

@@ -9,6 +9,7 @@ from .channel import Channel
 from .choice import Choice
 from .choice_factory_options import ChoiceFactoryOptions
 from .choice_factory import ChoiceFactory
+from .choice_recognizers import ChoiceRecognizers
 from .find import Find
 from .find_choices_options import FindChoicesOptions, FindValuesOptions
 from .found_choice import FoundChoice
@@ -24,6 +25,7 @@ __all__ = [
     "Choice",
     "ChoiceFactory",
     "ChoiceFactoryOptions",
+    "ChoiceRecognizers",
     "Find",
     "FindChoicesOptions",
     "FindValuesOptions",
