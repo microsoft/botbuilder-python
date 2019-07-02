@@ -119,6 +119,22 @@ class Prompt(Dialog):
     # TODO: Fix style to use ListStyle when ported.
     # TODO: Fix options to use ChoiceFactoryOptions object when ported.
     def append_choices(self, prompt: Activity, channel_id: str, choices: object, style: object, options : object = None ) -> Activity:
+        """
+        Helper function to compose an output activity containing a set of choices.
+
+        Parameters:
+        -----------
+        
+        prompt: The prompt to append the user's choice to.
+
+        channel_id: ID of the channel the prompt is being sent to.
+
+        choices: List of choices to append.
+
+        style: Configured style for the list of choices.
+
+        options: (Optional) options to configure the underlying `ChoiceFactory` call.
+        """
         # Get base prompt text (if any)
         text = prompt.text if prompt != None and not prompt.text == False else ''
         

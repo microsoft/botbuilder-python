@@ -7,6 +7,7 @@
 
 from .activity_prompt import ActivityPrompt
 from .attachment_prompt import AttachmentPrompt
+from .choice_prompt import ChoicePrompt
 from .confirm_prompt import ConfirmPrompt
 from .datetime_prompt import DateTimePrompt
 from .datetime_resolution import DateTimeResolution
@@ -21,6 +22,7 @@ from .text_prompt import TextPrompt
 __all__ = [
     "ActivityPrompt",
     "AttachmentPrompt",
+    "ChoicePrompt",
     "ConfirmPrompt",
     "DateTimePrompt",
     "DateTimeResolution",

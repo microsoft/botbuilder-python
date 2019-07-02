@@ -6,12 +6,16 @@ from typing import Callable, Dict, List, Union
 
 from botbuilder.core import TurnContext
 from botbuilder.dialogs.choices import Choice, ChoiceFactory, ChoiceFactoryOptions, ChoiceRecognizers, FindChoicesOptions, ListStyle
-from botbuilder.dialogs.prompts import Prompt, PromptOptions, PromptValidatorContext, PromptRecognizerResult
 from botbuilder.schema import Activity, ActivityTypes
+
+from .prompt import Prompt
+from .prompt_options import PromptOptions
+from .prompt_validator_context import PromptValidatorContext
+from .prompt_recognizer_result import PromptRecognizerResult
 
 class ChoicePrompt(Prompt):
     """
-    Prompts a user to select froma list of choices.
+    Prompts a user to select from a list of choices.
 
     By default the prompt will return to the calling dialog a `FoundChoice` object containing the choice that was selected.
     """
@@ -20,7 +24,7 @@ class ChoicePrompt(Prompt):
         Culture.Dutch: ChoiceFactoryOptions(inline_separator = ', ', inline_or = ' of ', include_numbers = True),
         Culture.English: ChoiceFactoryOptions(inline_separator = ', ', inline_or = ' or ', include_numbers = True),
         Culture.French: ChoiceFactoryOptions(inline_separator = ', ', inline_or = ' ou ', include_numbers = True),
-        Culture.German: ChoiceFactoryOptions(inline_separator = ', ', inline_or = ' oder ', include_numbers = True),
+        'de-de': ChoiceFactoryOptions(inline_separator = ', ', inline_or = ' oder ', include_numbers = True),
         Culture.Japanese: ChoiceFactoryOptions(inline_separator = '、 ', inline_or = ' または ', include_numbers = True),
         Culture.Portuguese: ChoiceFactoryOptions(inline_separator = ', ', inline_or = ' ou ', include_numbers = True),
         Culture.Chinese: ChoiceFactoryOptions(inline_separator = '， ', inline_or = ' 要么 ', include_numbers = True),
@@ -93,7 +97,7 @@ class ChoicePrompt(Prompt):
         if not turn_context:
             raise TypeError('ChoicePrompt.on_recognize(): turn_context cannot be None.')
         
-        choices: List[Choice] = options.choices if options.choices else []
+        choices: List[Choice] = options.choices if (options and options.choices) else []
         result: PromptRecognizerResult = PromptRecognizerResult()
 
         if turn_context.activity.type == ActivityTypes.message:
@@ -108,3 +112,4 @@ class ChoicePrompt(Prompt):
                 result.value = results[0].resolution
         
         return result
+        
