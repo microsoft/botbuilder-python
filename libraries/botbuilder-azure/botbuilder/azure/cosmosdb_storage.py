@@ -6,7 +6,7 @@ Part of the Azure Bot Framework in Python.
 
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
-
+from hashlib import sha256
 from typing import Dict, List
 from threading import Semaphore
 import json
@@ -40,6 +40,42 @@ class CosmosDbConfig:
         self.partition_key = partition_key or kwargs.get('partition_key')
         self.database_creation_options = database_creation_options or kwargs.get('database_creation_options')
         self.container_creation_options = container_creation_options or kwargs.get('container_creation_options')
+
+
+class CosmosDbKeyEscape:
+
+    @staticmethod
+    def sanitize_key(key) -> str:
+        """Return the sanitized key.
+
+        Replace characters that are not allowed in keys in Cosmos.
+
+        :param key:
+        :return str:
+        """
+        # forbidden characters
+        bad_chars = ['\\', '?', '/', '#', '\t', '\n', '\r', '*']
+        # replace those with with '*' and the
+        # Unicode code point of the character and return the new string
+        key = ''.join(
+            map(
+                lambda x: '*' + str(ord(x)) if x in bad_chars else x, key
+            )
+        )
+
+        return CosmosDbKeyEscape.truncate_key(key)
+
+    @staticmethod
+    def truncate_key(key: str) -> str:
+        MAX_KEY_LEN = 255
+
+        if len(key) > MAX_KEY_LEN:
+            aux_hash = sha256(key.encode('utf-8'))
+            aux_hex = aux_hash.hexdigest()
+
+            key = key[0:MAX_KEY_LEN - len(aux_hex)] + aux_hex
+
+        return key
 
 
 class CosmosDbStorage(Storage):
@@ -77,7 +113,7 @@ class CosmosDbStorage(Storage):
             if keys:
                 # create the parameters object
                 parameters = [
-                    {'name': f'@id{i}', 'value': f'{self.__sanitize_key(key)}'}
+                    {'name': f'@id{i}', 'value': f'{CosmosDbKeyEscape.sanitize_key(key)}'}
                     for i, key in enumerate(keys)
                 ]
                 # get the names of the params
@@ -125,7 +161,7 @@ class CosmosDbStorage(Storage):
                 # store the e_tag
                 e_tag = change.e_tag
                 # create the new document
-                doc = {'id': self.__sanitize_key(key),
+                doc = {'id': CosmosDbKeyEscape.sanitize_key(key),
                        'realId': key,
                        'document': self.__create_dict(change)
                        }
@@ -141,7 +177,7 @@ class CosmosDbStorage(Storage):
                     access_condition = {'type': 'IfMatch', 'condition': e_tag}
                     self.client.ReplaceItem(
                         document_link=self.__item_link(
-                            self.__sanitize_key(key)),
+                            CosmosDbKeyEscape.sanitize_key(key)),
                         new_document=doc,
                         options={'accessCondition': access_condition}
                     )
@@ -169,7 +205,7 @@ class CosmosDbStorage(Storage):
             # call the function for each key
             for k in keys:
                 self.client.DeleteItem(
-                    document_link=self.__item_link(self.__sanitize_key(k)),
+                    document_link=self.__item_link(CosmosDbKeyEscape.sanitize_key(k)),
                     options=options
                 )
                 # print(res)
@@ -208,24 +244,6 @@ class CosmosDbStorage(Storage):
         # loop through attributes and write and return a dict
         return ({attr: getattr(si, attr)
                  for attr in non_magic_attr})
-
-    def __sanitize_key(self, key) -> str:
-        """Return the sanitized key.
-
-        Replace characters that are not allowed in keys in Cosmos.
-
-        :param key:
-        :return str:
-        """
-        # forbidden characters
-        bad_chars = ['\\', '?', '/', '#', '\t', '\n', '\r']
-        # replace those with with '*' and the
-        # Unicode code point of the character and return the new string
-        return ''.join(
-            map(
-                lambda x: '*' + str(ord(x)) if x in bad_chars else x, key
-            )
-        )
 
     def __item_link(self, id) -> str:
         """Return the item link of a item in the container.
