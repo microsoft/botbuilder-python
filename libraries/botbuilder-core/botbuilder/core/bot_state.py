@@ -97,7 +97,7 @@ class BotState(PropertyManager):
         
         cached_state = turn_context.turn_state.get(self._context_service_key)
         
-        if force or (cached_state != None and cached_state.is_changed == True):
+        if force or (cached_state is not None and cached_state.is_changed):
             storage_key = self.get_storage_key(turn_context)
             changes : Dict[str, object] = { storage_key: cached_state.state }
             await self._storage.write(changes)
@@ -135,7 +135,7 @@ class BotState(PropertyManager):
         await self._storage.delete({ storage_key })
         
     @abstractmethod
-    async def get_storage_key(self, turn_context: TurnContext) -> str:
+    def get_storage_key(self, turn_context: TurnContext) -> str:
         raise NotImplementedError()
 
     async def get_property_value(self, turn_context: TurnContext, property_name: str):
