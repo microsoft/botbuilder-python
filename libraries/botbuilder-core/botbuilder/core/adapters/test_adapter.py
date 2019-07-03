@@ -134,7 +134,7 @@ class TestAdapter(BotAdapter, UserTokenProvider):
             if value is not None and key != 'additional_properties':
                 setattr(request, key, value)
 
-            request.type = ActivityTypes.message
+        request.type = request.type or ActivityTypes.message
         if not request.id:
             self._next_id += 1
             request.id = str(self._next_id)
@@ -142,6 +142,9 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         # Create context object and run middleware.
         context = TurnContext(self, request)
         return await self.run_pipeline(context, self.logic)
+
+    def get_next_activity(self) -> Activity:
+        return self.activity_buffer.pop(0)
 
     async def send(self, user_says) -> object:
         """
@@ -300,7 +303,7 @@ class TestFlow(object):
                 validate_activity(reply, expected)
             else:
                 assert reply.type == 'message', description + f" type == {reply.type}"
-                assert reply.text == expected, description + f" text == {reply.text}"
+                assert reply.text.strip() == expected.strip(), description + f" text == {reply.text}"
 
         if description is None:
             description = ''

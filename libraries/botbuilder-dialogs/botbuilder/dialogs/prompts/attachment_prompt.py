@@ -18,7 +18,7 @@ class AttachmentPrompt(Prompt):
     By default the prompt will return to the calling dialog an `[Attachment]`
     """
 
-    def __init__(self, dialog_id: str, validator: Callable[[Attachment], bool]):
+    def __init__(self, dialog_id: str, validator: Callable[[Attachment], bool] = None):
         super().__init__(dialog_id, validator)
     
     async def on_prompt(
@@ -26,7 +26,7 @@ class AttachmentPrompt(Prompt):
         context: TurnContext,
         state: Dict[str, object],
         options: PromptOptions,
-        isRetry: bool
+        is_retry: bool
     ):
         if not context:
             raise TypeError('AttachmentPrompt.on_prompt(): TurnContext cannot be None.')
@@ -34,7 +34,7 @@ class AttachmentPrompt(Prompt):
         if not isinstance(options, PromptOptions):
             raise TypeError('AttachmentPrompt.on_prompt(): PromptOptions are required for Attachment Prompt dialogs.')
         
-        if isRetry and options.retry_prompt:
+        if is_retry and options.retry_prompt:
             options.retry_prompt.input_hint = InputHints.expecting_input
             await context.send_activity(options.retry_prompt)
         elif options.prompt:
