@@ -24,7 +24,7 @@ async def get_auth_token():
         # Define a "app_creds_real.py" file with your bot credentials as follows:
         # MICROSOFT_APP_ID = '...'
         # MICROSOFT_APP_PASSWORD = '...'
-        return await MicrosoftAppCredentials(
+        return MicrosoftAppCredentials(
             MICROSOFT_APP_ID,
             MICROSOFT_APP_PASSWORD).get_access_token()
     except ImportError:

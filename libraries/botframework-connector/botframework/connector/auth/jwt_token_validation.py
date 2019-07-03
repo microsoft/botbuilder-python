@@ -5,11 +5,13 @@ from .channel_validation import ChannelValidation
 from .microsoft_app_credentials import MicrosoftAppCredentials
 from .credential_provider import CredentialProvider
 from .claims_identity import ClaimsIdentity
+from .government_constants import GovernmentConstants
 
 class JwtTokenValidation:
 
+    #TODO remove the default value on channel_service
     @staticmethod
-    async def authenticate_request(activity: Activity, auth_header: str, credentials: CredentialProvider) -> ClaimsIdentity:
+    async def authenticate_request(activity: Activity, auth_header: str, credentials: CredentialProvider, channel_service: str = '') -> ClaimsIdentity:
         """Authenticates the request and sets the service url in the set of trusted urls.
         
         :param activity: The incoming Activity from the Bot Framework or the Emulator
@@ -26,12 +28,12 @@ class JwtTokenValidation:
             is_auth_disabled = await credentials.is_authentication_disabled()
             if is_auth_disabled:
                 # We are on the anonymous code path.
-                return
+                return ClaimsIdentity({}, True)
 
             # No Auth Header. Auth is required. Request is not authorized.
             raise Exception('Unauthorized Access. Request is not authorized')
 
-        claims_identity = await JwtTokenValidation.validate_auth_header(auth_header, credentials, activity.channel_id, activity.service_url)
+        claims_identity = await JwtTokenValidation.validate_auth_header(auth_header, credentials, channel_service, activity.channel_id, activity.service_url)
 
         # On the standard Auth path, we need to trust the URL that was incoming.
         MicrosoftAppCredentials.trust_service_url(activity.service_url)
@@ -39,14 +41,25 @@ class JwtTokenValidation:
         return claims_identity
     
     @staticmethod
-    async def validate_auth_header(auth_header: str, credentials: CredentialProvider, channel_id: str, service_url: str = None) -> ClaimsIdentity:
+    async def validate_auth_header(auth_header: str, credentials: CredentialProvider, channel_service: str, channel_id: str, service_url: str = None) -> ClaimsIdentity:
         if not auth_header:
             raise ValueError('argument auth_header is null')
+        
         using_emulator = EmulatorValidation.is_token_from_emulator(auth_header)
+        
         if using_emulator:
-            return await EmulatorValidation.authenticate_emulator_token(auth_header, credentials, channel_id)
+            return await EmulatorValidation.authenticate_emulator_token(auth_header, credentials, channel_service, channel_id)
+        
+        if not channel_service:
+            if service_url.strip():
+                return 
+
         else:
             if service_url:
-                return await ChannelValidation.authenticate_token_service_url(auth_header, credentials, service_url, channel_id)
+                return await ChannelValidation.authenticate_channel_token_with_service_url(auth_header, credentials, service_url, channel_id)
             else:
-                return await ChannelValidation.authenticate_token(auth_header, credentials, channel_id)
+                return await ChannelValidation.authenticate_channel_token(auth_header, credentials, channel_id)
+    
+    @staticmethod
+    def is_government(channel_service: str) -> bool:
+        return channel_service and channel_service.lower() == GovernmentConstants.CHANNEL_SERVICE
