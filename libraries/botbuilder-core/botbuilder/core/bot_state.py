@@ -2,12 +2,9 @@
 # Licensed under the MIT License.
 
 from .turn_context import TurnContext
-from .middleware_set import Middleware
-from .storage import calculate_change_hash, StorageKeyFactory, Storage
+from .storage import Storage
 from .property_manager import PropertyManager
 from botbuilder.core.state_property_accessor import StatePropertyAccessor
-from botbuilder.core import turn_context
-from _ast import Try
 from abc import abstractmethod
 from typing import Callable, Dict
 
@@ -97,7 +94,7 @@ class BotState(PropertyManager):
         
         cached_state = turn_context.turn_state.get(self._context_service_key)
         
-        if force or (cached_state != None and cached_state.is_changed == True):
+        if force or (cached_state is not None and cached_state.is_changed):
             storage_key = self.get_storage_key(turn_context)
             changes : Dict[str, object] = { storage_key: cached_state.state }
             await self._storage.write(changes)
@@ -135,7 +132,7 @@ class BotState(PropertyManager):
         await self._storage.delete({ storage_key })
         
     @abstractmethod
-    async def get_storage_key(self, turn_context: TurnContext) -> str:
+    def get_storage_key(self, turn_context: TurnContext) -> str:
         raise NotImplementedError()
 
     async def get_property_value(self, turn_context: TurnContext, property_name: str):

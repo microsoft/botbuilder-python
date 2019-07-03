@@ -3,9 +3,9 @@
 import aiounittest
 from unittest.mock import MagicMock
 
-from botbuilder.core import TurnContext, BotState, MemoryStorage, UserState
+from botbuilder.core import BotState, ConversationState, MemoryStorage, Storage, StoreItem, TurnContext, UserState
 from botbuilder.core.adapters import TestAdapter
-from botbuilder.schema import Activity
+from botbuilder.schema import Activity, ConversationAccount
 
 from test_utilities import TestUtilities
 
@@ -22,6 +22,23 @@ def cached_state(context, state_key):
 def key_factory(context):
     assert context is not None
     return STORAGE_KEY
+
+class BotStateForTest(BotState):
+    def __init__(self, storage: Storage):
+        super().__init__(storage, f"BotState:BotState")
+
+    def get_storage_key(self, turn_context: TurnContext) -> str:
+        return f"botstate/{turn_context.activity.channel_id}/{turn_context.activity.conversation.id}/BotState"
+
+
+class CustomState(StoreItem):
+    def __init__(self, custom_string: str = None, e_tag: str = '*'):
+        super().__init__(custom_string=custom_string, e_tag=e_tag)
+
+
+class TestPocoState:
+    def __init__(self, value=None):
+        self.value = value
 
 
 class TestBotState(aiounittest.AsyncTestCase):
@@ -335,3 +352,133 @@ class TestBotState(aiounittest.AsyncTestCase):
         self.assertEqual("hello-2", obj2["property-a"])
         with self.assertRaises(KeyError) as _:
             obj2["property-b"]
+
+    async def test_state_use_bot_state_directly(self):
+        async def exec_test(context: TurnContext):
+            bot_state_manager = BotStateForTest(MemoryStorage())
+            test_property = bot_state_manager.create_property("test")
+
+            # read initial state object
+            await bot_state_manager.load(context)
+
+            custom_state = await test_property.get(context, lambda: CustomState())
+
+            # this should be a 'CustomState' as nothing is currently stored in storage
+            assert isinstance(custom_state, CustomState)
+
+            # amend property and write to storage
+            custom_state.custom_string = "test"
+            await bot_state_manager.save_changes(context)
+
+            custom_state.custom_string = "asdfsadf"
+
+            # read into context again
+            await bot_state_manager.load(context, True)
+
+            custom_state = await test_property.get(context)
+
+            # check object read from value has the correct value for custom_string
+            assert custom_state.custom_string == "test"
+
+        adapter = TestAdapter(exec_test)
+        await adapter.send('start')
+
+    async def test_user_state_bad_from_throws(self):
+        dictionary = {}
+        user_state = UserState(MemoryStorage(dictionary))
+        context = TestUtilities.create_empty_context()
+        context.activity.from_property = None
+        test_property = user_state.create_property("test")
+        with self.assertRaises(AttributeError):
+            await test_property.get(context)
+
+    async def test_conversation_state_bad_converation_throws(self):
+        dictionary = {}
+        user_state = ConversationState(MemoryStorage(dictionary))
+        context = TestUtilities.create_empty_context()
+        context.activity.conversation = None
+        test_property = user_state.create_property("test")
+        with self.assertRaises(AttributeError):
+            await test_property.get(context)
+
+    async def test_clear_and_save(self):
+        turn_context = TestUtilities.create_empty_context()
+        turn_context.activity.conversation = ConversationAccount(id="1234")
+
+        storage = MemoryStorage({})
+
+        # Turn 0
+        bot_state1 = ConversationState(storage)
+        (await bot_state1
+         .create_property("test-name")
+         .get(turn_context, lambda: TestPocoState())).value = "test-value"
+        await bot_state1.save_changes(turn_context)
+
+        # Turn 1
+        bot_state2 = ConversationState(storage)
+        value1 = (await bot_state2
+                  .create_property("test-name")
+                  .get(turn_context, lambda: TestPocoState(value="default-value"))).value
+
+        assert "test-value" == value1
+
+        # Turn 2
+        bot_state3 = ConversationState(storage)
+        await bot_state3.clear_state(turn_context)
+        await bot_state3.save_changes(turn_context)
+
+        # Turn 3
+        bot_state4 = ConversationState(storage)
+        value2 = (await bot_state4
+                  .create_property("test-name")
+                  .get(turn_context, lambda: TestPocoState(value="default-value"))).value
+
+        assert "default-value", value2
+
+    async def test_bot_state_delete(self):
+        turn_context = TestUtilities.create_empty_context()
+        turn_context.activity.conversation = ConversationAccount(id="1234")
+
+        storage = MemoryStorage({})
+
+        # Turn 0
+        bot_state1 = ConversationState(storage)
+        (await bot_state1
+         .create_property("test-name")
+         .get(turn_context, lambda: TestPocoState())).value = "test-value"
+        await bot_state1.save_changes(turn_context)
+
+        # Turn 1
+        bot_state2 = ConversationState(storage)
+        value1 = (await bot_state2
+                  .create_property("test-name")
+                  .get(turn_context, lambda: TestPocoState(value="default-value"))).value
+
+        assert "test-value" == value1
+
+        # Turn 2
+        bot_state3 = ConversationState(storage)
+        await bot_state3.delete(turn_context)
+
+        # Turn 3
+        bot_state4 = ConversationState(storage)
+        value2 = (await bot_state4
+                  .create_property("test-name")
+                  .get(turn_context, lambda: TestPocoState(value="default-value"))).value
+
+        assert "default-value" == value2
+
+    async def test_bot_state_get(self):
+        turn_context = TestUtilities.create_empty_context()
+        turn_context.activity.conversation = ConversationAccount(id="1234")
+
+        storage = MemoryStorage({})
+
+        conversation_state = ConversationState(storage)
+        (await conversation_state
+         .create_property("test-name")
+         .get(turn_context, lambda: TestPocoState())).value = "test-value"
+
+        result = conversation_state.get(turn_context)
+
+        assert "test-value" == result["test-name"].value
