@@ -68,55 +68,13 @@ class LuisRecognizer(object):
 
         self._include_api_results = include_api_results
 
-        self._telemetry_client = self._options.telemetry_client
-        self._log_personal_information = self._options.log_personal_information
+        self.telemetry_client = self._options.telemetry_client
+        self.log_personal_information = self._options.log_personal_information
 
         credentials = CognitiveServicesCredentials(self._application.endpoint_key)
         self._runtime = LUISRuntimeClient(self._application.endpoint, credentials)
         self._runtime.config.add_user_agent(LuisUtil.get_user_agent())
         self._runtime.config.connection.timeout = self._options.timeout // 1000
-
-    @property
-    def log_personal_information(self) -> bool:
-        """Gets a value indicating whether to log personal information that came from the user to telemetry.
-        
-        :return: If True, personal information is logged to Telemetry; otherwise the properties will be filtered.
-        :rtype: bool
-        """
-
-        return self._log_personal_information
-
-    @log_personal_information.setter
-    def log_personal_information(self, value: bool) -> None:
-        """Sets a value indicating whether to log personal information that came from the user to telemetry.
-        
-        :param value: If True, personal information is logged to Telemetry; otherwise the properties will be filtered.
-        :type value: bool
-        :return:
-        :rtype: None
-        """
-
-        self._log_personal_information = value
-
-    @property
-    def telemetry_client(self) -> BotTelemetryClient:
-        """Gets the currently configured <see cref="BotTelemetryClient"/> that logs the LuisResult event.
-        
-        :return: The <see cref="BotTelemetryClient"/> being used to log events.
-        :rtype: BotTelemetryClient
-        """
-
-        return self._telemetry_client
-
-    @telemetry_client.setter
-    def telemetry_client(self, value: BotTelemetryClient):
-        """Gets the currently configured <see cref="BotTelemetryClient"/> that logs the LuisResult event.
-        
-        :param value: The <see cref="BotTelemetryClient"/> being used to log events.
-        :type value: BotTelemetryClient
-        """
-
-        self._telemetry_client = value
 
     @staticmethod
     def top_intent(

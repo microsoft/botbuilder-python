@@ -13,22 +13,8 @@ from .prompt_recognizer_result import PromptRecognizerResult
 class NumberPrompt(Prompt):
     # TODO: PromptValidator
     def __init__(self, dialog_id: str, validator: object, default_locale: str):
-        super(ConfirmPrompt, self).__init__(dialog_id, validator)
-        self._default_locale = default_locale
-        
-    @property
-    def default_locale(self) -> str:
-        """Gets the locale used if `TurnContext.activity.locale` is not specified. 
-        """
-        return self._default_locale
-        
-    @default_locale.setter
-    def default_locale(self, value: str) -> None:
-        """Gets the locale used if `TurnContext.activity.locale` is not specified.
-
-        :param value: The locale used if `TurnContext.activity.locale` is not specified.
-        """
-        self._default_locale = value
+        super(NumberPrompt, self).__init__(dialog_id, validator)
+        self.default_locale = default_locale
         
 
     async def on_prompt(self, turn_context: TurnContext, state: Dict[str, object], options: PromptOptions, is_retry: bool):

@@ -26,28 +26,9 @@ class ComponentDialog(Dialog):
             raise TypeError('ComponentDialog(): dialog_id cannot be None.')
 
         self._dialogs = DialogSet()
-        self._initial_dialog_id = None
+        self.initial_dialog_id = None
 
     # TODO: Add TelemetryClient
-
-    
-    @property
-    def initial_dialog_id(self) -> str:
-        """Gets the ID of the initial dialog id.
-
-        :param:
-        :return str:ID of the dialog this instance is for.
-        """
-        return self._initial_dialog_id
-
-    @initial_dialog_id.setter
-    def initial_dialog_id(self, value: str) -> None:
-        """Sets the ID of the initial dialog id.
-
-        :param value: ID of the dialog this instance is for.
-        :return:
-        """
-        self._initial_dialog_id = value
 
     async def begin_dialog(self, outer_dc: DialogContext, options: object = None) -> DialogTurnResult:
         if outer_dc is None:
