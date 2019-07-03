@@ -16,27 +16,12 @@ class CachedBotState:
     Internal cached bot state.
     """
     def __init__(self, state: Dict[str, object] = None) : 
-        self._state = state if state != None else {}
-        self._hash = self.compute_hash(state)
-
-    @property
-    def state(self) -> Dict[str, object]:
-        return self._state
-    @state.setter
-    def state(self, state: Dict[str, object]):
-        self._state = self._state
-        
-    @property
-    def hash(self) -> str:
-        return self._hash
-    
-    @hash.setter
-    def hash(self, hash: str):
-        self._hash = hash
+        self.state = state if state is not None else {}
+        self.hash = self.compute_hash(state)
 
     @property
     def is_changed(self) -> bool:
-        return self.hash != self.compute_hash(self._state)
+        return self.hash != self.compute_hash(self.state)
 
     def compute_hash(self, obj: object) -> str:
         # TODO: Should this be compatible with C# JsonConvert.SerializeObject ?

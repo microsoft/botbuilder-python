@@ -6,7 +6,7 @@ from typing import List
 class DialogState():
 
     def __init__(self, stack: List[DialogInstance] = None):
-        if stack == None:
+        if stack is None:
             self._dialog_stack = []
         else:
             self._dialog_stack = stack

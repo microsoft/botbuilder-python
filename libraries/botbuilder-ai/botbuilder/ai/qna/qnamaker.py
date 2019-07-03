@@ -55,50 +55,8 @@ class QnAMaker(QnAMakerTelemetryClient):
         instance_timeout = ClientTimeout(total=self._options.timeout/1000)
         self._req_client = http_client or ClientSession(timeout=instance_timeout)
 
-        self._telemetry_client: Union[BotTelemetryClient, NullTelemetryClient] = telemetry_client or NullTelemetryClient()
-        self._log_personal_information = log_personal_information or False
-
-    @property
-    def log_personal_information(self) -> bool:
-        """Gets a value indicating whether to log personal information that came from the user to telemetry.
-        
-        :return: If True, personal information is logged to Telemetry; otherwise the properties will be filtered.
-        :rtype: bool
-        """
-
-        return self._log_personal_information
-
-    @log_personal_information.setter
-    def log_personal_information(self, value: bool) -> None:
-        """Sets a value indicating whether to log personal information that came from the user to telemetry.
-        
-        :param value: If True, personal information is logged to Telemetry; otherwise the properties will be filtered.
-        :type value: bool
-        :return:
-        :rtype: None
-        """
-
-        self._log_personal_information = value
-
-    @property
-    def telemetry_client(self) -> BotTelemetryClient:
-        """Gets the currently configured BotTelemetryClient that logs the event.
-        
-        :return: The BotTelemetryClient being used to log events.
-        :rtype: BotTelemetryClient
-        """
-
-        return self._telemetry_client
-
-    @telemetry_client.setter
-    def telemetry_client(self, value: BotTelemetryClient):
-        """Sets the currently configured BotTelemetryClient that logs the event.
-        
-        :param value: The BotTelemetryClient being used to log events.
-        :type value: BotTelemetryClient
-        """
-
-        self._telemetry_client = value
+        self.telemetry_client: Union[BotTelemetryClient, NullTelemetryClient] = telemetry_client or NullTelemetryClient()
+        self.log_personal_information = log_personal_information or False
 
     async def on_qna_result(
         self,

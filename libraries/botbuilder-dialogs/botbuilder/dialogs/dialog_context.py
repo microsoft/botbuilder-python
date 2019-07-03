@@ -50,26 +50,6 @@ class DialogContext():
         """    
         return self._stack
 
-    @property
-    def parent(self) -> 'DialogContext':
-        """
-        Gets the parent DialogContext if any. Used when searching for dialogs to start.
-
-        :param:
-        :return The parent DialogContext:
-        """    
-        return self._parent
-
-    @parent.setter
-    def parent(self, parent_dialog_context: object):
-        """
-        Sets the parent DialogContext if any. Used when searching for dialogs to start.
-
-        :param parent_dialog_context: The parent dialog context
-        :return str:
-        """    
-        self._parent = parent_dialog_context
-
 
     @property
     def active_dialog(self):

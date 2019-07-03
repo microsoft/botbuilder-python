@@ -41,9 +41,9 @@ class LuisApplication(object):
         if not valid:
             raise ValueError(f'"{endpoint}" is not a valid LUIS endpoint.')
 
-        self._application_id = application_id
-        self._endpoint_key = endpoint_key
-        self._endpoint = endpoint
+        self.application_id = application_id
+        self.endpoint_key = endpoint_key
+        self.endpoint = endpoint
 
     @classmethod
     def from_application_endpoint(cls, application_endpoint: str):
@@ -58,72 +58,6 @@ class LuisApplication(object):
             application_endpoint
         )
         return cls(application_id, endpoint_key, endpoint)
-
-    @property
-    def application_id(self) -> str:
-        """Gets LUIS application ID.
-        
-        :return: LUIS application ID.
-        :rtype: str
-        """
-
-        return self._application_id
-
-    @application_id.setter
-    def application_id(self, value: str) -> None:
-        """Sets LUIS application ID.
-        
-        :param value: LUIS application ID.
-        :type value: str
-        :return:
-        :rtype: None
-        """
-
-        self._application_id = value
-
-    @property
-    def endpoint_key(self) -> str:
-        """Gets LUIS subscription or endpoint key.
-        
-        :return: LUIS subscription or endpoint key.
-        :rtype: str
-        """
-
-        return self._endpoint_key
-
-    @endpoint_key.setter
-    def endpoint_key(self, value: str) -> None:
-        """Sets LUIS subscription or endpoint key.
-        
-        :param value: LUIS subscription or endpoint key.
-        :type value: str
-        :return:
-        :rtype: None
-        """
-
-        self._endpoint_key = value
-
-    @property
-    def endpoint(self) -> str:
-        """Gets LUIS endpoint like https://westus.api.cognitive.microsoft.com.
-        
-        :return: LUIS endpoint where application is hosted.
-        :rtype: str
-        """
-
-        return self._endpoint
-
-    @endpoint.setter
-    def endpoint(self, value: str) -> None:
-        """Sets LUIS endpoint like https://westus.api.cognitive.microsoft.com.
-        
-        :param value: LUIS endpoint where application is hosted.
-        :type value: str
-        :return:
-        :rtype: None
-        """
-
-        self._endpoint = value
 
     @staticmethod
     def _parse(application_endpoint: str) -> Tuple[str, str, str]:
