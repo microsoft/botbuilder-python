@@ -46,7 +46,8 @@ def messages():
     auth_header = request.headers['Authorization'] if 'Authorization' in request.headers else ''
 
     async def aux_func(turn_context):
-        asyncio.ensure_future(BOT.on_turn(turn_context))
+        await BOT.on_turn(turn_context)
+
     try:
         task = LOOP.create_task(ADAPTER.process_activity(activity, auth_header, aux_func))
         LOOP.run_until_complete(task)

@@ -6,6 +6,7 @@ from .verify_options import VerifyOptions
 from .constants import Constants
 from .credential_provider import CredentialProvider
 from .claims_identity import ClaimsIdentity
+from .government_constants import GovernmentConstants
 
 class EmulatorValidation:
     APP_ID_CLAIM = "appid"
@@ -81,7 +82,7 @@ class EmulatorValidation:
         return True
 
     @staticmethod
-    async def authenticate_emulator_token(auth_header: str, credentials: CredentialProvider, channel_id: str) -> ClaimsIdentity:
+    async def authenticate_emulator_token(auth_header: str, credentials: CredentialProvider, channel_service: str, channel_id: str) -> ClaimsIdentity:
         """ Validate the incoming Auth Header
 
         Validate the incoming Auth Header as a token sent from the Bot Framework Service.
@@ -95,9 +96,15 @@ class EmulatorValidation:
         :return: A valid ClaimsIdentity.
         :raises Exception:
         """
+        from .jwt_token_validation import JwtTokenValidation
+        
+        open_id_metadata = (GovernmentConstants.TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL
+            if (channel_service is not None and JwtTokenValidation.is_government(channel_service))
+            else Constants.TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL)
+
         token_extractor = JwtTokenExtractor(
             EmulatorValidation.TO_BOT_FROM_EMULATOR_TOKEN_VALIDATION_PARAMETERS,
-            Constants.TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL,
+            open_id_metadata,
             Constants.ALLOWED_SIGNING_ALGORITHMS)
 
         identity = await asyncio.ensure_future(
@@ -106,7 +113,7 @@ class EmulatorValidation:
             # No valid identity. Not Authorized.
             raise Exception('Unauthorized. No valid identity.')
 
-        if not identity.isAuthenticated:
+        if not identity.is_authenticated:
             # The token is in some way invalid. Not Authorized.
             raise Exception('Unauthorized. Is not authenticated')
 

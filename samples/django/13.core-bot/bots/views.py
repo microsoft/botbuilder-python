@@ -30,14 +30,15 @@ def messages(request):
 
     activity = Activity().deserialize(body)
     auth_header = request.headers['Authorization'] if 'Authorization' in request.headers else ''
-    loop = asyncio.get_event_loop()
 
     bot_app = apps.get_app_config('bots')
     bot = bot_app.bot
+    loop = bot_app.LOOP
     adapter = bot_app.ADAPTER
 
     async def aux_func(turn_context):
-        asyncio.ensure_future(bot.on_turn(turn_context), loop=loop)
+        await bot.on_turn(turn_context)
+
     try:
         task = asyncio.ensure_future(adapter.process_activity(activity, auth_header, aux_func), loop=loop)
         loop.run_until_complete(task)
