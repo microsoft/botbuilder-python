@@ -44,10 +44,10 @@ class Prompt(Dialog):
         if not isinstance(options, PromptOptions):
             raise TypeError('Prompt(): Prompt options are required for Prompt dialogs.')
         # Ensure prompts have input hint set
-        if options.prompt != None and not options.prompt.input_hint:
+        if options.prompt is not None and not options.prompt.input_hint:
             options.prompt.input_hint = InputHints.expecting_input
 
-        if options.retry_prompt != None and not options.retry_prompt.input_hint:
+        if options.retry_prompt is not None and not options.retry_prompt.input_hint:
             options.retry_prompt.input_hint = InputHints.expecting_input
        
         # Initialize prompt state

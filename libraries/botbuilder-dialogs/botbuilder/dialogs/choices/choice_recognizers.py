@@ -45,7 +45,7 @@ class ChoiceRecognizers:
         --------
         A list of found choices, sorted by most relevant first.
         """
-        if utterance == None:
+        if utterance is None:
             utterance = ''
         
         # Normalize list of choices
