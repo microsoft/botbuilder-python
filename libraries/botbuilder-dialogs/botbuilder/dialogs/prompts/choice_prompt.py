@@ -20,7 +20,7 @@ class ChoicePrompt(Prompt):
     By default the prompt will return to the calling dialog a `FoundChoice` object containing the choice that was selected.
     """
     _default_choice_options: Dict[str, ChoiceFactoryOptions] = {
-        Culture.English: ChoiceFactoryOptions(inline_separator = ', ', inline_or = ' o ', include_numbers = True),
+        Culture.Spanish: ChoiceFactoryOptions(inline_separator = ', ', inline_or = ' o ', include_numbers = True),
         Culture.Dutch: ChoiceFactoryOptions(inline_separator = ', ', inline_or = ' of ', include_numbers = True),
         Culture.English: ChoiceFactoryOptions(inline_separator = ', ', inline_or = ' or ', include_numbers = True),
         Culture.French: ChoiceFactoryOptions(inline_separator = ', ', inline_or = ' ou ', include_numbers = True),

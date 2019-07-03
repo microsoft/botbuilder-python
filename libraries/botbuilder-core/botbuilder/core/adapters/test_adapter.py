@@ -207,7 +207,7 @@ class TestFlow(object):
                 validate_activity(reply, expected)
             else:
                 assert reply.type == 'message', description + f" type == {reply.type}"
-                assert reply.text == expected, description + f" text == {reply.text}"
+                assert reply.text.strip() == expected.strip(), description + f" text == {reply.text}"
 
         if description is None:
             description = ''
