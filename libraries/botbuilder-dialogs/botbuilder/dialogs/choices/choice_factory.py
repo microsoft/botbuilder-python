@@ -10,6 +10,9 @@ from . import Channel, Choice, ChoiceFactoryOptions
 
 
 class ChoiceFactory:
+    """
+    Assists with formatting a message activity that contains a list of choices.
+    """
     @staticmethod
     def for_channel(
         channel_id: str,
@@ -18,6 +21,20 @@ class ChoiceFactory:
         speak: str = None,
         options: ChoiceFactoryOptions = None,
     ) -> Activity:
+        """
+        Creates a message activity that includes a list of choices formatted based on the capabilities of a given channel.
+
+        Parameters:
+        ----------
+
+        channel_id: A channel ID. 
+        
+        choices: List of choices to render.
+
+        text: (Optional) Text of the message to send.
+
+        speak (Optional) SSML. Text to be spoken by your bot on a speech-enabled channel.
+        """
         if channel_id is None:
             channel_id = ""
 
@@ -65,6 +82,20 @@ class ChoiceFactory:
         speak: str = None,
         options: ChoiceFactoryOptions = None,
     ) -> Activity:
+        """
+        Creates a message activity that includes a list of choices formatted as an inline list.
+
+        Parameters:
+        ----------
+
+        choices: The list of choices to render.
+
+        text: (Optional) The text of the message to send.
+
+        speak: (Optional) SSML. Text to be spoken by your bot on a speech-enabled channel.
+        
+        options: (Optional) The formatting options to use to tweak rendering of list.
+        """
         if choices is None:
             choices = []
 
@@ -113,6 +144,20 @@ class ChoiceFactory:
         speak: str = None,
         options: ChoiceFactoryOptions = None,
     ):
+        """
+        Creates a message activity that includes a list of choices formatted as a numbered or bulleted list.
+
+        Parameters:
+        ----------
+
+        choices: The list of choices to render.
+
+        text: (Optional) The text of the message to send.
+
+        speak: (Optional) SSML. Text to be spoken by your bot on a speech-enabled channel.
+
+        options: (Optional) The formatting options to use to tweak rendering of list.
+        """
         if choices is None:
             choices = []
         if options is None:
@@ -153,6 +198,9 @@ class ChoiceFactory:
     def suggested_action(
         choices: List[Choice], text: str = None, speak: str = None
     ) -> Activity:
+        """
+        Creates a message activity that includes a list of choices that have been added as suggested actions.
+        """
         # Return activity with choices as suggested actions
         return MessageFactory.suggested_actions(
             ChoiceFactory._extract_actions(choices),
@@ -165,6 +213,9 @@ class ChoiceFactory:
     def hero_card(
         choices: List[Choice], text: str = None, speak: str = None
     ) -> Activity:
+        """
+        Creates a message activity that includes a lsit of coices that have been added as `HeroCard`'s
+        """
         attachment = CardFactory.hero_card(
             HeroCard(text=text, buttons=ChoiceFactory._extract_actions(choices))
         )
@@ -176,6 +227,9 @@ class ChoiceFactory:
 
     @staticmethod
     def _to_choices(choices: List[str]) -> List[Choice]:
+        """
+        Takes a list of strings and returns them as [`Choice`].
+        """
         if choices is None:
             return []
         else:

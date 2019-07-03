@@ -5,6 +5,9 @@
 # license information.
 # --------------------------------------------------------------------------
 
+from .activity_prompt import ActivityPrompt
+from .attachment_prompt import AttachmentPrompt
+from .choice_prompt import ChoicePrompt
 from .confirm_prompt import ConfirmPrompt
 from .datetime_prompt import DateTimePrompt
 from .datetime_resolution import DateTimeResolution
@@ -17,14 +20,20 @@ from .prompt_validator_context import PromptValidatorContext
 from .prompt import Prompt
 from .text_prompt import TextPrompt
 
-__all__ = ["ConfirmPrompt",
-           "DateTimePrompt",
-           "DateTimeResolution",
-           "NumberPrompt",
-           "OAuthPrompt",
-           "OAuthPromptSettings",
-           "PromptRecognizerResult",
-           "PromptValidatorContext",
-           "Prompt", 
-           "PromptOptions",
-           "TextPrompt"]
+__all__ = [
+    "ActivityPrompt",
+    "AttachmentPrompt",
+    "ChoicePrompt",
+    "ConfirmPrompt",
+    "DateTimePrompt",
+    "DateTimeResolution",
+    "NumberPrompt",
+    "OAuthPrompt",
+    "OAuthPromptSettings",
+    "PromptOptions",
+    "PromptRecognizerResult",
+    "PromptValidatorContext",
+    "Prompt",
+    "PromptOptions",
+    "TextPrompt"
+]

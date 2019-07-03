@@ -73,8 +73,8 @@ class Dialog(ABC):
         :param result: (Optional) value returned from the dialog that was called. The type of the value returned is dependent on the dialog that was called.
         :return:
         """
-        # By default just end the current dialog.
-        return await dc.EndDialog(result)
+        # By default just end the current dialog and return result to parent.
+        return await dc.end_dialog(result)
 
     # TODO: instance is DialogInstance
     async def reprompt_dialog(self, context: TurnContext, instance: DialogInstance):

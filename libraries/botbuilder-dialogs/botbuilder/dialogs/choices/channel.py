@@ -7,7 +7,7 @@ from botframework.connector import Channels
 
 class Channel(object):
     """
-    Methods for determining channel specific functionality.
+    Methods for determining channel-specific functionality.
     """
 
     @staticmethod

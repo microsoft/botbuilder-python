@@ -20,6 +20,7 @@ from botbuilder.schema import Activity
 """ Base class for all prompts.
 """
 class Prompt(Dialog):
+    ATTEMPT_COUNT_KEY = "AttemptCount"
     persisted_options = "options"
     persisted_state = "state"
     def __init__(self, dialog_id: str, validator: object = None):
@@ -43,16 +44,16 @@ class Prompt(Dialog):
         if not isinstance(options, PromptOptions):
             raise TypeError('Prompt(): Prompt options are required for Prompt dialogs.')
         # Ensure prompts have input hint set
-        if options.prompt != None and not options.prompt.input_hint:
+        if options.prompt is not None and not options.prompt.input_hint:
             options.prompt.input_hint = InputHints.expecting_input
 
-        if options.retry_prompt != None and not options.prompt.input_hint:
+        if options.retry_prompt is not None and not options.retry_prompt.input_hint:
             options.retry_prompt.input_hint = InputHints.expecting_input
        
         # Initialize prompt state
         state = dc.active_dialog.state
         state[self.persisted_options] = options
-        state[self.persisted_state] = Dict[str, object]
+        state[self.persisted_state] = {}
 
         # Send initial prompt
         await self.on_prompt(dc.context, state[self.persisted_state], state[self.persisted_options], False)
@@ -118,6 +119,22 @@ class Prompt(Dialog):
     # TODO: Fix style to use ListStyle when ported.
     # TODO: Fix options to use ChoiceFactoryOptions object when ported.
     def append_choices(self, prompt: Activity, channel_id: str, choices: object, style: object, options : object = None ) -> Activity:
+        """
+        Helper function to compose an output activity containing a set of choices.
+
+        Parameters:
+        -----------
+        
+        prompt: The prompt to append the user's choice to.
+
+        channel_id: ID of the channel the prompt is being sent to.
+
+        choices: List of choices to append.
+
+        style: Configured style for the list of choices.
+
+        options: (Optional) options to configure the underlying `ChoiceFactory` call.
+        """
         # Get base prompt text (if any)
         text = prompt.text if prompt != None and not prompt.text == False else ''
         
