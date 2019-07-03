@@ -22,7 +22,7 @@ from .middleware_set import AnonymousReceiveMiddleware, Middleware, MiddlewareSe
 from .null_telemetry_client import NullTelemetryClient
 from .state_property_accessor import StatePropertyAccessor
 from .state_property_info import StatePropertyInfo
-from .storage import Storage, StoreItem, StorageKeyFactory, calculate_change_hash
+from .storage import Storage, StoreItem, calculate_change_hash
 from .turn_context import TurnContext
 from .user_state import UserState
 from .user_token_provider import UserTokenProvider
@@ -48,9 +48,8 @@ __all__ = ['ActivityHandler',
            'StatePropertyAccessor',
            'StatePropertyInfo',
            'Storage',
-           'StorageKeyFactory',
            'StoreItem',
-           'TurnContext',           
+           'TurnContext',
            'UserState',
            'UserTokenProvider',
            '__version__']

@@ -21,22 +21,18 @@ class ConversationState(BotState):
             Where to store 
         namespace: str
         """
-        def call_get_storage_key(context):
-            key = self.get_storage_key(context)
-            if key is None:
-                raise AttributeError(self.no_key_error_message)
-            else:
-                return key
 
         super(ConversationState, self).__init__(storage, 'ConversationState')
 
-
     def get_storage_key(self, context: TurnContext):
-        activity = context.activity
-        channel_id = getattr(activity, 'channel_id', None)
-        conversation_id = getattr(activity.conversation, 'id', None) if hasattr(activity, 'conversation') else None
+        channel_id = context.activity.channel_id or self.__raise_type_error("invalid activity-missing channel_id")
+        conversation_id = context.activity.conversation.id or self.__raise_type_error(
+            "invalid activity-missing conversation.id")
 
         storage_key = None
         if channel_id and conversation_id:
             storage_key = "%s/conversations/%s" % (channel_id,conversation_id)
         return storage_key
+
+    def __raise_type_error(self, err: str = 'NoneType found while expecting value'):
+        raise TypeError(err)

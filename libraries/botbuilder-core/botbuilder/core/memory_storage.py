@@ -3,6 +3,7 @@
 
 from typing import Dict, List
 from .storage import Storage, StoreItem
+from copy import deepcopy
 
 
 class MemoryStorage(Storage):
@@ -35,7 +36,6 @@ class MemoryStorage(Storage):
             # iterate over the changes
             for (key, change) in changes.items():
                 new_value = change
-                old_state = None
                 old_state_etag = None
 
                 # Check if the a matching key already exists in self.memory
@@ -51,13 +51,13 @@ class MemoryStorage(Storage):
                 new_state = new_value
                 
                 # Set ETag if applicable
-                if isinstance(new_value, StoreItem):
+                if hasattr(new_value, 'e_tag'):
                     if old_state_etag is not None and new_value.e_tag != "*" and new_value.e_tag < old_state_etag:
                         raise KeyError("Etag conflict.\nOriginal: %s\r\nCurrent: %s" % \
                                         (new_value.e_tag, old_state_etag) )
                     new_state.e_tag = str(self._e_tag)
                     self._e_tag += 1
-                self.memory[key] = new_state
+                self.memory[key] = deepcopy(new_state)
                 
         except Exception as e:
             raise e
