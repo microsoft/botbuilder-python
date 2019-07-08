@@ -4,9 +4,11 @@
 from botbuilder.core import MessageFactory
 from botbuilder.dialogs import WaterfallDialog, DialogTurnResult, WaterfallStepContext
 from botbuilder.dialogs.prompts import DateTimePrompt, PromptValidatorContext, PromptOptions, DateTimeResolution
+from botbuilder.schema import InputHints
 from .cancel_and_help_dialog import CancelAndHelpDialog
 
 from datatypes_date_time.timex import Timex
+
 
 class DateResolverDialog(CancelAndHelpDialog):
 
@@ -20,38 +22,40 @@ class DateResolverDialog(CancelAndHelpDialog):
         ]))
 
         self.initial_dialog_id = WaterfallDialog.__name__ + '2'
-    
-    async def initialStep(self,step_context: WaterfallStepContext) -> DialogTurnResult:
+
+    async def initialStep(self, step_context: WaterfallStepContext) -> DialogTurnResult:
         timex = step_context.options
 
-        prompt_msg = 'On what date would you like to travel?'
-        reprompt_msg = "I'm sorry, for best results, please enter your travel date including the month, day and year."
+        prompt_msg_text = 'On what date would you like to travel?'
+        prompt_msg = MessageFactory.text(prompt_msg_text, prompt_msg_text, InputHints.expecting_input)
+
+        reprompt_msg_text = "I'm sorry, for best results, please enter your travel date including the month, day and year."
+        reprompt_msg = MessageFactory.text(reprompt_msg_text, reprompt_msg_text, InputHints.expecting_input)
 
         if timex is None:
             # We were not given any date at all so prompt the user.
-            return await step_context.prompt(DateTimePrompt.__name__ ,
-                PromptOptions(
-                    prompt= MessageFactory.text(prompt_msg),
-                    retry_prompt= MessageFactory.text(reprompt_msg)
-                ))
-        else:
-            # We have a Date we just need to check it is unambiguous.
-            if 'definite' in Timex(timex).types:
-                # This is essentially a "reprompt" of the data we were given up front.
-                return await step_context.prompt(DateTimePrompt.__name__, PromptOptions(prompt= reprompt_msg))
-            else:
-                return await step_context.next(DateTimeResolution(timex= timex))
+            return await step_context.prompt(DateTimePrompt.__name__,
+                                             PromptOptions(
+                                                 prompt=prompt_msg,
+                                                 retry_prompt=reprompt_msg
+                                             ))
+        # We have a Date we just need to check it is unambiguous.
+        if 'definite' in Timex(timex).types:
+            # This is essentially a "reprompt" of the data we were given up front.
+            return await step_context.prompt(DateTimePrompt.__name__, PromptOptions(prompt=reprompt_msg))
+
+        return await step_context.next(DateTimeResolution(timex=timex))
 
     async def finalStep(self, step_context: WaterfallStepContext):
         timex = step_context.result[0].timex
         return await step_context.end_dialog(timex)
-    
+
     @staticmethod
     async def datetime_prompt_validator(prompt_context: PromptValidatorContext) -> bool:
         if prompt_context.recognized.succeeded:
             timex = prompt_context.recognized.value[0].timex.split('T')[0]
 
-            #TODO: Needs TimexProperty
+            # TODO: Needs TimexProperty
             return 'definite' in Timex(timex).types
-        
+
         return False

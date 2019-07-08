@@ -7,6 +7,7 @@ from botbuilder.core import ActivityHandler, ConversationState, UserState, TurnC
 from botbuilder.dialogs import Dialog
 from helpers.dialog_helper import DialogHelper
 
+
 class DialogBot(ActivityHandler):
 
     def __init__(self, conversation_state: ConversationState, user_state: UserState, dialog: Dialog):
@@ -24,7 +25,7 @@ class DialogBot(ActivityHandler):
     async def on_turn(self, turn_context: TurnContext):
         await super().on_turn(turn_context)
 
-        # Save any state changes that might have occured during the turn.
+        # Save any state changes that might have occurred during the turn.
         await self.conversation_state.save_changes(turn_context, False)
         await self.user_state.save_changes(turn_context, False)
     

@@ -5,6 +5,7 @@ from datetime import datetime
 from botbuilder.dialogs import ComponentDialog, DialogSet, DialogTurnStatus, WaterfallDialog, WaterfallStepContext, DialogTurnResult
 from botbuilder.dialogs.prompts import TextPrompt, ConfirmPrompt, PromptOptions
 from botbuilder.core import MessageFactory
+from botbuilder.schema import InputHints
 
 from .booking_dialog import BookingDialog
 from booking_details import BookingDetails
@@ -13,9 +14,11 @@ from datatypes_date_time.timex import Timex
 
 class MainDialog(ComponentDialog):
 
-    def __init__(self, configuration: dict, dialog_id: str = None):
+    def __init__(self, configuration: dict, dialog_id: str = None, luis_recognizer: FlightBookingRecognizer,
+                 booking_dialog: BookingDialog):
         super(MainDialog, self).__init__(dialog_id or MainDialog.__name__)
 
+        # TODO: check if necessary
         self._configuration = configuration
 
         self.add_dialog(TextPrompt(TextPrompt.__name__))
@@ -27,20 +30,24 @@ class MainDialog(ComponentDialog):
         ]))
 
         self.initial_dialog_id = 'WFDialog'
-    
+
     async def intro_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
-        if (not self._configuration.get("LuisAppId", "") or not self._configuration.get("LuisAPIKey", "") or not self._configuration.get("LuisAPIHostName", "")):
+        if (not self._configuration.get("LuisAppId", "") or not self._configuration.get("LuisAPIKey", "")
+                or not self._configuration.get("LuisAPIHostName", "")):
             await step_context.context.send_activity(
                 MessageFactory.text("NOTE: LUIS is not configured. To enable all capabilities, add 'LuisAppId', 'LuisAPIKey' and 'LuisAPIHostName' to the appsettings.json file."))
 
             return await step_context.next(None)
         else:
-            return await step_context.prompt(TextPrompt.__name__, PromptOptions(prompt = MessageFactory.text("What can I help you with today?")))
+            return await step_context.prompt(TextPrompt.__name__, PromptOptions(
+                prompt = MessageFactory.text("What can I help you with today?")
+            ))
 
 
     async def act_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
         # Call LUIS and gather any potential booking details. (Note the TurnContext has the response to the prompt.)
-        booking_details = await LuisHelper.excecute_luis_query(self._configuration, step_context.context) if step_context.result is not None else BookingDetails()
+        booking_details = (await LuisHelper.excecute_luis_query(self._configuration, step_context.context)
+                           if step_context.result is not None else BookingDetails())
 
         # In this sample we only have a single Intent we are concerned with. However, typically a scenario
         # will have multiple different Intents each corresponding to starting a different child Dialog.
@@ -50,7 +57,7 @@ class MainDialog(ComponentDialog):
 
     async def final_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
         # If the child dialog ("BookingDialog") was cancelled or the user failed to confirm, the Result here will be null.
-        if (step_context.result is not None):
+        if step_context.result is not None:
             result = step_context.result
 
             # Now we have all the booking details call the booking service.
