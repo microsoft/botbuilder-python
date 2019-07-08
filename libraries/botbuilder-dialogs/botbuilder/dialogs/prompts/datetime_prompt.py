@@ -8,6 +8,7 @@ from .datetime_resolution import DateTimeResolution
 from .prompt import Prompt
 from .prompt_options import PromptOptions
 from .prompt_recognizer_result import PromptRecognizerResult
+from recognizers_date_time import recognize_datetime
 
 class DateTimePrompt(Prompt):
     def __init__(self, dialog_id: str, validator: object = None, default_locale: str = None):
@@ -34,10 +35,9 @@ class DateTimePrompt(Prompt):
         if turn_context.activity.type == ActivityTypes.message:
             # Recognize utterance
             message = turn_context.activity
-            # TODO: English contsant needs to be ported.
+            # TODO: English constant needs to be ported.
             culture = message.locale if message.locale != None else "English"
-            # TODO: Move this import to top of file when recognizers package is published
-            from recognizers_date_time import recognize_datetime
+
             results = recognize_datetime(message.text, culture)
             if len(results) > 0:
                 result.succeeded = True
