@@ -1,19 +1,30 @@
-from enum import Enum
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License
+
+from enum import Enum, auto
+from typing import List, Dict
+from botbuilder.ai.luis.generator import InstanceData
+from botbuilder.core import IntentScore
+
+class AutoName(Enum):
+     def _generate_next_value_(name, start, count, last_values):
+         return name
 
 
 class FlightBooking(RecognizerConvert):
-    def __init__(self):
-        self.text = ''
-        self.altered_text = ''
-        self.intents = {}
-        class Intent(Enum):
-            BookFlight
-            Cancel 
-            GetWeather 
-            NoneIntent
+    class Intent(AutoName):
+        BookFlight = auto()
+        Cancel = auto()
+        GetWeather = auto()
+        NoneIntent = auto()
+
+    def __init__(self, text: str = '', altered_text: str = '', intents: Dict[Intent, IntentScore] = {} ):
+        self.text = text
+        self.altered_text = altered_text
+        self.intents = intents
 
     class _Entities:
-        def __init__():
+        def __init__(self):
             # Built-in entities
             self.datetime = []
             # Lists
@@ -33,6 +44,8 @@ class FlightBooking(RecognizerConvert):
                 self._instance = None
 
         class _InstanceTo:
+            def __init__(self):
+                self.airport: Ins
             InstanceData[] Airport
         
         class ToClass:
@@ -67,7 +80,7 @@ class FlightBooking(RecognizerConvert):
         Properties = app.Properties
     
 
-    def TopIntent() -> (Intent intent, double score):
+    def top_intent() -> (Intent intent, double score):
     
         Intent maxIntent = Intent.NoneIntent
         var max = 0.0

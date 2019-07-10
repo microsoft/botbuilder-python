@@ -17,13 +17,13 @@ class DateResolverDialog(CancelAndHelpDialog):
 
         self.add_dialog(DateTimePrompt(DateTimePrompt.__name__, DateResolverDialog.datetime_prompt_validator))
         self.add_dialog(WaterfallDialog(WaterfallDialog.__name__ + '2', [
-            self.initialStep,
-            self.finalStep
+            self.initial_step,
+            self.final_step
         ]))
 
         self.initial_dialog_id = WaterfallDialog.__name__ + '2'
 
-    async def initialStep(self, step_context: WaterfallStepContext) -> DialogTurnResult:
+    async def initial_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
         timex = step_context.options
 
         prompt_msg_text = 'On what date would you like to travel?'
@@ -46,7 +46,7 @@ class DateResolverDialog(CancelAndHelpDialog):
 
         return await step_context.next(DateTimeResolution(timex=timex))
 
-    async def finalStep(self, step_context: WaterfallStepContext):
+    async def final_step(self, step_context: WaterfallStepContext):
         timex = step_context.result[0].timex
         return await step_context.end_dialog(timex)
 

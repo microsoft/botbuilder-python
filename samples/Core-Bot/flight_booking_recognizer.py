@@ -1,5 +1,6 @@
 from botbuilder.ai.luis import LuisApplication, LuisRecognizer
-from botbuilder.core import TurnContext
+from botbuilder.core import Recognizer, RecognizerResult, TurnContext
+
 
 class FlightBookingRecognizer(Recognizer):
     def __init__(self, configuration: dict):
@@ -18,5 +19,5 @@ class FlightBookingRecognizer(Recognizer):
         # Returns true if luis is configured in the appsettings.json and initialized.
         return self._recognizer is not None
 
-    async def recognize(self, turn_context: TurnContext):
+    async def recognize(self, turn_context: TurnContext) -> RecognizerResult:
         await self._recognizer.recognize(turn_context)
