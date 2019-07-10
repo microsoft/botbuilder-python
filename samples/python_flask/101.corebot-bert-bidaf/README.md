@@ -93,7 +93,7 @@ Training the model can be performed in Jupyter Lab.
 Within the Anaconda shell, launch Jupyter Lab from the sample directory.
 
 ```bash
-# Start JupyterLab in sample directory
+# Start JupyterLab from the root of the sample directory
 (botsample) 101.corebot-bert-bidaf> jupyter lab
 
 ```
@@ -129,7 +129,7 @@ After running the Jupyter Notebook, the output should resemble something like th
 <details>
   <summary>Click for screen shot.</summary>
     Showing Completed Model Build
-    <img src="./media/jupyter_lab_bert_complete.PNG" alt="Completed Model Build]">
+    <img src="./media/jupyter_lab_bert_complete.PNG" alt="Completed Model Build">
 </details>
 
 
@@ -201,6 +201,9 @@ Sometimes it's helpful to host the model outside the bot's process space and ser
 
 This section builds on the previous section of [In-process](#in-process).
 
+#### Stop any running bot/model runtime processes
+Ensure there are no running bot or model runtimes executing.  Hit ^C on any Anaconda shells running flask/bot or the model service runtime (`python main.py`).
+
 #### Modify bot configuration for localhost
 To call the out-of-process REST API, the bot configuration is modified. Edit the following file:
 `101.corebot-bert-bidaf/bot/config.py`
@@ -231,15 +234,18 @@ Inside a separate Anaconda shell, activate the `botsample` environment, and inst
 
 ```bash
 # Install requirements required for model runtime service
-(botsample) 101.corebot-bert-bidaf> cd bot
+(botsample) 101.corebot-bert-bidaf> cd model_runtime_svc
 (botsample) 101.corebot-bert-bidaf\model_runtime_svc> pip install -e . # Note the dot after the -e switch
 ```
 
 #### Run model runtime service
 To run the model runtime service, execute the following:
 ```bash
-# From 101.corebot-bert-bidaf\model_runtime_svc\model_runtime_svc_corebot101 directory
-python main.py 
+# Navigate into the model_runtime_svc_corebot101 folder
+cd model_runtime_svc_corebot101
+
+# From 101.corebot-bert-bidaf\model_runtime_svc\model_runtime_svc_corebot101
+python main.py
 ```
 If not already running, create a separate Anaconda shell set to the  `botsample` environment and [run the local bot](#local-in-process) as described above.  If it was already running, ensure [the configuration changes made above](#modify-bot-configuration) are running.
 
@@ -252,7 +258,7 @@ This sample also demonstrates using Docker and Docker Compose to run a bot and m
 
 
 #### Modify bot configuration for Docker
-To call the out-of-process REST API inside a Docker containerI, the bot configuration is modified. Edit the following file:
+To call the out-of-process REST API inside a Docker container, the bot configuration is modified. Edit the following file:
 `101.corebot-bert-bidaf/bot/config.py`
 
 Ensure that the bot configuration is set to serve model predictions remotely by setting `USE_MODEL_RUNTIME_SERVICE` to `True`.
@@ -300,6 +306,13 @@ docker-compose --project-directory . --file docker/docker-compose.yml logs
 docker ps
 ```
 Look at the logs and docker to ensure the containers are running.
+
+> **NOTE**: When testing the bot inside containers, use your local IP address instead of `localhost` (`http://<ip address>:3978/api/messages`).  
+> To find your IP address:
+>
+>   - On **Windows**, `ipconfig` at a command prompt.
+>   - On **Linux**, `ip addr` at a command prompt.
+
 
 ## Testing the bot using Bot Framework Emulator
 
