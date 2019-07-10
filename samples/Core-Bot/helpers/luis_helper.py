@@ -9,18 +9,11 @@ from booking_details import BookingDetails
 class LuisHelper:
     
     @staticmethod
-    async def excecute_luis_query(configuration: dict, turn_context: TurnContext) -> BookingDetails:
+    async def excecute_luis_query(luis_recognizer: LuisRecognizer, turn_context: TurnContext) -> BookingDetails:
         booking_details = BookingDetails()
 
         try:
-            luis_application = LuisApplication(
-                configuration['LuisAppId'],
-                configuration['LuisAPIKey'],
-                'https://'+configuration['LuisAPIHostName']
-            )
-
-            recognizer = LuisRecognizer(luis_application)
-            recognizer_result = await recognizer.recognize(turn_context)
+            recognizer_result = await luis_recognizer.recognize(turn_context)
 
             intent = sorted(recognizer_result.intents, key=recognizer_result.intents.get, reverse=True)[:1][0] if recognizer_result.intents else None
 
