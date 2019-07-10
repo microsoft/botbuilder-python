@@ -52,7 +52,7 @@ class BookingDialog(CancelAndHelpDialog):
 
         # Capture the response to the previous step's prompt
         booking_details.destination = step_context.result
-        if (booking_details.origin is None):
+        if booking_details.origin is None:
             message_text = 'From what city will you be travelling?'
             prompt_message = MessageFactory.text(message_text, message_text, InputHints.expecting_input)
             return await step_context.prompt(TextPrompt.__name__, PromptOptions(prompt=prompt_message))
@@ -69,7 +69,7 @@ class BookingDialog(CancelAndHelpDialog):
 
         # Capture the results of the previous step
         booking_details.origin = step_context.result
-        if (not booking_details.travel_date or self.is_ambiguous(booking_details.travel_date)): 
+        if not booking_details.travel_date or self.is_ambiguous(booking_details.travel_date):
             return await step_context.begin_dialog(DateResolverDialog.__name__, booking_details.travel_date)
         return await step_context.next(booking_details.travel_date)
 
@@ -83,11 +83,12 @@ class BookingDialog(CancelAndHelpDialog):
 
         # Capture the results of the previous step
         booking_details.travel_date= step_context.result
-        message_text = f'Please confirm, I have you traveling to: { booking_details.destination } from: { booking_details.origin } on: { booking_details.travel_date}.'
+        message_text = f'Please confirm, I have you traveling to: { booking_details.destination } from: ' \
+            f'{ booking_details.origin } on: { booking_details.travel_date}.'
         prompt_message = MessageFactory.text(message_text, message_text, InputHints.expecting_input)
         
         # Offer a YES/NO prompt.
-        return await step_context.prompt(ConfirmPrompt.__name__, PromptOptions(prompt= prompt_message))
+        return await step_context.prompt(ConfirmPrompt.__name__, PromptOptions(prompt=prompt_message))
 
     """
     Complete the interaction and end the dialog.
