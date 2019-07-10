@@ -30,7 +30,7 @@ class CancelAndHelpDialog(ComponentDialog):
                 return DialogTurnResult(DialogTurnStatus.Waiting)
 
             cancel_message_text = "Cancelling"
-            cancel_message = MessageFactory.text(cancel_message_text, cancel_message_text, InputHints.expecting_input)
+            cancel_message = MessageFactory.text(cancel_message_text, cancel_message_text, InputHints.ignoring_input)
 
             if text == 'cancel' or text == 'quit':
                 await inner_dc.context.send_activity(cancel_message)

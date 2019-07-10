@@ -12,11 +12,12 @@ from botbuilder.schema import (Activity, ActivityTypes)
 from botbuilder.core import (BotFrameworkAdapter, BotFrameworkAdapterSettings, TurnContext,
                              ConversationState, MemoryStorage, UserState)
 
-from dialogs import MainDialog
+from dialogs import MainDialog, BookingDialog
 from bots import DialogAndWelcomeBot
 from helpers.dialog_helper import DialogHelper
 
 from adapter_with_error_handler import AdapterWithErrorHandler
+from flight_booking_recognizer import FlightBookingRecognizer
 
 relative_path = os.path.abspath(os.path.dirname(__file__))
 path = os.path.join(relative_path, "config.yaml")
@@ -33,8 +34,10 @@ user_state = UserState(memory)
 conversation_state = ConversationState(memory)
 
 ADAPTER = AdapterWithErrorHandler(SETTINGS, conversation_state)
+RECOGNIZER = FlightBookingRecognizer(cfg['Settings'])
+BOOKING_DIALOG = BookingDialog()
 
-dialog = MainDialog(cfg['Settings'])
+dialog = MainDialog(RECOGNIZER, BOOKING_DIALOG)
 bot = DialogAndWelcomeBot(conversation_state, user_state, dialog)
 
 async def messages(req: web.Request) -> web.Response:

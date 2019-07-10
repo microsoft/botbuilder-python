@@ -10,11 +10,9 @@ from botbuilder.core import MessageFactory, TurnContext
 from botbuilder.schema import InputHints
 
 from .booking_dialog import BookingDialog
-from helpers import cognitive_models_helper
-from helpers.cognitive_models_helper import Intent
 from booking_details import BookingDetails
 from flight_booking_recognizer import FlightBookingRecognizer
-from helpers.luis_helper import LuisHelper
+from helpers.luis_helper import LuisHelper, Intent
 
 
 class MainDialog(ComponentDialog):
@@ -24,6 +22,7 @@ class MainDialog(ComponentDialog):
         super(MainDialog, self).__init__(MainDialog.__name__)
 
         self._luis_recognizer = luis_recognizer
+        self._booking_dialog_id = booking_dialog.id
 
         self.add_dialog(TextPrompt(TextPrompt.__name__))
         self.add_dialog(booking_dialog)
@@ -54,27 +53,32 @@ class MainDialog(ComponentDialog):
     async def act_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
         if not self._luis_recognizer.is_configured:
             # LUIS is not configured, we just run the BookingDialog path with an empty BookingDetailsInstance.
-            return await step_context.begin_dialog(BookingDialog.__name__, BookingDetails())
+            return await step_context.begin_dialog(self._booking_dialog_id, BookingDetails())
 
         # Call LUIS and gather any potential booking details. (Note the TurnContext has the response to the prompt.)
-        luis_result = await LuisHelper.excecute_luis_query(self._luis_recognizer, step_context.context)
+        intent, luis_result = await LuisHelper.execute_luis_query(self._luis_recognizer, step_context.context)
 
         # top_intent = cognitive_models_helper.top_intent(luis_result['intents'])
 
-        if luis_result:
+        if intent == Intent.BOOK_FLIGHT.value and luis_result:
             await MainDialog._show_warning_for_unsupported_cities(step_context.context, luis_result)
 
             # Run the BookingDialog giving it whatever details we have from the LUIS call.
-            return await step_context.begin_dialog(BookingDialog.__name__, luis_result)
+            return await step_context.begin_dialog(self._booking_dialog_id, luis_result)
+
+        elif intent == Intent.GET_WEATHER.value:
+            get_weather_text = "TODO: get weather flow here"
+            get_weather_message = MessageFactory.text(get_weather_text, get_weather_text, InputHints.ignoring_input)
+            await step_context.context.send_activity(get_weather_message)
 
         else:
             didnt_understand_text = \
                 "Sorry, I didn't get that. Please try asking in a different way"
             didnt_understand_message = MessageFactory.text(didnt_understand_text, didnt_understand_text,
                                                            InputHints.ignoring_input)
-            step_context.context.send_activity(didnt_understand_message)
+            await step_context.context.send_activity(didnt_understand_message)
 
-        await step_context.next(None)
+        return await step_context.next(None)
 
     async def final_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
         # If the child dialog ("BookingDialog") was cancelled or the user failed to confirm,
@@ -89,25 +93,15 @@ class MainDialog(ComponentDialog):
             # travel_date_msg = time_property.to_natural_language(datetime.now())
             msg_txt = f'I have you booked to {result.destination} from {result.origin} on {result.travel_date}'
             message = MessageFactory.text(msg_txt, msg_txt, InputHints.ignoring_input)
-            await step_context.context.send_activity(MessageFactory.text(message))
-        else:
-            await step_context.context.send_activity(MessageFactory.text("Thank you."))
-        return await step_context.end_dialog()
+            await step_context.context.send_activity(message)
 
         prompt_message = "What else can I do for you?"
         return await step_context.replace_dialog(self.id, prompt_message)
 
     @staticmethod
     async def _show_warning_for_unsupported_cities(context: TurnContext, luis_result: BookingDetails) -> None:
-        unsupported_cities = []
-
-        if luis_result.origin and not luis_result.supported_origin:
-            unsupported_cities.append(luis_result.origin)
-
-        if luis_result.destination and not luis_result.supported_destination:
-            unsupported_cities.append(luis_result.destination)
-
-        if unsupported_cities:
-            message_text = f"Sorry but the following airports are not supported: {', '.join(unsupported_cities)}"
+        if luis_result.unsupported_airports:
+            message_text = f"Sorry but the following airports are not supported:" \
+                f" {', '.join(luis_result.unsupported_airports)}"
             message = MessageFactory.text(message_text, message_text, InputHints.ignoring_input)
             await context.send_activity(message)
