@@ -3,8 +3,8 @@
 
 from typing import Dict
 
-from botbuilder.ai.luis import LuisRecognizer, LuisTelemetryConstants, RecognizerResult
-from botbuilder.core import TurnContext
+from botbuilder.ai.luis import LuisRecognizer, LuisTelemetryConstants
+from botbuilder.core import RecognizerResult, TurnContext
 
 
 class TelemetryOverrideRecognizer(LuisRecognizer):

@@ -17,15 +17,12 @@ from requests import Session
 from requests.models import Response
 
 from botbuilder.ai.luis import (
-    IntentScore,
     LuisApplication,
     LuisPredictionOptions,
     LuisRecognizer,
-    RecognizerResult,
-    TopIntent,
 )
 from botbuilder.ai.luis.luis_util import LuisUtil
-from botbuilder.core import BotAdapter, BotTelemetryClient, TurnContext
+from botbuilder.core import BotAdapter, BotTelemetryClient, IntentScore, RecognizerResult, TopIntent, TurnContext
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.schema import (
     Activity,
