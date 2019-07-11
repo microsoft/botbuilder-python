@@ -7,14 +7,22 @@ from abc import ABC, abstractmethod
 from typing import Dict
 from enum import Enum
 
+
 class TelemetryDataPointType(Enum):
-        measurement = 0
-        aggregation = 1
+    measurement = 0
+    aggregation = 1
+
 
 class BotTelemetryClient(ABC):
     @abstractmethod
-    def track_pageview(self, name: str, url, duration: int = 0, properties : Dict[str, object]=None, 
-                        measurements: Dict[str, object]=None) -> None:
+    def track_pageview(
+        self,
+        name: str,
+        url,
+        duration: int = 0,
+        properties: Dict[str, object] = None,
+        measurements: Dict[str, object] = None,
+    ) -> None:
         """
         Send information about the page viewed in the application (a web page for instance).
         :param name: the name of the page that was viewed.
@@ -23,11 +31,19 @@ class BotTelemetryClient(ABC):
         :param properties: the set of custom properties the client wants attached to this data item. (defaults to: None)
         :param measurements: the set of custom measurements the client wants to attach to this data item. (defaults to: None)
         """
-        raise NotImplementedError('BotTelemetryClient.track_request(): is not implemented.')
+        raise NotImplementedError(
+            "BotTelemetryClient.track_request(): is not implemented."
+        )
 
     @abstractmethod
-    def track_exception(self, type: type = None, value : Exception =None, tb : traceback =None, 
-                        properties: Dict[str, object]=None, measurements: Dict[str, object]=None) -> None:
+    def track_exception(
+        self,
+        type: type = None,
+        value: Exception = None,
+        tb: traceback = None,
+        properties: Dict[str, object] = None,
+        measurements: Dict[str, object] = None,
+    ) -> None:
         """ 
         Send information about a single exception that occurred in the application.
         :param type: the type of the exception that was thrown.
@@ -36,23 +52,39 @@ class BotTelemetryClient(ABC):
         :param properties: the set of custom properties the client wants attached to this data item. (defaults to: None)
         :param measurements: the set of custom measurements the client wants to attach to this data item. (defaults to: None)
         """
-        raise NotImplementedError('BotTelemetryClient.track_request(): is not implemented.')
+        raise NotImplementedError(
+            "BotTelemetryClient.track_request(): is not implemented."
+        )
 
     @abstractmethod
-    def track_event(self, name: str, properties: Dict[str, object] = None, 
-                    measurements: Dict[str, object] = None) -> None:
+    def track_event(
+        self,
+        name: str,
+        properties: Dict[str, object] = None,
+        measurements: Dict[str, object] = None,
+    ) -> None:
         """ 
         Send information about a single event that has occurred in the context of the application.
         :param name: the data to associate to this event.
         :param properties: the set of custom properties the client wants attached to this data item. (defaults to: None)
         :param measurements: the set of custom measurements the client wants to attach to this data item. (defaults to: None)
         """
-        raise NotImplementedError('BotTelemetryClient.track_event(): is not implemented.')
+        raise NotImplementedError(
+            "BotTelemetryClient.track_event(): is not implemented."
+        )
 
     @abstractmethod
-    def track_metric(self, name: str, value: float, type: TelemetryDataPointType =None, 
-                    count: int =None, min: float=None, max: float=None, std_dev: float=None,
-                    properties: Dict[str, object]=None) -> NotImplemented:
+    def track_metric(
+        self,
+        name: str,
+        value: float,
+        type: TelemetryDataPointType = None,
+        count: int = None,
+        min: float = None,
+        max: float = None,
+        std_dev: float = None,
+        properties: Dict[str, object] = None,
+    ) -> NotImplemented:
         """
         Send information about a single metric data point that was captured for the application.
         :param name: The name of the metric that was captured.
@@ -64,7 +96,9 @@ class BotTelemetryClient(ABC):
         :param std_dev: the standard deviation of all metrics collected that were aggregated into this data point. (defaults to: None)
         :param properties: the set of custom properties the client wants attached to this data item. (defaults to: None)
         """
-        raise NotImplementedError('BotTelemetryClient.track_metric(): is not implemented.')
+        raise NotImplementedError(
+            "BotTelemetryClient.track_metric(): is not implemented."
+        )
 
     @abstractmethod
     def track_trace(self, name, properties=None, severity=None):
@@ -74,13 +108,24 @@ class BotTelemetryClient(ABC):
         :param properties: the set of custom properties the client wants attached to this data item. (defaults to: None)\n
         :param severity: the severity level of this trace, one of DEBUG, INFO, WARNING, ERROR, CRITICAL
         """
-        raise NotImplementedError('BotTelemetryClient.track_trace(): is not implemented.')
+        raise NotImplementedError(
+            "BotTelemetryClient.track_trace(): is not implemented."
+        )
 
     @abstractmethod
-    def track_request(self, name: str, url: str, success: bool, start_time: str=None, 
-                    duration: int=None, response_code: str =None, http_method: str=None, 
-                    properties: Dict[str, object]=None, measurements: Dict[str, object]=None, 
-                    request_id: str=None):
+    def track_request(
+        self,
+        name: str,
+        url: str,
+        success: bool,
+        start_time: str = None,
+        duration: int = None,
+        response_code: str = None,
+        http_method: str = None,
+        properties: Dict[str, object] = None,
+        measurements: Dict[str, object] = None,
+        request_id: str = None,
+    ):
         """
         Sends a single request that was captured for the application.
         :param name: The name for this request. All requests with the same name will be grouped together.
@@ -94,12 +139,24 @@ class BotTelemetryClient(ABC):
         :param measurements: the set of custom measurements the client wants to attach to this data item. (defaults to: None)
         :param request_id: the id for this request. If None, a new uuid will be generated. (defaults to: None)
         """
-        raise NotImplementedError('BotTelemetryClient.track_request(): is not implemented.')
+        raise NotImplementedError(
+            "BotTelemetryClient.track_request(): is not implemented."
+        )
 
     @abstractmethod
-    def track_dependency(self, name:str, data:str, type:str=None, target:str=None, duration:int=None, 
-                        success:bool=None, result_code:str=None, properties:Dict[str, object]=None, 
-                        measurements:Dict[str, object]=None, dependency_id:str=None):
+    def track_dependency(
+        self,
+        name: str,
+        data: str,
+        type: str = None,
+        target: str = None,
+        duration: int = None,
+        success: bool = None,
+        result_code: str = None,
+        properties: Dict[str, object] = None,
+        measurements: Dict[str, object] = None,
+        dependency_id: str = None,
+    ):
         """
         Sends a single dependency telemetry that was captured for the application.
         :param name: the name of the command initiated with this dependency call. Low cardinality value. Examples are stored procedure name and URL path template.
@@ -113,5 +170,6 @@ class BotTelemetryClient(ABC):
         :param measurements: the set of custom measurements the client wants to attach to this data item. (defaults to: None)
         :param id: the id for this dependency call. If None, a new uuid will be generated. (defaults to: None)
         """
-        raise NotImplementedError('BotTelemetryClient.track_dependency(): is not implemented.')
-
+        raise NotImplementedError(
+            "BotTelemetryClient.track_dependency(): is not implemented."
+        )

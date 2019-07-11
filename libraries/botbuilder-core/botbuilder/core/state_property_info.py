@@ -3,6 +3,7 @@
 
 from abc import ABC
 
+
 class StatePropertyInfo(ABC):
     @property
     def name(self):

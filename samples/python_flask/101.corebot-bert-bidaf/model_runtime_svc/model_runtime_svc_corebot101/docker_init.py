@@ -14,5 +14,6 @@ HOME_DIR = str(Path.home())
 BERT_MODEL_DIR_DEFAULT = os.path.abspath(os.path.join(HOME_DIR, "models/bert"))
 BIDAF_MODEL_DIR_DEFAULT = os.path.abspath(os.path.join(HOME_DIR, "models/bidaf"))
 
-LH.initialize_models(bert_model_dir=BERT_MODEL_DIR_DEFAULT,
-                     bidaf_model_dir=BIDAF_MODEL_DIR_DEFAULT)
+LH.initialize_models(
+    bert_model_dir=BERT_MODEL_DIR_DEFAULT, bidaf_model_dir=BIDAF_MODEL_DIR_DEFAULT
+)

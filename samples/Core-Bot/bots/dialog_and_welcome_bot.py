@@ -6,7 +6,13 @@ import os.path
 
 from typing import List
 from botbuilder.core import CardFactory
-from botbuilder.core import ActivityHandler, ConversationState, MessageFactory, UserState, TurnContext
+from botbuilder.core import (
+    ActivityHandler,
+    ConversationState,
+    MessageFactory,
+    UserState,
+    TurnContext,
+)
 from botbuilder.dialogs import Dialog
 from botbuilder.schema import Activity, Attachment, ChannelAccount
 from helpers.dialog_helper import DialogHelper
@@ -15,11 +21,19 @@ from .dialog_bot import DialogBot
 
 
 class DialogAndWelcomeBot(DialogBot):
+    def __init__(
+        self,
+        conversation_state: ConversationState,
+        user_state: UserState,
+        dialog: Dialog,
+    ):
+        super(DialogAndWelcomeBot, self).__init__(
+            conversation_state, user_state, dialog
+        )
 
-    def __init__(self, conversation_state: ConversationState, user_state: UserState, dialog: Dialog):
-        super(DialogAndWelcomeBot, self).__init__(conversation_state, user_state, dialog)
-
-    async def on_members_added_activity(self, members_added: List[ChannelAccount], turn_context: TurnContext):
+    async def on_members_added_activity(
+        self, members_added: List[ChannelAccount], turn_context: TurnContext
+    ):
         for member in members_added:
             # Greet anyone that was not the target (recipient) of this message.
             # To learn more about Adaptive Cards, see https://aka.ms/msbot-adaptivecards for more details.
@@ -27,8 +41,11 @@ class DialogAndWelcomeBot(DialogBot):
                 welcome_card = self.create_adaptive_card_attachment()
                 response = MessageFactory.attachment(welcome_card)
                 await turn_context.send_activity(response)
-                await DialogHelper.run_dialog(self.dialog, turn_context,
-                                              self.conversation_state.create_property("DialogState"))
+                await DialogHelper.run_dialog(
+                    self.dialog,
+                    turn_context,
+                    self.conversation_state.create_property("DialogState"),
+                )
 
     # Load attachment from file.
     def create_adaptive_card_attachment(self):
@@ -38,5 +55,5 @@ class DialogAndWelcomeBot(DialogBot):
             card = json.load(f)
 
         return Attachment(
-            content_type= "application/vnd.microsoft.card.adaptive",
-            content= card)
+            content_type="application/vnd.microsoft.card.adaptive", content=card
+        )

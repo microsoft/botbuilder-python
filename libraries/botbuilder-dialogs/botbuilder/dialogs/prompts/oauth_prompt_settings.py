@@ -1,13 +1,10 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+
 class OAuthPromptSettings:
     def __init__(
-            self,
-            connection_name: str,
-            title: str,
-            text: str = None,
-            timeout: int = None
+        self, connection_name: str, title: str, text: str = None, timeout: int = None
     ):
         """
         Settings used to configure an `OAuthPrompt` instance.

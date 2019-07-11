@@ -3,25 +3,33 @@
 import aiounittest
 from unittest.mock import MagicMock
 
-from botbuilder.core import BotState, ConversationState, MemoryStorage, Storage, StoreItem, TurnContext, UserState
+from botbuilder.core import (
+    BotState,
+    ConversationState,
+    MemoryStorage,
+    Storage,
+    StoreItem,
+    TurnContext,
+    UserState,
+)
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.schema import Activity, ConversationAccount
 
 from test_utilities import TestUtilities
 
-RECEIVED_MESSAGE = Activity(type='message',
-                            text='received')
-STORAGE_KEY = 'stateKey'
+RECEIVED_MESSAGE = Activity(type="message", text="received")
+STORAGE_KEY = "stateKey"
 
 
 def cached_state(context, state_key):
     cached = context.services.get(state_key)
-    return cached['state'] if cached is not None else None
+    return cached["state"] if cached is not None else None
 
 
 def key_factory(context):
     assert context is not None
     return STORAGE_KEY
+
 
 class BotStateForTest(BotState):
     def __init__(self, storage: Storage):
@@ -32,7 +40,7 @@ class BotStateForTest(BotState):
 
 
 class CustomState(StoreItem):
-    def __init__(self, custom_string: str = None, e_tag: str = '*'):
+    def __init__(self, custom_string: str = None, e_tag: str = "*"):
         super().__init__(custom_string=custom_string, e_tag=e_tag)
 
 
@@ -47,25 +55,24 @@ class TestBotState(aiounittest.AsyncTestCase):
     context = TurnContext(adapter, RECEIVED_MESSAGE)
     middleware = BotState(storage, key_factory)
 
-    
     def test_state_empty_name(self):
-        #Arrange
+        # Arrange
         dictionary = {}
         user_state = UserState(MemoryStorage(dictionary))
 
-        #Act
+        # Act
         with self.assertRaises(TypeError) as _:
-            user_state.create_property('')
-    
+            user_state.create_property("")
+
     def test_state_none_name(self):
-        #Arrange
+        # Arrange
         dictionary = {}
         user_state = UserState(MemoryStorage(dictionary))
 
-        #Act
+        # Act
         with self.assertRaises(TypeError) as _:
             user_state.create_property(None)
-    
+
     async def test_storage_not_called_no_changes(self):
         """Verify storage not called when no changes are made"""
         # Mock a storage provider, which counts read/writes
@@ -73,12 +80,13 @@ class TestBotState(aiounittest.AsyncTestCase):
 
         async def mock_write_result(self):
             return
+
         async def mock_read_result(self):
             return {}
 
         mock_storage = MemoryStorage(dictionary)
-        mock_storage.write = MagicMock(side_effect= mock_write_result)
-        mock_storage.read = MagicMock(side_effect= mock_read_result)
+        mock_storage.write = MagicMock(side_effect=mock_write_result)
+        mock_storage.read = MagicMock(side_effect=mock_read_result)
 
         # Arrange
         user_state = UserState(mock_storage)
@@ -89,18 +97,20 @@ class TestBotState(aiounittest.AsyncTestCase):
         self.assertEqual(mock_storage.write.call_count, 0)
         await user_state.save_changes(context)
         await property_a.set(context, "hello")
-        self.assertEqual(mock_storage.read.call_count, 1)       # Initial save bumps count
-        self.assertEqual(mock_storage.write.call_count, 0)       # Initial save bumps count
+        self.assertEqual(mock_storage.read.call_count, 1)  # Initial save bumps count
+        self.assertEqual(mock_storage.write.call_count, 0)  # Initial save bumps count
         await property_a.set(context, "there")
-        self.assertEqual(mock_storage.write.call_count, 0)       # Set on property should not bump
+        self.assertEqual(
+            mock_storage.write.call_count, 0
+        )  # Set on property should not bump
         await user_state.save_changes(context)
-        self.assertEqual(mock_storage.write.call_count, 1)       # Explicit save should bump
+        self.assertEqual(mock_storage.write.call_count, 1)  # Explicit save should bump
         value_a = await property_a.get(context)
         self.assertEqual("there", value_a)
-        self.assertEqual(mock_storage.write.call_count, 1)       # Gets should not bump
+        self.assertEqual(mock_storage.write.call_count, 1)  # Gets should not bump
         await user_state.save_changes(context)
         self.assertEqual(mock_storage.write.call_count, 1)
-        await property_a.delete(context)   # Delete alone no bump
+        await property_a.delete(context)  # Delete alone no bump
         self.assertEqual(mock_storage.write.call_count, 1)
         await user_state.save_changes(context)  # Save when dirty should bump
         self.assertEqual(mock_storage.write.call_count, 2)
@@ -108,7 +118,7 @@ class TestBotState(aiounittest.AsyncTestCase):
         await user_state.save_changes(context)  # Save not dirty should not bump
         self.assertEqual(mock_storage.write.call_count, 2)
         self.assertEqual(mock_storage.read.call_count, 1)
-    
+
     async def test_state_set_no_load(self):
         """Should be able to set a property with no Load"""
         # Arrange
@@ -119,9 +129,7 @@ class TestBotState(aiounittest.AsyncTestCase):
         # Act
         property_a = user_state.create_property("property_a")
         await property_a.set(context, "hello")
-    
-    
-    
+
     async def test_state_multiple_loads(self):
         """Should be able to load multiple times"""
         # Arrange
@@ -134,7 +142,6 @@ class TestBotState(aiounittest.AsyncTestCase):
         await user_state.load(context)
         await user_state.load(context)
 
-    
     async def test_State_GetNoLoadWithDefault(self):
         """Should be able to get a property with no Load and default"""
         # Arrange
@@ -144,11 +151,9 @@ class TestBotState(aiounittest.AsyncTestCase):
 
         # Act
         property_a = user_state.create_property("property_a")
-        value_a = await property_a.get(context, lambda : "Default!")
+        value_a = await property_a.get(context, lambda: "Default!")
         self.assertEqual("Default!", value_a)
 
-    
-    
     async def test_State_GetNoLoadNoDefault(self):
         """Cannot get a string with no default set"""
         # Arrange
@@ -163,7 +168,6 @@ class TestBotState(aiounittest.AsyncTestCase):
         # Assert
         self.assertIsNone(value_a)
 
-    
     async def test_State_POCO_NoDefault(self):
         """Cannot get a POCO with no default set"""
         # Arrange
@@ -178,8 +182,6 @@ class TestBotState(aiounittest.AsyncTestCase):
         # Assert
         self.assertIsNone(value)
 
-    
-    
     async def test_State_bool_NoDefault(self):
         """Cannot get a bool with no default set"""
         # Arange
@@ -211,7 +213,6 @@ class TestBotState(aiounittest.AsyncTestCase):
         self.assertEqual(0, value)
     """
 
-    
     async def test_State_SetAfterSave(self):
         """Verify setting property after save"""
         # Arrange
@@ -230,7 +231,6 @@ class TestBotState(aiounittest.AsyncTestCase):
 
         await property_a.set(context, "hello2")
 
-    
     async def test_State_MultipleSave(self):
         """Verify multiple saves"""
         # Arrange
@@ -252,7 +252,6 @@ class TestBotState(aiounittest.AsyncTestCase):
         value_a = await property_a.get(context)
         self.assertEqual("hello2", value_a)
 
-    
     async def test_LoadSetSave(self):
         # Arrange
         dictionary = {}
@@ -273,7 +272,6 @@ class TestBotState(aiounittest.AsyncTestCase):
         self.assertEqual("hello", obj["property-a"])
         self.assertEqual("world", obj["property-b"])
 
-    
     async def test_LoadSetSaveTwice(self):
         # Arrange
         dictionary = {}
@@ -314,7 +312,6 @@ class TestBotState(aiounittest.AsyncTestCase):
         self.assertEqual("world-2", obj2["property-b"])
         self.assertEqual("test", obj2["property-c"])
 
-    
     async def test_LoadSaveDelete(self):
         # Arrange
         dictionary = {}
@@ -381,7 +378,7 @@ class TestBotState(aiounittest.AsyncTestCase):
             assert custom_state.custom_string == "test"
 
         adapter = TestAdapter(exec_test)
-        await adapter.send('start')
+        await adapter.send("start")
 
     async def test_user_state_bad_from_throws(self):
         dictionary = {}
@@ -409,16 +406,20 @@ class TestBotState(aiounittest.AsyncTestCase):
 
         # Turn 0
         bot_state1 = ConversationState(storage)
-        (await bot_state1
-         .create_property("test-name")
-         .get(turn_context, lambda: TestPocoState())).value = "test-value"
+        (
+            await bot_state1.create_property("test-name").get(
+                turn_context, lambda: TestPocoState()
+            )
+        ).value = "test-value"
         await bot_state1.save_changes(turn_context)
 
         # Turn 1
         bot_state2 = ConversationState(storage)
-        value1 = (await bot_state2
-                  .create_property("test-name")
-                  .get(turn_context, lambda: TestPocoState(value="default-value"))).value
+        value1 = (
+            await bot_state2.create_property("test-name").get(
+                turn_context, lambda: TestPocoState(value="default-value")
+            )
+        ).value
 
         assert "test-value" == value1
 
@@ -429,9 +430,11 @@ class TestBotState(aiounittest.AsyncTestCase):
 
         # Turn 3
         bot_state4 = ConversationState(storage)
-        value2 = (await bot_state4
-                  .create_property("test-name")
-                  .get(turn_context, lambda: TestPocoState(value="default-value"))).value
+        value2 = (
+            await bot_state4.create_property("test-name").get(
+                turn_context, lambda: TestPocoState(value="default-value")
+            )
+        ).value
 
         assert "default-value", value2
 
@@ -443,16 +446,20 @@ class TestBotState(aiounittest.AsyncTestCase):
 
         # Turn 0
         bot_state1 = ConversationState(storage)
-        (await bot_state1
-         .create_property("test-name")
-         .get(turn_context, lambda: TestPocoState())).value = "test-value"
+        (
+            await bot_state1.create_property("test-name").get(
+                turn_context, lambda: TestPocoState()
+            )
+        ).value = "test-value"
         await bot_state1.save_changes(turn_context)
 
         # Turn 1
         bot_state2 = ConversationState(storage)
-        value1 = (await bot_state2
-                  .create_property("test-name")
-                  .get(turn_context, lambda: TestPocoState(value="default-value"))).value
+        value1 = (
+            await bot_state2.create_property("test-name").get(
+                turn_context, lambda: TestPocoState(value="default-value")
+            )
+        ).value
 
         assert "test-value" == value1
 
@@ -462,9 +469,11 @@ class TestBotState(aiounittest.AsyncTestCase):
 
         # Turn 3
         bot_state4 = ConversationState(storage)
-        value2 = (await bot_state4
-                  .create_property("test-name")
-                  .get(turn_context, lambda: TestPocoState(value="default-value"))).value
+        value2 = (
+            await bot_state4.create_property("test-name").get(
+                turn_context, lambda: TestPocoState(value="default-value")
+            )
+        ).value
 
         assert "default-value" == value2
 
@@ -475,9 +484,11 @@ class TestBotState(aiounittest.AsyncTestCase):
         storage = MemoryStorage({})
 
         conversation_state = ConversationState(storage)
-        (await conversation_state
-         .create_property("test-name")
-         .get(turn_context, lambda: TestPocoState())).value = "test-value"
+        (
+            await conversation_state.create_property("test-name").get(
+                turn_context, lambda: TestPocoState()
+            )
+        ).value = "test-value"
 
         result = conversation_state.get(turn_context)
 

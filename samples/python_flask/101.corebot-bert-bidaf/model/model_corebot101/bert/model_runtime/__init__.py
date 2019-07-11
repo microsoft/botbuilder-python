@@ -3,6 +3,4 @@
 
 from .bert_model_runtime import BertModelRuntime
 
-__all__ = [
-           'BertModelRuntime'
-           ]
+__all__ = ["BertModelRuntime"]

@@ -5,8 +5,9 @@
 # license information.
 # --------------------------------------------------------------------------
 
-from .application_insights_telemetry_client import ApplicationInsightsTelemetryClient, bot_telemetry_processor
+from .application_insights_telemetry_client import (
+    ApplicationInsightsTelemetryClient,
+    bot_telemetry_processor,
+)
 
-__all__ = ["ApplicationInsightsTelemetryClient",
-            "bot_telemetry_processor"
-            ]
+__all__ = ["ApplicationInsightsTelemetryClient", "bot_telemetry_processor"]

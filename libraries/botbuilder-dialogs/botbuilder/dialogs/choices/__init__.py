@@ -34,5 +34,5 @@ __all__ = [
     "ModelResult",
     "SortedValue",
     "Token",
-    "Tokenizer"
+    "Tokenizer",
 ]

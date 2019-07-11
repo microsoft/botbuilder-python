@@ -13,17 +13,22 @@ This sample shows how to create a bot that demonstrates the following:
 import asyncio
 
 from flask import Flask, request, Response
-from botbuilder.core import (BotFrameworkAdapter, BotFrameworkAdapterSettings,
-                             ConversationState, MemoryStorage, UserState)
-from botbuilder.schema import (Activity)
+from botbuilder.core import (
+    BotFrameworkAdapter,
+    BotFrameworkAdapterSettings,
+    ConversationState,
+    MemoryStorage,
+    UserState,
+)
+from botbuilder.schema import Activity
 from dialogs import MainDialog
 from bots import DialogAndWelcomeBot
 
 LOOP = asyncio.get_event_loop()
 APP = Flask(__name__, instance_relative_config=True)
-APP.config.from_object('config.DefaultConfig')
+APP.config.from_object("config.DefaultConfig")
 
-SETTINGS = BotFrameworkAdapterSettings(APP.config['APP_ID'], APP.config['APP_PASSWORD'])
+SETTINGS = BotFrameworkAdapterSettings(APP.config["APP_ID"], APP.config["APP_PASSWORD"])
 ADAPTER = BotFrameworkAdapter(SETTINGS)
 
 # Create MemoryStorage, UserState and ConversationState
@@ -34,22 +39,26 @@ DIALOG = MainDialog(APP.config)
 BOT = DialogAndWelcomeBot(CONVERSATION_STATE, USER_STATE, DIALOG)
 
 
-@APP.route('/api/messages', methods=['POST'])
+@APP.route("/api/messages", methods=["POST"])
 def messages():
     """Main bot message handler."""
-    if request.headers['Content-Type'] == 'application/json':
+    if request.headers["Content-Type"] == "application/json":
         body = request.json
     else:
         return Response(status=415)
 
     activity = Activity().deserialize(body)
-    auth_header = request.headers['Authorization'] if 'Authorization' in request.headers else ''
+    auth_header = (
+        request.headers["Authorization"] if "Authorization" in request.headers else ""
+    )
 
     async def aux_func(turn_context):
         await BOT.on_turn(turn_context)
 
     try:
-        task = LOOP.create_task(ADAPTER.process_activity(activity, auth_header, aux_func))
+        task = LOOP.create_task(
+            ADAPTER.process_activity(activity, auth_header, aux_func)
+        )
         LOOP.run_until_complete(task)
         return Response(status=201)
     except Exception as exception:

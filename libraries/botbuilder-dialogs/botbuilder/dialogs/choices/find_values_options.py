@@ -5,15 +5,16 @@ from typing import Callable, List
 
 from .token import Token
 
+
 class FindValuesOptions:
     """ Contains search options, used to control how choices are recognized in a user's utterance. """
-    
+
     def __init__(
         self,
         allow_partial_matches: bool = None,
         locale: str = None,
         max_token_distance: int = None,
-        tokenizer: Callable[[str, str], List[Token]] = None
+        tokenizer: Callable[[str, str], List[Token]] = None,
     ):
         """
         Parameters:

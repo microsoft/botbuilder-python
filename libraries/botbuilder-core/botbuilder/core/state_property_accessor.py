@@ -10,7 +10,7 @@ from .turn_context import TurnContext
 
 class StatePropertyAccessor(ABC):
     @abstractmethod
-    async def get(self, turnContext: TurnContext, default_value_factory = None):
+    async def get(self, turnContext: TurnContext, default_value_factory=None):
         """
         Get the property value from the source
         :param turn_context: Turn Context.
@@ -37,4 +37,3 @@ class StatePropertyAccessor(ABC):
         :return:
         """
         raise NotImplementedError()
-

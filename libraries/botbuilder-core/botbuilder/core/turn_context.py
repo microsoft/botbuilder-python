@@ -5,15 +5,11 @@ import asyncio
 from copy import copy
 from uuid import uuid4
 from typing import List, Callable, Union, Dict
-from botbuilder.schema import (
-                            Activity, 
-                            ConversationReference, 
-                            ResourceResponse
-                            )
+from botbuilder.schema import Activity, ConversationReference, ResourceResponse
 
 
 class TurnContext(object):
-    def __init__(self, adapter_or_context, request: Activity=None):
+    def __init__(self, adapter_or_context, request: Activity = None):
         """
         Creates a new TurnContext instance.
         :param adapter_or_context:
@@ -29,30 +25,37 @@ class TurnContext(object):
             self._on_send_activities: Callable[[]] = []
             self._on_update_activity: Callable[[]] = []
             self._on_delete_activity: Callable[[]] = []
-            self._responded : bool = False
+            self._responded: bool = False
 
         if self.adapter is None:
-            raise TypeError('TurnContext must be instantiated with an adapter.')
+            raise TypeError("TurnContext must be instantiated with an adapter.")
         if self.activity is None:
-            raise TypeError('TurnContext must be instantiated with a request parameter of type Activity.')
-        
+            raise TypeError(
+                "TurnContext must be instantiated with a request parameter of type Activity."
+            )
+
         self._turn_state = {}
 
-    
     @property
     def turn_state(self) -> Dict[str, object]:
         return self._turn_state
 
-
-    def copy_to(self, context: 'TurnContext') -> None:
+    def copy_to(self, context: "TurnContext") -> None:
         """
         Called when this TurnContext instance is passed into the constructor of a new TurnContext
         instance. Can be overridden in derived classes.
         :param context:
         :return:
         """
-        for attribute in ['adapter', 'activity', '_responded', '_services',
-                          '_on_send_activities', '_on_update_activity', '_on_delete_activity']:
+        for attribute in [
+            "adapter",
+            "activity",
+            "_responded",
+            "_services",
+            "_on_send_activities",
+            "_on_update_activity",
+            "_on_delete_activity",
+        ]:
             setattr(context, attribute, getattr(self, attribute))
 
     @property
@@ -71,7 +74,9 @@ class TurnContext(object):
         :return:
         """
         if not isinstance(value, Activity):
-            raise TypeError('TurnContext: cannot set `activity` to a type other than Activity.')
+            raise TypeError(
+                "TurnContext: cannot set `activity` to a type other than Activity."
+            )
         else:
             self._activity = value
 
@@ -86,7 +91,7 @@ class TurnContext(object):
     @responded.setter
     def responded(self, value: bool):
         if value == False:
-            raise ValueError('TurnContext: cannot set TurnContext.responded to False.')
+            raise ValueError("TurnContext: cannot set TurnContext.responded to False.")
         else:
             self._responded = True
 
@@ -104,7 +109,7 @@ class TurnContext(object):
         try:
             return self._services[key]
         except KeyError:
-            raise KeyError('%s not found in TurnContext._services.' % key)
+            raise KeyError("%s not found in TurnContext._services." % key)
 
     def has(self, key: str) -> bool:
         """
@@ -128,7 +133,9 @@ class TurnContext(object):
 
         self._services[key] = value
 
-    async def send_activity(self, *activity_or_text: Union[Activity, str]) -> ResourceResponse:
+    async def send_activity(
+        self, *activity_or_text: Union[Activity, str]
+    ) -> ResourceResponse:
         """
         Sends a single activity or message to the user.
         :param activity_or_text:
@@ -136,21 +143,28 @@ class TurnContext(object):
         """
         reference = TurnContext.get_conversation_reference(self.activity)
 
-        output = [TurnContext.apply_conversation_reference(
-            Activity(text=a, type='message') if isinstance(a, str) else a, reference)
-            for a in activity_or_text]
+        output = [
+            TurnContext.apply_conversation_reference(
+                Activity(text=a, type="message") if isinstance(a, str) else a, reference
+            )
+            for a in activity_or_text
+        ]
         for activity in output:
             if not activity.input_hint:
-                activity.input_hint = 'acceptingInput'
+                activity.input_hint = "acceptingInput"
 
-        async def callback(context: 'TurnContext', output):
+        async def callback(context: "TurnContext", output):
             responses = await context.adapter.send_activities(context, output)
             context._responded = True
             return responses
 
-        result = await self._emit(self._on_send_activities, output, callback(self, output))
+        result = await self._emit(
+            self._on_send_activities, output, callback(self, output)
+        )
 
-        return result[0] if result is not None and len(result) > 0 else ResourceResponse()
+        return (
+            result[0] if result is not None and len(result) > 0 else ResourceResponse()
+        )
 
     async def update_activity(self, activity: Activity):
         """
@@ -158,7 +172,11 @@ class TurnContext(object):
         :param activity:
         :return:
         """
-        return await self._emit(self._on_update_activity, activity, self.adapter.update_activity(self, activity))
+        return await self._emit(
+            self._on_update_activity,
+            activity,
+            self.adapter.update_activity(self, activity),
+        )
 
     async def delete_activity(self, id_or_reference: Union[str, ConversationReference]):
         """
@@ -171,9 +189,13 @@ class TurnContext(object):
             reference.activity_id = id_or_reference
         else:
             reference = id_or_reference
-        return await self._emit(self._on_delete_activity, reference, self.adapter.delete_activity(self, reference))
+        return await self._emit(
+            self._on_delete_activity,
+            reference,
+            self.adapter.delete_activity(self, reference),
+        )
 
-    def on_send_activities(self, handler) -> 'TurnContext':
+    def on_send_activities(self, handler) -> "TurnContext":
         """
         Registers a handler to be notified of and potentially intercept the sending of activities.
         :param handler:
@@ -182,7 +204,7 @@ class TurnContext(object):
         self._on_send_activities.append(handler)
         return self
 
-    def on_update_activity(self, handler) -> 'TurnContext':
+    def on_update_activity(self, handler) -> "TurnContext":
         """
         Registers a handler to be notified of and potentially intercept an activity being updated.
         :param handler:
@@ -191,7 +213,7 @@ class TurnContext(object):
         self._on_update_activity.append(handler)
         return self
 
-    def on_delete_activity(self, handler) -> 'TurnContext':
+    def on_delete_activity(self, handler) -> "TurnContext":
         """
         Registers a handler to be notified of and potentially intercept an activity being deleted.
         :param handler:
@@ -207,12 +229,15 @@ class TurnContext(object):
             context = self
             try:
                 if i < len(handlers):
+
                     async def next_handler():
                         await emit_next(i + 1)
+
                     await handlers[i](context, arg, next_handler)
 
             except Exception as e:
                 raise e
+
         await emit_next(0)
         # This should be changed to `return await logic()`
         return await logic
@@ -228,17 +253,19 @@ class TurnContext(object):
         :param activity:
         :return:
         """
-        return ConversationReference(activity_id=activity.id,
-                                     user=copy(activity.from_property),
-                                     bot=copy(activity.recipient),
-                                     conversation=copy(activity.conversation),
-                                     channel_id=activity.channel_id,
-                                     service_url=activity.service_url)
+        return ConversationReference(
+            activity_id=activity.id,
+            user=copy(activity.from_property),
+            bot=copy(activity.recipient),
+            conversation=copy(activity.conversation),
+            channel_id=activity.channel_id,
+            service_url=activity.service_url,
+        )
 
     @staticmethod
-    def apply_conversation_reference(activity: Activity,
-                                     reference: ConversationReference,
-                                     is_incoming: bool=False) -> Activity:
+    def apply_conversation_reference(
+        activity: Activity, reference: ConversationReference, is_incoming: bool = False
+    ) -> Activity:
         """
         Updates an activity with the delivery information from a conversation reference. Calling
         this after get_conversation_reference on an incoming activity

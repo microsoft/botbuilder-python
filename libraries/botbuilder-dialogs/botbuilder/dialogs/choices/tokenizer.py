@@ -5,6 +5,7 @@ from typing import Union
 
 from .token import Token
 
+
 class Tokenizer:
     """ Provides a default tokenizer implementation. """
 
@@ -43,43 +44,32 @@ class Tokenizer:
                 # we're going to just break each character in this range out as its own token
                 Tokenizer._append_token(tokens, token, i - 1)
                 token = None
-                tokens.append(Token(
-                    start = i,
-                    end = i,
-                    text = char,
-                    normalized = char
-                ))
+                tokens.append(Token(start=i, end=i, text=char, normalized=char))
             elif token is None:
                 # Start a new token
-                token = Token(
-                    start = i,
-                    end = 0,
-                    text = char,
-                    normalized = None    
-                )
+                token = Token(start=i, end=0, text=char, normalized=None)
             else:
                 # Add onto current token
                 token.text += char
-            
+
             i += 1
-        
+
         Tokenizer._append_token(tokens, token, length - 1)
-        
+
         return tokens
-                
 
     @staticmethod
     def _is_breaking_char(code_point) -> bool:
         return (
-            Tokenizer._is_between(code_point, 0x0000, 0x002F) or 
-            Tokenizer._is_between(code_point, 0x003A, 0x0040) or
-            Tokenizer._is_between(code_point, 0x005B, 0x0060) or
-            Tokenizer._is_between(code_point, 0x007B, 0x00BF) or
-            Tokenizer._is_between(code_point, 0x02B9, 0x036F) or
-            Tokenizer._is_between(code_point, 0x2000, 0x2BFF) or
-            Tokenizer._is_between(code_point, 0x2E00, 0x2E7F)
+            Tokenizer._is_between(code_point, 0x0000, 0x002F)
+            or Tokenizer._is_between(code_point, 0x003A, 0x0040)
+            or Tokenizer._is_between(code_point, 0x005B, 0x0060)
+            or Tokenizer._is_between(code_point, 0x007B, 0x00BF)
+            or Tokenizer._is_between(code_point, 0x02B9, 0x036F)
+            or Tokenizer._is_between(code_point, 0x2000, 0x2BFF)
+            or Tokenizer._is_between(code_point, 0x2E00, 0x2E7F)
         )
-    
+
     @staticmethod
     def _is_between(value: int, from_val: int, to_val: int) -> bool:
         """
@@ -93,10 +83,10 @@ class Tokenizer:
         to: high range
         """
         return value >= from_val and value <= to_val
-    
+
     @staticmethod
     def _append_token(tokens: [Token], token: Token, end: int):
-        if (token != None):
+        if token != None:
             token.end = end
             token.normalized = token.text.lower()
             tokens.append(token)

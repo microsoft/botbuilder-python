@@ -10,4 +10,5 @@
 # --------------------------------------------------------------------------
 
 from ._connector_client_async import ConnectorClient
-__all__ = ['ConnectorClient']
+
+__all__ = ["ConnectorClient"]

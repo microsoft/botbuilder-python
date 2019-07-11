@@ -16,13 +16,16 @@ from msrest import Deserializer
 from requests import Session
 from requests.models import Response
 
-from botbuilder.ai.luis import (
-    LuisApplication,
-    LuisPredictionOptions,
-    LuisRecognizer,
-)
+from botbuilder.ai.luis import LuisApplication, LuisPredictionOptions, LuisRecognizer
 from botbuilder.ai.luis.luis_util import LuisUtil
-from botbuilder.core import BotAdapter, BotTelemetryClient, IntentScore, RecognizerResult, TopIntent, TurnContext
+from botbuilder.core import (
+    BotAdapter,
+    BotTelemetryClient,
+    IntentScore,
+    RecognizerResult,
+    TopIntent,
+    TurnContext,
+)
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.schema import (
     Activity,
@@ -641,7 +644,9 @@ class LuisRecognizerTest(AsyncTestCase):
         )
 
         luis_prediction_options = LuisPredictionOptions(
-            log_personal_information=True, include_all_intents=True, include_instance_data=True
+            log_personal_information=True,
+            include_all_intents=True,
+            include_instance_data=True,
         )
 
         # Assert

@@ -2,18 +2,28 @@
 # Licensed under the MIT License.
 """Main dialog. """
 from typing import Dict
-from botbuilder.dialogs import ComponentDialog, WaterfallDialog, \
-    WaterfallStepContext, DialogTurnResult
+from botbuilder.dialogs import (
+    ComponentDialog,
+    WaterfallDialog,
+    WaterfallStepContext,
+    DialogTurnResult,
+)
 from botbuilder.dialogs.prompts import TextPrompt, PromptOptions
 from botbuilder.core import MessageFactory
 from model_corebot101.booking_details import BookingDetails
 from model_corebot101.language_helper import LanguageHelper
 from .booking_dialog import BookingDialog
 
-#pylint:disable=line-too-long
+# pylint:disable=line-too-long
 class MainDialog(ComponentDialog):
     """Main dialog."""
-    def __init__(self, configuration: Dict[str, object], dialog_id: str = None, language_helper: LanguageHelper = None):
+
+    def __init__(
+        self,
+        configuration: Dict[str, object],
+        dialog_id: str = None,
+        language_helper: LanguageHelper = None,
+    ):
         super(MainDialog, self).__init__(dialog_id or MainDialog.__name__)
 
         self._configuration = configuration
@@ -21,13 +31,13 @@ class MainDialog(ComponentDialog):
 
         self.add_dialog(TextPrompt(TextPrompt.__name__))
         self.add_dialog(BookingDialog())
-        self.add_dialog(WaterfallDialog('WFDialog', [
-            self.intro_step,
-            self.act_step,
-            self.final_step
-        ]))
+        self.add_dialog(
+            WaterfallDialog(
+                "WFDialog", [self.intro_step, self.act_step, self.final_step]
+            )
+        )
 
-        self.initial_dialog_id = 'WFDialog'
+        self.initial_dialog_id = "WFDialog"
 
         # Initialize language models if we're not using service
         self._language_helper = LanguageHelper()
@@ -36,9 +46,12 @@ class MainDialog(ComponentDialog):
 
     async def intro_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
         """Initial prompt."""
-        return await step_context.prompt(TextPrompt.__name__, PromptOptions(
-            prompt=MessageFactory.text("What can I help you with today?")))
-
+        return await step_context.prompt(
+            TextPrompt.__name__,
+            PromptOptions(
+                prompt=MessageFactory.text("What can I help you with today?")
+            ),
+        )
 
     async def act_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
         """Use language understanding to gather details about booking.
@@ -49,9 +62,13 @@ class MainDialog(ComponentDialog):
         if step_context.result is not None:
             utterance = step_context.context.activity.text
             if not self._configuration["USE_MODEL_RUNTIME_SERVICE"]:
-                booking_details = await self._language_helper.excecute_query_inproc(utterance)
+                booking_details = await self._language_helper.excecute_query_inproc(
+                    utterance
+                )
             else:
-                booking_details = await self._language_helper.excecute_query_service(self._configuration, utterance)
+                booking_details = await self._language_helper.excecute_query_service(
+                    self._configuration, utterance
+                )
         else:
             booking_details = BookingDetails()
 
@@ -71,10 +88,12 @@ class MainDialog(ComponentDialog):
 
             # Now we have all the booking details call the booking service.
             # If the call to the booking service was successful tell the user.
-            #time_property = Timex(result.travel_date)
-            #travel_date_msg = time_property.to_natural_language(datetime.now())
-            msg = f'I have you booked to {result.destination} from'\
-                f' {result.origin} on {result.travel_date}.'
+            # time_property = Timex(result.travel_date)
+            # travel_date_msg = time_property.to_natural_language(datetime.now())
+            msg = (
+                f"I have you booked to {result.destination} from"
+                f" {result.origin} on {result.travel_date}."
+            )
             await step_context.context.send_activity(MessageFactory.text(msg))
         else:
             await step_context.context.send_activity(MessageFactory.text("Thank you."))

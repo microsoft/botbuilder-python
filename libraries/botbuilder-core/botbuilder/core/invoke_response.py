@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+
 class InvokeResponse:
     """
     Tuple class containing an HTTP Status Code and a JSON Serializable

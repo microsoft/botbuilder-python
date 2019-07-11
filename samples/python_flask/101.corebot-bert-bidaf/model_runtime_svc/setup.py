@@ -27,12 +27,9 @@ setup(
     keywords="botframework azure botbuilder",
     long_description=package_info["__summary__"],
     license=package_info["__license__"],
-    packages=[
-        "model_runtime_svc_corebot101",
-        "model_runtime_svc_corebot101.handlers"
-        ],
+    packages=["model_runtime_svc_corebot101", "model_runtime_svc_corebot101.handlers"],
     install_requires=REQUIRES,
-    dependency_links=['https://github.com/pytorch/pytorch'],
+    dependency_links=["https://github.com/pytorch/pytorch"],
     include_package_data=True,
     classifiers=[
         "Programming Language :: Python :: 3.6",
@@ -41,5 +38,5 @@ setup(
         "Operating System :: OS Independent",
         "Development Status :: 3 - Alpha",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
-    ]
+    ],
 )

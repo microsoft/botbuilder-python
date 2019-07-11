@@ -14,6 +14,6 @@ class SortedValue:
 
         index: The values original position within its unsorted array.
         """
-        
+
         self.value = value
         self.index = index

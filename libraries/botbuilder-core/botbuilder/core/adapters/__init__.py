@@ -7,6 +7,4 @@
 
 from .test_adapter import TestAdapter, TestFlow
 
-__all__ = [
-            "TestAdapter", 
-            "TestFlow"]
+__all__ = ["TestAdapter", "TestFlow"]

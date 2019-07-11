@@ -11,12 +11,12 @@ from .qna_telemetry_constants import QnATelemetryConstants
 from .qnamaker_trace_info import QnAMakerTraceInfo
 
 __all__ = [
-    'Metadata',
-    'QueryResult',
-    'QnAMaker',
-    'QnAMakerEndpoint',
-    'QnAMakerOptions',
-    'QnAMakerTelemetryClient',
-    'QnAMakerTraceInfo',
-    'QnATelemetryConstants',
+    "Metadata",
+    "QueryResult",
+    "QnAMaker",
+    "QnAMakerEndpoint",
+    "QnAMakerOptions",
+    "QnAMakerTelemetryClient",
+    "QnAMakerTraceInfo",
+    "QnATelemetryConstants",
 ]

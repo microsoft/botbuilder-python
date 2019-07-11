@@ -1,16 +1,12 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+
 class ModelResult:
     """Contains recognition result information."""
 
     def __init__(
-        self,
-        text: str,
-        start: int,
-        end: int,
-        type_name: str,
-        resolution: object
+        self, text: str, start: int, end: int, type_name: str, resolution: object
     ):
         """
         Parameters:

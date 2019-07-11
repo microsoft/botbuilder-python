@@ -10,13 +10,16 @@ from .dialog_instance import DialogInstance
 from .dialog import Dialog
 from botbuilder.core.turn_context import TurnContext
 
-class DialogContext():
-    def __init__(self, dialog_set: object, turn_context: TurnContext, state: DialogState):
+
+class DialogContext:
+    def __init__(
+        self, dialog_set: object, turn_context: TurnContext, state: DialogState
+    ):
         if dialog_set is None:
-            raise TypeError('DialogContext(): dialog_set cannot be None.')
+            raise TypeError("DialogContext(): dialog_set cannot be None.")
         # TODO: Circular dependency with dialog_set: Check type.
         if turn_context is None:
-            raise TypeError('DialogContext(): turn_context cannot be None.')
+            raise TypeError("DialogContext(): turn_context cannot be None.")
         self._turn_context = turn_context
         self._dialogs = dialog_set
         # self._id = dialog_id;
@@ -29,7 +32,7 @@ class DialogContext():
 
         :param:
         :return str:
-        """    
+        """
         return self._dialogs
 
     @property
@@ -38,7 +41,7 @@ class DialogContext():
 
         :param:
         :return str:
-        """    
+        """
         return self._turn_context
 
     @property
@@ -47,9 +50,8 @@ class DialogContext():
 
         :param:
         :return str:
-        """    
+        """
         return self._stack
-
 
     @property
     def active_dialog(self):
@@ -57,34 +59,35 @@ class DialogContext():
 
         :param:
         :return str:
-        """    
+        """
         if self._stack != None and len(self._stack) > 0:
             return self._stack[0]
         return None
 
-
-    
     async def begin_dialog(self, dialog_id: str, options: object = None):
         """
         Pushes a new dialog onto the dialog stack.
         :param dialog_id: ID of the dialog to start..
         :param options: (Optional) additional argument(s) to pass to the dialog being started.
         """
-        if (not dialog_id):
-            raise TypeError('Dialog(): dialogId cannot be None.')
+        if not dialog_id:
+            raise TypeError("Dialog(): dialogId cannot be None.")
         # Look up dialog
         dialog = await self.find_dialog(dialog_id)
         if dialog is None:
-            raise Exception("'DialogContext.begin_dialog(): A dialog with an id of '%s' wasn't found."
-                    " The dialog must be included in the current or parent DialogSet."
-                    " For example, if subclassing a ComponentDialog you can call add_dialog() within your constructor." % dialog_id)
+            raise Exception(
+                "'DialogContext.begin_dialog(): A dialog with an id of '%s' wasn't found."
+                " The dialog must be included in the current or parent DialogSet."
+                " For example, if subclassing a ComponentDialog you can call add_dialog() within your constructor."
+                % dialog_id
+            )
         # Push new instance onto stack
         instance = DialogInstance()
         instance.id = dialog_id
         instance.state = {}
 
-        self._stack.insert(0,(instance))
-        
+        self._stack.insert(0, (instance))
+
         # Call dialog's begin_dialog() method
         return await dialog.begin_dialog(self, options)
 
@@ -97,14 +100,13 @@ class DialogContext():
         :param options: Contains a Prompt, potentially a RetryPrompt and if using ChoicePrompt, Choices.
         :return:
         """
-        if (not dialog_id):
-            raise TypeError('DialogContext.prompt(): dialogId cannot be None.')
+        if not dialog_id:
+            raise TypeError("DialogContext.prompt(): dialogId cannot be None.")
 
-        if (not options):
-            raise TypeError('DialogContext.prompt(): options cannot be None.')
+        if not options:
+            raise TypeError("DialogContext.prompt(): options cannot be None.")
 
         return await self.begin_dialog(dialog_id, options)
-
 
     async def continue_dialog(self):
         """
@@ -118,7 +120,10 @@ class DialogContext():
             # Look up dialog
             dialog = await self.find_dialog(self.active_dialog.id)
             if not dialog:
-                raise Exception("DialogContext.continue_dialog(): Can't continue dialog. A dialog with an id of '%s' wasn't found." % self.active_dialog.id)
+                raise Exception(
+                    "DialogContext.continue_dialog(): Can't continue dialog. A dialog with an id of '%s' wasn't found."
+                    % self.active_dialog.id
+                )
 
             # Continue execution of dialog
             return await dialog.continue_dialog(self)
@@ -145,13 +150,15 @@ class DialogContext():
             # Look up dialog
             dialog = await self.find_dialog(self.active_dialog.id)
             if not dialog:
-                raise Exception("DialogContext.EndDialogAsync(): Can't resume previous dialog. A dialog with an id of '%s' wasn't found." % self.active_dialog.id)
+                raise Exception(
+                    "DialogContext.EndDialogAsync(): Can't resume previous dialog. A dialog with an id of '%s' wasn't found."
+                    % self.active_dialog.id
+                )
 
             # Return result to previous dialog
             return await dialog.resume_dialog(self, DialogReason.EndCalled, result)
         else:
             return DialogTurnResult(DialogTurnStatus.Complete, result)
-
 
     async def cancel_all_dialogs(self):
         """
@@ -159,8 +166,8 @@ class DialogContext():
         :param result: (Optional) result to pass to the parent dialogs.
         :return:
         """
-        if (len(self.stack) > 0):
-            while (len(self.stack) > 0):
+        if len(self.stack) > 0:
+            while len(self.stack) > 0:
                 await self.end_active_dialog(DialogReason.CancelCalled)
             return DialogTurnResult(DialogTurnStatus.Cancelled)
         else:
@@ -175,11 +182,13 @@ class DialogContext():
         """
         dialog = await self.dialogs.find(dialog_id)
 
-        if (dialog == None and self.parent != None):
+        if dialog == None and self.parent != None:
             dialog = await self.parent.find_dialog(dialog_id)
         return dialog
 
-    async def replace_dialog(self, dialog_id: str, options: object = None) -> DialogTurnResult:
+    async def replace_dialog(
+        self, dialog_id: str, options: object = None
+    ) -> DialogTurnResult:
         """
         Ends the active dialog and starts a new dialog in its place. This is particularly useful
         for creating loops or redirecting to another dialog.
@@ -203,7 +212,10 @@ class DialogContext():
             # Look up dialog
             dialog = await self.find_dialog(self.active_dialog.id)
             if not dialog:
-                raise Exception("DialogSet.reprompt_dialog(): Can't find A dialog with an id of '%s'." % self.active_dialog.id)
+                raise Exception(
+                    "DialogSet.reprompt_dialog(): Can't find A dialog with an id of '%s'."
+                    % self.active_dialog.id
+                )
 
             # Ask dialog to re-prompt if supported
             await dialog.reprompt_dialog(self.context, self.active_dialog)

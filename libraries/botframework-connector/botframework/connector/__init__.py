@@ -17,4 +17,3 @@ from .version import VERSION
 __all__ = ["Channels", "ConnectorClient", "EmulatorApiClient"]
 
 __version__ = VERSION
-

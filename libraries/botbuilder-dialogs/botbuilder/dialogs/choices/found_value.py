@@ -1,15 +1,11 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+
 class FoundValue:
     """ Represents a result from matching user input against a list of choices """
 
-    def __init__(
-        self,
-        value: str,
-        index: int,
-        score: float,
-    ):
+    def __init__(self, value: str, index: int, score: float):
         """
         Parameters:
         ----------

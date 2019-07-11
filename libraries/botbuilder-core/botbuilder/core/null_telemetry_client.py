@@ -5,13 +5,19 @@ import traceback
 from .bot_telemetry_client import BotTelemetryClient, TelemetryDataPointType
 from typing import Dict
 
-class NullTelemetryClient(BotTelemetryClient):
 
+class NullTelemetryClient(BotTelemetryClient):
     def __init__(self):
         pass
-    
-    def track_pageview(self, name: str, url, duration: int = 0, properties : Dict[str, object]=None, 
-                        measurements: Dict[str, object]=None) -> None:
+
+    def track_pageview(
+        self,
+        name: str,
+        url,
+        duration: int = 0,
+        properties: Dict[str, object] = None,
+        measurements: Dict[str, object] = None,
+    ) -> None:
         """
         Send information about the page viewed in the application (a web page for instance).
         :param name: the name of the page that was viewed.
@@ -21,9 +27,15 @@ class NullTelemetryClient(BotTelemetryClient):
         :param measurements: the set of custom measurements the client wants to attach to this data item. (defaults to: None)
         """
         pass
-    
-    def track_exception(self, type: type = None, value : Exception =None, tb : traceback =None, 
-                        properties: Dict[str, object]=None, measurements: Dict[str, object]=None) -> None:
+
+    def track_exception(
+        self,
+        type: type = None,
+        value: Exception = None,
+        tb: traceback = None,
+        properties: Dict[str, object] = None,
+        measurements: Dict[str, object] = None,
+    ) -> None:
         """ 
         Send information about a single exception that occurred in the application.
         :param type: the type of the exception that was thrown.
@@ -34,8 +46,12 @@ class NullTelemetryClient(BotTelemetryClient):
         """
         pass
 
-    def track_event(self, name: str, properties: Dict[str, object] = None, 
-                    measurements: Dict[str, object] = None) -> None:
+    def track_event(
+        self,
+        name: str,
+        properties: Dict[str, object] = None,
+        measurements: Dict[str, object] = None,
+    ) -> None:
         """ 
         Send information about a single event that has occurred in the context of the application.
         :param name: the data to associate to this event.
@@ -44,9 +60,17 @@ class NullTelemetryClient(BotTelemetryClient):
         """
         pass
 
-    def track_metric(self, name: str, value: float, type: TelemetryDataPointType =None, 
-                    count: int =None, min: float=None, max: float=None, std_dev: float=None,
-                    properties: Dict[str, object]=None) -> NotImplemented:
+    def track_metric(
+        self,
+        name: str,
+        value: float,
+        type: TelemetryDataPointType = None,
+        count: int = None,
+        min: float = None,
+        max: float = None,
+        std_dev: float = None,
+        properties: Dict[str, object] = None,
+    ) -> NotImplemented:
         """
         Send information about a single metric data point that was captured for the application.
         :param name: The name of the metric that was captured.
@@ -69,10 +93,19 @@ class NullTelemetryClient(BotTelemetryClient):
         """
         pass
 
-    def track_request(self, name: str, url: str, success: bool, start_time: str=None, 
-                    duration: int=None, response_code: str =None, http_method: str=None, 
-                    properties: Dict[str, object]=None, measurements: Dict[str, object]=None, 
-                    request_id: str=None):
+    def track_request(
+        self,
+        name: str,
+        url: str,
+        success: bool,
+        start_time: str = None,
+        duration: int = None,
+        response_code: str = None,
+        http_method: str = None,
+        properties: Dict[str, object] = None,
+        measurements: Dict[str, object] = None,
+        request_id: str = None,
+    ):
         """
         Sends a single request that was captured for the application.
         :param name: The name for this request. All requests with the same name will be grouped together.
@@ -88,9 +121,19 @@ class NullTelemetryClient(BotTelemetryClient):
         """
         pass
 
-    def track_dependency(self, name:str, data:str, type:str=None, target:str=None, duration:int=None, 
-                        success:bool=None, result_code:str=None, properties:Dict[str, object]=None, 
-                        measurements:Dict[str, object]=None, dependency_id:str=None):
+    def track_dependency(
+        self,
+        name: str,
+        data: str,
+        type: str = None,
+        target: str = None,
+        duration: int = None,
+        success: bool = None,
+        result_code: str = None,
+        properties: Dict[str, object] = None,
+        measurements: Dict[str, object] = None,
+        dependency_id: str = None,
+    ):
         """
         Sends a single dependency telemetry that was captured for the application.
         :param name: the name of the command initiated with this dependency call. Low cardinality value. Examples are stored procedure name and URL path template.
@@ -105,4 +148,3 @@ class NullTelemetryClient(BotTelemetryClient):
         :param id: the id for this dependency call. If None, a new uuid will be generated. (defaults to: None)
         """
         pass
-

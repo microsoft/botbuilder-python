@@ -8,7 +8,4 @@
 from .about import __version__
 from .cosmosdb_storage import CosmosDbStorage, CosmosDbConfig, CosmosDbKeyEscape
 
-__all__ = ['CosmosDbStorage',
-           'CosmosDbConfig',
-           'CosmosDbKeyEscape',
-           '__version__']
+__all__ = ["CosmosDbStorage", "CosmosDbConfig", "CosmosDbKeyEscape", "__version__"]

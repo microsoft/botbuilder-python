@@ -8,6 +8,7 @@ from threading import current_thread
 # Map of thread id => POST body text
 _REQUEST_BODIES = {}
 
+
 def retrieve_flask_body():
     """ retrieve_flask_body
     Retrieve the POST body text from temporary cache.
@@ -17,7 +18,8 @@ def retrieve_flask_body():
     result = _REQUEST_BODIES.pop(current_thread().ident, None)
     return result
 
-class BotTelemetryMiddleware():
+
+class BotTelemetryMiddleware:
     """Bot Telemetry Middleware
     Save off the POST body to later populate bot-specific properties to
     add to Application Insights.
@@ -26,6 +28,7 @@ class BotTelemetryMiddleware():
        app = Flask(__name__)
        app.wsgi_app = BotTelemetryMiddleware(app.wsgi_app)
     """
+
     def __init__(self, app):
         self.app = app
 
@@ -36,13 +39,13 @@ class BotTelemetryMiddleware():
     def process_request(self, environ) -> bool:
         """Process the incoming Flask request."""
         # Bot Service doesn't handle anything over 256k
-        length = int(environ.get('CONTENT_LENGTH', '0'))
-        if length > 256*1024:
-            print(f'request too long - rejected')
+        length = int(environ.get("CONTENT_LENGTH", "0"))
+        if length > 256 * 1024:
+            print(f"request too long - rejected")
         else:
-            body_bytes = environ['wsgi.input'].read(length)
-            environ['wsgi.input'] = BytesIO(body_bytes)
-            body_unicode = body_bytes.decode('utf-8')
+            body_bytes = environ["wsgi.input"].read(length)
+            environ["wsgi.input"] = BytesIO(body_bytes)
+            body_unicode = body_bytes.decode("utf-8")
 
         # Sanity check JSON
         if body_unicode is not None:

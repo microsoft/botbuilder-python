@@ -20,13 +20,11 @@ class AadResourceUrls(Model):
     :type resource_urls: list[str]
     """
 
-    _attribute_map = {
-        'resource_urls': {'key': 'resourceUrls', 'type': '[str]'},
-    }
+    _attribute_map = {"resource_urls": {"key": "resourceUrls", "type": "[str]"}}
 
     def __init__(self, **kwargs):
         super(AadResourceUrls, self).__init__(**kwargs)
-        self.resource_urls = kwargs.get('resource_urls', None)
+        self.resource_urls = kwargs.get("resource_urls", None)
 
 
 class Error(Model):
@@ -41,16 +39,16 @@ class Error(Model):
     """
 
     _attribute_map = {
-        'code': {'key': 'code', 'type': 'str'},
-        'message': {'key': 'message', 'type': 'str'},
-        'inner_http_error': {'key': 'innerHttpError', 'type': 'InnerHttpError'},
+        "code": {"key": "code", "type": "str"},
+        "message": {"key": "message", "type": "str"},
+        "inner_http_error": {"key": "innerHttpError", "type": "InnerHttpError"},
     }
 
     def __init__(self, **kwargs):
         super(Error, self).__init__(**kwargs)
-        self.code = kwargs.get('code', None)
-        self.message = kwargs.get('message', None)
-        self.inner_http_error = kwargs.get('inner_http_error', None)
+        self.code = kwargs.get("code", None)
+        self.message = kwargs.get("message", None)
+        self.inner_http_error = kwargs.get("inner_http_error", None)
 
 
 class ErrorResponse(Model):
@@ -60,13 +58,11 @@ class ErrorResponse(Model):
     :type error: ~botframework.tokenapi.models.Error
     """
 
-    _attribute_map = {
-        'error': {'key': 'error', 'type': 'Error'},
-    }
+    _attribute_map = {"error": {"key": "error", "type": "Error"}}
 
     def __init__(self, **kwargs):
         super(ErrorResponse, self).__init__(**kwargs)
-        self.error = kwargs.get('error', None)
+        self.error = kwargs.get("error", None)
 
 
 class ErrorResponseException(HttpOperationError):
@@ -78,7 +74,9 @@ class ErrorResponseException(HttpOperationError):
 
     def __init__(self, deserialize, response, *args):
 
-        super(ErrorResponseException, self).__init__(deserialize, response, 'ErrorResponse', *args)
+        super(ErrorResponseException, self).__init__(
+            deserialize, response, "ErrorResponse", *args
+        )
 
 
 class InnerHttpError(Model):
@@ -91,14 +89,14 @@ class InnerHttpError(Model):
     """
 
     _attribute_map = {
-        'status_code': {'key': 'statusCode', 'type': 'int'},
-        'body': {'key': 'body', 'type': 'object'},
+        "status_code": {"key": "statusCode", "type": "int"},
+        "body": {"key": "body", "type": "object"},
     }
 
     def __init__(self, **kwargs):
         super(InnerHttpError, self).__init__(**kwargs)
-        self.status_code = kwargs.get('status_code', None)
-        self.body = kwargs.get('body', None)
+        self.status_code = kwargs.get("status_code", None)
+        self.body = kwargs.get("body", None)
 
 
 class TokenResponse(Model):
@@ -115,18 +113,18 @@ class TokenResponse(Model):
     """
 
     _attribute_map = {
-        'channel_id': {'key': 'channelId', 'type': 'str'},
-        'connection_name': {'key': 'connectionName', 'type': 'str'},
-        'token': {'key': 'token', 'type': 'str'},
-        'expiration': {'key': 'expiration', 'type': 'str'},
+        "channel_id": {"key": "channelId", "type": "str"},
+        "connection_name": {"key": "connectionName", "type": "str"},
+        "token": {"key": "token", "type": "str"},
+        "expiration": {"key": "expiration", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(TokenResponse, self).__init__(**kwargs)
-        self.channel_id = kwargs.get('channel_id', None)
-        self.connection_name = kwargs.get('connection_name', None)
-        self.token = kwargs.get('token', None)
-        self.expiration = kwargs.get('expiration', None)
+        self.channel_id = kwargs.get("channel_id", None)
+        self.connection_name = kwargs.get("connection_name", None)
+        self.token = kwargs.get("token", None)
+        self.expiration = kwargs.get("expiration", None)
 
 
 class TokenStatus(Model):
@@ -145,15 +143,20 @@ class TokenStatus(Model):
     """
 
     _attribute_map = {
-        'channel_id': {'key': 'channelId', 'type': 'str'},
-        'connection_name': {'key': 'connectionName', 'type': 'str'},
-        'has_token': {'key': 'hasToken', 'type': 'bool'},
-        'service_provider_display_name': {'key': 'serviceProviderDisplayName', 'type': 'str'},
+        "channel_id": {"key": "channelId", "type": "str"},
+        "connection_name": {"key": "connectionName", "type": "str"},
+        "has_token": {"key": "hasToken", "type": "bool"},
+        "service_provider_display_name": {
+            "key": "serviceProviderDisplayName",
+            "type": "str",
+        },
     }
 
     def __init__(self, **kwargs):
         super(TokenStatus, self).__init__(**kwargs)
-        self.channel_id = kwargs.get('channel_id', None)
-        self.connection_name = kwargs.get('connection_name', None)
-        self.has_token = kwargs.get('has_token', None)
-        self.service_provider_display_name = kwargs.get('service_provider_display_name', None)
+        self.channel_id = kwargs.get("channel_id", None)
+        self.connection_name = kwargs.get("connection_name", None)
+        self.has_token = kwargs.get("has_token", None)
+        self.service_provider_display_name = kwargs.get(
+            "service_provider_display_name", None
+        )

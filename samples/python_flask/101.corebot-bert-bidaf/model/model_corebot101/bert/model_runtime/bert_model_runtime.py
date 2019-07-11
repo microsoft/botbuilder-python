@@ -12,11 +12,19 @@ from pytorch_pretrained_bert import BertForSequenceClassification, BertTokenizer
 from model_corebot101.bert.common.bert_util import BertUtil
 from model_corebot101.bert.common.input_example import InputExample
 
+
 class BertModelRuntime:
     """Model runtime for the Bert model."""
-    def __init__(self, model_dir: str, label_list: List[str],
-                 max_seq_length: int = 128, output_mode: str = "classification",
-                 no_cuda: bool = False, do_lower_case: bool = True):
+
+    def __init__(
+        self,
+        model_dir: str,
+        label_list: List[str],
+        max_seq_length: int = 128,
+        output_mode: str = "classification",
+        no_cuda: bool = False,
+        do_lower_case: bool = True,
+    ):
         self.model_dir = model_dir
         self.label_list = label_list
         self.num_labels = len(self.label_list)
@@ -31,9 +39,9 @@ class BertModelRuntime:
     def init_bert(bert_model_dir: str) -> bool:
         """ Handle any one-time initlization """
         if os.path.isdir(bert_model_dir):
-            print('bert model directory already present..', file=sys.stderr)
+            print("bert model directory already present..", file=sys.stderr)
         else:
-            print('Creating bert model directory..', file=sys.stderr)
+            print("Creating bert model directory..", file=sys.stderr)
             os.makedirs(bert_model_dir, exist_ok=True)
         return True
 

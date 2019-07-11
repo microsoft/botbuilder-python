@@ -5,8 +5,10 @@
 Configuration parameters for the bot.
 """
 
+
 class DefaultConfig(object):
     """Bot configuration parameters."""
+
     # TCP port that the bot listens on (default:3978)
     PORT = 3978
 

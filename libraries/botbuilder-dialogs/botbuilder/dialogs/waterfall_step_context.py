@@ -9,10 +9,21 @@ from .dialog_state import DialogState
 
 from typing import Dict
 
-class WaterfallStepContext(DialogContext):
 
-    def __init__(self, parent, dc: DialogContext, options: object, values: Dict[str, object], index: int, reason: DialogReason, result: object = None):
-        super(WaterfallStepContext, self).__init__(dc.dialogs, dc.context, DialogState(dc.stack))
+class WaterfallStepContext(DialogContext):
+    def __init__(
+        self,
+        parent,
+        dc: DialogContext,
+        options: object,
+        values: Dict[str, object],
+        index: int,
+        reason: DialogReason,
+        result: object = None,
+    ):
+        super(WaterfallStepContext, self).__init__(
+            dc.dialogs, dc.context, DialogState(dc.stack)
+        )
         self._wf_parent = parent
         self._next_called = False
         self._index = index
@@ -25,23 +36,32 @@ class WaterfallStepContext(DialogContext):
     @property
     def index(self) -> int:
         return self._index
+
     @property
     def options(self) -> object:
         return self._options
+
     @property
-    def reason(self)->DialogReason:
+    def reason(self) -> DialogReason:
         return self._reason
+
     @property
     def result(self) -> object:
         return self._result
+
     @property
-    def values(self) -> Dict[str,object]:
+    def values(self) -> Dict[str, object]:
         return self._values
-    
+
     async def next(self, result: object) -> DialogTurnResult:
         if self._next_called is True:
-            raise Exception("WaterfallStepContext.next(): method already called for dialog and step '%s'[%s]." % (self._wf_parent.id, self._index))
-        
+            raise Exception(
+                "WaterfallStepContext.next(): method already called for dialog and step '%s'[%s]."
+                % (self._wf_parent.id, self._index)
+            )
+
         # Trigger next step
         self._next_called = True
-        return await self._wf_parent.resume_dialog(self, DialogReason.NextCalled, result)
+        return await self._wf_parent.resume_dialog(
+            self, DialogReason.NextCalled, result
+        )
