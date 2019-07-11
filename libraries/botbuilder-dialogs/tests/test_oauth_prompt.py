@@ -176,3 +176,40 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
 
         step1 = await adapter.send(magic_code)
         await step1.assert_reply(inspector)
+
+    async def test_should_add_accepting_input_hint_oauth_prompt(self):
+        connection_name = "myConnection"
+        called = False
+
+        async def callback_handler(turn_context: TurnContext):
+            nonlocal called
+            dc = await dialogs.create_context(turn_context)
+
+            await dc.continue_dialog()
+            await dc.prompt('prompt', PromptOptions(prompt=Activity(), retry_prompt=Activity()))
+
+            self.assertTrue(dc.active_dialog.state['options'].prompt.input_hint == InputHints.accepting_input)
+            self.assertTrue(dc.active_dialog.state['options'].retry_prompt.input_hint == InputHints.accepting_input)
+
+            await convo_state.save_changes(turn_context)
+            called = True
+
+        # Initialize TestAdapter.
+        adapter = TestAdapter(callback_handler)
+
+        # Create ConversationState with MemoryStorage and register the state as middleware.
+        convo_state = ConversationState(MemoryStorage())
+
+        # Create a DialogState property, DialogSet and AttachmentPrompt.
+        dialog_state = convo_state.create_property('dialogState')
+        dialogs = DialogSet(dialog_state)
+        dialogs.add(OAuthPrompt('prompt', OAuthPromptSettings(
+            connection_name,
+            'Login',
+            None,
+            300000
+        )))
+
+        await adapter.send('Hello')
+        self.assertTrue(called)
+

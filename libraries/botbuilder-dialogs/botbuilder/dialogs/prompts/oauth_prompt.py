@@ -63,7 +63,7 @@ class OAuthPrompt(Dialog):
             options.prompt.input_hint = InputHints.accepting_input
 
         if options.retry_prompt and not options.retry_prompt.input_hint:
-            options.prompt.input_hint = InputHints.accepting_input
+            options.retry_prompt.input_hint = InputHints.accepting_input
 
         # Initialize prompt state
         timeout = self._settings.timeout if isinstance(self._settings.timeout, int) else 900000
