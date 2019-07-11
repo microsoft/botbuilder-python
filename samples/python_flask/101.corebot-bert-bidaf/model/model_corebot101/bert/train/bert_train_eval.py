@@ -317,7 +317,7 @@ class BertTrainEval:
         if self.args.cleanup_output_dir:
             if os.path.exists(self.args.model_dir):
                 shutil.rmtree(self.args.model_dir)
-                
+
         if (
             os.path.exists(self.args.model_dir)
             and os.listdir(self.args.model_dir)
@@ -343,7 +343,9 @@ class BertTrainEval:
         self.train_examples = None
         self.num_train_optimization_steps = None
         if self.args.do_train:
-            self.train_examples = self.processor.get_train_examples(self.args.training_data_dir)
+            self.train_examples = self.processor.get_train_examples(
+                self.args.training_data_dir
+            )
             self.num_train_optimization_steps = (
                 int(
                     len(self.train_examples)

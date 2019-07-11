@@ -40,6 +40,7 @@ class CredentialProvider:
         """
         raise NotImplementedError
 
+
 class SimpleCredentialProvider(CredentialProvider):
     def __init__(self, app_id: str, password: str):
         self.app_id = app_id

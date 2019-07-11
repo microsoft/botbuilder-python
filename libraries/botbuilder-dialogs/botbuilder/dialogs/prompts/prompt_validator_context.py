@@ -7,8 +7,13 @@ from .prompt_recognizer_result import PromptRecognizerResult
 
 
 class PromptValidatorContext:
-    def __init__(self, turn_context: TurnContext, recognized: PromptRecognizerResult, 
-                 state: Dict[str, object], options: PromptOptions): 
+    def __init__(
+        self,
+        turn_context: TurnContext,
+        recognized: PromptRecognizerResult,
+        state: Dict[str, object],
+        options: PromptOptions,
+    ):
         """Creates contextual information passed to a custom `PromptValidator`.
         Parameters
         ----------
@@ -34,4 +39,5 @@ class PromptValidatorContext:
         Gets the number of times the prompt has been executed.
         """
         from botbuilder.dialogs.prompts import Prompt
+
         return self.state.get(Prompt.ATTEMPT_COUNT_KEY, 0)

@@ -8,12 +8,10 @@ REQUIRES = [
     "azure-cognitiveservices-language-luis==0.2.0",
     "botbuilder-schema>=4.4.0b1",
     "botbuilder-core>=4.4.0b1",
-    "aiohttp>=3.5.4"
+    "aiohttp>=3.5.4",
 ]
 
-TESTS_REQUIRES = [
-    "aiounittest>=1.1.0"
-]
+TESTS_REQUIRES = ["aiounittest>=1.1.0"]
 
 root = os.path.abspath(os.path.dirname(__file__))
 
@@ -22,7 +20,7 @@ with open(os.path.join(root, "botbuilder", "ai", "about.py")) as f:
     info = f.read()
     exec(info, package_info)
 
-with open(os.path.join(root, 'README.rst'), encoding='utf-8') as f:
+with open(os.path.join(root, "README.rst"), encoding="utf-8") as f:
     long_description = f.read()
 
 setup(
@@ -33,7 +31,7 @@ setup(
     description=package_info["__description__"],
     keywords="botbuilder-ai LUIS QnAMaker bots ai botframework botbuilder",
     long_description=long_description,
-    long_description_content_type='text/x-rst',
+    long_description_content_type="text/x-rst",
     license=package_info["__license__"],
     packages=["botbuilder.ai", "botbuilder.ai.qna", "botbuilder.ai.luis"],
     install_requires=REQUIRES + TESTS_REQUIRES,
@@ -46,5 +44,5 @@ setup(
         "Operating System :: OS Independent",
         "Development Status :: 3 - Alpha",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
-    ]
+    ],
 )

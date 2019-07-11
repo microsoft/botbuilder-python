@@ -3,6 +3,7 @@
 
 from enum import Enum
 
+
 class Channels(str, Enum):
     """
     Ids of channels supported by the Bot Builder.

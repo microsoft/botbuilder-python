@@ -11,6 +11,7 @@ from .prompt_options import PromptOptions
 from .prompt_recognizer_result import PromptRecognizerResult
 from .prompt_validator_context import PromptValidatorContext
 
+
 class AttachmentPrompt(Prompt):
     """
     Prompts a user to upload attachments like images.
@@ -20,36 +21,35 @@ class AttachmentPrompt(Prompt):
 
     def __init__(self, dialog_id: str, validator: Callable[[Attachment], bool] = None):
         super().__init__(dialog_id, validator)
-    
+
     async def on_prompt(
         self,
         context: TurnContext,
         state: Dict[str, object],
         options: PromptOptions,
-        is_retry: bool
+        is_retry: bool,
     ):
         if not context:
-            raise TypeError('AttachmentPrompt.on_prompt(): TurnContext cannot be None.')
+            raise TypeError("AttachmentPrompt.on_prompt(): TurnContext cannot be None.")
 
         if not isinstance(options, PromptOptions):
-            raise TypeError('AttachmentPrompt.on_prompt(): PromptOptions are required for Attachment Prompt dialogs.')
-        
+            raise TypeError(
+                "AttachmentPrompt.on_prompt(): PromptOptions are required for Attachment Prompt dialogs."
+            )
+
         if is_retry and options.retry_prompt:
             options.retry_prompt.input_hint = InputHints.expecting_input
             await context.send_activity(options.retry_prompt)
         elif options.prompt:
             options.prompt.input_hint = InputHints.expecting_input
             await context.send_activity(options.prompt)
-    
+
     async def on_recognize(
-        self,
-        context: TurnContext,
-        state: Dict[str, object],
-        options: PromptOptions
+        self, context: TurnContext, state: Dict[str, object], options: PromptOptions
     ) -> PromptRecognizerResult:
         if not context:
-            raise TypeError('AttachmentPrompt.on_recognize(): context cannot be None.')
-        
+            raise TypeError("AttachmentPrompt.on_recognize(): context cannot be None.")
+
         result = PromptRecognizerResult()
 
         if context.activity.type == ActivityTypes.message:
@@ -57,5 +57,5 @@ class AttachmentPrompt(Prompt):
             if isinstance(message.attachments, list) and len(message.attachments) > 0:
                 result.succeeded = True
                 result.value = message.attachments
-        
+
         return result

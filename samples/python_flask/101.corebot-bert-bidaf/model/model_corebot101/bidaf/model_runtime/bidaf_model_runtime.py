@@ -12,27 +12,22 @@ from onnxruntime import InferenceSession
 
 # pylint:disable=line-too-long
 class BidafModelRuntime:
-    def __init__(
-        self,
-        targets: List[str],
-        queries: Dict[str, str],
-        model_dir: str
-    ):
+    def __init__(self, targets: List[str], queries: Dict[str, str], model_dir: str):
         self.queries = queries
         self.targets = targets
-        bidaf_model = os.path.abspath(os.path.join(model_dir, 'bidaf.onnx'))
-        print(f'Loading Inference session from {bidaf_model}..', file=sys.stderr)
+        bidaf_model = os.path.abspath(os.path.join(model_dir, "bidaf.onnx"))
+        print(f"Loading Inference session from {bidaf_model}..", file=sys.stderr)
         self.session = InferenceSession(bidaf_model)
-        print(f'Inference session loaded..', file=sys.stderr)
+        print(f"Inference session loaded..", file=sys.stderr)
         self.processed_queries = self._process_queries()
-        print(f'Processed queries..', file=sys.stderr)
+        print(f"Processed queries..", file=sys.stderr)
 
     @staticmethod
     def init_bidaf(bidaf_model_dir: str, download_ntlk_punkt: bool = False) -> bool:
         if os.path.isdir(bidaf_model_dir):
-            print('bidaf model directory already present..', file=sys.stderr)
+            print("bidaf model directory already present..", file=sys.stderr)
         else:
-            print('Creating bidaf model directory..', file=sys.stderr)
+            print("Creating bidaf model directory..", file=sys.stderr)
             os.makedirs(bidaf_model_dir, exist_ok=True)
 
         # Download Punkt Sentence Tokenizer
@@ -41,19 +36,21 @@ class BidafModelRuntime:
             nltk.download("punkt")
 
         # Download bidaf onnx model
-        onnx_model_file = os.path.abspath(os.path.join(bidaf_model_dir, 'bidaf.onnx'))
+        onnx_model_file = os.path.abspath(os.path.join(bidaf_model_dir, "bidaf.onnx"))
 
-        print(f'Checking file {onnx_model_file}..', file=sys.stderr)
+        print(f"Checking file {onnx_model_file}..", file=sys.stderr)
         if os.path.isfile(onnx_model_file):
-            print('bidaf.onnx downloaded already!', file=sys.stderr)
+            print("bidaf.onnx downloaded already!", file=sys.stderr)
         else:
-            print('Downloading bidaf.onnx...', file=sys.stderr)
-            response = requests.get('https://onnxzoo.blob.core.windows.net/models/opset_9/bidaf/bidaf.onnx', stream=True)
-            with open(onnx_model_file, 'wb') as f:
+            print("Downloading bidaf.onnx...", file=sys.stderr)
+            response = requests.get(
+                "https://onnxzoo.blob.core.windows.net/models/opset_9/bidaf/bidaf.onnx",
+                stream=True,
+            )
+            with open(onnx_model_file, "wb") as f:
                 response.raw.decode_content = True
                 shutil.copyfileobj(response.raw, f)
         return True
-
 
     def serve(self, context: str) -> Dict[str, str]:
         result = {}
@@ -75,7 +72,6 @@ class BidafModelRuntime:
             result[target] = BidafModelRuntime._convert_result(result_item)
 
         return result
-
 
     def _process_queries(self) -> Dict[str, Tuple[np.ndarray, np.ndarray]]:
         result = {}

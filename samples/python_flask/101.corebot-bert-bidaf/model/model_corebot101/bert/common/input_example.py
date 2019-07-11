@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+
 class InputExample(object):
     """A single training/test example for sequence classification."""
 

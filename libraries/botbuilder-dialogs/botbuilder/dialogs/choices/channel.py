@@ -36,7 +36,11 @@ class Channel(object):
             Channels.direct_line: 100,
             Channels.webchat: 100,
         }
-        return button_cnt <= max_actions[channel_id] if channel_id in max_actions else False
+        return (
+            button_cnt <= max_actions[channel_id]
+            if channel_id in max_actions
+            else False
+        )
 
     @staticmethod
     def supports_card_actions(channel_id: str, button_cnt: int = 100) -> bool:
@@ -61,7 +65,11 @@ class Channel(object):
             Channels.webchat: 100,
             Channels.cortana: 100,
         }
-        return button_cnt <= max_actions[channel_id] if channel_id in max_actions else False
+        return (
+            button_cnt <= max_actions[channel_id]
+            if channel_id in max_actions
+            else False
+        )
 
     @staticmethod
     def has_message_feed(channel_id: str) -> bool:

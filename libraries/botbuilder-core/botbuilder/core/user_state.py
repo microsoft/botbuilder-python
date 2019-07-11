@@ -11,9 +11,11 @@ class UserState(BotState):
     Reads and writes user state for your bot to storage.
     """
 
-    no_key_error_message = 'UserState: channel_id and/or conversation missing from context.activity.'
+    no_key_error_message = (
+        "UserState: channel_id and/or conversation missing from context.activity."
+    )
 
-    def __init__(self, storage: Storage, namespace=''):
+    def __init__(self, storage: Storage, namespace=""):
         """
         Creates a new UserState instance.
         :param storage:
@@ -29,14 +31,17 @@ class UserState(BotState):
         :param context:
         :return:
         """
-        channel_id = context.activity.channel_id or self.__raise_type_error("invalid activity-missing channelId")
+        channel_id = context.activity.channel_id or self.__raise_type_error(
+            "invalid activity-missing channelId"
+        )
         user_id = context.activity.from_property.id or self.__raise_type_error(
-                                                        "invalid activity-missing from_property.id")
+            "invalid activity-missing from_property.id"
+        )
 
         storage_key = None
         if channel_id and user_id:
             storage_key = "%s/users/%s" % (channel_id, user_id)
         return storage_key
 
-    def __raise_type_error(self, err: str = 'NoneType found while expecting value'):
+    def __raise_type_error(self, err: str = "NoneType found while expecting value"):
         raise TypeError(err)

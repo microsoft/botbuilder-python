@@ -33,12 +33,12 @@ setup(
     license=package_info["__license__"],
     packages=[
         "model_corebot101.bert.train",
-        "model_corebot101.bert.common", 
-        "model_corebot101.bert.model_runtime", 
-        "model_corebot101.bidaf.model_runtime"
-        ],
+        "model_corebot101.bert.common",
+        "model_corebot101.bert.model_runtime",
+        "model_corebot101.bidaf.model_runtime",
+    ],
     install_requires=REQUIRES,
-    dependency_links=['https://github.com/pytorch/pytorch'],
+    dependency_links=["https://github.com/pytorch/pytorch"],
     include_package_data=True,
     classifiers=[
         "Programming Language :: Python :: 3.6",
@@ -47,5 +47,5 @@ setup(
         "Operating System :: OS Independent",
         "Development Status :: 3 - Alpha",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
-    ]
+    ],
 )

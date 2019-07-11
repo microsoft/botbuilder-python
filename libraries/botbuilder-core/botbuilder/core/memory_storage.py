@@ -46,24 +46,32 @@ class MemoryStorage(Storage):
                         if "eTag" in old_state:
                             old_state_etag = old_state["eTag"]
                     elif old_state.e_tag:
-                            old_state_etag = old_state.e_tag
-                
+                        old_state_etag = old_state.e_tag
+
                 new_state = new_value
-                
+
                 # Set ETag if applicable
-                if hasattr(new_value, 'e_tag'):
-                    if old_state_etag is not None and new_value.e_tag != "*" and new_value.e_tag < old_state_etag:
-                        raise KeyError("Etag conflict.\nOriginal: %s\r\nCurrent: %s" % \
-                                        (new_value.e_tag, old_state_etag) )
+                if hasattr(new_value, "e_tag"):
+                    if (
+                        old_state_etag is not None
+                        and new_value.e_tag != "*"
+                        and new_value.e_tag < old_state_etag
+                    ):
+                        raise KeyError(
+                            "Etag conflict.\nOriginal: %s\r\nCurrent: %s"
+                            % (new_value.e_tag, old_state_etag)
+                        )
                     new_state.e_tag = str(self._e_tag)
                     self._e_tag += 1
                 self.memory[key] = deepcopy(new_state)
-                
+
         except Exception as e:
             raise e
 
-    #TODO: Check if needed, if not remove
-    def __should_write_changes(self, old_value: StoreItem, new_value: StoreItem) -> bool:
+    # TODO: Check if needed, if not remove
+    def __should_write_changes(
+        self, old_value: StoreItem, new_value: StoreItem
+    ) -> bool:
         """
         Helper method that compares two StoreItems and their e_tags and returns True if the new_value should overwrite
         the old_value. Otherwise returns False.
@@ -73,14 +81,18 @@ class MemoryStorage(Storage):
         """
 
         # If old_value is none or if the new_value's e_tag is '*', then we return True
-        if old_value is None or (hasattr(new_value, 'e_tag') and new_value.e_tag == '*'):
+        if old_value is None or (
+            hasattr(new_value, "e_tag") and new_value.e_tag == "*"
+        ):
             return True
         # If none of the above cases, we verify that e_tags exist on both arguments
-        elif hasattr(new_value, 'e_tag') and hasattr(old_value, 'e_tag'):
+        elif hasattr(new_value, "e_tag") and hasattr(old_value, "e_tag"):
             if new_value.e_tag is not None and old_value.e_tag is None:
                 return True
             # And then we do a comparing between the old and new e_tag values to decide if the new data will be written
-            if old_value.e_tag == new_value.e_tag or int(old_value.e_tag) <= int(new_value.e_tag):
+            if old_value.e_tag == new_value.e_tag or int(old_value.e_tag) <= int(
+                new_value.e_tag
+            ):
                 return True
             else:
                 return False

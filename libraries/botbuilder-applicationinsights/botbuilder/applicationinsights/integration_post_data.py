@@ -7,6 +7,7 @@ import json
 from botbuilder.applicationinsights.django import retrieve_bot_body
 from botbuilder.applicationinsights.flask import retrieve_flask_body
 
+
 class IntegrationPostData:
     """
     Retrieve the POST body from the underlying framework:
@@ -23,6 +24,7 @@ class IntegrationPostData:
       body = botdata.activity_json  # Get current request body as json object
       activity_id = body[id] # Get the ID from the POST body
     """
+
     def __init__(self):
         pass
 

@@ -18,11 +18,7 @@ from botbuilder.core import (
 )
 from botbuilder.schema import Activity, ActivityTypes, ChannelAccount
 
-from . import (
-    LuisApplication,
-    LuisPredictionOptions,
-    LuisTelemetryConstants,
-)
+from . import LuisApplication, LuisPredictionOptions, LuisTelemetryConstants
 from .activity_util import ActivityUtil
 from .luis_util import LuisUtil
 
@@ -112,7 +108,7 @@ class LuisRecognizer(object):
         turn_context: TurnContext,
         telemetry_properties: Dict[str, str] = None,
         telemetry_metrics: Dict[str, float] = None,
-        luis_prediction_options: LuisPredictionOptions = None
+        luis_prediction_options: LuisPredictionOptions = None,
     ) -> RecognizerResult:
         """Return results of the analysis (Suggested actions and intents).
         
@@ -127,7 +123,10 @@ class LuisRecognizer(object):
         """
 
         return await self._recognize_internal(
-            turn_context, telemetry_properties, telemetry_metrics, luis_prediction_options
+            turn_context,
+            telemetry_properties,
+            telemetry_metrics,
+            luis_prediction_options,
         )
 
     def on_recognizer_result(
@@ -247,7 +246,7 @@ class LuisRecognizer(object):
         turn_context: TurnContext,
         telemetry_properties: Dict[str, str],
         telemetry_metrics: Dict[str, float],
-        luis_prediction_options: LuisPredictionOptions = None
+        luis_prediction_options: LuisPredictionOptions = None,
     ) -> RecognizerResult:
 
         BotAssert.context_not_none(turn_context)
@@ -261,7 +260,7 @@ class LuisRecognizer(object):
 
         if luis_prediction_options:
             options = self._merge_options(luis_prediction_options)
-        else: 
+        else:
             options = self._options
 
         if not utterance or utterance.isspace():
@@ -301,7 +300,9 @@ class LuisRecognizer(object):
             recognizer_result, turn_context, telemetry_properties, telemetry_metrics
         )
 
-        await self._emit_trace_info(turn_context, luis_result, recognizer_result, options)
+        await self._emit_trace_info(
+            turn_context, luis_result, recognizer_result, options
+        )
 
         return recognizer_result
 
@@ -310,7 +311,7 @@ class LuisRecognizer(object):
         turn_context: TurnContext,
         luis_result: LuisResult,
         recognizer_result: RecognizerResult,
-        options: LuisPredictionOptions
+        options: LuisPredictionOptions,
     ) -> None:
         trace_info: Dict[str, object] = {
             "recognizerResult": LuisUtil.recognizer_result_as_dict(recognizer_result),
@@ -330,8 +331,7 @@ class LuisRecognizer(object):
         await turn_context.send_activity(trace_activity)
 
     def _merge_options(
-        self,
-        user_defined_options: LuisPredictionOptions
+        self, user_defined_options: LuisPredictionOptions
     ) -> LuisPredictionOptions:
         merged_options = LuisPredictionOptions()
         merged_options.__dict__.update(user_defined_options.__dict__)

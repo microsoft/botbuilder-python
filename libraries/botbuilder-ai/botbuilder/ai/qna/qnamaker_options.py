@@ -6,11 +6,11 @@ from .metadata import Metadata
 # figure out if 300 milliseconds is ok for python requests library...or 100000
 class QnAMakerOptions:
     def __init__(
-        self, 
+        self,
         score_threshold: float = 0.0,
         timeout: int = 0,
         top: int = 0,
-        strict_filters: [Metadata] = []
+        strict_filters: [Metadata] = [],
     ):
         self.score_threshold = score_threshold
         self.timeout = timeout

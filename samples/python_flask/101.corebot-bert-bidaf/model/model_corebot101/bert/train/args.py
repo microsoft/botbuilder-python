@@ -6,9 +6,10 @@ import os
 import sys
 from pathlib import Path
 
-#pylint:disable=line-too-long
+# pylint:disable=line-too-long
 class Args:
     """Arguments for the model."""
+
     training_data_dir: str = None
     bert_model: str = None
     task_name: str = None
@@ -32,9 +33,13 @@ class Args:
     loss_scale: float = 0
 
     @classmethod
-    def for_flight_booking(cls,
-                           training_data_dir: str = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../training_data')),
-                           task_name: str = "flight_booking"):
+    def for_flight_booking(
+        cls,
+        training_data_dir: str = os.path.abspath(
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), "../training_data")
+        ),
+        task_name: str = "flight_booking",
+    ):
         """Return the flight booking args."""
         args = cls()
 
@@ -45,6 +50,9 @@ class Args:
         args.bert_model = "bert-base-uncased"
         args.do_lower_case = True
 
-        print(f'Bert Model training_data_dir is set to {args.training_data_dir}', file=sys.stderr)
-        print(f'Bert Model model_dir is set to {args.model_dir}', file=sys.stderr)
+        print(
+            f"Bert Model training_data_dir is set to {args.training_data_dir}",
+            file=sys.stderr,
+        )
+        print(f"Bert Model model_dir is set to {args.model_dir}", file=sys.stderr)
         return args

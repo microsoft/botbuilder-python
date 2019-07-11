@@ -4,8 +4,8 @@
 from typing import Callable
 from botbuilder.core import Middleware, TurnContext
 
-class CallCountingMiddleware(Middleware):
 
+class CallCountingMiddleware(Middleware):
     def __init__(self):
         self.counter = 0
 

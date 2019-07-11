@@ -6,14 +6,23 @@
 import sys
 import asyncio
 from django.apps import AppConfig
-from botbuilder.core import (BotFrameworkAdapter, BotFrameworkAdapterSettings, TurnContext, ConversationState, MemoryStorage, UserState)
+from botbuilder.core import (
+    BotFrameworkAdapter,
+    BotFrameworkAdapterSettings,
+    TurnContext,
+    ConversationState,
+    MemoryStorage,
+    UserState,
+)
 from dialogs import MainDialog
 from bots import DialogAndWelcomeBot
 import config
 
+
 class BotConfig(AppConfig):
     """ Bot initialization """
-    name = 'bots'
+
+    name = "bots"
     appConfig = config.DefaultConfig
 
     SETTINGS = BotFrameworkAdapterSettings(appConfig.APP_ID, appConfig.APP_PASSWORD)
@@ -35,9 +44,9 @@ class BotConfig(AppConfig):
         NOTE: In production environment, you should consider logging this to Azure
         application insights.
         """
-        print(f'\n [on_turn_error]: { error }', file=sys.stderr)
+        print(f"\n [on_turn_error]: { error }", file=sys.stderr)
         # Send a message to the user
-        await context.send_activity('Oops. Something went wrong!')
+        await context.send_activity("Oops. Something went wrong!")
         # Clear out state
         await self.conversation_state.delete(context)
 

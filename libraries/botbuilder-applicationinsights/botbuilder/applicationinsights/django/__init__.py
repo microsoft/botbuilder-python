@@ -4,7 +4,4 @@
 
 from .bot_telemetry_middleware import BotTelemetryMiddleware, retrieve_bot_body
 
-__all__ = [
-    "BotTelemetryMiddleware",
-    "retrieve_bot_body"
-]
+__all__ = ["BotTelemetryMiddleware", "retrieve_bot_body"]

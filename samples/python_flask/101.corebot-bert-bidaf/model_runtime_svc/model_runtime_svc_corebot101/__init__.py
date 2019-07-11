@@ -3,6 +3,4 @@
 """Model Runtime."""
 from .model_cache import ModelCache
 
-__all__ = [
-    'ModelCache'
-    ]
+__all__ = ["ModelCache"]

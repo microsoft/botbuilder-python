@@ -13,23 +13,37 @@ from copy import copy
 from ..bot_adapter import BotAdapter
 from ..turn_context import TurnContext
 from ..user_token_provider import UserTokenProvider
-from botbuilder.schema import (ActivityTypes, Activity, ConversationAccount,
-                               ConversationReference, ChannelAccount, ResourceResponse,
-                               TokenResponse)
+from botbuilder.schema import (
+    ActivityTypes,
+    Activity,
+    ConversationAccount,
+    ConversationReference,
+    ChannelAccount,
+    ResourceResponse,
+    TokenResponse,
+)
 
 
 class UserToken:
-    def __init__(self, connection_name: str = None, user_id: str = None, channel_id: str = None, token: str = None):
+    def __init__(
+        self,
+        connection_name: str = None,
+        user_id: str = None,
+        channel_id: str = None,
+        token: str = None,
+    ):
         self.connection_name = connection_name
         self.user_id = user_id
         self.channel_id = channel_id
         self.token = token
 
-    def equals_key(self, rhs: 'UserToken'):
-        return (rhs is not None and
-                self.connection_name == rhs.connection_name and
-                self.user_id == rhs.user_id and
-                self.channel_id == rhs.channel_id)
+    def equals_key(self, rhs: "UserToken"):
+        return (
+            rhs is not None
+            and self.connection_name == rhs.connection_name
+            and self.user_id == rhs.user_id
+            and self.channel_id == rhs.channel_id
+        )
 
 
 class TokenMagicCode:
@@ -39,8 +53,12 @@ class TokenMagicCode:
 
 
 class TestAdapter(BotAdapter, UserTokenProvider):
-    def __init__(self, logic: Coroutine = None, conversation: ConversationReference = None,
-                 send_trace_activity: bool = False):
+    def __init__(
+        self,
+        logic: Coroutine = None,
+        conversation: ConversationReference = None,
+        send_trace_activity: bool = False,
+    ):
         """
         Creates a new TestAdapter instance.
         :param logic:
@@ -56,11 +74,11 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         self.deleted_activities: List[ConversationReference] = []
 
         self.template: Activity = Activity(
-            channel_id='test',
-            service_url='https://test.com',
-            from_property=ChannelAccount(id='User1', name='user'),
-            recipient=ChannelAccount(id='bot', name='Bot'),
-            conversation=ConversationAccount(id='Convo1')
+            channel_id="test",
+            service_url="https://test.com",
+            from_property=ChannelAccount(id="User1", name="user"),
+            recipient=ChannelAccount(id="bot", name="Bot"),
+            conversation=ConversationAccount(id="Convo1"),
         )
         if self.template is not None:
             self.template.service_url = self.template.service_url
@@ -108,7 +126,9 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         """
         self.updated_activities.append(activity)
 
-    async def continue_conversation(self, bot_id: str, reference: ConversationReference, callback: Callable):
+    async def continue_conversation(
+        self, bot_id: str, reference: ConversationReference, callback: Callable
+    ):
         """
         The `TestAdapter` just calls parent implementation.
         :param bot_id
@@ -126,12 +146,12 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         :return:
         """
         if type(activity) == str:
-            activity = Activity(type='message', text=activity)
+            activity = Activity(type="message", text=activity)
         # Initialize request.
         request = copy(self.template)
 
         for key, value in vars(activity).items():
-            if value is not None and key != 'additional_properties':
+            if value is not None and key != "additional_properties":
                 setattr(request, key, value)
 
         request.type = request.type or ActivityTypes.message
@@ -155,7 +175,9 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         """
         return TestFlow(await self.receive_activity(user_says), self)
 
-    async def test(self, user_says, expected, description=None, timeout=None) -> 'TestFlow':
+    async def test(
+        self, user_says, expected, description=None, timeout=None
+    ) -> "TestFlow":
         """
         Send something to the bot and expects the bot to return with a given reply. This is simply a
         wrapper around calls to `send()` and `assertReply()`. This is such a common pattern that a
@@ -186,7 +208,14 @@ class TestAdapter(BotAdapter, UserTokenProvider):
                     timeout = arg[3]
             await self.test(arg[0], arg[1], description, timeout)
 
-    def add_user_token(self, connection_name: str, channel_id: str, user_id: str, token: str, magic_code: str = None):
+    def add_user_token(
+        self,
+        connection_name: str,
+        channel_id: str,
+        user_id: str,
+        token: str,
+        magic_code: str = None,
+    ):
         key = UserToken()
         key.channel_id = channel_id
         key.connection_name = connection_name
@@ -201,17 +230,30 @@ class TestAdapter(BotAdapter, UserTokenProvider):
             mc.magic_code = magic_code
             self._magic_codes.append(mc)
 
-    async def get_user_token(self, context: TurnContext, connection_name: str, magic_code: str = None) -> TokenResponse:
+    async def get_user_token(
+        self, context: TurnContext, connection_name: str, magic_code: str = None
+    ) -> TokenResponse:
         key = UserToken()
         key.channel_id = context.activity.channel_id
         key.connection_name = connection_name
         key.user_id = context.activity.from_property.id
 
         if magic_code:
-            magic_code_record = list(filter(lambda x: key.equals_key(x.key), self._magic_codes))
-            if magic_code_record and len(magic_code_record) > 0 and magic_code_record[0].magic_code == magic_code:
+            magic_code_record = list(
+                filter(lambda x: key.equals_key(x.key), self._magic_codes)
+            )
+            if (
+                magic_code_record
+                and len(magic_code_record) > 0
+                and magic_code_record[0].magic_code == magic_code
+            ):
                 # Move the token to long term dictionary.
-                self.add_user_token(connection_name, key.channel_id, key.user_id, magic_code_record[0].key.token)
+                self.add_user_token(
+                    connection_name,
+                    key.channel_id,
+                    key.user_id,
+                    magic_code_record[0].key.token,
+                )
 
                 # Remove from the magic code list.
                 idx = self._magic_codes.index(magic_code_record[0])
@@ -223,7 +265,7 @@ class TestAdapter(BotAdapter, UserTokenProvider):
             return TokenResponse(
                 connection_name=match[0].connection_name,
                 token=match[0].token,
-                expiration=None
+                expiration=None,
             )
         else:
             # Not found.
@@ -235,17 +277,22 @@ class TestAdapter(BotAdapter, UserTokenProvider):
 
         new_records = []
         for token in self._user_tokens:
-            if (token.channel_id != channel_id or
-                    token.user_id != user_id or
-                    (connection_name and connection_name != token.connection_name)):
+            if (
+                token.channel_id != channel_id
+                or token.user_id != user_id
+                or (connection_name and connection_name != token.connection_name)
+            ):
                 new_records.append(token)
         self._user_tokens = new_records
 
-    async def get_oauth_sign_in_link(self, context: TurnContext, connection_name: str) -> str:
-        return f'https://fake.com/oauthsignin/{connection_name}/{context.activity.channel_id}/{context.activity.from_property.id}'
+    async def get_oauth_sign_in_link(
+        self, context: TurnContext, connection_name: str
+    ) -> str:
+        return f"https://fake.com/oauthsignin/{connection_name}/{context.activity.channel_id}/{context.activity.from_property.id}"
 
-    async def get_aad_tokens(self, context: TurnContext, connection_name: str, resource_urls: List[str]) -> Dict[
-        str, TokenResponse]:
+    async def get_aad_tokens(
+        self, context: TurnContext, connection_name: str, resource_urls: List[str]
+    ) -> Dict[str, TokenResponse]:
         return None
 
 
@@ -259,7 +306,9 @@ class TestFlow(object):
         self.previous = previous
         self.adapter = adapter
 
-    async def test(self, user_says, expected, description=None, timeout=None) -> 'TestFlow':
+    async def test(
+        self, user_says, expected, description=None, timeout=None
+    ) -> "TestFlow":
         """
         Send something to the bot and expects the bot to return with a given reply. This is simply a
         wrapper around calls to `send()` and `assertReply()`. This is such a common pattern that a
@@ -271,9 +320,11 @@ class TestFlow(object):
         :return:
         """
         test_flow = await self.send(user_says)
-        return await test_flow.assert_reply(expected, description or f'test("{user_says}", "{expected}")', timeout)
+        return await test_flow.assert_reply(
+            expected, description or f'test("{user_says}", "{expected}")', timeout
+        )
 
-    async def send(self, user_says) -> 'TestFlow':
+    async def send(self, user_says) -> "TestFlow":
         """
         Sends something to the bot.
         :param user_says:
@@ -288,8 +339,12 @@ class TestFlow(object):
 
         return TestFlow(await new_previous(), self.adapter)
 
-    async def assert_reply(self, expected: Union[str, Activity, Callable[[Activity, str], None]], description=None,
-                           timeout=None) -> 'TestFlow':
+    async def assert_reply(
+        self,
+        expected: Union[str, Activity, Callable[[Activity, str], None]],
+        description=None,
+        timeout=None,
+    ) -> "TestFlow":
         """
         Generates an assertion if the bots response doesn't match the expected text/activity.
         :param expected:
@@ -302,11 +357,13 @@ class TestFlow(object):
             if isinstance(expected, Activity):
                 validate_activity(reply, expected)
             else:
-                assert reply.type == 'message', description + f" type == {reply.type}"
-                assert reply.text.strip() == expected.strip(), description + f" text == {reply.text}"
+                assert reply.type == "message", description + f" type == {reply.type}"
+                assert reply.text.strip() == expected.strip(), (
+                    description + f" text == {reply.text}"
+                )
 
         if description is None:
-            description = ''
+            description = ""
 
         inspector = expected if callable(expected) else default_inspector
 
@@ -327,8 +384,10 @@ class TestFlow(object):
                         expecting = inspect.getsourcefile(expected)
                     else:
                         expecting = str(expected)
-                    raise RuntimeError(f'TestAdapter.assert_reply({expecting}): {description} Timed out after '
-                                       f'{current - start}ms.')
+                    raise RuntimeError(
+                        f"TestAdapter.assert_reply({expecting}): {description} Timed out after "
+                        f"{current - start}ms."
+                    )
                 elif len(adapter.activity_buffer) > 0:
                     reply = adapter.activity_buffer.pop(0)
                     try:
@@ -355,5 +414,5 @@ def validate_activity(activity, expected) -> None:
     iterable_expected = vars(expected).items()
 
     for attr, value in iterable_expected:
-        if value is not None and attr != 'additional_properties':
+        if value is not None and attr != "additional_properties":
             assert value == getattr(activity, attr)

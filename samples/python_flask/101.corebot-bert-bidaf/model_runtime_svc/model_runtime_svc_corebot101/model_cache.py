@@ -9,11 +9,12 @@ import logging
 from model_corebot101.bidaf.model_runtime import BidafModelRuntime
 from model_corebot101.bert.model_runtime import BertModelRuntime
 
-#pylint:disable=line-too-long,bad-continuation
+# pylint:disable=line-too-long,bad-continuation
 class DeprecateModelCache(object):
     """Model Cache implementation."""
+
     def __init__(self):
-        self._logger = logging.getLogger('ModelCache')
+        self._logger = logging.getLogger("ModelCache")
         self._bert_model_dir = None
         self._bidaf_model_dir = None
         self._bert_intents = None
@@ -24,26 +25,34 @@ class DeprecateModelCache(object):
         if not os.path.exists(bidaf_model_dir):
             # BiDAF needs no training, just download
             if not BidafModelRuntime.init_bidaf(bidaf_model_dir, True):
-                self._logger.error('bidaf model creation failed at model directory %s..', bidaf_model_dir)
+                self._logger.error(
+                    "bidaf model creation failed at model directory %s..",
+                    bidaf_model_dir,
+                )
                 return False
 
         if not os.path.exists(bert_model_dir):
-            self._logger.error('BERT model directory does not exist "%s"', bert_model_dir)
+            self._logger.error(
+                'BERT model directory does not exist "%s"', bert_model_dir
+            )
             return False
 
         self._bert_model_dir = os.path.normpath(bert_model_dir)
         self._bidaf_model_dir = os.path.normpath(bidaf_model_dir)
 
-        self._bert_intents = BertModelRuntime(model_dir=self._bert_model_dir, label_list=["Book flight", "Cancel"])
-        self._bidaf_entities = BidafModelRuntime(targets=["from", "to", "date"],
-                                            queries={
-                                                "from": "which city will you travel from?",
-                                                "to": "which city will you travel to?",
-                                                "date": "which date will you travel?",
-                                                },
-                                            model_dir=self._bidaf_model_dir
-                                            )
-        self._logger.info('bidaf entities model created : %s..', self._bidaf_model_dir)
+        self._bert_intents = BertModelRuntime(
+            model_dir=self._bert_model_dir, label_list=["Book flight", "Cancel"]
+        )
+        self._bidaf_entities = BidafModelRuntime(
+            targets=["from", "to", "date"],
+            queries={
+                "from": "which city will you travel from?",
+                "to": "which city will you travel to?",
+                "date": "which date will you travel?",
+            },
+            model_dir=self._bidaf_model_dir,
+        )
+        self._logger.info("bidaf entities model created : %s..", self._bidaf_model_dir)
 
         return True
 

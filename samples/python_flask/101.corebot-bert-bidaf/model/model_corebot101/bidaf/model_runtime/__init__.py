@@ -3,6 +3,4 @@
 
 from .bidaf_model_runtime import BidafModelRuntime
 
-__all__ = [
-           'BidafModelRuntime'
-           ]
+__all__ = ["BidafModelRuntime"]

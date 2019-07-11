@@ -35,5 +35,5 @@ __all__ = [
     "PromptValidatorContext",
     "Prompt",
     "PromptOptions",
-    "TextPrompt"
+    "TextPrompt",
 ]

@@ -12,14 +12,15 @@ from .find_choices_options import FindChoicesOptions
 from .found_choice import FoundChoice
 from .model_result import ModelResult
 
+
 class ChoiceRecognizers:
     """ Contains methods for matching user input against a list of choices. """
 
     @staticmethod
     def recognize_choices(
-            utterance: str,
-            choices: List[Union[str, Choice]],
-            options: FindChoicesOptions = None
+        utterance: str,
+        choices: List[Union[str, Choice]],
+        options: FindChoicesOptions = None,
     ) -> List[ModelResult]:
         """
         Matches user input against a list of choices.
@@ -46,10 +47,13 @@ class ChoiceRecognizers:
         A list of found choices, sorted by most relevant first.
         """
         if utterance is None:
-            utterance = ''
-        
+            utterance = ""
+
         # Normalize list of choices
-        choices_list = [Choice(value=choice) if isinstance(choice, str) else choice for choice in choices]
+        choices_list = [
+            Choice(value=choice) if isinstance(choice, str) else choice
+            for choice in choices
+        ]
 
         # Try finding choices by text search first
         # - We only want to use a single strategy for returning results to avoid issues where utterances
@@ -59,79 +63,77 @@ class ChoiceRecognizers:
         matched = Find.find_choices(utterance, choices_list, options)
         if len(matched) == 0:
             # Next try finding by ordinal
-            matches =  ChoiceRecognizers._recognize_ordinal(utterance, locale)
-            
+            matches = ChoiceRecognizers._recognize_ordinal(utterance, locale)
+
             if len(matches) > 0:
                 for match in matches:
-                    ChoiceRecognizers._match_choice_by_index(choices_list, matched, match)
+                    ChoiceRecognizers._match_choice_by_index(
+                        choices_list, matched, match
+                    )
             else:
                 # Finally try by numerical index
                 matches = ChoiceRecognizers._recognize_number(utterance, locale)
 
                 for match in matches:
-                    ChoiceRecognizers._match_choice_by_index(choices_list, matched, match)
-            
+                    ChoiceRecognizers._match_choice_by_index(
+                        choices_list, matched, match
+                    )
+
             # Sort any found matches by their position within the utterance.
             # - The results from find_choices() are already properly sorted so we just need this
             #   for ordinal & numerical lookups.
-            matched = sorted(
-                matched,
-                key=lambda model_result: model_result.start
-            )
-        
+            matched = sorted(matched, key=lambda model_result: model_result.start)
+
         return matched
-                
 
     @staticmethod
     def _recognize_ordinal(utterance: str, culture: str) -> List[ModelResult]:
         model: OrdinalModel = NumberRecognizer(culture).get_ordinal_model(culture)
 
-        return list(map(ChoiceRecognizers._found_choice_constructor, model.parse(utterance)))
-    
+        return list(
+            map(ChoiceRecognizers._found_choice_constructor, model.parse(utterance))
+        )
+
     @staticmethod
     def _match_choice_by_index(
-            choices: List[Choice],
-            matched: List[ModelResult],
-            match: ModelResult
+        choices: List[Choice], matched: List[ModelResult], match: ModelResult
     ):
         try:
             index: int = int(match.resolution.value) - 1
-            if (index >= 0 and index < len(choices)):
+            if index >= 0 and index < len(choices):
                 choice = choices[index]
 
-                matched.append(ModelResult(
-                    start=match.start,
-                    end=match.end,
-                    type_name='choice',
-                    text=match.text,
-                    resolution=FoundChoice(
-                        value=choice.value,
-                        index=index,
-                        score=1.0
+                matched.append(
+                    ModelResult(
+                        start=match.start,
+                        end=match.end,
+                        type_name="choice",
+                        text=match.text,
+                        resolution=FoundChoice(
+                            value=choice.value, index=index, score=1.0
+                        ),
                     )
-                ))
+                )
         except:
             # noop here, as in dotnet/node repos
             pass
-    
+
     @staticmethod
     def _recognize_number(utterance: str, culture: str) -> List[ModelResult]:
         model: NumberModel = NumberRecognizer(culture).get_number_model(culture)
 
-        return list(map(ChoiceRecognizers._found_choice_constructor, model.parse(utterance)))
-    
+        return list(
+            map(ChoiceRecognizers._found_choice_constructor, model.parse(utterance))
+        )
+
     @staticmethod
     def _found_choice_constructor(value_model: ModelResult) -> ModelResult:
         return ModelResult(
             start=value_model.start,
             end=value_model.end,
-            type_name='choice',
+            type_name="choice",
             text=value_model.text,
             resolution=FoundChoice(
-                value=value_model.resolution['value'],
-                index=0,
-                score=1.0,
-            )
+                value=value_model.resolution["value"], index=0, score=1.0
+            ),
         )
-
-    

@@ -25,10 +25,11 @@ except (SyntaxError, ImportError):
     from ._models import TokenStatus
 
 __all__ = [
-    'AadResourceUrls',
-    'Error',
-    'ErrorResponse', 'ErrorResponseException',
-    'InnerHttpError',
-    'TokenResponse',
-    'TokenStatus',
+    "AadResourceUrls",
+    "Error",
+    "ErrorResponse",
+    "ErrorResponseException",
+    "InnerHttpError",
+    "TokenResponse",
+    "TokenStatus",
 ]

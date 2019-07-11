@@ -9,11 +9,13 @@ from botbuilder.schema import Activity, Attachment, ChannelAccount
 from helpers.activity_helper import create_activity_reply
 from .dialog_bot import DialogBot
 
+
 class DialogAndWelcomeBot(DialogBot):
     """Main dialog to welcome users implementation."""
 
-    async def on_members_added_activity(self, members_added: List[ChannelAccount],
-                                        turn_context: TurnContext):
+    async def on_members_added_activity(
+        self, members_added: List[ChannelAccount], turn_context: TurnContext
+    ):
         for member in members_added:
             # Greet anyone that was not the target (recipient) of this message.
             # To learn more about Adaptive Cards, see https://aka.ms/msbot-adaptivecards
@@ -38,5 +40,5 @@ class DialogAndWelcomeBot(DialogBot):
             card = json.load(card_file)
 
         return Attachment(
-            content_type="application/vnd.microsoft.card.adaptive",
-            content=card)
+            content_type="application/vnd.microsoft.card.adaptive", content=card
+        )

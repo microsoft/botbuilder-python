@@ -10,43 +10,45 @@ REQUIRES = [
     "requests>=2.8.1",
     "cryptography>=2.1.4",
     "PyJWT>=1.5.3",
-    "botbuilder-schema>=4.4.0b1"]
+    "botbuilder-schema>=4.4.0b1",
+]
 
 root = os.path.abspath(os.path.dirname(__file__))
 
-with open(os.path.join(root, 'README.rst'), encoding='utf-8') as f:
+with open(os.path.join(root, "README.rst"), encoding="utf-8") as f:
     long_description = f.read()
 
 setup(
     name=NAME,
     version=VERSION,
     description="Microsoft Bot Framework Bot Builder SDK for Python.",
-    author='Microsoft',
+    author="Microsoft",
     url="https://www.github.com/Microsoft/botbuilder-python",
-    keywords=["BotFrameworkConnector", "bots","ai", "botframework", "botbuilder"],
+    keywords=["BotFrameworkConnector", "bots", "ai", "botframework", "botbuilder"],
     install_requires=REQUIRES,
-    packages=["botframework.connector",
-              "botframework.connector.auth",
-              "botframework.connector.async_mixin",
-              "botframework.connector.operations",
-              "botframework.connector.models",
-              "botframework.connector.aio",
-              "botframework.connector.aio.operations_async",
-              "botframework.connector.token_api",
-              "botframework.connector.token_api.aio",
-              "botframework.connector.token_api.models",
-              "botframework.connector.token_api.operations"
+    packages=[
+        "botframework.connector",
+        "botframework.connector.auth",
+        "botframework.connector.async_mixin",
+        "botframework.connector.operations",
+        "botframework.connector.models",
+        "botframework.connector.aio",
+        "botframework.connector.aio.operations_async",
+        "botframework.connector.token_api",
+        "botframework.connector.token_api.aio",
+        "botframework.connector.token_api.models",
+        "botframework.connector.token_api.operations",
     ],
     include_package_data=True,
     long_description=long_description,
-    long_description_content_type='text/x-rst',
-    license='MIT',
+    long_description_content_type="text/x-rst",
+    license="MIT",
     classifiers=[
-        'Programming Language :: Python :: 3.7',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: MIT License',
-        'Operating System :: OS Independent',
-        'Development Status :: 3 - Alpha',
-        'Topic :: Scientific/Engineering :: Artificial Intelligence',
-    ]
+        "Programming Language :: Python :: 3.7",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+        "Development Status :: 3 - Alpha",
+        "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    ],
 )

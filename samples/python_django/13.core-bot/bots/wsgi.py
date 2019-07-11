@@ -15,5 +15,5 @@ import os
 from django.core.wsgi import get_wsgi_application
 
 # pylint:disable=invalid-name
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'bots.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "bots.settings")
 application = get_wsgi_application()

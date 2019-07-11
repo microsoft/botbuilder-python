@@ -13,6 +13,7 @@ class ChoiceFactory:
     """
     Assists with formatting a message activity that contains a list of choices.
     """
+
     @staticmethod
     def for_channel(
         channel_id: str,

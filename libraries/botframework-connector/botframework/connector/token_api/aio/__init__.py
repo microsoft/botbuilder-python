@@ -10,4 +10,5 @@
 # --------------------------------------------------------------------------
 
 from ._token_api_client_async import TokenApiClient
-__all__ = ['TokenApiClient']
+
+__all__ = ["TokenApiClient"]

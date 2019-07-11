@@ -10,5 +10,5 @@ __all__ = [
     "LuisApplication",
     "LuisPredictionOptions",
     "LuisRecognizer",
-    "LuisTelemetryConstants"
+    "LuisTelemetryConstants",
 ]

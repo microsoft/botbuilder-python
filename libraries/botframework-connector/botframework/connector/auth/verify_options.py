@@ -4,4 +4,3 @@ class VerifyOptions:
         self.audience = audience
         self.clock_tolerance = clock_tolerance
         self.ignore_expiration = ignore_expiration
-        

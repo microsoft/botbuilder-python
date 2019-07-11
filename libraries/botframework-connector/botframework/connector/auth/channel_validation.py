@@ -6,11 +6,12 @@ from .jwt_token_extractor import JwtTokenExtractor
 from .claims_identity import ClaimsIdentity
 from .credential_provider import CredentialProvider
 
+
 class ChannelValidation:
     open_id_metadata_endpoint: str = None
 
     # This claim is ONLY used in the Channel Validation, and not in the emulator validation
-    SERVICE_URL_CLAIM = 'serviceurl'
+    SERVICE_URL_CLAIM = "serviceurl"
 
     #
     # TO BOT FROM CHANNEL: Token validation parameters when connecting to a bot
@@ -20,11 +21,16 @@ class ChannelValidation:
         # Audience validation takes place manually in code.
         audience=None,
         clock_tolerance=5 * 60,
-        ignore_expiration=False
+        ignore_expiration=False,
     )
 
     @staticmethod
-    async def authenticate_channel_token_with_service_url(auth_header: str, credentials: CredentialProvider, service_url: str, channel_id: str) -> ClaimsIdentity:
+    async def authenticate_channel_token_with_service_url(
+        auth_header: str,
+        credentials: CredentialProvider,
+        service_url: str,
+        channel_id: str,
+    ) -> ClaimsIdentity:
         """ Validate the incoming Auth Header
 
         Validate the incoming Auth Header as a token sent from the Bot Framework Service.
@@ -41,17 +47,24 @@ class ChannelValidation:
         :raises Exception:
         """
         identity = await asyncio.ensure_future(
-            ChannelValidation.authenticate_channel_token(auth_header, credentials, channel_id))
+            ChannelValidation.authenticate_channel_token(
+                auth_header, credentials, channel_id
+            )
+        )
 
-        service_url_claim = identity.get_claim_value(ChannelValidation.SERVICE_URL_CLAIM)
+        service_url_claim = identity.get_claim_value(
+            ChannelValidation.SERVICE_URL_CLAIM
+        )
         if service_url_claim != service_url:
             # Claim must match. Not Authorized.
-            raise Exception('Unauthorized. service_url claim do not match.')
+            raise Exception("Unauthorized. service_url claim do not match.")
 
         return identity
 
     @staticmethod
-    async def authenticate_channel_token(auth_header: str, credentials: CredentialProvider, channel_id: str) -> ClaimsIdentity:
+    async def authenticate_channel_token(
+        auth_header: str, credentials: CredentialProvider, channel_id: str
+    ) -> ClaimsIdentity:
         """ Validate the incoming Auth Header
 
         Validate the incoming Auth Header as a token sent from the Bot Framework Service.
@@ -65,29 +78,35 @@ class ChannelValidation:
         :return: A valid ClaimsIdentity.
         :raises Exception:
         """
-        metadata_endpoint = (ChannelValidation.open_id_metadata_endpoint 
-                                        if ChannelValidation 
-                                        else Constants.TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL)
+        metadata_endpoint = (
+            ChannelValidation.open_id_metadata_endpoint
+            if ChannelValidation
+            else Constants.TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL
+        )
 
         token_extractor = JwtTokenExtractor(
             ChannelValidation.TO_BOT_FROM_CHANNEL_TOKEN_VALIDATION_PARAMETERS,
             metadata_endpoint,
-            Constants.ALLOWED_SIGNING_ALGORITHMS)
+            Constants.ALLOWED_SIGNING_ALGORITHMS,
+        )
 
         identity = await asyncio.ensure_future(
-            token_extractor.get_identity_from_auth_header(auth_header, channel_id))
-        
+            token_extractor.get_identity_from_auth_header(auth_header, channel_id)
+        )
+
         return await ChannelValidation.validate_identity(identity, credentials)
-    
+
     @staticmethod
-    async def validate_identity(identity: ClaimsIdentity, credentials: CredentialProvider) -> ClaimsIdentity:
+    async def validate_identity(
+        identity: ClaimsIdentity, credentials: CredentialProvider
+    ) -> ClaimsIdentity:
         if not identity:
             # No valid identity. Not Authorized.
-            raise Exception('Unauthorized. No valid identity.')
+            raise Exception("Unauthorized. No valid identity.")
 
         if not identity.is_authenticated:
             # The token is in some way invalid. Not Authorized.
-            raise Exception('Unauthorized. Is not authenticated')
+            raise Exception("Unauthorized. Is not authenticated")
 
         # Now check that the AppID in the claimset matches
         # what we're looking for. Note that in a multi-tenant bot, this value
@@ -95,16 +114,21 @@ class ChannelValidation:
         # Async validation.
 
         # Look for the "aud" claim, but only if issued from the Bot Framework
-        if identity.get_claim_value(Constants.ISSUER_CLAIM) != Constants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER:
+        if (
+            identity.get_claim_value(Constants.ISSUER_CLAIM)
+            != Constants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER
+        ):
             # The relevant Audience Claim MUST be present. Not Authorized.
-            raise Exception('Unauthorized. Audience Claim MUST be present.')
+            raise Exception("Unauthorized. Audience Claim MUST be present.")
 
         # The AppId from the claim in the token must match the AppId specified by the developer.
         # Note that the Bot Framework uses the Audience claim ("aud") to pass the AppID.
         aud_claim = identity.get_claim_value(Constants.AUDIENCE_CLAIM)
-        is_valid_app_id = await asyncio.ensure_future(credentials.is_valid_appid(aud_claim or ''))
+        is_valid_app_id = await asyncio.ensure_future(
+            credentials.is_valid_appid(aud_claim or "")
+        )
         if not is_valid_app_id:
             # The AppId is not valid or not present. Not Authorized.
-            raise Exception('Unauthorized. Invalid AppId passed on token: ', aud_claim)
+            raise Exception("Unauthorized. Invalid AppId passed on token: ", aud_claim)
 
         return identity

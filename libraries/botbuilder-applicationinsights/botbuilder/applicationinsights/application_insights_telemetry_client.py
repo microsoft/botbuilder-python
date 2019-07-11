@@ -5,7 +5,10 @@
 import traceback
 from typing import Dict
 from applicationinsights import TelemetryClient
-from botbuilder.core.bot_telemetry_client import BotTelemetryClient, TelemetryDataPointType
+from botbuilder.core.bot_telemetry_client import (
+    BotTelemetryClient,
+    TelemetryDataPointType,
+)
 from .integration_post_data import IntegrationPostData
 
 # pylint: disable=line-too-long
@@ -43,36 +46,47 @@ def bot_telemetry_processor(data, context) -> bool:
         return True
 
     # Override session and user id
-    from_prop = post_data['from'] if 'from' in post_data else None
-    user_id = from_prop['id'] if from_prop is not None else None
-    channel_id = post_data['channelId'] if 'channelId' in post_data else None
-    conversation = post_data['conversation'] if 'conversation' in post_data else None
-    conversation_id = conversation['id'] if 'id' in conversation else None
+    from_prop = post_data["from"] if "from" in post_data else None
+    user_id = from_prop["id"] if from_prop is not None else None
+    channel_id = post_data["channelId"] if "channelId" in post_data else None
+    conversation = post_data["conversation"] if "conversation" in post_data else None
+    conversation_id = conversation["id"] if "id" in conversation else None
     context.user.id = channel_id + user_id
     context.session.id = conversation_id
 
     # Additional bot-specific properties
-    if 'id' in post_data:
-        data.properties["activityId"] = post_data['id']
-    if 'channelId' in post_data:
-        data.properties["channelId"] = post_data['channelId']
-    if 'type' in post_data:
-        data.properties["activityType"] = post_data['type']
+    if "id" in post_data:
+        data.properties["activityId"] = post_data["id"]
+    if "channelId" in post_data:
+        data.properties["channelId"] = post_data["channelId"]
+    if "type" in post_data:
+        data.properties["activityType"] = post_data["type"]
     return True
 
 
 class ApplicationInsightsTelemetryClient(BotTelemetryClient):
     """Application Insights Telemetry Client."""
-    def __init__(self, instrumentation_key: str, telemetry_client: TelemetryClient = None):
+
+    def __init__(
+        self, instrumentation_key: str, telemetry_client: TelemetryClient = None
+    ):
         self._instrumentation_key = instrumentation_key
-        self._client = telemetry_client if telemetry_client is not None \
+        self._client = (
+            telemetry_client
+            if telemetry_client is not None
             else TelemetryClient(self._instrumentation_key)
+        )
         # Telemetry Processor
         self._client.add_telemetry_processor(bot_telemetry_processor)
 
-
-    def track_pageview(self, name: str, url: str, duration: int = 0, properties: Dict[str, object] = None,
-                       measurements: Dict[str, object] = None) -> None:
+    def track_pageview(
+        self,
+        name: str,
+        url: str,
+        duration: int = 0,
+        properties: Dict[str, object] = None,
+        measurements: Dict[str, object] = None,
+    ) -> None:
         """
         Send information about the page viewed in the application (a web page for instance).
         :param name: the name of the page that was viewed.
@@ -83,8 +97,14 @@ class ApplicationInsightsTelemetryClient(BotTelemetryClient):
         """
         self._client.track_pageview(name, url, duration, properties, measurements)
 
-    def track_exception(self, exception_type: type = None, value: Exception = None, tb: traceback = None,
-                        properties: Dict[str, object] = None, measurements: Dict[str, object] = None) -> None:
+    def track_exception(
+        self,
+        exception_type: type = None,
+        value: Exception = None,
+        tb: traceback = None,
+        properties: Dict[str, object] = None,
+        measurements: Dict[str, object] = None,
+    ) -> None:
         """
         Send information about a single exception that occurred in the application.
         :param exception_type: the type of the exception that was thrown.
@@ -93,10 +113,16 @@ class ApplicationInsightsTelemetryClient(BotTelemetryClient):
         :param properties: the set of custom properties the client wants attached to this data item. (defaults to: None)
         :param measurements: the set of custom measurements the client wants to attach to this data item. (defaults to: None)
         """
-        self._client.track_exception(exception_type, value, tb, properties, measurements)
+        self._client.track_exception(
+            exception_type, value, tb, properties, measurements
+        )
 
-    def track_event(self, name: str, properties: Dict[str, object] = None,
-                    measurements: Dict[str, object] = None) -> None:
+    def track_event(
+        self,
+        name: str,
+        properties: Dict[str, object] = None,
+        measurements: Dict[str, object] = None,
+    ) -> None:
         """
         Send information about a single event that has occurred in the context of the application.
         :param name: the data to associate to this event.
@@ -105,9 +131,17 @@ class ApplicationInsightsTelemetryClient(BotTelemetryClient):
         """
         self._client.track_event(name, properties=properties, measurements=measurements)
 
-    def track_metric(self, name: str, value: float, tel_type: TelemetryDataPointType = None,
-                     count: int = None, min_val: float = None, max_val: float = None, std_dev: float = None,
-                     properties: Dict[str, object] = None) -> NotImplemented:
+    def track_metric(
+        self,
+        name: str,
+        value: float,
+        tel_type: TelemetryDataPointType = None,
+        count: int = None,
+        min_val: float = None,
+        max_val: float = None,
+        std_dev: float = None,
+        properties: Dict[str, object] = None,
+    ) -> NotImplemented:
         """
         Send information about a single metric data point that was captured for the application.
         :param name: The name of the metric that was captured.
@@ -119,9 +153,13 @@ class ApplicationInsightsTelemetryClient(BotTelemetryClient):
         :param std_dev: the standard deviation of all metrics collected that were aggregated into this data point. (defaults to: None)
         :param properties: the set of custom properties the client wants attached to this data item. (defaults to: None)
         """
-        self._client.track_metric(name, value, tel_type, count, min_val, max_val, std_dev, properties)
+        self._client.track_metric(
+            name, value, tel_type, count, min_val, max_val, std_dev, properties
+        )
 
-    def track_trace(self, name: str, properties: Dict[str, object] = None, severity=None):
+    def track_trace(
+        self, name: str, properties: Dict[str, object] = None, severity=None
+    ):
         """
         Sends a single trace statement.
         :param name: the trace statement.
@@ -130,10 +168,19 @@ class ApplicationInsightsTelemetryClient(BotTelemetryClient):
         """
         self._client.track_trace(name, properties, severity)
 
-    def track_request(self, name: str, url: str, success: bool, start_time: str = None,
-                      duration: int = None, response_code: str = None, http_method: str = None,
-                      properties: Dict[str, object] = None, measurements: Dict[str, object] = None,
-                      request_id: str = None):
+    def track_request(
+        self,
+        name: str,
+        url: str,
+        success: bool,
+        start_time: str = None,
+        duration: int = None,
+        response_code: str = None,
+        http_method: str = None,
+        properties: Dict[str, object] = None,
+        measurements: Dict[str, object] = None,
+        request_id: str = None,
+    ):
         """
         Sends a single request that was captured for the application.
         :param name: The name for this request. All requests with the same name will be grouped together.
@@ -147,12 +194,32 @@ class ApplicationInsightsTelemetryClient(BotTelemetryClient):
         :param measurements: the set of custom measurements the client wants to attach to this data item. (defaults to: None)
         :param request_id: the id for this request. If None, a new uuid will be generated. (defaults to: None)
         """
-        self._client.track_request(name, url, success, start_time, duration, response_code, http_method, properties,
-                                   measurements, request_id)
+        self._client.track_request(
+            name,
+            url,
+            success,
+            start_time,
+            duration,
+            response_code,
+            http_method,
+            properties,
+            measurements,
+            request_id,
+        )
 
-    def track_dependency(self, name: str, data: str, type_name: str = None, target: str = None, duration: int = None,
-                         success: bool = None, result_code: str = None, properties: Dict[str, object] = None,
-                         measurements: Dict[str, object] = None, dependency_id: str = None):
+    def track_dependency(
+        self,
+        name: str,
+        data: str,
+        type_name: str = None,
+        target: str = None,
+        duration: int = None,
+        success: bool = None,
+        result_code: str = None,
+        properties: Dict[str, object] = None,
+        measurements: Dict[str, object] = None,
+        dependency_id: str = None,
+    ):
         """
         Sends a single dependency telemetry that was captured for the application.
         :param name: the name of the command initiated with this dependency call. Low cardinality value. Examples are stored procedure name and URL path template.
@@ -166,8 +233,18 @@ class ApplicationInsightsTelemetryClient(BotTelemetryClient):
         :param measurements: the set of custom measurements the client wants to attach to this data item. (defaults to: None)
         :param id: the id for this dependency call. If None, a new uuid will be generated. (defaults to: None)
         """
-        self._client.track_dependency(name, data, type_name, target, duration, success, result_code, properties,
-                                      measurements, dependency_id)
+        self._client.track_dependency(
+            name,
+            data,
+            type_name,
+            target,
+            duration,
+            success,
+            result_code,
+            properties,
+            measurements,
+            dependency_id,
+        )
 
     def flush(self):
         """Flushes data in the queue. Data in the queue will be sent either immediately irrespective of what sender is

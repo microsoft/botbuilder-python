@@ -2,8 +2,9 @@
 # Licensed under the MIT License.
 
 import aiounittest
-from botbuilder.dialogs import ( DialogSet, ComponentDialog) 
+from botbuilder.dialogs import DialogSet, ComponentDialog
 from botbuilder.core import ConversationState, MemoryStorage
+
 
 class DialogSetTests(aiounittest.AsyncTestCase):
     def test_dialogset_constructor_valid(self):
@@ -13,8 +14,7 @@ class DialogSetTests(aiounittest.AsyncTestCase):
         assert ds is not None
 
     def test_dialogset_constructor_null_property(self):
-        self.assertRaises(TypeError, lambda:DialogSet(None))
+        self.assertRaises(TypeError, lambda: DialogSet(None))
 
     def test_dialogset_constructor_null_from_componentdialog(self):
         ComponentDialog("MyId")
-

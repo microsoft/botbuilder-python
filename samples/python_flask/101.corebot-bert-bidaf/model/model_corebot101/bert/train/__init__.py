@@ -6,8 +6,4 @@ from .args import Args
 from .bert_train_eval import BertTrainEval
 from .flight_booking_processor import FlightBookingProcessor
 
-__all__ = [
-    'Args',
-    'BertTrainEval',
-    'FlightBookingProcessor'
-    ]
+__all__ = ["Args", "BertTrainEval", "FlightBookingProcessor"]
