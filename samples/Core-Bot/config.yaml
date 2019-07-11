@@ -5,8 +5,8 @@ Settings:
   Port: 3978
   LuisAppId: ""
   # LUIS authoring key from LUIS portal or LUIS Cognitive Service subscription key
-  LuisAPIKey: "" 
+  LuisAPIKey: ""
   # LUIS endpoint host name, ie "westus.api.cognitive.microsoft.com"
-  LuisAPIHostName: "" 
+  LuisAPIHostName: ""
   AppId: ""
   AppPassword: ""

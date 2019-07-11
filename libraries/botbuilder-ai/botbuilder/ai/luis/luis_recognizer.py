@@ -11,17 +11,17 @@ from msrest.authentication import CognitiveServicesCredentials
 from botbuilder.core import (
     BotAssert,
     BotTelemetryClient,
+    IntentScore,
     NullTelemetryClient,
+    RecognizerResult,
     TurnContext,
 )
 from botbuilder.schema import Activity, ActivityTypes, ChannelAccount
 
 from . import (
-    IntentScore,
     LuisApplication,
     LuisPredictionOptions,
     LuisTelemetryConstants,
-    RecognizerResult,
 )
 from .activity_util import ActivityUtil
 from .luis_util import LuisUtil

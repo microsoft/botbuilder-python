@@ -11,10 +11,10 @@ from azure.cognitiveservices.language.luis.runtime.models import (
     EntityModel,
     LuisResult,
 )
+from botbuilder.core import IntentScore, RecognizerResult
 from msrest import Serializer
 
 from .. import __title__, __version__
-from . import IntentScore, RecognizerResult
 
 
 class LuisUtil:
