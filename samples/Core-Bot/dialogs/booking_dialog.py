@@ -4,6 +4,7 @@
 from botbuilder.dialogs import WaterfallDialog, WaterfallStepContext, DialogTurnResult
 from botbuilder.dialogs.prompts import ConfirmPrompt, TextPrompt, PromptOptions
 from botbuilder.core import MessageFactory
+from botbuilder.schema import InputHints
 from .cancel_and_help_dialog import CancelAndHelpDialog
 from .date_resolver_dialog import DateResolverDialog
 
@@ -35,10 +36,11 @@ class BookingDialog(CancelAndHelpDialog):
     async def destination_step(self, step_context: WaterfallStepContext) -> DialogTurnResult: 
         booking_details = step_context.options
 
-        if (booking_details.destination is None): 
-            return await step_context.prompt(TextPrompt.__name__, PromptOptions(prompt= MessageFactory.text('To what city would you like to travel?')))
-        else: 
-            return await step_context.next(booking_details.destination)
+        if booking_details.destination is None:
+            message_text = 'Where would you like to travel to?'
+            prompt_message = MessageFactory.text(message_text, message_text, InputHints.expecting_input)
+            return await step_context.prompt(TextPrompt.__name__, PromptOptions(prompt=prompt_message))
+        return await step_context.next(booking_details.destination)
 
     """
     If an origin city has not been provided, prompt for one.
@@ -50,10 +52,11 @@ class BookingDialog(CancelAndHelpDialog):
 
         # Capture the response to the previous step's prompt
         booking_details.destination = step_context.result
-        if (booking_details.origin is None): 
-            return await step_context.prompt(TextPrompt.__name__, PromptOptions(prompt= MessageFactory.text('From what city will you be travelling?')))
-        else: 
-            return await step_context.next(booking_details.origin)
+        if booking_details.origin is None:
+            message_text = 'From what city will you be travelling?'
+            prompt_message = MessageFactory.text(message_text, message_text, InputHints.expecting_input)
+            return await step_context.prompt(TextPrompt.__name__, PromptOptions(prompt=prompt_message))
+        return await step_context.next(booking_details.origin)
 
     """
     If a travel date has not been provided, prompt for one.
@@ -66,10 +69,9 @@ class BookingDialog(CancelAndHelpDialog):
 
         # Capture the results of the previous step
         booking_details.origin = step_context.result
-        if (not booking_details.travel_date or self.is_ambiguous(booking_details.travel_date)): 
+        if not booking_details.travel_date or self.is_ambiguous(booking_details.travel_date):
             return await step_context.begin_dialog(DateResolverDialog.__name__, booking_details.travel_date)
-        else: 
-            return await step_context.next(booking_details.travel_date)
+        return await step_context.next(booking_details.travel_date)
 
     """
     Confirm the information the user has provided.
@@ -81,10 +83,12 @@ class BookingDialog(CancelAndHelpDialog):
 
         # Capture the results of the previous step
         booking_details.travel_date= step_context.result
-        msg = f'Please confirm, I have you traveling to: { booking_details.destination } from: { booking_details.origin } on: { booking_details.travel_date}.'
-
+        message_text = f'Please confirm, I have you traveling to: { booking_details.destination } from: ' \
+            f'{ booking_details.origin } on: { booking_details.travel_date}.'
+        prompt_message = MessageFactory.text(message_text, message_text, InputHints.expecting_input)
+        
         # Offer a YES/NO prompt.
-        return await step_context.prompt(ConfirmPrompt.__name__, PromptOptions(prompt= MessageFactory.text(msg)))
+        return await step_context.prompt(ConfirmPrompt.__name__, PromptOptions(prompt=prompt_message))
 
     """
     Complete the interaction and end the dialog.
@@ -98,8 +102,7 @@ class BookingDialog(CancelAndHelpDialog):
             booking_details.travel_date= step_context.result
 
             return await step_context.end_dialog(booking_details)
-        else: 
-            return await step_context.end_dialog()
+        return await step_context.end_dialog()
 
     def is_ambiguous(self, timex: str) -> bool: 
         timex_property = Timex(timex)

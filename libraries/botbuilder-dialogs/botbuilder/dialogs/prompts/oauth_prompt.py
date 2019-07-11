@@ -60,10 +60,10 @@ class OAuthPrompt(Dialog):
 
         # Ensure prompts have input hint set
         if options.prompt and not options.prompt.input_hint:
-            options.prompt.input_hint = InputHints.expecting_input
+            options.prompt.input_hint = InputHints.accepting_input
 
         if options.retry_prompt and not options.retry_prompt.input_hint:
-            options.prompt.input_hint = InputHints.expecting_input
+            options.retry_prompt.input_hint = InputHints.accepting_input
 
         # Initialize prompt state
         timeout = self._settings.timeout if isinstance(self._settings.timeout, int) else 900000
@@ -142,9 +142,9 @@ class OAuthPrompt(Dialog):
 
     async def send_oauth_card(self, context: TurnContext, prompt: Union[Activity, str] = None):
         if not isinstance(prompt, Activity):
-            prompt = MessageFactory.text(prompt or '', None, InputHints.expecting_input)
+            prompt = MessageFactory.text(prompt or '', None, InputHints.accepting_input)
         else:
-            prompt.input_hint = prompt.input_hint or InputHints.expecting_input
+            prompt.input_hint = prompt.input_hint or InputHints.accepting_input
 
         prompt.attachments = prompt.attachments or []
 
