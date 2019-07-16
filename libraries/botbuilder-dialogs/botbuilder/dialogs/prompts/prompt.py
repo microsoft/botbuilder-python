@@ -187,23 +187,24 @@ class Prompt(Dialog):
             return ChoiceFactory.hero_card(choices, text)
 
         def list_style_none() -> Activity:
-            activity = Activity()
+            activity = Activity(type=ActivityTypes.message)
             activity.text = text
             return activity
 
         def default() -> Activity:
             return ChoiceFactory.for_channel(channel_id, choices, text, None, options)
 
+        # Maps to values in ListStyle Enum
         switcher = {
-            # ListStyle.inline
-            1: inline,
-            2: list_style,
-            3: suggested_action,
-            4: hero_card,
-            5: list_style_none,
-        }
-
-        msg = switcher.get(style, default)()
+            0: list_style_none,
+            1: default,
+            2: inline,
+            3: list_style,
+            4: suggested_action,
+            5: hero_card
+            }
+            
+        msg = switcher.get(int(style.value), default)()
 
         # Update prompt with text, actions and attachments
         if not prompt:
