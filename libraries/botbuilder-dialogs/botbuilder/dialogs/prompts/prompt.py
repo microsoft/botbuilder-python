@@ -199,8 +199,8 @@ class Prompt(Dialog):
             3: list_style,
             4: suggested_action,
             5: hero_card
-            }
-            
+        }
+ 
         msg = switcher.get(int(style.value), default)()
 
         # Update prompt with text, actions and attachments
