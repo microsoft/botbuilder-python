@@ -267,11 +267,8 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
         dialogs.add(choice_prompt)
 
         step1 = await adapter.send(Activity(type=ActivityTypes.message, text="Hello"))
-        # TODO ChoiceFactory.inline() is broken, where it only uses hard-coded English locale.
-        # commented out the CORRECT assertion below, until .inline() is fixed to use proper locale
-        # step2 = await step1.assert_reply('Please choose a color. (1) red, (2) green, o (3) blue')
         step2 = await step1.assert_reply(
-            "Please choose a color. (1) red, (2) green, or (3) blue"
+            "Please choose a color. (1) red, (2) green, o (3) blue"
         )
         step3 = await step2.send(_invalid_message)
         step4 = await step3.assert_reply("Bad input.")
@@ -318,11 +315,8 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
         step1 = await adapter.send(
             Activity(type=ActivityTypes.message, text="Hello", locale=Culture.Spanish)
         )
-        # TODO ChoiceFactory.inline() is broken, where it only uses hard-coded English locale.
-        # commented out the CORRECT assertion below, until .inline() is fixed to use proper locale
-        # step2 = await step1.assert_reply('Please choose a color. (1) red, (2) green, o (3) blue')
         step2 = await step1.assert_reply(
-            "Please choose a color. (1) red, (2) green, or (3) blue"
+            'Please choose a color. (1) red, (2) green, o (3) blue'
         )
         step3 = await step2.send(_answer_message)
         await step3.assert_reply("red")

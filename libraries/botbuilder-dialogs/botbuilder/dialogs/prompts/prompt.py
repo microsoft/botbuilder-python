@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 import copy
-from typing import Dict
+from typing import Dict, List
 from .prompt_options import PromptOptions
 from .prompt_validator_context import PromptValidatorContext
 from ..dialog_reason import DialogReason
@@ -12,7 +12,7 @@ from ..dialog_turn_result import DialogTurnResult
 from ..dialog_context import DialogContext
 from botbuilder.core.turn_context import TurnContext
 from botbuilder.schema import InputHints, ActivityTypes
-from botbuilder.dialogs.choices import ChoiceFactory, ListStyle
+from botbuilder.dialogs.choices import Choice, ChoiceFactory, ChoiceFactoryOptions, ListStyle
 
 from abc import abstractmethod
 from botbuilder.schema import Activity
@@ -142,15 +142,13 @@ class Prompt(Dialog):
     ):
         pass
 
-    # TODO: Fix choices to use Choice object when ported.
-    # TODO: Fix options to use ChoiceFactoryOptions object when ported.
     def append_choices(
         self,
         prompt: Activity,
         channel_id: str,
-        choices: object,
+        choices: List[Choice],
         style: ListStyle,
-        options: object = None,
+        options: ChoiceFactoryOptions = None,
     ) -> Activity:
         """
         Helper function to compose an output activity containing a set of choices.
