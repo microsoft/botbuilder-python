@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 import copy
-from typing import Dict
+from typing import Dict, List
 from .prompt_options import PromptOptions
 from .prompt_validator_context import PromptValidatorContext
 from ..dialog_reason import DialogReason
@@ -12,7 +12,12 @@ from ..dialog_turn_result import DialogTurnResult
 from ..dialog_context import DialogContext
 from botbuilder.core.turn_context import TurnContext
 from botbuilder.schema import InputHints, ActivityTypes
-from botbuilder.dialogs.choices import ChoiceFactory
+from botbuilder.dialogs.choices import (
+    Choice,
+    ChoiceFactory,
+    ChoiceFactoryOptions,
+    ListStyle,
+)
 
 from abc import abstractmethod
 from botbuilder.schema import Activity
@@ -142,16 +147,13 @@ class Prompt(Dialog):
     ):
         pass
 
-    # TODO: Fix choices to use Choice object when ported.
-    # TODO: Fix style to use ListStyle when ported.
-    # TODO: Fix options to use ChoiceFactoryOptions object when ported.
     def append_choices(
         self,
         prompt: Activity,
         channel_id: str,
-        choices: object,
-        style: object,
-        options: object = None,
+        choices: List[Choice],
+        style: ListStyle,
+        options: ChoiceFactoryOptions = None,
     ) -> Activity:
         """
         Helper function to compose an output activity containing a set of choices.
@@ -187,23 +189,24 @@ class Prompt(Dialog):
             return ChoiceFactory.hero_card(choices, text)
 
         def list_style_none() -> Activity:
-            activity = Activity()
+            activity = Activity(type=ActivityTypes.message)
             activity.text = text
             return activity
 
         def default() -> Activity:
             return ChoiceFactory.for_channel(channel_id, choices, text, None, options)
 
+        # Maps to values in ListStyle Enum
         switcher = {
-            # ListStyle.inline
-            1: inline,
-            2: list_style,
-            3: suggested_action,
-            4: hero_card,
-            5: list_style_none,
+            0: list_style_none,
+            1: default,
+            2: inline,
+            3: list_style,
+            4: suggested_action,
+            5: hero_card,
         }
 
-        msg = switcher.get(style, default)()
+        msg = switcher.get(int(style.value), default)()
 
         # Update prompt with text, actions and attachments
         if not prompt:

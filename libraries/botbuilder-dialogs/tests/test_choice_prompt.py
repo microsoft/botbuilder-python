@@ -267,11 +267,8 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
         dialogs.add(choice_prompt)
 
         step1 = await adapter.send(Activity(type=ActivityTypes.message, text="Hello"))
-        # TODO ChoiceFactory.inline() is broken, where it only uses hard-coded English locale.
-        # commented out the CORRECT assertion below, until .inline() is fixed to use proper locale
-        # step2 = await step1.assert_reply('Please choose a color. (1) red, (2) green, o (3) blue')
         step2 = await step1.assert_reply(
-            "Please choose a color. (1) red, (2) green, or (3) blue"
+            "Please choose a color. (1) red, (2) green, o (3) blue"
         )
         step3 = await step2.send(_invalid_message)
         step4 = await step3.assert_reply("Bad input.")
@@ -318,11 +315,8 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
         step1 = await adapter.send(
             Activity(type=ActivityTypes.message, text="Hello", locale=Culture.Spanish)
         )
-        # TODO ChoiceFactory.inline() is broken, where it only uses hard-coded English locale.
-        # commented out the CORRECT assertion below, until .inline() is fixed to use proper locale
-        # step2 = await step1.assert_reply('Please choose a color. (1) red, (2) green, o (3) blue')
         step2 = await step1.assert_reply(
-            "Please choose a color. (1) red, (2) green, or (3) blue"
+            "Please choose a color. (1) red, (2) green, o (3) blue"
         )
         step3 = await step2.send(_answer_message)
         await step3.assert_reply("red")
@@ -377,9 +371,7 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
         step3 = await step2.send(_answer_message)
         await step3.assert_reply("red")
 
-    async def test_should_not_render_choices_and_not_blow_up_if_choices_are_not_passed_in(
-        self
-    ):
+    async def test_should_not_render_choices_if_list_style_none_is_specified(self):
         async def exec_test(turn_context: TurnContext):
             dc = await dialogs.create_context(turn_context)
 
@@ -390,7 +382,8 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
                     prompt=Activity(
                         type=ActivityTypes.message, text="Please choose a color."
                     ),
-                    choices=None,
+                    choices=_color_choices,
+                    style=ListStyle.none,
                 )
                 await dc.prompt("prompt", options)
             elif results.status == DialogTurnStatus.Complete:
@@ -406,53 +399,13 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
         dialogs = DialogSet(dialog_state)
 
         choice_prompt = ChoicePrompt("prompt")
-        choice_prompt.style = ListStyle.none
-
-        dialogs.add(choice_prompt)
-
-        step1 = await adapter.send("Hello")
-        await step1.assert_reply("Please choose a color.")
-
-    # TODO to create parity with JS, need to refactor this so that it does not blow up when choices are None
-    # Possibly does not work due to the side effect of list styles not applying
-    # Note: step2 only appears to pass as ListStyle.none, probably because choices is None, and therefore appending
-    # nothing to the prompt text
-    async def test_should_not_recognize_if_choices_are_not_passed_in(self):
-        async def exec_test(turn_context: TurnContext):
-            dc = await dialogs.create_context(turn_context)
-
-            results: DialogTurnResult = await dc.continue_dialog()
-
-            if results.status == DialogTurnStatus.Empty:
-                options = PromptOptions(
-                    prompt=Activity(
-                        type=ActivityTypes.message, text="Please choose a color."
-                    ),
-                    choices=None,
-                )
-                await dc.prompt("prompt", options)
-            elif results.status == DialogTurnStatus.Complete:
-                selected_choice = results.result
-                await turn_context.send_activity(selected_choice.value)
-
-            await convo_state.save_changes(turn_context)
-
-        adapter = TestAdapter(exec_test)
-
-        convo_state = ConversationState(MemoryStorage())
-        dialog_state = convo_state.create_property("dialogState")
-        dialogs = DialogSet(dialog_state)
-
-        choice_prompt = ChoicePrompt("prompt")
-        choice_prompt.style = ListStyle.none
 
         dialogs.add(choice_prompt)
 
         step1 = await adapter.send("Hello")
         step2 = await step1.assert_reply("Please choose a color.")
-        # TODO uncomment when styling is fixed for prompts - assertions should pass
-        # step3 = await step2.send('hello')
-        # await step3.assert_reply('Please choose a color.')
+        step3 = await step2.send(_answer_message)
+        await step3.assert_reply("red")
 
     async def test_should_create_prompt_with_inline_choices_when_specified(self):
         async def exec_test(turn_context: TurnContext):
@@ -492,8 +445,6 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
         step3 = await step2.send(_answer_message)
         await step3.assert_reply("red")
 
-    # TODO fix test to actually test for list_style instead of inline
-    # currently bug where all styling is ignored and only does inline styling for prompts
     async def test_should_create_prompt_with_list_choices_when_specified(self):
         async def exec_test(turn_context: TurnContext):
             dc = await dialogs.create_context(turn_context)
@@ -526,9 +477,82 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
         dialogs.add(choice_prompt)
 
         step1 = await adapter.send("Hello")
-        # TODO uncomment assertion when prompt styling has been fixed - assertion should pass with list_style
-        # Also be sure to remove inline assertion currently being tested below
-        # step2 = await step1.assert_reply('Please choose a color.\n\n   1. red\n   2. green\n   3. blue')
+        step2 = await step1.assert_reply(
+            "Please choose a color.\n\n   1. red\n   2. green\n   3. blue"
+        )
+        step3 = await step2.send(_answer_message)
+        await step3.assert_reply("red")
+
+    async def test_should_create_prompt_with_suggested_action_style_when_specified(
+        self
+    ):
+        async def exec_test(turn_context: TurnContext):
+            dc = await dialogs.create_context(turn_context)
+
+            results: DialogTurnResult = await dc.continue_dialog()
+
+            if results.status == DialogTurnStatus.Empty:
+                options = PromptOptions(
+                    prompt=Activity(
+                        type=ActivityTypes.message, text="Please choose a color."
+                    ),
+                    choices=_color_choices,
+                    style=ListStyle.suggested_action,
+                )
+                await dc.prompt("prompt", options)
+            elif results.status == DialogTurnStatus.Complete:
+                selected_choice = results.result
+                await turn_context.send_activity(selected_choice.value)
+
+            await convo_state.save_changes(turn_context)
+
+        adapter = TestAdapter(exec_test)
+
+        convo_state = ConversationState(MemoryStorage())
+        dialog_state = convo_state.create_property("dialogState")
+        dialogs = DialogSet(dialog_state)
+
+        choice_prompt = ChoicePrompt("prompt")
+
+        dialogs.add(choice_prompt)
+
+        step1 = await adapter.send("Hello")
+        step2 = await step1.assert_reply("Please choose a color.")
+        step3 = await step2.send(_answer_message)
+        await step3.assert_reply("red")
+
+    async def test_should_create_prompt_with_auto_style_when_specified(self):
+        async def exec_test(turn_context: TurnContext):
+            dc = await dialogs.create_context(turn_context)
+
+            results: DialogTurnResult = await dc.continue_dialog()
+
+            if results.status == DialogTurnStatus.Empty:
+                options = PromptOptions(
+                    prompt=Activity(
+                        type=ActivityTypes.message, text="Please choose a color."
+                    ),
+                    choices=_color_choices,
+                    style=ListStyle.auto,
+                )
+                await dc.prompt("prompt", options)
+            elif results.status == DialogTurnStatus.Complete:
+                selected_choice = results.result
+                await turn_context.send_activity(selected_choice.value)
+
+            await convo_state.save_changes(turn_context)
+
+        adapter = TestAdapter(exec_test)
+
+        convo_state = ConversationState(MemoryStorage())
+        dialog_state = convo_state.create_property("dialogState")
+        dialogs = DialogSet(dialog_state)
+
+        choice_prompt = ChoicePrompt("prompt")
+
+        dialogs.add(choice_prompt)
+
+        step1 = await adapter.send("Hello")
         step2 = await step1.assert_reply(
             "Please choose a color. (1) red, (2) green, or (3) blue"
         )
