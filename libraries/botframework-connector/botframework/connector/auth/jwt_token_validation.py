@@ -49,16 +49,12 @@ class JwtTokenValidation:
         
         if using_emulator:
             return await EmulatorValidation.authenticate_emulator_token(auth_header, credentials, channel_service, channel_id)
-        
-        if not channel_service:
-            if service_url.strip():
-                return 
 
-        else:
-            if service_url:
-                return await ChannelValidation.authenticate_channel_token_with_service_url(auth_header, credentials, service_url, channel_id)
-            else:
-                return await ChannelValidation.authenticate_channel_token(auth_header, credentials, channel_id)
+        # Right now public Azure is the only supported scenario (Gov and Enterprise pending) 
+        if service_url:
+            return await ChannelValidation.authenticate_channel_token_with_service_url(auth_header, credentials, service_url, channel_id)
+        
+        return await ChannelValidation.authenticate_channel_token(auth_header, credentials, channel_id)
     
     @staticmethod
     def is_government(channel_service: str) -> bool:
