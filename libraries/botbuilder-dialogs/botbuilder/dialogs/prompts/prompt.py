@@ -12,7 +12,12 @@ from ..dialog_turn_result import DialogTurnResult
 from ..dialog_context import DialogContext
 from botbuilder.core.turn_context import TurnContext
 from botbuilder.schema import InputHints, ActivityTypes
-from botbuilder.dialogs.choices import Choice, ChoiceFactory, ChoiceFactoryOptions, ListStyle
+from botbuilder.dialogs.choices import (
+    Choice,
+    ChoiceFactory,
+    ChoiceFactoryOptions,
+    ListStyle,
+)
 
 from abc import abstractmethod
 from botbuilder.schema import Activity
@@ -167,7 +172,7 @@ class Prompt(Dialog):
         options: (Optional) options to configure the underlying `ChoiceFactory` call.
         """
         # Get base prompt text (if any)
-        text = prompt.text if prompt != None and not prompt.text == False else ''
+        text = prompt.text if prompt != None and not prompt.text == False else ""
 
         # Create temporary msg
         # TODO: fix once ChoiceFactory complete
@@ -198,9 +203,9 @@ class Prompt(Dialog):
             2: inline,
             3: list_style,
             4: suggested_action,
-            5: hero_card
+            5: hero_card,
         }
- 
+
         msg = switcher.get(int(style.value), default)()
 
         # Update prompt with text, actions and attachments
