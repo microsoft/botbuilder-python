@@ -22,9 +22,9 @@ from botbuilder.schema import Activity
 
 
 class Prompt(Dialog):
-    ATTEMPT_COUNT_KEY = 'AttemptCount'
-    persisted_options = 'options'
-    persisted_state = 'state'
+    ATTEMPT_COUNT_KEY = "AttemptCount"
+    persisted_options = "options"
+    persisted_state = "state"
 
     def __init__(self, dialog_id: str, validator: object = None):
         """Creates a new Prompt instance.
@@ -45,9 +45,9 @@ class Prompt(Dialog):
         self, dc: DialogContext, options: object
     ) -> DialogTurnResult:
         if not dc:
-            raise TypeError('Prompt(): dc cannot be None.')
+            raise TypeError("Prompt(): dc cannot be None.")
         if not isinstance(options, PromptOptions):
-            raise TypeError('Prompt(): Prompt options are required for Prompt dialogs.')
+            raise TypeError("Prompt(): Prompt options are required for Prompt dialogs.")
         # Ensure prompts have input hint set
         if options.prompt is not None and not options.prompt.input_hint:
             options.prompt.input_hint = InputHints.expecting_input
@@ -72,7 +72,7 @@ class Prompt(Dialog):
 
     async def continue_dialog(self, dc: DialogContext):
         if not dc:
-            raise TypeError('Prompt(): dc cannot be None.')
+            raise TypeError("Prompt(): dc cannot be None.")
 
         # Don't do anything for non-message activities
         if dc.context.activity.type != ActivityTypes.message:
