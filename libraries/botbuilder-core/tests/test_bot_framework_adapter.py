@@ -1,10 +1,10 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import aiounittest
-import unittest
 from copy import copy, deepcopy
 from unittest.mock import Mock
+import unittest
+import aiounittest
 
 from botbuilder.core import (
     BotFrameworkAdapter,
@@ -21,7 +21,7 @@ from botbuilder.schema import (
 from botframework.connector.aio import ConnectorClient
 from botframework.connector.auth import ClaimsIdentity
 
-reference = ConversationReference(
+REFERENCE = ConversationReference(
     activity_id="1234",
     channel_id="test",
     service_url="https://example.org/channel",
@@ -30,16 +30,16 @@ reference = ConversationReference(
     conversation=ConversationAccount(id="convo1"),
 )
 
-test_activity = Activity(text="test", type=ActivityTypes.message)
+TEST_ACTIVITY = Activity(text="test", type=ActivityTypes.message)
 
-incoming_message = TurnContext.apply_conversation_reference(
-    copy(test_activity), reference, True
+INCOMING_MESSAGE = TurnContext.apply_conversation_reference(
+    copy(TEST_ACTIVITY), REFERENCE, True
 )
-outgoing_message = TurnContext.apply_conversation_reference(
-    copy(test_activity), reference
+OUTGOING_MESSAGE = TurnContext.apply_conversation_reference(
+    copy(TEST_ACTIVITY), REFERENCE
 )
-incoming_invoke = TurnContext.apply_conversation_reference(
-    Activity(type=ActivityTypes.invoke), reference, True
+INCOMING_INVOKE = TurnContext.apply_conversation_reference(
+    Activity(type=ActivityTypes.invoke), REFERENCE, True
 )
 
 
@@ -176,7 +176,7 @@ async def process_activity(
 class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
     def test_should_create_connector_client(self):
         adapter = AdapterUnderTest()
-        client = adapter.aux_test_create_connector_client(reference.service_url)
+        client = adapter.aux_test_create_connector_client(REFERENCE.service_url)
         self.assertIsNotNone(client, "client not returned.")
         self.assertIsNotNone(client.conversations, "invalid client returned.")
 
@@ -189,37 +189,37 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
             nonlocal called
             called = True
 
-        await adapter.process_activity(incoming_message, "", aux_func_assert_context)
+        await adapter.process_activity(INCOMING_MESSAGE, "", aux_func_assert_context)
         self.assertTrue(called, "bot logic not called.")
 
     async def test_should_update_activity(self):
         adapter = AdapterUnderTest()
-        context = TurnContext(adapter, incoming_message)
+        context = TurnContext(adapter, INCOMING_MESSAGE)
         self.assertTrue(
-            await adapter.update_activity(context, incoming_message),
+            await adapter.update_activity(context, INCOMING_MESSAGE),
             "Activity not updated.",
         )
 
-    async def test_should_fail_to_update_activity_if_serviceUrl_missing(self):
+    async def test_should_fail_to_update_activity_if_service_url_missing(self):
         adapter = AdapterUnderTest()
-        context = TurnContext(adapter, incoming_message)
-        cpy = deepcopy(incoming_message)
+        context = TurnContext(adapter, INCOMING_MESSAGE)
+        cpy = deepcopy(INCOMING_MESSAGE)
         cpy.service_url = None
         with self.assertRaises(Exception) as _:
             await adapter.update_activity(context, cpy)
 
     async def test_should_fail_to_update_activity_if_conversation_missing(self):
         adapter = AdapterUnderTest()
-        context = TurnContext(adapter, incoming_message)
-        cpy = deepcopy(incoming_message)
+        context = TurnContext(adapter, INCOMING_MESSAGE)
+        cpy = deepcopy(INCOMING_MESSAGE)
         cpy.conversation = None
         with self.assertRaises(Exception) as _:
             await adapter.update_activity(context, cpy)
 
     async def test_should_fail_to_update_activity_if_activity_id_missing(self):
         adapter = AdapterUnderTest()
-        context = TurnContext(adapter, incoming_message)
-        cpy = deepcopy(incoming_message)
+        context = TurnContext(adapter, INCOMING_MESSAGE)
+        cpy = deepcopy(INCOMING_MESSAGE)
         cpy.id = None
         with self.assertRaises(Exception) as _:
             await adapter.update_activity(context, cpy)
@@ -231,7 +231,7 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
                 text="foo",
                 channel_data={"tenant": {"id": "1234"}},
             ),
-            reference=reference,
+            reference=REFERENCE,
             is_incoming=True,
         )
 
@@ -239,7 +239,7 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
         adapter = AdapterUnderTest()
 
         async def aux_func_assert_tenant_id_copied(context):
-            self.assertEquals(
+            self.assertEqual(
                 context.activity.conversation.tenant_id,
                 "1234",
                 "should have copied tenant id from "

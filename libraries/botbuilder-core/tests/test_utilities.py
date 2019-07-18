@@ -11,13 +11,13 @@ from botbuilder.core.adapters import TestAdapter
 class TestUtilities:
     @staticmethod
     def create_empty_context():
-        b = TestAdapter()
-        a = Activity(
+        adapter = TestAdapter()
+        activity = Activity(
             type=ActivityTypes.message,
             channel_id="EmptyContext",
             conversation=ConversationAccount(id="test"),
             from_property=ChannelAccount(id="empty@empty.context.org"),
         )
-        bc = TurnContext(b, a)
+        context = TurnContext(adapter, activity)
 
-        return bc
+        return context
