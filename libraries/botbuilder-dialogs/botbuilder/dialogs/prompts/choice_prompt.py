@@ -30,28 +30,52 @@ class ChoicePrompt(Prompt):
 
     _default_choice_options: Dict[str, ChoiceFactoryOptions] = {
         Culture.Spanish: ChoiceFactoryOptions(
-            inline_separator=", ", inline_or=" o ", include_numbers=True
+            inline_separator=", ",
+            inline_or=" o ",
+            inline_or_more=", o ",
+            include_numbers=True,
         ),
         Culture.Dutch: ChoiceFactoryOptions(
-            inline_separator=", ", inline_or=" of ", include_numbers=True
+            inline_separator=", ",
+            inline_or=" of ",
+            inline_or_more=", of ",
+            include_numbers=True,
         ),
         Culture.English: ChoiceFactoryOptions(
-            inline_separator=", ", inline_or=" or ", include_numbers=True
+            inline_separator=", ",
+            inline_or=" or ",
+            inline_or_more=", or ",
+            include_numbers=True,
         ),
         Culture.French: ChoiceFactoryOptions(
-            inline_separator=", ", inline_or=" ou ", include_numbers=True
+            inline_separator=", ",
+            inline_or=" ou ",
+            inline_or_more=", ou ",
+            include_numbers=True,
         ),
         "de-de": ChoiceFactoryOptions(
-            inline_separator=", ", inline_or=" oder ", include_numbers=True
+            inline_separator=", ",
+            inline_or=" oder ",
+            inline_or_more=", oder ",
+            include_numbers=True,
         ),
         Culture.Japanese: ChoiceFactoryOptions(
-            inline_separator="、 ", inline_or=" または ", include_numbers=True
+            inline_separator="、 ",
+            inline_or=" または ",
+            inline_or_more="、 または ",
+            include_numbers=True,
         ),
         Culture.Portuguese: ChoiceFactoryOptions(
-            inline_separator=", ", inline_or=" ou ", include_numbers=True
+            inline_separator=", ",
+            inline_or=" ou ",
+            inline_or_more=", ou ",
+            include_numbers=True,
         ),
         Culture.Chinese: ChoiceFactoryOptions(
-            inline_separator="， ", inline_or=" 要么 ", include_numbers=True
+            inline_separator="， ",
+            inline_or=" 要么 ",
+            inline_or_more="， 要么 ",
+            include_numbers=True,
         ),
     }
 
