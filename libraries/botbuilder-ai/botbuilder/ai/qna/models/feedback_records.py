@@ -5,8 +5,10 @@ from typing import List
 
 from .feedback_record import FeedbackRecord
 
+
 class FeedbackRecords:
     """ Active learning feedback records. """
+
     def __init__(self, records: List[FeedbackRecord]):
         """
         Parameter(s):

@@ -6,9 +6,17 @@
 # --------------------------------------------------------------------------
 
 from .feedback_record import FeedbackRecord
+from .feedback_records import FeedbackRecords
 from .metadata import Metadata
+from .qnamaker_trace_info import QnAMakerTraceInfo
+from .query_result import QueryResult
+from .query_results import QueryResults
 
 __all__ = [
     "FeedbackRecord",
-    "Metadata"
+    "FeedbackRecords",
+    "Metadata",
+    "QnAMakerTraceInfo",
+    "QueryResult",
+    "QueryResults",
 ]
