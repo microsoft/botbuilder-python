@@ -4,7 +4,7 @@
 
 class FeedbackRecord:
     """ Active learning feedback record. """
-    def __init__(self, user_id, user_question, qna_id):
+    def __init__(self, user_id: str, user_question: str, qna_id: str):
         """
         Parameters:
         -----------
