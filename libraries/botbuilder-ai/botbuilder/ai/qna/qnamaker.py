@@ -1,11 +1,13 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+#TODO delete client lines below when Active Learning is fully
 from aiohttp import ClientSession, ClientTimeout, ClientResponse
 
 from botbuilder.schema import Activity
 from botbuilder.core import BotTelemetryClient, NullTelemetryClient, TurnContext
 from copy import copy
+#TODO after porting Active Learning, delete import json, platform, requests
 import json, platform, requests
 from typing import Dict, List, NamedTuple, Union
 
