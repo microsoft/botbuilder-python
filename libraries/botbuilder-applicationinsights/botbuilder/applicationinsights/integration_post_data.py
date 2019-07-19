@@ -35,14 +35,14 @@ class IntegrationPostData:
         body = json.loads(body_text) if body_text is not None else None
         return body
 
-    def get_request_body(self) -> str:
+    def get_request_body(self) -> str:  # pylint: disable=inconsistent-return-statements
         """Retrieve the request body from flask/django middleware component."""
         if self.detect_flask():
             return retrieve_flask_body()
-        else:
-            if self.detect_django():
-                # Retrieve from Middleware cache
-                return retrieve_bot_body()
+
+        if self.detect_django():
+            # Retrieve from Middleware cache
+            return retrieve_bot_body()
 
     def detect_flask(self) -> bool:
         """Detects if running in flask."""
