@@ -1,7 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
-import aiounittest
+
 from unittest.mock import MagicMock
+import aiounittest
 
 from botbuilder.core import (
     BotState,
@@ -78,10 +79,10 @@ class TestBotState(aiounittest.AsyncTestCase):
         # Mock a storage provider, which counts read/writes
         dictionary = {}
 
-        async def mock_write_result(self):
+        async def mock_write_result(self):  # pylint: disable=unused-argument
             return
 
-        async def mock_read_result(self):
+        async def mock_read_result(self):  # pylint: disable=unused-argument
             return {}
 
         mock_storage = MemoryStorage(dictionary)
@@ -138,11 +139,11 @@ class TestBotState(aiounittest.AsyncTestCase):
         context = TestUtilities.create_empty_context()
 
         # Act
-        property_a = user_state.create_property("property_a")
+        user_state.create_property("property_a")
         await user_state.load(context)
         await user_state.load(context)
 
-    async def test_State_GetNoLoadWithDefault(self):
+    async def test_state_get_no_load_with_default(self):
         """Should be able to get a property with no Load and default"""
         # Arrange
         dictionary = {}
@@ -154,7 +155,7 @@ class TestBotState(aiounittest.AsyncTestCase):
         value_a = await property_a.get(context, lambda: "Default!")
         self.assertEqual("Default!", value_a)
 
-    async def test_State_GetNoLoadNoDefault(self):
+    async def test_state_get_no_load_no_default(self):
         """Cannot get a string with no default set"""
         # Arrange
         dictionary = {}
@@ -168,7 +169,7 @@ class TestBotState(aiounittest.AsyncTestCase):
         # Assert
         self.assertIsNone(value_a)
 
-    async def test_State_POCO_NoDefault(self):
+    async def test_state_poco_no_default(self):
         """Cannot get a POCO with no default set"""
         # Arrange
         dictionary = {}
@@ -182,7 +183,7 @@ class TestBotState(aiounittest.AsyncTestCase):
         # Assert
         self.assertIsNone(value)
 
-    async def test_State_bool_NoDefault(self):
+    async def test_state_bool_no_default(self):
         """Cannot get a bool with no default set"""
         # Arange
         dictionary = {}
@@ -196,24 +197,7 @@ class TestBotState(aiounittest.AsyncTestCase):
         # Assert
         self.assertFalse(value)
 
-    """
-    TODO: Check if default int functionality is needed
-    async def test_State_int_NoDefault(self):
-        ""Cannot get a int with no default set""
-        # Arrange
-        dictionary = {}
-        user_state = UserState(MemoryStorage(dictionary))
-        context = TestUtilities.create_empty_context()
-
-        # Act
-        test_property = user_state.create_property("test")
-        value = await test_property.get(context)
-
-        # Assert
-        self.assertEqual(0, value)
-    """
-
-    async def test_State_SetAfterSave(self):
+    async def test_state_set_after_save(self):
         """Verify setting property after save"""
         # Arrange
         dictionary = {}
@@ -231,7 +215,7 @@ class TestBotState(aiounittest.AsyncTestCase):
 
         await property_a.set(context, "hello2")
 
-    async def test_State_MultipleSave(self):
+    async def test_state_multiple_save(self):
         """Verify multiple saves"""
         # Arrange
         dictionary = {}
@@ -252,7 +236,7 @@ class TestBotState(aiounittest.AsyncTestCase):
         value_a = await property_a.get(context)
         self.assertEqual("hello2", value_a)
 
-    async def test_LoadSetSave(self):
+    async def test_load_set_save(self):
         # Arrange
         dictionary = {}
         user_state = UserState(MemoryStorage(dictionary))
@@ -272,7 +256,7 @@ class TestBotState(aiounittest.AsyncTestCase):
         self.assertEqual("hello", obj["property-a"])
         self.assertEqual("world", obj["property-b"])
 
-    async def test_LoadSetSaveTwice(self):
+    async def test_load_set_save_twice(self):
         # Arrange
         dictionary = {}
         context = TestUtilities.create_empty_context()
@@ -282,12 +266,12 @@ class TestBotState(aiounittest.AsyncTestCase):
 
         property_a = user_state.create_property("property-a")
         property_b = user_state.create_property("property-b")
-        propertyC = user_state.create_property("property-c")
+        property_c = user_state.create_property("property-c")
 
         await user_state.load(context)
         await property_a.set(context, "hello")
         await property_b.set(context, "world")
-        await propertyC.set(context, "test")
+        await property_c.set(context, "test")
         await user_state.save_changes(context)
 
         # Assert
@@ -312,7 +296,7 @@ class TestBotState(aiounittest.AsyncTestCase):
         self.assertEqual("world-2", obj2["property-b"])
         self.assertEqual("test", obj2["property-c"])
 
-    async def test_LoadSaveDelete(self):
+    async def test_load_save_delete(self):
         # Arrange
         dictionary = {}
         context = TestUtilities.create_empty_context()
@@ -348,7 +332,7 @@ class TestBotState(aiounittest.AsyncTestCase):
         obj2 = dictionary["EmptyContext/users/empty@empty.context.org"]
         self.assertEqual("hello-2", obj2["property-a"])
         with self.assertRaises(KeyError) as _:
-            obj2["property-b"]
+            obj2["property-b"]  # pylint: disable=pointless-statement
 
     async def test_state_use_bot_state_directly(self):
         async def exec_test(context: TurnContext):
@@ -358,7 +342,8 @@ class TestBotState(aiounittest.AsyncTestCase):
             # read initial state object
             await bot_state_manager.load(context)
 
-            custom_state = await test_property.get(context, lambda: CustomState())
+            custom_state = \
+                await test_property.get(context, lambda: CustomState())  # pylint: disable=unnecessary-lambda
 
             # this should be a 'CustomState' as nothing is currently stored in storage
             assert isinstance(custom_state, CustomState)
@@ -389,7 +374,7 @@ class TestBotState(aiounittest.AsyncTestCase):
         with self.assertRaises(AttributeError):
             await test_property.get(context)
 
-    async def test_conversation_state_bad_converation_throws(self):
+    async def test_conversation_state_bad_conversation_throws(self):
         dictionary = {}
         user_state = ConversationState(MemoryStorage(dictionary))
         context = TestUtilities.create_empty_context()
@@ -408,7 +393,7 @@ class TestBotState(aiounittest.AsyncTestCase):
         bot_state1 = ConversationState(storage)
         (
             await bot_state1.create_property("test-name").get(
-                turn_context, lambda: TestPocoState()
+                turn_context, lambda: TestPocoState()  # pylint: disable=unnecessary-lambda
             )
         ).value = "test-value"
         await bot_state1.save_changes(turn_context)
@@ -417,11 +402,11 @@ class TestBotState(aiounittest.AsyncTestCase):
         bot_state2 = ConversationState(storage)
         value1 = (
             await bot_state2.create_property("test-name").get(
-                turn_context, lambda: TestPocoState(value="default-value")
+                turn_context, lambda: TestPocoState(value="default-value")  # pylint: disable=unnecessary-lambda
             )
         ).value
 
-        assert "test-value" == value1
+        assert value1 == "test-value"
 
         # Turn 2
         bot_state3 = ConversationState(storage)
@@ -432,11 +417,11 @@ class TestBotState(aiounittest.AsyncTestCase):
         bot_state4 = ConversationState(storage)
         value2 = (
             await bot_state4.create_property("test-name").get(
-                turn_context, lambda: TestPocoState(value="default-value")
+                turn_context, lambda: TestPocoState(value="default-value")  # pylint: disable=unnecessary-lambda
             )
         ).value
 
-        assert "default-value", value2
+        assert value2, "default-value"
 
     async def test_bot_state_delete(self):
         turn_context = TestUtilities.create_empty_context()
@@ -448,7 +433,7 @@ class TestBotState(aiounittest.AsyncTestCase):
         bot_state1 = ConversationState(storage)
         (
             await bot_state1.create_property("test-name").get(
-                turn_context, lambda: TestPocoState()
+                turn_context, lambda: TestPocoState()  # pylint: disable=unnecessary-lambda
             )
         ).value = "test-value"
         await bot_state1.save_changes(turn_context)
@@ -457,11 +442,11 @@ class TestBotState(aiounittest.AsyncTestCase):
         bot_state2 = ConversationState(storage)
         value1 = (
             await bot_state2.create_property("test-name").get(
-                turn_context, lambda: TestPocoState(value="default-value")
+                turn_context, lambda: TestPocoState(value="default-value")  # pylint: disable=unnecessary-lambda
             )
         ).value
 
-        assert "test-value" == value1
+        assert value1 == "test-value"
 
         # Turn 2
         bot_state3 = ConversationState(storage)
@@ -471,11 +456,11 @@ class TestBotState(aiounittest.AsyncTestCase):
         bot_state4 = ConversationState(storage)
         value2 = (
             await bot_state4.create_property("test-name").get(
-                turn_context, lambda: TestPocoState(value="default-value")
+                turn_context, lambda: TestPocoState(value="default-value")  # pylint: disable=unnecessary-lambda
             )
         ).value
 
-        assert "default-value" == value2
+        assert value2 == "default-value"
 
     async def test_bot_state_get(self):
         turn_context = TestUtilities.create_empty_context()
@@ -486,10 +471,10 @@ class TestBotState(aiounittest.AsyncTestCase):
         conversation_state = ConversationState(storage)
         (
             await conversation_state.create_property("test-name").get(
-                turn_context, lambda: TestPocoState()
+                turn_context, lambda: TestPocoState()  # pylint: disable=unnecessary-lambda
             )
         ).value = "test-value"
 
         result = conversation_state.get(turn_context)
 
-        assert "test-value" == result["test-name"].value
+        assert result["test-name"].value == "test-value"

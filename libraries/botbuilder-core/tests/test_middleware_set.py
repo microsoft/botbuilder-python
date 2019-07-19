@@ -1,9 +1,10 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from typing import Awaitable, Callable
 import aiounittest
 
-from botbuilder.core import AnonymousReceiveMiddleware, MiddlewareSet, Middleware
+from botbuilder.core import AnonymousReceiveMiddleware, MiddlewareSet, Middleware, TurnContext
 
 
 class TestMiddlewareSet(aiounittest.AsyncTestCase):
@@ -18,7 +19,7 @@ class TestMiddlewareSet(aiounittest.AsyncTestCase):
 
         middleware_set = MiddlewareSet()
 
-        async def runs_after_pipeline(context):
+        async def runs_after_pipeline(context):  # pylint: disable=unused-argument
             nonlocal callback_complete
             callback_complete = True
 
@@ -26,23 +27,17 @@ class TestMiddlewareSet(aiounittest.AsyncTestCase):
         assert callback_complete
 
     async def test_middleware_set_receive_activity_internal(self):
-        class PrintMiddleware(object):
-            def __init__(self):
-                super(PrintMiddleware, self).__init__()
-
+        class PrintMiddleware:
             async def on_process_request(self, context_or_string, next_middleware):
                 print("PrintMiddleware says: %s." % context_or_string)
                 return next_middleware
 
         class ModifyInputMiddleware(Middleware):
-            def __init__(self):
-                super(ModifyInputMiddleware, self).__init__()
-
-            async def on_process_request(self, context_or_string, next_middleware):
-                context_or_string = "Hello"
-                print(context_or_string)
-                print("Here is the current context_or_string: %s" % context_or_string)
-                return next_middleware
+            async def on_process_request(self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]):
+                context = "Hello"
+                print(context)
+                print("Here is the current context_or_string: %s" % context)
+                return logic
 
         async def request_handler(context_or_string):
             assert context_or_string == "Hello"
@@ -88,7 +83,7 @@ class TestMiddlewareSet(aiounittest.AsyncTestCase):
 
         middleware_set = MiddlewareSet().use(FirstMiddleware())
 
-        async def runs_after_pipeline(context):
+        async def runs_after_pipeline(context):  # pylint: disable=unused-argument
             nonlocal finished_pipeline
             finished_pipeline = True
 
@@ -101,7 +96,7 @@ class TestMiddlewareSet(aiounittest.AsyncTestCase):
         ran_empty_pipeline = False
         middleware_set = MiddlewareSet()
 
-        async def runs_after_pipeline(context):
+        async def runs_after_pipeline(context):  # pylint: disable=unused-argument
             nonlocal ran_empty_pipeline
             ran_empty_pipeline = True
 
@@ -147,7 +142,7 @@ class TestMiddlewareSet(aiounittest.AsyncTestCase):
 
         middleware_set = MiddlewareSet().use(FirstMiddleware())
 
-        async def runs_after_pipeline(context):
+        async def runs_after_pipeline(context):  # pylint: disable=unused-argument
             nonlocal finished_pipeline
             finished_pipeline = True
 
@@ -161,7 +156,7 @@ class TestMiddlewareSet(aiounittest.AsyncTestCase):
 
         middleware_set = MiddlewareSet()
 
-        async def processor(context, logic):
+        async def processor(context, logic):  # pylint: disable=unused-argument
             nonlocal did_run
             did_run = True
             return await logic()
@@ -178,13 +173,13 @@ class TestMiddlewareSet(aiounittest.AsyncTestCase):
 
         middleware_set = MiddlewareSet()
 
-        async def processor_one(context, logic):
+        async def processor_one(context, logic):  # pylint: disable=unused-argument
             nonlocal called_first, called_second
             called_first = True
             assert not called_second
             return await logic()
 
-        async def processor_two(context, logic):
+        async def processor_two(context, logic):  # pylint: disable=unused-argument
             nonlocal called_first, called_second
             called_second = True
             return await logic()
@@ -209,7 +204,7 @@ class TestMiddlewareSet(aiounittest.AsyncTestCase):
                 called_regular_middleware = True
                 return await logic()
 
-        async def anonymous_method(context, logic):
+        async def anonymous_method(context, logic):  # pylint: disable=unused-argument
             nonlocal called_regular_middleware, called_anonymous_middleware
             assert not called_regular_middleware
             called_anonymous_middleware = True
@@ -235,7 +230,7 @@ class TestMiddlewareSet(aiounittest.AsyncTestCase):
                 called_regular_middleware = True
                 return await logic()
 
-        async def anonymous_method(context, logic):
+        async def anonymous_method(context, logic):  # pylint: disable=unused-argument
             nonlocal called_regular_middleware, called_anonymous_middleware
             assert called_regular_middleware
             called_anonymous_middleware = True
@@ -255,8 +250,8 @@ class TestMiddlewareSet(aiounittest.AsyncTestCase):
             middleware_set.use(2)
         except TypeError:
             pass
-        except Exception as e:
-            raise e
+        except Exception as error:
+            raise error
         else:
             raise AssertionError(
                 "MiddlewareSet.use(): should not have added an invalid middleware."

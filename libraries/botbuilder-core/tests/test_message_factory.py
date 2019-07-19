@@ -1,8 +1,9 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
-import aiounittest
 
 from typing import List
+
+import aiounittest
 from botbuilder.core import MessageFactory
 from botbuilder.schema import (
     ActionTypes,
@@ -20,7 +21,7 @@ def assert_message(activity: Activity):
 
 
 def assert_actions(actions: List[CardAction], count: int, titles: List[str] = None):
-    assert type(actions) == list, "actions not list"
+    assert isinstance(actions, list), "actions not list"
     assert len(actions) == count, "wrong number of actions returned"
     for idx, action in enumerate(actions):
         # Added type checking
@@ -33,7 +34,7 @@ def assert_actions(actions: List[CardAction], count: int, titles: List[str] = No
 
 
 def assert_attachments(activity: Activity, count: int, types: List[str] = None):
-    assert type(activity.attachments) == list, "no attachments array"
+    assert isinstance(activity.attachments, list), "no attachments array"
     assert len(activity.attachments) == count, "wrong number of attachments"
 
     if types:

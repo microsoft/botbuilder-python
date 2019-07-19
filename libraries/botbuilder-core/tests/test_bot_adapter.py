@@ -1,11 +1,11 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import aiounittest
 import uuid
 from typing import List
+import aiounittest
 
-from botbuilder.core import BotAdapter, TurnContext
+from botbuilder.core import TurnContext
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.schema import (
     Activity,
@@ -29,7 +29,7 @@ class TestBotAdapter(aiounittest.AsyncTestCase):
         adapter.use(CallCountingMiddleware()).use(CallCountingMiddleware())
 
     async def test_pass_resource_responses_through(self):
-        def validate_responses(activities: List[Activity]):
+        def validate_responses(activities: List[Activity]):  # pylint: disable=unused-argument
             pass  # no need to do anything.
 
         adapter = SimpleAdapter(call_on_send=validate_responses)
@@ -61,7 +61,7 @@ class TestBotAdapter(aiounittest.AsyncTestCase):
             user=ChannelAccount(id="channelId", name="testChannelAccount", role="bot"),
         )
 
-        async def continue_callback(turn_context):
+        async def continue_callback(turn_context):  # pylint: disable=unused-argument
             nonlocal callback_invoked
             callback_invoked = True
 

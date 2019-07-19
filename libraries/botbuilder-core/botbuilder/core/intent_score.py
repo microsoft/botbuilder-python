@@ -1,8 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from msrest.serialization import Model
 from typing import Dict
+from msrest.serialization import Model
 
 
 class IntentScore(Model):
@@ -12,8 +12,8 @@ class IntentScore(Model):
     }
 
     def __init__(
-        self, score: float = None, properties: Dict[str, object] = {}, **kwargs
+        self, score: float = None, properties: Dict[str, object] = None, **kwargs
     ):
         super(IntentScore, self).__init__(**kwargs)
         self.score = score
-        self.properties = properties
+        self.properties = properties or {}

@@ -27,7 +27,7 @@ def assert_attachment(attachment: Attachment, content_type: str):
 
 
 def assert_actions(actions: List[CardAction], count: int, titles: List[str] = None):
-    assert type(actions) == list, "actions is not a list"
+    assert isinstance(actions, list), "actions is not a list"
     assert len(actions) == count, "wrong number of actions returned"
     for idx, action in enumerate(actions):
         # Added type checking
@@ -43,7 +43,7 @@ def assert_actions(actions: List[CardAction], count: int, titles: List[str] = No
 
 
 def assert_images(images: List[CardImage], count: int, links: List[str] = None):
-    assert type(images) == list, "images is not a list"
+    assert isinstance(images, list), "images is not a list"
     assert len(images) == count, "wrong number of images returned"
     for idx, image in enumerate(images):
         # Added type checking
@@ -55,15 +55,15 @@ def assert_images(images: List[CardImage], count: int, links: List[str] = None):
 
 
 def assert_media(media: List[MediaUrl], count: int, links: List[str] = None):
-    assert type(media) == list, "media is not a list"
+    assert isinstance(media, list), "media is not a list"
     assert len(media) == count, "wrong number of media returned"
-    for idx, m in enumerate(media):
+    for idx, m_value in enumerate(media):
         # Added type checking
-        assert isinstance(m, MediaUrl), f"media[{idx}] is not a MediaUrl object"
+        assert isinstance(m_value, MediaUrl), f"media[{idx}] is not a MediaUrl object"
 
-        assert m.url is not None, f"media url[{idx}] missing"
+        assert m_value.url is not None, f"media url[{idx}] missing"
         if links is not None:
-            assert m.url == links[idx], f"media url[{idx}] invalid"
+            assert m_value.url == links[idx], f"media url[{idx}] invalid"
 
 
 class TestCardFactory:
@@ -74,7 +74,7 @@ class TestCardFactory:
 
     def test_should_raise_error_for_adaptive_card_if_card_is_not_dict(self):
         try:
-            attachment = CardFactory.adaptive_card(None)
+            CardFactory.adaptive_card(None)
         except TypeError:
             pass
         else:
@@ -91,7 +91,7 @@ class TestCardFactory:
 
     def test_should_raise_error_for_animation_card_if_card_is_not_animation_card(self):
         try:
-            attachment = CardFactory.animation_card(None)
+            CardFactory.animation_card(None)
         except TypeError:
             pass
         else:
@@ -108,7 +108,7 @@ class TestCardFactory:
 
     def test_should_raise_error_for_audio_card_if_card_is_not_audio_card(self):
         try:
-            attachment = CardFactory.audio_card(None)
+            CardFactory.audio_card(None)
         except TypeError:
             pass
         else:
@@ -125,7 +125,7 @@ class TestCardFactory:
 
     def test_should_raise_error_for_video_card_if_card_is_not_video_card(self):
         try:
-            attachment = CardFactory.video_card(None)
+            CardFactory.video_card(None)
         except TypeError:
             pass
         else:
@@ -140,7 +140,7 @@ class TestCardFactory:
 
     def test_should_raise_error_for_hero_card_if_card_is_not_hero_card(self):
         try:
-            attachment = CardFactory.hero_card(None)
+            CardFactory.hero_card(None)
         except TypeError:
             pass
         else:
@@ -155,7 +155,7 @@ class TestCardFactory:
 
     def test_should_raise_error_for_thumbnail_card_if_card_is_not_thumbnail_card(self):
         try:
-            attachment = CardFactory.thumbnail_card(None)
+            CardFactory.thumbnail_card(None)
         except TypeError:
             pass
         else:
@@ -170,7 +170,7 @@ class TestCardFactory:
 
     def test_should_raise_error_for_receipt_card_if_card_is_not_receipt_card(self):
         try:
-            attachment = CardFactory.receipt_card(None)
+            CardFactory.receipt_card(None)
         except TypeError:
             pass
         else:
@@ -192,7 +192,7 @@ class TestCardFactory:
 
     def test_should_raise_error_for_signin_card_if_card_is_not_signin_card(self):
         try:
-            attachment = CardFactory.signin_card(None)
+            CardFactory.signin_card(None)
         except TypeError:
             pass
         else:
@@ -212,7 +212,7 @@ class TestCardFactory:
 
     def test_should_raise_error_for_oauth_card_if_card_is_not_oauth_card(self):
         try:
-            attachment = CardFactory.oauth_card(None)
+            CardFactory.oauth_card(None)
         except TypeError:
             pass
         else:

@@ -38,7 +38,7 @@ class CardFactory:
         :param card:
         :return:
         """
-        if not type(card) == dict:
+        if not isinstance(card, dict):
             raise TypeError(
                 "CardFactory.adaptive_card(): `card` argument is not of type dict, unable to prepare "
                 "attachment."

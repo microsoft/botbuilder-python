@@ -22,6 +22,7 @@ class BotAdapter(ABC):
     async def send_activities(self, context: TurnContext, activities: List[Activity]):
         """
         Sends a set of activities to the user. An array of responses from the server will be returned.
+        :param context:
         :param activities:
         :return:
         """
@@ -31,6 +32,7 @@ class BotAdapter(ABC):
     async def update_activity(self, context: TurnContext, activity: Activity):
         """
         Replaces an existing activity.
+        :param context:
         :param activity:
         :return:
         """
@@ -42,6 +44,7 @@ class BotAdapter(ABC):
     ):
         """
         Deletes an existing activity.
+        :param context:
         :param reference:
         :return:
         """
@@ -58,12 +61,12 @@ class BotAdapter(ABC):
 
     async def continue_conversation(
         self, bot_id: str, reference: ConversationReference, callback: Callable
-    ):
+    ):  # pylint: disable=unused-argument
         """
         Sends a proactive message to a conversation. Call this method to proactively send a message to a conversation.
-        Most _channels require a user to initiate a conversation with a bot before the bot can send activities 
+        Most _channels require a user to initiate a conversation with a bot before the bot can send activities
         to the user.
-        :param bot_id: The application ID of the bot. This paramter is ignored in
+        :param bot_id: The application ID of the bot. This parameter is ignored in
         single tenant the Adpters (Console, Test, etc) but is critical to the BotFrameworkAdapter
         which is multi-tenant aware. </param>
         :param reference: A reference to the conversation to continue.</param>
