@@ -5,10 +5,9 @@ import aiounittest
 from botbuilder.dialogs.prompts import (
     AttachmentPrompt,
     PromptOptions,
-    PromptRecognizerResult,
     PromptValidatorContext,
 )
-from botbuilder.schema import Activity, ActivityTypes, Attachment, InputHints
+from botbuilder.schema import Activity, ActivityTypes, Attachment
 
 from botbuilder.core import (
     TurnContext,
@@ -33,16 +32,16 @@ class AttachmentPromptTests(aiounittest.AsyncTestCase):
 
     async def test_basic_attachment_prompt(self):
         async def exec_test(turn_context: TurnContext):
-            dc = await dialogs.create_context(turn_context)
+            dialog_context = await dialogs.create_context(turn_context)
 
-            results = await dc.continue_dialog()
+            results = await dialog_context.continue_dialog()
             if results.status == DialogTurnStatus.Empty:
                 options = PromptOptions(
                     prompt=Activity(
                         type=ActivityTypes.message, text="please add an attachment."
                     )
                 )
-                await dc.prompt("AttachmentPrompt", options)
+                await dialog_context.prompt("AttachmentPrompt", options)
             elif results.status == DialogTurnStatus.Complete:
                 attachment = results.result[0]
                 content = MessageFactory.text(attachment.content)
@@ -74,16 +73,16 @@ class AttachmentPromptTests(aiounittest.AsyncTestCase):
 
     async def test_attachment_prompt_with_validator(self):
         async def exec_test(turn_context: TurnContext):
-            dc = await dialogs.create_context(turn_context)
+            dialog_context = await dialogs.create_context(turn_context)
 
-            results = await dc.continue_dialog()
+            results = await dialog_context.continue_dialog()
             if results.status == DialogTurnStatus.Empty:
                 options = PromptOptions(
                     prompt=Activity(
                         type=ActivityTypes.message, text="please add an attachment."
                     )
                 )
-                await dc.prompt("AttachmentPrompt", options)
+                await dialog_context.prompt("AttachmentPrompt", options)
             elif results.status == DialogTurnStatus.Complete:
                 attachment = results.result[0]
                 content = MessageFactory.text(attachment.content)
@@ -120,16 +119,16 @@ class AttachmentPromptTests(aiounittest.AsyncTestCase):
 
     async def test_retry_attachment_prompt(self):
         async def exec_test(turn_context: TurnContext):
-            dc = await dialogs.create_context(turn_context)
+            dialog_context = await dialogs.create_context(turn_context)
 
-            results = await dc.continue_dialog()
+            results = await dialog_context.continue_dialog()
             if results.status == DialogTurnStatus.Empty:
                 options = PromptOptions(
                     prompt=Activity(
                         type=ActivityTypes.message, text="please add an attachment."
                     )
                 )
-                await dc.prompt("AttachmentPrompt", options)
+                await dialog_context.prompt("AttachmentPrompt", options)
             elif results.status == DialogTurnStatus.Complete:
                 attachment = results.result[0]
                 content = MessageFactory.text(attachment.content)
@@ -163,9 +162,9 @@ class AttachmentPromptTests(aiounittest.AsyncTestCase):
 
     async def test_attachment_prompt_with_custom_retry(self):
         async def exec_test(turn_context: TurnContext):
-            dc = await dialogs.create_context(turn_context)
+            dialog_context = await dialogs.create_context(turn_context)
 
-            results = await dc.continue_dialog()
+            results = await dialog_context.continue_dialog()
             if results.status == DialogTurnStatus.Empty:
                 options = PromptOptions(
                     prompt=Activity(
@@ -175,7 +174,7 @@ class AttachmentPromptTests(aiounittest.AsyncTestCase):
                         type=ActivityTypes.message, text="please try again."
                     ),
                 )
-                await dc.prompt("AttachmentPrompt", options)
+                await dialog_context.prompt("AttachmentPrompt", options)
             elif results.status == DialogTurnStatus.Complete:
                 attachment = results.result[0]
                 content = MessageFactory.text(attachment.content)
@@ -215,9 +214,9 @@ class AttachmentPromptTests(aiounittest.AsyncTestCase):
 
     async def test_should_send_ignore_retry_rompt_if_validator_replies(self):
         async def exec_test(turn_context: TurnContext):
-            dc = await dialogs.create_context(turn_context)
+            dialog_context = await dialogs.create_context(turn_context)
 
-            results = await dc.continue_dialog()
+            results = await dialog_context.continue_dialog()
             if results.status == DialogTurnStatus.Empty:
                 options = PromptOptions(
                     prompt=Activity(
@@ -227,7 +226,7 @@ class AttachmentPromptTests(aiounittest.AsyncTestCase):
                         type=ActivityTypes.message, text="please try again."
                     ),
                 )
-                await dc.prompt("AttachmentPrompt", options)
+                await dialog_context.prompt("AttachmentPrompt", options)
             elif results.status == DialogTurnStatus.Complete:
                 attachment = results.result[0]
                 content = MessageFactory.text(attachment.content)
@@ -271,11 +270,11 @@ class AttachmentPromptTests(aiounittest.AsyncTestCase):
 
     async def test_should_not_send_retry_if_not_specified(self):
         async def exec_test(turn_context: TurnContext):
-            dc = await dialogs.create_context(turn_context)
+            dialog_context = await dialogs.create_context(turn_context)
 
-            results = await dc.continue_dialog()
+            results = await dialog_context.continue_dialog()
             if results.status == DialogTurnStatus.Empty:
-                await dc.begin_dialog("AttachmentPrompt", PromptOptions())
+                await dialog_context.begin_dialog("AttachmentPrompt", PromptOptions())
             elif results.status == DialogTurnStatus.Complete:
                 attachment = results.result[0]
                 content = MessageFactory.text(attachment.content)

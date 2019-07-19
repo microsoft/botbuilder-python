@@ -1,18 +1,15 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import aiounittest
 import unittest
+import aiounittest
 
-from typing import Callable
 from botbuilder.dialogs.prompts import (
     ActivityPrompt,
-    NumberPrompt,
     PromptOptions,
-    PromptRecognizerResult,
     PromptValidatorContext,
 )
-from botbuilder.schema import Activity, InputHints, ActivityTypes
+from botbuilder.schema import Activity, ActivityTypes
 
 from botbuilder.core import (
     ConversationState,
@@ -43,10 +40,7 @@ async def validator(prompt_context: PromptValidatorContext):
 
 
 class SimpleActivityPrompt(ActivityPrompt):
-    def __init__(
-        self, dialog_id: str, validator: Callable[[PromptValidatorContext], bool]
-    ):
-        super().__init__(dialog_id, validator)
+    pass
 
 
 class ActivityPromptTests(aiounittest.AsyncTestCase):
@@ -67,16 +61,16 @@ class ActivityPromptTests(aiounittest.AsyncTestCase):
 
     async def test_basic_activity_prompt(self):
         async def exec_test(turn_context: TurnContext):
-            dc = await dialogs.create_context(turn_context)
+            dialog_context = await dialogs.create_context(turn_context)
 
-            results = await dc.continue_dialog()
+            results = await dialog_context.continue_dialog()
             if results.status == DialogTurnStatus.Empty:
                 options = PromptOptions(
                     prompt=Activity(
                         type=ActivityTypes.message, text="please send an event."
                     )
                 )
-                await dc.prompt("EventActivityPrompt", options)
+                await dialog_context.prompt("EventActivityPrompt", options)
             elif results.status == DialogTurnStatus.Complete:
                 await turn_context.send_activity(results.result)
 
@@ -102,16 +96,16 @@ class ActivityPromptTests(aiounittest.AsyncTestCase):
 
     async def test_retry_activity_prompt(self):
         async def exec_test(turn_context: TurnContext):
-            dc = await dialogs.create_context(turn_context)
+            dialog_context = await dialogs.create_context(turn_context)
 
-            results = await dc.continue_dialog()
+            results = await dialog_context.continue_dialog()
             if results.status == DialogTurnStatus.Empty:
                 options = PromptOptions(
                     prompt=Activity(
                         type=ActivityTypes.message, text="please send an event."
                     )
                 )
-                await dc.prompt("EventActivityPrompt", options)
+                await dialog_context.prompt("EventActivityPrompt", options)
             elif results.status == DialogTurnStatus.Complete:
                 await turn_context.send_activity(results.result)
 
@@ -141,9 +135,9 @@ class ActivityPromptTests(aiounittest.AsyncTestCase):
 
     async def test_activity_prompt_should_return_dialog_end_if_validation_failed(self):
         async def exec_test(turn_context: TurnContext):
-            dc = await dialogs.create_context(turn_context)
+            dialog_context = await dialogs.create_context(turn_context)
 
-            results = await dc.continue_dialog()
+            results = await dialog_context.continue_dialog()
             if results.status == DialogTurnStatus.Empty:
                 options = PromptOptions(
                     prompt=Activity(
@@ -153,7 +147,7 @@ class ActivityPromptTests(aiounittest.AsyncTestCase):
                         type=ActivityTypes.message, text="event not received."
                     ),
                 )
-                await dc.prompt("EventActivityPrompt", options)
+                await dialog_context.prompt("EventActivityPrompt", options)
             elif results.status == DialogTurnStatus.Complete:
                 await turn_context.send_activity(results.result)
 
@@ -181,19 +175,19 @@ class ActivityPromptTests(aiounittest.AsyncTestCase):
 
     async def test_activity_prompt_resume_dialog_should_return_dialog_end(self):
         async def exec_test(turn_context: TurnContext):
-            dc = await dialogs.create_context(turn_context)
+            dialog_context = await dialogs.create_context(turn_context)
 
-            results = await dc.continue_dialog()
+            results = await dialog_context.continue_dialog()
             if results.status == DialogTurnStatus.Empty:
                 options = PromptOptions(
                     prompt=Activity(
                         type=ActivityTypes.message, text="please send an event."
                     )
                 )
-                await dc.prompt("EventActivityPrompt", options)
+                await dialog_context.prompt("EventActivityPrompt", options)
 
             second_results = await event_prompt.resume_dialog(
-                dc, DialogReason.NextCalled
+                dialog_context, DialogReason.NextCalled
             )
 
             assert (

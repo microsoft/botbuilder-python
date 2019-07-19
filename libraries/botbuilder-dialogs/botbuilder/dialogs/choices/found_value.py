@@ -11,9 +11,7 @@ class FoundValue:
         ----------
 
         value: The value that was matched.
-        
         index: The index of the value that was matched.
-
         score: The accuracy with which the synonym matched the specified portion of the utterance.
         A value of 1.0 would indicate a perfect match.
 

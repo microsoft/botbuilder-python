@@ -152,7 +152,9 @@ disable=print-statement,
         broad-except,
         bare-except,
         too-many-public-methods,
-        cyclic-import
+        cyclic-import,
+        too-many-locals,
+        too-many-function-args
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
