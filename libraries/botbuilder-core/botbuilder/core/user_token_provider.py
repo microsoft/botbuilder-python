@@ -24,11 +24,12 @@ class UserTokenProvider(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def sign_out_user(self, context: TurnContext, connection_name: str):
+    async def sign_out_user(self, context: TurnContext, connection_name: str, user_id: str = None):
         """
         Signs the user out with the token server.
         :param context:
         :param connection_name:
+        :param user_id:
         :return:
         """
         raise NotImplementedError()

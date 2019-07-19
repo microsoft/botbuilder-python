@@ -10,7 +10,7 @@ from .turn_context import TurnContext
 
 class Middleware(ABC):
     @abstractmethod
-    def on_process_request(self, context: TurnContext, next: Callable):
+    def on_process_request(self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]):
         pass
 
 
@@ -22,8 +22,8 @@ class AnonymousReceiveMiddleware(Middleware):
             )
         self._to_call = anonymous_handler
 
-    def on_process_request(self, context: TurnContext, next):
-        return self._to_call(context, next)
+    def on_process_request(self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]):
+        return self._to_call(context, logic)
 
 
 class MiddlewareSet(Middleware):
@@ -43,15 +43,14 @@ class MiddlewareSet(Middleware):
         :param middleware :
         :return:
         """
-        for (idx, m) in enumerate(middleware):
-            if hasattr(m, "on_process_request") and callable(m.on_process_request):
-                self._middleware.append(m)
+        for (idx, mid) in enumerate(middleware):
+            if hasattr(mid, "on_process_request") and callable(mid.on_process_request):
+                self._middleware.append(mid)
                 return self
-            else:
-                raise TypeError(
-                    'MiddlewareSet.use(): invalid middleware at index "%s" being added.'
-                    % idx
-                )
+            raise TypeError(
+                'MiddlewareSet.use(): invalid middleware at index "%s" being added.'
+                % idx
+            )
 
     async def receive_activity(self, context: TurnContext):
         await self.receive_activity_internal(context, None)
@@ -76,8 +75,7 @@ class MiddlewareSet(Middleware):
         if next_middleware_index == len(self._middleware):
             if callback is not None:
                 return await callback(context)
-            else:
-                return None
+            return None
         next_middleware = self._middleware[next_middleware_index]
 
         async def call_next_middleware():
@@ -89,5 +87,5 @@ class MiddlewareSet(Middleware):
             return await next_middleware.on_process_request(
                 context, call_next_middleware
             )
-        except Exception as e:
-            raise e
+        except Exception as error:
+            raise error

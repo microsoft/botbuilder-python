@@ -25,16 +25,16 @@ class UserState(BotState):
 
         super(UserState, self).__init__(storage, "UserState")
 
-    def get_storage_key(self, context: TurnContext) -> str:
+    def get_storage_key(self, turn_context: TurnContext) -> str:
         """
         Returns the storage key for the current user state.
-        :param context:
+        :param turn_context:
         :return:
         """
-        channel_id = context.activity.channel_id or self.__raise_type_error(
+        channel_id = turn_context.activity.channel_id or self.__raise_type_error(
             "invalid activity-missing channelId"
         )
-        user_id = context.activity.from_property.id or self.__raise_type_error(
+        user_id = turn_context.activity.from_property.id or self.__raise_type_error(
             "invalid activity-missing from_property.id"
         )
 

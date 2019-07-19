@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 import unittest
-from typing import Callable, List
+from typing import List
 from botbuilder.core import BotAdapter, TurnContext
 from botbuilder.schema import Activity, ConversationReference, ResourceResponse
 

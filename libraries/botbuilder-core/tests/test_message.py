@@ -11,7 +11,7 @@ from botbuilder.schema import (
 
 class TestMessage:
     @staticmethod
-    def message(id: str = "1234") -> Activity:
+    def message(id: str = "1234") -> Activity:  # pylint: disable=invalid-name
         return Activity(
             type=ActivityTypes.message,
             id=id,

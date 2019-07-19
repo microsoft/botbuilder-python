@@ -3,7 +3,7 @@
 
 import aiounittest
 
-from botbuilder.core import TurnContext, MemoryStorage, StoreItem, UserState
+from botbuilder.core import TurnContext, MemoryStorage, UserState
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.schema import Activity, ChannelAccount
 

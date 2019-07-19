@@ -1,9 +1,9 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from copy import deepcopy
 from typing import Dict, List
 from .storage import Storage, StoreItem
-from copy import deepcopy
 
 
 class MemoryStorage(Storage):
@@ -17,8 +17,8 @@ class MemoryStorage(Storage):
             for key in keys:
                 if key in self.memory:
                     del self.memory[key]
-        except TypeError as e:
-            raise e
+        except TypeError as error:
+            raise error
 
     async def read(self, keys: List[str]):
         data = {}
@@ -26,8 +26,8 @@ class MemoryStorage(Storage):
             for key in keys:
                 if key in self.memory:
                     data[key] = self.memory[key]
-        except TypeError as e:
-            raise e
+        except TypeError as error:
+            raise error
 
         return data
 
@@ -65,8 +65,8 @@ class MemoryStorage(Storage):
                     self._e_tag += 1
                 self.memory[key] = deepcopy(new_state)
 
-        except Exception as e:
-            raise e
+        except Exception as error:
+            raise error
 
     # TODO: Check if needed, if not remove
     def __should_write_changes(
@@ -86,7 +86,7 @@ class MemoryStorage(Storage):
         ):
             return True
         # If none of the above cases, we verify that e_tags exist on both arguments
-        elif hasattr(new_value, "e_tag") and hasattr(old_value, "e_tag"):
+        if hasattr(new_value, "e_tag") and hasattr(old_value, "e_tag"):
             if new_value.e_tag is not None and old_value.e_tag is None:
                 return True
             # And then we do a comparing between the old and new e_tag values to decide if the new data will be written
@@ -94,7 +94,5 @@ class MemoryStorage(Storage):
                 new_value.e_tag
             ):
                 return True
-            else:
-                return False
-        else:
             return False
+        return False
