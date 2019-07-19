@@ -73,7 +73,7 @@ class TestCosmosDbStorage:
         test_id = "1"
         client = get_mock_client(identifier=test_id)
         storage = CosmosDbStorage(test_config, client)
-        storage.db = test_id
+        storage.database = test_id
 
         assert storage._get_or_create_database(doc_client=client, id=test_id), test_id
         client.CreateDatabase.assert_called_with(
