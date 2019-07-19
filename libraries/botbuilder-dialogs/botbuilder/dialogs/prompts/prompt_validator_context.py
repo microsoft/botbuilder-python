@@ -18,15 +18,13 @@ class PromptValidatorContext:
         Parameters
         ----------
         turn_context
-            The context for the current turn of conversation with the user. 
+            The context for the current turn of conversation with the user.
         recognized
             Result returned from the prompts recognizer function.
         state
             A dictionary of values persisted for each conversational turn while the prompt is active.
-            
         options
             Original set of options passed to the prompt by the calling dialog.
-            
         """
         self.context = turn_context
         self.recognized = recognized

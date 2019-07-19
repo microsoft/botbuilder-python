@@ -44,11 +44,11 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
         token = "abc123"
 
         async def callback_handler(turn_context: TurnContext):
-            dc = await dialogs.create_context(turn_context)
+            dialog_context = await dialogs.create_context(turn_context)
 
-            results = await dc.continue_dialog()
+            results = await dialog_context.continue_dialog()
             if results.status == DialogTurnStatus.Empty:
-                await dc.prompt("prompt", PromptOptions())
+                await dialog_context.prompt("prompt", PromptOptions())
             elif results.status == DialogTurnStatus.Complete:
                 if results.result.token:
                     await turn_context.send_activity("Logged in.")
@@ -72,7 +72,7 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
             )
         )
 
-        async def inspector(activity: Activity, description: str = None):
+        async def inspector(activity: Activity, description: str = None):  # pylint: disable=unused-argument
 
             self.assertTrue(len(activity.attachments) == 1)
             self.assertTrue(
@@ -109,11 +109,11 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
         magic_code = "888999"
 
         async def exec_test(turn_context: TurnContext):
-            dc = await dialogs.create_context(turn_context)
+            dialog_context = await dialogs.create_context(turn_context)
 
-            results = await dc.continue_dialog()
+            results = await dialog_context.continue_dialog()
             if results.status == DialogTurnStatus.Empty:
-                await dc.prompt("prompt", PromptOptions())
+                await dialog_context.prompt("prompt", PromptOptions())
             elif results.status == DialogTurnStatus.Complete:
                 if results.result.token:
                     await turn_context.send_activity("Logged in.")
@@ -138,7 +138,7 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
             )
         )
 
-        def inspector(activity: Activity, description: str = None):
+        def inspector(activity: Activity, description: str = None):  # pylint: disable=unused-argument
             assert len(activity.attachments) == 1
             assert (
                 activity.attachments[0].content_type
@@ -165,7 +165,8 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
         magic_code = "888999"
 
         async def exec_test(turn_context: TurnContext):
-            # Add a magic code to the adapter preemptively so that we can test if the message that triggers BeginDialogAsync uses magic code detection
+            # Add a magic code to the adapter preemptively so that we can test if the message that triggers
+            # BeginDialogAsync uses magic code detection
             adapter.add_user_token(
                 connection_name,
                 turn_context.activity.channel_id,
@@ -174,15 +175,15 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
                 magic_code,
             )
 
-            dc = await dialogs.create_context(turn_context)
+            dialog_context = await dialogs.create_context(turn_context)
 
-            results = await dc.continue_dialog()
+            results = await dialog_context.continue_dialog()
             if results.status == DialogTurnStatus.Empty:
 
                 # If magicCode is detected when prompting, this will end the dialog and return the token in tokenResult
-                token_result = await dc.prompt("prompt", PromptOptions())
+                token_result = await dialog_context.prompt("prompt", PromptOptions())
                 if isinstance(token_result.result, TokenResponse):
-                    self.assertTrue(False)
+                    self.assertTrue(False)  # pylint: disable=redundant-unittest-assert
 
             await convo_state.save_changes(turn_context)
 
@@ -201,7 +202,7 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
             )
         )
 
-        def inspector(activity: Activity, description: str = None):
+        def inspector(activity: Activity, description: str = None):  # pylint: disable=unused-argument
             assert len(activity.attachments) == 1
             assert (
                 activity.attachments[0].content_type
@@ -217,19 +218,19 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
 
         async def callback_handler(turn_context: TurnContext):
             nonlocal called
-            dc = await dialogs.create_context(turn_context)
+            dialog_context = await dialogs.create_context(turn_context)
 
-            await dc.continue_dialog()
-            await dc.prompt(
+            await dialog_context.continue_dialog()
+            await dialog_context.prompt(
                 "prompt", PromptOptions(prompt=Activity(), retry_prompt=Activity())
             )
 
             self.assertTrue(
-                dc.active_dialog.state["options"].prompt.input_hint
+                dialog_context.active_dialog.state["options"].prompt.input_hint
                 == InputHints.accepting_input
             )
             self.assertTrue(
-                dc.active_dialog.state["options"].retry_prompt.input_hint
+                dialog_context.active_dialog.state["options"].retry_prompt.input_hint
                 == InputHints.accepting_input
             )
 

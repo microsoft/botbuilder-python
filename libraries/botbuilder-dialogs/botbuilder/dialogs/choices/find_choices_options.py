@@ -14,7 +14,8 @@ class FindChoicesOptions(FindValuesOptions):
 
         no_value: (Optional) If `True`, the choices `value` field will NOT be search over. Defaults to `False`.
 
-        no_action: (Optional) If `True`, the choices `action.title` field will NOT be searched over. Defaults to `False`.
+        no_action: (Optional) If `True`, the choices `action.title` field will NOT be searched over.
+         Defaults to `False`.
         """
 
         super().__init__(**kwargs)

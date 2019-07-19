@@ -23,17 +23,14 @@ class ChoiceFactory:
         options: ChoiceFactoryOptions = None,
     ) -> Activity:
         """
-        Creates a message activity that includes a list of choices formatted based on the capabilities of a given channel.
+        Creates a message activity that includes a list of choices formatted based on the
+         capabilities of a given channel.
 
         Parameters:
         ----------
-
-        channel_id: A channel ID. 
-        
-        choices: List of choices to render.
-
+        channel_id: A channel ID.
+        choices: List of choices to render
         text: (Optional) Text of the message to send.
-
         speak (Optional) SSML. Text to be spoken by your bot on a speech-enabled channel.
         """
         if channel_id is None:
@@ -46,12 +43,12 @@ class ChoiceFactory:
         max_title_length = 0
         for choice in choices:
             if choice.action is not None and choice.action.title not in (None, ""):
-                l = len(choice.action.title)
+                size = len(choice.action.title)
             else:
-                l = len(choice.value)
+                size = len(choice.value)
 
-            if l > max_title_length:
-                max_title_length = l
+            if size > max_title_length:
+                max_title_length = size
 
         # Determine list style
         supports_suggested_actions = Channel.supports_suggested_actions(
@@ -65,16 +62,15 @@ class ChoiceFactory:
             # SuggestedActions is the preferred approach, but for channels that don't
             # support them (e.g. Teams, Cortana) we should use a HeroCard with CardActions
             return ChoiceFactory.hero_card(choices, text, speak)
-        elif not long_titles and supports_suggested_actions:
+        if not long_titles and supports_suggested_actions:
             # We always prefer showing choices using suggested actions. If the titles are too long, however,
             # we'll have to show them as a text list.
             return ChoiceFactory.suggested_action(choices, text, speak)
-        elif not long_titles and len(choices) <= 3:
+        if not long_titles and len(choices) <= 3:
             # If the titles are short and there are 3 or less choices we'll use an inline list.
             return ChoiceFactory.inline(choices, text, speak, options)
-        else:
-            # Show a numbered list.
-            return List(choices, text, speak, options)
+        # Show a numbered list.
+        return [choices, text, speak, options]
 
     @staticmethod
     def inline(
@@ -88,13 +84,9 @@ class ChoiceFactory:
 
         Parameters:
         ----------
-
         choices: The list of choices to render.
-
         text: (Optional) The text of the message to send.
-
         speak: (Optional) SSML. Text to be spoken by your bot on a speech-enabled channel.
-        
         options: (Optional) The formatting options to use to tweak rendering of list.
         """
         if choices is None:
@@ -233,8 +225,7 @@ class ChoiceFactory:
         """
         if choices is None:
             return []
-        else:
-            return [Choice(value=choice.value) for choice in choices]
+        return [Choice(value=choice.value) for choice in choices]
 
     @staticmethod
     def _extract_actions(choices: List[Choice]) -> List[CardAction]:

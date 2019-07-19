@@ -42,9 +42,7 @@ class Find:
         # used to map the search results back to their choice.
         synonyms: [SortedValue] = []
 
-        for index in range(len(choices_list)):
-            choice = choices_list[index]
-
+        for index, choice in enumerate(choices_list):
             if not opt.no_value:
                 synonyms.append(SortedValue(value=choice.value, index=index))
 
@@ -102,8 +100,7 @@ class Find:
             opt.max_token_distance if opt.max_token_distance is not None else 2
         )
 
-        for i in range(len(sorted_values)):
-            entry = sorted_values[i]
+        for entry in sorted_values:
 
             # Find all matches for a value
             # - To match "last one" in "the last time I chose the last one" we need

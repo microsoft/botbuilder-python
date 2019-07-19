@@ -39,7 +39,7 @@ class OAuthPrompt(Dialog):
     - The automatic sign-in flow where once the user signs in, the SSO service will forward
     the bot the users access token using either an `event` or `invoke` activity.
     - The "magic code" flow where once the user signs in, they will be prompted by the SSO service
-    to send the bot a six digit code confirming their identity. This code will be sent as a 
+    to send the bot a six digit code confirming their identity. This code will be sent as a
     standard `message` activity.
     Both flows are automatically supported by the `OAuthPrompt` and they only thing you need to be careful of
     is that you don't block the `event` and `invoke` activities that the prompt might be waiting on.
@@ -50,9 +50,12 @@ class OAuthPrompt(Dialog):
     When calling the prompt from within a waterfall step, you should use the token within the step
     following the prompt and then let the token go out of scope at the end of your function
     Prompt Usage
-    When used with your bots `DialogSet`, you can simply add a new instance of the prompt as a named dialog using `DialogSet.add()`.
-    You can then start the prompt from a waterfall step using either `DialogContext.begin()` or `DialogContext.prompt()`.
-    The user will be prompted to sign in as needed and their access token will be passed as an argument to the callers next waterfall step.
+    When used with your bots `DialogSet`, you can simply add a new instance of the prompt as a named dialog using
+     `DialogSet.add()`.
+    You can then start the prompt from a waterfall step using either
+     `DialogContext.begin()` or `DialogContext.prompt()`.
+    The user will be prompted to sign in as needed and their access token will be passed as an argument to the callers
+     next waterfall step.
     """
 
     def __init__(
@@ -111,9 +114,9 @@ class OAuthPrompt(Dialog):
 
         if output is not None:
             return await dialog_context.end_dialog(output)
-        else:
-            await self.send_oauth_card(dialog_context.context, options.prompt)
-            return Dialog.end_of_turn
+
+        await self.send_oauth_card(dialog_context.context, options.prompt)
+        return Dialog.end_of_turn
 
     async def continue_dialog(self, dialog_context: DialogContext) -> DialogTurnResult:
         # Recognize token
@@ -126,40 +129,40 @@ class OAuthPrompt(Dialog):
 
         if has_timed_out:
             return await dialog_context.end_dialog(None)
-        else:
-            if state["state"].get("attemptCount") is None:
-                state["state"]["attemptCount"] = 1
 
-            # Validate the return value
-            is_valid = False
-            if self._validator is not None:
-                is_valid = await self._validator(
-                    PromptValidatorContext(
-                        dialog_context.context,
-                        recognized,
-                        state["state"],
-                        state["options"],
-                        state["state"]["attemptCount"],
-                    )
+        if state["state"].get("attemptCount") is None:
+            state["state"]["attemptCount"] = 1
+
+        # Validate the return value
+        is_valid = False
+        if self._validator is not None:
+            is_valid = await self._validator(
+                PromptValidatorContext(
+                    dialog_context.context,
+                    recognized,
+                    state["state"],
+                    state["options"],
+                    state["state"]["attemptCount"],
                 )
-            elif recognized.succeeded:
-                is_valid = True
+            )
+        elif recognized.succeeded:
+            is_valid = True
 
-            # Return recognized value or re-prompt
-            if is_valid:
-                return await dialog_context.end_dialog(recognized.value)
-            else:
-                # Send retry prompt
-                if (
-                    not dialog_context.context.responded
-                    and is_message
-                    and state["options"].retry_prompt is not None
-                ):
-                    await dialog_context.context.send_activity(
-                        state["options"].retry_prompt
-                    )
+        # Return recognized value or re-prompt
+        if is_valid:
+            return await dialog_context.end_dialog(recognized.value)
 
-                return Dialog.end_of_turn
+        # Send retry prompt
+        if (
+            not dialog_context.context.responded
+            and is_message
+            and state["options"].retry_prompt is not None
+        ):
+            await dialog_context.context.send_activity(
+                state["options"].retry_prompt
+            )
+
+        return Dialog.end_of_turn
 
     async def get_user_token(
         self, context: TurnContext, code: str = None

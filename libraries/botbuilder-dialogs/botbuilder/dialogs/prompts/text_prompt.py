@@ -3,18 +3,13 @@
 
 from typing import Dict
 from botbuilder.core import TurnContext
-from botbuilder.schema import ActivityTypes, Activity
-from .datetime_resolution import DateTimeResolution
+from botbuilder.schema import ActivityTypes
 from .prompt import Prompt
-from .confirm_prompt import ConfirmPrompt
 from .prompt_options import PromptOptions
 from .prompt_recognizer_result import PromptRecognizerResult
 
 
 class TextPrompt(Prompt):
-    # TODO: PromptValidator
-    def __init__(self, dialog_id: str, validator: object = None):
-        super(TextPrompt, self).__init__(dialog_id, validator)
 
     async def on_prompt(
         self,
@@ -28,10 +23,10 @@ class TextPrompt(Prompt):
         if not options:
             raise TypeError("TextPrompt.on_prompt(): options cannot be None.")
 
-        if is_retry == True and options.retry_prompt != None:
+        if is_retry and options.retry_prompt is not None:
             await turn_context.send_activity(options.retry_prompt)
         else:
-            if options.prompt != None:
+            if options.prompt is not None:
                 await turn_context.send_activity(options.prompt)
 
     async def on_recognize(
@@ -48,7 +43,7 @@ class TextPrompt(Prompt):
         result = PromptRecognizerResult()
         if turn_context.activity.type == ActivityTypes.message:
             message = turn_context.activity
-            if message.text != None:
+            if message.text is not None:
                 result.succeeded = True
                 result.value = message.text
         return result

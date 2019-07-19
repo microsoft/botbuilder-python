@@ -10,12 +10,12 @@ class DialogInstance:
     """
 
     def __init__(self):
-        self.id: str = None
+        self.id: str = None  # pylint: disable=invalid-name
         self.state: Dict[str, object] = {}
 
     def __str__(self):
         result = "\ndialog_instance_id: %s\n" % self.id
-        if not self.state is None:
+        if self.state is not None:
             for key, value in self.state.items():
                 result += "   {} ({})\n".format(key, str(value))
         return result

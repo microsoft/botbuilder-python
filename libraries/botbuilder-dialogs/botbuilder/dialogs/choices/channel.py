@@ -5,7 +5,7 @@ from botbuilder.core import TurnContext
 from botframework.connector import Channels
 
 
-class Channel(object):
+class Channel:
     """
     Methods for determining channel-specific functionality.
     """
@@ -19,7 +19,8 @@ class Channel(object):
             button_cnt (int, optional): Defaults to 100. The number of Suggested Actions to check for the Channel.
 
         Returns:
-            bool: True if the Channel supports the button_cnt total Suggested Actions, False if the Channel does not support that number of Suggested Actions.
+            bool: True if the Channel supports the button_cnt total Suggested Actions, False if the Channel does not
+             support that number of Suggested Actions.
         """
 
         max_actions = {
@@ -51,7 +52,8 @@ class Channel(object):
             button_cnt (int, optional): Defaults to 100. The number of Card Actions to check for the Channel.
 
         Returns:
-            bool: True if the Channel supports the button_cnt total Card Actions, False if the Channel does not support that number of Card Actions.
+            bool: True if the Channel supports the button_cnt total Card Actions, False if the Channel does not support
+             that number of Card Actions.
         """
 
         max_actions = {
@@ -82,10 +84,10 @@ class Channel(object):
             bool: True if the Channel has a Message Feed, False if it does not.
         """
 
-        return False if channel_id == Channels.cortana else True
+        return not channel_id == Channels.cortana
 
     @staticmethod
-    def max_action_title_length(channel_id: str) -> int:
+    def max_action_title_length(channel_id: str) -> int:  # pylint: disable=unused-argument
         """Maximum length allowed for Action Titles.
 
         Args:
@@ -110,5 +112,5 @@ class Channel(object):
 
         if turn_context.activity.channel_id is None:
             return ""
-        else:
-            return turn_context.activity.channel_id
+
+        return turn_context.activity.channel_id

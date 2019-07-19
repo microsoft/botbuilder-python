@@ -15,7 +15,7 @@ from botbuilder.dialogs import DialogSet, DialogTurnStatus
 class NumberPromptTests(aiounittest.AsyncTestCase):
     def test_empty_should_fail(self):
         empty_id = ""
-        self.assertRaises(TypeError, lambda: NumberPrompt(empty_id))
+        self.assertRaises(TypeError, lambda: NumberPrompt(empty_id))  # pylint: disable=no-value-for-parameter
 
     async def test_number_prompt(self):
         # Create new ConversationState with MemoryStorage and register the state as middleware.
@@ -27,16 +27,16 @@ class NumberPromptTests(aiounittest.AsyncTestCase):
         dialogs = DialogSet(dialog_state)
 
         # Create and add number prompt to DialogSet.
-        numberPrompt = NumberPrompt("NumberPrompt", None, "English")
-        dialogs.add(numberPrompt)
+        number_prompt = NumberPrompt("NumberPrompt", None, "English")
+        dialogs.add(number_prompt)
 
         async def exec_test(turn_context: TurnContext) -> None:
 
-            dialogContext = await dialogs.create_context(turn_context)
-            results = await dialogContext.continue_dialog()
+            dialog_context = await dialogs.create_context(turn_context)
+            results = await dialog_context.continue_dialog()
 
             if results.status == DialogTurnStatus.Empty:
-                await dialogContext.begin_dialog(
+                await dialog_context.begin_dialog(
                     "NumberPrompt",
                     PromptOptions(
                         prompt=MessageFactory.text("Enter quantity of cable")
@@ -44,10 +44,10 @@ class NumberPromptTests(aiounittest.AsyncTestCase):
                 )
             else:
                 if results.status == DialogTurnStatus.Complete:
-                    numberResult = results.result
+                    number_result = results.result
                     await turn_context.send_activity(
                         MessageFactory.text(
-                            f"You asked me for '{numberResult}' meters of cable."
+                            f"You asked me for '{number_result}' meters of cable."
                         )
                     )
 
@@ -60,6 +60,6 @@ class NumberPromptTests(aiounittest.AsyncTestCase):
         test_flow2 = await test_flow.send("Hello")
         test_flow3 = await test_flow2.assert_reply("Enter quantity of cable")
         test_flow4 = await test_flow3.send("Give me twenty meters of cable")
-        test_flow5 = await test_flow4.assert_reply(
+        await test_flow4.assert_reply(
             "You asked me for '20' meters of cable."
         )

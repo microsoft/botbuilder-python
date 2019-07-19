@@ -6,7 +6,7 @@ from typing import List
 from botbuilder.schema import CardAction
 
 
-class Choice(object):
+class Choice:
     def __init__(
         self, value: str = None, action: CardAction = None, synonyms: List[str] = None
     ):
