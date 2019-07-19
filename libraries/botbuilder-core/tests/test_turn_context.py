@@ -28,9 +28,9 @@ class SimpleAdapter(BotAdapter):
         responses = []
         assert context is not None
         assert activities is not None
-        assert type(activities) == list
-        assert len(activities) > 0
-        for (idx, activity) in enumerate(activities):
+        assert isinstance(activities, list)
+        assert activities
+        for (idx, activity) in enumerate(activities):  # pylint: disable=unused-variable
             assert isinstance(activity, Activity)
             assert activity.type == "message"
             responses.append(ResourceResponse(id="5678"))
@@ -48,27 +48,27 @@ class SimpleAdapter(BotAdapter):
 
 class TestBotContext(aiounittest.AsyncTestCase):
     def test_should_create_context_with_request_and_adapter(self):
-        context = TurnContext(SimpleAdapter(), ACTIVITY)
+        TurnContext(SimpleAdapter(), ACTIVITY)
 
     def test_should_not_create_context_without_request(self):
         try:
-            context = TurnContext(SimpleAdapter(), None)
+            TurnContext(SimpleAdapter(), None)
         except TypeError:
             pass
-        except Exception as e:
-            raise e
+        except Exception as error:
+            raise error
 
     def test_should_not_create_context_without_adapter(self):
         try:
-            context = TurnContext(None, ACTIVITY)
+            TurnContext(None, ACTIVITY)
         except TypeError:
             pass
-        except Exception as e:
-            raise e
+        except Exception as error:
+            raise error
 
     def test_should_create_context_with_older_context(self):
         context = TurnContext(SimpleAdapter(), ACTIVITY)
-        new_context = TurnContext(context)
+        TurnContext(context)
 
     def test_copy_to_should_copy_all_references(self):
         old_adapter = SimpleAdapter()
@@ -100,37 +100,37 @@ class TestBotContext(aiounittest.AsyncTestCase):
 
         adapter = SimpleAdapter()
         new_context = TurnContext(adapter, ACTIVITY)
-        assert len(new_context._on_send_activities) == 0
-        assert len(new_context._on_update_activity) == 0
-        assert len(new_context._on_delete_activity) == 0
+        assert not new_context._on_send_activities  # pylint: disable=protected-access
+        assert not new_context._on_update_activity  # pylint: disable=protected-access
+        assert not new_context._on_delete_activity  # pylint: disable=protected-access
 
         old_context.copy_to(new_context)
 
         assert new_context.adapter == old_adapter
         assert new_context.activity == old_activity
         assert new_context.responded is True
-        assert len(new_context._on_send_activities) == 1
-        assert len(new_context._on_update_activity) == 1
-        assert len(new_context._on_delete_activity) == 1
+        assert len(new_context._on_send_activities) == 1  # pylint: disable=protected-access
+        assert len(new_context._on_update_activity) == 1  # pylint: disable=protected-access
+        assert len(new_context._on_delete_activity) == 1  # pylint: disable=protected-access
 
-    def test_responded_should_be_automatically_set_to_False(self):
+    def test_responded_should_be_automatically_set_to_false(self):
         context = TurnContext(SimpleAdapter(), ACTIVITY)
         assert context.responded is False
 
-    def test_should_be_able_to_set_responded_to_True(self):
+    def test_should_be_able_to_set_responded_to_true(self):
         context = TurnContext(SimpleAdapter(), ACTIVITY)
         assert context.responded is False
         context.responded = True
         assert context.responded
 
-    def test_should_not_be_able_to_set_responded_to_False(self):
+    def test_should_not_be_able_to_set_responded_to_false(self):
         context = TurnContext(SimpleAdapter(), ACTIVITY)
         try:
             context.responded = False
         except ValueError:
             pass
-        except Exception as e:
-            raise e
+        except Exception as error:
+            raise error
 
     async def test_should_call_on_delete_activity_handlers_before_deletion(self):
         context = TurnContext(SimpleAdapter(), ACTIVITY)
@@ -227,7 +227,7 @@ class TestBotContext(aiounittest.AsyncTestCase):
         assert reference.channel_id == ACTIVITY.channel_id
         assert reference.service_url == ACTIVITY.service_url
 
-    def test_apply_conversation_reference_should_return_prepare_reply_when_is_incoming_is_False(
+    def test_apply_conversation_reference_should_return_prepare_reply_when_is_incoming_is_false(
         self
     ):
         reference = TurnContext.get_conversation_reference(ACTIVITY)
@@ -241,7 +241,7 @@ class TestBotContext(aiounittest.AsyncTestCase):
         assert reply.service_url == ACTIVITY.service_url
         assert reply.channel_id == ACTIVITY.channel_id
 
-    def test_apply_conversation_reference_when_is_incoming_is_True_should_not_prepare_a_reply(
+    def test_apply_conversation_reference_when_is_incoming_is_true_should_not_prepare_a_reply(
         self
     ):
         reference = TurnContext.get_conversation_reference(ACTIVITY)

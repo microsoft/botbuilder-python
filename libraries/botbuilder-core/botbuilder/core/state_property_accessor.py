@@ -1,16 +1,14 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from copy import copy
 from abc import ABC, abstractmethod
-from typing import Callable, List
 
 from .turn_context import TurnContext
 
 
 class StatePropertyAccessor(ABC):
     @abstractmethod
-    async def get(self, turnContext: TurnContext, default_value_factory=None):
+    async def get(self, turn_context: TurnContext, default_value_factory=None) -> object:
         """
         Get the property value from the source
         :param turn_context: Turn Context.
@@ -21,7 +19,7 @@ class StatePropertyAccessor(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def delete(self, turnContext: TurnContext):
+    async def delete(self, turn_context: TurnContext) -> None:
         """
         Saves store items to storage.
         :param turn_context: Turn Context.
@@ -30,10 +28,11 @@ class StatePropertyAccessor(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def set(self, turnContext: TurnContext, value):
+    async def set(self, turn_context: TurnContext, value) -> None:
         """
         Set the property value on the source.
         :param turn_context: Turn Context.
+        :param value:
         :return:
         """
         raise NotImplementedError()

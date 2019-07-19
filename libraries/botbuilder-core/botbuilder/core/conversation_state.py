@@ -14,21 +14,13 @@ class ConversationState(BotState):
     no_key_error_message = "ConversationState: channelId and/or conversation missing from context.activity."
 
     def __init__(self, storage: Storage):
-        """Creates a new ConversationState instance.
-        Parameters
-        ----------
-        storage : Storage
-            Where to store 
-        namespace: str
-        """
-
         super(ConversationState, self).__init__(storage, "ConversationState")
 
-    def get_storage_key(self, context: TurnContext):
-        channel_id = context.activity.channel_id or self.__raise_type_error(
+    def get_storage_key(self, turn_context: TurnContext) -> object:
+        channel_id = turn_context.activity.channel_id or self.__raise_type_error(
             "invalid activity-missing channel_id"
         )
-        conversation_id = context.activity.conversation.id or self.__raise_type_error(
+        conversation_id = turn_context.activity.conversation.id or self.__raise_type_error(
             "invalid activity-missing conversation.id"
         )
 

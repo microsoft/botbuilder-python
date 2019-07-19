@@ -1,14 +1,12 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import asyncio
 from copy import copy
-from uuid import uuid4
 from typing import List, Callable, Union, Dict
 from botbuilder.schema import Activity, ConversationReference, ResourceResponse
 
 
-class TurnContext(object):
+class TurnContext:
     def __init__(self, adapter_or_context, request: Activity = None):
         """
         Creates a new TurnContext instance.
@@ -22,9 +20,9 @@ class TurnContext(object):
             self._activity = request
             self.responses: List[Activity] = []
             self._services: dict = {}
-            self._on_send_activities: Callable[[]] = []
-            self._on_update_activity: Callable[[]] = []
-            self._on_delete_activity: Callable[[]] = []
+            self._on_send_activities: Callable[["TurnContext", List[Activity], Callable], List[ResourceResponse]] = []
+            self._on_update_activity: Callable[["TurnContext", Activity, Callable], ResourceResponse] = []
+            self._on_delete_activity: Callable[["TurnContext", ConversationReference, Callable], None] = []
             self._responded: bool = False
 
         if self.adapter is None:
@@ -77,8 +75,7 @@ class TurnContext(object):
             raise TypeError(
                 "TurnContext: cannot set `activity` to a type other than Activity."
             )
-        else:
-            self._activity = value
+        self._activity = value
 
     @property
     def responded(self) -> bool:
@@ -90,10 +87,9 @@ class TurnContext(object):
 
     @responded.setter
     def responded(self, value: bool):
-        if value == False:
+        if not value:
             raise ValueError("TurnContext: cannot set TurnContext.responded to False.")
-        else:
-            self._responded = True
+        self._responded = True
 
     @property
     def services(self):
@@ -155,7 +151,7 @@ class TurnContext(object):
 
         async def callback(context: "TurnContext", output):
             responses = await context.adapter.send_activities(context, output)
-            context._responded = True
+            context._responded = True  # pylint: disable=protected-access
             return responses
 
         result = await self._emit(
@@ -163,7 +159,7 @@ class TurnContext(object):
         )
 
         return (
-            result[0] if result is not None and len(result) > 0 else ResourceResponse()
+            result[0] if result else ResourceResponse()
         )
 
     async def update_activity(self, activity: Activity):
@@ -184,7 +180,7 @@ class TurnContext(object):
         :param id_or_reference:
         :return:
         """
-        if type(id_or_reference) == str:
+        if isinstance(id_or_reference, str):
             reference = TurnContext.get_conversation_reference(self.activity)
             reference.activity_id = id_or_reference
         else:
@@ -235,8 +231,8 @@ class TurnContext(object):
 
                     await handlers[i](context, arg, next_handler)
 
-            except Exception as e:
-                raise e
+            except Exception as error:
+                raise error
 
         await emit_next(0)
         # This should be changed to `return await logic()`

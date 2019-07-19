@@ -4,14 +4,12 @@
 import asyncio
 import base64
 from typing import List, Callable, Awaitable, Union, Dict
+from msrest.serialization import Model
 from botbuilder.schema import (
     Activity,
-    ChannelAccount,
     ConversationAccount,
     ConversationParameters,
     ConversationReference,
-    ConversationsResult,
-    ConversationResourceResponse,
     TokenResponse,
 )
 from botframework.connector import Channels, EmulatorApiClient
@@ -23,12 +21,10 @@ from botframework.connector.auth import (
 )
 from botframework.connector.token_api import TokenApiClient
 from botframework.connector.token_api.models import TokenStatus
-from msrest.serialization import Model
 
 from . import __version__
 from .bot_adapter import BotAdapter
 from .turn_context import TurnContext
-from .middleware_set import Middleware
 from .user_token_provider import UserTokenProvider
 
 USER_AGENT = f"Microsoft-BotFramework/3.1 (BotBuilder Python/{__version__})"
@@ -60,7 +56,7 @@ class TokenExchangeState(Model):
         self.ms_app_id = ms_app_id
 
 
-class BotFrameworkAdapterSettings(object):
+class BotFrameworkAdapterSettings:
     def __init__(
         self,
         app_id: str,
@@ -94,21 +90,28 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         )
         self._is_emulating_oauth_cards = False
 
-    async def continue_conversation(self, reference: ConversationReference, logic):
+    async def continue_conversation(self, bot_id: str, reference: ConversationReference, callback: Callable):
         """
         Continues a conversation with a user. This is often referred to as the bots "Proactive Messaging"
         flow as its lets the bot proactively send messages to a conversation or user that its already
         communicated with. Scenarios like sending notifications or coupons to a user are enabled by this
         method.
+        :param bot_id:
         :param reference:
-        :param logic:
+        :param callback:
         :return:
         """
+
+        # TODO: proactive messages
+
+        if not bot_id:
+            raise TypeError("Expected bot_id: str but got None instead")
+
         request = TurnContext.apply_conversation_reference(
             Activity(), reference, is_incoming=True
         )
         context = self.create_context(request)
-        return await self.run_pipeline(context, logic)
+        return await self.run_pipeline(context, callback)
 
     async def create_conversation(
         self,
@@ -155,8 +158,8 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             context = self.create_context(request)
             return await self.run_pipeline(context, logic)
 
-        except Exception as e:
-            raise e
+        except Exception as error:
+            raise error
 
     async def process_activity(self, req, auth_header: str, logic: Callable):
         """
@@ -238,16 +241,16 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                     is_valid_activity = await validate_activity(activity)
                     if is_valid_activity:
                         return activity
-                except Exception as e:
-                    raise e
+                except Exception as error:
+                    raise error
             elif "body" in req:
                 try:
                     activity = Activity().deserialize(req["body"])
                     is_valid_activity = await validate_activity(activity)
                     if is_valid_activity:
                         return activity
-                except Exception as e:
-                    raise e
+                except Exception as error:
+                    raise error
             else:
                 raise TypeError(
                     "BotFrameworkAdapter.parse_request(): received invalid request"
@@ -271,27 +274,27 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             return await client.conversations.update_activity(
                 activity.conversation.id, activity.id, activity
             )
-        except Exception as e:
-            raise e
+        except Exception as error:
+            raise error
 
     async def delete_activity(
-        self, context: TurnContext, conversation_reference: ConversationReference
+        self, context: TurnContext, reference: ConversationReference
     ):
         """
         Deletes an activity that was previously sent to a channel. It should be noted that not all
         channels support this feature.
         :param context:
-        :param conversation_reference:
+        :param reference:
         :return:
         """
         try:
-            client = self.create_connector_client(conversation_reference.service_url)
+            client = self.create_connector_client(reference.service_url)
             await client.conversations.delete_activity(
-                conversation_reference.conversation.id,
-                conversation_reference.activity_id,
+                reference.conversation.id,
+                reference.activity_id,
             )
-        except Exception as e:
-            raise e
+        except Exception as error:
+            raise error
 
     async def send_activities(self, context: TurnContext, activities: List[Activity]):
         try:
@@ -319,8 +322,8 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                     await client.conversations.send_to_conversation(
                         activity.conversation.id, activity
                     )
-        except Exception as e:
-            raise e
+        except Exception as error:
+            raise error
 
     async def delete_conversation_member(
         self, context: TurnContext, member_id: str
@@ -352,8 +355,8 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             )
         except AttributeError as attr_e:
             raise attr_e
-        except Exception as e:
-            raise e
+        except Exception as error:
+            raise error
 
     async def get_activity_members(self, context: TurnContext, activity_id: str):
         """
@@ -387,8 +390,8 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             return await client.conversations.get_activity_members(
                 conversation_id, activity_id
             )
-        except Exception as e:
-            raise e
+        except Exception as error:
+            raise error
 
     async def get_conversation_members(self, context: TurnContext):
         """
@@ -413,8 +416,8 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             conversation_id = context.activity.conversation.id
             client = self.create_connector_client(service_url)
             return await client.conversations.get_conversation_members(conversation_id)
-        except Exception as e:
-            raise e
+        except Exception as error:
+            raise error
 
     async def get_conversations(self, service_url: str, continuation_token: str = None):
         """
@@ -429,7 +432,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         return await client.conversations.get_conversations(continuation_token)
 
     async def get_user_token(
-        self, context: TurnContext, connection_name: str, magic_code: str
+        self, context: TurnContext, connection_name: str, magic_code: str = None
     ) -> TokenResponse:
         if (
             context.activity.from_property is None
@@ -455,8 +458,8 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         # TODO check form of response
         if result is None or result.token is None:
             return None
-        else:
-            return result
+
+        return result
 
     async def sign_out_user(
         self, context: TurnContext, connection_name: str = None, user_id: str = None

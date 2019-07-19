@@ -10,9 +10,6 @@ import inspect
 from datetime import datetime
 from typing import Coroutine, Dict, List, Callable, Union
 from copy import copy
-from ..bot_adapter import BotAdapter
-from ..turn_context import TurnContext
-from ..user_token_provider import UserTokenProvider
 from botbuilder.schema import (
     ActivityTypes,
     Activity,
@@ -22,6 +19,9 @@ from botbuilder.schema import (
     ResourceResponse,
     TokenResponse,
 )
+from ..bot_adapter import BotAdapter
+from ..turn_context import TurnContext
+from ..user_token_provider import UserTokenProvider
 
 
 class UserToken:
@@ -58,7 +58,7 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         logic: Coroutine = None,
         conversation: ConversationReference = None,
         send_trace_activity: bool = False,
-    ):
+    ):   # pylint: disable=unused-argument
         """
         Creates a new TestAdapter instance.
         :param logic:
@@ -99,8 +99,8 @@ class TestAdapter(BotAdapter, UserTokenProvider):
             self._next_id += 1
             return ResourceResponse(id=str(self._next_id))
 
-        """This if-else code is temporary until the BotAdapter and Bot/TurnContext are revamped."""
-        if type(activities) == list:
+        # TODO This if-else code is temporary until the BotAdapter and Bot/TurnContext are revamped.
+        if isinstance(activities, list):
             responses = [id_mapper(activity) for activity in activities]
         else:
             responses = [id_mapper(activities)]
@@ -145,7 +145,7 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         :param activity:
         :return:
         """
-        if type(activity) == str:
+        if isinstance(activity, str):
             activity = Activity(type="message", text=activity)
         # Initialize request.
         request = copy(self.template)
@@ -171,7 +171,7 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         Sends something to the bot. This returns a new `TestFlow` instance which can be used to add
         additional steps for inspecting the bots reply and then sending additional activities.
         :param user_says:
-        :return: A new instance of the TestFlow object 
+        :return: A new instance of the TestFlow object
         """
         return TestFlow(await self.receive_activity(user_says), self)
 
@@ -225,10 +225,10 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         if not magic_code:
             self._user_tokens.append(key)
         else:
-            mc = TokenMagicCode()
-            mc.key = key
-            mc.magic_code = magic_code
-            self._magic_codes.append(mc)
+            code = TokenMagicCode()
+            code.key = key
+            code.magic_code = magic_code
+            self._magic_codes.append(code)
 
     async def get_user_token(
         self, context: TurnContext, connection_name: str, magic_code: str = None
@@ -244,7 +244,6 @@ class TestAdapter(BotAdapter, UserTokenProvider):
             )
             if (
                 magic_code_record
-                and len(magic_code_record) > 0
                 and magic_code_record[0].magic_code == magic_code
             ):
                 # Move the token to long term dictionary.
@@ -259,19 +258,18 @@ class TestAdapter(BotAdapter, UserTokenProvider):
                 idx = self._magic_codes.index(magic_code_record[0])
                 self._magic_codes = [self._magic_codes.pop(idx)]
 
-        match = list(filter(lambda x: key.equals_key(x), self._user_tokens))
+        match = [token for token in self._user_tokens if key.equals_key(token)]
 
-        if match and len(match) > 0:
+        if match:
             return TokenResponse(
                 connection_name=match[0].connection_name,
                 token=match[0].token,
                 expiration=None,
             )
-        else:
-            # Not found.
-            return None
+        # Not found.
+        return None
 
-    async def sign_out_user(self, context: TurnContext, connection_name: str):
+    async def sign_out_user(self, context: TurnContext, connection_name: str, user_id: str = None):
         channel_id = context.activity.channel_id
         user_id = context.activity.from_property.id
 
@@ -288,7 +286,8 @@ class TestAdapter(BotAdapter, UserTokenProvider):
     async def get_oauth_sign_in_link(
         self, context: TurnContext, connection_name: str
     ) -> str:
-        return f"https://fake.com/oauthsignin/{connection_name}/{context.activity.channel_id}/{context.activity.from_property.id}"
+        return f"https://fake.com/oauthsignin" \
+            f"/{connection_name}/{context.activity.channel_id}/{context.activity.from_property.id}"
 
     async def get_aad_tokens(
         self, context: TurnContext, connection_name: str, resource_urls: List[str]
@@ -296,7 +295,7 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         return None
 
 
-class TestFlow(object):
+class TestFlow:
     def __init__(self, previous: Callable, adapter: TestAdapter):
         """
         INTERNAL: creates a new TestFlow instance.
@@ -343,7 +342,7 @@ class TestFlow(object):
         self,
         expected: Union[str, Activity, Callable[[Activity, str], None]],
         description=None,
-        timeout=None,
+        timeout=None,  # pylint: disable=unused-argument
     ) -> "TestFlow":
         """
         Generates an assertion if the bots response doesn't match the expected text/activity.
@@ -388,7 +387,7 @@ class TestFlow(object):
                         f"TestAdapter.assert_reply({expecting}): {description} Timed out after "
                         f"{current - start}ms."
                     )
-                elif len(adapter.activity_buffer) > 0:
+                if adapter.activity_buffer:
                     reply = adapter.activity_buffer.pop(0)
                     try:
                         await inspector(reply, description)
