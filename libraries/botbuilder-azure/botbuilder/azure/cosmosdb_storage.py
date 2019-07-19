@@ -10,9 +10,9 @@ from hashlib import sha256
 from typing import Dict, List
 from threading import Semaphore
 import json
+import azure.cosmos.cosmos_client as cosmos_client  # pylint: disable=no-name-in-module,import-error
+import azure.cosmos.errors as cosmos_errors  # pylint: disable=no-name-in-module,import-error
 from botbuilder.core.storage import Storage, StoreItem
-import azure.cosmos.cosmos_client as cosmos_client
-import azure.cosmos.errors as cosmos_errors
 
 
 class CosmosDbConfig:
@@ -74,13 +74,13 @@ class CosmosDbKeyEscape:
 
     @staticmethod
     def truncate_key(key: str) -> str:
-        MAX_KEY_LEN = 255
+        max_key_len = 255
 
-        if len(key) > MAX_KEY_LEN:
+        if len(key) > max_key_len:
             aux_hash = sha256(key.encode("utf-8"))
             aux_hex = aux_hash.hexdigest()
 
-            key = key[0 : MAX_KEY_LEN - len(aux_hex)] + aux_hex
+            key = key[0 : max_key_len - len(aux_hex)] + aux_hex
 
         return key
 
@@ -101,8 +101,8 @@ class CosmosDbStorage(Storage):
             self.config.endpoint, {"masterKey": self.config.masterkey}
         )
         # these are set by the functions that check
-        # the presence of the db and container or creates them
-        self.db = None
+        # the presence of the database and container or creates them
+        self.database = None
         self.container = None
         self._database_creation_options = config.database_creation_options
         self._container_creation_options = config.container_creation_options
@@ -146,11 +146,11 @@ class CosmosDbStorage(Storage):
                 )
                 # return a dict with a key and a StoreItem
                 return {r.get("realId"): self.__create_si(r) for r in results}
-            else:
-                # No keys passed in, no result to return.
-                return {}
-        except TypeError as e:
-            raise e
+
+            # No keys passed in, no result to return.
+            return {}
+        except TypeError as error:
+            raise error
 
     async def write(self, changes: Dict[str, StoreItem]):
         """Save storeitems to storage.
@@ -180,7 +180,7 @@ class CosmosDbStorage(Storage):
                         options={"disableAutomaticIdGeneration": True},
                     )
                 # if we have an etag, do opt. concurrency replace
-                elif len(e_tag) > 0:
+                elif e_tag:
                     access_condition = {"type": "IfMatch", "condition": e_tag}
                     self.client.ReplaceItem(
                         document_link=self.__item_link(
@@ -192,8 +192,8 @@ class CosmosDbStorage(Storage):
                 # error when there is no e_tag
                 else:
                     raise Exception("cosmosdb_storage.write(): etag missing")
-        except Exception as e:
-            raise e
+        except Exception as error:
+            raise error
 
     async def delete(self, keys: List[str]):
         """Remove storeitems from storage.
@@ -211,18 +211,18 @@ class CosmosDbStorage(Storage):
                 options["partitionKey"] = self.config.partition_key
 
             # call the function for each key
-            for k in keys:
+            for key in keys:
                 self.client.DeleteItem(
-                    document_link=self.__item_link(CosmosDbKeyEscape.sanitize_key(k)),
+                    document_link=self.__item_link(CosmosDbKeyEscape.sanitize_key(key)),
                     options=options,
                 )
                 # print(res)
-        except cosmos_errors.HTTPFailure as h:
+        except cosmos_errors.HTTPFailure as http_failure:
             # print(h.status_code)
-            if h.status_code != 404:
-                raise h
-        except TypeError as e:
-            raise e
+            if http_failure.status_code != 404:
+                raise http_failure
+        except TypeError as error:
+            raise error
 
     def __create_si(self, result) -> StoreItem:
         """Create a StoreItem from a result out of CosmosDB.
@@ -238,28 +238,28 @@ class CosmosDbStorage(Storage):
         # create and return the StoreItem
         return StoreItem(**doc)
 
-    def __create_dict(self, si: StoreItem) -> Dict:
+    def __create_dict(self, store_item: StoreItem) -> Dict:
         """Return the dict of a StoreItem.
 
         This eliminates non_magic attributes and the e_tag.
 
-        :param si:
+        :param store_item:
         :return dict:
         """
         # read the content
         non_magic_attr = [
-            attr for attr in dir(si) if not attr.startswith("_") or attr.__eq__("e_tag")
+            attr for attr in dir(store_item) if not attr.startswith("_") or attr.__eq__("e_tag")
         ]
         # loop through attributes and write and return a dict
-        return {attr: getattr(si, attr) for attr in non_magic_attr}
+        return {attr: getattr(store_item, attr) for attr in non_magic_attr}
 
-    def __item_link(self, id) -> str:
+    def __item_link(self, identifier) -> str:
         """Return the item link of a item in the container.
 
-        :param id:
+        :param identifier:
         :return str:
         """
-        return self.__container_link + "/docs/" + id
+        return self.__container_link + "/docs/" + identifier
 
     @property
     def __container_link(self) -> str:
@@ -276,7 +276,7 @@ class CosmosDbStorage(Storage):
 
         :return str:
         """
-        return "dbs/" + self.db
+        return "dbs/" + self.database
 
     @property
     def __container_exists(self) -> bool:
@@ -284,20 +284,20 @@ class CosmosDbStorage(Storage):
 
         :return bool:
         """
-        return self.db and self.container
+        return self.database and self.container
 
     def __create_db_and_container(self):
         """Call the get or create methods."""
         with self.__semaphore:
             db_id = self.config.database
             container_name = self.config.container
-            self.db = self._get_or_create_database(self.client, db_id)
+            self.database = self._get_or_create_database(self.client, db_id)
             self.container = self._get_or_create_container(self.client, container_name)
 
-    def _get_or_create_database(self, doc_client, id) -> str:
+    def _get_or_create_database(self, doc_client, id) -> str:  # pylint: disable=invalid-name
         """Return the database link.
 
-        Check if the database exists or create the db.
+        Check if the database exists or create the database.
 
         :param doc_client:
         :param id:
@@ -312,13 +312,13 @@ class CosmosDbStorage(Storage):
                 }
             )
         )
-        # if there are results, return the first (db names are unique)
-        if len(dbs) > 0:
+        # if there are results, return the first (database names are unique)
+        if dbs:
             return dbs[0]["id"]
-        else:
-            # create the database if it didn't exist
-            res = doc_client.CreateDatabase({"id": id}, self._database_creation_options)
-            return res["id"]
+
+        # create the database if it didn't exist
+        res = doc_client.CreateDatabase({"id": id}, self._database_creation_options)
+        return res["id"]
 
     def _get_or_create_container(self, doc_client, container) -> str:
         """Return the container link.
@@ -340,13 +340,13 @@ class CosmosDbStorage(Storage):
             )
         )
         # if there are results, return the first (container names are unique)
-        if len(containers) > 0:
+        if containers:
             return containers[0]["id"]
-        else:
-            # Create a container if it didn't exist
-            res = doc_client.CreateContainer(
-                self.__database_link,
-                {"id": container},
-                self._container_creation_options,
-            )
-            return res["id"]
+
+        # Create a container if it didn't exist
+        res = doc_client.CreateContainer(
+            self.__database_link,
+            {"id": container},
+            self._container_creation_options,
+        )
+        return res["id"]
