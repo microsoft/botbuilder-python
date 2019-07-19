@@ -10,8 +10,8 @@ class DialogSetTests(aiounittest.AsyncTestCase):
     def test_dialogset_constructor_valid(self):
         convo_state = ConversationState(MemoryStorage())
         dialog_state_property = convo_state.create_property("dialogstate")
-        ds = DialogSet(dialog_state_property)
-        assert ds is not None
+        dialog_set = DialogSet(dialog_state_property)
+        assert dialog_set is not None
 
     def test_dialogset_constructor_null_property(self):
         self.assertRaises(TypeError, lambda: DialogSet(None))

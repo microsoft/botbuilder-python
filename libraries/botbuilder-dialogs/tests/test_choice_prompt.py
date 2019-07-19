@@ -1,20 +1,17 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from recognizers_text import Culture
 from typing import List
 
 import aiounittest
+from recognizers_text import Culture
 
 from botbuilder.core import ConversationState, MemoryStorage, TurnContext
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.dialogs import (
-    Dialog,
     DialogSet,
-    DialogContext,
     DialogTurnResult,
     DialogTurnStatus,
-    WaterfallStepContext,
 )
 from botbuilder.dialogs.choices import Choice, ListStyle
 from botbuilder.dialogs.prompts import (
@@ -47,11 +44,11 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
         with self.assertRaises(TypeError):
             ChoicePrompt(none_id)
 
-    async def test_should_call_ChoicePrompt_using_dc_prompt(self):
+    async def test_should_call_choice_prompt_using_dc_prompt(self):
         async def exec_test(turn_context: TurnContext):
-            dc = await dialogs.create_context(turn_context)
+            dialog_context = await dialogs.create_context(turn_context)
 
-            results: DialogTurnResult = await dc.continue_dialog()
+            results: DialogTurnResult = await dialog_context.continue_dialog()
 
             if results.status == DialogTurnStatus.Empty:
                 options = PromptOptions(
@@ -60,7 +57,7 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
                     ),
                     choices=_color_choices,
                 )
-                await dc.prompt("ChoicePrompt", options)
+                await dialog_context.prompt("ChoicePrompt", options)
             elif results.status == DialogTurnStatus.Complete:
                 selected_choice = results.result
                 await turn_context.send_activity(selected_choice.value)
@@ -86,11 +83,11 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
         step3 = await step2.send(_answer_message)
         await step3.assert_reply("red")
 
-    async def test_should_call_ChoicePrompt_with_custom_validator(self):
+    async def test_should_call_choice_prompt_with_custom_validator(self):
         async def exec_test(turn_context: TurnContext):
-            dc = await dialogs.create_context(turn_context)
+            dialog_context = await dialogs.create_context(turn_context)
 
-            results: DialogTurnResult = await dc.continue_dialog()
+            results: DialogTurnResult = await dialog_context.continue_dialog()
 
             if results.status == DialogTurnStatus.Empty:
                 options = PromptOptions(
@@ -99,7 +96,7 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
                     ),
                     choices=_color_choices,
                 )
-                await dc.prompt("prompt", options)
+                await dialog_context.prompt("prompt", options)
             elif results.status == DialogTurnStatus.Complete:
                 selected_choice = results.result
                 await turn_context.send_activity(selected_choice.value)
@@ -134,9 +131,9 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
 
     async def test_should_send_custom_retry_prompt(self):
         async def exec_test(turn_context: TurnContext):
-            dc = await dialogs.create_context(turn_context)
+            dialog_context = await dialogs.create_context(turn_context)
 
-            results: DialogTurnResult = await dc.continue_dialog()
+            results: DialogTurnResult = await dialog_context.continue_dialog()
 
             if results.status == DialogTurnStatus.Empty:
                 options = PromptOptions(
@@ -149,7 +146,7 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
                     ),
                     choices=_color_choices,
                 )
-                await dc.prompt("prompt", options)
+                await dialog_context.prompt("prompt", options)
             elif results.status == DialogTurnStatus.Complete:
                 selected_choice = results.result
                 await turn_context.send_activity(selected_choice.value)
@@ -177,9 +174,9 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
 
     async def test_should_send_ignore_retry_prompt_if_validator_replies(self):
         async def exec_test(turn_context: TurnContext):
-            dc = await dialogs.create_context(turn_context)
+            dialog_context = await dialogs.create_context(turn_context)
 
-            results: DialogTurnResult = await dc.continue_dialog()
+            results: DialogTurnResult = await dialog_context.continue_dialog()
 
             if results.status == DialogTurnStatus.Empty:
                 options = PromptOptions(
@@ -192,7 +189,7 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
                     ),
                     choices=_color_choices,
                 )
-                await dc.prompt("prompt", options)
+                await dialog_context.prompt("prompt", options)
             elif results.status == DialogTurnStatus.Complete:
                 selected_choice = results.result
                 await turn_context.send_activity(selected_choice.value)
@@ -228,9 +225,9 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
 
     async def test_should_use_default_locale_when_rendering_choices(self):
         async def exec_test(turn_context: TurnContext):
-            dc = await dialogs.create_context(turn_context)
+            dialog_context = await dialogs.create_context(turn_context)
 
-            results: DialogTurnResult = await dc.continue_dialog()
+            results: DialogTurnResult = await dialog_context.continue_dialog()
 
             if results.status == DialogTurnStatus.Empty:
                 options = PromptOptions(
@@ -239,7 +236,7 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
                     ),
                     choices=_color_choices,
                 )
-                await dc.prompt("prompt", options)
+                await dialog_context.prompt("prompt", options)
             elif results.status == DialogTurnStatus.Complete:
                 selected_choice = results.result
                 await turn_context.send_activity(selected_choice.value)
@@ -277,9 +274,9 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
 
     async def test_should_use_context_activity_locale_when_rendering_choices(self):
         async def exec_test(turn_context: TurnContext):
-            dc = await dialogs.create_context(turn_context)
+            dialog_context = await dialogs.create_context(turn_context)
 
-            results: DialogTurnResult = await dc.continue_dialog()
+            results: DialogTurnResult = await dialog_context.continue_dialog()
 
             if results.status == DialogTurnStatus.Empty:
                 options = PromptOptions(
@@ -288,7 +285,7 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
                     ),
                     choices=_color_choices,
                 )
-                await dc.prompt("prompt", options)
+                await dialog_context.prompt("prompt", options)
             elif results.status == DialogTurnStatus.Complete:
                 selected_choice = results.result
                 await turn_context.send_activity(selected_choice.value)
@@ -325,9 +322,9 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
         self
     ):
         async def exec_test(turn_context: TurnContext):
-            dc = await dialogs.create_context(turn_context)
+            dialog_context = await dialogs.create_context(turn_context)
 
-            results: DialogTurnResult = await dc.continue_dialog()
+            results: DialogTurnResult = await dialog_context.continue_dialog()
 
             if results.status == DialogTurnStatus.Empty:
                 options = PromptOptions(
@@ -336,7 +333,7 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
                     ),
                     choices=_color_choices,
                 )
-                await dc.prompt("prompt", options)
+                await dialog_context.prompt("prompt", options)
             elif results.status == DialogTurnStatus.Complete:
                 selected_choice = results.result
                 await turn_context.send_activity(selected_choice.value)
@@ -373,9 +370,9 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
 
     async def test_should_not_render_choices_if_list_style_none_is_specified(self):
         async def exec_test(turn_context: TurnContext):
-            dc = await dialogs.create_context(turn_context)
+            dialog_context = await dialogs.create_context(turn_context)
 
-            results: DialogTurnResult = await dc.continue_dialog()
+            results: DialogTurnResult = await dialog_context.continue_dialog()
 
             if results.status == DialogTurnStatus.Empty:
                 options = PromptOptions(
@@ -385,7 +382,7 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
                     choices=_color_choices,
                     style=ListStyle.none,
                 )
-                await dc.prompt("prompt", options)
+                await dialog_context.prompt("prompt", options)
             elif results.status == DialogTurnStatus.Complete:
                 selected_choice = results.result
                 await turn_context.send_activity(selected_choice.value)
@@ -409,9 +406,9 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
 
     async def test_should_create_prompt_with_inline_choices_when_specified(self):
         async def exec_test(turn_context: TurnContext):
-            dc = await dialogs.create_context(turn_context)
+            dialog_context = await dialogs.create_context(turn_context)
 
-            results: DialogTurnResult = await dc.continue_dialog()
+            results: DialogTurnResult = await dialog_context.continue_dialog()
 
             if results.status == DialogTurnStatus.Empty:
                 options = PromptOptions(
@@ -420,7 +417,7 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
                     ),
                     choices=_color_choices,
                 )
-                await dc.prompt("prompt", options)
+                await dialog_context.prompt("prompt", options)
             elif results.status == DialogTurnStatus.Complete:
                 selected_choice = results.result
                 await turn_context.send_activity(selected_choice.value)
@@ -447,9 +444,9 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
 
     async def test_should_create_prompt_with_list_choices_when_specified(self):
         async def exec_test(turn_context: TurnContext):
-            dc = await dialogs.create_context(turn_context)
+            dialog_context = await dialogs.create_context(turn_context)
 
-            results: DialogTurnResult = await dc.continue_dialog()
+            results: DialogTurnResult = await dialog_context.continue_dialog()
 
             if results.status == DialogTurnStatus.Empty:
                 options = PromptOptions(
@@ -458,7 +455,7 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
                     ),
                     choices=_color_choices,
                 )
-                await dc.prompt("prompt", options)
+                await dialog_context.prompt("prompt", options)
             elif results.status == DialogTurnStatus.Complete:
                 selected_choice = results.result
                 await turn_context.send_activity(selected_choice.value)
@@ -487,9 +484,9 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
         self
     ):
         async def exec_test(turn_context: TurnContext):
-            dc = await dialogs.create_context(turn_context)
+            dialog_context = await dialogs.create_context(turn_context)
 
-            results: DialogTurnResult = await dc.continue_dialog()
+            results: DialogTurnResult = await dialog_context.continue_dialog()
 
             if results.status == DialogTurnStatus.Empty:
                 options = PromptOptions(
@@ -499,7 +496,7 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
                     choices=_color_choices,
                     style=ListStyle.suggested_action,
                 )
-                await dc.prompt("prompt", options)
+                await dialog_context.prompt("prompt", options)
             elif results.status == DialogTurnStatus.Complete:
                 selected_choice = results.result
                 await turn_context.send_activity(selected_choice.value)
@@ -523,9 +520,9 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
 
     async def test_should_create_prompt_with_auto_style_when_specified(self):
         async def exec_test(turn_context: TurnContext):
-            dc = await dialogs.create_context(turn_context)
+            dialog_context = await dialogs.create_context(turn_context)
 
-            results: DialogTurnResult = await dc.continue_dialog()
+            results: DialogTurnResult = await dialog_context.continue_dialog()
 
             if results.status == DialogTurnStatus.Empty:
                 options = PromptOptions(
@@ -535,7 +532,7 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
                     choices=_color_choices,
                     style=ListStyle.auto,
                 )
-                await dc.prompt("prompt", options)
+                await dialog_context.prompt("prompt", options)
             elif results.status == DialogTurnStatus.Complete:
                 selected_choice = results.result
                 await turn_context.send_activity(selected_choice.value)
@@ -561,9 +558,9 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
 
     async def test_should_recognize_valid_number_choice(self):
         async def exec_test(turn_context: TurnContext):
-            dc = await dialogs.create_context(turn_context)
+            dialog_context = await dialogs.create_context(turn_context)
 
-            results: DialogTurnResult = await dc.continue_dialog()
+            results: DialogTurnResult = await dialog_context.continue_dialog()
 
             if results.status == DialogTurnStatus.Empty:
                 options = PromptOptions(
@@ -572,7 +569,7 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
                     ),
                     choices=_color_choices,
                 )
-                await dc.prompt("prompt", options)
+                await dialog_context.prompt("prompt", options)
             elif results.status == DialogTurnStatus.Complete:
                 selected_choice = results.result
                 await turn_context.send_activity(selected_choice.value)

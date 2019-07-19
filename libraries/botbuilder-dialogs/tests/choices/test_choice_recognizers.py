@@ -57,7 +57,7 @@ def assert_choice(result, value, index, score, synonym=None):
         resolution.score == score
     ), f"Invalid resolution.score of '{resolution.score}' for '{value}' choice."
     if synonym:
-        assert (
+        assert (  # pylint: disable=assert-on-tuple
             resolution.synonym == synonym,
             f"Invalid resolution.synonym of '{resolution.synonym}' for '{value}' choice.",
         )
@@ -147,7 +147,7 @@ class ChoiceRecognizersTest(aiounittest.AsyncTestCase):
 
     def test_should_accept_null_utterance_in_find_choices(self):
         found = Find.find_choices(None, _color_choices)
-        assert len(found) == 0
+        assert not found
 
     # ChoiceRecognizers.recognize_choices
 
@@ -195,4 +195,4 @@ class ChoiceRecognizersTest(aiounittest.AsyncTestCase):
 
     def test_should_accept_null_utterance_in_recognize_choices(self):
         found = ChoiceRecognizers.recognize_choices(None, _color_choices)
-        assert len(found) == 0
+        assert not found
