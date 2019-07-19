@@ -1,9 +1,9 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from typing import List, Union
 from recognizers_number import NumberModel, NumberRecognizer, OrdinalModel
 from recognizers_text import Culture
-from typing import List, Union
 
 
 from .choice import Choice
@@ -26,7 +26,8 @@ class ChoiceRecognizers:
         Matches user input against a list of choices.
 
         This is layered above the `Find.find_choices()` function, and adds logic to let the user specify
-        their choice by index (they can say "one" to pick `choice[0]`) or ordinal position (they can say "the second one" to pick `choice[1]`.)
+        their choice by index (they can say "one" to pick `choice[0]`) or ordinal position
+         (they can say "the second one" to pick `choice[1]`.)
         The user's utterance is recognized in the following order:
 
         - By name using `find_choices()`
@@ -37,7 +38,7 @@ class ChoiceRecognizers:
         -----------
 
         utterance: The input.
-        
+
         choices: The list of choices.
 
         options: (Optional) Options to control the recognition strategy.
@@ -61,11 +62,11 @@ class ChoiceRecognizers:
         #   a numerical index or ordinal as well.
         locale = options.locale if (options and options.locale) else Culture.English
         matched = Find.find_choices(utterance, choices_list, options)
-        if len(matched) == 0:
+        if not matched:
             # Next try finding by ordinal
             matches = ChoiceRecognizers._recognize_ordinal(utterance, locale)
 
-            if len(matches) > 0:
+            if matches:
                 for match in matches:
                     ChoiceRecognizers._match_choice_by_index(
                         choices_list, matched, match
@@ -100,7 +101,7 @@ class ChoiceRecognizers:
     ):
         try:
             index: int = int(match.resolution.value) - 1
-            if index >= 0 and index < len(choices):
+            if 0 <= index < len(choices):
                 choice = choices[index]
 
                 matched.append(

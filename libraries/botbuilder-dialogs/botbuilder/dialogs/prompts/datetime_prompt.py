@@ -3,12 +3,12 @@
 
 from typing import Dict
 from botbuilder.core.turn_context import TurnContext
-from botbuilder.schema import ActivityTypes, Activity
+from botbuilder.schema import ActivityTypes
+from recognizers_date_time import recognize_datetime
 from .datetime_resolution import DateTimeResolution
 from .prompt import Prompt
 from .prompt_options import PromptOptions
 from .prompt_recognizer_result import PromptRecognizerResult
-from recognizers_date_time import recognize_datetime
 
 
 class DateTimePrompt(Prompt):
@@ -30,10 +30,10 @@ class DateTimePrompt(Prompt):
         if not options:
             raise TypeError("DateTimePrompt.on_prompt(): options cannot be None.")
 
-        if is_retry == True and options.retry_prompt != None:
+        if is_retry and options.retry_prompt is not None:
             await turn_context.send_activity(options.retry_prompt)
         else:
-            if options.prompt != None:
+            if options.prompt is not None:
                 await turn_context.send_activity(options.prompt)
 
     async def on_recognize(
@@ -52,10 +52,10 @@ class DateTimePrompt(Prompt):
             # Recognize utterance
             message = turn_context.activity
             # TODO: English constant needs to be ported.
-            culture = message.locale if message.locale != None else "English"
+            culture = message.locale if message.locale is not None else "English"
 
             results = recognize_datetime(message.text, culture)
-            if len(results) > 0:
+            if results:
                 result.succeeded = True
                 result.value = []
                 values = results[0].resolution["values"]

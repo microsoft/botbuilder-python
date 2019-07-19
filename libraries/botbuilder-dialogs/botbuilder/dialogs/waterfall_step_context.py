@@ -1,13 +1,12 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from typing import Dict
 
 from .dialog_context import DialogContext
 from .dialog_reason import DialogReason
 from .dialog_turn_result import DialogTurnResult
 from .dialog_state import DialogState
-
-from typing import Dict
 
 
 class WaterfallStepContext(DialogContext):

@@ -1,19 +1,18 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from recognizers_text import Culture
 from typing import Callable, Dict, List, Union
 
 from botbuilder.core import TurnContext
 from botbuilder.dialogs.choices import (
     Choice,
-    ChoiceFactory,
     ChoiceFactoryOptions,
     ChoiceRecognizers,
     FindChoicesOptions,
     ListStyle,
 )
 from botbuilder.schema import Activity, ActivityTypes
+from recognizers_text import Culture
 
 from .prompt import Prompt
 from .prompt_options import PromptOptions
@@ -25,7 +24,8 @@ class ChoicePrompt(Prompt):
     """
     Prompts a user to select from a list of choices.
 
-    By default the prompt will return to the calling dialog a `FoundChoice` object containing the choice that was selected.
+    By default the prompt will return to the calling dialog a `FoundChoice` object containing the choice that
+     was selected.
     """
 
     _default_choice_options: Dict[str, ChoiceFactoryOptions] = {
@@ -116,9 +116,8 @@ class ChoicePrompt(Prompt):
         # Format prompt to send
         choices: List[Choice] = options.choices if options.choices else []
         channel_id: str = turn_context.activity.channel_id
-        choice_options: ChoiceFactoryOptions = self.choice_options if self.choice_options else ChoicePrompt._default_choice_options[
-            culture
-        ]
+        choice_options: ChoiceFactoryOptions = self.choice_options \
+            if self.choice_options else ChoicePrompt._default_choice_options[culture]
         choice_style = options.style if options.style else self.style
 
         if is_retry and options.retry_prompt is not None:
@@ -156,7 +155,7 @@ class ChoicePrompt(Prompt):
             )
             results = ChoiceRecognizers.recognize_choices(utterance, choices, opt)
 
-            if results is not None and len(results) > 0:
+            if results is not None and results:
                 result.succeeded = True
                 result.value = results[0].resolution
 

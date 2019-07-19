@@ -1,7 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
-from .dialog_instance import DialogInstance
+
 from typing import List
+from .dialog_instance import DialogInstance
 
 
 class DialogState:
@@ -16,6 +17,6 @@ class DialogState:
         return self._dialog_stack
 
     def __str__(self):
-        if len(self._dialog_stack) <= 0:
+        if not self._dialog_stack:
             return "dialog stack empty!"
         return " ".join(map(str, self._dialog_stack))

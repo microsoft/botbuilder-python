@@ -2,12 +2,12 @@
 # Licensed under the MIT License.
 
 from typing import Dict
+from recognizers_number import recognize_number
 from botbuilder.core.turn_context import TurnContext
-from botbuilder.schema import ActivityTypes, Activity
+from botbuilder.schema import ActivityTypes
 from .prompt import Prompt
 from .prompt_options import PromptOptions
 from .prompt_recognizer_result import PromptRecognizerResult
-from recognizers_number import recognize_number
 
 
 class NumberPrompt(Prompt):
@@ -28,10 +28,10 @@ class NumberPrompt(Prompt):
         if not options:
             raise TypeError("NumberPrompt.on_prompt(): options cannot be None.")
 
-        if is_retry == True and options.retry_prompt != None:
-            prompt = turn_context.send_activity(options.retry_prompt)
+        if is_retry and options.retry_prompt is not None:
+            turn_context.send_activity(options.retry_prompt)
         else:
-            if options.prompt != None:
+            if options.prompt is not None:
                 await turn_context.send_activity(options.prompt)
 
     async def on_recognize(
@@ -50,12 +50,12 @@ class NumberPrompt(Prompt):
             # TODO: Fix constant English with correct constant from text recognizer
             culture = (
                 turn_context.activity.locale
-                if turn_context.activity.locale != None
+                if turn_context.activity.locale is not None
                 else "English"
             )
 
             results = recognize_number(message.text, culture)
-            if len(results) > 0:
+            if results:
                 result.succeeded = True
                 result.value = results[0].resolution["value"]
 

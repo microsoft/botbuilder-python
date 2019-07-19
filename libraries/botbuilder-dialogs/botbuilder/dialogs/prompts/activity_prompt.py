@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from abc import ABC, abstractmethod
+from abc import ABC
 from typing import Callable, Dict
 
 from botbuilder.core import TurnContext
@@ -12,7 +12,7 @@ from botbuilder.dialogs import (
     DialogReason,
     DialogTurnResult,
 )
-from botbuilder.schema import Activity, ActivityTypes, InputHints
+from botbuilder.schema import ActivityTypes, InputHints
 
 from .prompt import Prompt
 from .prompt_options import PromptOptions
@@ -51,9 +51,9 @@ class ActivityPrompt(Dialog, ABC):
         self._validator = validator
 
     async def begin_dialog(
-        self, dc: DialogContext, options: PromptOptions
+        self, dialog_context: DialogContext, options: PromptOptions = None
     ) -> DialogTurnResult:
-        if not dc:
+        if not dialog_context:
             raise TypeError("ActivityPrompt.begin_dialog(): dc cannot be None.")
         if not isinstance(options, PromptOptions):
             raise TypeError(
@@ -68,13 +68,13 @@ class ActivityPrompt(Dialog, ABC):
             options.retry_prompt.input_hint = InputHints.expecting_input
 
         # Initialize prompt state
-        state: Dict[str, object] = dc.active_dialog.state
+        state: Dict[str, object] = dialog_context.active_dialog.state
         state[self.persisted_options] = options
         state[self.persisted_state] = {Prompt.ATTEMPT_COUNT_KEY: 0}
 
         # Send initial prompt
         await self.on_prompt(
-            dc.context,
+            dialog_context.context,
             state[self.persisted_state],
             state[self.persisted_options],
             False,
@@ -82,18 +82,18 @@ class ActivityPrompt(Dialog, ABC):
 
         return Dialog.end_of_turn
 
-    async def continue_dialog(self, dc: DialogContext) -> DialogTurnResult:
-        if not dc:
+    async def continue_dialog(self, dialog_context: DialogContext) -> DialogTurnResult:
+        if not dialog_context:
             raise TypeError(
                 "ActivityPrompt.continue_dialog(): DialogContext cannot be None."
             )
 
         # Perform base recognition
-        instance = dc.active_dialog
+        instance = dialog_context.active_dialog
         state: Dict[str, object] = instance.state[self.persisted_state]
         options: Dict[str, object] = instance.state[self.persisted_options]
         recognized: PromptRecognizerResult = await self.on_recognize(
-            dc.context, state, options
+            dialog_context.context, state, options
         )
 
         # Increment attempt count
@@ -103,7 +103,7 @@ class ActivityPrompt(Dialog, ABC):
         is_valid = False
         if self._validator is not None:
             prompt_context = PromptValidatorContext(
-                dc.context, recognized, state, options
+                dialog_context.context, recognized, state, options
             )
             is_valid = await self._validator(prompt_context)
 
@@ -116,18 +116,18 @@ class ActivityPrompt(Dialog, ABC):
 
         # Return recognized value or re-prompt
         if is_valid:
-            return await dc.end_dialog(recognized.value)
-        else:
-            if (
-                dc.context.activity.type == ActivityTypes.message
-                and not dc.context.responded
-            ):
-                await self.on_prompt(dc.context, state, options, True)
+            return await dialog_context.end_dialog(recognized.value)
+
+        if (
+            dialog_context.context.activity.type == ActivityTypes.message
+            and not dialog_context.context.responded
+        ):
+            await self.on_prompt(dialog_context.context, state, options, True)
 
         return Dialog.end_of_turn
 
     async def resume_dialog(
-        self, dc: DialogContext, reason: DialogReason, result: object = None
+        self, dialog_context: DialogContext, reason: DialogReason, result: object = None
     ):
         """
         Prompts are typically leaf nodes on the stack but the dev is free to push other dialogs
@@ -136,7 +136,7 @@ class ActivityPrompt(Dialog, ABC):
         To avoid the prompt prematurely ending, we need to implement this method and
         simply re-prompt the user
         """
-        await self.reprompt_dialog(dc.context, dc.active_dialog)
+        await self.reprompt_dialog(dialog_context.context, dialog_context.active_dialog)
 
         return Dialog.end_of_turn
 
@@ -148,7 +148,7 @@ class ActivityPrompt(Dialog, ABC):
     async def on_prompt(
         self,
         context: TurnContext,
-        state: Dict[str, dict],
+        state: Dict[str, dict],  # pylint: disable=unused-argument
         options: PromptOptions,
         is_retry: bool = False,
     ):
@@ -173,7 +173,7 @@ class ActivityPrompt(Dialog, ABC):
             await context.send_activity(options.prompt)
 
     async def on_recognize(
-        self, context: TurnContext, state: Dict[str, object], options: PromptOptions
+        self, context: TurnContext, state: Dict[str, object], options: PromptOptions  # pylint: disable=unused-argument
     ) -> PromptRecognizerResult:
 
         result = PromptRecognizerResult()

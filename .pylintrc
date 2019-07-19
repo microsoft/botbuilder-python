@@ -139,10 +139,22 @@ disable=print-statement,
         deprecated-sys-function,
         exception-escape,
         comprehension-escape,
-        C0330,
-        R0801,
-        W0621,
-        C0111
+        bad-continuation,
+        duplicate-code,
+        redefined-outer-name,
+        missing-docstring,
+        too-many-instance-attributes,
+        too-few-public-methods,
+        redefined-builtin,
+        too-many-arguments,
+        no-self-use,
+        fixme,
+        broad-except,
+        bare-except,
+        too-many-public-methods,
+        cyclic-import,
+        too-many-locals,
+        too-many-function-args
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option

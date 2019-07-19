@@ -10,7 +10,7 @@ class Tokenizer:
     """ Provides a default tokenizer implementation. """
 
     @staticmethod
-    def default_tokenizer(text: str, locale: str = None) -> [Token]:
+    def default_tokenizer(text: str, locale: str = None) -> [Token]:  # pylint: disable=unused-argument
         """
         Simple tokenizer that breaks on spaces and punctuation. The only normalization is to lowercase.
 
@@ -82,11 +82,11 @@ class Tokenizer:
 
         to: high range
         """
-        return value >= from_val and value <= to_val
+        return from_val <= value <= to_val
 
     @staticmethod
     def _append_token(tokens: [Token], token: Token, end: int):
-        if token != None:
+        if token is not None:
             token.end = end
             token.normalized = token.text.lower()
             tokens.append(token)

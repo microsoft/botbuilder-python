@@ -12,7 +12,8 @@ class OAuthPromptSettings:
             connection_name (str): Name of the OAuth connection being used.
             title (str): The title of the cards signin button.
             text (str): (Optional) additional text included on the signin card.
-            timeout (int): (Optional) number of milliseconds the prompt will wait for the user to authenticate. `OAuthPrompt` defaults value to `900,000` ms (15 minutes).
+            timeout (int): (Optional) number of milliseconds the prompt will wait for the user to authenticate.
+                `OAuthPrompt` defaults value to `900,000` ms (15 minutes).
         """
         self.connection_name = connection_name
         self.title = title
