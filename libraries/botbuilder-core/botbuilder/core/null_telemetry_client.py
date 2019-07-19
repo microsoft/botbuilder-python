@@ -30,7 +30,7 @@ class NullTelemetryClient(BotTelemetryClient):
 
     def track_exception(
         self,
-        type: type = None,
+        exception_type: type = None,
         value: Exception = None,
         tb: traceback = None,
         properties: Dict[str, object] = None,
@@ -38,7 +38,7 @@ class NullTelemetryClient(BotTelemetryClient):
     ) -> None:
         """ 
         Send information about a single exception that occurred in the application.
-        :param type: the type of the exception that was thrown.
+        :param exception_type: the type of the exception that was thrown.
         :param value: the exception that the client wants to send.
         :param tb: the traceback information as returned by :func:`sys.exc_info`.
         :param properties: the set of custom properties the client wants attached to this data item. (defaults to: None)
@@ -64,10 +64,10 @@ class NullTelemetryClient(BotTelemetryClient):
         self,
         name: str,
         value: float,
-        type: TelemetryDataPointType = None,
+        tel_type: TelemetryDataPointType = None,
         count: int = None,
-        min: float = None,
-        max: float = None,
+        min_val: float = None,
+        max_val: float = None,
         std_dev: float = None,
         properties: Dict[str, object] = None,
     ) -> NotImplemented:
@@ -75,10 +75,10 @@ class NullTelemetryClient(BotTelemetryClient):
         Send information about a single metric data point that was captured for the application.
         :param name: The name of the metric that was captured.
         :param value: The value of the metric that was captured.
-        :param type: The type of the metric. (defaults to: TelemetryDataPointType.aggregation`)
+        :param tel_type: The type of the metric. (defaults to: TelemetryDataPointType.aggregation`)
         :param count: the number of metrics that were aggregated into this data point. (defaults to: None)
-        :param min: the minimum of all metrics collected that were aggregated into this data point. (defaults to: None)
-        :param max: the maximum of all metrics collected that were aggregated into this data point. (defaults to: None)
+        :param min_val: the minimum of all metrics collected that were aggregated into this data point. (defaults to: None)
+        :param max_val: the maximum of all metrics collected that were aggregated into this data point. (defaults to: None)
         :param std_dev: the standard deviation of all metrics collected that were aggregated into this data point. (defaults to: None)
         :param properties: the set of custom properties the client wants attached to this data item. (defaults to: None)
         """
@@ -125,7 +125,7 @@ class NullTelemetryClient(BotTelemetryClient):
         self,
         name: str,
         data: str,
-        type: str = None,
+        type_name: str = None,
         target: str = None,
         duration: int = None,
         success: bool = None,
@@ -138,7 +138,7 @@ class NullTelemetryClient(BotTelemetryClient):
         Sends a single dependency telemetry that was captured for the application.
         :param name: the name of the command initiated with this dependency call. Low cardinality value. Examples are stored procedure name and URL path template.
         :param data: the command initiated by this dependency call. Examples are SQL statement and HTTP URL with all query parameters.
-        :param type: the dependency type name. Low cardinality value for logical grouping of dependencies and interpretation of other fields like commandName and resultCode. Examples are SQL, Azure table, and HTTP. (default to: None)
+        :param type_name: the dependency type name. Low cardinality value for logical grouping of dependencies and interpretation of other fields like commandName and resultCode. Examples are SQL, Azure table, and HTTP. (default to: None)
         :param target: the target site of a dependency call. Examples are server name, host address. (default to: None)
         :param duration: the number of milliseconds that this dependency call lasted. (defaults to: None)
         :param success: true if the dependency call ended in success, false otherwise. (defaults to: None)
