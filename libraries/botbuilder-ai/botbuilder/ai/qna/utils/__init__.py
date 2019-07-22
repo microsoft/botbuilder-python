@@ -7,6 +7,4 @@
 
 from .http_request_utils import HttpRequestUtils
 
-__all__ = [
-    "HttpRequestUtils"
-]
+__all__ = ["HttpRequestUtils"]

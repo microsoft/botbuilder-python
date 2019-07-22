@@ -2,12 +2,14 @@
 # Licensed under the MIT License.
 
 import json, platform, requests
-from aiohttp import ClientSession, ClientTimeout
+from aiohttp import ClientResponse, ClientSession, ClientTimeout
 from typing import Union
-#TODO fix importing title and version
-# from ../.. import __title__, __version__ 
+
+# TODO fix importing title and version -- try ...about if ... doesn't work
+from ... import __title__, __version__
 
 from ..qnamaker_endpoint import QnAMakerEndpoint
+
 
 class HttpRequestUtils:
     """ HTTP request utils class. """
@@ -15,15 +17,13 @@ class HttpRequestUtils:
     def __init__(self, http_client: Union[ClientSession, object]):
         self._http_client = http_client
 
-    #TODO figure out return type
     async def execute_http_request(
         self,
         request_url: str,
-        #TODO verify if this is str in python
-        payload_body: str,
+        question: object,
         endpoint: QnAMakerEndpoint,
-        timeout: float=None
-    ):
+        timeout: float,
+    ) -> ClientResponse:
         """
         Execute HTTP request.
 
@@ -36,37 +36,50 @@ class HttpRequestUtils:
 
         endpoint: QnA Maker endpoint details.
 
-        timeout: (Optional) Timeout for HTTP call.
+        timeout: Timeout for HTTP call.
         """
         if not request_url:
-            raise TypeError("HttpRequestUtils.execute_http_request(): request_url cannot be None.")
-        
-        if not payload_body:
-            raise TypeError("HttpRequestUtils.execute_http_request(): payload_body cannot be None.")
-        
-        if  not endpoint:
-            raise TypeError("HttpRequestUtils.execute_http_request(): endpoint cannot be None.")
-        
+            raise TypeError(
+                "HttpRequestUtils.execute_http_request(): request_url cannot be None."
+            )
+
+        if not question:
+            raise TypeError(
+                "HttpRequestUtils.execute_http_request(): question cannot be None."
+            )
+
+        if not endpoint:
+            raise TypeError(
+                "HttpRequestUtils.execute_http_request(): endpoint cannot be None."
+            )
+
+        if not timeout:
+            raise TypeError(
+                "HttpRequestUtils.execute_http_request(): timeout cannot be None."
+            )
+
+        serialized_payload_body = json.dumps(question)
+
         headers = self._get_headers(endpoint)
 
         # Convert miliseconds to seconds (as other BotBuilder SDKs accept timeout value in miliseconds)
         # aiohttp.ClientSession units are in seconds
-        timeout = ClientTimeout(total=timeout / 1000)
+        request_timeout = ClientTimeout(total=timeout / 1000)
 
-        #TODO figure out at what point you want to serialize payload_body
-        response = await self._http_client.post(
-            request_url, data=payload_body, headers=headers, timeout=timeout
+        response: ClientResponse = await self._http_client.post(
+            request_url, data=serialized_payload_body, headers=headers, timeout=request_timeout
         )
 
         return response
-    
+
     def _get_headers(self, endpoint: QnAMakerEndpoint):
         headers = {
             "Content-Type": "application/json",
             "User-Agent": self._get_user_agent(),
         }
 
-        if endpoint.host.endswith("v3.0"):
+        is_legacy_protocol: bool = endpoint.host.endswith("v2.0") or endpoint.host.endswith("v3.0")
+        if is_legacy_protocol:
             headers["Ocp-Apim-Subscription-Key"] = endpoint.endpoint_key
         else:
             headers["Authorization"] = f"EndpointKey {endpoint.endpoint_key}"
@@ -74,14 +87,12 @@ class HttpRequestUtils:
         return headers
 
     def _get_user_agent(self):
-        # package_user_agent = f"{__title__}/{__version__}"
+        package_user_agent = f"{__title__}/{__version__}"
         uname = platform.uname()
         os_version = f"{uname.machine}-{uname.system}-{uname.version}"
         py_version = f"Python,Version={platform.python_version()}"
         f"({os_version}; {py_version})"
-        # TODO delete above line, and use platform_user_agent variable
-        # platform_user_agent = f"({os_version}; {py_version})"
-        # user_agent = f"{package_user_agent} {platform_user_agent}"
-        user_agent = "CHANGE THIS LATER"
+        platform_user_agent = f"({os_version}; {py_version})"
+        user_agent = f"{package_user_agent} {platform_user_agent}"
 
         return user_agent
