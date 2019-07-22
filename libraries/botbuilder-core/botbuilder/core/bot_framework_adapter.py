@@ -3,6 +3,7 @@
 
 import asyncio
 import base64
+import json
 from typing import List, Callable, Awaitable, Union, Dict
 from botbuilder.schema import (Activity, ChannelAccount,
                                ConversationAccount,
@@ -387,13 +388,11 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         state = TokenExchangeState(
             connection_name=connection_name,
             conversation=conversation,
-            ms_app_id=client.config.credentials.app_id
+            ms_app_id=client.config.credentials.microsoft_app_id
         )
 
-        # TODO check proper encoding error handling
-        final_state = base64.b64encode(state.serialize().encode(encoding='UTF-8', errors='strict')).decode()
+        final_state = base64.b64encode(json.dumps(state.serialize()).encode(encoding='UTF-8', errors='strict')).decode()
 
-        # TODO check form of response
         return client.bot_sign_in.get_sign_in_url(final_state)
 
     async def get_token_status(self, context: TurnContext, user_id: str = None, include_filter: str = None) -> List[

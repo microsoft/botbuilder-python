@@ -66,8 +66,8 @@ class ChannelValidation:
         :raises Exception:
         """
         metadata_endpoint = (ChannelValidation.open_id_metadata_endpoint 
-                                        if ChannelValidation 
-                                        else Constants.TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL)
+                                        if ChannelValidation.open_id_metadata_endpoint 
+                                        else Constants.TO_BOT_FROM_CHANNEL_OPEN_ID_METADATA_URL)
 
         token_extractor = JwtTokenExtractor(
             ChannelValidation.TO_BOT_FROM_CHANNEL_TOKEN_VALIDATION_PARAMETERS,
