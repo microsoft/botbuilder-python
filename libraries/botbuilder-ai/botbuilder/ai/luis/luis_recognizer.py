@@ -10,20 +10,18 @@ from msrest.authentication import CognitiveServicesCredentials
 
 from botbuilder.core import (
     BotAssert,
-    BotTelemetryClient,
     IntentScore,
-    NullTelemetryClient,
     RecognizerResult,
     TurnContext,
 )
-from botbuilder.schema import Activity, ActivityTypes, ChannelAccount
+from botbuilder.schema import ActivityTypes
 
 from . import LuisApplication, LuisPredictionOptions, LuisTelemetryConstants
 from .activity_util import ActivityUtil
 from .luis_util import LuisUtil
 
 
-class LuisRecognizer(object):
+class LuisRecognizer:
     """
     A LUIS based implementation of <see cref="IRecognizer"/>.
     """
@@ -41,7 +39,6 @@ class LuisRecognizer(object):
         include_api_results: bool = False,
     ):
         """Initializes a new instance of the <see cref="LuisRecognizer"/> class.
-        
         :param application: The LUIS application to use to recognize text.
         :type application: LuisApplication
         :param prediction_options: The LUIS prediction options to use, defaults to None
@@ -77,12 +74,12 @@ class LuisRecognizer(object):
         results: RecognizerResult, default_intent: str = "None", min_score: float = 0.0
     ) -> str:
         """Returns the name of the top scoring intent from a set of LUIS results.
-        
         :param results: Result set to be searched.
         :type results: RecognizerResult
         :param default_intent: Intent name to return should a top intent be found, defaults to "None"
         :param default_intent: str, optional
-        :param min_score: Minimum score needed for an intent to be considered as a top intent. If all intents in the set are below this threshold then the `defaultIntent` will be returned, defaults to 0.0
+        :param min_score: Minimum score needed for an intent to be considered as a top intent. If all intents in the
+         set are below this threshold then the `defaultIntent` will be returned, defaults to 0.0
         :param min_score: float, optional
         :raises TypeError:
         :return: The top scoring intent name.
@@ -111,12 +108,13 @@ class LuisRecognizer(object):
         luis_prediction_options: LuisPredictionOptions = None,
     ) -> RecognizerResult:
         """Return results of the analysis (Suggested actions and intents).
-        
         :param turn_context: Context object containing information for a single turn of conversation with a user.
         :type turn_context: TurnContext
-        :param telemetry_properties: Additional properties to be logged to telemetry with the LuisResult event, defaults to None
+        :param telemetry_properties: Additional properties to be logged to telemetry with the LuisResult event, defaults
+         to None
         :param telemetry_properties: Dict[str, str], optional
-        :param telemetry_metrics: Additional metrics to be logged to telemetry with the LuisResult event, defaults to None
+        :param telemetry_metrics: Additional metrics to be logged to telemetry with the LuisResult event, defaults to
+         None
         :param telemetry_metrics: Dict[str, float], optional
         :return: The LUIS results of the analysis of the current message text in the current turn's context activity.
         :rtype: RecognizerResult
@@ -137,14 +135,15 @@ class LuisRecognizer(object):
         telemetry_metrics: Dict[str, float] = None,
     ):
         """Invoked prior to a LuisResult being logged.
-        
         :param recognizer_result: The Luis Results for the call.
         :type recognizer_result: RecognizerResult
         :param turn_context: Context object containing information for a single turn of conversation with a user.
         :type turn_context: TurnContext
-        :param telemetry_properties: Additional properties to be logged to telemetry with the LuisResult event, defaults to None
+        :param telemetry_properties: Additional properties to be logged to telemetry with the LuisResult event, defaults
+         to None
         :param telemetry_properties: Dict[str, str], optional
-        :param telemetry_metrics: Additional metrics to be logged to telemetry with the LuisResult event, defaults to None
+        :param telemetry_metrics: Additional metrics to be logged to telemetry with the LuisResult event, defaults to
+         None
         :param telemetry_metrics: Dict[str, float], optional
         """
 
@@ -159,7 +158,7 @@ class LuisRecognizer(object):
 
     @staticmethod
     def _get_top_k_intent_score(
-        intent_names: List[str], intents: Dict[str, IntentScore], index: int
+        intent_names: List[str], intents: Dict[str, IntentScore], index: int  # pylint: disable=unused-argument
     ) -> Tuple[str, str]:
         intent_name = ""
         intent_score = "0.00"
@@ -178,14 +177,15 @@ class LuisRecognizer(object):
     ) -> Dict[str, str]:
         """Fills the event properties for LuisResult event for telemetry.
         These properties are logged when the recognizer is called.
-        
         :param recognizer_result: Last activity sent from user.
         :type recognizer_result: RecognizerResult
         :param turn_context: Context object containing information for a single turn of conversation with a user.
         :type turn_context: TurnContext
-        :param telemetry_properties: Additional properties to be logged to telemetry with the LuisResult event, defaults to None
+        :param telemetry_properties: Additional properties to be logged to telemetry with the LuisResult event,
+         defaults to None
         :param telemetry_properties: Dict[str, str], optional
-        :return: A dictionary that is sent as "Properties" to IBotTelemetryClient.TrackEvent method for the BotMessageSend event.
+        :return: A dictionary that is sent as "Properties" to IBotTelemetryClient.TrackEvent method for the
+         BotMessageSend event.
         :rtype: Dict[str, str]
         """
 
