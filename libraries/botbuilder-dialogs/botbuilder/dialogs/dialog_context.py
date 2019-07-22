@@ -1,14 +1,13 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-
+from botbuilder.core.turn_context import TurnContext
 from .dialog_state import DialogState
 from .dialog_turn_status import DialogTurnStatus
 from .dialog_turn_result import DialogTurnResult
 from .dialog_reason import DialogReason
 from .dialog_instance import DialogInstance
 from .dialog import Dialog
-from botbuilder.core.turn_context import TurnContext
 
 
 class DialogContext:
@@ -60,7 +59,7 @@ class DialogContext:
         :param:
         :return str:
         """
-        if self._stack != None and len(self._stack) > 0:
+        if self._stack:
             return self._stack[0]
         return None
 
@@ -116,7 +115,7 @@ class DialogContext:
         :return:
         """
         # Check for a dialog on the stack
-        if self.active_dialog != None:
+        if self.active_dialog is not None:
             # Look up dialog
             dialog = await self.find_dialog(self.active_dialog.id)
             if not dialog:
@@ -127,8 +126,8 @@ class DialogContext:
 
             # Continue execution of dialog
             return await dialog.continue_dialog(self)
-        else:
-            return DialogTurnResult(DialogTurnStatus.Empty)
+
+        return DialogTurnResult(DialogTurnStatus.Empty)
 
     # TODO: instance is DialogInstance
     async def end_dialog(self, result: object = None):
@@ -139,26 +138,27 @@ class DialogContext:
         The parent dialog will have its `Dialog.resume_dialog()` method invoked with any returned
         result. If the parent dialog hasn't implemented a `resume_dialog()` method then it will be
         automatically ended as well and the result passed to its parent. If there are no more
-        parent dialogs on the stack then processing of the turn will end.        
+        parent dialogs on the stack then processing of the turn will end.
         :param result: (Optional) result to pass to the parent dialogs.
         :return:
         """
         await self.end_active_dialog(DialogReason.EndCalled)
 
         # Resume previous dialog
-        if self.active_dialog != None:
+        if self.active_dialog is not None:
             # Look up dialog
             dialog = await self.find_dialog(self.active_dialog.id)
             if not dialog:
                 raise Exception(
-                    "DialogContext.EndDialogAsync(): Can't resume previous dialog. A dialog with an id of '%s' wasn't found."
+                    "DialogContext.EndDialogAsync(): Can't resume previous dialog."
+                    " A dialog with an id of '%s' wasn't found."
                     % self.active_dialog.id
                 )
 
             # Return result to previous dialog
             return await dialog.resume_dialog(self, DialogReason.EndCalled, result)
-        else:
-            return DialogTurnResult(DialogTurnStatus.Complete, result)
+
+        return DialogTurnResult(DialogTurnStatus.Complete, result)
 
     async def cancel_all_dialogs(self):
         """
@@ -166,12 +166,12 @@ class DialogContext:
         :param result: (Optional) result to pass to the parent dialogs.
         :return:
         """
-        if len(self.stack) > 0:
-            while len(self.stack) > 0:
+        if self.stack:
+            while self.stack:
                 await self.end_active_dialog(DialogReason.CancelCalled)
             return DialogTurnResult(DialogTurnStatus.Cancelled)
-        else:
-            return DialogTurnResult(DialogTurnStatus.Empty)
+
+        return DialogTurnResult(DialogTurnStatus.Empty)
 
     async def find_dialog(self, dialog_id: str) -> Dialog:
         """
@@ -182,7 +182,7 @@ class DialogContext:
         """
         dialog = await self.dialogs.find(dialog_id)
 
-        if dialog == None and self.parent != None:
+        if dialog is None and self.parent is not None:
             dialog = await self.parent.find_dialog(dialog_id)
         return dialog
 
@@ -208,7 +208,7 @@ class DialogContext:
         :return:
         """
         # Check for a dialog on the stack
-        if self.active_dialog != None:
+        if self.active_dialog is not None:
             # Look up dialog
             dialog = await self.find_dialog(self.active_dialog.id)
             if not dialog:
@@ -222,10 +222,10 @@ class DialogContext:
 
     async def end_active_dialog(self, reason: DialogReason):
         instance = self.active_dialog
-        if instance != None:
+        if instance is not None:
             # Look up dialog
             dialog = await self.find_dialog(instance.id)
-            if dialog != None:
+            if dialog is not None:
                 # Notify dialog of end
                 await dialog.end_dialog(self.context, instance, reason)
 

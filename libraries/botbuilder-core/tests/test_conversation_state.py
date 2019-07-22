@@ -40,8 +40,8 @@ class TestConversationState(aiounittest.AsyncTestCase):
             await self.middleware.on_process_request(context, next_middleware)
         except AttributeError:
             pass
-        except Exception as e:
-            raise e
+        except Exception as error:
+            raise error
         else:
             raise AssertionError(
                 "Should not have completed and not raised AttributeError."
@@ -57,8 +57,8 @@ class TestConversationState(aiounittest.AsyncTestCase):
             await self.middleware.on_process_request(context, next_middleware)
         except AttributeError:
             pass
-        except Exception as e:
-            raise e
+        except Exception as error:
+            raise error
         else:
             raise AssertionError(
                 "Should not have completed and not raised AttributeError."

@@ -1,12 +1,12 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from abc import abstractmethod
+from typing import Callable, Dict
+from botbuilder.core.state_property_accessor import StatePropertyAccessor
 from .turn_context import TurnContext
 from .storage import Storage
 from .property_manager import PropertyManager
-from botbuilder.core.state_property_accessor import StatePropertyAccessor
-from abc import abstractmethod
-from typing import Callable, Dict
 
 
 class CachedBotState:
@@ -57,7 +57,7 @@ class BotState(PropertyManager):
         :param turn_context: The context object for this turn.
         :param force: Optional. True to bypass the cache.
         """
-        if turn_context == None:
+        if turn_context is None:
             raise TypeError("BotState.load(): turn_context cannot be None.")
 
         cached_state = turn_context.turn_state.get(self._context_service_key)
@@ -72,11 +72,12 @@ class BotState(PropertyManager):
         self, turn_context: TurnContext, force: bool = False
     ) -> None:
         """
-        If it has changed, writes to storage the state object that is cached in the current context object for this turn.
+        If it has changed, writes to storage the state object that is cached in the current context object
+        for this turn.
         :param turn_context: The context object for this turn.
         :param force: Optional. True to save state to storage whether or not there are changes.
         """
-        if turn_context == None:
+        if turn_context is None:
             raise TypeError("BotState.save_changes(): turn_context cannot be None.")
 
         cached_state = turn_context.turn_state.get(self._context_service_key)
@@ -91,11 +92,10 @@ class BotState(PropertyManager):
         """
         Clears any state currently stored in this state scope.
         NOTE: that save_changes must be called in order for the cleared state to be persisted to the underlying store.
-        
         :param turn_context: The context object for this turn.
         :return: None
         """
-        if turn_context == None:
+        if turn_context is None:
             raise TypeError("BotState.clear_state(): turn_context cannot be None.")
 
         #  Explicitly setting the hash will mean IsChanged is always true. And that will force a Save.
@@ -106,11 +106,10 @@ class BotState(PropertyManager):
     async def delete(self, turn_context: TurnContext) -> None:
         """
         Delete any state currently stored in this state scope.
-        
         :param turn_context: The context object for this turn.
         :return: None
         """
-        if turn_context == None:
+        if turn_context is None:
             raise TypeError("BotState.delete(): turn_context cannot be None.")
 
         turn_context.turn_state.pop(self._context_service_key)
@@ -123,7 +122,7 @@ class BotState(PropertyManager):
         raise NotImplementedError()
 
     async def get_property_value(self, turn_context: TurnContext, property_name: str):
-        if turn_context == None:
+        if turn_context is None:
             raise TypeError(
                 "BotState.get_property_value(): turn_context cannot be None."
             )
@@ -142,13 +141,12 @@ class BotState(PropertyManager):
     ) -> None:
         """
         Deletes a property from the state cache in the turn context.
-        
         :param turn_context: The context object for this turn.
         :param property_name: The name of the property to delete.
         :return: None
         """
 
-        if turn_context == None:
+        if turn_context is None:
             raise TypeError("BotState.delete_property(): turn_context cannot be None.")
         if not property_name:
             raise TypeError("BotState.delete_property(): property_name cannot be None.")
@@ -160,13 +158,12 @@ class BotState(PropertyManager):
     ) -> None:
         """
         Deletes a property from the state cache in the turn context.
-        
         :param turn_context: The context object for this turn.
         :param property_name: The value to set on the property.
         :return: None
         """
 
-        if turn_context == None:
+        if turn_context is None:
             raise TypeError("BotState.delete_property(): turn_context cannot be None.")
         if not property_name:
             raise TypeError("BotState.delete_property(): property_name cannot be None.")

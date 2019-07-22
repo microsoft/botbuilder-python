@@ -50,7 +50,7 @@ class AttachmentPromptTests(aiounittest.AsyncTestCase):
 
     def test_should_return_no_tokens(self):
         tokens = Tokenizer.default_tokenizer(".?-()")
-        assert len(tokens) == 0
+        assert not tokens
 
     def test_should_return_a_the_normalized_and_original_text_for_a_token(self):
         tokens = Tokenizer.default_tokenizer("fOoD")

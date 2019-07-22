@@ -1,4 +1,6 @@
-import asyncio
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 from botbuilder.schema import ActivityTypes, ChannelAccount
 from .turn_context import TurnContext
 
@@ -30,20 +32,20 @@ class ActivityHandler:
         else:
             await self.on_unrecognized_activity_type(turn_context)
 
-    async def on_message_activity(self, turn_context: TurnContext):
+    async def on_message_activity(self, turn_context: TurnContext):  # pylint: disable=unused-argument
         return
 
     async def on_conversation_update_activity(self, turn_context: TurnContext):
         if (
             turn_context.activity.members_added is not None
-            and len(turn_context.activity.members_added) > 0
+            and turn_context.activity.members_added
         ):
             return await self.on_members_added_activity(
                 turn_context.activity.members_added, turn_context
             )
-        elif (
+        if (
             turn_context.activity.members_removed is not None
-            and len(turn_context.activity.members_removed) > 0
+            and turn_context.activity.members_removed
         ):
             return await self.on_members_removed_activity(
                 turn_context.activity.members_removed, turn_context
@@ -52,12 +54,12 @@ class ActivityHandler:
 
     async def on_members_added_activity(
         self, members_added: ChannelAccount, turn_context: TurnContext
-    ):
+    ):  # pylint: disable=unused-argument
         return
 
     async def on_members_removed_activity(
         self, members_removed: ChannelAccount, turn_context: TurnContext
-    ):
+    ):  # pylint: disable=unused-argument
         return
 
     async def on_event_activity(self, turn_context: TurnContext):
@@ -66,11 +68,11 @@ class ActivityHandler:
 
         return await self.on_event(turn_context)
 
-    async def on_token_response_event(self, turn_context: TurnContext):
+    async def on_token_response_event(self, turn_context: TurnContext):  # pylint: disable=unused-argument
         return
 
-    async def on_event(self, turn_context: TurnContext):
+    async def on_event(self, turn_context: TurnContext):  # pylint: disable=unused-argument
         return
 
-    async def on_unrecognized_activity_type(self, turn_context: TurnContext):
+    async def on_unrecognized_activity_type(self, turn_context: TurnContext):  # pylint: disable=unused-argument
         return

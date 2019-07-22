@@ -3,16 +3,15 @@
 
 
 import uuid
-from typing import Dict, Coroutine, List
+from typing import Coroutine
+from botbuilder.core import TurnContext
+from botbuilder.schema import ActivityTypes
 from .dialog_reason import DialogReason
 from .dialog import Dialog
 from .dialog_turn_result import DialogTurnResult
 from .dialog_context import DialogContext
 from .dialog_instance import DialogInstance
 from .waterfall_step_context import WaterfallStepContext
-from botbuilder.core import TurnContext
-from botbuilder.schema import ActivityTypes
-from typing import Coroutine, List
 
 
 class WaterfallDialog(Dialog):
@@ -34,7 +33,6 @@ class WaterfallDialog(Dialog):
         """
         Adds a new step to the waterfall.
         :param step: Step to add
-           
         :return: Waterfall dialog for fluent calls to `add_step()`.
         """
         if not step:
@@ -44,14 +42,14 @@ class WaterfallDialog(Dialog):
         return self
 
     async def begin_dialog(
-        self, dc: DialogContext, options: object = None
+        self, dialog_context: DialogContext, options: object = None
     ) -> DialogTurnResult:
 
-        if not dc:
+        if not dialog_context:
             raise TypeError("WaterfallDialog.begin_dialog(): dc cannot be None.")
 
         # Initialize waterfall state
-        state = dc.active_dialog.state
+        state = dialog_context.active_dialog.state
 
         instance_id = uuid.uuid1().__str__()
         state[self.PersistedOptions] = options
@@ -64,40 +62,40 @@ class WaterfallDialog(Dialog):
         self.telemetry_client.track_event("WaterfallStart", properties=properties)
 
         # Run first stepkinds
-        return await self.run_step(dc, 0, DialogReason.BeginCalled, None)
+        return await self.run_step(dialog_context, 0, DialogReason.BeginCalled, None)
 
-    async def continue_dialog(
+    async def continue_dialog(  # pylint: disable=unused-argument,arguments-differ
         self,
-        dc: DialogContext = None,
+        dialog_context: DialogContext = None,
         reason: DialogReason = None,
-        result: object = NotImplementedError,
+        result: object = NotImplementedError(),
     ) -> DialogTurnResult:
-        if not dc:
+        if not dialog_context:
             raise TypeError("WaterfallDialog.continue_dialog(): dc cannot be None.")
 
-        if dc.context.activity.type != ActivityTypes.message:
+        if dialog_context.context.activity.type != ActivityTypes.message:
             return Dialog.end_of_turn
 
         return await self.resume_dialog(
-            dc, DialogReason.ContinueCalled, dc.context.activity.text
+            dialog_context, DialogReason.ContinueCalled, dialog_context.context.activity.text
         )
 
     async def resume_dialog(
-        self, dc: DialogContext, reason: DialogReason, result: object
+        self, dialog_context: DialogContext, reason: DialogReason, result: object
     ):
-        if dc is None:
+        if dialog_context is None:
             raise TypeError("WaterfallDialog.resume_dialog(): dc cannot be None.")
 
         # Increment step index and run step
-        state = dc.active_dialog.state
+        state = dialog_context.active_dialog.state
 
         # Future Me:
         # If issues with CosmosDB, see https://github.com/Microsoft/botbuilder-dotnet/issues/871
         # for hints.
-        return await self.run_step(dc, state[self.StepIndex] + 1, reason, result)
+        return await self.run_step(dialog_context, state[self.StepIndex] + 1, reason, result)
 
     async def end_dialog(
-        self, turn_context: TurnContext, instance: DialogInstance, reason: DialogReason
+        self, context: TurnContext, instance: DialogInstance, reason: DialogReason  # pylint: disable=unused-argument
     ) -> None:
         if reason is DialogReason.CancelCalled:
             index = instance.state[self.StepIndex]
@@ -130,25 +128,25 @@ class WaterfallDialog(Dialog):
         return await self._steps[step_context.index](step_context)
 
     async def run_step(
-        self, dc: DialogContext, index: int, reason: DialogReason, result: object
+        self, dialog_context: DialogContext, index: int, reason: DialogReason, result: object
     ) -> DialogTurnResult:
-        if not dc:
-            raise TypeError("WaterfallDialog.run_steps(): dc cannot be None.")
+        if not dialog_context:
+            raise TypeError("WaterfallDialog.run_steps(): dialog_context cannot be None.")
         if index < len(self._steps):
             # Update persisted step index
-            state = dc.active_dialog.state
+            state = dialog_context.active_dialog.state
             state[self.StepIndex] = index
 
             # Create step context
             options = state[self.PersistedOptions]
             values = state[self.PersistedValues]
             step_context = WaterfallStepContext(
-                self, dc, options, values, index, reason, result
+                self, dialog_context, options, values, index, reason, result
             )
             return await self.on_step(step_context)
-        else:
-            # End of waterfall so just return any result to parent
-            return await dc.end_dialog(result)
+
+        # End of waterfall so just return any result to parent
+        return await dialog_context.end_dialog(result)
 
     def get_step_name(self, index: int) -> str:
         """

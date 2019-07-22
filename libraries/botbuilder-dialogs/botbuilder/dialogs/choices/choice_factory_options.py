@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 
-class ChoiceFactoryOptions(object):
+class ChoiceFactoryOptions:
     def __init__(
         self,
         inline_separator: str = None,

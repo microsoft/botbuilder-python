@@ -17,11 +17,11 @@ class TestMemoryStorage(aiounittest.AsyncTestCase):
     def test_initializing_memory_storage_without_data_should_still_have_memory(self):
         storage = MemoryStorage()
         assert storage.memory is not None
-        assert type(storage.memory) == dict
+        assert isinstance(storage.memory, dict)
 
     def test_memory_storage__e_tag_should_start_at_0(self):
         storage = MemoryStorage()
-        assert storage._e_tag == 0
+        assert storage._e_tag == 0  # pylint: disable=protected-access
 
     async def test_memory_storage_initialized_with_memory_should_have_accessible_data(
         self
@@ -40,7 +40,7 @@ class TestMemoryStorage(aiounittest.AsyncTestCase):
         assert "user" in data
         assert data["user"].counter == 1
         assert len(data.keys()) == 1
-        assert storage._e_tag == 1
+        assert storage._e_tag == 1  # pylint: disable=protected-access
         assert int(data["user"].e_tag) == 0
 
     async def test_memory_storage_write_should_add_new_value(self):
@@ -76,20 +76,20 @@ class TestMemoryStorage(aiounittest.AsyncTestCase):
         storage = MemoryStorage()
         data = await storage.read(["test"])
 
-        assert type(data) == dict
-        assert len(data.keys()) == 0
+        assert isinstance(data, dict)
+        assert not data.keys()
 
     async def test_memory_storage_delete_should_delete_according_cached_data(self):
         storage = MemoryStorage({"test": "test"})
         try:
             await storage.delete(["test"])
-        except Exception as e:
-            raise e
+        except Exception as error:
+            raise error
         else:
             data = await storage.read(["test"])
 
-            assert type(data) == dict
-            assert len(data.keys()) == 0
+            assert isinstance(data, dict)
+            assert not data.keys()
 
     async def test_memory_storage_delete_should_delete_multiple_values_when_given_multiple_valid_keys(
         self
@@ -100,7 +100,7 @@ class TestMemoryStorage(aiounittest.AsyncTestCase):
 
         await storage.delete(["test", "test2"])
         data = await storage.read(["test", "test2"])
-        assert len(data.keys()) == 0
+        assert not data.keys()
 
     async def test_memory_storage_delete_should_delete_values_when_given_multiple_valid_keys_and_ignore_other_data(
         self
@@ -126,7 +126,7 @@ class TestMemoryStorage(aiounittest.AsyncTestCase):
         data = await storage.read(["test"])
         assert len(data.keys()) == 1
         data = await storage.read(["foo"])
-        assert len(data.keys()) == 0
+        assert not data.keys()
 
     async def test_memory_storage_delete_invalid_keys_should_do_nothing_and_not_affect_cached_data(
         self

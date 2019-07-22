@@ -1,4 +1,6 @@
-import asyncio
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 import json
 from datetime import datetime, timedelta
 import requests
@@ -53,8 +55,8 @@ class JwtTokenExtractor:
 
         try:
             return await self._validate_token(parameter, channel_id)
-        except:
-            raise
+        except Exception as error:
+            raise error
 
     def _has_allowed_issuer(self, jwt_token: str) -> bool:
         decoded = jwt.decode(jwt_token, verify=False)

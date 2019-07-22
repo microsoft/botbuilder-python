@@ -8,7 +8,6 @@ from botbuilder.schema import (
     Attachment,
     AttachmentLayoutTypes,
     CardAction,
-    CardImage,
     SuggestedActions,
     InputHints,
 )
@@ -77,7 +76,8 @@ class MessageFactory:
         :Example:
         message = MessageFactory.suggested_actions([CardAction(title='a', type=ActionTypes.im_back, value='a'),
                                                     CardAction(title='b', type=ActionTypes.im_back, value='b'),
-                                                    CardAction(title='c', type=ActionTypes.im_back, value='c')], 'Choose a color')
+                                                    CardAction(title='c', type=ActionTypes.im_back, value='c')],
+                                                    'Choose a color')
         await context.send_activity(message)
 
         :param actions:
@@ -108,7 +108,9 @@ class MessageFactory:
 
         :Example:
         message = MessageFactory.attachment(CardFactory.hero_card(HeroCard(title='White T-Shirt',
-                                                                  images=[CardImage(url='https://example.com/whiteShirt.jpg')],
+                                                                  images=[CardImage(url=
+                                                                    'https://example.com/whiteShirt.jpg'
+                                                                    )],
                                                                   buttons=[CardAction(title='buy')])))
         await context.send_activity(message)
 

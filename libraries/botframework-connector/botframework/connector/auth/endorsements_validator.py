@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 from typing import List
 
 
@@ -9,7 +12,7 @@ class EndorsementsValidator:
         if not channel_id:
             return True
 
-        if endorsements == None:
+        if endorsements is None:
             raise ValueError("Argument endorsements is null.")
 
         # The Call path to get here is:
@@ -28,5 +31,5 @@ class EndorsementsValidator:
         # of scope, tokens from WebChat have about 10 endorsements, and
         # tokens coming from Teams have about 20.
 
-        endorsementPresent = channel_id in endorsements
-        return endorsementPresent
+        endorsement_present = channel_id in endorsements
+        return endorsement_present

@@ -86,15 +86,15 @@ class ConfirmPrompt(Prompt):
         culture = self.determine_culture(turn_context.activity)
         defaults = self.choice_defaults[culture]
         choice_opts = (
-            self.choice_options if self.choice_options != None else defaults[2]
+            self.choice_options if self.choice_options is not None else defaults[2]
         )
         confirms = (
             self.confirm_choices
-            if self.confirm_choices != None
+            if self.confirm_choices is not None
             else (defaults[0], defaults[1])
         )
         choices = {confirms[0], confirms[1]}
-        if is_retry == True and options.retry_prompt != None:
+        if is_retry and options.retry_prompt is not None:
             prompt = self.append_choices(
                 options.retry_prompt, channel_id, choices, self.style, choice_opts
             )
@@ -119,41 +119,43 @@ class ConfirmPrompt(Prompt):
             message = turn_context.activity
             culture = self.determine_culture(turn_context.activity)
             # TODO: Port ChoiceRecognizer
-            results = ChoiceRecognizer.recognize_boolean(message.text, culture)
+            results = ChoiceRecognizer.recognize_boolean(message.text, culture)  # pylint: disable=undefined-variable
             if results.Count > 0:
                 first = results[0]
                 if "value" in first.Resolution:
-                    result.Succeeded = True
-                    result.Value = str(first.Resolution["value"])
+                    result.succeeded = True
+                    result.value = str(first.Resolution["value"])
             else:
-                # First check whether the prompt was sent to the user with numbers - if it was we should recognize numbers
+                # First check whether the prompt was sent to the user with numbers
+                # if it was we should recognize numbers
                 defaults = self.choice_defaults[culture]
                 opts = (
-                    self.choice_options if self.choice_options != None else defaults[2]
+                    self.choice_options if self.choice_options is not None else defaults[2]
                 )
 
-                # This logic reflects the fact that IncludeNumbers is nullable and True is the default set in Inline style
+                # This logic reflects the fact that IncludeNumbers is nullable and True is the default set in
+                # Inline style
                 if opts.include_numbers.has_value or opts.include_numbers.value:
                     # The text may be a number in which case we will interpret that as a choice.
-                    confirmChoices = (
+                    confirm_choices = (
                         self.confirm_choices
-                        if self.confirm_choices != None
+                        if self.confirm_choices is not None
                         else (defaults[0], defaults[1])
                     )
-                    choices = {confirmChoices[0], confirmChoices[1]}
+                    choices = {confirm_choices[0], confirm_choices[1]}
                     # TODO: Port ChoiceRecognizer
-                    secondAttemptResults = ChoiceRecognizers.recognize_choices(
+                    second_attempt_results = ChoiceRecognizers.recognize_choices(  # pylint: disable=undefined-variable
                         message.text, choices
                     )
-                    if len(secondAttemptResults) > 0:
+                    if second_attempt_results:
                         result.succeeded = True
-                        result.value = secondAttemptResults[0].resolution.index == 0
+                        result.value = second_attempt_results[0].resolution.index == 0
 
         return result
 
     def determine_culture(self, activity: Activity) -> str:
-        culture = activity.locale if activity.locale != None else self.default_locale
-        if not culture or not culture in self.choice_defaults:
+        culture = activity.locale if activity.locale is not None else self.default_locale
+        if not culture or culture not in self.choice_defaults:
             culture = (
                 "English"
             )  # TODO: Fix to reference recognizer to use proper constants

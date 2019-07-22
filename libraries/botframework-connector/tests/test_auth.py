@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 import pytest
 
 from botbuilder.schema import Activity
@@ -152,7 +155,8 @@ class TestAuth:
         assert claims.get_claim_value("tid") == "72f988bf-86f1-41af-91ab-2d7cd011db47"
 
     @pytest.mark.asyncio
-    # Tests with a valid Token and invalid service url; and ensures that Service url is NOT added to Trusted service url list.
+    # Tests with a valid Token and invalid service url and ensures that Service url is NOT added to
+    # Trusted service url list.
     async def test_channel_msa_header_invalid_service_url_should_not_be_trusted(self):
         activity = Activity(service_url="https://webchat.botframework.com/")
         header = (
@@ -180,12 +184,12 @@ class TestAuth:
         header = ""
         credentials = SimpleCredentialProvider("", "")
 
-        claimsPrincipal = await JwtTokenValidation.authenticate_request(
+        claims_principal = await JwtTokenValidation.authenticate_request(
             activity, header, credentials
         )
 
-        assert claimsPrincipal.is_authenticated
-        assert len(claimsPrincipal.claims) == 0
+        assert claims_principal.is_authenticated
+        assert not claims_principal.claims
 
     @pytest.mark.asyncio
     # Tests with no authentication header and makes sure the service URL is not added to the trusted list.

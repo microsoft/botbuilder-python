@@ -19,12 +19,12 @@ class JwtTokenValidation:
         channel_service: str = "",
     ) -> ClaimsIdentity:
         """Authenticates the request and sets the service url in the set of trusted urls.
-        
         :param activity: The incoming Activity from the Bot Framework or the Emulator
         :type activity: ~botframework.connector.models.Activity
         :param auth_header: The Bearer token included as part of the request
         :type auth_header: str
         :param credentials: The set of valid credentials, such as the Bot Application ID
+        :param channel_service: String for the channel service
         :type credentials: CredentialProvider
 
         :raises Exception:
@@ -70,19 +70,15 @@ class JwtTokenValidation:
                 auth_header, credentials, channel_service, channel_id
             )
 
-        if not channel_service:
-            if service_url.strip():
-                return
+        # Right now public Azure is the only supported scenario (Gov and Enterprise pending)
+        if service_url:
+            return await ChannelValidation.authenticate_channel_token_with_service_url(
+                auth_header, credentials, service_url, channel_id
+            )
 
-        else:
-            if service_url:
-                return await ChannelValidation.authenticate_channel_token_with_service_url(
-                    auth_header, credentials, service_url, channel_id
-                )
-            else:
-                return await ChannelValidation.authenticate_channel_token(
-                    auth_header, credentials, channel_id
-                )
+        return await ChannelValidation.authenticate_channel_token(
+            auth_header, credentials, channel_id
+        )
 
     @staticmethod
     def is_government(channel_service: str) -> bool:

@@ -10,8 +10,7 @@ class FoundChoice:
         Parameters:
         ----------
 
-        value: The value of the choice that was matched. 
-        
+        value: The value of the choice that was matched.
         index: The index of the choice within the list of choices that was searched over.
 
         score: The accuracy with which the synonym matched the specified portion of the utterance.

@@ -15,10 +15,11 @@ from msrest.exceptions import HttpOperationError
 from .. import models
 
 
-class ConversationsOperations(object):
+class ConversationsOperations:
     """ConversationsOperations operations.
 
-    You should not instantiate directly this class, but create a Client instance that will create it for you and attach it as attribute.
+    You should not instantiate directly this class, but create a Client instance that will create it for you and attach
+     it as attribute.
 
     :param client: Client for service requests.
     :param config: Configuration of service client.
@@ -532,7 +533,7 @@ class ConversationsOperations(object):
         "url": "/v3/conversations/{conversationId}/activities/{activityId}"
     }
 
-    def delete_activity(
+    def delete_activity(  # pylint: disable=inconsistent-return-statements
         self,
         conversation_id,
         activity_id,
@@ -744,7 +745,7 @@ class ConversationsOperations(object):
         "url": "/v3/conversations/{conversationId}/pagedmembers"
     }
 
-    def delete_conversation_member(
+    def delete_conversation_member(  # pylint: disable=inconsistent-return-statements
         self,
         conversation_id,
         member_id,

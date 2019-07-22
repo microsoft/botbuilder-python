@@ -20,7 +20,8 @@ class FindValuesOptions:
         Parameters:
         ----------
 
-        allow_partial_matches: (Optional) If `True`, then only some of the tokens in a value need to exist to be considered
+        allow_partial_matches: (Optional) If `True`, then only some of the tokens in a value need to exist to
+         be considered
         a match. The default value is `False`.
 
         locale: (Optional) locale/culture code of the utterance. Default is `en-US`.

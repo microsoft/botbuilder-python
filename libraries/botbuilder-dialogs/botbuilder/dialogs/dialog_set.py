@@ -6,8 +6,6 @@ from typing import Dict
 from botbuilder.core import TurnContext, BotAssert, StatePropertyAccessor
 from .dialog import Dialog
 from .dialog_state import DialogState
-from .dialog_turn_result import DialogTurnResult
-from .dialog_reason import DialogReason
 from .dialog_context import DialogContext
 
 
@@ -64,7 +62,7 @@ class DialogSet:
                 "DialogSet.CreateContextAsync(): DialogSet created with a null IStatePropertyAccessor."
             )
 
-        state = await self._dialog_state.get(turn_context, lambda: DialogState())
+        state = await self._dialog_state.get(turn_context, lambda: DialogState())  # pylint: disable=unnecessary-lambda
 
         return DialogContext(self, turn_context, state)
 
@@ -83,6 +81,6 @@ class DialogSet:
         return None
 
     def __str__(self):
-        if len(self._dialogs) <= 0:
+        if self._dialogs:
             return "dialog set empty!"
         return " ".join(map(str, self._dialogs.keys()))
