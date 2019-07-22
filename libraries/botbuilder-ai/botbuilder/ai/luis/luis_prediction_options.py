@@ -4,7 +4,7 @@
 from botbuilder.core import BotTelemetryClient, NullTelemetryClient
 
 
-class LuisPredictionOptions(object):
+class LuisPredictionOptions:
     """
     Optional parameters for a LUIS prediction request.
     """

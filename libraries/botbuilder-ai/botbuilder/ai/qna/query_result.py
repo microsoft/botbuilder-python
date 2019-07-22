@@ -12,7 +12,7 @@ class QueryResult:
         score: float,
         metadata: [Metadata],
         source: str,
-        id: int,
+        id: int,  # pylint: disable=invalid-name
         context=None,
     ):
         self.questions = (questions,)
@@ -20,7 +20,7 @@ class QueryResult:
         self.score = (score,)
         self.metadata = (list(map(lambda meta: Metadata(**meta), metadata)),)
         self.source = source
-        self.id = id
+        self.id = id  # pylint: disable=invalid-name
 
         # 4.4 multi-turn
         self.context = context

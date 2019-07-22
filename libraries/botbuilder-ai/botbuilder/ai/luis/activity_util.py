@@ -11,7 +11,7 @@ from botbuilder.schema import (
 )
 
 
-class ActivityUtil(object):
+class ActivityUtil:
     @staticmethod
     def create_trace(
         turn_activity: Activity,
@@ -26,11 +26,14 @@ class ActivityUtil(object):
         :type turn_activity: Activity
         :param name: The value to assign to the trace activity's <see cref="Activity.name"/> property.
         :type name: str
-        :param value: The value to assign to the trace activity's <see cref="Activity.value"/> property., defaults to None
+        :param value: The value to assign to the trace activity's <see cref="Activity.value"/> property., defaults
+         to None
         :param value: object, optional
-        :param value_type: The value to assign to the trace activity's <see cref="Activity.value_type"/> property, defaults to None
+        :param value_type: The value to assign to the trace activity's <see cref="Activity.value_type"/> property,
+         defaults to None
         :param value_type: str, optional
-        :param label: The value to assign to the trace activity's <see cref="Activity.label"/> property, defaults to None
+        :param label: The value to assign to the trace activity's <see cref="Activity.label"/> property, defaults
+         to None
         :param label: str, optional
         :return: The created trace activity.
         :rtype: Activity

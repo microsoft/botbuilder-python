@@ -1,16 +1,16 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import json
-import aiounittest, unittest, requests
-from os import path
-from requests.models import Response
-from typing import List, Tuple, Dict, Union
-from uuid import uuid4
-from unittest.mock import Mock, patch, MagicMock
-from asyncio import Future
-from aiohttp import ClientSession, ClientTimeout, ClientResponse
+# pylint: disable=protected-access
 
+import json
+from os import path
+from typing import List, Dict
+import unittest
+from unittest.mock import patch
+from aiohttp import ClientSession
+
+import aiounittest
 from botbuilder.ai.qna import (
     Metadata,
     QnAMakerEndpoint,
@@ -22,7 +22,6 @@ from botbuilder.ai.qna import (
 from botbuilder.core import (
     BotAdapter,
     BotTelemetryClient,
-    NullTelemetryClient,
     TurnContext,
 )
 from botbuilder.core.adapters import TestAdapter
@@ -30,7 +29,6 @@ from botbuilder.schema import (
     Activity,
     ActivityTypes,
     ChannelAccount,
-    ResourceResponse,
     ConversationAccount,
 )
 
@@ -42,7 +40,7 @@ class TestContext(TurnContext):
 
         self.on_send_activities(self.capture_sent_activities)
 
-    async def capture_sent_activities(self, context: TurnContext, activities, next):
+    async def capture_sent_activities(self, context: TurnContext, activities, next):  # pylint: disable=unused-argument
         self.sent += activities
         context.responded = True
 
@@ -614,7 +612,8 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         log_personal_information = False
 
         # Act - Pass in properties during QnA invocation that override default properties
-        #       In addition Override with derivation.  This presents an interesting question of order of setting properties.
+        #       In addition Override with derivation.  This presents an interesting question of order of setting
+        #       properties.
         #       If I want to override "originalQuestion" property:
         #           - Set in "Stock" schema
         #           - Set in derived QnAMaker class
@@ -703,8 +702,8 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         curr_dir = path.dirname(path.abspath(__file__))
         response_path = path.join(curr_dir, "test_data", response_file)
 
-        with open(response_path, "r", encoding="utf-8-sig") as f:
-            response_str = f.read()
+        with open(response_path, "r", encoding="utf-8-sig") as file:
+            response_str = file.read()
         response_json = json.loads(response_str)
 
         return response_json
@@ -742,7 +741,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         async def on_qna_result(
             self,
             query_results: [QueryResult],
-            context: TurnContext,
+            turn_context: TurnContext,  # pylint: disable=unused-argument
             telemetry_properties: Dict[str, str] = None,
             telemetry_metrics: Dict[str, float] = None,
         ):
@@ -782,12 +781,12 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         async def on_qna_result(
             self,
             query_results: [QueryResult],
-            context: TurnContext,
+            turn_context: TurnContext,
             telemetry_properties: Dict[str, str] = None,
             telemetry_metrics: Dict[str, float] = None,
         ):
             event_data = await self.fill_qna_event(
-                query_results, context, telemetry_properties, telemetry_metrics
+                query_results, turn_context, telemetry_properties, telemetry_metrics
             )
 
             # Add my property.
