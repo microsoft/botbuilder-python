@@ -18,6 +18,7 @@ QNAMAKER_TRACE_NAME = "QnAMaker"
 QNAMAKER_TRACE_LABEL = "QnAMaker Trace"
 QNAMAKER_TRACE_TYPE = "https://www.qnamaker.ai/schemas/trace"
 
+
 class GenerateAnswerUtils:
     """ Helper class for Generate Answer API, which is used to make queries to a single QnA Maker knowledge base and return the result."""
 
@@ -47,18 +48,22 @@ class GenerateAnswerUtils:
         """
         self._telemetry_client = telemetry_client
         self._endpoint = endpoint
-        
-        self.options = options if isinstance(options, QnAMakerOptions) else QnAMakerOptions()
+
+        self.options = (
+            options if isinstance(options, QnAMakerOptions) else QnAMakerOptions()
+        )
         self._validate_options(self.options)
 
         self._http_client = http_client
-    
-    async def get_answers(self, context: TurnContext, options: QnAMakerOptions = None) -> List[QueryResult]:
+
+    async def get_answers(
+        self, context: TurnContext, options: QnAMakerOptions = None
+    ) -> List[QueryResult]:
         if not isinstance(context, TurnContext):
             raise TypeError(
                 "GenerateAnswerUtils.get_answers(): context must be an instance of TurnContext"
             )
-        
+
         hydrated_options = self._hydrate_options(options)
 
         result: List[QueryResult] = self._query_qna_service(context, hydrated_options)
@@ -67,8 +72,6 @@ class GenerateAnswerUtils:
 
         return result
 
-
-    
     def _validate_options(self, options: QnAMakerOptions):
         if not options.score_threshold:
             options.score_threshold = 0.3
@@ -119,8 +122,10 @@ class GenerateAnswerUtils:
                 hydrated_options.timeout = query_options.timeout
 
         return hydrated_options
-    
-    async def _query_qna_service(self, context: TurnContext, options: QnAMakerOptions) -> List[QueryResult]:
+
+    async def _query_qna_service(
+        self, context: TurnContext, options: QnAMakerOptions
+    ) -> List[QueryResult]:
         url = f"{ self._endpoint.host }/knowledgebases/{ self._endpoint.knowledge_base_id }/generateAnswer"
 
         question = {
@@ -131,12 +136,9 @@ class GenerateAnswerUtils:
         }
 
         http_request_helper = HttpRequestUtils(self._http_client)
-        
+
         response: ClientResponse = await http_request_helper.execute_http_request(
-            url,
-            question,
-            self._endpoint,
-            options.timeout
+            url, question, self._endpoint, options.timeout
         )
 
         result: List[QueryResult] = await self._format_qna_result(response, options)
@@ -144,7 +146,7 @@ class GenerateAnswerUtils:
         await self._emit_trace_info(context, result, options)
 
         return result
-    
+
     async def _emit_trace_info(
         self, context: TurnContext, result: List[QueryResult], options: QnAMakerOptions
     ):
@@ -166,9 +168,10 @@ class GenerateAnswerUtils:
         )
 
         await context.send_activity(trace_activity)
-        
-    
-    async def _format_qna_result(self, result, options: QnAMakerOptions) -> List[QueryResult]:
+
+    async def _format_qna_result(
+        self, result, options: QnAMakerOptions
+    ) -> List[QueryResult]:
         json_res = result
         if isinstance(result, ClientResponse):
             json_res = await result.json()
@@ -184,7 +187,9 @@ class GenerateAnswerUtils:
 
         # The old version of the protocol returns the id in a field called qnaId
         # The following translates this old structure to the new
-        is_legacy_protocol: bool = self._endpoint.host.endswith("v2.0") or self._endpoint.host.endswith("v3.0")
+        is_legacy_protocol: bool = self._endpoint.host.endswith(
+            "v2.0"
+        ) or self._endpoint.host.endswith("v3.0")
         if is_legacy_protocol:
             for answer in answers_within_threshold:
                 answer["id"] = answer.pop("qnaId", None)

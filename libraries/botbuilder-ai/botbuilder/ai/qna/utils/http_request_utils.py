@@ -67,7 +67,10 @@ class HttpRequestUtils:
         request_timeout = ClientTimeout(total=timeout / 1000)
 
         response: ClientResponse = await self._http_client.post(
-            request_url, data=serialized_payload_body, headers=headers, timeout=request_timeout
+            request_url,
+            data=serialized_payload_body,
+            headers=headers,
+            timeout=request_timeout,
         )
 
         return response
@@ -78,7 +81,9 @@ class HttpRequestUtils:
             "User-Agent": self._get_user_agent(),
         }
 
-        is_legacy_protocol: bool = endpoint.host.endswith("v2.0") or endpoint.host.endswith("v3.0")
+        is_legacy_protocol: bool = endpoint.host.endswith(
+            "v2.0"
+        ) or endpoint.host.endswith("v3.0")
         if is_legacy_protocol:
             headers["Ocp-Apim-Subscription-Key"] = endpoint.endpoint_key
         else:
