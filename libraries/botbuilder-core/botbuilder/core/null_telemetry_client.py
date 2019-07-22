@@ -80,8 +80,10 @@ class NullTelemetryClient(BotTelemetryClient):
         :param value: The value of the metric that was captured.
         :param tel_type: The type of the metric. (defaults to: TelemetryDataPointType.aggregation`)
         :param count: the number of metrics that were aggregated into this data point. (defaults to: None
-        :param min_val: the minimum of all metrics collected that were aggregated into this data point. (defaults to: None)
-        :param max_val: the maximum of all metrics collected that were aggregated into this data point. (defaults to: None)
+        :param min_val: the minimum of all metrics collected that were aggregated into this data point.
+         (defaults to: None)
+        :param max_val: the maximum of all metrics collected that were aggregated into this data point.
+         (defaults to: None)
         :param std_dev: the standard deviation of all metrics collected that were aggregated into this data point. \
         (defaults to: None)
         :param properties: the set of custom properties the client wants attached to this data item. (defaults to: None)
