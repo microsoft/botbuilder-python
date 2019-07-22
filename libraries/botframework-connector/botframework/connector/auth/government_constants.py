@@ -14,7 +14,8 @@ class GovernmentConstants(ABC):
     """
     TO CHANNEL FROM BOT: Login URL
     """
-    TO_CHANNEL_FROM_BOT_LOGIN_URL = "https://login.microsoftonline.us/cab8a31a-1906-4287-a0d8-4eef66b95f6e/oauth2/v2.0/token"
+    TO_CHANNEL_FROM_BOT_LOGIN_URL = \
+        "https://login.microsoftonline.us/cab8a31a-1906-4287-a0d8-4eef66b95f6e/oauth2/v2.0/token"
 
     """
     TO CHANNEL FROM BOT: OAuth scope to request
@@ -36,4 +37,5 @@ class GovernmentConstants(ABC):
     """
     TO BOT FROM GOV EMULATOR: OpenID metadata document for tokens coming from MSA
     """
-    TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL = "https://login.microsoftonline.us/cab8a31a-1906-4287-a0d8-4eef66b95f6e/v2.0/.well-known/openid-configuration"
+    TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL = \
+        "https://login.microsoftonline.us/cab8a31a-1906-4287-a0d8-4eef66b95f6e/v2.0/.well-known/openid-configuration"

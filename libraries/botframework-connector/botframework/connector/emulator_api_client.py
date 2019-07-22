@@ -21,7 +21,7 @@ class EmulatorApiClient:
 
         if res.status_code == 200:
             return True
-        else:
-            raise Exception(
-                f"EmulateOAuthCards failed with status code: { res.status_code }"
-            )
+
+        raise Exception(
+            f"EmulateOAuthCards failed with status code: { res.status_code }"
+        )

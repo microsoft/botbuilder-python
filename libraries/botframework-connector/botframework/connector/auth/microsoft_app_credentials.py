@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 from urllib.parse import urlparse
 from msrest.authentication import BasicTokenAuthentication, Authentication
 import requests
-import aiohttp
 from .constants import Constants
 
 # TODO: Decide to move this to Constants or viceversa (when porting OAuth)
@@ -11,7 +10,8 @@ AUTH_SETTINGS = {
     "refreshScope": "https://api.botframework.com/.default",
     "botConnectorOpenIdMetadata": "https://login.botframework.com/v1/.well-known/openidconfiguration",
     "botConnectorIssuer": "https://api.botframework.com",
-    "emulatorOpenIdMetadata": "https://login.microsoftonline.com/botframework.com/v2.0/.well-known/openid-configuration",
+    "emulatorOpenIdMetadata":
+        "https://login.microsoftonline.com/botframework.com/v2.0/.well-known/openid-configuration",
     "emulatorAuthV31IssuerV1": "https://sts.windows.net/d6d49420-f39b-4df7-a1dc-d59a935871db/",
     "emulatorAuthV31IssuerV2": "https://login.microsoftonline.com/d6d49420-f39b-4df7-a1dc-d59a935871db/v2.0",
     "emulatorAuthV32IssuerV1": "https://sts.windows.net/f8cdef31-a31e-4b4a-93e4-5f571e91255a/",
@@ -63,7 +63,7 @@ class MicrosoftAppCredentials(Authentication):
         self.microsoft_app_password = password
         tenant = (
             channel_auth_tenant
-            if channel_auth_tenant is not None and len(channel_auth_tenant) > 0
+            if channel_auth_tenant
             else Constants.DEFAULT_CHANNEL_AUTH_TENANT
         )
         self.oauth_endpoint = (
@@ -73,7 +73,7 @@ class MicrosoftAppCredentials(Authentication):
         )
         self.token_cache_key = app_id + "-cache"
 
-    def signed_session(self) -> requests.Session:
+    def signed_session(self) -> requests.Session:  # pylint: disable=arguments-differ
         """
         Gets the signed session.
         :returns: Signed requests.Session object
@@ -113,8 +113,7 @@ class MicrosoftAppCredentials(Authentication):
             oauth_token = self.refresh_token()
             MicrosoftAppCredentials.cache.setdefault(self.token_cache_key, oauth_token)
             return oauth_token.access_token
-        else:
-            return ""
+        return ""
 
     def refresh_token(self) -> _OAuthResponse:
         """

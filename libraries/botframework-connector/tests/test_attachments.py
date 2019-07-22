@@ -1,11 +1,14 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 import os
 import base64
-import pytest
 import asyncio
+import pytest
 from azure_devtools.scenario_tests import ReplayableTest
 
 import msrest
-from botbuilder.schema import *
+from botbuilder.schema import AttachmentData, ErrorResponseException
 from botframework.connector import ConnectorClient
 from botframework.connector.auth import MicrosoftAppCredentials
 
@@ -43,8 +46,8 @@ def read_base64(path_to_file):
         return encoded_string
 
 
-loop = asyncio.get_event_loop()
-auth_token = loop.run_until_complete(get_auth_token())
+LOOP = asyncio.get_event_loop()
+AUTH_TOKEN = LOOP.run_until_complete(get_auth_token())
 
 
 class AttachmentsTest(ReplayableTest):
@@ -53,7 +56,7 @@ class AttachmentsTest(ReplayableTest):
 
     @property
     def credentials(self):
-        return MicrosoftTokenAuthenticationStub(auth_token)
+        return MicrosoftTokenAuthenticationStub(AUTH_TOKEN)
 
     def test_attachments_upload_and_get_attachment(self):
         attachment = AttachmentData(
@@ -124,7 +127,7 @@ class AttachmentsTest(ReplayableTest):
                 CONVERSATION_ID, attachment
             )
             attachment_id = response.id
-            attachment_view = connector.attachments.get_attachment(
+            connector.attachments.get_attachment(
                 attachment_id, "invalid"
             )
 
