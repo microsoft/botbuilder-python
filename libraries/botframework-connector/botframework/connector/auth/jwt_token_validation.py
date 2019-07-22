@@ -19,12 +19,12 @@ class JwtTokenValidation:
         channel_service: str = "",
     ) -> ClaimsIdentity:
         """Authenticates the request and sets the service url in the set of trusted urls.
-        
         :param activity: The incoming Activity from the Bot Framework or the Emulator
         :type activity: ~botframework.connector.models.Activity
         :param auth_header: The Bearer token included as part of the request
         :type auth_header: str
         :param credentials: The set of valid credentials, such as the Bot Application ID
+        :param channel_service: String for the channel service
         :type credentials: CredentialProvider
 
         :raises Exception:

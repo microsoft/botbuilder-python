@@ -1,8 +1,12 @@
-import pytest
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 import asyncio
+import pytest
 from azure_devtools.scenario_tests import ReplayableTest
 
-from botbuilder.schema import *
+from botbuilder.schema import (Activity, ActivityTypes, Attachment, AttachmentLayoutTypes, CardImage,
+                               ChannelAccount, ConversationParameters, ErrorResponseException, HeroCard)
 from botframework.connector import ConnectorClient
 from botframework.connector.auth import MicrosoftAppCredentials
 
@@ -30,8 +34,8 @@ async def get_auth_token():
         return "STUB_ACCESS_TOKEN"
 
 
-loop = asyncio.get_event_loop()
-auth_token = loop.run_until_complete(get_auth_token())
+LOOP = asyncio.get_event_loop()
+AUTH_TOKEN = LOOP.run_until_complete(get_auth_token())
 
 
 class ConversationTest(ReplayableTest):
@@ -40,18 +44,18 @@ class ConversationTest(ReplayableTest):
 
     @property
     def credentials(self):
-        return MicrosoftTokenAuthenticationStub(auth_token)
+        return MicrosoftTokenAuthenticationStub(AUTH_TOKEN)
 
     def test_conversations_create_conversation(self):
-        to = ChannelAccount(id=RECIPIENT_ID)
+        test_object = ChannelAccount(id=RECIPIENT_ID)
         create_conversation = ConversationParameters(
             bot=ChannelAccount(id=BOT_ID),
-            members=[to],
+            members=[test_object],
             activity=Activity(
                 type=ActivityTypes.message,
                 channel_id=CHANNEL_ID,
                 from_property=ChannelAccount(id=BOT_ID),
-                recipient=to,
+                recipient=test_object,
                 text="Hi there!",
             ),
         )
@@ -62,15 +66,15 @@ class ConversationTest(ReplayableTest):
         assert conversation.id is not None
 
     def test_conversations_create_conversation_with_invalid_bot_id_fails(self):
-        to = ChannelAccount(id=RECIPIENT_ID)
+        test_object = ChannelAccount(id=RECIPIENT_ID)
         create_conversation = ConversationParameters(
             bot=ChannelAccount(id="INVALID"),
-            members=[to],
+            members=[test_object],
             activity=Activity(
                 type=ActivityTypes.message,
                 channel_id=CHANNEL_ID,
                 from_property=ChannelAccount(id="INVALID"),
-                recipient=to,
+                recipient=test_object,
                 text="Hi there!",
             ),
         )
@@ -102,16 +106,16 @@ class ConversationTest(ReplayableTest):
         assert "Conversations" in str(excinfo.value.error.error.message)
 
     def test_conversations_create_conversation_with_bot_as_only_member_fails(self):
-        to = ChannelAccount(id=BOT_ID)
+        test_object = ChannelAccount(id=BOT_ID)
         sender = ChannelAccount(id=BOT_ID)
         create_conversation = ConversationParameters(
             bot=sender,
-            members=[to],
+            members=[test_object],
             activity=Activity(
                 type=ActivityTypes.message,
                 channel_id=CHANNEL_ID,
                 from_property=sender,
-                recipient=to,
+                recipient=test_object,
                 text="Hi there!",
             ),
         )
@@ -206,7 +210,7 @@ class ConversationTest(ReplayableTest):
     def test_conversations_get_conversation_members_invalid_id_fails(self):
         with pytest.raises(ErrorResponseException) as excinfo:
             connector = ConnectorClient(self.credentials, base_url=SERVICE_URL)
-            members = connector.conversations.get_conversation_members("INVALID_ID")
+            connector.conversations.get_conversation_members("INVALID_ID")
 
         assert excinfo.value.error.error.code == "ServiceError"
         assert "cannot send messages to this id" in str(

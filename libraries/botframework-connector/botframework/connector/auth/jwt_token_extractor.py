@@ -1,4 +1,6 @@
-import asyncio
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 import json
 from datetime import datetime, timedelta
 import requests
