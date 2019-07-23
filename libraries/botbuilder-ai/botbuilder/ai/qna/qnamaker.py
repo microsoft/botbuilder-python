@@ -61,9 +61,8 @@ class QnAMaker(QnAMakerTelemetryClient):
         self._options = options or QnAMakerOptions()
         self._validate_options(self._options)
 
-        self._req_client = http_client or ClientSession()
-        # instance_timeout = ClientTimeout(total=self._options.timeout / 1000)
-        # self._req_client = http_client or ClientSession(timeout=instance_timeout)
+        instance_timeout = ClientTimeout(total=self._options.timeout / 1000)
+        self._req_client = http_client or ClientSession(timeout=instance_timeout)
 
         self.telemetry_client: Union[
             BotTelemetryClient, NullTelemetryClient

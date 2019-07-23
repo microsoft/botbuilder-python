@@ -40,7 +40,7 @@ class TrainUtils:
         if not feedback_records.records or len(feedback_records.records) == 0:
             return
         
-        # TODO query_train()
+        self.query_train(feedback_records)
     
     async def query_train(self, feedback_records: FeedbackRecords):
         url: str = f"{ self._endpoint.host }/knowledgebases/{ self._endpoint.knowledge_base_id }/train"
