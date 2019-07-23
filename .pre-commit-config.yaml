@@ -4,4 +4,8 @@ repos:
     rev: v2.3.1
     hooks:
     -   id: pylint
-        entry: pylint --rcfile=.pylintrc libraries
+        files: $GIT_DIR/../libraries
+        args:
+        -   --rcfile=$GIT_DIR/../.pylintrc
+        always_run: true
+        verbose: true
