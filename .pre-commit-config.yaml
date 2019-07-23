@@ -1,10 +1,11 @@
 default_stages: [push]
 repos:
 -   repo: https://github.com/pre-commit/mirrors-pylint
-    rev: master
+    rev: v2.3.1
     hooks:
     -   id: pylint
         files: libraries
-        args: [--rcfile=.pylintrc]
+        args:
+        -   --rcfile=.pylintrc
         always_run: true
         verbose: true
