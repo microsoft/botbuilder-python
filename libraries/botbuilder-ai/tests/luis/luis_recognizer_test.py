@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+# pylint: disable=protected-access
+
 import json
 from os import path
 from typing import Dict, Tuple, Union
@@ -23,7 +25,6 @@ from botbuilder.core import (
     BotTelemetryClient,
     IntentScore,
     RecognizerResult,
-    TopIntent,
     TurnContext,
 )
 from botbuilder.core.adapters import TestAdapter
@@ -54,7 +55,9 @@ class LuisRecognizerTest(AsyncTestCase):
 
     def test_luis_recognizer_construction(self):
         # Arrange
-        endpoint = "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/b31aeaf3-3511-495b-a07f-571fc873214b?verbose=true&timezoneOffset=-360&subscription-key=048ec46dc58e495482b0c447cfdbd291&q="
+        endpoint = "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/" \
+                   "b31aeaf3-3511-495b-a07f-571fc873214b?verbose=true&timezoneOffset=-360" \
+                   "&subscription-key=048ec46dc58e495482b0c447cfdbd291&q="
 
         # Act
         recognizer = LuisRecognizer(endpoint)
@@ -66,7 +69,9 @@ class LuisRecognizerTest(AsyncTestCase):
         self.assertEqual("https://westus.api.cognitive.microsoft.com", app.endpoint)
 
     def test_luis_recognizer_timeout(self):
-        endpoint = "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/b31aeaf3-3511-495b-a07f-571fc873214b?verbose=true&timezoneOffset=-360&subscription-key=048ec46dc58e495482b0c447cfdbd291&q="
+        endpoint = "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/" \
+                   "b31aeaf3-3511-495b-a07f-571fc873214b?verbose=true&timezoneOffset=-360" \
+                   "&subscription-key=048ec46dc58e495482b0c447cfdbd291&q="
         expected_timeout = 300
         options_with_timeout = LuisPredictionOptions(timeout=expected_timeout * 1000)
 
@@ -431,7 +436,9 @@ class LuisRecognizerTest(AsyncTestCase):
         # Arrange
         # Note this is NOT a real LUIS application ID nor a real LUIS subscription-key
         # theses are GUIDs edited to look right to the parsing and validation code.
-        endpoint = "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/b31aeaf3-3511-495b-a07f-571fc873214b?verbose=true&timezoneOffset=-360&subscription-key=048ec46dc58e495482b0c447cfdbd291&q="
+        endpoint = "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/" \
+                   "b31aeaf3-3511-495b-a07f-571fc873214b?verbose=true&timezoneOffset=-360" \
+                   "&subscription-key=048ec46dc58e495482b0c447cfdbd291&q="
 
         # Act
         recognizer = LuisRecognizer(endpoint)
@@ -714,13 +721,13 @@ class LuisRecognizerTest(AsyncTestCase):
         self.assertEqual(trimmed_expected, trimmed_actual)
 
     @staticmethod
-    def _remove_none_property(d: Dict[str, object]) -> Dict[str, object]:
-        for key, value in list(d.items()):
+    def _remove_none_property(dictionary: Dict[str, object]) -> Dict[str, object]:
+        for key, value in list(dictionary.items()):
             if value is None:
-                del d[key]
+                del dictionary[key]
             elif isinstance(value, dict):
                 LuisRecognizerTest._remove_none_property(value)
-        return d
+        return dictionary
 
     @classmethod
     async def _get_recognizer_result(
@@ -761,8 +768,8 @@ class LuisRecognizerTest(AsyncTestCase):
         curr_dir = path.dirname(path.abspath(__file__))
         response_path = path.join(curr_dir, "test_data", response_file)
 
-        with open(response_path, "r", encoding="utf-8-sig") as f:
-            response_str = f.read()
+        with open(response_path, "r", encoding="utf-8-sig") as file:
+            response_str = file.read()
         response_json = json.loads(response_str)
         return response_json
 

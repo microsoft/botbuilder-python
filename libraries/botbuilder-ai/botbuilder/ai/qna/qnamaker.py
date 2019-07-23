@@ -1,18 +1,28 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+<<<<<<< HEAD
 # TODO delete client lines below when Active Learning is fully
 from aiohttp import ClientSession, ClientTimeout, ClientResponse
+=======
+from copy import copy
+import json
+import platform
+from typing import Dict, NamedTuple, Union
+>>>>>>> 0bfda9eaa7eefd628ddd2540a4632852374501da
 
+from aiohttp import ClientSession, ClientTimeout, ClientResponse
 from botbuilder.schema import Activity
 from botbuilder.core import BotTelemetryClient, NullTelemetryClient, TurnContext
+<<<<<<< HEAD
 from copy import copy
 
 # TODO after porting Active Learning, delete import json, platform, requests
 import json, platform, requests
 from typing import Dict, List, NamedTuple, Union
+=======
+>>>>>>> 0bfda9eaa7eefd628ddd2540a4632852374501da
 
-from .metadata import Metadata
 from .query_result import QueryResult
 from .qnamaker_endpoint import QnAMakerEndpoint
 from .qnamaker_options import QnAMakerOptions
@@ -33,11 +43,11 @@ class EventData(NamedTuple):
 
 
 class QnAMaker(QnAMakerTelemetryClient):
-    """ 
-    Class used to query a QnA Maker knowledge base for answers. 
+    """
+    Class used to query a QnA Maker knowledge base for answers.
     """
 
-    def __init__(
+    def __init__(  # pylint: disable=super-init-not-called
         self,
         endpoint: QnAMakerEndpoint,
         options: QnAMakerOptions = None,
@@ -52,7 +62,8 @@ class QnAMaker(QnAMakerTelemetryClient):
 
         if endpoint.host.endswith("v2.0"):
             raise ValueError(
-                "v2.0 of QnA Maker service is no longer supported in the Bot Framework. Please upgrade your QnA Maker service at www.qnamaker.ai."
+                "v2.0 of QnA Maker service is no longer supported in the Bot Framework. Please upgrade your QnA Maker"
+                " service at www.qnamaker.ai."
             )
 
         self._endpoint: str = endpoint
@@ -95,9 +106,9 @@ class QnAMaker(QnAMakerTelemetryClient):
     ) -> EventData:
         """
         Fills the event properties and metrics for the QnaMessage event for telemetry.
-
-        :return: A tuple of event data properties and metrics that will be sent to the BotTelemetryClient.track_event() method for the QnAMessage event. The properties and metrics returned the standard properties logged with any properties passed from the get_answers() method.
-
+        :return: A tuple of event data properties and metrics that will be sent to the BotTelemetryClient.track_event()
+         method for the QnAMessage event. The properties and metrics returned the standard properties logged with any
+          properties passed from the get_answers() method.
         :rtype: EventData
         """
 
@@ -109,18 +120,18 @@ class QnAMaker(QnAMakerTelemetryClient):
         ] = self._endpoint.knowledge_base_id
 
         text: str = turn_context.activity.text
-        userName: str = turn_context.activity.from_property.name
+        user_name: str = turn_context.activity.from_property.name
 
         # Use the LogPersonalInformation flag to toggle logging PII data; text and username are common examples.
         if self.log_personal_information:
             if text:
                 properties[QnATelemetryConstants.question_property] = text
 
-            if userName:
-                properties[QnATelemetryConstants.username_property] = userName
+            if user_name:
+                properties[QnATelemetryConstants.username_property] = user_name
 
         # Fill in Qna Results (found or not).
-        if len(query_results) > 0:
+        if query_results:
             query_result = query_results[0]
 
             result_properties = {
@@ -163,9 +174,7 @@ class QnAMaker(QnAMakerTelemetryClient):
     ) -> [QueryResult]:
         """
         Generates answers from the knowledge base.
-        
         :return: A list of answers for the user's query, sorted in decreasing order of ranking score.
-        
         :rtype: [QueryResult]
         """
 
@@ -203,10 +212,10 @@ class QnAMaker(QnAMakerTelemetryClient):
 
     def _hydrate_options(self, query_options: QnAMakerOptions) -> QnAMakerOptions:
         """
-        Combines QnAMakerOptions passed into the QnAMaker constructor with the options passed as arguments into get_answers().
-        
-        :return: QnAMakerOptions with options passed into constructor overwritten by new options passed into get_answers()
-
+        Combines QnAMakerOptions passed into the QnAMaker constructor with the options passed as arguments
+         into get_answers().
+        :return: QnAMakerOptions with options passed into constructor overwritten by new options passed into
+         get_answers()
         :rtype: QnAMakerOptions
         """
 
@@ -222,7 +231,7 @@ class QnAMaker(QnAMakerTelemetryClient):
             if query_options.top != hydrated_options.top and query_options.top != 0:
                 hydrated_options.top = query_options.top
 
-            if len(query_options.strict_filters) > 0:
+            if query_options.strict_filters:
                 hydrated_options.strict_filters = query_options.strict_filters
 
             if (

@@ -2,9 +2,9 @@
 # Licensed under the MIT License.
 
 from abc import ABC, abstractmethod
+from typing import Dict
 from botbuilder.core import BotTelemetryClient, TurnContext
 from .qnamaker_options import QnAMakerOptions
-from typing import Dict
 
 
 class QnAMakerTelemetryClient(ABC):
