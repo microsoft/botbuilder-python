@@ -103,7 +103,7 @@ class ApplicationInsightsTelemetryClient(BotTelemetryClient):
         self,
         exception_type: type = None,
         value: Exception = None,
-        tb: traceback = None,
+        trace: traceback = None,
         properties: Dict[str, object] = None,
         measurements: Dict[str, object] = None,
     ) -> None:
@@ -111,14 +111,14 @@ class ApplicationInsightsTelemetryClient(BotTelemetryClient):
         Send information about a single exception that occurred in the application.
         :param exception_type: the type of the exception that was thrown.
         :param value: the exception that the client wants to send.
-        :param tb: the traceback information as returned by :func:`sys.exc_info`.
+        :param trace: the traceback information as returned by :func:`sys.exc_info`.
         :param properties: the set of custom properties the client wants attached to this data item.
          (defaults to: None)
         :param measurements: the set of custom measurements the client wants to attach to this data item.
          (defaults to: None)
         """
         self._client.track_exception(
-            exception_type, value, tb, properties, measurements
+            exception_type, value, trace, properties, measurements
         )
 
     def track_event(
