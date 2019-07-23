@@ -4,8 +4,8 @@ repos:
     rev: v2.3.1
     hooks:
     -   id: pylint
-        files: ./libraries
+        files: botbuilder-core
         args:
-        -   --rcfile=./.pylintrc
+        -   --rcfile=.pylintrc
         always_run: true
         verbose: true
