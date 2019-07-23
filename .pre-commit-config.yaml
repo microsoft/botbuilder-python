@@ -4,5 +4,5 @@ repos:
     rev: master
     hooks:
     -   id: pylint
-        files: libraries/
+        files: libraries
         args: [--rcfile=.pylintrc]
