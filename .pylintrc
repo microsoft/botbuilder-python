@@ -155,7 +155,8 @@ disable=print-statement,
         cyclic-import,
         too-many-locals,
         too-many-function-args,
-        too-many-return-statements
+        too-many-return-statements,
+        import-error
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
