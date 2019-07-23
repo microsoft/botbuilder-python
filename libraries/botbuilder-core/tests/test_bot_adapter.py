@@ -29,7 +29,9 @@ class TestBotAdapter(aiounittest.AsyncTestCase):
         adapter.use(CallCountingMiddleware()).use(CallCountingMiddleware())
 
     async def test_pass_resource_responses_through(self):
-        def validate_responses(activities: List[Activity]):  # pylint: disable=unused-argument
+        def validate_responses(
+            activities: List[Activity]
+        ):  # pylint: disable=unused-argument
             pass  # no need to do anything.
 
         adapter = SimpleAdapter(call_on_send=validate_responses)

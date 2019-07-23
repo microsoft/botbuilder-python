@@ -158,9 +158,7 @@ class OAuthPrompt(Dialog):
             and is_message
             and state["options"].retry_prompt is not None
         ):
-            await dialog_context.context.send_activity(
-                state["options"].retry_prompt
-            )
+            await dialog_context.context.send_activity(state["options"].retry_prompt)
 
         return Dialog.end_of_turn
 

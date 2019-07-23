@@ -41,7 +41,9 @@ class Dialog(ABC):
             self._telemetry_client = value
 
     @abstractmethod
-    async def begin_dialog(self, dialog_context: "DialogContext", options: object = None):
+    async def begin_dialog(
+        self, dialog_context: "DialogContext", options: object = None
+    ):
         """
         Method called when a new dialog has been pushed onto the stack and is being activated.
         :param dialog_context: The dialog context for the current turn of conversation.
@@ -62,7 +64,10 @@ class Dialog(ABC):
         return await dialog_context.end_dialog(None)
 
     async def resume_dialog(
-        self, dialog_context: "DialogContext", reason: DialogReason, result: object  # pylint: disable=unused-argument
+        self,
+        dialog_context: "DialogContext",
+        reason: DialogReason,
+        result: object,  # pylint: disable=unused-argument
     ):
         """
         Method called when an instance of the dialog is being returned to from another
@@ -80,7 +85,9 @@ class Dialog(ABC):
         return await dialog_context.end_dialog(result)
 
     # TODO: instance is DialogInstance
-    async def reprompt_dialog(self, context: TurnContext, instance: DialogInstance):  # pylint: disable=unused-argument
+    async def reprompt_dialog(
+        self, context: TurnContext, instance: DialogInstance
+    ):  # pylint: disable=unused-argument
         """
         :param context:
         :param instance:
@@ -91,7 +98,10 @@ class Dialog(ABC):
 
     # TODO: instance is DialogInstance
     async def end_dialog(
-        self, context: TurnContext, instance: DialogInstance, reason: DialogReason  # pylint: disable=unused-argument
+        self,
+        context: TurnContext,
+        instance: DialogInstance,
+        reason: DialogReason,  # pylint: disable=unused-argument
     ):
         """
         :param context:

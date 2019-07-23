@@ -15,7 +15,9 @@ from botbuilder.dialogs import DialogSet, DialogTurnStatus
 class NumberPromptTests(aiounittest.AsyncTestCase):
     def test_empty_should_fail(self):
         empty_id = ""
-        self.assertRaises(TypeError, lambda: NumberPrompt(empty_id))  # pylint: disable=no-value-for-parameter
+        self.assertRaises(
+            TypeError, lambda: NumberPrompt(empty_id)
+        )  # pylint: disable=no-value-for-parameter
 
     async def test_number_prompt(self):
         # Create new ConversationState with MemoryStorage and register the state as middleware.
@@ -60,6 +62,4 @@ class NumberPromptTests(aiounittest.AsyncTestCase):
         test_flow2 = await test_flow.send("Hello")
         test_flow3 = await test_flow2.assert_reply("Enter quantity of cable")
         test_flow4 = await test_flow3.send("Give me twenty meters of cable")
-        await test_flow4.assert_reply(
-            "You asked me for '20' meters of cable."
-        )
+        await test_flow4.assert_reply("You asked me for '20' meters of cable.")

@@ -24,6 +24,7 @@ from ..dialog_context import DialogContext
 
 class Prompt(Dialog):
     """ Base class for all prompts."""
+
     ATTEMPT_COUNT_KEY = "AttemptCount"
     persisted_options = "options"
     persisted_state = "state"
@@ -118,9 +119,7 @@ class Prompt(Dialog):
         await self.reprompt_dialog(dialog_context.context, dialog_context.active_dialog)
         return Dialog.end_of_turn
 
-    async def reprompt_dialog(
-        self, context: TurnContext, instance: DialogInstance
-    ):
+    async def reprompt_dialog(self, context: TurnContext, instance: DialogInstance):
         state = instance.state[self.persisted_state]
         options = instance.state[self.persisted_options]
         await self.on_prompt(context, state, options, False)

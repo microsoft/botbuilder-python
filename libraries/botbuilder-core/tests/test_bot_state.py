@@ -342,8 +342,9 @@ class TestBotState(aiounittest.AsyncTestCase):
             # read initial state object
             await bot_state_manager.load(context)
 
-            custom_state = \
-                await test_property.get(context, lambda: CustomState())  # pylint: disable=unnecessary-lambda
+            custom_state = await test_property.get(
+                context, lambda: CustomState()
+            )  # pylint: disable=unnecessary-lambda
 
             # this should be a 'CustomState' as nothing is currently stored in storage
             assert isinstance(custom_state, CustomState)
@@ -393,7 +394,8 @@ class TestBotState(aiounittest.AsyncTestCase):
         bot_state1 = ConversationState(storage)
         (
             await bot_state1.create_property("test-name").get(
-                turn_context, lambda: TestPocoState()  # pylint: disable=unnecessary-lambda
+                turn_context,
+                lambda: TestPocoState(),  # pylint: disable=unnecessary-lambda
             )
         ).value = "test-value"
         await bot_state1.save_changes(turn_context)
@@ -402,7 +404,10 @@ class TestBotState(aiounittest.AsyncTestCase):
         bot_state2 = ConversationState(storage)
         value1 = (
             await bot_state2.create_property("test-name").get(
-                turn_context, lambda: TestPocoState(value="default-value")  # pylint: disable=unnecessary-lambda
+                turn_context,
+                lambda: TestPocoState(
+                    value="default-value"
+                ),  # pylint: disable=unnecessary-lambda
             )
         ).value
 
@@ -417,7 +422,10 @@ class TestBotState(aiounittest.AsyncTestCase):
         bot_state4 = ConversationState(storage)
         value2 = (
             await bot_state4.create_property("test-name").get(
-                turn_context, lambda: TestPocoState(value="default-value")  # pylint: disable=unnecessary-lambda
+                turn_context,
+                lambda: TestPocoState(
+                    value="default-value"
+                ),  # pylint: disable=unnecessary-lambda
             )
         ).value
 
@@ -433,7 +441,8 @@ class TestBotState(aiounittest.AsyncTestCase):
         bot_state1 = ConversationState(storage)
         (
             await bot_state1.create_property("test-name").get(
-                turn_context, lambda: TestPocoState()  # pylint: disable=unnecessary-lambda
+                turn_context,
+                lambda: TestPocoState(),  # pylint: disable=unnecessary-lambda
             )
         ).value = "test-value"
         await bot_state1.save_changes(turn_context)
@@ -442,7 +451,10 @@ class TestBotState(aiounittest.AsyncTestCase):
         bot_state2 = ConversationState(storage)
         value1 = (
             await bot_state2.create_property("test-name").get(
-                turn_context, lambda: TestPocoState(value="default-value")  # pylint: disable=unnecessary-lambda
+                turn_context,
+                lambda: TestPocoState(
+                    value="default-value"
+                ),  # pylint: disable=unnecessary-lambda
             )
         ).value
 
@@ -456,7 +468,10 @@ class TestBotState(aiounittest.AsyncTestCase):
         bot_state4 = ConversationState(storage)
         value2 = (
             await bot_state4.create_property("test-name").get(
-                turn_context, lambda: TestPocoState(value="default-value")  # pylint: disable=unnecessary-lambda
+                turn_context,
+                lambda: TestPocoState(
+                    value="default-value"
+                ),  # pylint: disable=unnecessary-lambda
             )
         ).value
 
@@ -471,7 +486,8 @@ class TestBotState(aiounittest.AsyncTestCase):
         conversation_state = ConversationState(storage)
         (
             await conversation_state.create_property("test-name").get(
-                turn_context, lambda: TestPocoState()  # pylint: disable=unnecessary-lambda
+                turn_context,
+                lambda: TestPocoState(),  # pylint: disable=unnecessary-lambda
             )
         ).value = "test-value"
 

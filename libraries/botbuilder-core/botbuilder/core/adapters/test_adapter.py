@@ -58,7 +58,7 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         logic: Coroutine = None,
         conversation: ConversationReference = None,
         send_trace_activity: bool = False,
-    ):   # pylint: disable=unused-argument
+    ):  # pylint: disable=unused-argument
         """
         Creates a new TestAdapter instance.
         :param logic:
@@ -242,10 +242,7 @@ class TestAdapter(BotAdapter, UserTokenProvider):
             magic_code_record = list(
                 filter(lambda x: key.equals_key(x.key), self._magic_codes)
             )
-            if (
-                magic_code_record
-                and magic_code_record[0].magic_code == magic_code
-            ):
+            if magic_code_record and magic_code_record[0].magic_code == magic_code:
                 # Move the token to long term dictionary.
                 self.add_user_token(
                     connection_name,
@@ -269,7 +266,9 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         # Not found.
         return None
 
-    async def sign_out_user(self, context: TurnContext, connection_name: str, user_id: str = None):
+    async def sign_out_user(
+        self, context: TurnContext, connection_name: str, user_id: str = None
+    ):
         channel_id = context.activity.channel_id
         user_id = context.activity.from_property.id
 
@@ -286,8 +285,10 @@ class TestAdapter(BotAdapter, UserTokenProvider):
     async def get_oauth_sign_in_link(
         self, context: TurnContext, connection_name: str
     ) -> str:
-        return f"https://fake.com/oauthsignin" \
+        return (
+            f"https://fake.com/oauthsignin"
             f"/{connection_name}/{context.activity.channel_id}/{context.activity.from_property.id}"
+        )
 
     async def get_aad_tokens(
         self, context: TurnContext, connection_name: str, resource_urls: List[str]

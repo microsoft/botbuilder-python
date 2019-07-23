@@ -35,7 +35,9 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
         self.assertEqual(type(dialog.telemetry_client), NullTelemetryClient)
 
     @patch("botbuilder.applicationinsights.ApplicationInsightsTelemetryClient")
-    async def test_execute_sequence_waterfall_steps(self, MockTelemetry):  # pylint: disable=invalid-name
+    async def test_execute_sequence_waterfall_steps(
+        self, MockTelemetry
+    ):  # pylint: disable=invalid-name
         # arrange
 
         # Create new ConversationState with MemoryStorage and register the state as middleware.
@@ -91,7 +93,9 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
         self.assert_telemetry_calls(telemetry, telemetry_calls)
 
     @patch("botbuilder.applicationinsights.ApplicationInsightsTelemetryClient")
-    async def test_ensure_end_dialog_called(self, MockTelemetry):  # pylint: disable=invalid-name
+    async def test_ensure_end_dialog_called(
+        self, MockTelemetry
+    ):  # pylint: disable=invalid-name
         # arrange
 
         # Create new ConversationState with MemoryStorage and register the state as middleware.
@@ -150,7 +154,9 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
     def assert_telemetry_call(
         self, telemetry_mock, index: int, event_name: str, props: Dict[str, str]
     ) -> None:
-        args, kwargs = telemetry_mock.track_event.call_args_list[index]  # pylint: disable=unused-variable
+        args, kwargs = telemetry_mock.track_event.call_args_list[
+            index
+        ]  # pylint: disable=unused-variable
         self.assertEqual(args[0], event_name)
 
         for key, val in props.items():

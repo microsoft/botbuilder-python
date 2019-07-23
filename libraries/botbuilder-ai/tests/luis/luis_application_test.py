@@ -48,10 +48,11 @@ class LuisApplicationTest(unittest.TestCase):
         # Arrange
         # Note this is NOT a real LUIS application ID nor a real LUIS subscription-key
         # theses are GUIDs edited to look right to the parsing and validation code.
-        endpoint = \
-            "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/" \
-            "b31aeaf3-3511-495b-a07f-571fc873214b?verbose=true&timezoneOffset=-360" \
+        endpoint = (
+            "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/"
+            "b31aeaf3-3511-495b-a07f-571fc873214b?verbose=true&timezoneOffset=-360"
             "&subscription-key=048ec46dc58e495482b0c447cfdbd291&q="
+        )
 
         # Act
         app = LuisApplication.from_application_endpoint(endpoint)

@@ -124,12 +124,17 @@ class ComponentDialog(Dialog):
         return await inner_dc.continue_dialog()
 
     async def on_end_dialog(
-        self, context: TurnContext, instance: DialogInstance, reason: DialogReason  # pylint: disable=unused-argument
+        self,
+        context: TurnContext,
+        instance: DialogInstance,
+        reason: DialogReason,  # pylint: disable=unused-argument
     ) -> None:
         return
 
     async def on_reprompt_dialog(
-        self, turn_context: TurnContext, instance: DialogInstance  # pylint: disable=unused-argument
+        self,
+        turn_context: TurnContext,
+        instance: DialogInstance,  # pylint: disable=unused-argument
     ) -> None:
         return
 

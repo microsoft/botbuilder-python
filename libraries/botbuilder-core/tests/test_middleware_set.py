@@ -4,7 +4,12 @@
 from typing import Awaitable, Callable
 import aiounittest
 
-from botbuilder.core import AnonymousReceiveMiddleware, MiddlewareSet, Middleware, TurnContext
+from botbuilder.core import (
+    AnonymousReceiveMiddleware,
+    MiddlewareSet,
+    Middleware,
+    TurnContext,
+)
 
 
 class TestMiddlewareSet(aiounittest.AsyncTestCase):
@@ -33,7 +38,9 @@ class TestMiddlewareSet(aiounittest.AsyncTestCase):
                 return next_middleware
 
         class ModifyInputMiddleware(Middleware):
-            async def on_process_request(self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]):
+            async def on_process_request(
+                self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]
+            ):
                 context = "Hello"
                 print(context)
                 print("Here is the current context_or_string: %s" % context)

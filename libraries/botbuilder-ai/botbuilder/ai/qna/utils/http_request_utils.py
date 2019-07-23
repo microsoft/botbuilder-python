@@ -69,11 +69,8 @@ class HttpRequestUtils:
             )
         else:
             response: ClientResponse = await self._http_client.post(
-                request_url,
-                data=serialized_payload_body,
-                headers=headers,
+                request_url, data=serialized_payload_body, headers=headers
             )
-
 
         return response
 

@@ -116,8 +116,9 @@ class ChoicePrompt(Prompt):
         # Format prompt to send
         choices: List[Choice] = options.choices if options.choices else []
         channel_id: str = turn_context.activity.channel_id
-        choice_options: ChoiceFactoryOptions = self.choice_options \
-            if self.choice_options else ChoicePrompt._default_choice_options[culture]
+        choice_options: ChoiceFactoryOptions = self.choice_options if self.choice_options else ChoicePrompt._default_choice_options[
+            culture
+        ]
         choice_style = options.style if options.style else self.style
 
         if is_retry and options.retry_prompt is not None:

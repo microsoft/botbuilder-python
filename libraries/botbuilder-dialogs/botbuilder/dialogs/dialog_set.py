@@ -62,7 +62,9 @@ class DialogSet:
                 "DialogSet.CreateContextAsync(): DialogSet created with a null IStatePropertyAccessor."
             )
 
-        state = await self._dialog_state.get(turn_context, lambda: DialogState())  # pylint: disable=unnecessary-lambda
+        state = await self._dialog_state.get(
+            turn_context, lambda: DialogState()
+        )  # pylint: disable=unnecessary-lambda
 
         return DialogContext(self, turn_context, state)
 

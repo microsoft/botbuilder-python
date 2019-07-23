@@ -20,8 +20,9 @@ class ConversationState(BotState):
         channel_id = turn_context.activity.channel_id or self.__raise_type_error(
             "invalid activity-missing channel_id"
         )
-        conversation_id = turn_context.activity.conversation.id or self.__raise_type_error(
-            "invalid activity-missing conversation.id"
+        conversation_id = (
+            turn_context.activity.conversation.id
+            or self.__raise_type_error("invalid activity-missing conversation.id")
         )
 
         storage_key = None

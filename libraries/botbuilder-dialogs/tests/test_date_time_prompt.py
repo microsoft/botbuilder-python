@@ -50,6 +50,4 @@ class DatetimePromptTests(aiounittest.AsyncTestCase):
         tf2 = await test_flow.send("hello")
         tf3 = await tf2.assert_reply("What date would you like?")
         tf4 = await tf3.send("5th December 2018 at 9am")
-        await tf4.assert_reply(
-            "Timex: '2018-12-05T09' Value: '2018-12-05 09:00:00'"
-        )
+        await tf4.assert_reply("Timex: '2018-12-05T09' Value: '2018-12-05 09:00:00'")

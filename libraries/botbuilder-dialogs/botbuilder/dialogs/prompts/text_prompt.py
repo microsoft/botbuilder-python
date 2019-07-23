@@ -10,7 +10,6 @@ from .prompt_recognizer_result import PromptRecognizerResult
 
 
 class TextPrompt(Prompt):
-
     async def on_prompt(
         self,
         turn_context: TurnContext,

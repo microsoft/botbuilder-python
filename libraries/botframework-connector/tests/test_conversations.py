@@ -5,8 +5,17 @@ import asyncio
 import pytest
 from azure_devtools.scenario_tests import ReplayableTest
 
-from botbuilder.schema import (Activity, ActivityTypes, Attachment, AttachmentLayoutTypes, CardImage,
-                               ChannelAccount, ConversationParameters, ErrorResponseException, HeroCard)
+from botbuilder.schema import (
+    Activity,
+    ActivityTypes,
+    Attachment,
+    AttachmentLayoutTypes,
+    CardImage,
+    ChannelAccount,
+    ConversationParameters,
+    ErrorResponseException,
+    HeroCard,
+)
 from botframework.connector import ConnectorClient
 from botframework.connector.auth import MicrosoftAppCredentials
 

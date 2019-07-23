@@ -1,27 +1,16 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-<<<<<<< HEAD
 # TODO delete client lines below when Active Learning is fully
 from aiohttp import ClientSession, ClientTimeout, ClientResponse
-=======
-from copy import copy
-import json
-import platform
-from typing import Dict, NamedTuple, Union
->>>>>>> 0bfda9eaa7eefd628ddd2540a4632852374501da
 
-from aiohttp import ClientSession, ClientTimeout, ClientResponse
 from botbuilder.schema import Activity
 from botbuilder.core import BotTelemetryClient, NullTelemetryClient, TurnContext
-<<<<<<< HEAD
 from copy import copy
 
 # TODO after porting Active Learning, delete import json, platform, requests
 import json, platform, requests
 from typing import Dict, List, NamedTuple, Union
-=======
->>>>>>> 0bfda9eaa7eefd628ddd2540a4632852374501da
 
 from .query_result import QueryResult
 from .qnamaker_endpoint import QnAMakerEndpoint
