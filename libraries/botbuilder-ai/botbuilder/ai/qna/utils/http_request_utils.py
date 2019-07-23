@@ -3,7 +3,6 @@
 
 import json, platform, requests
 from aiohttp import ClientResponse, ClientSession, ClientTimeout
-from typing import Union
 
 # TODO fix importing title and version -- try ...about if ... doesn't work
 from ... import __title__, __version__
@@ -14,15 +13,15 @@ from ..qnamaker_endpoint import QnAMakerEndpoint
 class HttpRequestUtils:
     """ HTTP request utils class. """
 
-    def __init__(self, http_client: Union[ClientSession, object]):
+    def __init__(self, http_client: ClientSession):
         self._http_client = http_client
 
     async def execute_http_request(
         self,
         request_url: str,
-        question: object,
+        payload_body: object,
         endpoint: QnAMakerEndpoint,
-        timeout: float,
+        timeout: float = None,
     ) -> ClientResponse:
         """
         Execute HTTP request.
@@ -36,14 +35,14 @@ class HttpRequestUtils:
 
         endpoint: QnA Maker endpoint details.
 
-        timeout: Timeout for HTTP call.
+        timeout: Timeout for HTTP call (milliseconds).
         """
         if not request_url:
             raise TypeError(
                 "HttpRequestUtils.execute_http_request(): request_url cannot be None."
             )
 
-        if not question:
+        if not payload_body:
             raise TypeError(
                 "HttpRequestUtils.execute_http_request(): question cannot be None."
             )
@@ -53,25 +52,28 @@ class HttpRequestUtils:
                 "HttpRequestUtils.execute_http_request(): endpoint cannot be None."
             )
 
-        if not timeout:
-            raise TypeError(
-                "HttpRequestUtils.execute_http_request(): timeout cannot be None."
-            )
-
-        serialized_payload_body = json.dumps(question)
+        serialized_payload_body = json.dumps(payload_body)
 
         headers = self._get_headers(endpoint)
 
-        # Convert miliseconds to seconds (as other BotBuilder SDKs accept timeout value in miliseconds)
-        # aiohttp.ClientSession units are in seconds
-        request_timeout = ClientTimeout(total=timeout / 1000)
+        if timeout:
+            # Convert miliseconds to seconds (as other BotBuilder SDKs accept timeout value in miliseconds)
+            # aiohttp.ClientSession units are in seconds
+            request_timeout = ClientTimeout(total=timeout / 1000)
 
-        response: ClientResponse = await self._http_client.post(
-            request_url,
-            data=serialized_payload_body,
-            headers=headers,
-            timeout=request_timeout,
-        )
+            response: ClientResponse = await self._http_client.post(
+                request_url,
+                data=serialized_payload_body,
+                headers=headers,
+                timeout=request_timeout,
+            )
+        else:
+            response: ClientResponse = await self._http_client.post(
+                request_url,
+                data=serialized_payload_body,
+                headers=headers,
+            )
+
 
         return response
 

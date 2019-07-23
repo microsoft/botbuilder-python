@@ -65,10 +65,11 @@ class GenerateAnswerUtils:
             )
 
         hydrated_options = self._hydrate_options(options)
+        self._validate_options(hydrated_options)
 
         result: List[QueryResult] = self._query_qna_service(context, hydrated_options)
 
-        # TODO emit trace info
+        await self._emit_trace_info(context, result, hydrated_options)
 
         return result
 
@@ -142,8 +143,6 @@ class GenerateAnswerUtils:
         )
 
         result: List[QueryResult] = await self._format_qna_result(response, options)
-
-        await self._emit_trace_info(context, result, options)
 
         return result
 
