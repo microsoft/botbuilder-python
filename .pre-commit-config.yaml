@@ -7,3 +7,4 @@ repos:
         files: libraries
         args: [--rcfile=.pylintrc]
         always_run: true
+        verbose: true
