@@ -172,16 +172,8 @@ class ActivityPrompt(Dialog, ABC):
             options.prompt.input_hint = InputHints.expecting_input
             await context.send_activity(options.prompt)
 
-<<<<<<< HEAD
-    async def on_recognize(
-        self,
-        context: TurnContext,
-        state: Dict[str, object],
-        options: PromptOptions,  # pylint: disable=unused-argument
-=======
     async def on_recognize(  # pylint: disable=unused-argument
         self, context: TurnContext, state: Dict[str, object], options: PromptOptions
->>>>>>> 6cc2e000be86f67297d21128216a763ba0f4ad78
     ) -> PromptRecognizerResult:
 
         result = PromptRecognizerResult()

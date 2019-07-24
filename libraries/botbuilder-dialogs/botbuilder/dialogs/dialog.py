@@ -63,16 +63,8 @@ class Dialog(ABC):
         # By default just end the current dialog.
         return await dialog_context.end_dialog(None)
 
-<<<<<<< HEAD
-    async def resume_dialog(
-        self,
-        dialog_context: "DialogContext",
-        reason: DialogReason,
-        result: object,  # pylint: disable=unused-argument
-=======
     async def resume_dialog(  # pylint: disable=unused-argument
         self, dialog_context: "DialogContext", reason: DialogReason, result: object
->>>>>>> 6cc2e000be86f67297d21128216a763ba0f4ad78
     ):
         """
         Method called when an instance of the dialog is being returned to from another

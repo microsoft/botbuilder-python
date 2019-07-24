@@ -296,15 +296,9 @@ class CosmosDbStorage(Storage):
             self.database = self._get_or_create_database(self.client, db_id)
             self.container = self._get_or_create_container(self.client, container_name)
 
-<<<<<<< HEAD
-    def _get_or_create_database(
-        self, doc_client, id
-    ) -> str:  # pylint: disable=invalid-name
-=======
     def _get_or_create_database(  # pylint: disable=invalid-name
         self, doc_client, id
     ) -> str:
->>>>>>> 6cc2e000be86f67297d21128216a763ba0f4ad78
         """Return the database link.
 
         Check if the database exists or create the database.

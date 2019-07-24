@@ -120,13 +120,7 @@ class ConfirmPrompt(Prompt):
             message = turn_context.activity
             culture = self.determine_culture(turn_context.activity)
             # TODO: Port ChoiceRecognizer
-<<<<<<< HEAD
-            results = ChoiceRecognizer.recognize_boolean(
-                message.text, culture
-            )  # pylint: disable=undefined-variable
-=======
             results = ChoiceRecognizer.recognize_boolean(message.text, culture)
->>>>>>> 6cc2e000be86f67297d21128216a763ba0f4ad78
             if results.Count > 0:
                 first = results[0]
                 if "value" in first.Resolution:

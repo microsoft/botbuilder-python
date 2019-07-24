@@ -343,13 +343,7 @@ class TestBotState(aiounittest.AsyncTestCase):
             # read initial state object
             await bot_state_manager.load(context)
 
-<<<<<<< HEAD
-            custom_state = await test_property.get(
-                context, lambda: CustomState()
-            )  # pylint: disable=unnecessary-lambda
-=======
             custom_state = await test_property.get(context, lambda: CustomState())
->>>>>>> 6cc2e000be86f67297d21128216a763ba0f4ad78
 
             # this should be a 'CustomState' as nothing is currently stored in storage
             assert isinstance(custom_state, CustomState)

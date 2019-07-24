@@ -35,15 +35,9 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
         self.assertEqual(type(dialog.telemetry_client), NullTelemetryClient)
 
     @patch("botbuilder.applicationinsights.ApplicationInsightsTelemetryClient")
-<<<<<<< HEAD
-    async def test_execute_sequence_waterfall_steps(
-        self, MockTelemetry
-    ):  # pylint: disable=invalid-name
-=======
     async def test_execute_sequence_waterfall_steps(  # pylint: disable=invalid-name
         self, MockTelemetry
     ):
->>>>>>> 6cc2e000be86f67297d21128216a763ba0f4ad78
         # arrange
 
         # Create new ConversationState with MemoryStorage and register the state as middleware.

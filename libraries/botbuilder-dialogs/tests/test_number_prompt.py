@@ -16,13 +16,7 @@ class NumberPromptTests(aiounittest.AsyncTestCase):
     def test_empty_should_fail(self):
         # pylint: disable=no-value-for-parameter
         empty_id = ""
-<<<<<<< HEAD
-        self.assertRaises(
-            TypeError, lambda: NumberPrompt(empty_id)
-        )  # pylint: disable=no-value-for-parameter
-=======
         self.assertRaises(TypeError, lambda: NumberPrompt(empty_id))
->>>>>>> 6cc2e000be86f67297d21128216a763ba0f4ad78
 
     async def test_number_prompt(self):
         # Create new ConversationState with MemoryStorage and register the state as middleware.

@@ -110,7 +110,6 @@ class TestBotContext(aiounittest.AsyncTestCase):
         assert new_context.adapter == old_adapter
         assert new_context.activity == old_activity
         assert new_context.responded is True
-<<<<<<< HEAD
         assert (
             len(new_context._on_send_activities) == 1
         )  # pylint: disable=protected-access
@@ -120,11 +119,6 @@ class TestBotContext(aiounittest.AsyncTestCase):
         assert (
             len(new_context._on_delete_activity) == 1
         )  # pylint: disable=protected-access
-=======
-        assert len(new_context._on_send_activities) == 1
-        assert len(new_context._on_update_activity) == 1
-        assert len(new_context._on_delete_activity) == 1
->>>>>>> 6cc2e000be86f67297d21128216a763ba0f4ad78
 
     def test_responded_should_be_automatically_set_to_false(self):
         context = TurnContext(SimpleAdapter(), ACTIVITY)
