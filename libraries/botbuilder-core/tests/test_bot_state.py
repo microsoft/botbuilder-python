@@ -394,12 +394,7 @@ class TestBotState(aiounittest.AsyncTestCase):
         bot_state1 = ConversationState(storage)
         (
             await bot_state1.create_property("test-name").get(
-<<<<<<< HEAD
-                turn_context,
-                lambda: TestPocoState(),  # pylint: disable=unnecessary-lambda
-=======
                 turn_context, lambda: TestPocoState()
->>>>>>> 6cc2e000be86f67297d21128216a763ba0f4ad78
             )
         ).value = "test-value"
         await bot_state1.save_changes(turn_context)
@@ -408,14 +403,7 @@ class TestBotState(aiounittest.AsyncTestCase):
         bot_state2 = ConversationState(storage)
         value1 = (
             await bot_state2.create_property("test-name").get(
-<<<<<<< HEAD
-                turn_context,
-                lambda: TestPocoState(
-                    value="default-value"
-                ),  # pylint: disable=unnecessary-lambda
-=======
                 turn_context, lambda: TestPocoState(value="default-value")
->>>>>>> 6cc2e000be86f67297d21128216a763ba0f4ad78
             )
         ).value
 
@@ -430,14 +418,7 @@ class TestBotState(aiounittest.AsyncTestCase):
         bot_state4 = ConversationState(storage)
         value2 = (
             await bot_state4.create_property("test-name").get(
-<<<<<<< HEAD
-                turn_context,
-                lambda: TestPocoState(
-                    value="default-value"
-                ),  # pylint: disable=unnecessary-lambda
-=======
                 turn_context, lambda: TestPocoState(value="default-value")
->>>>>>> 6cc2e000be86f67297d21128216a763ba0f4ad78
             )
         ).value
 
@@ -454,12 +435,7 @@ class TestBotState(aiounittest.AsyncTestCase):
         bot_state1 = ConversationState(storage)
         (
             await bot_state1.create_property("test-name").get(
-<<<<<<< HEAD
-                turn_context,
-                lambda: TestPocoState(),  # pylint: disable=unnecessary-lambda
-=======
                 turn_context, lambda: TestPocoState()
->>>>>>> 6cc2e000be86f67297d21128216a763ba0f4ad78
             )
         ).value = "test-value"
         await bot_state1.save_changes(turn_context)
@@ -468,14 +444,7 @@ class TestBotState(aiounittest.AsyncTestCase):
         bot_state2 = ConversationState(storage)
         value1 = (
             await bot_state2.create_property("test-name").get(
-<<<<<<< HEAD
-                turn_context,
-                lambda: TestPocoState(
-                    value="default-value"
-                ),  # pylint: disable=unnecessary-lambda
-=======
                 turn_context, lambda: TestPocoState(value="default-value")
->>>>>>> 6cc2e000be86f67297d21128216a763ba0f4ad78
             )
         ).value
 
@@ -489,14 +458,7 @@ class TestBotState(aiounittest.AsyncTestCase):
         bot_state4 = ConversationState(storage)
         value2 = (
             await bot_state4.create_property("test-name").get(
-<<<<<<< HEAD
-                turn_context,
-                lambda: TestPocoState(
-                    value="default-value"
-                ),  # pylint: disable=unnecessary-lambda
-=======
                 turn_context, lambda: TestPocoState(value="default-value")
->>>>>>> 6cc2e000be86f67297d21128216a763ba0f4ad78
             )
         ).value
 
@@ -512,12 +474,7 @@ class TestBotState(aiounittest.AsyncTestCase):
         conversation_state = ConversationState(storage)
         (
             await conversation_state.create_property("test-name").get(
-<<<<<<< HEAD
-                turn_context,
-                lambda: TestPocoState(),  # pylint: disable=unnecessary-lambda
-=======
                 turn_context, lambda: TestPocoState()
->>>>>>> 6cc2e000be86f67297d21128216a763ba0f4ad78
             )
         ).value = "test-value"
 
