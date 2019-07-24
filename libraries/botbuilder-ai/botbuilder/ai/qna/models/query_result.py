@@ -16,7 +16,7 @@ class QueryResult:
         score: float,
         metadata: object = None,
         source: str = None,
-        id: int = None,
+        id: int = None,  # pylint: disable=invalid-name
         context: object = None,
     ):
         """
@@ -40,7 +40,7 @@ class QueryResult:
         self.score = score
         self.metadata = list(map(lambda meta: Metadata(**meta), metadata))
         self.source = source
-        self.id = id
+        self.id = id  # pylint: disable=invalid-name
 
-        # (preview) multi-turn
+        # QnA Maker Preview Multi-Turn Feature
         self.context = context
