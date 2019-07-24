@@ -48,7 +48,7 @@ AUTH_TOKEN = LOOP.run_until_complete(get_auth_token())
 
 
 class ConversationTest(ReplayableTest):
-    def __init__(self, method_name):
+    def __init__(self, method_name):  # pylint: disable=useless-super-delegation
         super(ConversationTest, self).__init__(method_name)
 
     @property

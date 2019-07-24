@@ -55,6 +55,7 @@ class DialogSet:
         return self
 
     async def create_context(self, turn_context: TurnContext) -> DialogContext:
+        # pylint: disable=unnecessary-lambda
         BotAssert.context_not_none(turn_context)
 
         if not self._dialog_state:
@@ -62,9 +63,13 @@ class DialogSet:
                 "DialogSet.CreateContextAsync(): DialogSet created with a null IStatePropertyAccessor."
             )
 
+<<<<<<< HEAD
         state = await self._dialog_state.get(
             turn_context, lambda: DialogState()
         )  # pylint: disable=unnecessary-lambda
+=======
+        state = await self._dialog_state.get(turn_context, lambda: DialogState())
+>>>>>>> 6cc2e000be86f67297d21128216a763ba0f4ad78
 
         return DialogContext(self, turn_context, state)
 

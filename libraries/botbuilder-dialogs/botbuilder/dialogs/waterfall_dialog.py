@@ -98,11 +98,16 @@ class WaterfallDialog(Dialog):
             dialog_context, state[self.StepIndex] + 1, reason, result
         )
 
+<<<<<<< HEAD
     async def end_dialog(
         self,
         context: TurnContext,
         instance: DialogInstance,
         reason: DialogReason,  # pylint: disable=unused-argument
+=======
+    async def end_dialog(  # pylint: disable=unused-argument
+        self, context: TurnContext, instance: DialogInstance, reason: DialogReason
+>>>>>>> 6cc2e000be86f67297d21128216a763ba0f4ad78
     ) -> None:
         if reason is DialogReason.CancelCalled:
             index = instance.state[self.StepIndex]

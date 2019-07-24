@@ -35,9 +35,15 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
         self.assertEqual(type(dialog.telemetry_client), NullTelemetryClient)
 
     @patch("botbuilder.applicationinsights.ApplicationInsightsTelemetryClient")
+<<<<<<< HEAD
     async def test_execute_sequence_waterfall_steps(
         self, MockTelemetry
     ):  # pylint: disable=invalid-name
+=======
+    async def test_execute_sequence_waterfall_steps(  # pylint: disable=invalid-name
+        self, MockTelemetry
+    ):
+>>>>>>> 6cc2e000be86f67297d21128216a763ba0f4ad78
         # arrange
 
         # Create new ConversationState with MemoryStorage and register the state as middleware.
@@ -154,9 +160,14 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
     def assert_telemetry_call(
         self, telemetry_mock, index: int, event_name: str, props: Dict[str, str]
     ) -> None:
+<<<<<<< HEAD
         args, kwargs = telemetry_mock.track_event.call_args_list[
             index
         ]  # pylint: disable=unused-variable
+=======
+        # pylint: disable=unused-variable
+        args, kwargs = telemetry_mock.track_event.call_args_list[index]
+>>>>>>> 6cc2e000be86f67297d21128216a763ba0f4ad78
         self.assertEqual(args[0], event_name)
 
         for key, val in props.items():

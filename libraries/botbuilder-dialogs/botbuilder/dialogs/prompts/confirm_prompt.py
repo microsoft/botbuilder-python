@@ -110,6 +110,7 @@ class ConfirmPrompt(Prompt):
         state: Dict[str, object],
         options: PromptOptions,
     ) -> PromptRecognizerResult:
+        # pylint: disable=undefined-variable
         if not turn_context:
             raise TypeError("ConfirmPrompt.on_prompt(): turn_context cannot be None.")
 
@@ -119,9 +120,13 @@ class ConfirmPrompt(Prompt):
             message = turn_context.activity
             culture = self.determine_culture(turn_context.activity)
             # TODO: Port ChoiceRecognizer
+<<<<<<< HEAD
             results = ChoiceRecognizer.recognize_boolean(
                 message.text, culture
             )  # pylint: disable=undefined-variable
+=======
+            results = ChoiceRecognizer.recognize_boolean(message.text, culture)
+>>>>>>> 6cc2e000be86f67297d21128216a763ba0f4ad78
             if results.Count > 0:
                 first = results[0]
                 if "value" in first.Resolution:
@@ -148,7 +153,7 @@ class ConfirmPrompt(Prompt):
                     )
                     choices = {confirm_choices[0], confirm_choices[1]}
                     # TODO: Port ChoiceRecognizer
-                    second_attempt_results = ChoiceRecognizers.recognize_choices(  # pylint: disable=undefined-variable
+                    second_attempt_results = ChoiceRecognizers.recognize_choices(
                         message.text, choices
                     )
                     if second_attempt_results:

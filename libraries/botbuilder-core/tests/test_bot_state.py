@@ -336,15 +336,20 @@ class TestBotState(aiounittest.AsyncTestCase):
 
     async def test_state_use_bot_state_directly(self):
         async def exec_test(context: TurnContext):
+            # pylint: disable=unnecessary-lambda
             bot_state_manager = BotStateForTest(MemoryStorage())
             test_property = bot_state_manager.create_property("test")
 
             # read initial state object
             await bot_state_manager.load(context)
 
+<<<<<<< HEAD
             custom_state = await test_property.get(
                 context, lambda: CustomState()
             )  # pylint: disable=unnecessary-lambda
+=======
+            custom_state = await test_property.get(context, lambda: CustomState())
+>>>>>>> 6cc2e000be86f67297d21128216a763ba0f4ad78
 
             # this should be a 'CustomState' as nothing is currently stored in storage
             assert isinstance(custom_state, CustomState)
@@ -385,6 +390,7 @@ class TestBotState(aiounittest.AsyncTestCase):
             await test_property.get(context)
 
     async def test_clear_and_save(self):
+        # pylint: disable=unnecessary-lambda
         turn_context = TestUtilities.create_empty_context()
         turn_context.activity.conversation = ConversationAccount(id="1234")
 
@@ -394,8 +400,12 @@ class TestBotState(aiounittest.AsyncTestCase):
         bot_state1 = ConversationState(storage)
         (
             await bot_state1.create_property("test-name").get(
+<<<<<<< HEAD
                 turn_context,
                 lambda: TestPocoState(),  # pylint: disable=unnecessary-lambda
+=======
+                turn_context, lambda: TestPocoState()
+>>>>>>> 6cc2e000be86f67297d21128216a763ba0f4ad78
             )
         ).value = "test-value"
         await bot_state1.save_changes(turn_context)
@@ -404,10 +414,14 @@ class TestBotState(aiounittest.AsyncTestCase):
         bot_state2 = ConversationState(storage)
         value1 = (
             await bot_state2.create_property("test-name").get(
+<<<<<<< HEAD
                 turn_context,
                 lambda: TestPocoState(
                     value="default-value"
                 ),  # pylint: disable=unnecessary-lambda
+=======
+                turn_context, lambda: TestPocoState(value="default-value")
+>>>>>>> 6cc2e000be86f67297d21128216a763ba0f4ad78
             )
         ).value
 
@@ -422,16 +436,21 @@ class TestBotState(aiounittest.AsyncTestCase):
         bot_state4 = ConversationState(storage)
         value2 = (
             await bot_state4.create_property("test-name").get(
+<<<<<<< HEAD
                 turn_context,
                 lambda: TestPocoState(
                     value="default-value"
                 ),  # pylint: disable=unnecessary-lambda
+=======
+                turn_context, lambda: TestPocoState(value="default-value")
+>>>>>>> 6cc2e000be86f67297d21128216a763ba0f4ad78
             )
         ).value
 
         assert value2, "default-value"
 
     async def test_bot_state_delete(self):
+        # pylint: disable=unnecessary-lambda
         turn_context = TestUtilities.create_empty_context()
         turn_context.activity.conversation = ConversationAccount(id="1234")
 
@@ -441,8 +460,12 @@ class TestBotState(aiounittest.AsyncTestCase):
         bot_state1 = ConversationState(storage)
         (
             await bot_state1.create_property("test-name").get(
+<<<<<<< HEAD
                 turn_context,
                 lambda: TestPocoState(),  # pylint: disable=unnecessary-lambda
+=======
+                turn_context, lambda: TestPocoState()
+>>>>>>> 6cc2e000be86f67297d21128216a763ba0f4ad78
             )
         ).value = "test-value"
         await bot_state1.save_changes(turn_context)
@@ -451,10 +474,14 @@ class TestBotState(aiounittest.AsyncTestCase):
         bot_state2 = ConversationState(storage)
         value1 = (
             await bot_state2.create_property("test-name").get(
+<<<<<<< HEAD
                 turn_context,
                 lambda: TestPocoState(
                     value="default-value"
                 ),  # pylint: disable=unnecessary-lambda
+=======
+                turn_context, lambda: TestPocoState(value="default-value")
+>>>>>>> 6cc2e000be86f67297d21128216a763ba0f4ad78
             )
         ).value
 
@@ -468,16 +495,21 @@ class TestBotState(aiounittest.AsyncTestCase):
         bot_state4 = ConversationState(storage)
         value2 = (
             await bot_state4.create_property("test-name").get(
+<<<<<<< HEAD
                 turn_context,
                 lambda: TestPocoState(
                     value="default-value"
                 ),  # pylint: disable=unnecessary-lambda
+=======
+                turn_context, lambda: TestPocoState(value="default-value")
+>>>>>>> 6cc2e000be86f67297d21128216a763ba0f4ad78
             )
         ).value
 
         assert value2 == "default-value"
 
     async def test_bot_state_get(self):
+        # pylint: disable=unnecessary-lambda
         turn_context = TestUtilities.create_empty_context()
         turn_context.activity.conversation = ConversationAccount(id="1234")
 
@@ -486,8 +518,12 @@ class TestBotState(aiounittest.AsyncTestCase):
         conversation_state = ConversationState(storage)
         (
             await conversation_state.create_property("test-name").get(
+<<<<<<< HEAD
                 turn_context,
                 lambda: TestPocoState(),  # pylint: disable=unnecessary-lambda
+=======
+                turn_context, lambda: TestPocoState()
+>>>>>>> 6cc2e000be86f67297d21128216a763ba0f4ad78
             )
         ).value = "test-value"
 

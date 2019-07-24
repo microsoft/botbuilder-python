@@ -87,9 +87,15 @@ class Channel:
         return not channel_id == Channels.cortana
 
     @staticmethod
+<<<<<<< HEAD
     def max_action_title_length(
         channel_id: str
     ) -> int:  # pylint: disable=unused-argument
+=======
+    def max_action_title_length(  # pylint: disable=unused-argument
+        channel_id: str
+    ) -> int:
+>>>>>>> 6cc2e000be86f67297d21128216a763ba0f4ad78
         """Maximum length allowed for Action Titles.
 
         Args:

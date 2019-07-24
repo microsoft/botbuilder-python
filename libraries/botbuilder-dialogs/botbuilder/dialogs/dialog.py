@@ -63,11 +63,16 @@ class Dialog(ABC):
         # By default just end the current dialog.
         return await dialog_context.end_dialog(None)
 
+<<<<<<< HEAD
     async def resume_dialog(
         self,
         dialog_context: "DialogContext",
         reason: DialogReason,
         result: object,  # pylint: disable=unused-argument
+=======
+    async def resume_dialog(  # pylint: disable=unused-argument
+        self, dialog_context: "DialogContext", reason: DialogReason, result: object
+>>>>>>> 6cc2e000be86f67297d21128216a763ba0f4ad78
     ):
         """
         Method called when an instance of the dialog is being returned to from another
@@ -85,9 +90,15 @@ class Dialog(ABC):
         return await dialog_context.end_dialog(result)
 
     # TODO: instance is DialogInstance
+<<<<<<< HEAD
     async def reprompt_dialog(
         self, context: TurnContext, instance: DialogInstance
     ):  # pylint: disable=unused-argument
+=======
+    async def reprompt_dialog(  # pylint: disable=unused-argument
+        self, context: TurnContext, instance: DialogInstance
+    ):
+>>>>>>> 6cc2e000be86f67297d21128216a763ba0f4ad78
         """
         :param context:
         :param instance:
@@ -97,11 +108,16 @@ class Dialog(ABC):
         return
 
     # TODO: instance is DialogInstance
+<<<<<<< HEAD
     async def end_dialog(
         self,
         context: TurnContext,
         instance: DialogInstance,
         reason: DialogReason,  # pylint: disable=unused-argument
+=======
+    async def end_dialog(  # pylint: disable=unused-argument
+        self, context: TurnContext, instance: DialogInstance, reason: DialogReason
+>>>>>>> 6cc2e000be86f67297d21128216a763ba0f4ad78
     ):
         """
         :param context:
