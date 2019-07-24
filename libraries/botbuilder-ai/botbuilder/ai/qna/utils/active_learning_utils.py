@@ -4,7 +4,7 @@
 import math
 
 from typing import List
-from ..query_result import QueryResult
+from ..models import QueryResult
 
 MINIMUM_SCORE_FOR_LOW_SCORE_VARIATION = 20.0
 PREVIOUS_LOW_SCORE_VARIATION_MULTIPLIER = 1.4

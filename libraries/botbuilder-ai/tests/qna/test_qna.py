@@ -11,14 +11,10 @@ from unittest.mock import patch
 from aiohttp import ClientSession
 
 import aiounittest
-from botbuilder.ai.qna import (
-    Metadata,
-    QnAMakerEndpoint,
-    QnAMaker,
-    QnAMakerOptions,
-    QnATelemetryConstants,
-    QueryResult,
-)
+from botbuilder.ai.qna import QnAMakerEndpoint, QnAMaker, QnAMakerOptions
+from botbuilder.ai.qna.models import Metadata, QueryResult
+from botbuilder.ai.qna.utils import QnATelemetryConstants
+
 from botbuilder.core import BotAdapter, BotTelemetryClient, TurnContext
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.schema import (
@@ -113,13 +109,13 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         )
         v4_qna = QnAMaker(nonlegacy_endpoint)
 
-        self.assertEqual(is_legacy, legacy_qna._is_legacy_protocol)
-        self.assertNotEqual(is_legacy, v4_qna._is_legacy_protocol)
+        self.assertEqual(is_legacy, legacy_qna._endpoint.host.endswith("v3.0"))
+        self.assertNotEqual(is_legacy, v4_qna._endpoint.host.endswith("v3.0"))
 
     def test_set_default_options_with_no_options_arg(self):
         qna_without_options = QnAMaker(self.tests_endpoint)
 
-        options = qna_without_options._options
+        options = qna_without_options._generate_answer_helper.options
 
         default_threshold = 0.3
         default_top = 1
@@ -138,7 +134,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         )
 
         qna_with_options = QnAMaker(self.tests_endpoint, options)
-        actual_options = qna_with_options._options
+        actual_options = qna_with_options._generate_answer_helper.options
 
         expected_threshold = 0.8
         expected_timeout = 9000
@@ -170,7 +166,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         self.assertEqual(1, len(result))
         self.assertEqual(
             "BaseCamp: You can use a damp rag to clean around the Power Pack",
-            first_answer.answer[0],
+            first_answer.answer,
         )
 
     async def test_returns_answer_using_options(self):
@@ -190,14 +186,14 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
 
         first_answer = result[0]
         has_at_least_1_ans = True
-        first_metadata = first_answer.metadata[0][0]
+        first_metadata = first_answer.metadata[0]
 
         # Assert
         self.assertIsNotNone(result)
         self.assertEqual(has_at_least_1_ans, len(result) >= 1)
         self.assertTrue(first_answer.answer[0])
-        self.assertEqual("is a movie", first_answer.answer[0])
-        self.assertTrue(first_answer.score[0] >= options.score_threshold)
+        self.assertEqual("is a movie", first_answer.answer)
+        self.assertTrue(first_answer.score >= options.score_threshold)
         self.assertEqual("movie", first_metadata.name)
         self.assertEqual("disney", first_metadata.value)
 
@@ -242,7 +238,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
             self.assertEqual(True, hasattr(trace_activity.value, "top"))
             self.assertEqual(True, hasattr(trace_activity.value, "strict_filters"))
             self.assertEqual(
-                self._knowledge_base_id, trace_activity.value.knowledge_base_id[0]
+                self._knowledge_base_id, trace_activity.value.knowledge_base_id
             )
 
             return result
@@ -261,7 +257,9 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
             result = await qna.get_answers(context, options)
 
             self.assertIsNotNone(result)
-            self.assertEqual(options.timeout, qna._options.timeout)
+            self.assertEqual(
+                options.timeout, qna._generate_answer_helper.options.timeout
+            )
 
     async def test_telemetry_returns_answer(self):
         # Arrange
@@ -289,7 +287,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
             number_of_args = len(telemetry_args)
             first_answer = telemetry_args["properties"][
                 QnATelemetryConstants.answer_property
-            ][0]
+            ]
             expected_answer = (
                 "BaseCamp: You can use a damp rag to clean around the Power Pack"
             )
@@ -306,12 +304,12 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
             self.assertTrue("articleFound" in telemetry_properties)
             self.assertEqual(expected_answer, first_answer)
             self.assertTrue("score" in telemetry_metrics)
-            self.assertEqual(1, telemetry_metrics["score"][0])
+            self.assertEqual(1, telemetry_metrics["score"])
 
             # Assert - Validate we didn't break QnA functionality.
             self.assertIsNotNone(results)
             self.assertEqual(1, len(results))
-            self.assertEqual(expected_answer, results[0].answer[0])
+            self.assertEqual(expected_answer, results[0].answer)
             self.assertEqual("Editorial", results[0].source)
 
     async def test_telemetry_returns_answer_when_no_answer_found_in_kb(self):
@@ -388,7 +386,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
             number_of_args = len(telemetry_args)
             first_answer = telemetry_args["properties"][
                 QnATelemetryConstants.answer_property
-            ][0]
+            ]
             expected_answer = (
                 "BaseCamp: You can use a damp rag to clean around the Power Pack"
             )
@@ -405,12 +403,12 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
             self.assertTrue("articleFound" in telemetry_properties)
             self.assertEqual(expected_answer, first_answer)
             self.assertTrue("score" in telemetry_metrics)
-            self.assertEqual(1, telemetry_metrics["score"][0])
+            self.assertEqual(1, telemetry_metrics["score"])
 
             # Assert - Validate we didn't break QnA functionality.
             self.assertIsNotNone(results)
             self.assertEqual(1, len(results))
-            self.assertEqual(expected_answer, results[0].answer[0])
+            self.assertEqual(expected_answer, results[0].answer)
             self.assertEqual("Editorial", results[0].source)
 
     async def test_telemetry_override(self):
@@ -467,7 +465,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
             # Validate we didn't break QnA functionality.
             self.assertIsNotNone(results)
             self.assertEqual(1, len(results))
-            self.assertEqual(expected_answer, results[0].answer[0])
+            self.assertEqual(expected_answer, results[0].answer)
             self.assertEqual("Editorial", results[0].source)
 
     async def test_telemetry_additional_props_metrics(self):
@@ -515,7 +513,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
             self.assertTrue("matchedQuestion" in telemetry_properties)
             self.assertTrue("questionId" in telemetry_properties)
             self.assertTrue("answer" in telemetry_properties)
-            self.assertTrue(expected_answer, telemetry_properties["answer"][0])
+            self.assertTrue(expected_answer, telemetry_properties["answer"])
             self.assertTrue("my_important_property" in telemetry_properties)
             self.assertEqual(
                 "my_important_value", telemetry_properties["my_important_property"]
@@ -531,7 +529,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
             # Assert - Validate we didn't break QnA functionality.
             self.assertIsNotNone(results)
             self.assertEqual(1, len(results))
-            self.assertEqual(expected_answer, results[0].answer[0])
+            self.assertEqual(expected_answer, results[0].answer)
             self.assertEqual("Editorial", results[0].source)
 
     async def test_telemetry_additional_props_override(self):
@@ -588,7 +586,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
             self.assertTrue("question" not in tracked_properties)
             self.assertTrue("questionId" in tracked_properties)
             self.assertTrue("answer" in tracked_properties)
-            self.assertEqual(expected_answer, tracked_properties["answer"][0])
+            self.assertEqual(expected_answer, tracked_properties["answer"])
             self.assertTrue("my_important_property" not in tracked_properties)
             self.assertEqual(1, len(tracked_metrics))
             self.assertTrue("score" in tracked_metrics)
@@ -597,7 +595,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
             # Assert - Validate we didn't break QnA functionality.
             self.assertIsNotNone(results)
             self.assertEqual(1, len(results))
-            self.assertEqual(expected_answer, results[0].answer[0])
+            self.assertEqual(expected_answer, results[0].answer)
             self.assertEqual("Editorial", results[0].source)
 
     async def test_telemetry_fill_props_override(self):
@@ -657,7 +655,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
             self.assertEqual("my_important_value2", first_properties["matchedQuestion"])
             self.assertTrue("questionId" in first_properties)
             self.assertTrue("answer" in first_properties)
-            self.assertEqual(expected_answer, first_properties["answer"][0])
+            self.assertEqual(expected_answer, first_properties["answer"])
             self.assertTrue("articleFound" in first_properties)
             self.assertTrue("my_important_property" in first_properties)
             self.assertEqual(
@@ -671,7 +669,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
             # Assert - Validate we didn't break QnA functionality.
             self.assertIsNotNone(results)
             self.assertEqual(1, len(results))
-            self.assertEqual(expected_answer, results[0].answer[0])
+            self.assertEqual(expected_answer, results[0].answer)
             self.assertEqual("Editorial", results[0].source)
 
     @classmethod

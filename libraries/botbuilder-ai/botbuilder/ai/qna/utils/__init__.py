@@ -5,6 +5,16 @@
 # license information.
 # --------------------------------------------------------------------------
 
+from .active_learning_utils import ActiveLearningUtils
+from .generate_answer_utils import GenerateAnswerUtils
 from .http_request_utils import HttpRequestUtils
+from .qna_telemetry_constants import QnATelemetryConstants
+from .train_utils import TrainUtils
 
-__all__ = ["HttpRequestUtils"]
+__all__ = [
+    "ActiveLearningUtils",
+    "GenerateAnswerUtils",
+    "HttpRequestUtils",
+    "QnATelemetryConstants",
+    "TrainUtils",
+]

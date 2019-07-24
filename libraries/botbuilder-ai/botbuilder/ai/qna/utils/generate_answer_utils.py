@@ -3,7 +3,7 @@
 
 from aiohttp import ClientResponse, ClientSession
 from copy import copy
-from typing import List
+from typing import List, Union
 
 from botbuilder.core import BotTelemetryClient, NullTelemetryClient, TurnContext
 from botbuilder.schema import Activity
@@ -12,7 +12,7 @@ from .http_request_utils import HttpRequestUtils
 
 from ..qnamaker_endpoint import QnAMakerEndpoint
 from ..qnamaker_options import QnAMakerOptions
-from ..models import QnAMakerTraceInfo, QueryResult, QueryResults
+from ..models import QnAMakerTraceInfo, QueryResult
 
 QNAMAKER_TRACE_NAME = "QnAMaker"
 QNAMAKER_TRACE_LABEL = "QnAMaker Trace"
@@ -24,7 +24,7 @@ class GenerateAnswerUtils:
 
     def __init__(
         self,
-        telemetry_client: BotTelemetryClient,
+        telemetry_client: Union[BotTelemetryClient, NullTelemetryClient],
         endpoint: QnAMakerEndpoint,
         options: QnAMakerOptions,
         http_client: ClientSession,
@@ -67,7 +67,9 @@ class GenerateAnswerUtils:
         hydrated_options = self._hydrate_options(options)
         self._validate_options(hydrated_options)
 
-        result: List[QueryResult] = self._query_qna_service(context, hydrated_options)
+        result: List[QueryResult] = await self._query_qna_service(
+            context, hydrated_options
+        )
 
         await self._emit_trace_info(context, result, hydrated_options)
 
@@ -96,9 +98,13 @@ class GenerateAnswerUtils:
         """
         Combines QnAMakerOptions passed into the QnAMaker constructor with the options passed as arguments into get_answers().
         
-        :return: QnAMakerOptions with options passed into constructor overwritten by new options passed into get_answers()
+        return: 
+        -------
+        QnAMakerOptions with options passed into constructor overwritten by new options passed into get_answers()
 
-        :rtype: QnAMakerOptions
+        rtype:
+        ------
+        QnAMakerOptions
         """
 
         hydrated_options = copy(self.options)
