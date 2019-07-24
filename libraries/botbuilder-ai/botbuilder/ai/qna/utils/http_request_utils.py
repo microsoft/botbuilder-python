@@ -1,10 +1,11 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import json, platform, requests
+import json
+import platform
+
 from aiohttp import ClientResponse, ClientSession, ClientTimeout
 
-# TODO fix importing title and version -- try ...about if ... doesn't work
 from ... import __title__, __version__
 
 from ..qnamaker_endpoint import QnAMakerEndpoint
@@ -95,7 +96,6 @@ class HttpRequestUtils:
         uname = platform.uname()
         os_version = f"{uname.machine}-{uname.system}-{uname.version}"
         py_version = f"Python,Version={platform.python_version()}"
-        f"({os_version}; {py_version})"
         platform_user_agent = f"({os_version}; {py_version})"
         user_agent = f"{package_user_agent} {platform_user_agent}"
 

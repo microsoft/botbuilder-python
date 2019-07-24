@@ -1,9 +1,10 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from aiohttp import ClientResponse, ClientSession
 from copy import copy
 from typing import List, Union
+
+from aiohttp import ClientResponse, ClientSession
 
 from botbuilder.core import BotTelemetryClient, NullTelemetryClient, TurnContext
 from botbuilder.schema import Activity
@@ -20,7 +21,10 @@ QNAMAKER_TRACE_TYPE = "https://www.qnamaker.ai/schemas/trace"
 
 
 class GenerateAnswerUtils:
-    """ Helper class for Generate Answer API, which is used to make queries to a single QnA Maker knowledge base and return the result."""
+    """
+    Helper class for Generate Answer API, which is used to make queries to
+    a single QnA Maker knowledge base and return the result.
+    """
 
     def __init__(
         self,
@@ -40,11 +44,6 @@ class GenerateAnswerUtils:
         options: QnA Maker options to configure the instance.
 
         http_client: HTTP client.
-
-        TODO this is a potential bug in botbuilder-dotnet, where logPersonalInformation shows in the summary of parameters,
-        however the ctor doesn't actually take such parameter, nor use it
-        Verify whether or not we need this in botbuilder-python or not
-        log_personal_information: Log personal information (PII). 
         """
         self._telemetry_client = telemetry_client
         self._endpoint = endpoint
@@ -96,9 +95,9 @@ class GenerateAnswerUtils:
 
     def _hydrate_options(self, query_options: QnAMakerOptions) -> QnAMakerOptions:
         """
-        Combines QnAMakerOptions passed into the QnAMaker constructor with the options passed as arguments into get_answers().
-        
-        return: 
+        Combines QnAMakerOptions passed into the QnAMaker constructor
+        with the options passed as arguments into get_answers().
+        Return:
         -------
         QnAMakerOptions with options passed into constructor overwritten by new options passed into get_answers()
 
@@ -119,7 +118,7 @@ class GenerateAnswerUtils:
             if query_options.top != hydrated_options.top and query_options.top != 0:
                 hydrated_options.top = query_options.top
 
-            if len(query_options.strict_filters) > 0:
+            if query_options.strict_filters:
                 hydrated_options.strict_filters = query_options.strict_filters
 
             if (

@@ -2,8 +2,8 @@
 # Licensed under the MIT License.
 
 import json
-from aiohttp import ClientSession, ClientTimeout
 from typing import Dict, List, NamedTuple, Union
+from aiohttp import ClientSession, ClientTimeout
 
 from botbuilder.schema import Activity
 from botbuilder.core import BotTelemetryClient, NullTelemetryClient, TurnContext
@@ -160,9 +160,12 @@ class QnAMaker(QnAMakerTelemetryClient):
         """
         Fills the event properties and metrics for the QnaMessage event for telemetry.
 
-        return: 
+        return:
         -------
-        A tuple of event data properties and metrics that will be sent to the BotTelemetryClient.track_event() method for the QnAMessage event. The properties and metrics returned the standard properties logged with any properties passed from the get_answers() method.
+        A tuple of event data properties and metrics that will be sent to the
+        BotTelemetryClient.track_event() method for the QnAMessage event.
+        The properties and metrics returned the standard properties logged
+        with any properties passed from the get_answers() method.
 
         rtype:
         ------

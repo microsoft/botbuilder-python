@@ -3,7 +3,6 @@
 
 from typing import List
 
-from .metadata import Metadata
 from .query_result import QueryResult
 
 

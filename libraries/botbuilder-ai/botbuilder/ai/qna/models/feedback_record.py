@@ -14,7 +14,7 @@ class FeedbackRecord:
 
         user_question: User question.
 
-        qna_id: QnA ID.        
+        qna_id: QnA ID.
         """
         self.user_id = user_id
         self.user_question = user_question

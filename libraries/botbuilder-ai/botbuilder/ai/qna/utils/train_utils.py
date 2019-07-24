@@ -38,7 +38,7 @@ class TrainUtils:
         if not feedback_records:
             raise TypeError("TrainUtils.call_train(): feedback_records cannot be None.")
 
-        if not feedback_records.records or len(feedback_records.records) == 0:
+        if not feedback_records.records:
             return
 
         self.query_train(feedback_records)
