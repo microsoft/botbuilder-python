@@ -38,7 +38,11 @@ class ActiveLearningUtils:
         top_answer_score = qna_search_results[0].score * 100
         prev_score = top_answer_score
 
-        if MINIMUM_SCORE_FOR_LOW_SCORE_VARIATION < top_answer_score <= MAX_SCORE_FOR_LOW_SCORE_VARIATION:
+        if (
+            MINIMUM_SCORE_FOR_LOW_SCORE_VARIATION
+            < top_answer_score
+            <= MAX_SCORE_FOR_LOW_SCORE_VARIATION
+        ):
             filtered_qna_search_result.append(qna_search_results[0])
 
             for result in qna_search_results:
