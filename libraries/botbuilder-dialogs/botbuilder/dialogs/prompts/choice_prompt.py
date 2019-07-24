@@ -3,6 +3,7 @@
 
 from typing import Callable, Dict, List, Union
 
+from recognizers_text import Culture
 from botbuilder.core import TurnContext
 from botbuilder.dialogs.choices import (
     Choice,
@@ -12,7 +13,6 @@ from botbuilder.dialogs.choices import (
     ListStyle,
 )
 from botbuilder.schema import Activity, ActivityTypes
-from recognizers_text import Culture
 
 from .prompt import Prompt
 from .prompt_options import PromptOptions
