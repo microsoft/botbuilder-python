@@ -51,7 +51,7 @@ AUTH_TOKEN = LOOP.run_until_complete(get_auth_token())
 
 
 class AttachmentsTest(ReplayableTest):
-    def __init__(self, method_name):
+    def __init__(self, method_name):  # pylint: disable=useless-super-delegation
         super(AttachmentsTest, self).__init__(method_name)
 
     @property
@@ -127,8 +127,6 @@ class AttachmentsTest(ReplayableTest):
                 CONVERSATION_ID, attachment
             )
             attachment_id = response.id
-            connector.attachments.get_attachment(
-                attachment_id, "invalid"
-            )
+            connector.attachments.get_attachment(attachment_id, "invalid")
 
         assert "not found" in str(excinfo.value)

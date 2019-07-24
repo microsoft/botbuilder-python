@@ -110,6 +110,7 @@ class ConfirmPrompt(Prompt):
         state: Dict[str, object],
         options: PromptOptions,
     ) -> PromptRecognizerResult:
+        # pylint: disable=undefined-variable
         if not turn_context:
             raise TypeError("ConfirmPrompt.on_prompt(): turn_context cannot be None.")
 
@@ -119,7 +120,7 @@ class ConfirmPrompt(Prompt):
             message = turn_context.activity
             culture = self.determine_culture(turn_context.activity)
             # TODO: Port ChoiceRecognizer
-            results = ChoiceRecognizer.recognize_boolean(message.text, culture)  # pylint: disable=undefined-variable
+            results = ChoiceRecognizer.recognize_boolean(message.text, culture)
             if results.Count > 0:
                 first = results[0]
                 if "value" in first.Resolution:
@@ -130,7 +131,9 @@ class ConfirmPrompt(Prompt):
                 # if it was we should recognize numbers
                 defaults = self.choice_defaults[culture]
                 opts = (
-                    self.choice_options if self.choice_options is not None else defaults[2]
+                    self.choice_options
+                    if self.choice_options is not None
+                    else defaults[2]
                 )
 
                 # This logic reflects the fact that IncludeNumbers is nullable and True is the default set in
@@ -144,7 +147,7 @@ class ConfirmPrompt(Prompt):
                     )
                     choices = {confirm_choices[0], confirm_choices[1]}
                     # TODO: Port ChoiceRecognizer
-                    second_attempt_results = ChoiceRecognizers.recognize_choices(  # pylint: disable=undefined-variable
+                    second_attempt_results = ChoiceRecognizers.recognize_choices(
                         message.text, choices
                     )
                     if second_attempt_results:
@@ -154,7 +157,9 @@ class ConfirmPrompt(Prompt):
         return result
 
     def determine_culture(self, activity: Activity) -> str:
-        culture = activity.locale if activity.locale is not None else self.default_locale
+        culture = (
+            activity.locale if activity.locale is not None else self.default_locale
+        )
         if not culture or culture not in self.choice_defaults:
             culture = (
                 "English"

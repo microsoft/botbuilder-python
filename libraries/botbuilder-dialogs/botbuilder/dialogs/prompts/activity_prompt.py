@@ -126,7 +126,7 @@ class ActivityPrompt(Dialog, ABC):
 
         return Dialog.end_of_turn
 
-    async def resume_dialog(
+    async def resume_dialog(  # pylint: disable=unused-argument
         self, dialog_context: DialogContext, reason: DialogReason, result: object = None
     ):
         """
@@ -172,8 +172,8 @@ class ActivityPrompt(Dialog, ABC):
             options.prompt.input_hint = InputHints.expecting_input
             await context.send_activity(options.prompt)
 
-    async def on_recognize(
-        self, context: TurnContext, state: Dict[str, object], options: PromptOptions  # pylint: disable=unused-argument
+    async def on_recognize(  # pylint: disable=unused-argument
+        self, context: TurnContext, state: Dict[str, object], options: PromptOptions
     ) -> PromptRecognizerResult:
 
         result = PromptRecognizerResult()

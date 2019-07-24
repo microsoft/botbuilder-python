@@ -19,11 +19,7 @@ from botbuilder.ai.qna import (
     QnATelemetryConstants,
     QueryResult,
 )
-from botbuilder.core import (
-    BotAdapter,
-    BotTelemetryClient,
-    TurnContext,
-)
+from botbuilder.core import BotAdapter, BotTelemetryClient, TurnContext
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.schema import (
     Activity,
@@ -40,7 +36,9 @@ class TestContext(TurnContext):
 
         self.on_send_activities(self.capture_sent_activities)
 
-    async def capture_sent_activities(self, context: TurnContext, activities, next):  # pylint: disable=unused-argument
+    async def capture_sent_activities(
+        self, context: TurnContext, activities, next
+    ):  # pylint: disable=unused-argument
         self.sent += activities
         context.responded = True
 
@@ -722,7 +720,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         return TurnContext(test_adapter, activity)
 
     class OverrideTelemetry(QnAMaker):
-        def __init__(
+        def __init__(  # pylint: disable=useless-super-delegation
             self,
             endpoint: QnAMakerEndpoint,
             options: QnAMakerOptions,
@@ -738,10 +736,10 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
                 log_personal_information,
             )
 
-        async def on_qna_result(
+        async def on_qna_result(  # pylint: disable=unused-argument
             self,
             query_results: [QueryResult],
-            turn_context: TurnContext,  # pylint: disable=unused-argument
+            turn_context: TurnContext,
             telemetry_properties: Dict[str, str] = None,
             telemetry_metrics: Dict[str, float] = None,
         ):
@@ -762,7 +760,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
             )
 
     class OverrideFillTelemetry(QnAMaker):
-        def __init__(
+        def __init__(  # pylint: disable=useless-super-delegation
             self,
             endpoint: QnAMakerEndpoint,
             options: QnAMakerOptions,

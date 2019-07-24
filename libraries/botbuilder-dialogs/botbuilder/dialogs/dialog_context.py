@@ -151,8 +151,7 @@ class DialogContext:
             if not dialog:
                 raise Exception(
                     "DialogContext.EndDialogAsync(): Can't resume previous dialog."
-                    " A dialog with an id of '%s' wasn't found."
-                    % self.active_dialog.id
+                    " A dialog with an id of '%s' wasn't found." % self.active_dialog.id
                 )
 
             # Return result to previous dialog

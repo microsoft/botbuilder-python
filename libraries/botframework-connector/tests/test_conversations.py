@@ -5,8 +5,17 @@ import asyncio
 import pytest
 from azure_devtools.scenario_tests import ReplayableTest
 
-from botbuilder.schema import (Activity, ActivityTypes, Attachment, AttachmentLayoutTypes, CardImage,
-                               ChannelAccount, ConversationParameters, ErrorResponseException, HeroCard)
+from botbuilder.schema import (
+    Activity,
+    ActivityTypes,
+    Attachment,
+    AttachmentLayoutTypes,
+    CardImage,
+    ChannelAccount,
+    ConversationParameters,
+    ErrorResponseException,
+    HeroCard,
+)
 from botframework.connector import ConnectorClient
 from botframework.connector.auth import MicrosoftAppCredentials
 
@@ -39,7 +48,7 @@ AUTH_TOKEN = LOOP.run_until_complete(get_auth_token())
 
 
 class ConversationTest(ReplayableTest):
-    def __init__(self, method_name):
+    def __init__(self, method_name):  # pylint: disable=useless-super-delegation
         super(ConversationTest, self).__init__(method_name)
 
     @property

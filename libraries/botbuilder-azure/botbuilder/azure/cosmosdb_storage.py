@@ -248,7 +248,9 @@ class CosmosDbStorage(Storage):
         """
         # read the content
         non_magic_attr = [
-            attr for attr in dir(store_item) if not attr.startswith("_") or attr.__eq__("e_tag")
+            attr
+            for attr in dir(store_item)
+            if not attr.startswith("_") or attr.__eq__("e_tag")
         ]
         # loop through attributes and write and return a dict
         return {attr: getattr(store_item, attr) for attr in non_magic_attr}
@@ -294,7 +296,9 @@ class CosmosDbStorage(Storage):
             self.database = self._get_or_create_database(self.client, db_id)
             self.container = self._get_or_create_container(self.client, container_name)
 
-    def _get_or_create_database(self, doc_client, id) -> str:  # pylint: disable=invalid-name
+    def _get_or_create_database(  # pylint: disable=invalid-name
+        self, doc_client, id
+    ) -> str:
         """Return the database link.
 
         Check if the database exists or create the database.
@@ -345,8 +349,6 @@ class CosmosDbStorage(Storage):
 
         # Create a container if it didn't exist
         res = doc_client.CreateContainer(
-            self.__database_link,
-            {"id": container},
-            self._container_creation_options,
+            self.__database_link, {"id": container}, self._container_creation_options
         )
         return res["id"]

@@ -32,7 +32,9 @@ class ActivityHandler:
         else:
             await self.on_unrecognized_activity_type(turn_context)
 
-    async def on_message_activity(self, turn_context: TurnContext):  # pylint: disable=unused-argument
+    async def on_message_activity(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext
+    ):
         return
 
     async def on_conversation_update_activity(self, turn_context: TurnContext):
@@ -68,11 +70,17 @@ class ActivityHandler:
 
         return await self.on_event(turn_context)
 
-    async def on_token_response_event(self, turn_context: TurnContext):  # pylint: disable=unused-argument
+    async def on_token_response_event(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext
+    ):
         return
 
-    async def on_event(self, turn_context: TurnContext):  # pylint: disable=unused-argument
+    async def on_event(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext
+    ):
         return
 
-    async def on_unrecognized_activity_type(self, turn_context: TurnContext):  # pylint: disable=unused-argument
+    async def on_unrecognized_activity_type(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext
+    ):
         return

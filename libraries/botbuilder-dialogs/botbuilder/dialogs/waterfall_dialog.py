@@ -77,7 +77,9 @@ class WaterfallDialog(Dialog):
             return Dialog.end_of_turn
 
         return await self.resume_dialog(
-            dialog_context, DialogReason.ContinueCalled, dialog_context.context.activity.text
+            dialog_context,
+            DialogReason.ContinueCalled,
+            dialog_context.context.activity.text,
         )
 
     async def resume_dialog(
@@ -92,10 +94,12 @@ class WaterfallDialog(Dialog):
         # Future Me:
         # If issues with CosmosDB, see https://github.com/Microsoft/botbuilder-dotnet/issues/871
         # for hints.
-        return await self.run_step(dialog_context, state[self.StepIndex] + 1, reason, result)
+        return await self.run_step(
+            dialog_context, state[self.StepIndex] + 1, reason, result
+        )
 
-    async def end_dialog(
-        self, context: TurnContext, instance: DialogInstance, reason: DialogReason  # pylint: disable=unused-argument
+    async def end_dialog(  # pylint: disable=unused-argument
+        self, context: TurnContext, instance: DialogInstance, reason: DialogReason
     ) -> None:
         if reason is DialogReason.CancelCalled:
             index = instance.state[self.StepIndex]
@@ -128,10 +132,16 @@ class WaterfallDialog(Dialog):
         return await self._steps[step_context.index](step_context)
 
     async def run_step(
-        self, dialog_context: DialogContext, index: int, reason: DialogReason, result: object
+        self,
+        dialog_context: DialogContext,
+        index: int,
+        reason: DialogReason,
+        result: object,
     ) -> DialogTurnResult:
         if not dialog_context:
-            raise TypeError("WaterfallDialog.run_steps(): dialog_context cannot be None.")
+            raise TypeError(
+                "WaterfallDialog.run_steps(): dialog_context cannot be None."
+            )
         if index < len(self._steps):
             # Update persisted step index
             state = dialog_context.active_dialog.state

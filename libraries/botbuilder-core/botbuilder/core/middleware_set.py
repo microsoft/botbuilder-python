@@ -10,7 +10,9 @@ from .turn_context import TurnContext
 
 class Middleware(ABC):
     @abstractmethod
-    def on_process_request(self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]):
+    def on_process_request(
+        self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]
+    ):
         pass
 
 
@@ -22,7 +24,9 @@ class AnonymousReceiveMiddleware(Middleware):
             )
         self._to_call = anonymous_handler
 
-    def on_process_request(self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]):
+    def on_process_request(
+        self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]
+    ):
         return self._to_call(context, logic)
 
 
