@@ -55,9 +55,11 @@ class LuisRecognizerTest(AsyncTestCase):
 
     def test_luis_recognizer_construction(self):
         # Arrange
-        endpoint = "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/" \
-                   "b31aeaf3-3511-495b-a07f-571fc873214b?verbose=true&timezoneOffset=-360" \
-                   "&subscription-key=048ec46dc58e495482b0c447cfdbd291&q="
+        endpoint = (
+            "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/"
+            "b31aeaf3-3511-495b-a07f-571fc873214b?verbose=true&timezoneOffset=-360"
+            "&subscription-key=048ec46dc58e495482b0c447cfdbd291&q="
+        )
 
         # Act
         recognizer = LuisRecognizer(endpoint)
@@ -69,9 +71,11 @@ class LuisRecognizerTest(AsyncTestCase):
         self.assertEqual("https://westus.api.cognitive.microsoft.com", app.endpoint)
 
     def test_luis_recognizer_timeout(self):
-        endpoint = "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/" \
-                   "b31aeaf3-3511-495b-a07f-571fc873214b?verbose=true&timezoneOffset=-360" \
-                   "&subscription-key=048ec46dc58e495482b0c447cfdbd291&q="
+        endpoint = (
+            "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/"
+            "b31aeaf3-3511-495b-a07f-571fc873214b?verbose=true&timezoneOffset=-360"
+            "&subscription-key=048ec46dc58e495482b0c447cfdbd291&q="
+        )
         expected_timeout = 300
         options_with_timeout = LuisPredictionOptions(timeout=expected_timeout * 1000)
 
@@ -436,9 +440,11 @@ class LuisRecognizerTest(AsyncTestCase):
         # Arrange
         # Note this is NOT a real LUIS application ID nor a real LUIS subscription-key
         # theses are GUIDs edited to look right to the parsing and validation code.
-        endpoint = "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/" \
-                   "b31aeaf3-3511-495b-a07f-571fc873214b?verbose=true&timezoneOffset=-360" \
-                   "&subscription-key=048ec46dc58e495482b0c447cfdbd291&q="
+        endpoint = (
+            "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/"
+            "b31aeaf3-3511-495b-a07f-571fc873214b?verbose=true&timezoneOffset=-360"
+            "&subscription-key=048ec46dc58e495482b0c447cfdbd291&q="
+        )
 
         # Act
         recognizer = LuisRecognizer(endpoint)

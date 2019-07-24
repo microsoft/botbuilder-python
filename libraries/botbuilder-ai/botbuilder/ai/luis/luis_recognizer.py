@@ -8,12 +8,7 @@ from azure.cognitiveservices.language.luis.runtime import LUISRuntimeClient
 from azure.cognitiveservices.language.luis.runtime.models import LuisResult
 from msrest.authentication import CognitiveServicesCredentials
 
-from botbuilder.core import (
-    BotAssert,
-    IntentScore,
-    RecognizerResult,
-    TurnContext,
-)
+from botbuilder.core import BotAssert, IntentScore, RecognizerResult, TurnContext
 from botbuilder.schema import ActivityTypes
 
 from . import LuisApplication, LuisPredictionOptions, LuisTelemetryConstants
@@ -158,7 +153,9 @@ class LuisRecognizer:
 
     @staticmethod
     def _get_top_k_intent_score(
-        intent_names: List[str], intents: Dict[str, IntentScore], index: int  # pylint: disable=unused-argument
+        intent_names: List[str],
+        intents: Dict[str, IntentScore],
+        index: int,  # pylint: disable=unused-argument
     ) -> Tuple[str, str]:
         intent_name = ""
         intent_score = "0.00"

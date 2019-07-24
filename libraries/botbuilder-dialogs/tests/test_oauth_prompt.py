@@ -72,7 +72,9 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
             )
         )
 
-        async def inspector(activity: Activity, description: str = None):  # pylint: disable=unused-argument
+        async def inspector(
+            activity: Activity, description: str = None
+        ):  # pylint: disable=unused-argument
 
             self.assertTrue(len(activity.attachments) == 1)
             self.assertTrue(
@@ -138,7 +140,9 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
             )
         )
 
-        def inspector(activity: Activity, description: str = None):  # pylint: disable=unused-argument
+        def inspector(
+            activity: Activity, description: str = None
+        ):  # pylint: disable=unused-argument
             assert len(activity.attachments) == 1
             assert (
                 activity.attachments[0].content_type
@@ -202,7 +206,9 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
             )
         )
 
-        def inspector(activity: Activity, description: str = None):  # pylint: disable=unused-argument
+        def inspector(
+            activity: Activity, description: str = None
+        ):  # pylint: disable=unused-argument
             assert len(activity.attachments) == 1
             assert (
                 activity.attachments[0].content_type

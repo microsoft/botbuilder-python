@@ -8,11 +8,7 @@ from recognizers_text import Culture
 
 from botbuilder.core import ConversationState, MemoryStorage, TurnContext
 from botbuilder.core.adapters import TestAdapter
-from botbuilder.dialogs import (
-    DialogSet,
-    DialogTurnResult,
-    DialogTurnStatus,
-)
+from botbuilder.dialogs import DialogSet, DialogTurnResult, DialogTurnStatus
 from botbuilder.dialogs.choices import Choice, ListStyle
 from botbuilder.dialogs.prompts import (
     ChoicePrompt,

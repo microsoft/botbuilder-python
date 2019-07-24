@@ -127,8 +127,6 @@ class AttachmentsTest(ReplayableTest):
                 CONVERSATION_ID, attachment
             )
             attachment_id = response.id
-            connector.attachments.get_attachment(
-                attachment_id, "invalid"
-            )
+            connector.attachments.get_attachment(attachment_id, "invalid")
 
         assert "not found" in str(excinfo.value)

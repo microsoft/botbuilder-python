@@ -44,7 +44,10 @@ class AttachmentPrompt(Prompt):
             await turn_context.send_activity(options.prompt)
 
     async def on_recognize(
-        self, turn_context: TurnContext, state: Dict[str, object], options: PromptOptions
+        self,
+        turn_context: TurnContext,
+        state: Dict[str, object],
+        options: PromptOptions,
     ) -> PromptRecognizerResult:
         if not turn_context:
             raise TypeError("AttachmentPrompt.on_recognize(): context cannot be None.")

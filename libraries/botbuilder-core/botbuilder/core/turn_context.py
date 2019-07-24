@@ -20,9 +20,15 @@ class TurnContext:
             self._activity = request
             self.responses: List[Activity] = []
             self._services: dict = {}
-            self._on_send_activities: Callable[["TurnContext", List[Activity], Callable], List[ResourceResponse]] = []
-            self._on_update_activity: Callable[["TurnContext", Activity, Callable], ResourceResponse] = []
-            self._on_delete_activity: Callable[["TurnContext", ConversationReference, Callable], None] = []
+            self._on_send_activities: Callable[
+                ["TurnContext", List[Activity], Callable], List[ResourceResponse]
+            ] = []
+            self._on_update_activity: Callable[
+                ["TurnContext", Activity, Callable], ResourceResponse
+            ] = []
+            self._on_delete_activity: Callable[
+                ["TurnContext", ConversationReference, Callable], None
+            ] = []
             self._responded: bool = False
 
         if self.adapter is None:
@@ -158,9 +164,7 @@ class TurnContext:
             self._on_send_activities, output, callback(self, output)
         )
 
-        return (
-            result[0] if result else ResourceResponse()
-        )
+        return result[0] if result else ResourceResponse()
 
     async def update_activity(self, activity: Activity):
         """

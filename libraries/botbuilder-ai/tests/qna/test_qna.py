@@ -19,11 +19,7 @@ from botbuilder.ai.qna import (
     QnATelemetryConstants,
     QueryResult,
 )
-from botbuilder.core import (
-    BotAdapter,
-    BotTelemetryClient,
-    TurnContext,
-)
+from botbuilder.core import BotAdapter, BotTelemetryClient, TurnContext
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.schema import (
     Activity,
@@ -40,7 +36,9 @@ class TestContext(TurnContext):
 
         self.on_send_activities(self.capture_sent_activities)
 
-    async def capture_sent_activities(self, context: TurnContext, activities, next):  # pylint: disable=unused-argument
+    async def capture_sent_activities(
+        self, context: TurnContext, activities, next
+    ):  # pylint: disable=unused-argument
         self.sent += activities
         context.responded = True
 
