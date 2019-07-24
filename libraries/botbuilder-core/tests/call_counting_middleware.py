@@ -9,7 +9,7 @@ class CallCountingMiddleware(Middleware):
     def __init__(self):
         self.counter = 0
 
-    def on_process_request(
+    def on_process_request(  # pylint: disable=unused-argument
         self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]
     ):
         self.counter += 1

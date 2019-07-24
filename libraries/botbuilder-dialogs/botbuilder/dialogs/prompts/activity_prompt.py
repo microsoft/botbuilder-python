@@ -126,7 +126,7 @@ class ActivityPrompt(Dialog, ABC):
 
         return Dialog.end_of_turn
 
-    async def resume_dialog(
+    async def resume_dialog(  # pylint: disable=unused-argument
         self, dialog_context: DialogContext, reason: DialogReason, result: object = None
     ):
         """
