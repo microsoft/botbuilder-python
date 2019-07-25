@@ -4,7 +4,7 @@
 from aiohttp import ClientSession
 
 from ..qnamaker_endpoint import QnAMakerEndpoint
-from ..models import FeedbackRecords
+from ..models import FeedbackRecords, TrainRequestBody
 
 from .http_request_utils import HttpRequestUtils
 
@@ -41,11 +41,11 @@ class TrainUtils:
         if not feedback_records.records:
             return
 
-        self.query_train(feedback_records)
+        await self._query_train(feedback_records)
 
-    async def query_train(self, feedback_records: FeedbackRecords):
+    async def _query_train(self, feedback_records: FeedbackRecords):
         url: str = f"{ self._endpoint.host }/knowledgebases/{ self._endpoint.knowledge_base_id }/train"
-        payload_body = {"feedbackRecords": feedback_records}
+        payload_body = TrainRequestBody(feedback_records=feedback_records)
         http_request_helper = HttpRequestUtils(self._http_client)
 
         await http_request_helper.execute_http_request(

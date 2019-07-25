@@ -3,17 +3,24 @@
 
 from typing import List
 
+from msrest.serialization import Model
+
 from .feedback_record import FeedbackRecord
 
 
-class FeedbackRecords:
+class FeedbackRecords(Model):
     """ Active learning feedback records. """
 
-    def __init__(self, records: List[FeedbackRecord]):
+    _attribute_map = {"records": {"key": "records", "type": "[FeedbackRecord]"}}
+
+    def __init__(self, records: List[FeedbackRecord], **kwargs):
         """
         Parameter(s):
         -------------
 
         records: List of feedback records.
         """
+
+        super().__init__(**kwargs)
+
         self.records = records

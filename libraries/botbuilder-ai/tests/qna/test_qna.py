@@ -12,8 +12,14 @@ from aiohttp import ClientSession
 
 import aiounittest
 from botbuilder.ai.qna import QnAMakerEndpoint, QnAMaker, QnAMakerOptions
-from botbuilder.ai.qna.models import Metadata, QueryResult
+from botbuilder.ai.qna.models import (
+    # FeedbackRecord,
+    # FeedbackRecords,
+    Metadata,
+    QueryResult,
+)
 from botbuilder.ai.qna.utils import QnATelemetryConstants
+# from botbuilder.ai.qna.utils import TrainUtils
 
 from botbuilder.core import BotAdapter, BotTelemetryClient, TurnContext
 from botbuilder.core.adapters import TestAdapter
@@ -42,6 +48,7 @@ class TestContext(TurnContext):
 class QnaApplicationTest(aiounittest.AsyncTestCase):
     # Note this is NOT a real LUIS application ID nor a real LUIS subscription-key
     # theses are GUIDs edited to look right to the parsing and validation code.
+
     _knowledge_base_id: str = "f028d9k3-7g9z-11d3-d300-2b8x98227q8w"
     _endpoint_key: str = "1k997n7w-207z-36p3-j2u1-09tas20ci6011"
     _host: str = "https://dummyqnahost.azurewebsites.net/qnamaker"
@@ -174,9 +181,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         question: str = "up"
         response_path: str = "AnswerWithOptions.json"
         options = QnAMakerOptions(
-            score_threshold=0.8,
-            top=5,
-            strict_filters=[{"name": "movie", "value": "disney"}],
+            score_threshold=0.8, top=5, strict_filters=[Metadata("movie", "disney")]
         )
 
         # Act
@@ -671,6 +676,38 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
             self.assertEqual(1, len(results))
             self.assertEqual(expected_answer, results[0].answer)
             self.assertEqual("Editorial", results[0].source)
+
+    async def test_call_train(self):
+        # endpoint = QnAMakerEndpoint(
+        #     QnaApplicationTest._knowledge_base_id,
+        #     QnaApplicationTest._endpoint_key,
+        #     QnaApplicationTest._host,
+        # )
+        # qna = QnAMaker(endpoint)
+        # feedback_records = FeedbackRecords([])
+
+        # feedback1 = FeedbackRecord(
+        #     qna_id=1, user_id="test", user_question="How are you?"
+        # )
+
+        # feedback2 = FeedbackRecord(qna_id=2, user_id="test", user_question="What up??")
+
+        # feedback_records.records.extend([feedback1, feedback2])
+
+        # client_sesh = ClientSession()
+        # train_util = TrainUtils(endpoint, client_sesh)
+        # await train_util.call_train(feedback_records)
+
+        # utterance = "up"
+        # context = QnaApplicationTest._get_context(utterance, TestAdapter())
+        # options = QnAMakerOptions(
+        #     score_threshold=0.8,
+        #     timeout=9000,
+        #     top=5,
+        #     strict_filters=[Metadata("movie", "disney")],
+        # )
+        # rezzy = await qna.get_answers(context, options=options)
+        pass
 
     @classmethod
     async def _get_service_result(

@@ -53,7 +53,9 @@ class HttpRequestUtils:
                 "HttpRequestUtils.execute_http_request(): endpoint cannot be None."
             )
 
-        serialized_payload_body = json.dumps(payload_body)
+        # serialized_payload_body = json.dumps(payload_body)
+        # serialized_payload_body = payload_body.serialize()
+        serialized_payload_body = json.dumps(payload_body.serialize())
 
         headers = self._get_headers(endpoint)
 

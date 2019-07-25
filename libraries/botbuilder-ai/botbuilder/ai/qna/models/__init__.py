@@ -7,16 +7,20 @@
 
 from .feedback_record import FeedbackRecord
 from .feedback_records import FeedbackRecords
+from .generate_answer_question import GenerateAnswerQuestion
 from .metadata import Metadata
 from .qnamaker_trace_info import QnAMakerTraceInfo
 from .query_result import QueryResult
 from .query_results import QueryResults
+from .train_request_body import TrainRequestBody
 
 __all__ = [
     "FeedbackRecord",
     "FeedbackRecords",
+    "GenerateAnswerQuestion",
     "Metadata",
     "QnAMakerTraceInfo",
     "QueryResult",
     "QueryResults",
+    "TrainRequestBody",
 ]
