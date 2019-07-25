@@ -5,7 +5,7 @@ from msrest.serialization import Model
 from .metadata import Metadata
 
 
-class GenerateAnswerQuestion(Model):
+class GenerateAnswerRequestBody(Model):
     """ Question used as the payload body for QnA Maker's Generate Answer API. """
 
     _attribute_map = {

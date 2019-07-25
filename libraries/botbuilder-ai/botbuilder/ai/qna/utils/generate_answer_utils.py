@@ -13,7 +13,7 @@ from .http_request_utils import HttpRequestUtils
 
 from ..qnamaker_endpoint import QnAMakerEndpoint
 from ..qnamaker_options import QnAMakerOptions
-from ..models import GenerateAnswerQuestion, QnAMakerTraceInfo, QueryResult
+from ..models import GenerateAnswerRequestBody, QnAMakerTraceInfo, QueryResult
 
 QNAMAKER_TRACE_NAME = "QnAMaker"
 QNAMAKER_TRACE_LABEL = "QnAMaker Trace"
@@ -134,19 +134,12 @@ class GenerateAnswerUtils:
     ) -> List[QueryResult]:
         url = f"{ self._endpoint.host }/knowledgebases/{ self._endpoint.knowledge_base_id }/generateAnswer"
 
-        question = GenerateAnswerQuestion(
+        question = GenerateAnswerRequestBody(
             question=context.activity.text,
             top=options.top,
             score_threshold=options.score_threshold,
             strict_filters=options.strict_filters,
         )
-
-        # question = {
-        #     "question": context.activity.text,
-        #     "top": options.top,
-        #     "scoreThreshold": options.score_threshold,
-        #     "strictFilters": options.strict_filters,
-        # }
 
         http_request_helper = HttpRequestUtils(self._http_client)
 

@@ -19,6 +19,7 @@ from botbuilder.ai.qna.models import (
     QueryResult,
 )
 from botbuilder.ai.qna.utils import QnATelemetryConstants
+
 # from botbuilder.ai.qna.utils import TrainUtils
 
 from botbuilder.core import BotAdapter, BotTelemetryClient, TurnContext
@@ -46,7 +47,7 @@ class TestContext(TurnContext):
 
 
 class QnaApplicationTest(aiounittest.AsyncTestCase):
-    # Note this is NOT a real LUIS application ID nor a real LUIS subscription-key
+    # Note this is NOT a real QnA Maker application ID nor a real QnA Maker subscription-key
     # theses are GUIDs edited to look right to the parsing and validation code.
 
     _knowledge_base_id: str = "f028d9k3-7g9z-11d3-d300-2b8x98227q8w"
@@ -683,6 +684,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         #     QnaApplicationTest._endpoint_key,
         #     QnaApplicationTest._host,
         # )
+
         # qna = QnAMaker(endpoint)
         # feedback_records = FeedbackRecords([])
 
