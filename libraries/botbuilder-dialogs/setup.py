@@ -11,6 +11,7 @@ REQUIRES = [
     "recognizers-text>=1.0.1a0",
     "recognizers-text-choice>=1.0.1a0",
     "grapheme>=0.5.0",
+    "emoji>=0.5.2",
     "botbuilder-schema>=4.4.0b1",
     "botframework-connector>=4.4.0b1",
     "botbuilder-core>=4.4.0b1",
