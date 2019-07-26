@@ -1,7 +1,10 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from typing import List
+
 from msrest.serialization import Model
+
 from .metadata import Metadata
 
 
@@ -18,18 +21,22 @@ class GenerateAnswerRequestBody(Model):
     def __init__(
         self,
         question: str,
-        top: str,
+        top: int,
         score_threshold: float,
-        strict_filters: [Metadata],
+        strict_filters: List[Metadata],
         **kwargs
     ):
         """
         Parameters:
         -----------
 
-        name: Metadata name. Max length: 100.
+        question: The user question to query against the knowledge base.
 
-        value: Metadata value. Max length: 100.
+        top: Max number of answers to be returned for the question.
+
+        score_threshold: Threshold for answers returned based on score.
+
+        strict_filters: Find only answers that contain these metadata.
         """
 
         super().__init__(**kwargs)
