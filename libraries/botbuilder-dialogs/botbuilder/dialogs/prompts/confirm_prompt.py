@@ -2,9 +2,15 @@
 # Licensed under the MIT License.
 
 from typing import Dict
+from recognizers_choice import recognize_boolean
 from botbuilder.core.turn_context import TurnContext
 from botbuilder.schema import ActivityTypes, Activity
-from botbuilder.dialogs.choices import Choice, ChoiceFactoryOptions, ListStyle
+from botbuilder.dialogs.choices import (
+    Choice,
+    ChoiceFactoryOptions,
+    ChoiceRecognizers,
+    ListStyle,
+)
 from .prompt import Prompt
 from .prompt_options import PromptOptions
 from .prompt_recognizer_result import PromptRecognizerResult
@@ -93,7 +99,7 @@ class ConfirmPrompt(Prompt):
             if self.confirm_choices is not None
             else (defaults[0], defaults[1])
         )
-        choices = {confirms[0], confirms[1]}
+        choices = [confirms[0], confirms[1]]
         if is_retry and options.retry_prompt is not None:
             prompt = self.append_choices(
                 options.retry_prompt, channel_id, choices, self.style, choice_opts
@@ -110,7 +116,6 @@ class ConfirmPrompt(Prompt):
         state: Dict[str, object],
         options: PromptOptions,
     ) -> PromptRecognizerResult:
-        # pylint: disable=undefined-variable
         if not turn_context:
             raise TypeError("ConfirmPrompt.on_prompt(): turn_context cannot be None.")
 
@@ -119,13 +124,12 @@ class ConfirmPrompt(Prompt):
             # Recognize utterance
             message = turn_context.activity
             culture = self.determine_culture(turn_context.activity)
-            # TODO: Port ChoiceRecognizer
-            results = ChoiceRecognizer.recognize_boolean(message.text, culture)
-            if results.Count > 0:
+            results = recognize_boolean(message.text, culture)
+            if results:
                 first = results[0]
-                if "value" in first.Resolution:
+                if "value" in first.resolution:
                     result.succeeded = True
-                    result.value = str(first.Resolution["value"])
+                    result.value = first.resolution["value"]
             else:
                 # First check whether the prompt was sent to the user with numbers
                 # if it was we should recognize numbers
@@ -138,7 +142,7 @@ class ConfirmPrompt(Prompt):
 
                 # This logic reflects the fact that IncludeNumbers is nullable and True is the default set in
                 # Inline style
-                if opts.include_numbers.has_value or opts.include_numbers.value:
+                if opts.include_numbers is None or opts.include_numbers:
                     # The text may be a number in which case we will interpret that as a choice.
                     confirm_choices = (
                         self.confirm_choices
@@ -146,7 +150,6 @@ class ConfirmPrompt(Prompt):
                         else (defaults[0], defaults[1])
                     )
                     choices = {confirm_choices[0], confirm_choices[1]}
-                    # TODO: Port ChoiceRecognizer
                     second_attempt_results = ChoiceRecognizers.recognize_choices(
                         message.text, choices
                     )
