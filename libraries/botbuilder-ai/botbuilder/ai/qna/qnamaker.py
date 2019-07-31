@@ -191,7 +191,7 @@ class QnAMaker(QnAMakerTelemetryClient):
                 properties[QnATelemetryConstants.username_property] = user_name
 
         # Fill in Qna Results (found or not).
-        if query_results:
+        if self._has_matched_answer_in_kb(query_results):
             query_result = query_results[0]
 
             result_properties = {
@@ -243,3 +243,13 @@ class QnAMaker(QnAMakerTelemetryClient):
 
         if not options.timeout:
             options.timeout = 100000
+
+    def _has_matched_answer_in_kb(self, query_results: [QueryResult]) -> bool:
+        if query_results:
+            if len(query_results) is not None:
+                ans = query_results[0].answer
+                if ans != "No good match found in KB.":
+
+                    return True
+
+        return False

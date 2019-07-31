@@ -689,6 +689,27 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
 
             mocked_call_train.assert_called_once_with(feedback_records)
 
+    async def test_should_filter_low_score_variation(self):
+        options = QnAMakerOptions(top=5)
+        qna = QnAMaker(QnaApplicationTest.tests_endpoint, options)
+        question: str = "Q11"
+        context = QnaApplicationTest._get_context(question, TestAdapter())
+        response_json = QnaApplicationTest._get_json_for_file("TopNAnswer.json")
+
+        with patch(
+            "aiohttp.ClientSession.post",
+            return_value=aiounittest.futurized(response_json),
+        ):
+            results = await qna.get_answers(context)
+            self.assertEqual(4, len(results), "Should have received 4 answers.")
+
+            filtered_results = qna.get_low_score_variation(results)
+            self.assertEqual(
+                3,
+                len(filtered_results),
+                "Should have 3 filtered answers after low score variation.",
+            )
+
     @classmethod
     async def _get_service_result(
         cls,

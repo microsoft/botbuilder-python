@@ -28,7 +28,7 @@ class ActiveLearningUtils:
         qna_serach_results: A list of QnA QueryResults returned from the QnA GenerateAnswer API call.
         """
 
-        if qna_search_results is None:
+        if not qna_search_results:
             return []
 
         if len(qna_search_results) == 1:
@@ -45,8 +45,8 @@ class ActiveLearningUtils:
         ):
             filtered_qna_search_result.append(qna_search_results[0])
 
-            for result in qna_search_results:
-                current_score = result.score * 100
+            for idx in range(1, len(qna_search_results)):
+                current_score = qna_search_results[idx].score * 100
 
                 if ActiveLearningUtils._include_for_clustering(
                     prev_score, current_score, PREVIOUS_LOW_SCORE_VARIATION_MULTIPLIER
@@ -54,7 +54,7 @@ class ActiveLearningUtils:
                     top_answer_score, current_score, MAX_LOW_SCORE_VARIATION_MULTIPLIER
                 ):
                     prev_score = current_score
-                    filtered_qna_search_result.append(result)
+                    filtered_qna_search_result.append(qna_search_results[idx])
 
         return filtered_qna_search_result
 
