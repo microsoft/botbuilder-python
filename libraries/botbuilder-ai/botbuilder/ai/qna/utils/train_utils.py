@@ -1,10 +1,11 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from typing import List
 from aiohttp import ClientSession
 
 from ..qnamaker_endpoint import QnAMakerEndpoint
-from ..models import FeedbackRecords, TrainRequestBody
+from ..models import FeedbackRecord, TrainRequestBody
 
 from .http_request_utils import HttpRequestUtils
 
@@ -26,7 +27,7 @@ class TrainUtils:
         self._endpoint = endpoint
         self._http_client = http_client
 
-    async def call_train(self, feedback_records: FeedbackRecords):
+    async def call_train(self, feedback_records: List[FeedbackRecord]):
         """
         Train API to provide feedback.
 
@@ -38,12 +39,12 @@ class TrainUtils:
         if not feedback_records:
             raise TypeError("TrainUtils.call_train(): feedback_records cannot be None.")
 
-        if not feedback_records.records:
+        if not feedback_records:
             return
 
         await self._query_train(feedback_records)
 
-    async def _query_train(self, feedback_records: FeedbackRecords):
+    async def _query_train(self, feedback_records: List[FeedbackRecord]):
         url: str = f"{ self._endpoint.host }/knowledgebases/{ self._endpoint.knowledge_base_id }/train"
         payload_body = TrainRequestBody(feedback_records=feedback_records)
         http_request_helper = HttpRequestUtils(self._http_client)

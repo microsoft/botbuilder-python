@@ -12,16 +12,8 @@ from aiohttp import ClientSession
 
 import aiounittest
 from botbuilder.ai.qna import QnAMakerEndpoint, QnAMaker, QnAMakerOptions
-from botbuilder.ai.qna.models import (
-    # FeedbackRecord,
-    # FeedbackRecords,
-    Metadata,
-    QueryResult,
-)
+from botbuilder.ai.qna.models import FeedbackRecord, Metadata, QueryResult
 from botbuilder.ai.qna.utils import QnATelemetryConstants
-
-# from botbuilder.ai.qna.utils import TrainUtils
-
 from botbuilder.core import BotAdapter, BotTelemetryClient, TurnContext
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.schema import (
@@ -679,37 +671,23 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
             self.assertEqual("Editorial", results[0].source)
 
     async def test_call_train(self):
-        # endpoint = QnAMakerEndpoint(
-        #     QnaApplicationTest._knowledge_base_id,
-        #     QnaApplicationTest._endpoint_key,
-        #     QnaApplicationTest._host,
-        # )
+        feedback_records = []
 
-        # qna = QnAMaker(endpoint)
-        # feedback_records = FeedbackRecords([])
+        feedback1 = FeedbackRecord(
+            qna_id=1, user_id="test", user_question="How are you?"
+        )
 
-        # feedback1 = FeedbackRecord(
-        #     qna_id=1, user_id="test", user_question="How are you?"
-        # )
+        feedback2 = FeedbackRecord(qna_id=2, user_id="test", user_question="What up??")
 
-        # feedback2 = FeedbackRecord(qna_id=2, user_id="test", user_question="What up??")
+        feedback_records.extend([feedback1, feedback2])
 
-        # feedback_records.records.extend([feedback1, feedback2])
+        with patch.object(
+            QnAMaker, "call_train", return_value=None
+        ) as mocked_call_train:
+            qna = QnAMaker(QnaApplicationTest.tests_endpoint)
+            qna.call_train(feedback_records)
 
-        # client_sesh = ClientSession()
-        # train_util = TrainUtils(endpoint, client_sesh)
-        # await train_util.call_train(feedback_records)
-
-        # utterance = "up"
-        # context = QnaApplicationTest._get_context(utterance, TestAdapter())
-        # options = QnAMakerOptions(
-        #     score_threshold=0.8,
-        #     timeout=9000,
-        #     top=5,
-        #     strict_filters=[Metadata("movie", "disney")],
-        # )
-        # rezzy = await qna.get_answers(context, options=options)
-        pass
+            mocked_call_train.assert_called_once_with(feedback_records)
 
     @classmethod
     async def _get_service_result(

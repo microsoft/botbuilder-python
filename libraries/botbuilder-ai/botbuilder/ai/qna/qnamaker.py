@@ -8,7 +8,7 @@ from aiohttp import ClientSession, ClientTimeout
 from botbuilder.schema import Activity
 from botbuilder.core import BotTelemetryClient, NullTelemetryClient, TurnContext
 
-from .models import FeedbackRecords, QueryResult
+from .models import FeedbackRecord, QueryResult
 from .utils import (
     ActiveLearningUtils,
     GenerateAnswerUtils,
@@ -122,7 +122,7 @@ class QnAMaker(QnAMakerTelemetryClient):
         """
         return ActiveLearningUtils.get_low_score_variation(query_result)
 
-    async def call_train(self, feedback_records: FeedbackRecords):
+    async def call_train(self, feedback_records: List[FeedbackRecord]):
         """
         Sends feedback to the knowledge base.
 
