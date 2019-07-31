@@ -45,7 +45,10 @@ class AuthenticationConstants(ABC):
     )
 
     # TO BOT FROM ENTERPRISE CHANNEL: OpenID metadata document for tokens coming from MSA
-    TO_BOT_FROM_ENTERPRISE_CHANNEL_OPEN_ID_METADATA_URL_FORMAT = "https://{channelService}.enterprisechannel.botframework.com/v1/.well-known/openidconfiguration"
+    TO_BOT_FROM_ENTERPRISE_CHANNEL_OPEN_ID_METADATA_URL_FORMAT = (
+        "https://{channelService}.enterprisechannel.botframework.com"
+        "/v1/.well-known/openidconfiguration"
+    )
 
     # TO BOT FROM EMULATOR: OpenID metadata document for tokens coming from MSA
     TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL = (
