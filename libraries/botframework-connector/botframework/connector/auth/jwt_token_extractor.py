@@ -16,12 +16,12 @@ class JwtTokenExtractor:
 
     def __init__(
         self,
-        validationParams: VerifyOptions,
+        validation_params: VerifyOptions,
         metadata_url: str,
-        allowedAlgorithms: list,
+        allowed_algorithms: list,
     ):
-        self.validation_parameters = validationParams
-        self.validation_parameters.algorithms = allowedAlgorithms
+        self.validation_parameters = validation_params
+        self.validation_parameters.algorithms = allowed_algorithms
         self.open_id_metadata = JwtTokenExtractor.get_open_id_metadata(metadata_url)
 
     @staticmethod
