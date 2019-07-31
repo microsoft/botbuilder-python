@@ -17,7 +17,7 @@ class EnterpriseChannelValidation(ABC):
         issuer=[AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER],
         audience=None,
         clock_tolerance=5 * 60,
-        ignore_expiration=False
+        ignore_expiration=False,
     )
 
     @staticmethod
@@ -25,21 +25,27 @@ class EnterpriseChannelValidation(ABC):
         auth_header: str,
         credentials: CredentialProvider,
         channel_id: str,
-        channel_service: str
+        channel_service: str,
     ) -> ClaimsIdentity:
-        endpoint = (ChannelValidation.open_id_metadata_endpoint
-                    if ChannelValidation.open_id_metadata_endpoint
-                    else AuthenticationConstants.TO_BOT_FROM_ENTERPRISE_CHANNEL_OPEN_ID_METADATA_URL_FORMAT.replace(
-                        "{channelService}", channel_service
-                    ))
+        endpoint = (
+            ChannelValidation.open_id_metadata_endpoint
+            if ChannelValidation.open_id_metadata_endpoint
+            else AuthenticationConstants.TO_BOT_FROM_ENTERPRISE_CHANNEL_OPEN_ID_METADATA_URL_FORMAT.replace(
+                "{channelService}", channel_service
+            )
+        )
         token_extractor = JwtTokenExtractor(
             EnterpriseChannelValidation.TO_BOT_FROM_ENTERPRISE_CHANNEL_TOKEN_VALIDATION_PARAMETERS,
             endpoint,
-            AuthenticationConstants.ALLOWED_SIGNING_ALGORITHMS
+            AuthenticationConstants.ALLOWED_SIGNING_ALGORITHMS,
         )
 
-        identity: ClaimsIdentity = await token_extractor.get_identity_from_auth_header(auth_header, channel_id)
-        return await EnterpriseChannelValidation.validate_identity(identity, credentials)
+        identity: ClaimsIdentity = await token_extractor.get_identity_from_auth_header(
+            auth_header, channel_id
+        )
+        return await EnterpriseChannelValidation.validate_identity(
+            identity, credentials
+        )
 
     @staticmethod
     async def authenticate_channel_token_with_service_url(
@@ -47,20 +53,24 @@ class EnterpriseChannelValidation(ABC):
         credentials: CredentialProvider,
         service_url: str,
         channel_id: str,
-        channel_service: str
+        channel_service: str,
     ) -> ClaimsIdentity:
         identity: ClaimsIdentity = await EnterpriseChannelValidation.authenticate_channel_token(
             auth_header, credentials, channel_id, channel_service
         )
 
-        service_url_claim: str = identity.get_claim_value(AuthenticationConstants.SERVICE_URL_CLAIM)
+        service_url_claim: str = identity.get_claim_value(
+            AuthenticationConstants.SERVICE_URL_CLAIM
+        )
         if service_url_claim != service_url:
             raise Exception("Unauthorized. service_url claim do not match.")
 
         return identity
 
     @staticmethod
-    async def validate_identity(identity: ClaimsIdentity, credentials: CredentialProvider) -> ClaimsIdentity:
+    async def validate_identity(
+        identity: ClaimsIdentity, credentials: CredentialProvider
+    ) -> ClaimsIdentity:
         if identity is None:
             # No valid identity. Not Authorized.
             raise Exception("Unauthorized. No valid identity.")
@@ -75,16 +85,22 @@ class EnterpriseChannelValidation(ABC):
         # Async validation.
 
         # Look for the "aud" claim, but only if issued from the Bot Framework
-        if (identity.get_claim_value(AuthenticationConstants.ISSUER_CLAIM) !=
-                AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER):
+        if (
+            identity.get_claim_value(AuthenticationConstants.ISSUER_CLAIM)
+            != AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER
+        ):
             # The relevant Audience Claim MUST be present. Not Authorized.
             raise Exception("Unauthorized. Issuer claim MUST be present.")
 
         # The AppId from the claim in the token must match the AppId specified by the developer.
         # In this case, the token is destined for the app, so we find the app ID in the audience claim.
-        aud_claim: str = identity.get_claim_value(AuthenticationConstants.AUDIENCE_CLAIM)
+        aud_claim: str = identity.get_claim_value(
+            AuthenticationConstants.AUDIENCE_CLAIM
+        )
         if not await credentials.is_valid_appid(aud_claim or ""):
             # The AppId is not valid or not present. Not Authorized.
-            raise Exception(f"Unauthorized. Invalid AppId passed on token: { aud_claim }")
+            raise Exception(
+                f"Unauthorized. Invalid AppId passed on token: { aud_claim }"
+            )
 
         return identity

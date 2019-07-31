@@ -206,7 +206,10 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         :return:
         """
         claims = await JwtTokenValidation.authenticate_request(
-            request, auth_header, self._credential_provider, self.settings.channel_service
+            request,
+            auth_header,
+            self._credential_provider,
+            self.settings.channel_service,
         )
 
         if not claims.is_authenticated:

@@ -14,11 +14,9 @@ from botframework.connector.auth import MicrosoftAppCredentials
 from botframework.connector.auth import GovernmentConstants
 from botframework.connector.auth import GovernmentChannelValidation
 
+
 async def jwt_token_validation_validate_auth_header_with_channel_service_succeeds(
-    app_id: str,
-    pwd: str,
-    channel_service: str,
-    header: str = None
+    app_id: str, pwd: str, channel_service: str, header: str = None
 ):
     if header is None:
         header = f"Bearer {MicrosoftAppCredentials(app_id, pwd).get_access_token()}"
@@ -29,6 +27,7 @@ async def jwt_token_validation_validate_auth_header_with_channel_service_succeed
     )
 
     assert result.is_authenticated
+
 
 class TestAuth:
     EmulatorValidation.TO_BOT_FROM_EMULATOR_TOKEN_VALIDATION_PARAMETERS.ignore_expiration = (
@@ -226,11 +225,13 @@ class TestAuth:
         )
 
     @pytest.mark.asyncio
-    async def test_emulator_auth_header_correct_app_id_and_service_url_with_gov_channel_service_should_validate(self):
+    async def test_emulator_auth_header_correct_app_id_and_service_url_with_gov_channel_service_should_validate(
+        self
+    ):
         await jwt_token_validation_validate_auth_header_with_channel_service_succeeds(
             "2cd87869-38a0-4182-9251-d056e8f0ac24",  # emulator creds
             "2.30Vs3VQLKt974F",
-            GovernmentConstants.CHANNEL_SERVICE
+            GovernmentConstants.CHANNEL_SERVICE,
         )
 
     @pytest.mark.asyncio
@@ -240,115 +241,143 @@ class TestAuth:
         await jwt_token_validation_validate_auth_header_with_channel_service_succeeds(
             "2cd87869-38a0-4182-9251-d056e8f0ac24",  # emulator creds
             "2.30Vs3VQLKt974F",
-            "TheChannel"
+            "TheChannel",
         )
 
     @pytest.mark.asyncio
     async def test_government_channel_validation_succeeds(self):
-        credentials = SimpleCredentialProvider("2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F")
+        credentials = SimpleCredentialProvider(
+            "2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F"
+        )
 
         await GovernmentChannelValidation.validate_identity(
             ClaimsIdentity(
-                {"iss": "https://api.botframework.us", "aud": credentials.app_id},
-                True
+                {"iss": "https://api.botframework.us", "aud": credentials.app_id}, True
             ),
-            credentials
+            credentials,
         )
 
     @pytest.mark.asyncio
     async def test_government_channel_validation_no_authentication_fails(self):
         with pytest.raises(Exception) as excinfo:
-            await GovernmentChannelValidation.validate_identity(ClaimsIdentity({}, False), None)
+            await GovernmentChannelValidation.validate_identity(
+                ClaimsIdentity({}, False), None
+            )
         assert "Unauthorized" in str(excinfo.value)
 
     @pytest.mark.asyncio
     async def test_government_channel_validation_no_issuer_fails(self):
-        credentials = SimpleCredentialProvider("2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F")
+        credentials = SimpleCredentialProvider(
+            "2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F"
+        )
         with pytest.raises(Exception) as excinfo:
-            await GovernmentChannelValidation.validate_identity(ClaimsIdentity({
-                "peanut": "peanut"
-            }, True), credentials)
+            await GovernmentChannelValidation.validate_identity(
+                ClaimsIdentity({"peanut": "peanut"}, True), credentials
+            )
         assert "Unauthorized" in str(excinfo.value)
 
     @pytest.mark.asyncio
     async def test_government_channel_validation_wrong_issuer_fails(self):
-        credentials = SimpleCredentialProvider("2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F")
+        credentials = SimpleCredentialProvider(
+            "2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F"
+        )
         with pytest.raises(Exception) as excinfo:
-            await GovernmentChannelValidation.validate_identity(ClaimsIdentity({
-                "iss": "peanut"
-            }, True), credentials)
+            await GovernmentChannelValidation.validate_identity(
+                ClaimsIdentity({"iss": "peanut"}, True), credentials
+            )
         assert "Unauthorized" in str(excinfo.value)
 
     @pytest.mark.asyncio
     async def test_government_channel_validation_no_audience_fails(self):
-        credentials = SimpleCredentialProvider("2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F")
+        credentials = SimpleCredentialProvider(
+            "2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F"
+        )
         with pytest.raises(Exception) as excinfo:
-            await GovernmentChannelValidation.validate_identity(ClaimsIdentity({
-                "iss": "https://api.botframework.us"
-            }, True), credentials)
+            await GovernmentChannelValidation.validate_identity(
+                ClaimsIdentity({"iss": "https://api.botframework.us"}, True),
+                credentials,
+            )
         assert "Unauthorized" in str(excinfo.value)
 
     @pytest.mark.asyncio
     async def test_government_channel_validation_wrong_audience_fails(self):
-        credentials = SimpleCredentialProvider("2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F")
+        credentials = SimpleCredentialProvider(
+            "2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F"
+        )
         with pytest.raises(Exception) as excinfo:
-            await GovernmentChannelValidation.validate_identity(ClaimsIdentity({
-                "iss": "https://api.botframework.us",
-                "aud": "peanut"
-            }, True), credentials)
+            await GovernmentChannelValidation.validate_identity(
+                ClaimsIdentity(
+                    {"iss": "https://api.botframework.us", "aud": "peanut"}, True
+                ),
+                credentials,
+            )
         assert "Unauthorized" in str(excinfo.value)
 
     @pytest.mark.asyncio
     async def test_enterprise_channel_validation_succeeds(self):
-        credentials = SimpleCredentialProvider("2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F")
+        credentials = SimpleCredentialProvider(
+            "2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F"
+        )
 
         await EnterpriseChannelValidation.validate_identity(
             ClaimsIdentity(
-                {"iss": "https://api.botframework.com", "aud": credentials.app_id},
-                True
+                {"iss": "https://api.botframework.com", "aud": credentials.app_id}, True
             ),
-            credentials
+            credentials,
         )
 
     @pytest.mark.asyncio
     async def test_enterprise_channel_validation_no_authentication_fails(self):
         with pytest.raises(Exception) as excinfo:
-            await EnterpriseChannelValidation.validate_identity(ClaimsIdentity({}, False), None)
+            await EnterpriseChannelValidation.validate_identity(
+                ClaimsIdentity({}, False), None
+            )
         assert "Unauthorized" in str(excinfo.value)
 
     @pytest.mark.asyncio
     async def test_enterprise_channel_validation_no_issuer_fails(self):
-        credentials = SimpleCredentialProvider("2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F")
+        credentials = SimpleCredentialProvider(
+            "2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F"
+        )
         with pytest.raises(Exception) as excinfo:
-            await EnterpriseChannelValidation.validate_identity(ClaimsIdentity({
-                "peanut": "peanut"
-            }, True), credentials)
+            await EnterpriseChannelValidation.validate_identity(
+                ClaimsIdentity({"peanut": "peanut"}, True), credentials
+            )
         assert "Unauthorized" in str(excinfo.value)
 
     @pytest.mark.asyncio
     async def test_enterprise_channel_validation_wrong_issuer_fails(self):
-        credentials = SimpleCredentialProvider("2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F")
+        credentials = SimpleCredentialProvider(
+            "2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F"
+        )
         with pytest.raises(Exception) as excinfo:
-            await EnterpriseChannelValidation.validate_identity(ClaimsIdentity({
-                "iss": "peanut"
-            }, True), credentials)
+            await EnterpriseChannelValidation.validate_identity(
+                ClaimsIdentity({"iss": "peanut"}, True), credentials
+            )
         assert "Unauthorized" in str(excinfo.value)
 
     @pytest.mark.asyncio
     async def test_enterprise_channel_validation_no_audience_fails(self):
-        credentials = SimpleCredentialProvider("2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F")
+        credentials = SimpleCredentialProvider(
+            "2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F"
+        )
         with pytest.raises(Exception) as excinfo:
-            await GovernmentChannelValidation.validate_identity(ClaimsIdentity({
-                "iss": "https://api.botframework.com"
-            }, True), credentials)
+            await GovernmentChannelValidation.validate_identity(
+                ClaimsIdentity({"iss": "https://api.botframework.com"}, True),
+                credentials,
+            )
         assert "Unauthorized" in str(excinfo.value)
 
     @pytest.mark.asyncio
     async def test_enterprise_channel_validation_wrong_audience_fails(self):
-        credentials = SimpleCredentialProvider("2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F")
+        credentials = SimpleCredentialProvider(
+            "2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F"
+        )
         with pytest.raises(Exception) as excinfo:
-            await GovernmentChannelValidation.validate_identity(ClaimsIdentity({
-                "iss": "https://api.botframework.com",
-                "aud": "peanut"
-            }, True), credentials)
+            await GovernmentChannelValidation.validate_identity(
+                ClaimsIdentity(
+                    {"iss": "https://api.botframework.com", "aud": "peanut"}, True
+                ),
+                credentials,
+            )
         assert "Unauthorized" in str(excinfo.value)
