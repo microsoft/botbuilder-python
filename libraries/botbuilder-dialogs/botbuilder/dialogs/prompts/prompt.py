@@ -204,7 +204,7 @@ class Prompt(Dialog):
         msg = switcher.get(int(style.value), default)()
 
         # Update prompt with text, actions and attachments
-        if not prompt:
+        if prompt:
             # clone the prompt the set in the options (note ActivityEx has Properties so this is the safest mechanism)
             prompt = copy.copy(prompt)
 

@@ -99,7 +99,9 @@ class ChoiceFactory:
             inline_separator=options.inline_separator or ", ",
             inline_or=options.inline_or or " or ",
             inline_or_more=options.inline_or_more or ", or ",
-            include_numbers=options.include_numbers or True,
+            include_numbers=(
+                options.include_numbers if options.include_numbers is not None else True
+            ),
         )
 
         # Format list of choices
