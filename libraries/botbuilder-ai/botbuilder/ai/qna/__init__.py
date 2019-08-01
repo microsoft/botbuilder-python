@@ -1,6 +1,5 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
-# TODO import necessary classes from models later
 
 from .qnamaker import QnAMaker
 from .qnamaker_endpoint import QnAMakerEndpoint
