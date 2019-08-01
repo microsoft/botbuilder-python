@@ -79,7 +79,7 @@ class HttpRequestUtils:
         headers = {
             "Content-Type": "application/json",
             "User-Agent": self._get_user_agent(),
-            "Authorization": f"EndpointKey {endpoint.endpoint_key}"
+            "Authorization": f"EndpointKey {endpoint.endpoint_key}",
         }
 
         return headers

@@ -85,33 +85,6 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         with self.assertRaises(TypeError):
             QnAMaker(None)
 
-    def test_v2_legacy_endpoint(self):
-        v2_hostname = "https://westus.api.cognitive.microsoft.com/qnamaker/v2.0"
-
-        v2_legacy_endpoint = QnAMakerEndpoint(
-            self._knowledge_base_id, self._endpoint_key, v2_hostname
-        )
-
-        with self.assertRaises(ValueError):
-            QnAMaker(v2_legacy_endpoint)
-
-    def test_legacy_protocol(self):
-        v3_hostname = "https://westus.api.cognitive.microsoft.com/qnamaker/v3.0"
-        v3_legacy_endpoint = QnAMakerEndpoint(
-            self._knowledge_base_id, self._endpoint_key, v3_hostname
-        )
-        legacy_qna = QnAMaker(v3_legacy_endpoint)
-        is_legacy = True
-
-        v4_hostname = "https://UpdatedNonLegacyQnaHostName.azurewebsites.net/qnamaker"
-        nonlegacy_endpoint = QnAMakerEndpoint(
-            self._knowledge_base_id, self._endpoint_key, v4_hostname
-        )
-        v4_qna = QnAMaker(nonlegacy_endpoint)
-
-        self.assertEqual(is_legacy, legacy_qna._endpoint.host.endswith("v3.0"))
-        self.assertNotEqual(is_legacy, v4_qna._endpoint.host.endswith("v3.0"))
-
     def test_set_default_options_with_no_options_arg(self):
         qna_without_options = QnAMaker(self.tests_endpoint)
 
