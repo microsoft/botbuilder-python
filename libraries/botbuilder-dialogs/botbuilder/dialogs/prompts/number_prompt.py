@@ -3,8 +3,11 @@
 
 from typing import Dict
 from recognizers_number import recognize_number
+from recognizers_text import Culture
+
 from botbuilder.core.turn_context import TurnContext
 from botbuilder.schema import ActivityTypes
+
 from .prompt import Prompt
 from .prompt_options import PromptOptions
 from .prompt_recognizer_result import PromptRecognizerResult
@@ -46,17 +49,24 @@ class NumberPrompt(Prompt):
         result = PromptRecognizerResult()
         if turn_context.activity.type == ActivityTypes.message:
             message = turn_context.activity
-
-            # TODO: Fix constant English with correct constant from text recognizer
-            culture = (
-                turn_context.activity.locale
-                if turn_context.activity.locale is not None
-                else "English"
-            )
-
+            culture = self._get_culture(turn_context)
             results = recognize_number(message.text, culture)
+           
             if results:
                 result.succeeded = True
+                # TODO Parse str to int/float
                 result.value = results[0].resolution["value"]
 
         return result
+
+    def _get_culture(self, turn_context: TurnContext):
+        culture = (
+            turn_context.activity.locale
+            if turn_context.activity.locale
+            else self.default_locale
+        )
+
+        if not culture:
+            culture = Culture.English
+
+        return culture
