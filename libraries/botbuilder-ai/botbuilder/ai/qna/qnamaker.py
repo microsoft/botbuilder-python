@@ -246,10 +246,8 @@ class QnAMaker(QnAMakerTelemetryClient):
 
     def _has_matched_answer_in_kb(self, query_results: [QueryResult]) -> bool:
         if query_results:
-            if len(query_results) is not None:
-                ans = query_results[0].answer
-                if ans != "No good match found in KB.":
+            if query_results[0].id != -1:
 
-                    return True
+                return True
 
         return False

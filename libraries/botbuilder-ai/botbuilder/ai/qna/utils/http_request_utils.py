@@ -79,15 +79,8 @@ class HttpRequestUtils:
         headers = {
             "Content-Type": "application/json",
             "User-Agent": self._get_user_agent(),
+            "Authorization": f"EndpointKey {endpoint.endpoint_key}"
         }
-
-        is_legacy_protocol: bool = endpoint.host.endswith(
-            "v2.0"
-        ) or endpoint.host.endswith("v3.0")
-        if is_legacy_protocol:
-            headers["Ocp-Apim-Subscription-Key"] = endpoint.endpoint_key
-        else:
-            headers["Authorization"] = f"EndpointKey {endpoint.endpoint_key}"
 
         return headers
 

@@ -17,7 +17,6 @@ class QueryResult:
         metadata: object = None,
         source: str = None,
         id: int = None,  # pylint: disable=invalid-name
-        context: object = None,
     ):
         """
         Parameters:
@@ -41,6 +40,3 @@ class QueryResult:
         self.metadata = list(map(lambda meta: Metadata(**meta), metadata))
         self.source = source
         self.id = id  # pylint: disable=invalid-name
-
-        # QnA Maker Preview Multi-Turn Feature
-        self.context = context
