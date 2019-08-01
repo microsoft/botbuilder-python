@@ -51,7 +51,7 @@ class NumberPrompt(Prompt):
             message = turn_context.activity
             culture = self._get_culture(turn_context)
             results = recognize_number(message.text, culture)
-           
+
             if results:
                 result.succeeded = True
                 # TODO Parse str to int/float
