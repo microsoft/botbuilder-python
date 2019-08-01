@@ -6,7 +6,7 @@ from enum import Enum
 
 class QnATelemetryConstants(str, Enum):
     """
-    The IBotTelemetryClient event and property names that logged by default.
+    Default QnA event and property names logged using IBotTelemetryClient.
     """
 
     qna_message_event = "QnaMessage"

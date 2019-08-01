@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from .metadata import Metadata
+from .models import Metadata
 
 
 # figure out if 300 milliseconds is ok for python requests library...or 100000
