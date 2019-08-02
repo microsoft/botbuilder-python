@@ -2,8 +2,10 @@
 # Licensed under the MIT License.
 
 from typing import Dict
+
+from babel.numbers import parse_decimal
 from recognizers_number import recognize_number
-from recognizers_text import Culture
+from recognizers_text import Culture, ModelResult
 
 from botbuilder.core.turn_context import TurnContext
 from botbuilder.schema import ActivityTypes
@@ -50,12 +52,13 @@ class NumberPrompt(Prompt):
         if turn_context.activity.type == ActivityTypes.message:
             message = turn_context.activity
             culture = self._get_culture(turn_context)
-            results = recognize_number(message.text, culture)
+            results: [ModelResult] = recognize_number(message.text, culture)
 
             if results:
                 result.succeeded = True
-                # TODO Parse str to int/float
-                result.value = results[0].resolution["value"]
+                result.value = parse_decimal(
+                    results[0].resolution["value"], locale=culture.replace("-", "_")
+                )
 
         return result
 
