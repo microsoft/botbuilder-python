@@ -16,6 +16,9 @@ from botbuilder.schema import (
 from botframework.connector import Channels, EmulatorApiClient
 from botframework.connector.aio import ConnectorClient
 from botframework.connector.auth import (
+    ChannelValidation,
+    GovernmentChannelValidation,
+    GovernmentConstants,
     MicrosoftAppCredentials,
     JwtTokenValidation,
     SimpleCredentialProvider,
@@ -90,6 +93,20 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             self.settings.app_id, self.settings.app_password
         )
         self._is_emulating_oauth_cards = False
+
+        if self.settings.open_id_metadata:
+            ChannelValidation.open_id_metadata_endpoint = self.settings.open_id_metadata
+            GovernmentChannelValidation.OPEN_ID_METADATA_ENDPOINT = (
+                self.settings.open_id_metadata
+            )
+
+        if JwtTokenValidation.is_government(self.settings.channel_service):
+            self._credentials.oauth_endpoint = (
+                GovernmentConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL
+            )
+            self._credentials.oauth_scope = (
+                GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
+            )
 
     async def continue_conversation(
         self, bot_id: str, reference: ConversationReference, callback: Callable
