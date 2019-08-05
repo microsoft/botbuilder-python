@@ -16,7 +16,7 @@ class BookingDialog(CancelAndHelpDialog):
         super(BookingDialog, self).__init__(dialog_id or BookingDialog.__name__)
 
         self.add_dialog(TextPrompt(TextPrompt.__name__))
-        # self.add_dialog(ConfirmPrompt(ConfirmPrompt.__name__))
+        self.add_dialog(ConfirmPrompt(ConfirmPrompt.__name__))
         self.add_dialog(DateResolverDialog(DateResolverDialog.__name__))
         self.add_dialog(
             WaterfallDialog(
@@ -25,7 +25,7 @@ class BookingDialog(CancelAndHelpDialog):
                     self.destination_step,
                     self.origin_step,
                     self.travel_date_step,
-                    # self.confirm_step,
+                    self.confirm_step,
                     self.final_step,
                 ],
             )
@@ -133,7 +133,6 @@ class BookingDialog(CancelAndHelpDialog):
 
         if step_context.result:
             booking_details = step_context.options
-            booking_details.travel_date = step_context.result
 
             return await step_context.end_dialog(booking_details)
         return await step_context.end_dialog()
