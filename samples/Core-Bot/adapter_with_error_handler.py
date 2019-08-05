@@ -21,7 +21,7 @@ class AdapterWithErrorHandler(BotFrameworkAdapter):
         self._conversation_state = conversation_state
 
         # Catch-all for errors.
-        async def on_error(self, context: TurnContext, error: Exception):
+        async def on_error(context: TurnContext, error: Exception):
             # This check writes out errors to console log
             # NOTE: In production environment, you should consider logging this to Azure
             #       application insights.
@@ -34,6 +34,7 @@ class AdapterWithErrorHandler(BotFrameworkAdapter):
             )
             await context.send_activity(error_message)
             # Clear out state
+            nonlocal self
             await self._conversation_state.delete(context)
 
         self.on_turn_error = on_error
