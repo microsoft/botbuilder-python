@@ -5,7 +5,7 @@ from typing import Callable
 import aiounittest
 from recognizers_text import Culture
 
-from botbuilder.dialogs import DialogContext, DialogTurnResult
+from botbuilder.dialogs import DialogContext
 from botbuilder.dialogs.prompts import (
     NumberPrompt,
     PromptOptions,
@@ -37,9 +37,9 @@ class NumberPromptMock(NumberPrompt):
             turn_context=None, state=None, options=options, is_retry=False
         )
 
-    async def on_prompt_null_options(self, dc: DialogContext):
+    async def on_prompt_null_options(self, dialog_context: DialogContext):
         # Should throw TypeError
-        await self.on_prompt(dc.context, state=None, options=None, is_retry=False)
+        await self.on_prompt(dialog_context.context, state=None, options=None, is_retry=False)
 
     async def on_recognize_null_context(self):
         # Should throw TypeError
@@ -299,18 +299,23 @@ class NumberPromptTests(aiounittest.AsyncTestCase):
 
             if results.status == DialogTurnStatus.Empty:
                 options = PromptOptions(
-                    prompt=Activity(type=ActivityTypes.message, text="Enter a number."),
+                    prompt=Activity(
+                        type=ActivityTypes.message,
+                        text="Enter a number."
+                    ),
                     retry_prompt=Activity(
                         type=ActivityTypes.message,
-                        text="You must enter a positive number less than 100.",
-                    ),
+                        text="You must enter a positive number less than 100."
+                    )
                 )
                 await dialog_context.prompt("NumberPrompt", options)
 
             elif results.status == DialogTurnStatus.Complete:
                 number_result = int(results.result)
                 await turn_context.send_activity(
-                    MessageFactory.text(f"Bot received the number '{number_result}'.")
+                    MessageFactory.text(
+                        f"Bot received the number '{number_result}'."
+                    )
                 )
 
             await conver_state.save_changes(turn_context)
@@ -357,14 +362,18 @@ class NumberPromptTests(aiounittest.AsyncTestCase):
 
             if results.status == DialogTurnStatus.Empty:
                 options = PromptOptions(
-                    prompt=Activity(type=ActivityTypes.message, text="Enter a number.")
+                    prompt=Activity(
+                        type=ActivityTypes.message, text="Enter a number."
+                    )
                 )
                 await dialog_context.prompt("NumberPrompt", options)
 
             elif results.status == DialogTurnStatus.Complete:
                 number_result = float(results.result)
                 await turn_context.send_activity(
-                    MessageFactory.text(f"Bot received the number '{number_result}'.")
+                    MessageFactory.text(
+                        f"Bot received the number '{number_result}'."
+                    )
                 )
 
             await conver_state.save_changes(turn_context)
@@ -398,7 +407,9 @@ class NumberPromptTests(aiounittest.AsyncTestCase):
 
             if results.status == DialogTurnStatus.Empty:
                 options = PromptOptions(
-                    prompt=Activity(type=ActivityTypes.message, text="Enter a number.")
+                    prompt=Activity(
+                        type=ActivityTypes.message, text="Enter a number."
+                    )
                 )
                 await dialog_context.prompt("NumberPrompt", options)
 
@@ -410,7 +421,9 @@ class NumberPromptTests(aiounittest.AsyncTestCase):
         dialog_state = conver_state.create_property("dialogState")
         dialogs = DialogSet(dialog_state)
 
-        number_prompt = NumberPrompt("NumberPrompt", None, None)
+        number_prompt = NumberPrompt(
+            "NumberPrompt", None, None
+        )
         dialogs.add(number_prompt)
 
         adapter = TestAdapter(exec_test)
@@ -420,3 +433,4 @@ class NumberPromptTests(aiounittest.AsyncTestCase):
         await step2.send(
             Activity(type=ActivityTypes.message, text="3,14", locale=Culture.Dutch)
         )
+    
