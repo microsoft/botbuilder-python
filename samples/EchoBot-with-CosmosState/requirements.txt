@@ -1,3 +1,0 @@
-botbuilder-core>=4.4.0b1
-aiohttp>=3.0.0
-azure.cosmos>=3.0.0
