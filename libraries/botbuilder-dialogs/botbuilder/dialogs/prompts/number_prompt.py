@@ -1,18 +1,29 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from typing import Dict
+from typing import Callable, Dict
+
+from babel.numbers import parse_decimal
 from recognizers_number import recognize_number
+from recognizers_text import Culture, ModelResult
+
 from botbuilder.core.turn_context import TurnContext
 from botbuilder.schema import ActivityTypes
-from .prompt import Prompt
+
+from .prompt import Prompt, PromptValidatorContext
 from .prompt_options import PromptOptions
 from .prompt_recognizer_result import PromptRecognizerResult
 
 
 class NumberPrompt(Prompt):
-    # TODO: PromptValidator
-    def __init__(self, dialog_id: str, validator: object, default_locale: str):
+    # TODO: PromptValidator needs to be fixed
+    # Does not accept answer as intended (times out)
+    def __init__(
+        self,
+        dialog_id: str,
+        validator: Callable[[PromptValidatorContext], bool] = None,
+        default_locale: str = None,
+    ):
         super(NumberPrompt, self).__init__(dialog_id, validator)
         self.default_locale = default_locale
 
@@ -30,9 +41,8 @@ class NumberPrompt(Prompt):
 
         if is_retry and options.retry_prompt is not None:
             turn_context.send_activity(options.retry_prompt)
-        else:
-            if options.prompt is not None:
-                await turn_context.send_activity(options.prompt)
+        elif options.prompt is not None:
+            await turn_context.send_activity(options.prompt)
 
     async def on_recognize(
         self,
@@ -46,17 +56,25 @@ class NumberPrompt(Prompt):
         result = PromptRecognizerResult()
         if turn_context.activity.type == ActivityTypes.message:
             message = turn_context.activity
+            culture = self._get_culture(turn_context)
+            results: [ModelResult] = recognize_number(message.text, culture)
 
-            # TODO: Fix constant English with correct constant from text recognizer
-            culture = (
-                turn_context.activity.locale
-                if turn_context.activity.locale is not None
-                else "English"
-            )
-
-            results = recognize_number(message.text, culture)
             if results:
                 result.succeeded = True
-                result.value = results[0].resolution["value"]
+                result.value = parse_decimal(
+                    results[0].resolution["value"], locale=culture.replace("-", "_")
+                )
 
         return result
+
+    def _get_culture(self, turn_context: TurnContext):
+        culture = (
+            turn_context.activity.locale
+            if turn_context.activity.locale
+            else self.default_locale
+        )
+
+        if not culture:
+            culture = Culture.English
+
+        return culture
