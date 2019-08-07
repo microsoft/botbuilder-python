@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from typing import Dict
+from typing import Callable, Dict
 
 from babel.numbers import parse_decimal
 from recognizers_number import recognize_number
@@ -10,14 +10,20 @@ from recognizers_text import Culture, ModelResult
 from botbuilder.core.turn_context import TurnContext
 from botbuilder.schema import ActivityTypes
 
-from .prompt import Prompt
+from .prompt import Prompt, PromptValidatorContext
 from .prompt_options import PromptOptions
 from .prompt_recognizer_result import PromptRecognizerResult
 
 
 class NumberPrompt(Prompt):
-    # TODO: PromptValidator
-    def __init__(self, dialog_id: str, validator: object, default_locale: str):
+    # TODO: PromptValidator needs to be fixed
+    # Does not accept answer as intended (times out)
+    def __init__(
+        self,
+        dialog_id: str,
+        validator: Callable[[PromptValidatorContext], bool] = None,
+        default_locale: str = None,
+    ):
         super(NumberPrompt, self).__init__(dialog_id, validator)
         self.default_locale = default_locale
 
