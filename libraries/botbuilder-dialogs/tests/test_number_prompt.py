@@ -160,7 +160,6 @@ class NumberPromptTests(aiounittest.AsyncTestCase):
         )
         dialogs.add(number_prompt)
 
-        # WORKS! Just testing number prompt vanilla
         step1 = await adapter.send("hello")
         await step1.assert_reply("Enter a number.")
         # TODO: something is breaking in the validators or retry prompt
