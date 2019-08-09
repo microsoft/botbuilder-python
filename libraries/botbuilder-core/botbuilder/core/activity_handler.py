@@ -1,13 +1,13 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
-
+from abc import ABC, abstractmethod
 from typing import List
 
 from botbuilder.schema import ActivityTypes, ChannelAccount, MessageReaction
 from .turn_context import TurnContext
 
 
-class ActivityHandler:
+class ActivityHandler(ABC):
     async def on_turn(self, turn_context: TurnContext):
         if turn_context is None:
             raise TypeError("ActivityHandler.on_turn(): turn_context cannot be None.")
@@ -36,9 +36,8 @@ class ActivityHandler:
         else:
             await self.on_unrecognized_activity_type(turn_context)
 
-    async def on_message_activity(  # pylint: disable=unused-argument
-        self, turn_context: TurnContext
-    ):
+    @abstractmethod
+    async def on_message_activity(self, turn_context: TurnContext):
         return
 
     async def on_conversation_update_activity(self, turn_context: TurnContext):
@@ -58,14 +57,16 @@ class ActivityHandler:
             )
         return
 
+    @abstractmethod
     async def on_members_added_activity(
         self, members_added: ChannelAccount, turn_context: TurnContext
-    ):  # pylint: disable=unused-argument
+    ):
         return
 
+    @abstractmethod
     async def on_members_removed_activity(
         self, members_removed: ChannelAccount, turn_context: TurnContext
-    ):  # pylint: disable=unused-argument
+    ):
         return
 
     async def on_message_reaction_activity(self, turn_context: TurnContext):
@@ -79,12 +80,14 @@ class ActivityHandler:
                 turn_context.activity.reactions_removed, turn_context
             )
 
-    async def on_reactions_added(  # pylint: disable=unused-argument
+    @abstractmethod
+    async def on_reactions_added(
         self, message_reactions: List[MessageReaction], turn_context: TurnContext
     ):
         return
 
-    async def on_reactions_removed(  # pylint: disable=unused-argument
+    @abstractmethod
+    async def on_reactions_removed(
         self, message_reactions: List[MessageReaction], turn_context: TurnContext
     ):
         return
@@ -95,17 +98,14 @@ class ActivityHandler:
 
         return await self.on_event(turn_context)
 
-    async def on_token_response_event(  # pylint: disable=unused-argument
-        self, turn_context: TurnContext
-    ):
+    @abstractmethod
+    async def on_token_response_event(self, turn_context: TurnContext):
         return
 
-    async def on_event(  # pylint: disable=unused-argument
-        self, turn_context: TurnContext
-    ):
+    @abstractmethod
+    async def on_event(self, turn_context: TurnContext):
         return
 
-    async def on_unrecognized_activity_type(  # pylint: disable=unused-argument
-        self, turn_context: TurnContext
-    ):
+    @abstractmethod
+    async def on_unrecognized_activity_type(self, turn_context: TurnContext):
         return
