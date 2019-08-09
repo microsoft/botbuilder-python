@@ -8,10 +8,12 @@ from . import conversation_reference_extension
 
 from .about import __version__
 from .activity_handler import ActivityHandler
+from .auto_save_state_middleware import AutoSaveStateMiddleware
 from .bot_assert import BotAssert
 from .bot_adapter import BotAdapter
 from .bot_framework_adapter import BotFrameworkAdapter, BotFrameworkAdapterSettings
 from .bot_state import BotState
+from .bot_state_set import BotStateSet
 from .bot_telemetry_client import BotTelemetryClient
 from .card_factory import CardFactory
 from .conversation_state import ConversationState
@@ -33,11 +35,13 @@ from .user_token_provider import UserTokenProvider
 __all__ = [
     "ActivityHandler",
     "AnonymousReceiveMiddleware",
+    "AutoSaveStateMiddleware",
     "BotAdapter",
     "BotAssert",
     "BotFrameworkAdapter",
     "BotFrameworkAdapterSettings",
     "BotState",
+    "BotStateSet",
     "BotTelemetryClient",
     "calculate_change_hash",
     "CardFactory",
