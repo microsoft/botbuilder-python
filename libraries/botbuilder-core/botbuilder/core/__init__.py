@@ -25,6 +25,7 @@ from .middleware_set import AnonymousReceiveMiddleware, Middleware, MiddlewareSe
 from .null_telemetry_client import NullTelemetryClient
 from .recognizer import Recognizer
 from .recognizer_result import RecognizerResult, TopIntent
+from .show_typing_middleware import ShowTypingMiddleware
 from .state_property_accessor import StatePropertyAccessor
 from .state_property_info import StatePropertyInfo
 from .storage import Storage, StoreItem, calculate_change_hash
@@ -56,6 +57,7 @@ __all__ = [
     "NullTelemetryClient",
     "Recognizer",
     "RecognizerResult",
+    "ShowTypingMiddleware",
     "StatePropertyAccessor",
     "StatePropertyInfo",
     "Storage",
