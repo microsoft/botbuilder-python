@@ -14,7 +14,7 @@ from .bot_adapter import BotAdapter
 from .bot_framework_adapter import BotFrameworkAdapter, BotFrameworkAdapterSettings
 from .bot_state import BotState
 from .bot_state_set import BotStateSet
-from .bot_telemetry_client import BotTelemetryClient
+from .bot_telemetry_client import BotTelemetryClient, Severity
 from .card_factory import CardFactory
 from .conversation_state import ConversationState
 from .intent_score import IntentScore
@@ -57,6 +57,7 @@ __all__ = [
     "NullTelemetryClient",
     "Recognizer",
     "RecognizerResult",
+    "Severity",
     "ShowTypingMiddleware",
     "StatePropertyAccessor",
     "StatePropertyInfo",

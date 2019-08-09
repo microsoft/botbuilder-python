@@ -3,7 +3,7 @@
 
 import traceback
 from typing import Dict
-from .bot_telemetry_client import BotTelemetryClient, TelemetryDataPointType
+from .bot_telemetry_client import BotTelemetryClient, TelemetryDataPointType, Severity
 
 
 class NullTelemetryClient(BotTelemetryClient):
@@ -90,7 +90,7 @@ class NullTelemetryClient(BotTelemetryClient):
         """
         return
 
-    def track_trace(self, name, properties=None, severity=None):
+    def track_trace(self, name, properties=None, severity: Severity = None):
         """
         Sends a single trace statement.
         :param name: the trace statement.\n
