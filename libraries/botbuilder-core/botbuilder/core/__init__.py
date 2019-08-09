@@ -14,7 +14,7 @@ from .bot_adapter import BotAdapter
 from .bot_framework_adapter import BotFrameworkAdapter, BotFrameworkAdapterSettings
 from .bot_state import BotState
 from .bot_state_set import BotStateSet
-from .bot_telemetry_client import BotTelemetryClient
+from .bot_telemetry_client import BotTelemetryClient, Severity
 from .card_factory import CardFactory
 from .conversation_state import ConversationState
 from .intent_score import IntentScore
@@ -26,6 +26,7 @@ from .null_telemetry_client import NullTelemetryClient
 from .private_conversation_state import PrivateConversationState
 from .recognizer import Recognizer
 from .recognizer_result import RecognizerResult, TopIntent
+from .show_typing_middleware import ShowTypingMiddleware
 from .state_property_accessor import StatePropertyAccessor
 from .state_property_info import StatePropertyInfo
 from .storage import Storage, StoreItem, calculate_change_hash
@@ -58,6 +59,8 @@ __all__ = [
     "PrivateConversationState",
     "Recognizer",
     "RecognizerResult",
+    "Severity",
+    "ShowTypingMiddleware",
     "StatePropertyAccessor",
     "StatePropertyInfo",
     "Storage",
