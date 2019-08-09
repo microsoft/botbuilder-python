@@ -1,11 +1,13 @@
 from botbuilder.schema import Activity
 
 from .emulator_validation import EmulatorValidation
+from .enterprise_channel_validation import EnterpriseChannelValidation
 from .channel_validation import ChannelValidation
 from .microsoft_app_credentials import MicrosoftAppCredentials
 from .credential_provider import CredentialProvider
 from .claims_identity import ClaimsIdentity
 from .government_constants import GovernmentConstants
+from .government_channel_validation import GovernmentChannelValidation
 
 
 class JwtTokenValidation:
@@ -70,14 +72,35 @@ class JwtTokenValidation:
                 auth_header, credentials, channel_service, channel_id
             )
 
-        # Right now public Azure is the only supported scenario (Gov and Enterprise pending)
-        if service_url:
-            return await ChannelValidation.authenticate_channel_token_with_service_url(
-                auth_header, credentials, service_url, channel_id
+        # If the channel is Public Azure
+        if not channel_service:
+            if service_url:
+                return await ChannelValidation.authenticate_channel_token_with_service_url(
+                    auth_header, credentials, service_url, channel_id
+                )
+
+            return await ChannelValidation.authenticate_channel_token(
+                auth_header, credentials, channel_id
             )
 
-        return await ChannelValidation.authenticate_channel_token(
-            auth_header, credentials, channel_id
+        if JwtTokenValidation.is_government(channel_service):
+            if service_url:
+                return await GovernmentChannelValidation.authenticate_channel_token_with_service_url(
+                    auth_header, credentials, service_url, channel_id
+                )
+
+            return await GovernmentChannelValidation.authenticate_channel_token(
+                auth_header, credentials, channel_id
+            )
+
+        # Otherwise use Enterprise Channel Validation
+        if service_url:
+            return await EnterpriseChannelValidation.authenticate_channel_token_with_service_url(
+                auth_header, credentials, service_url, channel_id, channel_service
+            )
+
+        return await EnterpriseChannelValidation.authenticate_channel_token(
+            auth_header, credentials, channel_id, channel_service
         )
 
     @staticmethod

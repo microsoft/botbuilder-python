@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 from datetime import datetime, timedelta
 from urllib.parse import urlparse
 from msrest.authentication import BasicTokenAuthentication, Authentication
@@ -43,11 +46,16 @@ class MicrosoftAppCredentials(Authentication):
     MicrosoftAppCredentials auth implementation and cache.
     """
 
-    refreshEndpoint = AUTH_SETTINGS["refreshEndpoint"]
-    refreshScope = AUTH_SETTINGS["refreshScope"]
     schema = "Bearer"
 
-    trustedHostNames = {}
+    trustedHostNames = {
+        "state.botframework.com": datetime.max,
+        "api.botframework.com": datetime.max,
+        "token.botframework.com": datetime.max,
+        "state.botframework.azure.us": datetime.max,
+        "api.botframework.azure.us": datetime.max,
+        "token.botframework.azure.us": datetime.max,
+    }
     cache = {}
 
     def __init__(self, app_id: str, password: str, channel_auth_tenant: str = None):
@@ -71,6 +79,7 @@ class MicrosoftAppCredentials(Authentication):
             + tenant
             + Constants.TO_CHANNEL_FROM_BOT_TOKEN_ENDPOINT_PATH
         )
+        self.oauth_scope = AUTH_SETTINGS["refreshScope"]
         self.token_cache_key = app_id + "-cache"
 
     def signed_session(self) -> requests.Session:  # pylint: disable=arguments-differ
@@ -123,7 +132,7 @@ class MicrosoftAppCredentials(Authentication):
             "grant_type": "client_credentials",
             "client_id": self.microsoft_app_id,
             "client_secret": self.microsoft_app_password,
-            "scope": MicrosoftAppCredentials.refreshScope,
+            "scope": self.oauth_scope,
         }
 
         response = requests.post(self.oauth_endpoint, data=options)

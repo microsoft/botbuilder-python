@@ -4,6 +4,7 @@
 import asyncio
 import base64
 import json
+import os
 from typing import List, Callable, Awaitable, Union, Dict
 from msrest.serialization import Model
 from botbuilder.schema import (
@@ -16,6 +17,10 @@ from botbuilder.schema import (
 from botframework.connector import Channels, EmulatorApiClient
 from botframework.connector.aio import ConnectorClient
 from botframework.connector.auth import (
+    AuthenticationConstants,
+    ChannelValidation,
+    GovernmentChannelValidation,
+    GovernmentConstants,
     MicrosoftAppCredentials,
     JwtTokenValidation,
     SimpleCredentialProvider,
@@ -81,6 +86,13 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
     def __init__(self, settings: BotFrameworkAdapterSettings):
         super(BotFrameworkAdapter, self).__init__()
         self.settings = settings or BotFrameworkAdapterSettings("", "")
+        self.settings.channel_service = self.settings.channel_service or os.environ.get(
+            AuthenticationConstants.CHANNEL_SERVICE
+        )
+        self.settings.open_id_metadata = (
+            self.settings.open_id_metadata
+            or os.environ.get(AuthenticationConstants.BOT_OPEN_ID_METADATA_KEY)
+        )
         self._credentials = MicrosoftAppCredentials(
             self.settings.app_id,
             self.settings.app_password,
@@ -90,6 +102,20 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             self.settings.app_id, self.settings.app_password
         )
         self._is_emulating_oauth_cards = False
+
+        if self.settings.open_id_metadata:
+            ChannelValidation.open_id_metadata_endpoint = self.settings.open_id_metadata
+            GovernmentChannelValidation.OPEN_ID_METADATA_ENDPOINT = (
+                self.settings.open_id_metadata
+            )
+
+        if JwtTokenValidation.is_government(self.settings.channel_service):
+            self._credentials.oauth_endpoint = (
+                GovernmentConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL
+            )
+            self._credentials.oauth_scope = (
+                GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
+            )
 
     async def continue_conversation(
         self, bot_id: str, reference: ConversationReference, callback: Callable
@@ -206,7 +232,10 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         :return:
         """
         claims = await JwtTokenValidation.authenticate_request(
-            request, auth_header, self._credential_provider
+            request,
+            auth_header,
+            self._credential_provider,
+            self.settings.channel_service,
         )
 
         if not claims.is_authenticated:
