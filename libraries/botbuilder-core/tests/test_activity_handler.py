@@ -15,59 +15,49 @@ class TestingActivityHandler(ActivityHandler):
     def __init__(self):
         self.record: List[str] = []
 
-    async def on_message_activity(  # pylint: disable=unused-argument
-        self, turn_context: TurnContext
-    ):
+    async def on_message_activity(self, turn_context: TurnContext):
         self.record.append("on_message_activity")
-        return
+        return await super().on_message_activity(turn_context)
 
-    async def on_members_added_activity(  # pylint: disable=unused-argument
+    async def on_members_added_activity(
         self, members_added: ChannelAccount, turn_context: TurnContext
     ):
         self.record.append("on_members_added_activity")
-        return
+        return await super().on_members_added_activity(members_added, turn_context)
 
-    async def on_members_removed_activity(  # pylint: disable=unused-argument
+    async def on_members_removed_activity(
         self, members_removed: ChannelAccount, turn_context: TurnContext
     ):
         self.record.append("on_members_removed_activity")
-        return
+        return await super().on_members_removed_activity(members_removed, turn_context)
 
-    async def on_message_reaction_activity(
-        self, turn_context: TurnContext
-    ):  # pylint: disable=unused-argument
+    async def on_message_reaction_activity(self, turn_context: TurnContext):
         self.record.append("on_message_reaction_activity")
-        return
+        return await super().on_message_reaction_activity(turn_context)
 
-    async def on_reactions_added(  # pylint: disable=unused-argument
+    async def on_reactions_added(
         self, message_reactions: List[MessageReaction], turn_context: TurnContext
     ):
         self.record.append("on_reactions_added")
-        return
+        return await super().on_reactions_added(message_reactions, turn_context)
 
-    async def on_reactions_removed(  # pylint: disable=unused-argument
+    async def on_reactions_removed(
         self, message_reactions: List[MessageReaction], turn_context: TurnContext
     ):
         self.record.append("on_reactions_removed")
-        return
+        return await super().on_reactions_removed(message_reactions, turn_context)
 
-    async def on_token_response_event(  # pylint: disable=unused-argument
-        self, turn_context: TurnContext
-    ):
+    async def on_token_response_event(self, turn_context: TurnContext):
         self.record.append("on_token_response_event")
-        return
+        return await super().on_token_response_event(turn_context)
 
-    async def on_event(  # pylint: disable=unused-argument
-        self, turn_context: TurnContext
-    ):
+    async def on_event(self, turn_context: TurnContext):
         self.record.append("on_event")
-        return
+        return await super().on_event(turn_context)
 
-    async def on_unrecognized_activity_type(  # pylint: disable=unused-argument
-        self, turn_context: TurnContext
-    ):
+    async def on_unrecognized_activity_type(self, turn_context: TurnContext):
         self.record.append("on_unrecognized_activity_type")
-        return
+        return await super().on_unrecognized_activity_type(turn_context)
 
 
 class NotImplementedAdapter(BotAdapter):
