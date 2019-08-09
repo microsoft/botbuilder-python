@@ -1,13 +1,12 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 from typing import List
-from ABC import ABC
 
 from botbuilder.schema import ActivityTypes, ChannelAccount, MessageReaction
 from .turn_context import TurnContext
 
 
-class ActivityHandler(ABC):
+class ActivityHandler:
     async def on_turn(self, turn_context: TurnContext):
         if turn_context is None:
             raise TypeError("ActivityHandler.on_turn(): turn_context cannot be None.")
