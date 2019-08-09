@@ -31,7 +31,7 @@ class BotStateMock(BotState):
             assert force, "BotStateMock.save_changes(): force not set."
         self.write_called = True
 
-    def get_storage_key(self, turn_context: TurnContext) -> str:
+    def get_storage_key(self, turn_context: TurnContext) -> str:  # pylint: unused-argument
         return ""
 
 
