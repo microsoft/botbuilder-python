@@ -32,8 +32,8 @@ class BotStateMock(BotState):
         self.write_called = True
 
     def get_storage_key(
-        self, turn_context: TurnContext
-    ) -> str:  # pylint: disable=unused-argument
+        self, turn_context: TurnContext  # pylint: disable=unused-argument
+    ) -> str:
         return ""
 
 
