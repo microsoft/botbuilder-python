@@ -7,6 +7,7 @@ from typing import Dict
 from applicationinsights import TelemetryClient  # pylint: disable=no-name-in-module
 from botbuilder.core.bot_telemetry_client import (
     BotTelemetryClient,
+    Severity,
     TelemetryDataPointType,
 )
 from .integration_post_data import IntegrationPostData
@@ -168,7 +169,7 @@ class ApplicationInsightsTelemetryClient(BotTelemetryClient):
         )
 
     def track_trace(
-        self, name: str, properties: Dict[str, object] = None, severity=None
+        self, name: str, properties: Dict[str, object] = None, severity: Severity = None
     ):
         """
         Sends a single trace statement.

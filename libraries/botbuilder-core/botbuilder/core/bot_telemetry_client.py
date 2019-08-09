@@ -7,6 +7,14 @@ from typing import Dict
 from enum import Enum
 
 
+class Severity(Enum):
+    verbose = 0
+    information = 1
+    warning = 2
+    error = 3
+    critical = 4
+
+
 class TelemetryDataPointType(Enum):
     measurement = 0
     aggregation = 1
@@ -105,7 +113,7 @@ class BotTelemetryClient(ABC):
         )
 
     @abstractmethod
-    def track_trace(self, name, properties=None, severity=None):
+    def track_trace(self, name, properties=None, severity: Severity = None):
         """
         Sends a single trace statement.
         :param name: the trace statement.\n
