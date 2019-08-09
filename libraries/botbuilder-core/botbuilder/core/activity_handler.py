@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
-from ABC import ABC
 from typing import List
+from ABC import ABC
 
 from botbuilder.schema import ActivityTypes, ChannelAccount, MessageReaction
 from .turn_context import TurnContext
