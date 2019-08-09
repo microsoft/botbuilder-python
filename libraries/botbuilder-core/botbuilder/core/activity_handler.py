@@ -1,7 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+from typing import List
 
-from botbuilder.schema import ActivityTypes, ChannelAccount
+from botbuilder.schema import ActivityTypes, ChannelAccount, MessageReaction
 from .turn_context import TurnContext
 
 
@@ -27,6 +28,8 @@ class ActivityHandler:
             await self.on_message_activity(turn_context)
         elif turn_context.activity.type == ActivityTypes.conversation_update:
             await self.on_conversation_update_activity(turn_context)
+        elif turn_context.activity.type == ActivityTypes.message_reaction:
+            await self.on_message_reaction_activity(turn_context)
         elif turn_context.activity.type == ActivityTypes.event:
             await self.on_event_activity(turn_context)
         else:
@@ -62,6 +65,27 @@ class ActivityHandler:
     async def on_members_removed_activity(
         self, members_removed: ChannelAccount, turn_context: TurnContext
     ):  # pylint: disable=unused-argument
+        return
+
+    async def on_message_reaction_activity(self, turn_context: TurnContext):
+        if turn_context.activity.reactions_added is not None:
+            await self.on_reactions_added(
+                turn_context.activity.reactions_added, turn_context
+            )
+
+        if turn_context.activity.reactions_removed is not None:
+            await self.on_reactions_removed(
+                turn_context.activity.reactions_removed, turn_context
+            )
+
+    async def on_reactions_added(  # pylint: disable=unused-argument
+        self, message_reactions: List[MessageReaction], turn_context: TurnContext
+    ):
+        return
+
+    async def on_reactions_removed(  # pylint: disable=unused-argument
+        self, message_reactions: List[MessageReaction], turn_context: TurnContext
+    ):
         return
 
     async def on_event_activity(self, turn_context: TurnContext):
