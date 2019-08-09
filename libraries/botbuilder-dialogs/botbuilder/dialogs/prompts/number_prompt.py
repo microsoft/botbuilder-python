@@ -3,9 +3,9 @@
 
 from typing import Callable, Dict
 
-from babel.numbers import parse_decimal
 from recognizers_number import recognize_number
 from recognizers_text import Culture, ModelResult
+from babel.numbers import parse_decimal
 
 from botbuilder.core.turn_context import TurnContext
 from botbuilder.schema import ActivityTypes
