@@ -4,6 +4,7 @@
 import asyncio
 import base64
 import json
+import os
 from typing import List, Callable, Awaitable, Union, Dict
 from msrest.serialization import Model
 from botbuilder.schema import (
@@ -16,6 +17,7 @@ from botbuilder.schema import (
 from botframework.connector import Channels, EmulatorApiClient
 from botframework.connector.aio import ConnectorClient
 from botframework.connector.auth import (
+    AuthenticationConstants,
     ChannelValidation,
     GovernmentChannelValidation,
     GovernmentConstants,
@@ -84,6 +86,13 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
     def __init__(self, settings: BotFrameworkAdapterSettings):
         super(BotFrameworkAdapter, self).__init__()
         self.settings = settings or BotFrameworkAdapterSettings("", "")
+        self.settings.channel_service = self.settings.channel_service or os.environ.get(
+            AuthenticationConstants.CHANNEL_SERVICE
+        )
+        self.settings.open_id_metadata = (
+            self.settings.open_id_metadata
+            or os.environ.get(AuthenticationConstants.BOT_OPEN_ID_METADATA_KEY)
+        )
         self._credentials = MicrosoftAppCredentials(
             self.settings.app_id,
             self.settings.app_password,
