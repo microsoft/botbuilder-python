@@ -1,9 +1,10 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import re
 from copy import copy
 from typing import List, Callable, Union, Dict
-from botbuilder.schema import Activity, ConversationReference, ResourceResponse
+from botbuilder.schema import Activity, ConversationReference, Mention, ResourceResponse
 
 
 class TurnContext:
@@ -290,3 +291,29 @@ class TurnContext:
                 activity.reply_to_id = reference.activity_id
 
         return activity
+
+    @staticmethod
+    def remove_recipient_mention(activity: Activity) -> str:
+        return TurnContext.remove_mention_text(activity, activity.recipient.id)
+
+    @staticmethod
+    def remove_mention_text(activity: Activity, identifier: str) -> str:
+        mentions = TurnContext.get_mentions(activity)
+        for mention in mentions:
+            if mention.mentioned.id == identifier:
+                mention_name_match = re.match(
+                    r"/(?<=<at.*>)(.*?)(?=<\/at>)/i", mention.text
+                )
+                if mention_name_match:
+                    activity.text = activity.text.replace(mention_name_match[0], "")
+                    activity.text = activity.text.replace(r"/<at><\/at>/g", "")
+        return activity.text
+
+    @staticmethod
+    def get_mentions(activity: Activity) -> List[Mention]:
+        result: List[Mention] = []
+        if activity.entities is not None:
+            for entity in activity.entities:
+                if entity.type.lower() == "mention":
+                    result.append(entity)
+        return result
