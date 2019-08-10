@@ -3,16 +3,15 @@
 """Middleware Component for logging Activity messages."""
 
 from typing import Awaitable, Callable, List, Dict
+from botbuilder.schema import Activity, ConversationReference, ActivityTypes
 from .bot_telemetry_client import BotTelemetryClient
-from .bot_state import BotState
 from .bot_assert import BotAssert
-from .bot_state_set import BotStateSet
 from .middleware_set import Middleware
 from .null_telemetry_client import NullTelemetryClient
 from .turn_context import TurnContext
 from .telemetry_constants import TelemetryConstants
 from .telemetry_logger_constants import TelemetryLoggerConstants
-from botbuilder.schema import Activity, ConversationReference, ActivityTypes
+
 
 # pylint: disable=line-too-long
 class TelemetryLoggerMiddleware(Middleware):
@@ -34,7 +33,7 @@ class TelemetryLoggerMiddleware(Middleware):
         return self._log_personal_information
 
     async def on_process_request(self, context: TurnContext,
-                           logic_fn: Callable[[TurnContext], Awaitable]) -> None:
+                                 logic_fn: Callable[[TurnContext], Awaitable]) -> None:
         """Logs events based on incoming and outgoing activities using
         BotTelemetryClient base class
 
@@ -127,7 +126,7 @@ class TelemetryLoggerMiddleware(Middleware):
                                           await self.fill_delete_event_properties(activity))
 
 
-    async def fill_receive_event_properties(self, activity: Activity, 
+    async def fill_receive_event_properties(self, activity: Activity,
                                             additional_properties: Dict[str, str] = None) -> Dict[str, str]:
         """Fills the event properties for the BotMessageReceived.
         Adheres to the LogPersonalInformation flag to filter Name, Text and Speak properties.
@@ -138,7 +137,7 @@ class TelemetryLoggerMiddleware(Middleware):
         :return: A dictionary that is sent as "Properties" to
         BotTelemetryClient.track_event method for the BotMessageReceived event.
         """
-        properties = { 
+        properties = {
             TelemetryConstants.FROM_ID_PROPERTY : activity.from_property.id,
             TelemetryConstants.CONVERSATION_NAME_PROPERTY : activity.conversation.name,
             TelemetryConstants.LOCALE_PROPERTY : activity.locale,
@@ -161,7 +160,7 @@ class TelemetryLoggerMiddleware(Middleware):
 
         return properties
 
-    async def fill_send_event_properties(self, activity: Activity, 
+    async def fill_send_event_properties(self, activity: Activity,
                                          additional_properties: Dict[str, str] = None) -> Dict[str, str]:
         """Fills the event properties for the BotMessageSend.
         These properties are logged when an activity message is sent by the Bot to the user.
@@ -208,7 +207,7 @@ class TelemetryLoggerMiddleware(Middleware):
         :return: A dictionary that is sent as "Properties" to the
         BotTelemetryClient.track_event method for the BotMessageUpdate event.
         """
-        properties = { 
+        properties = {
             TelemetryConstants.RECIPIENT_ID_PROPERTY : activity.recipient.id,
             TelemetryConstants.CONVERSATION_ID_PROPERTY : activity.conversation.id,
             TelemetryConstants.CONVERSATION_NAME_PROPERTY : activity.conversation.name,
@@ -227,7 +226,7 @@ class TelemetryLoggerMiddleware(Middleware):
 
         return properties
 
-    async def fill_delete_event_properties(self, activity: Activity, 
+    async def fill_delete_event_properties(self, activity: Activity,
                                            additional_properties: Dict[str, str] = None) -> Dict[str, str]:
         """Fills the event properties for the BotMessageDelete.
         These properties are logged when an activity message is deleted by the Bot.
@@ -238,7 +237,7 @@ class TelemetryLoggerMiddleware(Middleware):
         :return: A dictionary that is sent as "Properties" to the
         BotTelemetryClient.track_event method for the BotMessageUpdate event.
         """
-        properties = { 
+        properties = {
             TelemetryConstants.RECIPIENT_ID_PROPERTY : activity.recipient.id,
             TelemetryConstants.CONVERSATION_ID_PROPERTY : activity.conversation.id,
             TelemetryConstants.CONVERSATION_NAME_PROPERTY : activity.conversation.name,
