@@ -10,7 +10,7 @@ from .turn_context import TurnContext
 
 class Middleware(ABC):
     @abstractmethod
-    def on_process_request(
+    async def on_process_request(
         self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]
     ):
         pass
