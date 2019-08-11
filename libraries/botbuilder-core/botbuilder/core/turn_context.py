@@ -293,6 +293,19 @@ class TurnContext:
         return activity
 
     @staticmethod
+    def get_reply_conversation_reference(
+        activity: Activity, reply: ResourceResponse
+    ) -> ConversationReference:
+        reference: ConversationReference = TurnContext.get_conversation_reference(
+            activity
+        )
+
+        # Update the reference with the new outgoing Activity's id.
+        reference.activity_id = reply.id
+
+        return reference
+
+    @staticmethod
     def remove_recipient_mention(activity: Activity) -> str:
         return TurnContext.remove_mention_text(activity, activity.recipient.id)
 
@@ -302,11 +315,13 @@ class TurnContext:
         for mention in mentions:
             if mention.mentioned.id == identifier:
                 mention_name_match = re.match(
-                    r"/(?<=<at.*>)(.*?)(?=<\/at>)/i", mention.text
+                    r"<at(.*)>(.*?)<\/at>", mention.text, re.IGNORECASE
                 )
                 if mention_name_match:
-                    activity.text = activity.text.replace(mention_name_match[0], "")
-                    activity.text = activity.text.replace(r"/<at><\/at>/g", "")
+                    activity.text = re.sub(
+                        mention_name_match.groups()[1], "", activity.text
+                    )
+                    activity.text = re.sub(r"<at><\/at>", "", activity.text)
         return activity.text
 
     @staticmethod
