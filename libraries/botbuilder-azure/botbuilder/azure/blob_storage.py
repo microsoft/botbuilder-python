@@ -65,8 +65,12 @@ class BlobStorage(Storage):
             self.settings.container_name, public_access=PublicAccess.Container
         )
 
-        for name, item in changes:
-            e_tag = None if "e_tag" not in item else item["e_tag"]
+        for name, item in changes.items():
+            e_tag = (
+                None if not hasattr(item, "e_tag") or item.e_tag == "*" else item.e_tag
+            )
+            if e_tag:
+                item.e_tag = e_tag.replace('"', '\\"')
             self.client.create_blob_from_text(
                 container_name=self.settings.container_name,
                 blob_name=name,
@@ -84,9 +88,12 @@ class BlobStorage(Storage):
         )
 
         for key in keys:
-            self.client.delete_blob(
+            if self.client.exists(
                 container_name=self.settings.container_name, blob_name=key
-            )
+            ):
+                self.client.delete_blob(
+                    container_name=self.settings.container_name, blob_name=key
+                )
 
     def _blob_to_store_item(self, blob: Blob) -> StoreItem:
         item = json.loads(blob.content)
