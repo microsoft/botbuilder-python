@@ -31,7 +31,7 @@ class SimpleStoreItem(StoreItem):
 
 class TestBlobStorage:
     @pytest.mark.asyncio
-    async def test_cosmos_storage_init_should_error_without_cosmos_db_config(self):
+    async def test_blob_storage_init_should_error_without_cosmos_db_config(self):
         try:
             BlobStorage(BlobStorageSettings())  # pylint: disable=no-value-for-parameter
         except Exception as error:
@@ -39,7 +39,7 @@ class TestBlobStorage:
 
     @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
-    async def test_cosmos_storage_read_should_return_data_with_valid_key(self):
+    async def test_blob_storage_read_should_return_data_with_valid_key(self):
         storage = BlobStorage(BLOB_STORAGE_SETTINGS)
         await storage.write({"user": SimpleStoreItem()})
 
@@ -50,7 +50,7 @@ class TestBlobStorage:
 
     @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
-    async def test_cosmos_storage_read_update_should_return_new_etag(self):
+    async def test_blob_storage_read_update_should_return_new_etag(self):
         storage = BlobStorage(BLOB_STORAGE_SETTINGS)
         await storage.write({"test": SimpleStoreItem(counter=1)})
         data_result = await storage.read(["test"])
@@ -62,7 +62,7 @@ class TestBlobStorage:
 
     @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
-    async def test_cosmos_storage_read_no_key_should_throw(self):
+    async def test_blob_storage_read_no_key_should_throw(self):
         try:
             storage = BlobStorage(BLOB_STORAGE_SETTINGS)
             await storage.read([])
@@ -71,7 +71,7 @@ class TestBlobStorage:
 
     @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
-    async def test_cosmos_storage_write_should_add_new_value(self):
+    async def test_blob_storage_write_should_add_new_value(self):
         storage = BlobStorage(BLOB_STORAGE_SETTINGS)
         await storage.write({"user": SimpleStoreItem(counter=1)})
 
@@ -81,7 +81,7 @@ class TestBlobStorage:
 
     @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
-    async def test_cosmos_storage_write_should_overwrite_when_new_e_tag_is_an_asterisk(
+    async def test_blob_storage_write_should_overwrite_when_new_e_tag_is_an_asterisk(
         self
     ):
         storage = BlobStorage(BLOB_STORAGE_SETTINGS)
@@ -93,7 +93,7 @@ class TestBlobStorage:
 
     @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
-    async def test_cosmos_storage_write_batch_operation(self):
+    async def test_blob_storage_write_batch_operation(self):
         storage = BlobStorage(BLOB_STORAGE_SETTINGS)
         await storage.write(
             {
@@ -119,7 +119,7 @@ class TestBlobStorage:
 
     @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
-    async def test_cosmos_storage_delete_should_delete_according_cached_data(self):
+    async def test_blob_storage_delete_should_delete_according_cached_data(self):
         storage = BlobStorage(BLOB_STORAGE_SETTINGS)
         await storage.write({"test": SimpleStoreItem()})
         try:
@@ -134,7 +134,7 @@ class TestBlobStorage:
 
     @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
-    async def test_cosmos_storage_delete_should_delete_multiple_values_when_given_multiple_valid_keys(
+    async def test_blob_storage_delete_should_delete_multiple_values_when_given_multiple_valid_keys(
         self
     ):
         storage = BlobStorage(BLOB_STORAGE_SETTINGS)
@@ -146,7 +146,7 @@ class TestBlobStorage:
 
     @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
-    async def test_cosmos_storage_delete_should_delete_values_when_given_multiple_valid_keys_and_ignore_other_data(
+    async def test_blob_storage_delete_should_delete_values_when_given_multiple_valid_keys_and_ignore_other_data(
         self
     ):
         storage = BlobStorage(BLOB_STORAGE_SETTINGS)
@@ -164,7 +164,7 @@ class TestBlobStorage:
 
     @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
-    async def test_cosmos_storage_delete_invalid_key_should_do_nothing_and_not_affect_cached_data(
+    async def test_blob_storage_delete_invalid_key_should_do_nothing_and_not_affect_cached_data(
         self
     ):
         storage = BlobStorage(BLOB_STORAGE_SETTINGS)
@@ -178,7 +178,7 @@ class TestBlobStorage:
 
     @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
-    async def test_cosmos_storage_delete_invalid_keys_should_do_nothing_and_not_affect_cached_data(
+    async def test_blob_storage_delete_invalid_keys_should_do_nothing_and_not_affect_cached_data(
         self
     ):
         storage = BlobStorage(BLOB_STORAGE_SETTINGS)
