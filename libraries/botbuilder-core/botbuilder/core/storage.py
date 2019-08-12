@@ -49,7 +49,7 @@ class StoreItem:
         output = (
             "{"
             + ",".join(
-                [f" '{attr}': '{getattr(self, attr)}'" for attr in non_magic_attributes]
+                [f' "{attr}": "{getattr(self, attr)}"' for attr in non_magic_attributes]
             )
             + " }"
         )
