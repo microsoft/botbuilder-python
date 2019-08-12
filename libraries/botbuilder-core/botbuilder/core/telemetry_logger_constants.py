@@ -2,7 +2,7 @@
 # Licensed under the MIT License
 
 
-class TelemetryLoggerConstants():
+class TelemetryLoggerConstants:
     """The Telemetry Logger Event names."""
 
     # The name of the event when a new message is received from the user.
