@@ -1,9 +1,10 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import re
 from copy import copy
 from typing import List, Callable, Union, Dict
-from botbuilder.schema import Activity, ConversationReference, ResourceResponse
+from botbuilder.schema import Activity, ConversationReference, Mention, ResourceResponse
 
 
 class TurnContext:
@@ -290,3 +291,44 @@ class TurnContext:
                 activity.reply_to_id = reference.activity_id
 
         return activity
+
+    @staticmethod
+    def get_reply_conversation_reference(
+        activity: Activity, reply: ResourceResponse
+    ) -> ConversationReference:
+        reference: ConversationReference = TurnContext.get_conversation_reference(
+            activity
+        )
+
+        # Update the reference with the new outgoing Activity's id.
+        reference.activity_id = reply.id
+
+        return reference
+
+    @staticmethod
+    def remove_recipient_mention(activity: Activity) -> str:
+        return TurnContext.remove_mention_text(activity, activity.recipient.id)
+
+    @staticmethod
+    def remove_mention_text(activity: Activity, identifier: str) -> str:
+        mentions = TurnContext.get_mentions(activity)
+        for mention in mentions:
+            if mention.mentioned.id == identifier:
+                mention_name_match = re.match(
+                    r"<at(.*)>(.*?)<\/at>", mention.text, re.IGNORECASE
+                )
+                if mention_name_match:
+                    activity.text = re.sub(
+                        mention_name_match.groups()[1], "", activity.text
+                    )
+                    activity.text = re.sub(r"<at><\/at>", "", activity.text)
+        return activity.text
+
+    @staticmethod
+    def get_mentions(activity: Activity) -> List[Mention]:
+        result: List[Mention] = []
+        if activity.entities is not None:
+            for entity in activity.entities:
+                if entity.type.lower() == "mention":
+                    result.append(entity)
+        return result
