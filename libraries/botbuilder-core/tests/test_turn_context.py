@@ -6,9 +6,9 @@ import aiounittest
 from botbuilder.schema import (
     Activity,
     ChannelAccount,
+    ConversationAccount,
     Mention,
     ResourceResponse,
-    ConversationAccount,
 )
 from botbuilder.core import BotAdapter, TurnContext
 
