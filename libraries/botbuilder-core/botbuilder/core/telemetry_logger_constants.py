@@ -1,8 +1,10 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License
 
+
 class TelemetryLoggerConstants(object):
     """The Telemetry Logger Event names."""
+
     # The name of the event when a new message is received from the user.
     BOT_MSG_RECEIVE_EVENT: str = "BotMessageReceived"
 
