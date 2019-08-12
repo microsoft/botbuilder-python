@@ -30,6 +30,9 @@ from .show_typing_middleware import ShowTypingMiddleware
 from .state_property_accessor import StatePropertyAccessor
 from .state_property_info import StatePropertyInfo
 from .storage import Storage, StoreItem, calculate_change_hash
+from .telemetry_constants import TelemetryConstants
+from .telemetry_logger_constants import TelemetryLoggerConstants
+from .telemetry_logger_middleware import TelemetryLoggerMiddleware
 from .turn_context import TurnContext
 from .user_state import UserState
 from .user_token_provider import UserTokenProvider
@@ -65,6 +68,9 @@ __all__ = [
     "StatePropertyInfo",
     "Storage",
     "StoreItem",
+    "TelemetryConstants",
+    "TelemetryLoggerConstants",
+    "TelemetryLoggerMiddleware",
     "TopIntent",
     "TurnContext",
     "UserState",
