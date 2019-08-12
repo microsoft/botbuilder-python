@@ -2,7 +2,7 @@
 # Licensed under the MIT License
 
 
-class TelemetryConstants(object):
+class TelemetryConstants():
     """Telemetry logger property names."""
 
     CHANNEL_ID_PROPERTY: str = "channelId"

@@ -35,6 +35,7 @@ class TelemetryLoggerMiddleware(Middleware):
         information that came from the user."""
         return self._log_personal_information
 
+    # pylint: disable=arguments-differ
     async def on_process_request(
         self, context: TurnContext, logic_fn: Callable[[TurnContext], Awaitable]
     ) -> None:

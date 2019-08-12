@@ -1,16 +1,12 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+# pylint: disable=line-too-long,missing-docstring,unused-variable
 import copy
-from typing import Awaitable, Callable, Dict
+from typing import Dict
+from unittest.mock import Mock
 import aiounittest
-
-from unittest.mock import patch, Mock
 from botbuilder.core import (
-    AnonymousReceiveMiddleware,
-    BotTelemetryClient,
-    MiddlewareSet,
-    Middleware,
     NullTelemetryClient,
     TelemetryLoggerMiddleware,
     TelemetryLoggerConstants,
@@ -22,10 +18,9 @@ from botbuilder.schema import (
     ActivityTypes,
     ChannelAccount,
     ConversationAccount,
-    ConversationReference,
 )
 
-# pylint: disable=line-too-long,missing-docstring
+
 class TestTelemetryMiddleware(aiounittest.AsyncTestCase):
     # pylint: disable=unused-argument
     async def test_create_middleware(self):
@@ -215,13 +210,10 @@ class TestTelemetryMiddleware(aiounittest.AsyncTestCase):
     def assert_telemetry_call(
         self, telemetry_mock, index: int, event_name: str, props: Dict[str, str]
     ) -> None:
-        # pylint: disable=unused-variable
-
-        if index > len(telemetry_mock.track_event.call_args_list) - 1:
-            self.assertTrue(
-                False,
-                f"{len(telemetry_mock.track_event.call_args_list)} calls were made. You were asking for index {index}.",
-            )
+        self.assertTrue(
+            index < len(telemetry_mock.track_event.call_args_list),
+            f"{len(telemetry_mock.track_event.call_args_list)} calls were made. You were asking for index {index}.",
+        )
         args, kwargs = telemetry_mock.track_event.call_args_list[index]
         self.assertEqual(
             args[0],
