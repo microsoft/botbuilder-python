@@ -1,7 +1,7 @@
 import json
-from typing import List
+from typing import Dict, List
 
-from azure.storage.blob import BlockBlobService, Blob
+from azure.storage.blob import BlockBlobService, Blob, PublicAccess
 from botbuilder.core import Storage, StoreItem
 
 # TODO: sanitize_blob_name
@@ -37,38 +37,59 @@ class BlobStorage(Storage):
         self.client = client
         self.settings = settings
 
-    async def read(self, keys: List[str]):
+    async def read(self, keys: List[str]) -> Dict[str, object]:
         if not keys:
             raise Exception("Please provide at least one key to read from storage.")
 
         self.client.create_container(self.settings.container_name)
+        self.client.set_container_acl(
+            self.settings.container_name, public_access=PublicAccess.Container
+        )
         items = {}
 
         for key in keys:
             if self.client.exists(
                 container_name=self.settings.container_name, blob_name=key
             ):
-                items[key] = self.client.get_blob_to_text(
-                    container_name=self.settings.container_name, blob_name=key
+                items[key] = self._blob_to_store_item(
+                    self.client.get_blob_to_text(
+                        container_name=self.settings.container_name, blob_name=key
+                    )
                 )
 
         return items
 
-    async def write(self, changes):
-        pass
+    async def write(self, changes: Dict[str, StoreItem]):
+        self.client.create_container(self.settings.container_name)
+        self.client.set_container_acl(
+            self.settings.container_name, public_access=PublicAccess.Container
+        )
+
+        for name, item in changes:
+            e_tag = None if "e_tag" not in item else item["e_tag"]
+            self.client.create_blob_from_text(
+                container_name=self.settings.container_name,
+                blob_name=name,
+                text=str(item),
+                if_match=e_tag,
+            )
 
     async def delete(self, keys: List[str]):
-        pass
+        if keys is None:
+            raise Exception("BlobStorage.delete: keys parameter can't be null")
+
+        self.client.create_container(self.settings.container_name)
+        self.client.set_container_acl(
+            self.settings.container_name, public_access=PublicAccess.Container
+        )
+
+        for key in keys:
+            self.client.delete_blob(
+                container_name=self.settings.container_name, blob_name=key
+            )
 
     def _blob_to_store_item(self, blob: Blob) -> StoreItem:
         item = json.loads(blob.content)
         item["e_tag"] = blob.properties.etag
         item["id"] = blob.name
         return StoreItem(**item)
-
-    def _store_item_to_str(self, item: StoreItem) -> str:
-        if hasattr(item, "e_tag"):
-            delattr(item, "e_tag")
-        if hasattr(item, "id"):
-            delattr(item, "id")
-        return str(item)

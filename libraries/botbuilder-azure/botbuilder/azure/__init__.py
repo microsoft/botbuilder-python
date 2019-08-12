@@ -7,5 +7,13 @@
 
 from .about import __version__
 from .cosmosdb_storage import CosmosDbStorage, CosmosDbConfig, CosmosDbKeyEscape
+from .blob_storage import BlobStorage, BlobStorageSettings
 
-__all__ = ["CosmosDbStorage", "CosmosDbConfig", "CosmosDbKeyEscape", "__version__"]
+__all__ = [
+    "BlobStorage",
+    "BlobStorageSettings",
+    "CosmosDbStorage",
+    "CosmosDbConfig",
+    "CosmosDbKeyEscape",
+    "__version__",
+]
