@@ -24,6 +24,7 @@ from .memory_transcript_store import MemoryTranscriptStore
 from .message_factory import MessageFactory
 from .middleware_set import AnonymousReceiveMiddleware, Middleware, MiddlewareSet
 from .null_telemetry_client import NullTelemetryClient
+from .private_conversation_state import PrivateConversationState
 from .recognizer import Recognizer
 from .recognizer_result import RecognizerResult, TopIntent
 from .show_typing_middleware import ShowTypingMiddleware
@@ -57,6 +58,7 @@ __all__ = [
     "Middleware",
     "MiddlewareSet",
     "NullTelemetryClient",
+    "PrivateConversationState",
     "Recognizer",
     "RecognizerResult",
     "Severity",
