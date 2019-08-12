@@ -20,6 +20,7 @@ from .conversation_state import ConversationState
 from .intent_score import IntentScore
 from .invoke_response import InvokeResponse
 from .memory_storage import MemoryStorage
+from .memory_transcript_store import MemoryTranscriptStore
 from .message_factory import MessageFactory
 from .middleware_set import AnonymousReceiveMiddleware, Middleware, MiddlewareSet
 from .null_telemetry_client import NullTelemetryClient
@@ -55,6 +56,7 @@ __all__ = [
     "IntentScore",
     "InvokeResponse",
     "MemoryStorage",
+    "MemoryTranscriptStore",
     "MessageFactory",
     "Middleware",
     "MiddlewareSet",
