@@ -22,7 +22,7 @@ class AutoSaveStateMiddleware(Middleware):
         self.bot_state_set.add(bot_state)
         return self
 
-    async def on_process_request(
+    async def on_turn(
         self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]
     ):
         await logic()
