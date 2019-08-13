@@ -36,7 +36,7 @@ class TelemetryLoggerMiddleware(Middleware):
         return self._log_personal_information
 
     # pylint: disable=arguments-differ
-    async def on_process_request(
+    async def on_turn(
         self, context: TurnContext, logic_fn: Callable[[TurnContext], Awaitable]
     ) -> None:
         """Logs events based on incoming and outgoing activities using

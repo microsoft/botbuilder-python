@@ -33,7 +33,7 @@ class TranscriptLoggerMiddleware(Middleware):
             )
         self.logger = logger
 
-    async def on_process_request(
+    async def on_turn(
         self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]
     ):
         """Initialization for middleware.

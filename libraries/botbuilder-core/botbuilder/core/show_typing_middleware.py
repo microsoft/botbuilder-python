@@ -49,7 +49,7 @@ class ShowTypingMiddleware(Middleware):
         self._delay = delay
         self._period = period
 
-    async def on_process_request(
+    async def on_turn(
         self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]
     ):
         finished = False
