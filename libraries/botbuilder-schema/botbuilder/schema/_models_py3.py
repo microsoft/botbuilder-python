@@ -763,6 +763,8 @@ class ConversationAccount(Model):
     :type role: str or ~botframework.connector.models.RoleTypes
     :param tenant_id: This conversation's tenant ID
     :type tenant_id: str
+    :param properties: This conversation's properties
+    :type properties: object
     """
 
     _attribute_map = {
@@ -773,6 +775,7 @@ class ConversationAccount(Model):
         "aad_object_id": {"key": "aadObjectId", "type": "str"},
         "role": {"key": "role", "type": "str"},
         "tenant_id": {"key": "tenantID", "type": "str"},
+        "properties": {"key": "properties", "type": "object"},
     }
 
     def __init__(
@@ -785,6 +788,7 @@ class ConversationAccount(Model):
         aad_object_id: str = None,
         role=None,
         tenant_id=None,
+        properties=None,
         **kwargs
     ) -> None:
         super(ConversationAccount, self).__init__(**kwargs)
@@ -795,6 +799,7 @@ class ConversationAccount(Model):
         self.aad_object_id = aad_object_id
         self.role = role
         self.tenant_id = tenant_id
+        self.properties = properties
 
 
 class ConversationMembers(Model):
