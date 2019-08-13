@@ -775,7 +775,7 @@ class ConversationAccount(Model):
         "aad_object_id": {"key": "aadObjectId", "type": "str"},
         "role": {"key": "role", "type": "str"},
         "tenant_id": {"key": "tenantID", "type": "str"},
-        "properties": {"key": "properties", "type": "object"}
+        "properties": {"key": "properties", "type": "object"},
     }
 
     def __init__(
