@@ -56,7 +56,7 @@ class DateResolverDialog(CancelAndHelpDialog):
                 PromptOptions(prompt=prompt_msg, retry_prompt=reprompt_msg),
             )
         # We have a Date we just need to check it is unambiguous.
-        if "definite" in Timex(timex).types:
+        if "definite" not in Timex(timex).types:
             # This is essentially a "reprompt" of the data we were given up front.
             return await step_context.prompt(
                 DateTimePrompt.__name__, PromptOptions(prompt=reprompt_msg)

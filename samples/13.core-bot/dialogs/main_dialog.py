@@ -1,17 +1,13 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from datetime import datetime
-from typing import Dict
 from botbuilder.dialogs import (
     ComponentDialog,
-    DialogSet,
-    DialogTurnStatus,
     WaterfallDialog,
     WaterfallStepContext,
     DialogTurnResult,
 )
-from botbuilder.dialogs.prompts import TextPrompt, ConfirmPrompt, PromptOptions
+from botbuilder.dialogs.prompts import TextPrompt, PromptOptions
 from botbuilder.core import MessageFactory, TurnContext
 from botbuilder.schema import InputHints
 
@@ -76,9 +72,8 @@ class MainDialog(ComponentDialog):
             self._luis_recognizer, step_context.context
         )
 
-        # top_intent = cognitive_models_helper.top_intent(luis_result['intents'])
-
         if intent == Intent.BOOK_FLIGHT.value and luis_result:
+            # Show a warning for Origin and Destination if we can't resolve them.
             await MainDialog._show_warning_for_unsupported_cities(
                 step_context.context, luis_result
             )
