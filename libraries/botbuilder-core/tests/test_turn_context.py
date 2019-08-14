@@ -6,8 +6,9 @@ import aiounittest
 from botbuilder.schema import (
     Activity,
     ChannelAccount,
-    ResourceResponse,
     ConversationAccount,
+    Mention,
+    ResourceResponse,
 )
 from botbuilder.core import BotAdapter, TurnContext
 
@@ -261,3 +262,39 @@ class TestBotContext(aiounittest.AsyncTestCase):
         assert reply.conversation == ACTIVITY.conversation
         assert reply.service_url == ACTIVITY.service_url
         assert reply.channel_id == ACTIVITY.channel_id
+
+    async def test_should_get_conversation_reference_using_get_reply_conversation_reference(
+        self
+    ):
+        context = TurnContext(SimpleAdapter(), ACTIVITY)
+        reply = await context.send_activity("test")
+
+        assert reply.id, "reply has an id"
+
+        reference = TurnContext.get_reply_conversation_reference(
+            context.activity, reply
+        )
+
+        assert reference.activity_id, "reference has an activity id"
+        assert (
+            reference.activity_id == reply.id
+        ), "reference id matches outgoing reply id"
+
+    def test_should_remove_at_mention_from_activity(self):
+        activity = Activity(
+            type="message",
+            text="<at>TestOAuth619</at> test activity",
+            recipient=ChannelAccount(id="TestOAuth619"),
+            entities=[
+                Mention(
+                    type="mention",
+                    text="<at>TestOAuth619</at>",
+                    mentioned=ChannelAccount(name="Bot", id="TestOAuth619"),
+                )
+            ],
+        )
+
+        text = TurnContext.remove_recipient_mention(activity)
+
+        assert text, " test activity"
+        assert activity.text, " test activity"

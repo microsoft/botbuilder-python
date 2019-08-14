@@ -95,7 +95,7 @@ class TestAutoSaveMiddleware(aiounittest.AsyncTestCase):
         context = TurnContext(adapter, Activity())
         foo_state = BotStateMock({"foo": "bar"})
         autosave_middleware = AutoSaveStateMiddleware().add(foo_state)
-        await autosave_middleware.on_process_request(context, aux_func)
+        await autosave_middleware.on_turn(context, aux_func)
         assert foo_state.write_called, "save_all_changes() not called."
 
     async def test_should_support_plugins_passed_to_constructor(self):
@@ -103,7 +103,7 @@ class TestAutoSaveMiddleware(aiounittest.AsyncTestCase):
         context = TurnContext(adapter, Activity())
         foo_state = BotStateMock({"foo": "bar"})
         autosave_middleware = AutoSaveStateMiddleware().add(foo_state)
-        await autosave_middleware.on_process_request(context, aux_func)
+        await autosave_middleware.on_turn(context, aux_func)
         assert foo_state.write_called, "save_all_changes() not called."
 
     async def test_should_not_add_any_bot_state_on_construction_if_none_are_passed_in(

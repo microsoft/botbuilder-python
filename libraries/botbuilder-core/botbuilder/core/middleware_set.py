@@ -10,7 +10,7 @@ from .turn_context import TurnContext
 
 class Middleware(ABC):
     @abstractmethod
-    def on_process_request(
+    async def on_turn(
         self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]
     ):
         pass
@@ -24,9 +24,7 @@ class AnonymousReceiveMiddleware(Middleware):
             )
         self._to_call = anonymous_handler
 
-    def on_process_request(
-        self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]
-    ):
+    def on_turn(self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]):
         return self._to_call(context, logic)
 
 
@@ -48,7 +46,7 @@ class MiddlewareSet(Middleware):
         :return:
         """
         for (idx, mid) in enumerate(middleware):
-            if hasattr(mid, "on_process_request") and callable(mid.on_process_request):
+            if hasattr(mid, "on_turn") and callable(mid.on_turn):
                 self._middleware.append(mid)
                 return self
             raise TypeError(
@@ -59,7 +57,7 @@ class MiddlewareSet(Middleware):
     async def receive_activity(self, context: TurnContext):
         await self.receive_activity_internal(context, None)
 
-    async def on_process_request(
+    async def on_turn(
         self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]
     ):
         await self.receive_activity_internal(context, None)
@@ -88,8 +86,6 @@ class MiddlewareSet(Middleware):
             )
 
         try:
-            return await next_middleware.on_process_request(
-                context, call_next_middleware
-            )
+            return await next_middleware.on_turn(context, call_next_middleware)
         except Exception as error:
             raise error
