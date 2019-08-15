@@ -40,7 +40,7 @@ class NumberPrompt(Prompt):
             raise TypeError("NumberPrompt.on_prompt(): options cannot be None.")
 
         if is_retry and options.retry_prompt is not None:
-            turn_context.send_activity(options.retry_prompt)
+            await turn_context.send_activity(options.retry_prompt)
         elif options.prompt is not None:
             await turn_context.send_activity(options.prompt)
 
