@@ -267,7 +267,9 @@ class NumberPromptTests(aiounittest.AsyncTestCase):
         step1 = await adapter.send("hello")
         step2 = await step1.assert_reply("Enter a number.")
         step3 = await step2.send("150")
-        step4 = await step3.assert_reply("You must enter a positive number less than 100.")
+        step4 = await step3.assert_reply(
+            "You must enter a positive number less than 100."
+        )
         step5 = await step4.send("64")
         await step5.assert_reply("Bot received the number '64'.")
 
