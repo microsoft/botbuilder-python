@@ -125,9 +125,6 @@ class NumberPromptTests(aiounittest.AsyncTestCase):
         test_flow4 = await test_flow3.send("Give me twenty meters of cable")
         await test_flow4.assert_reply("You asked me for '20' meters of cable.")
 
-    # TODO: retry_prompt in NumberPrompt appears to be broken
-    # It when NumberPrompt fails to receive a number, it retries, prompting
-    # with the prompt and not retry prompt in options
     async def test_number_prompt_retry(self):
         async def exec_test(turn_context: TurnContext) -> None:
             dialog_context: DialogContext = await dialogs.create_context(turn_context)
@@ -161,14 +158,11 @@ class NumberPromptTests(aiounittest.AsyncTestCase):
         dialogs.add(number_prompt)
 
         step1 = await adapter.send("hello")
-        await step1.assert_reply("Enter a number.")
-        # TODO: something is breaking in the validators or retry prompt
-        # where it does not accept the 2nd answer after reprompting the user
-        # for another value
-        # step3 = await step2.send("hello")
-        # step4 = await step3.assert_reply("You must enter a number.")
-        # step5 = await step4.send("64")
-        # await step5.assert_reply("Bot received the number '64'.")
+        step2 = await step1.assert_reply("Enter a number.")
+        step3 = await step2.send("hello")
+        step4 = await step3.assert_reply("You must enter a number.")
+        step5 = await step4.send("64")
+        await step5.assert_reply("Bot received the number '64'.")
 
     async def test_number_uses_locale_specified_in_constructor(self):
         # Create new ConversationState with MemoryStorage and register the state as middleware.
@@ -272,13 +266,12 @@ class NumberPromptTests(aiounittest.AsyncTestCase):
 
         step1 = await adapter.send("hello")
         step2 = await step1.assert_reply("Enter a number.")
-        await step2.send("150")
-        # TODO: something is breaking in the validators or retry prompt
-        # where it does not accept the 2nd answer after reprompting the user
-        # for another value
-        # step4 = await step3.assert_reply("You must enter a positive number less than 100.")
-        # step5 = await step4.send("64")
-        # await step5.assert_reply("Bot received the number '64'.")
+        step3 = await step2.send("150")
+        step4 = await step3.assert_reply(
+            "You must enter a positive number less than 100."
+        )
+        step5 = await step4.send("64")
+        await step5.assert_reply("Bot received the number '64'.")
 
     async def test_float_number_prompt(self):
         async def exec_test(turn_context: TurnContext) -> None:
