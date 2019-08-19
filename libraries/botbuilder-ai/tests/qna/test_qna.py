@@ -87,7 +87,6 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
 
     def test_set_default_options_with_no_options_arg(self):
         qna_without_options = QnAMaker(self.tests_endpoint)
-
         options = qna_without_options._generate_answer_helper.options
 
         default_threshold = 0.3

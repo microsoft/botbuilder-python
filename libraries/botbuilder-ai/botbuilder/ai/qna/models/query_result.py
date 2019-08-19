@@ -4,6 +4,7 @@
 from typing import List
 
 from .metadata import Metadata
+from .qna_request_context import QnARequestContext
 
 
 class QueryResult:
@@ -17,6 +18,7 @@ class QueryResult:
         metadata: object = None,
         source: str = None,
         id: int = None,  # pylint: disable=invalid-name
+        context: QnARequestContext = None,
     ):
         """
         Parameters:
@@ -33,6 +35,8 @@ class QueryResult:
         source: The source from which the QnA was extracted (if any).
 
         id: The index of the answer in the knowledge base. V3 uses 'qnaId', V4 uses 'id' (if any).
+
+        context: The context from which the QnA was extracted.
         """
         self.questions = questions
         self.answer = answer
@@ -40,3 +44,4 @@ class QueryResult:
         self.metadata = list(map(lambda meta: Metadata(**meta), metadata))
         self.source = source
         self.id = id  # pylint: disable=invalid-name
+        self.context = context

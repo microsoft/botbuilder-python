@@ -13,6 +13,9 @@ from .qnamaker_trace_info import QnAMakerTraceInfo
 from .query_result import QueryResult
 from .query_results import QueryResults
 from .train_request_body import TrainRequestBody
+from .prompt import Prompt
+from .qna_request_context import QnARequestContext
+from .qna_response_context import QnAResponseContext
 
 __all__ = [
     "FeedbackRecord",
@@ -23,4 +26,7 @@ __all__ = [
     "QueryResult",
     "QueryResults",
     "TrainRequestBody",
+    "Prompt",
+    "QnARequestContext",
+    "QnAResponseContext",
 ]

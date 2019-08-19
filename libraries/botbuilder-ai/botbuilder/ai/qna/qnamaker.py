@@ -47,12 +47,6 @@ class QnAMaker(QnAMakerTelemetryClient):
                 "QnAMaker.__init__(): endpoint is not an instance of QnAMakerEndpoint"
             )
 
-        if endpoint.host.endswith("v2.0"):
-            raise ValueError(
-                "v2.0 of QnA Maker service is no longer supported in the Bot Framework. Please upgrade your QnA Maker"
-                " service at www.qnamaker.ai."
-            )
-
         self._endpoint: str = endpoint
 
         opt = options or QnAMakerOptions()
@@ -76,7 +70,7 @@ class QnAMaker(QnAMakerTelemetryClient):
 
     async def get_answers(
         self,
-        context: TurnContext,
+        turn_context: TurnContext,
         options: QnAMakerOptions = None,
         telemetry_properties: Dict[str, str] = None,
         telemetry_metrics: Dict[str, int] = None,
@@ -92,18 +86,18 @@ class QnAMaker(QnAMakerTelemetryClient):
         ------
         List[QueryResult]
         """
-        if not context:
+        if not turn_context:
             raise TypeError("QnAMaker.get_answers(): context cannot be None.")
 
-        if not isinstance(context.activity, Activity):
+        if not isinstance(turn_context.activity, Activity):
             raise TypeError(
                 "QnAMaker.get_answers(): TurnContext's activity must be an Activity instance."
             )
 
-        result = await self._generate_answer_helper.get_answers(context, options)
+        result = await self._generate_answer_helper.get_answers(turn_context, options)
 
         await self.on_qna_result(
-            result, context, telemetry_properties, telemetry_metrics
+            result, turn_context, telemetry_properties, telemetry_metrics
         )
 
         return result
