@@ -6,6 +6,7 @@ from typing import List
 from msrest.serialization import Model
 
 from .metadata import Metadata
+from .qna_request_context import QnARequestContext
 
 
 class GenerateAnswerRequestBody(Model):
@@ -16,6 +17,7 @@ class GenerateAnswerRequestBody(Model):
         "top": {"key": "top", "type": "int"},
         "score_threshold": {"key": "scoreThreshold", "type": "float"},
         "strict_filters": {"key": "strictFilters", "type": "[Metadata]"},
+        "context": {"key": "context", "type": "QnARequestContext"},
     }
 
     def __init__(
@@ -24,6 +26,7 @@ class GenerateAnswerRequestBody(Model):
         top: int,
         score_threshold: float,
         strict_filters: List[Metadata],
+        context: QnARequestContext = None,
         **kwargs
     ):
         """
@@ -37,6 +40,9 @@ class GenerateAnswerRequestBody(Model):
         score_threshold: Threshold for answers returned based on score.
 
         strict_filters: Find only answers that contain these metadata.
+
+        context: Find only answers that contain these metadata.
+
         """
 
         super().__init__(**kwargs)
@@ -45,3 +51,4 @@ class GenerateAnswerRequestBody(Model):
         self.top = top
         self.score_threshold = score_threshold
         self.strict_filters = strict_filters
+        self.context = context or None

@@ -133,12 +133,12 @@ class GenerateAnswerUtils:
         return hydrated_options
 
     async def _query_qna_service(
-        self, context: TurnContext, options: QnAMakerOptions
+        self, turn_context: TurnContext, options: QnAMakerOptions
     ) -> List[QueryResult]:
         url = f"{ self._endpoint.host }/knowledgebases/{ self._endpoint.knowledge_base_id }/generateAnswer"
 
         question = GenerateAnswerRequestBody(
-            question=context.activity.text,
+            question=turn_context.activity.text,
             top=options.top,
             score_threshold=options.score_threshold,
             strict_filters=options.strict_filters,

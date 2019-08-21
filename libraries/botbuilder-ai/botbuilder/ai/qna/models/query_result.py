@@ -2,23 +2,35 @@
 # Licensed under the MIT License.
 
 from typing import List
-
+from msrest.serialization import Model
 from .metadata import Metadata
-from .qna_request_context import QnARequestContext
+from .qna_response_context import QnAResponseContext
 
 
-class QueryResult:
+class QueryResult(Model):
     """ Represents an individual result from a knowledge base query. """
+
+    _attribute_map = {
+        "questions": {"key": "questions", "type": "[str]"},
+        "answer": {"key": "answer", "type": "str"},
+        "score": {"key": "score", "type": "float"},
+        "metadata": {"key": "metadata", "type": "object"},
+        "source": {"key": "source", "type": "str"},
+        "id": {"key": "id", "type": "int"},
+        "context": {"key": "context", "type": "object"},
+    }
 
     def __init__(
         self,
+        *,
         questions: List[str],
         answer: str,
         score: float,
         metadata: object = None,
         source: str = None,
         id: int = None,  # pylint: disable=invalid-name
-        context: QnARequestContext = None,
+        context: QnAResponseContext = None,
+        **kwargs
     ):
         """
         Parameters:
@@ -38,10 +50,11 @@ class QueryResult:
 
         context: The context from which the QnA was extracted.
         """
+        super(QueryResult, self).__init__(**kwargs)
         self.questions = questions
         self.answer = answer
         self.score = score
         self.metadata = list(map(lambda meta: Metadata(**meta), metadata))
         self.source = source
+        self.context = QnAResponseContext(**context) if context is not None else None 
         self.id = id  # pylint: disable=invalid-name
-        self.context = context

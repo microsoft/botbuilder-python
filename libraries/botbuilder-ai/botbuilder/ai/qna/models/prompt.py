@@ -15,7 +15,7 @@ class Prompt(Model):
     }
 
     def __init__(
-        self, display_order: int, qna_id: int, qna: object, display_text: str, **kwargs
+        self, *, display_order: int, qna_id: int, qna: object, display_text: str, **kwargs
     ):
         """
         Parameters:
@@ -30,7 +30,7 @@ class Prompt(Model):
         display_text: Text displayed to represent a follow up question prompt.
         """
 
-        super().__init__(**kwargs)
+        super(Prompt, self).__init__(**kwargs)
 
         self.display_order = display_order
         self.qna_id = qna_id
