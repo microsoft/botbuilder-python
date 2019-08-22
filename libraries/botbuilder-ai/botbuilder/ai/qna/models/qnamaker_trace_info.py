@@ -10,7 +10,7 @@ from .qna_request_context import QnARequestContext
 
 
 class QnAMakerTraceInfo:
-    """ Represents all the trice info that we collect from the QnAMaker Middleware. """
+    """ Represents all the trace info that we collect from the QnAMaker Middleware. """
 
     def __init__(
         self,

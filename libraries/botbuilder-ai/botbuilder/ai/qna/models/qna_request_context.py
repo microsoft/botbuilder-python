@@ -3,9 +3,11 @@
 
 from msrest.serialization import Model
 
-
 class QnARequestContext(Model):
-    """ The context associated with QnA.  Used to mark if the current prompt is relevant with a previous question or not. """
+    """
+    The context associated with QnA.
+    Used to mark if the current prompt is relevant with a previous question or not.
+    """
 
     _attribute_map = {
         "previous_qna_id": {"key": "previousQnAId", "type": "int"},

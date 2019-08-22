@@ -70,7 +70,7 @@ class QnAMaker(QnAMakerTelemetryClient):
 
     async def get_answers(
         self,
-        turn_context: TurnContext,
+        context: TurnContext,
         options: QnAMakerOptions = None,
         telemetry_properties: Dict[str, str] = None,
         telemetry_metrics: Dict[str, int] = None,
@@ -86,18 +86,18 @@ class QnAMaker(QnAMakerTelemetryClient):
         ------
         List[QueryResult]
         """
-        if not turn_context:
+        if not context:
             raise TypeError("QnAMaker.get_answers(): context cannot be None.")
 
-        if not isinstance(turn_context.activity, Activity):
+        if not isinstance(context.activity, Activity):
             raise TypeError(
                 "QnAMaker.get_answers(): TurnContext's activity must be an Activity instance."
             )
 
-        result = await self._generate_answer_helper.get_answers(turn_context, options)
+        result = await self._generate_answer_helper.get_answers(context, options)
 
         await self.on_qna_result(
-            result, turn_context, telemetry_properties, telemetry_metrics
+            result, context, telemetry_properties, telemetry_metrics
         )
 
         return result

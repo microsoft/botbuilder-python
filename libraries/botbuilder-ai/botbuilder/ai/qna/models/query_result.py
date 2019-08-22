@@ -56,5 +56,5 @@ class QueryResult(Model):
         self.score = score
         self.metadata = list(map(lambda meta: Metadata(**meta), metadata))
         self.source = source
-        self.context = QnAResponseContext(**context) if context is not None else None 
+        self.context = QnAResponseContext(**context) if context is not None else None
         self.id = id  # pylint: disable=invalid-name

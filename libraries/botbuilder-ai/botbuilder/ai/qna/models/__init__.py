@@ -9,24 +9,24 @@ from .feedback_record import FeedbackRecord
 from .feedback_records import FeedbackRecords
 from .generate_answer_request_body import GenerateAnswerRequestBody
 from .metadata import Metadata
+from .prompt import Prompt
 from .qnamaker_trace_info import QnAMakerTraceInfo
+from .qna_request_context import QnARequestContext
+from .qna_response_context import QnAResponseContext
 from .query_result import QueryResult
 from .query_results import QueryResults
 from .train_request_body import TrainRequestBody
-from .prompt import Prompt
-from .qna_request_context import QnARequestContext
-from .qna_response_context import QnAResponseContext
 
 __all__ = [
     "FeedbackRecord",
     "FeedbackRecords",
     "GenerateAnswerRequestBody",
     "Metadata",
+    "Prompt",
     "QnAMakerTraceInfo",
+    "QnARequestContext",
+    "QnAResponseContext",
     "QueryResult",
     "QueryResults",
     "TrainRequestBody",
-    "Prompt",
-    "QnARequestContext",
-    "QnAResponseContext",
 ]

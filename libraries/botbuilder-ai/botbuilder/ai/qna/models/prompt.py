@@ -3,7 +3,6 @@
 
 from msrest.serialization import Model
 
-
 class Prompt(Model):
     """ Prompt Object. """
 
@@ -15,7 +14,13 @@ class Prompt(Model):
     }
 
     def __init__(
-        self, *, display_order: int, qna_id: int, qna: object, display_text: str, **kwargs
+        self,
+        *,
+        display_order: int,
+        qna_id: int,
+        display_text: str,
+        qna: object = None,
+        **kwargs
     ):
         """
         Parameters:
@@ -25,14 +30,15 @@ class Prompt(Model):
 
         qna_id: QnA ID.
 
-        qna: The QnA object returned from the API (Optional parameter).
-
         display_text: Text displayed to represent a follow up question prompt.
+
+        qna: The QnA object returned from the API (Optional).
+
         """
 
         super(Prompt, self).__init__(**kwargs)
 
         self.display_order = display_order
         self.qna_id = qna_id
-        self.qna = qna
         self.display_text = display_text
+        self.qna = qna
