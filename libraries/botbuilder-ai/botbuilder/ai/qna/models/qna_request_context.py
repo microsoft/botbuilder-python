@@ -3,6 +3,7 @@
 
 from msrest.serialization import Model
 
+
 class QnARequestContext(Model):
     """
     The context associated with QnA.

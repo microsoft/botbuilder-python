@@ -5,6 +5,7 @@ from typing import List
 from msrest.serialization import Model
 from .prompt import Prompt
 
+
 class QnAResponseContext(Model):
     """
     The context associated with QnA.

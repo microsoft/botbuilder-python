@@ -3,6 +3,7 @@
 
 from msrest.serialization import Model
 
+
 class Prompt(Model):
     """ Prompt Object. """
 
