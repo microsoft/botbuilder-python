@@ -127,18 +127,22 @@ class GenerateAnswerUtils:
             ):
                 hydrated_options.timeout = query_options.timeout
 
+            if query_options.context:
+                hydrated_options.context = query_options.context
+
         return hydrated_options
 
     async def _query_qna_service(
-        self, context: TurnContext, options: QnAMakerOptions
+        self, turn_context: TurnContext, options: QnAMakerOptions
     ) -> List[QueryResult]:
         url = f"{ self._endpoint.host }/knowledgebases/{ self._endpoint.knowledge_base_id }/generateAnswer"
 
         question = GenerateAnswerRequestBody(
-            question=context.activity.text,
+            question=turn_context.activity.text,
             top=options.top,
             score_threshold=options.score_threshold,
             strict_filters=options.strict_filters,
+            context=options.context,
         )
 
         http_request_helper = HttpRequestUtils(self._http_client)
@@ -161,6 +165,7 @@ class GenerateAnswerUtils:
             score_threshold=options.score_threshold,
             top=options.top,
             strict_filters=options.strict_filters,
+            context=options.context,
         )
 
         trace_activity = Activity(
@@ -188,15 +193,6 @@ class GenerateAnswerUtils:
         sorted_answers = sorted(
             answers_within_threshold, key=lambda ans: ans["score"], reverse=True
         )
-
-        # The old version of the protocol returns the id in a field called qnaId
-        # The following translates this old structure to the new
-        is_legacy_protocol: bool = self._endpoint.host.endswith(
-            "v2.0"
-        ) or self._endpoint.host.endswith("v3.0")
-        if is_legacy_protocol:
-            for answer in answers_within_threshold:
-                answer["id"] = answer.pop("qnaId", None)
 
         answers_as_query_results = list(
             map(lambda answer: QueryResult(**answer), sorted_answers)

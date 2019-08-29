@@ -47,12 +47,6 @@ class QnAMaker(QnAMakerTelemetryClient):
                 "QnAMaker.__init__(): endpoint is not an instance of QnAMakerEndpoint"
             )
 
-        if endpoint.host.endswith("v2.0"):
-            raise ValueError(
-                "v2.0 of QnA Maker service is no longer supported in the Bot Framework. Please upgrade your QnA Maker"
-                " service at www.qnamaker.ai."
-            )
-
         self._endpoint: str = endpoint
 
         opt = options or QnAMakerOptions()
