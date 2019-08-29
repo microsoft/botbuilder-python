@@ -12,7 +12,12 @@ from aiohttp import ClientSession
 
 import aiounittest
 from botbuilder.ai.qna import QnAMakerEndpoint, QnAMaker, QnAMakerOptions
-from botbuilder.ai.qna.models import FeedbackRecord, Metadata, QueryResult
+from botbuilder.ai.qna.models import (
+    FeedbackRecord,
+    Metadata,
+    QueryResult,
+    QnARequestContext,
+)
 from botbuilder.ai.qna.utils import QnATelemetryConstants
 from botbuilder.core import BotAdapter, BotTelemetryClient, TurnContext
 from botbuilder.core.adapters import TestAdapter
@@ -87,7 +92,6 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
 
     def test_set_default_options_with_no_options_arg(self):
         qna_without_options = QnAMaker(self.tests_endpoint)
-
         options = qna_without_options._generate_answer_helper.options
 
         default_threshold = 0.3
@@ -682,6 +686,63 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
                 len(filtered_results),
                 "Should have 3 filtered answers after low score variation.",
             )
+
+    async def test_should_answer_with_prompts(self):
+        options = QnAMakerOptions(top=2)
+        qna = QnAMaker(QnaApplicationTest.tests_endpoint, options)
+        question: str = "how do I clean the stove?"
+        turn_context = QnaApplicationTest._get_context(question, TestAdapter())
+        response_json = QnaApplicationTest._get_json_for_file("AnswerWithPrompts.json")
+
+        with patch(
+            "aiohttp.ClientSession.post",
+            return_value=aiounittest.futurized(response_json),
+        ):
+            results = await qna.get_answers(turn_context, options)
+            self.assertEqual(1, len(results), "Should have received 1 answers.")
+            self.assertEqual(
+                1, len(results[0].context.prompts), "Should have received 1 prompt."
+            )
+
+    async def test_should_answer_with_high_score_provided_context(self):
+        qna = QnAMaker(QnaApplicationTest.tests_endpoint)
+        question: str = "where can I buy?"
+        context = QnARequestContext(
+            previous_qna_id=5, prvious_user_query="how do I clean the stove?"
+        )
+        options = QnAMakerOptions(top=2, context=context)
+        turn_context = QnaApplicationTest._get_context(question, TestAdapter())
+        response_json = QnaApplicationTest._get_json_for_file(
+            "AnswerWithHighScoreProvidedContext.json"
+        )
+
+        with patch(
+            "aiohttp.ClientSession.post",
+            return_value=aiounittest.futurized(response_json),
+        ):
+            results = await qna.get_answers(turn_context, options)
+            self.assertEqual(1, len(results), "Should have received 1 answers.")
+            self.assertEqual(1, results[0].score, "Score should be high.")
+
+    async def test_should_answer_with_low_score_without_provided_context(self):
+        qna = QnAMaker(QnaApplicationTest.tests_endpoint)
+        question: str = "where can I buy?"
+        options = QnAMakerOptions(top=2, context=None)
+
+        turn_context = QnaApplicationTest._get_context(question, TestAdapter())
+        response_json = QnaApplicationTest._get_json_for_file(
+            "AnswerWithLowScoreProvidedWithoutContext.json"
+        )
+
+        with patch(
+            "aiohttp.ClientSession.post",
+            return_value=aiounittest.futurized(response_json),
+        ):
+            results = await qna.get_answers(turn_context, options)
+            self.assertEqual(
+                2, len(results), "Should have received more than one answers."
+            )
+            self.assertEqual(True, results[0].score < 1, "Score should be low.")
 
     @classmethod
     async def _get_service_result(

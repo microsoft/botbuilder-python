@@ -6,10 +6,11 @@ from typing import List
 from botbuilder.schema import Activity
 from .metadata import Metadata
 from .query_result import QueryResult
+from .qna_request_context import QnARequestContext
 
 
 class QnAMakerTraceInfo:
-    """ Represents all the trice info that we collect from the QnAMaker Middleware. """
+    """ Represents all the trace info that we collect from the QnAMaker Middleware. """
 
     def __init__(
         self,
@@ -19,6 +20,7 @@ class QnAMakerTraceInfo:
         score_threshold: float,
         top: int,
         strict_filters: List[Metadata],
+        context: QnARequestContext = None,
     ):
         """
         Parameters:
@@ -35,6 +37,8 @@ class QnAMakerTraceInfo:
         top: Number of ranked results that are asked to be returned.
 
         strict_filters: Filters used on query.
+
+        context: (Optional) The context from which the QnA was extracted.
         """
         self.message = message
         self.query_results = query_results
@@ -42,3 +46,4 @@ class QnAMakerTraceInfo:
         self.score_threshold = score_threshold
         self.top = top
         self.strict_filters = strict_filters
+        self.context = context
