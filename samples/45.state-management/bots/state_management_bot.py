@@ -59,7 +59,9 @@ class StateManagementBot(ActivityHandler):
                 user_profile.name = turn_context.activity.text
 
                 # Acknowledge that we got their name.
-                await turn_context.send_activity(f"Thanks { user_profile.name }.")
+                await turn_context.send_activity(
+                    f"Thanks { user_profile.name }. To see conversation data, type anything."
+                )
 
                 # Reset the flag to allow the bot to go though the cycle again.
                 conversation_data.prompted_for_user_name = False
