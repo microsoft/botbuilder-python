@@ -20,7 +20,7 @@ class QnAMakerTraceInfo:
         score_threshold: float,
         top: int,
         strict_filters: List[Metadata],
-        context: QnARequestContext,
+        context: QnARequestContext = None,
     ):
         """
         Parameters:
@@ -38,7 +38,7 @@ class QnAMakerTraceInfo:
 
         strict_filters: Filters used on query.
 
-        context: The context from which the QnA was extracted.
+        context: (Optional) The context from which the QnA was extracted.
         """
         self.message = message
         self.query_results = query_results

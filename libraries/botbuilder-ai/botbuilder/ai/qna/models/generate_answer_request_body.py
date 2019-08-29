@@ -39,9 +39,9 @@ class GenerateAnswerRequestBody(Model):
 
         score_threshold: Threshold for answers returned based on score.
 
-        strict_filters: Find only answers that contain these metadata.
+        strict_filters: Find answers that contains these metadata.
 
-        context: Find only answers that contain these metadata.
+        context: The context from which the QnA was extracted.
 
         """
 
@@ -51,4 +51,4 @@ class GenerateAnswerRequestBody(Model):
         self.top = top
         self.score_threshold = score_threshold
         self.strict_filters = strict_filters
-        self.context = context or None
+        self.context = context
