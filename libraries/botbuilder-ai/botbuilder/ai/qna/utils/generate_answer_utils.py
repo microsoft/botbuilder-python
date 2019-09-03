@@ -127,8 +127,8 @@ class GenerateAnswerUtils:
             ):
                 hydrated_options.timeout = query_options.timeout
 
-            if query_options.context:
-                hydrated_options.context = query_options.context
+            hydrated_options.context = query_options.context
+            hydrated_options.qna_id = query_options.qna_id
 
         return hydrated_options
 
@@ -143,6 +143,7 @@ class GenerateAnswerUtils:
             score_threshold=options.score_threshold,
             strict_filters=options.strict_filters,
             context=options.context,
+            qna_id=options.qna_id,
         )
 
         http_request_helper = HttpRequestUtils(self._http_client)
@@ -166,6 +167,7 @@ class GenerateAnswerUtils:
             top=options.top,
             strict_filters=options.strict_filters,
             context=options.context,
+            qna_id=options.qna_id,
         )
 
         trace_activity = Activity(

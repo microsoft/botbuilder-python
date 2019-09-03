@@ -18,6 +18,7 @@ class GenerateAnswerRequestBody(Model):
         "score_threshold": {"key": "scoreThreshold", "type": "float"},
         "strict_filters": {"key": "strictFilters", "type": "[Metadata]"},
         "context": {"key": "context", "type": "QnARequestContext"},
+        "qna_id": {"key": "qnaId", "type": "int"},
     }
 
     def __init__(
@@ -27,6 +28,7 @@ class GenerateAnswerRequestBody(Model):
         score_threshold: float,
         strict_filters: List[Metadata],
         context: QnARequestContext = None,
+        qna_id: int = None,
         **kwargs
     ):
         """
@@ -43,6 +45,8 @@ class GenerateAnswerRequestBody(Model):
 
         context: The context from which the QnA was extracted.
 
+        qna_id: Id of the current question asked.
+
         """
 
         super().__init__(**kwargs)
@@ -52,3 +56,4 @@ class GenerateAnswerRequestBody(Model):
         self.score_threshold = score_threshold
         self.strict_filters = strict_filters
         self.context = context
+        self.qna_id = qna_id
