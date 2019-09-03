@@ -724,7 +724,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
             self.assertEqual(1, len(results), "Should have received 1 answers.")
             self.assertEqual(1, results[0].score, "Score should be high.")
 
-    async def test_should_answer_with_high_score_provided_qnaId(self):
+    async def test_should_answer_with_high_score_provided_qna_id(self):
         qna = QnAMaker(QnaApplicationTest.tests_endpoint)
         question: str = "where can I buy?"
 
