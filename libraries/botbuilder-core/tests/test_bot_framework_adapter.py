@@ -5,6 +5,7 @@ from copy import copy, deepcopy
 from unittest.mock import Mock
 import unittest
 import aiounittest
+import uuid
 
 from botbuilder.core import (
     BotFrameworkAdapter,
@@ -16,6 +17,7 @@ from botbuilder.schema import (
     ActivityTypes,
     ConversationAccount,
     ConversationReference,
+    ConversationResourceResponse,
     ChannelAccount,
 )
 from botframework.connector.aio import ConnectorClient
@@ -124,7 +126,12 @@ class AdapterUnderTest(BotFrameworkAdapter):
             self.tester.assertIsNotNone(
                 parameters, "create_conversation not passed parameters"
             )
-            return not self.fail_auth
+            response = ConversationResourceResponse(
+                activity_id=REFERENCE.activity_id,
+                service_url=REFERENCE.service_url,
+                id=uuid.uuid4(),
+            )
+            return response
 
         connector_client_mock.conversations.reply_to_activity.side_effect = (
             mock_reply_to_activity
@@ -247,3 +254,42 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
             )
 
         await adapter.process_activity(incoming, "", aux_func_assert_tenant_id_copied)
+
+    async def test_should_create_valid_conversation_for_msteams(self):
+
+        tenant_id = "testTenant"
+
+        reference = deepcopy(REFERENCE)
+        reference.conversation.tenant_id = tenant_id
+        reference.channel_data = {
+            'tenant': {
+                'id': tenant_id
+            }
+        }
+        adapter = AdapterUnderTest()
+
+        async def aux_func_assert_valid_conversation(context):
+            self.assertIsNotNone(
+                context,
+                "context not passed"
+            )
+            self.assertIsNotNone(
+                context.activity,
+                "context has no request"
+            )
+            self.assertIsNotNone(
+                context.activity.conversation,
+                "request has invalid conversation"
+            )
+            self.assertEqual(
+                context.activity.conversation.tenant_id,
+                tenant_id,
+                "request has invalid tenant_id on conversation"
+            )
+            self.assertEqual(
+                context.activity.channel_data['tenant']['id'],
+                tenant_id,
+                "request has invalid tenant_id in channel_data"
+            )
+
+        await adapter.create_conversation(reference, aux_func_assert_valid_conversation)
