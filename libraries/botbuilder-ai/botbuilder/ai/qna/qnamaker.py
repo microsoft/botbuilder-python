@@ -8,7 +8,7 @@ from aiohttp import ClientSession, ClientTimeout
 from botbuilder.schema import Activity
 from botbuilder.core import BotTelemetryClient, NullTelemetryClient, TurnContext
 
-from .models import FeedbackRecord, QueryResult
+from .models import FeedbackRecord, QueryResult, QueryResults
 from .utils import (
     ActiveLearningUtils,
     GenerateAnswerUtils,
@@ -86,6 +86,30 @@ class QnAMaker(QnAMakerTelemetryClient):
         ------
         List[QueryResult]
         """
+        result = await self.get_answers_raw(
+            context, options, telemetry_properties, telemetry_metrics
+        )
+
+        return result.answers
+
+    async def get_answers_raw(
+        self,
+        context: TurnContext,
+        options: QnAMakerOptions = None,
+        telemetry_properties: Dict[str, str] = None,
+        telemetry_metrics: Dict[str, int] = None,
+    ) -> QueryResults:
+        """
+        Generates raw answers from the knowledge base.
+
+        return:
+        -------
+        A list of answers for the user's query, sorted in decreasing order of ranking score.
+
+        rtype:
+        ------
+        QueryResults
+        """
         if not context:
             raise TypeError("QnAMaker.get_answers(): context cannot be None.")
 
@@ -97,7 +121,7 @@ class QnAMaker(QnAMakerTelemetryClient):
         result = await self._generate_answer_helper.get_answers(context, options)
 
         await self.on_qna_result(
-            result, context, telemetry_properties, telemetry_metrics
+            result.answers, context, telemetry_properties, telemetry_metrics
         )
 
         return result

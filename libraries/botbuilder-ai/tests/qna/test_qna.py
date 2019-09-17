@@ -146,6 +146,21 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
             first_answer.answer,
         )
 
+    async def test_active_learning_enabled_status(self):
+        # Arrange
+        question: str = "how do I clean the stove?"
+        response_path: str = "ReturnsAnswer.json"
+
+        # Act
+        result = await QnaApplicationTest._get_service_result_raw(
+            question, response_path
+        )
+
+        # Assert
+        self.assertIsNotNone(result)
+        self.assertEqual(1, len(result.answers))
+        self.assertFalse(result.active_learning_enabled)
+
     async def test_returns_answer_using_options(self):
         # Arrange
         question: str = "up"
@@ -762,6 +777,27 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
             return_value=aiounittest.futurized(response_json),
         ):
             result = await qna.get_answers(context, options)
+
+            return result
+
+    @classmethod
+    async def _get_service_result_raw(
+        cls,
+        utterance: str,
+        response_file: str,
+        bot_adapter: BotAdapter = TestAdapter(),
+        options: QnAMakerOptions = None,
+    ) -> [dict]:
+        response_json = QnaApplicationTest._get_json_for_file(response_file)
+
+        qna = QnAMaker(QnaApplicationTest.tests_endpoint)
+        context = QnaApplicationTest._get_context(utterance, bot_adapter)
+
+        with patch(
+            "aiohttp.ClientSession.post",
+            return_value=aiounittest.futurized(response_json),
+        ):
+            result = await qna.get_answers_raw(context, options)
 
             return result
 

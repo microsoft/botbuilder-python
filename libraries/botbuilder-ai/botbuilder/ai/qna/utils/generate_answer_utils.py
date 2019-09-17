@@ -13,7 +13,12 @@ from .http_request_utils import HttpRequestUtils
 
 from ..qnamaker_endpoint import QnAMakerEndpoint
 from ..qnamaker_options import QnAMakerOptions
-from ..models import GenerateAnswerRequestBody, QnAMakerTraceInfo, QueryResult
+from ..models import (
+    GenerateAnswerRequestBody,
+    QnAMakerTraceInfo,
+    QueryResult,
+    QueryResults,
+)
 
 QNAMAKER_TRACE_NAME = "QnAMaker"
 QNAMAKER_TRACE_LABEL = "QnAMaker Trace"
@@ -57,7 +62,7 @@ class GenerateAnswerUtils:
 
     async def get_answers(
         self, context: TurnContext, options: QnAMakerOptions = None
-    ) -> List[QueryResult]:
+    ) -> QueryResults:
         if not isinstance(context, TurnContext):
             raise TypeError(
                 "GenerateAnswerUtils.get_answers(): context must be an instance of TurnContext"
@@ -66,11 +71,9 @@ class GenerateAnswerUtils:
         hydrated_options = self._hydrate_options(options)
         self._validate_options(hydrated_options)
 
-        result: List[QueryResult] = await self._query_qna_service(
-            context, hydrated_options
-        )
+        result: QueryResults = await self._query_qna_service(context, hydrated_options)
 
-        await self._emit_trace_info(context, result, hydrated_options)
+        await self._emit_trace_info(context, result.answers, hydrated_options)
 
         return result
 
@@ -134,7 +137,7 @@ class GenerateAnswerUtils:
 
     async def _query_qna_service(
         self, turn_context: TurnContext, options: QnAMakerOptions
-    ) -> List[QueryResult]:
+    ) -> QueryResults:
         url = f"{ self._endpoint.host }/knowledgebases/{ self._endpoint.knowledge_base_id }/generateAnswer"
 
         question = GenerateAnswerRequestBody(
@@ -151,7 +154,7 @@ class GenerateAnswerUtils:
             url, question, self._endpoint, options.timeout
         )
 
-        result: List[QueryResult] = await self._format_qna_result(response, options)
+        result: QueryResults = await self._format_qna_result(response, options)
 
         return result
 
@@ -180,7 +183,7 @@ class GenerateAnswerUtils:
 
     async def _format_qna_result(
         self, result, options: QnAMakerOptions
-    ) -> List[QueryResult]:
+    ) -> QueryResults:
         json_res = result
         if isinstance(result, ClientResponse):
             json_res = await result.json()
@@ -198,4 +201,14 @@ class GenerateAnswerUtils:
             map(lambda answer: QueryResult(**answer), sorted_answers)
         )
 
-        return answers_as_query_results
+        active_learning_enabled = (
+            json_res["activeLearningEnabled"]
+            if "activeLearningEnabled" in json_res
+            else True
+        )
+
+        query_answer_response = QueryResults(
+            answers_as_query_results, active_learning_enabled
+        )
+
+        return query_answer_response
