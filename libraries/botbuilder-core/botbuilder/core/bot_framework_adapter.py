@@ -180,7 +180,8 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             request = TurnContext.apply_conversation_reference(
                 Activity(), reference, is_incoming=True
             )
-            request.conversation = ConversationAccount(id=resource_response.id)
+            request.conversation = ConversationAccount(id=resource_response.id, tenant_id=parameters.tenant_id)
+            request.channel_data = parameters.channel_data
             if resource_response.service_url:
                 request.service_url = resource_response.service_url
 
