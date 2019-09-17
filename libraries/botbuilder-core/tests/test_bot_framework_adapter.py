@@ -264,6 +264,8 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
         reference.channel_data = {"tenant": {"id": tenant_id}}
         adapter = AdapterUnderTest()
 
+        called = False
+
         async def aux_func_assert_valid_conversation(context):
             self.assertIsNotNone(context, "context not passed")
             self.assertIsNotNone(context.activity, "context has no request")
@@ -280,5 +282,8 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
                 tenant_id,
                 "request has invalid tenant_id in channel_data",
             )
+            nonlocal called
+            called = True
 
         await adapter.create_conversation(reference, aux_func_assert_valid_conversation)
+        self.assertTrue(called, "bot logic not called.")
