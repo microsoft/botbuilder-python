@@ -261,35 +261,24 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
 
         reference = deepcopy(REFERENCE)
         reference.conversation.tenant_id = tenant_id
-        reference.channel_data = {
-            'tenant': {
-                'id': tenant_id
-            }
-        }
+        reference.channel_data = {"tenant": {"id": tenant_id}}
         adapter = AdapterUnderTest()
 
         async def aux_func_assert_valid_conversation(context):
+            self.assertIsNotNone(context, "context not passed")
+            self.assertIsNotNone(context.activity, "context has no request")
             self.assertIsNotNone(
-                context,
-                "context not passed"
-            )
-            self.assertIsNotNone(
-                context.activity,
-                "context has no request"
-            )
-            self.assertIsNotNone(
-                context.activity.conversation,
-                "request has invalid conversation"
+                context.activity.conversation, "request has invalid conversation"
             )
             self.assertEqual(
                 context.activity.conversation.tenant_id,
                 tenant_id,
-                "request has invalid tenant_id on conversation"
+                "request has invalid tenant_id on conversation",
             )
             self.assertEqual(
-                context.activity.channel_data['tenant']['id'],
+                context.activity.channel_data["tenant"]["id"],
                 tenant_id,
-                "request has invalid tenant_id in channel_data"
+                "request has invalid tenant_id in channel_data",
             )
 
         await adapter.create_conversation(reference, aux_func_assert_valid_conversation)
