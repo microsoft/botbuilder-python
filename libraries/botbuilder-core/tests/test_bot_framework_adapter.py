@@ -4,8 +4,8 @@
 from copy import copy, deepcopy
 from unittest.mock import Mock
 import unittest
-import aiounittest
 import uuid
+import aiounittest
 
 from botbuilder.core import (
     BotFrameworkAdapter,
