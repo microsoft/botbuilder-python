@@ -118,7 +118,7 @@ class QnAMaker(QnAMakerTelemetryClient):
                 "QnAMaker.get_answers(): TurnContext's activity must be an Activity instance."
             )
 
-        result = await self._generate_answer_helper.get_answers(context, options)
+        result = await self._generate_answer_helper.get_answers_raw(context, options)
 
         await self.on_qna_result(
             result.answers, context, telemetry_properties, telemetry_metrics

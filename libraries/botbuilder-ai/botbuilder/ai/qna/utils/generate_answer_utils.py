@@ -62,6 +62,13 @@ class GenerateAnswerUtils:
 
     async def get_answers(
         self, context: TurnContext, options: QnAMakerOptions = None
+    ) -> List[QueryResult]:
+        result: QueryResults = await self.get_answers_raw(context, options)
+
+        return result
+
+    async def get_answers_raw(
+        self, context: TurnContext, options: QnAMakerOptions = None
     ) -> QueryResults:
         if not isinstance(context, TurnContext):
             raise TypeError(
