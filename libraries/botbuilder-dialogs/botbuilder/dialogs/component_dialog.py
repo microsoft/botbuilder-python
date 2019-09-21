@@ -89,7 +89,7 @@ class ComponentDialog(Dialog):
     ) -> None:
         # Forward cancel to inner dialogs
         if reason == DialogReason.CancelCalled:
-            dialog_state = instance.State[self.persisted_dialog_state]
+            dialog_state = instance.state[self.persisted_dialog_state]
             inner_dc = DialogContext(self._dialogs, context, dialog_state)
             await inner_dc.cancel_all_dialogs()
         await self.on_end_dialog(context, instance, reason)
