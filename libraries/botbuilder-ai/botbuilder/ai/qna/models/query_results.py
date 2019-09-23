@@ -2,11 +2,11 @@
 # Licensed under the MIT License.
 
 from typing import List
-
+from msrest.serialization import Model
 from .query_result import QueryResult
 
 
-class QueryResults:
+class QueryResults(Model):
     """ Contains answers for a user query. """
 
     _attribute_map = {
