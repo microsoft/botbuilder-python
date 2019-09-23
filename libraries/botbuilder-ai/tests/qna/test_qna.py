@@ -725,7 +725,25 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         context = QnARequestContext(
             previous_qna_id=5, prvious_user_query="how do I clean the stove?"
         )
-        options = QnAMakerOptions(top=2, context=context)
+        options = QnAMakerOptions(top=2, qna_id=55, context=context)
+        turn_context = QnaApplicationTest._get_context(question, TestAdapter())
+        response_json = QnaApplicationTest._get_json_for_file(
+            "AnswerWithHighScoreProvidedContext.json"
+        )
+
+        with patch(
+            "aiohttp.ClientSession.post",
+            return_value=aiounittest.futurized(response_json),
+        ):
+            results = await qna.get_answers(turn_context, options)
+            self.assertEqual(1, len(results), "Should have received 1 answers.")
+            self.assertEqual(1, results[0].score, "Score should be high.")
+
+    async def test_should_answer_with_high_score_provided_qna_id(self):
+        qna = QnAMaker(QnaApplicationTest.tests_endpoint)
+        question: str = "where can I buy?"
+
+        options = QnAMakerOptions(top=2, qna_id=55)
         turn_context = QnaApplicationTest._get_context(question, TestAdapter())
         response_json = QnaApplicationTest._get_json_for_file(
             "AnswerWithHighScoreProvidedContext.json"

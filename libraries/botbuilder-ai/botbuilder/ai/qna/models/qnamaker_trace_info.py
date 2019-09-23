@@ -21,6 +21,7 @@ class QnAMakerTraceInfo:
         top: int,
         strict_filters: List[Metadata],
         context: QnARequestContext = None,
+        qna_id: int = None,
     ):
         """
         Parameters:
@@ -39,6 +40,8 @@ class QnAMakerTraceInfo:
         strict_filters: Filters used on query.
 
         context: (Optional) The context from which the QnA was extracted.
+
+        qna_id: (Optional) Id of the current question asked.
         """
         self.message = message
         self.query_results = query_results
@@ -47,3 +50,4 @@ class QnAMakerTraceInfo:
         self.top = top
         self.strict_filters = strict_filters
         self.context = context
+        self.qna_id = qna_id
