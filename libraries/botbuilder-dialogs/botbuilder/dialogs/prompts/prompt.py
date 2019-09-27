@@ -222,7 +222,6 @@ class Prompt(Dialog):
                     prompt.attachments.extend(msg.attachments)
                 else:
                     prompt.attachments = msg.attachments
-                    
 
             return prompt
 
