@@ -24,7 +24,7 @@ def home():
 
 def messages(request):
     """Main bot message handler."""
-    if request.headers["Content-Type"] == "application/json":
+    if "application/json" in request.headers["Content-Type"]:
         body = json.loads(request.body.decode("utf-8"))
     else:
         return HttpResponse(status=415)
