@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from typing import List
+from typing import List, Union
 
 from botbuilder.core import CardFactory, MessageFactory
 from botbuilder.schema import ActionTypes, Activity, CardAction, HeroCard, InputHints
@@ -17,7 +17,7 @@ class ChoiceFactory:
     @staticmethod
     def for_channel(
         channel_id: str,
-        choices: List[Choice],
+        choices: List[Union[str, Choice]],
         text: str = None,
         speak: str = None,
         options: ChoiceFactoryOptions = None,
@@ -36,8 +36,7 @@ class ChoiceFactory:
         if channel_id is None:
             channel_id = ""
 
-        if choices is None:
-            choices = []
+        choices = ChoiceFactory._to_choices(choices)
 
         # Find maximum title length
         max_title_length = 0
@@ -74,7 +73,7 @@ class ChoiceFactory:
 
     @staticmethod
     def inline(
-        choices: List[Choice],
+        choices: List[Union[str, Choice]],
         text: str = None,
         speak: str = None,
         options: ChoiceFactoryOptions = None,
@@ -89,8 +88,7 @@ class ChoiceFactory:
         speak: (Optional) SSML. Text to be spoken by your bot on a speech-enabled channel.
         options: (Optional) The formatting options to use to tweak rendering of list.
         """
-        if choices is None:
-            choices = []
+        choices = ChoiceFactory._to_choices(choices)
 
         if options is None:
             options = ChoiceFactoryOptions()
@@ -134,7 +132,7 @@ class ChoiceFactory:
 
     @staticmethod
     def list_style(
-        choices: List[Choice],
+        choices: List[Union[str, Choice]],
         text: str = None,
         speak: str = None,
         options: ChoiceFactoryOptions = None,
@@ -153,8 +151,7 @@ class ChoiceFactory:
 
         options: (Optional) The formatting options to use to tweak rendering of list.
         """
-        if choices is None:
-            choices = []
+        choices = ChoiceFactory._to_choices(choices)
         if options is None:
             options = ChoiceFactoryOptions()
 
@@ -206,7 +203,7 @@ class ChoiceFactory:
 
     @staticmethod
     def hero_card(
-        choices: List[Choice], text: str = None, speak: str = None
+        choices: List[Union[Choice, str]], text: str = None, speak: str = None
     ) -> Activity:
         """
         Creates a message activity that includes a lsit of coices that have been added as `HeroCard`'s
@@ -221,18 +218,19 @@ class ChoiceFactory:
         )
 
     @staticmethod
-    def _to_choices(choices: List[str]) -> List[Choice]:
+    def _to_choices(choices: List[Union[str, Choice]]) -> List[Choice]:
         """
         Takes a list of strings and returns them as [`Choice`].
         """
         if choices is None:
             return []
-        return [Choice(value=choice.value) for choice in choices]
+        return [Choice(value=choice) if isinstance(choice, str) else choice for choice in choices]
 
     @staticmethod
-    def _extract_actions(choices: List[Choice]) -> List[CardAction]:
+    def _extract_actions(choices: List[Union[str, Choice]]) -> List[CardAction]:
         if choices is None:
             choices = []
+        choices = ChoiceFactory._to_choices(choices)
         card_actions: List[CardAction] = []
         for choice in choices:
             if choice.action is not None:
