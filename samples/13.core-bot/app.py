@@ -46,7 +46,7 @@ BOT = DialogAndWelcomeBot(CONVERSATION_STATE, USER_STATE, DIALOG)
 @APP.route("/api/messages", methods=["POST"])
 def messages():
     """Main bot message handler."""
-    if request.headers["Content-Type"] == "application/json":
+    if "application/json" in request.headers["Content-Type"]:
         body = request.json
     else:
         return Response(status=415)
