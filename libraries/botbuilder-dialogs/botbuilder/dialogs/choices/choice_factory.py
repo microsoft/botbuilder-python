@@ -224,7 +224,10 @@ class ChoiceFactory:
         """
         if choices is None:
             return []
-        return [Choice(value=choice) if isinstance(choice, str) else choice for choice in choices]
+        return [
+            Choice(value=choice) if isinstance(choice, str) else choice
+            for choice in choices
+        ]
 
     @staticmethod
     def _extract_actions(choices: List[Union[str, Choice]]) -> List[CardAction]:

@@ -591,6 +591,7 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
 
     async def test_should_display_choices_on_hero_card(self):
         size_choices = ["large", "medium", "small"]
+
         async def exec_test(turn_context: TurnContext):
             dialog_context = await dialogs.create_context(turn_context)
 
@@ -610,9 +611,14 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
 
             await convo_state.save_changes(turn_context)
 
-        def assert_expected_activity(activity: Activity, description):  # pylint: disable=unused-argument
+        def assert_expected_activity(
+            activity: Activity, description
+        ):  # pylint: disable=unused-argument
             assert len(activity.attachments) == 1
-            assert activity.attachments[0].content_type == CardFactory.content_types.hero_card
+            assert (
+                activity.attachments[0].content_type
+                == CardFactory.content_types.hero_card
+            )
             assert activity.attachments[0].content.text == "Please choose a size."
 
         adapter = TestAdapter(exec_test)
@@ -640,7 +646,7 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
                 "type": "AdaptiveCard",
                 "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
                 "version": "1.2",
-                "body": []
+                "body": [],
             }
         )
         card_activity = Activity(attachments=[card])
@@ -651,10 +657,7 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
             results: DialogTurnResult = await dialog_context.continue_dialog()
 
             if results.status == DialogTurnStatus.Empty:
-                options = PromptOptions(
-                    prompt=card_activity,
-                    choices=size_choices,
-                )
+                options = PromptOptions(prompt=card_activity, choices=size_choices)
                 await dialog_context.prompt("prompt", options)
             elif results.status == DialogTurnStatus.Complete:
                 selected_choice = results.result
@@ -662,10 +665,18 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
 
             await convo_state.save_changes(turn_context)
 
-        def assert_expected_activity(activity: Activity, description):  # pylint: disable=unused-argument
+        def assert_expected_activity(
+            activity: Activity, description
+        ):  # pylint: disable=unused-argument
             assert len(activity.attachments) == 2
-            assert activity.attachments[0].content_type == CardFactory.content_types.adaptive_card
-            assert activity.attachments[1].content_type == CardFactory.content_types.hero_card
+            assert (
+                activity.attachments[0].content_type
+                == CardFactory.content_types.adaptive_card
+            )
+            assert (
+                activity.attachments[1].content_type
+                == CardFactory.content_types.hero_card
+            )
 
         adapter = TestAdapter(exec_test)
 
