@@ -1,10 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import os
 from rest_framework.decorators import api_view
-from applicationinsights import TelemetryClient
-from applicationinsights.django import common
+from botbuilder.applicationinsights.django import common
 from botbuilder.applicationinsights import ApplicationInsightsTelemetryClient
 from django.http import HttpResponse, Http404
 from django.template.response import TemplateResponse
