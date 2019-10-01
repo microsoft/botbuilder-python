@@ -352,7 +352,7 @@ class TestFlow:
         :param timeout:
         :return:
         """
-
+        # TODO: refactor method so expected can take a Callable[[Activity], None]
         def default_inspector(reply, description=None):
             if isinstance(expected, Activity):
                 validate_activity(reply, expected)

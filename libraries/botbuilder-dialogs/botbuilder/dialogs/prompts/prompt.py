@@ -217,8 +217,11 @@ class Prompt(Dialog):
             ):
                 prompt.suggested_actions = msg.suggested_actions
 
-            if msg.attachments is not None and msg.attachments:
-                prompt.attachments = msg.attachments
+            if msg.attachments:
+                if prompt.attachments:
+                    prompt.attachments.extend(msg.attachments)
+                else:
+                    prompt.attachments = msg.attachments
 
             return prompt
 
