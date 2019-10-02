@@ -8,7 +8,7 @@ class InspectionState(BotState):
     def __init__(self, storage: Storage):
         super().__init__(storage, self.__class__.__name__)
 
-    def get_storage_key(
+    def get_storage_key(  # pylint: disable=unused-argument
         self, turn_context: TurnContext
-    ) -> str:  # pylint: disable=unused-argument
+    ) -> str:
         return self.__class__.__name__
