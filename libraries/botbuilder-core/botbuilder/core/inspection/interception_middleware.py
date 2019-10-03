@@ -7,7 +7,7 @@ from typing import Any, Awaitable, Callable, List
 from botbuilder.core import Middleware, TurnContext
 from botbuilder.schema import Activity, ConversationReference
 
-from trace_activity import from_activity, from_conversation_reference, from_error
+from .trace_activity import from_activity, from_conversation_reference, from_error
 
 
 class InterceptionMiddleware(Middleware):

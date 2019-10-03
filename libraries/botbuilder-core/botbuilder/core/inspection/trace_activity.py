@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 from datetime import datetime
+from typing import Dict, Union
 
 from botbuilder.core import BotState
 from botbuilder.schema import Activity, ActivityTypes, ConversationReference
@@ -29,7 +30,7 @@ def from_activity(activity: Activity, name: str, label: str) -> Activity:
     )
 
 
-def from_state(bot_state: BotState) -> Activity:
+def from_state(bot_state: Union[BotState, Dict]) -> Activity:
     return Activity(
         type=ActivityTypes.trace,
         timestamp=datetime.utcnow(),
