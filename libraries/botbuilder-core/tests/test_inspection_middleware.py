@@ -12,7 +12,7 @@ from botbuilder.core.inspection import InspectionMiddleware, InspectionState
 
 
 class TestConversationState(aiounittest.AsyncTestCase):
-    def setUp(self):
+    def setUp(self):  # pylint: disable=invalid-name
         self.session = Session()
         # self.mock_adapter = Adapter()
         # self.session.mount("mock", self.mock_adapter)

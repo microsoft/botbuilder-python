@@ -21,7 +21,7 @@ from .trace_activity import from_state, make_command_activity
 class InspectionMiddleware(InterceptionMiddleware):
     _COMMAND = "/INSPECT"
 
-    def __init__(
+    def __init__(  # pylint: disable=super-init-not-called
         self,
         inspection_state: InspectionState,
         user_state: UserState = None,
