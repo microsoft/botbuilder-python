@@ -159,7 +159,9 @@ class InspectionMiddleware(InterceptionMiddleware):
             context, DEFAULT_INSPECTION_SESSIONS_BY_STATUS
         )
 
-        conversation_reference = sessions.attached_sessions.get(context.activity.conversation.id)
+        conversation_reference = sessions.attached_sessions.get(
+            context.activity.conversation.id
+        )
         if conversation_reference:
             return InspectionSession(conversation_reference, self.credentials)
 

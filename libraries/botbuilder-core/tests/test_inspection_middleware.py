@@ -3,7 +3,8 @@
 
 import aiounittest
 from requests import Session
-#from requests_mock import Adapter
+
+# from requests_mock import Adapter
 
 from botbuilder.core import MemoryStorage, MessageFactory, TurnContext
 from botbuilder.core.adapters import TestAdapter
@@ -13,8 +14,8 @@ from botbuilder.core.inspection import InspectionMiddleware, InspectionState
 class TestConversationState(aiounittest.AsyncTestCase):
     def setUp(self):
         self.session = Session()
-        self.mock_adapter = Adapter()
-        self.session.mount("mock", self.mock_adapter)
+        # self.mock_adapter = Adapter()
+        # self.session.mount("mock", self.mock_adapter)
 
     async def test_scenario_with_inspection_middlware_passthrough(self):
         inspection_state = InspectionState(MemoryStorage())
@@ -33,4 +34,3 @@ class TestConversationState(aiounittest.AsyncTestCase):
         outbound_activity = adapter.activity_buffer.pop(0)
 
         assert outbound_activity.text, "hi"
-

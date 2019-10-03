@@ -14,7 +14,8 @@ class StatePropertyAccessor(ABC):
         """
         Get the property value from the source
         :param turn_context: Turn Context.
-        :param default_value_or_factory: Function which defines the property value to be returned if no value has been set.
+        :param default_value_or_factory: Function which defines the property
+        value to be returned if no value has been set.
 
         :return:
         """
