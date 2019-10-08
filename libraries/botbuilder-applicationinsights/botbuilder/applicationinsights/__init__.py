@@ -9,5 +9,11 @@ from .application_insights_telemetry_client import (
     ApplicationInsightsTelemetryClient,
     bot_telemetry_processor,
 )
+from .bot_telemetry_processor import BotTelemetryProcessor
 
-__all__ = ["ApplicationInsightsTelemetryClient", "bot_telemetry_processor"]
+
+__all__ = [
+    "ApplicationInsightsTelemetryClient",
+    "BotTelemetryProcessor",
+    "bot_telemetry_processor",
+]

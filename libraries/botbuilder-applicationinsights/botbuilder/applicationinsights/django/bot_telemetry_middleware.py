@@ -4,6 +4,7 @@
 
 from threading import current_thread
 
+
 # Map of thread id => POST body text
 _REQUEST_BODIES = {}
 
@@ -14,7 +15,8 @@ def retrieve_bot_body():
     The POST body corresponds with the thread id and should resides in
     cache just for lifetime of request.
     """
-    result = _REQUEST_BODIES.pop(current_thread().ident, None)
+
+    result = _REQUEST_BODIES.get(current_thread().ident, None)
     return result
 
 
@@ -36,7 +38,9 @@ class BotTelemetryMiddleware:
 
     def __call__(self, request):
         self.process_request(request)
-        return self.get_response(request)
+        response = self.get_response(request)
+        _REQUEST_BODIES.pop(current_thread().ident, None)
+        return response
 
     def process_request(self, request) -> bool:
         """Process the incoming Django request."""
