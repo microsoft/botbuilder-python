@@ -2,7 +2,6 @@
 # Licensed under the MIT License.
 
 import time
-import pytz
 from datetime import datetime
 
 from botbuilder.core import ActivityHandler, ConversationState, TurnContext, UserState

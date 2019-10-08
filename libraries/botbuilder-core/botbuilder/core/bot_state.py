@@ -3,7 +3,11 @@
 
 from abc import abstractmethod
 from copy import deepcopy
-from typing import Callable, Dict, Union
+from typing import Any, Callable, Dict, List, Tuple, Type, Union
+from msrest.serialization import (
+    Deserializer,
+    Model
+)
 from botbuilder.core.state_property_accessor import StatePropertyAccessor
 from .turn_context import TurnContext
 from .storage import Storage
@@ -25,10 +29,14 @@ class CachedBotState:
 
     def compute_hash(self, obj: object) -> str:
         # TODO: Should this be compatible with C# JsonConvert.SerializeObject ?
-        return str(obj)
+        serialized_obj = BotState.apply_serialization(obj, True)
+        return str(serialized_obj)
 
 
 class BotState(PropertyManager):
+
+    _serialization_registry: Dict[str, Tuple[Union[Callable, None], Callable]] = {}
+
     def __init__(self, storage: Storage, context_service_key: str):
         self.state_key = "state"
         self._storage = storage
@@ -38,12 +46,11 @@ class BotState(PropertyManager):
         """
         Create a property definition and register it with this BotState.
         :param name: The name of the property.
-        :param force:
         :return: If successful, the state property accessor created.
         """
         if not name:
             raise TypeError(
-                "BotState.create_property(): BotState cannot be None or empty."
+                "BotState.create_property(): Name cannot be None or empty."
             )
         return BotStatePropertyAccessor(self, name)
 
@@ -66,7 +73,8 @@ class BotState(PropertyManager):
 
         if force or not cached_state or not cached_state.state:
             items = await self._storage.read([storage_key])
-            val = items.get(storage_key)
+            temp = items.get(storage_key)
+            val = BotState.apply_serialization(data_to_process=temp, serialize=False)
             turn_context.turn_state[self._context_service_key] = CachedBotState(val)
 
     async def save_changes(
@@ -85,7 +93,8 @@ class BotState(PropertyManager):
 
         if force or (cached_state is not None and cached_state.is_changed):
             storage_key = self.get_storage_key(turn_context)
-            changes: Dict[str, object] = {storage_key: cached_state.state}
+            state = BotState.apply_serialization(data_to_process=cached_state.state, serialize=True)
+            changes: Dict[str, object] = {storage_key: state}
             await self._storage.write(changes)
             cached_state.hash = cached_state.compute_hash(cached_state.state)
 
@@ -170,6 +179,80 @@ class BotState(PropertyManager):
             raise TypeError("BotState.delete_property(): property_name cannot be None.")
         cached_state = turn_context.turn_state.get(self._context_service_key)
         cached_state.state[property_name] = value
+
+    @classmethod
+    def register_serialization_functions(cls, cls_to_register: type, serializer: Callable, deserializer: Callable):
+        cls._serialization_registry[cls_to_register.__name__] = (serializer, deserializer)
+
+    @classmethod
+    def register_msrest_deserializer(cls, msrest_cls: Type[Model], dependencies: List[Type[Model]] = []):
+        def aux_deserializer(dict_val):
+            dependencies.append(msrest_cls)
+            dependencies_dict = {dependency.__name__: dependency for dependency in dependencies}
+            deserializer = Deserializer(dependencies_dict)
+            deserializer.additional_properties_detection = False
+            return deserializer(msrest_cls.__name__, dict_val)
+
+        cls._serialization_registry[f"msrest.serialization.Model.{msrest_cls.__name__}"] = (
+            None,
+            aux_deserializer
+        )
+
+    @classmethod
+    def apply_serialization(cls, data_to_process: Dict[str, Any], serialize: bool) -> Union[object, Dict]:
+        if serialize:
+            func = cls._serialization_registry.get(
+                data_to_process.__class__.__name__,
+                (None, None)
+            )[0]
+
+            if func:
+                result = func(data_to_process)
+                if isinstance(result, dict):
+                    result["$instanceType"] = data_to_process.__class__.__name__
+                return result
+
+            if isinstance(data_to_process, Model):
+                result = data_to_process.serialize()
+                result["$instanceType"] = f"msrest.serialization.Model.{data_to_process.__class__.__name__}"
+                return result
+
+            if isinstance(data_to_process, dict):
+                return {key: BotState.apply_serialization(data_to_process=value, serialize=True)
+                        for (key, value)
+                        in data_to_process.items()}
+
+            if isinstance(data_to_process, list):
+                return [BotState.apply_serialization(data_to_process=value, serialize=True)
+                        for value
+                        in data_to_process]
+
+            if data_to_process.__class__ in (int, float, str, bool):
+                return data_to_process
+        else:
+            if isinstance(data_to_process, dict):
+                if "$instanceType" in data_to_process:
+                    func = cls._serialization_registry.get(
+                        data_to_process["$instanceType"],
+                        (None, None)
+                    )[1]
+
+                    if func:
+                        return func(data_to_process)
+                if isinstance(data_to_process, dict):
+                    return {key: BotState.apply_serialization(data_to_process=value, serialize=False)
+                            for (key, value)
+                            in data_to_process.items()}
+
+                if isinstance(data_to_process, list):
+                    return [BotState.apply_serialization(data_to_process=value, serialize=False)
+                            for value
+                            in data_to_process]
+
+                if data_to_process.__class__ in (int, float, str, bool):
+                    return data_to_process
+
+        return None
 
 
 ##

@@ -80,7 +80,6 @@ class WaterfallTests(aiounittest.AsyncTestCase):
 
         # Initialize TestAdapter
         async def exec_test(turn_context: TurnContext) -> None:
-
             dialog_context = await dialogs.create_context(turn_context)
             results = await dialog_context.continue_dialog()
             if results.status == DialogTurnStatus.Empty:

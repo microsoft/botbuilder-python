@@ -11,14 +11,18 @@ from flask import Flask, request, Response
 from botbuilder.core import (
     BotFrameworkAdapter,
     BotFrameworkAdapterSettings,
+    BotState,
     ConversationState,
     MemoryStorage,
     TurnContext,
     UserState,
 )
+from botbuilder.core.inspection import InspectionState, InspectionMiddleware
 from botbuilder.schema import Activity
+from botframework.connector.auth import MicrosoftAppCredentials
 
 from bots import StateManagementBot
+from data_models import ConversationData, UserProfile
 
 LOOP = asyncio.get_event_loop()
 APP = Flask(__name__, instance_relative_config=True)
@@ -28,6 +32,7 @@ SETTINGS = BotFrameworkAdapterSettings(
     APP.config["APP_ID"], APP.config["APP_PASSWORD"]
 )
 ADAPTER = BotFrameworkAdapter(SETTINGS)
+
 
 # Catch-all for errors.
 async def on_error(context: TurnContext, error: Exception):
@@ -45,13 +50,32 @@ ADAPTER.on_turn_error = on_error
 
 # Create MemoryStorage, UserState and ConversationState
 MEMORY = MemoryStorage()
+INSPECTION_STATE = InspectionState(MEMORY)
 
 # Commented out user_state because it's not being used.
 USER_STATE = UserState(MEMORY)
 CONVERSATION_STATE = ConversationState(MEMORY)
 
+BotState.register_serialization_functions(
+    ConversationData,
+    ConversationData.conversation_data_serializer,
+    ConversationData.conversation_data_deserializer
+)
+
+BotState.register_serialization_functions(
+    UserProfile,
+    UserProfile.user_profile_serializer,
+    UserProfile.user_profile_deserializer
+)
+
 
 BOT = StateManagementBot(CONVERSATION_STATE, USER_STATE)
+ADAPTER.use(InspectionMiddleware(
+    INSPECTION_STATE,
+    USER_STATE,
+    CONVERSATION_STATE,
+    MicrosoftAppCredentials(APP.config["APP_ID"], APP.config["APP_PASSWORD"])
+))
 
 
 @APP.route("/api/messages", methods=["POST"])
