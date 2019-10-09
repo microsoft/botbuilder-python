@@ -80,10 +80,8 @@ class TestAdapter(BotAdapter, UserTokenProvider):
             recipient=ChannelAccount(id="bot", name="Bot"),
             conversation=ConversationAccount(id="Convo1"),
         )
-        if self.template is not None:
-            self.template.service_url = self.template.service_url
-            self.template.conversation = self.template.conversation
-            self.template.channel_id = self.template.channel_id
+        if conversation is not None and conversation.channel_id is not None:
+            self.template.channel_id = conversation.channel_id
 
     async def send_activities(self, context, activities: List[Activity]):
         """
