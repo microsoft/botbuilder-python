@@ -44,7 +44,7 @@ class BotStateForTest(BotState):
 class CustomState(StoreItem, Model):
     _attribute_map = {
         "custom_string": {"key": "customString", "type": "str"},
-        "e_tag": {"key": "eTag", "type": "str"}
+        "e_tag": {"key": "eTag", "type": "str"},
     }
 
     def __init__(self, custom_string: str = None, e_tag: str = "*"):

@@ -45,8 +45,8 @@ BotState.register_msrest_deserializer(
     PromptOptions,
     dependencies=[
         schema_cls
-        for key, schema_cls
-        in getmembers(schema)
+        for key, schema_cls in getmembers(schema)
         if isinstance(schema_cls, type) and issubclass(schema_cls, (Model, Enum))
-    ] + [Choice, ListStyle]
+    ]
+    + [Choice, ListStyle],
 )

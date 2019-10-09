@@ -1,8 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from botbuilder.core import BotState
 from typing import Dict
+from botbuilder.core import BotState
 
 
 class DialogInstance:

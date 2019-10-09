@@ -5,10 +5,7 @@ from abc import abstractmethod
 from copy import deepcopy
 from enum import Enum
 from typing import Any, Callable, Dict, List, Tuple, Type, Union
-from msrest.serialization import (
-    Deserializer,
-    Model
-)
+from msrest.serialization import Deserializer, Model
 from botbuilder.core.state_property_accessor import StatePropertyAccessor
 from .turn_context import TurnContext
 from .storage import Storage
@@ -50,9 +47,7 @@ class BotState(PropertyManager):
         :return: If successful, the state property accessor created.
         """
         if not name:
-            raise TypeError(
-                "BotState.create_property(): Name cannot be None or empty."
-            )
+            raise TypeError("BotState.create_property(): Name cannot be None or empty.")
         return BotStatePropertyAccessor(self, name)
 
     def get(self, turn_context: TurnContext) -> Dict[str, object]:
@@ -94,7 +89,9 @@ class BotState(PropertyManager):
 
         if force or (cached_state is not None and cached_state.is_changed):
             storage_key = self.get_storage_key(turn_context)
-            state = BotState.apply_serialization(data_to_process=cached_state.state, serialize=True)
+            state = BotState.apply_serialization(
+                data_to_process=cached_state.state, serialize=True
+            )
             changes: Dict[str, object] = {storage_key: state}
             await self._storage.write(changes)
             cached_state.hash = cached_state.compute_hash(cached_state.state)
@@ -182,29 +179,42 @@ class BotState(PropertyManager):
         cached_state.state[property_name] = value
 
     @classmethod
-    def register_serialization_functions(cls, cls_to_register: type, serializer: Callable, deserializer: Callable):
-        cls._serialization_registry[cls_to_register.__name__] = (serializer, deserializer)
+    def register_serialization_functions(
+        cls, cls_to_register: type, serializer: Callable, deserializer: Callable
+    ):
+        cls._serialization_registry[cls_to_register.__name__] = (
+            serializer,
+            deserializer,
+        )
 
     @classmethod
-    def register_msrest_deserializer(cls, msrest_cls: Type[Model], dependencies: List[Union[Type[Model], Enum]] = []):
+    def register_msrest_deserializer(
+        cls,
+        msrest_cls: Type[Model],
+        dependencies: List[Union[Type[Model], Enum]] = None,
+    ):
+        dependencies = dependencies or []
+
         def aux_deserializer(dict_val):
             dependencies.append(msrest_cls)
-            dependencies_dict = {dependency.__name__: dependency for dependency in dependencies}
+            dependencies_dict = {
+                dependency.__name__: dependency for dependency in dependencies
+            }
             deserializer = Deserializer(dependencies_dict)
             deserializer.additional_properties_detection = False
             return deserializer(msrest_cls.__name__, dict_val)
 
-        cls._serialization_registry[f"msrest.serialization.Model.{msrest_cls.__name__}"] = (
-            None,
-            aux_deserializer
-        )
+        cls._serialization_registry[
+            f"msrest.serialization.Model.{msrest_cls.__name__}"
+        ] = (None, aux_deserializer)
 
     @classmethod
-    def apply_serialization(cls, data_to_process: Dict[str, Any], serialize: bool) -> Union[object, Dict]:
+    def apply_serialization(
+        cls, data_to_process: Dict[str, Any], serialize: bool
+    ) -> Union[object, Dict]:
         if serialize:
             func = cls._serialization_registry.get(
-                data_to_process.__class__.__name__,
-                (None, None)
+                data_to_process.__class__.__name__, (None, None)
             )[0]
 
             if func:
@@ -215,18 +225,24 @@ class BotState(PropertyManager):
 
             if isinstance(data_to_process, Model):
                 result = data_to_process.serialize()
-                result["$instanceType"] = f"msrest.serialization.Model.{data_to_process.__class__.__name__}"
+                result[
+                    "$instanceType"
+                ] = f"msrest.serialization.Model.{data_to_process.__class__.__name__}"
                 return result
 
             if isinstance(data_to_process, dict):
-                return {key: BotState.apply_serialization(data_to_process=value, serialize=True)
-                        for (key, value)
-                        in data_to_process.items()}
+                return {
+                    key: BotState.apply_serialization(
+                        data_to_process=value, serialize=True
+                    )
+                    for (key, value) in data_to_process.items()
+                }
 
             if isinstance(data_to_process, list):
-                return [BotState.apply_serialization(data_to_process=value, serialize=True)
-                        for value
-                        in data_to_process]
+                return [
+                    BotState.apply_serialization(data_to_process=value, serialize=True)
+                    for value in data_to_process
+                ]
 
             if data_to_process.__class__ in (int, float, str, bool):
                 return data_to_process
@@ -234,21 +250,26 @@ class BotState(PropertyManager):
             if isinstance(data_to_process, dict):
                 if "$instanceType" in data_to_process:
                     func = cls._serialization_registry.get(
-                        data_to_process["$instanceType"],
-                        (None, None)
+                        data_to_process["$instanceType"], (None, None)
                     )[1]
 
                     if func:
                         return func(data_to_process)
                 if isinstance(data_to_process, dict):
-                    return {key: BotState.apply_serialization(data_to_process=value, serialize=False)
-                            for (key, value)
-                            in data_to_process.items()}
+                    return {
+                        key: BotState.apply_serialization(
+                            data_to_process=value, serialize=False
+                        )
+                        for (key, value) in data_to_process.items()
+                    }
 
                 if isinstance(data_to_process, list):
-                    return [BotState.apply_serialization(data_to_process=value, serialize=False)
-                            for value
-                            in data_to_process]
+                    return [
+                        BotState.apply_serialization(
+                            data_to_process=value, serialize=False
+                        )
+                        for value in data_to_process
+                    ]
 
                 if data_to_process.__class__ in (int, float, str, bool):
                     return data_to_process

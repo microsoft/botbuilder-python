@@ -15,7 +15,11 @@ class Choice(Model):
     }
 
     def __init__(
-        self, value: str = None, action: CardAction = None, synonyms: List[str] = None, **kwargs
+        self,
+        value: str = None,
+        action: CardAction = None,
+        synonyms: List[str] = None,
+        **kwargs
     ):
         super().__init__(**kwargs)
         self.value: str = value

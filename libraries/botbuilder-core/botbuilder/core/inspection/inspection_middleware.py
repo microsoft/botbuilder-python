@@ -92,12 +92,15 @@ class InspectionMiddleware(InterceptionMiddleware):
             bot_state = {}
 
             if self.user_state:
-                bot_state["user_state"] = InspectionMiddleware._get_serialized_context(self.user_state, context)
+                bot_state["user_state"] = InspectionMiddleware._get_serialized_context(
+                    self.user_state, context
+                )
 
             if self.conversation_state:
-                bot_state["conversation_state"] = InspectionMiddleware._get_serialized_context(
-                    self.conversation_state,
-                    context
+                bot_state[
+                    "conversation_state"
+                ] = InspectionMiddleware._get_serialized_context(
+                    self.conversation_state, context
                 )
 
             await self._invoke_send(context, session, from_state(bot_state))
