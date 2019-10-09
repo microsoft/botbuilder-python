@@ -149,7 +149,7 @@ class ConfirmPrompt(Prompt):
                         if self.confirm_choices is not None
                         else (defaults[0], defaults[1])
                     )
-                    choices = {confirm_choices[0], confirm_choices[1]}
+                    choices = [confirm_choices[0], confirm_choices[1]]
                     second_attempt_results = ChoiceRecognizers.recognize_choices(
                         message.text, choices
                     )

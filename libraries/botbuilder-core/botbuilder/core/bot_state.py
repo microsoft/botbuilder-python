@@ -3,6 +3,7 @@
 
 from abc import abstractmethod
 from copy import deepcopy
+from enum import Enum
 from typing import Any, Callable, Dict, List, Tuple, Type, Union
 from msrest.serialization import (
     Deserializer,
@@ -185,7 +186,7 @@ class BotState(PropertyManager):
         cls._serialization_registry[cls_to_register.__name__] = (serializer, deserializer)
 
     @classmethod
-    def register_msrest_deserializer(cls, msrest_cls: Type[Model], dependencies: List[Type[Model]] = []):
+    def register_msrest_deserializer(cls, msrest_cls: Type[Model], dependencies: List[Union[Type[Model], Enum]] = []):
         def aux_deserializer(dict_val):
             dependencies.append(msrest_cls)
             dependencies_dict = {dependency.__name__: dependency for dependency in dependencies}

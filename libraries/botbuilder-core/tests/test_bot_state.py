@@ -4,6 +4,7 @@
 from unittest.mock import MagicMock
 import aiounittest
 
+from msrest.serialization import Model
 from botbuilder.core import (
     BotState,
     ConversationState,
@@ -40,7 +41,12 @@ class BotStateForTest(BotState):
         return f"botstate/{turn_context.activity.channel_id}/{turn_context.activity.conversation.id}/BotState"
 
 
-class CustomState(StoreItem):
+class CustomState(StoreItem, Model):
+    _attribute_map = {
+        "custom_string": {"key": "customString", "type": "str"},
+        "e_tag": {"key": "eTag", "type": "str"}
+    }
+
     def __init__(self, custom_string: str = None, e_tag: str = "*"):
         super().__init__(custom_string=custom_string, e_tag=e_tag)
 
@@ -335,6 +341,8 @@ class TestBotState(aiounittest.AsyncTestCase):
             obj2["property-b"]  # pylint: disable=pointless-statement
 
     async def test_state_use_bot_state_directly(self):
+        BotState.register_msrest_deserializer(CustomState)
+
         async def exec_test(context: TurnContext):
             # pylint: disable=unnecessary-lambda
             bot_state_manager = BotStateForTest(MemoryStorage())

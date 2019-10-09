@@ -1,23 +1,16 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from msrest.serialization import Model
 from botbuilder.core import BotState
 from typing import Dict
 
 
-class DialogInstance(Model):
+class DialogInstance:
     """
     Tracking information for a dialog on the stack.
     """
 
-    _attribute_map = {
-        "id": {"key": "id", "type": "str"},
-        "state": {"key": "state", "type": "{object}"},
-    }
-
-    def __init__(self, id: str = None, state: Dict[str, object] = None, **kwargs):
-        super(DialogInstance, self).__init__(**kwargs)
+    def __init__(self, id: str = None, state: Dict[str, object] = None):
         self.id: str = id  # pylint: disable=invalid-name
         self.state: Dict[str, object] = state
 
@@ -29,4 +22,12 @@ class DialogInstance(Model):
         return result
 
 
-BotState.register_msrest_deserializer(DialogInstance)
+def serializer(dialog_instance: DialogInstance) -> Dict[str, object]:
+    return dict(id=dialog_instance.id, state=dialog_instance.state)
+
+
+def deserializer(data: Dict[str, object]) -> DialogInstance:
+    return DialogInstance(data["id"], data["state"])
+
+
+BotState.register_serialization_functions(DialogInstance, serializer, deserializer)
