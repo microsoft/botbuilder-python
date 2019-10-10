@@ -249,7 +249,7 @@ class CosmosDbStorage(Storage):
         # read the content
         non_magic_attr = [
             attr
-            for attr in (store_item)
+            for attr in dir(store_item)
             if not attr.startswith("_") or attr.__eq__("e_tag")
         ]
         # loop through attributes and write and return a dict
