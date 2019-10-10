@@ -4,7 +4,7 @@
 from uuid import uuid4
 from typing import Any, List
 
-from botbuilder.core import ConversationState, TurnContext, UserState
+from botbuilder.core import BotState, ConversationState, TurnContext, UserState
 from botbuilder.schema import Activity, ActivityTypes, ConversationReference
 from botframework.connector.auth import MicrosoftAppCredentials
 
@@ -92,10 +92,16 @@ class InspectionMiddleware(InterceptionMiddleware):
             bot_state = {}
 
             if self.user_state:
-                bot_state["user_state"] = self.user_state.get(context)
+                bot_state["user_state"] = InspectionMiddleware._get_serialized_context(
+                    self.user_state, context
+                )
 
             if self.conversation_state:
-                bot_state["conversation_state"] = self.conversation_state.get(context)
+                bot_state[
+                    "conversation_state"
+                ] = InspectionMiddleware._get_serialized_context(
+                    self.conversation_state, context
+                )
 
             await self._invoke_send(context, session, from_state(bot_state))
 
@@ -153,6 +159,13 @@ class InspectionMiddleware(InterceptionMiddleware):
             return True
 
         return False
+
+    @staticmethod
+    def _get_serialized_context(state: BotState, context: TurnContext):
+        # TODO: revert this comments after merging state serialization
+        # ctx = state.get(context)
+        # return BotState.apply_serialization(ctx, serialize=True)
+        return state, context
 
     async def _find_session(self, context: TurnContext) -> Any:
         sessions = await self.inspection_state_accessor.get(
