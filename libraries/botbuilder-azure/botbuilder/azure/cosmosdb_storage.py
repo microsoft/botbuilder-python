@@ -238,7 +238,7 @@ class CosmosDbStorage(Storage):
         if result.get("_etag"):
             doc["e_tag"] = result["_etag"]
 
-        result_obj = Unpickler().restore(result)
+        result_obj = Unpickler().restore(doc)
 
         # create and return the object
         return result_obj
