@@ -188,7 +188,7 @@ class InspectionMiddleware(InterceptionMiddleware):
         await self._clean_up_session(context)
         return False
 
-    async def _clean_up_session(self, context: TurnContext) -> Any:
+    async def _clean_up_session(self, context: TurnContext) -> None:
         sessions = await self.inspection_state_accessor.get(
             context, DEFAULT_INSPECTION_SESSIONS_BY_STATUS
         )
