@@ -122,7 +122,7 @@ class InspectionMiddleware(InterceptionMiddleware):
 
     async def process_attach_command(
         self, context: TurnContext, session_id: str
-    ) -> Any:
+    ) -> None:
         sessions = await self.inspection_state_accessor.get(
             context, DEFAULT_INSPECTION_SESSIONS_BY_STATUS
         )
@@ -181,7 +181,7 @@ class InspectionMiddleware(InterceptionMiddleware):
 
     async def _invoke_send(
         self, context: TurnContext, session: InspectionSession, activity: Activity
-    ) -> Any:
+    ) -> bool:
         if await session.send(activity):
             return True
 
