@@ -31,7 +31,11 @@ setup(
     long_description=long_description,
     long_description_content_type="text/x-rst",
     license=package_info["__license__"],
-    packages=["botbuilder.core", "botbuilder.core.adapters"],
+    packages=[
+        "botbuilder.core",
+        "botbuilder.core.adapters",
+        "botbuilder.core.inspection",
+    ],
     install_requires=REQUIRES,
     classifiers=[
         "Programming Language :: Python :: 3.7",
