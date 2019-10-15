@@ -9,6 +9,7 @@ REQUIRES = [
     "azure-storage-blob>=2.1.0",
     "botbuilder-schema>=4.4.0b1",
     "botframework-connector>=4.4.0b1",
+    "jsonpickle>=1.2",
 ]
 TEST_REQUIRES = ["aiounittest>=1.1.0"]
 
