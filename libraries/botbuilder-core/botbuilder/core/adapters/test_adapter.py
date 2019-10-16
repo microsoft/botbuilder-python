@@ -57,7 +57,7 @@ class TestAdapter(BotAdapter, UserTokenProvider):
     def __init__(
         self,
         logic: Coroutine = None,
-        template: Activity = None,
+        template_or_conversation: Union[Activity, ConversationReference] = None,
         send_trace_activities: bool = False,
     ):  # pylint: disable=unused-argument
         """
@@ -76,13 +76,20 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         self.deleted_activities: List[ConversationReference] = []
         self.send_trace_activities = send_trace_activities
 
-        self.template = template or Activity(
-            channel_id="test",
-            service_url="https://test.com",
-            from_property=ChannelAccount(id="User1", name="user"),
-            recipient=ChannelAccount(id="bot", name="Bot"),
-            conversation=ConversationAccount(id="Convo1"),
+        self.template = (
+            template_or_conversation
+            if isinstance(template_or_conversation, Activity)
+            else Activity(
+                channel_id="test",
+                service_url="https://test.com",
+                from_property=ChannelAccount(id="User1", name="user"),
+                recipient=ChannelAccount(id="bot", name="Bot"),
+                conversation=ConversationAccount(id="Convo1"),
+            )
         )
+
+        if isinstance(template_or_conversation, ConversationReference):
+            self.template.channel_id = template_or_conversation.channel_id
 
     async def process_activity(
         self, activity: Activity, logic: Callable[[TurnContext], Awaitable]
