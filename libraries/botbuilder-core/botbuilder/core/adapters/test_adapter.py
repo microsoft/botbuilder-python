@@ -8,8 +8,9 @@
 import asyncio
 import inspect
 from datetime import datetime
-from typing import Coroutine, Dict, List, Callable, Union
+from typing import Awaitable, Coroutine, Dict, List, Callable, Union
 from copy import copy
+from threading import Lock
 from botbuilder.schema import (
     ActivityTypes,
     Activity,
@@ -56,8 +57,8 @@ class TestAdapter(BotAdapter, UserTokenProvider):
     def __init__(
         self,
         logic: Coroutine = None,
-        conversation: ConversationReference = None,
-        send_trace_activity: bool = False,
+        template: Activity = None,
+        send_trace_activities: bool = False,
     ):  # pylint: disable=unused-argument
         """
         Creates a new TestAdapter instance.
@@ -69,19 +70,42 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         self._next_id: int = 0
         self._user_tokens: List[UserToken] = []
         self._magic_codes: List[TokenMagicCode] = []
+        self._conversation_lock = Lock()
         self.activity_buffer: List[Activity] = []
         self.updated_activities: List[Activity] = []
         self.deleted_activities: List[ConversationReference] = []
+        self.send_trace_activities = send_trace_activities
 
-        self.template: Activity = Activity(
+        self.template = template or Activity(
             channel_id="test",
             service_url="https://test.com",
             from_property=ChannelAccount(id="User1", name="user"),
             recipient=ChannelAccount(id="bot", name="Bot"),
             conversation=ConversationAccount(id="Convo1"),
         )
-        if conversation is not None and conversation.channel_id is not None:
-            self.template.channel_id = conversation.channel_id
+
+    async def process_activity(
+        self, activity: Activity, logic: Callable[[TurnContext], Awaitable]
+    ):
+        self._conversation_lock.acquire()
+        try:
+            # ready for next reply
+            if activity.type is None:
+                activity.type = ActivityTypes.message
+
+            activity.channel_id = self.template.channel_id
+            activity.from_property = self.template.from_property
+            activity.recipient = self.template.recipient
+            activity.conversation = self.template.conversation
+            activity.service_url = self.template.service_url
+
+            activity.id = str((self._next_id))
+            self._next_id += 1
+        finally:
+            self._conversation_lock.release()
+
+        activity.timestamp = activity.timestamp or datetime.utcnow()
+        await self.run_pipeline(TurnContext(self, activity), logic)
 
     async def send_activities(self, context, activities: List[Activity]):
         """
@@ -97,12 +121,11 @@ class TestAdapter(BotAdapter, UserTokenProvider):
             self._next_id += 1
             return ResourceResponse(id=str(self._next_id))
 
-        # TODO This if-else code is temporary until the BotAdapter and Bot/TurnContext are revamped.
-        if isinstance(activities, list):
-            responses = [id_mapper(activity) for activity in activities]
-        else:
-            responses = [id_mapper(activities)]
-        return responses
+        return [
+            id_mapper(activity)
+            for activity in activities
+            if self.send_trace_activities or activity.type != "trace"
+        ]
 
     async def delete_activity(self, context, reference: ConversationReference):
         """

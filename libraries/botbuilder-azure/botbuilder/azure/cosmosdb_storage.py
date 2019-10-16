@@ -10,9 +10,11 @@ from hashlib import sha256
 from typing import Dict, List
 from threading import Semaphore
 import json
+from jsonpickle.pickler import Pickler
+from jsonpickle.unpickler import Unpickler
 import azure.cosmos.cosmos_client as cosmos_client  # pylint: disable=no-name-in-module,import-error
 import azure.cosmos.errors as cosmos_errors  # pylint: disable=no-name-in-module,import-error
-from botbuilder.core.storage import Storage, StoreItem
+from botbuilder.core.storage import Storage
 
 
 class CosmosDbConfig:
@@ -144,7 +146,7 @@ class CosmosDbStorage(Storage):
                 results = list(
                     self.client.QueryItems(self.__container_link, query, options)
                 )
-                # return a dict with a key and a StoreItem
+                # return a dict with a key and an object
                 return {r.get("realId"): self.__create_si(r) for r in results}
 
             # No keys passed in, no result to return.
@@ -152,7 +154,7 @@ class CosmosDbStorage(Storage):
         except TypeError as error:
             raise error
 
-    async def write(self, changes: Dict[str, StoreItem]):
+    async def write(self, changes: Dict[str, object]):
         """Save storeitems to storage.
 
         :param changes:
@@ -224,22 +226,25 @@ class CosmosDbStorage(Storage):
         except TypeError as error:
             raise error
 
-    def __create_si(self, result) -> StoreItem:
-        """Create a StoreItem from a result out of CosmosDB.
+    def __create_si(self, result) -> object:
+        """Create an object from a result out of CosmosDB.
 
         :param result:
-        :return StoreItem:
+        :return object:
         """
         # get the document item from the result and turn into a dict
         doc = result.get("document")
-        # readd the e_tag from Cosmos
+        # read the e_tag from Cosmos
         if result.get("_etag"):
             doc["e_tag"] = result["_etag"]
-        # create and return the StoreItem
-        return StoreItem(**doc)
 
-    def __create_dict(self, store_item: StoreItem) -> Dict:
-        """Return the dict of a StoreItem.
+        result_obj = Unpickler().restore(doc)
+
+        # create and return the object
+        return result_obj
+
+    def __create_dict(self, store_item: object) -> Dict:
+        """Return the dict of an object.
 
         This eliminates non_magic attributes and the e_tag.
 
@@ -247,13 +252,12 @@ class CosmosDbStorage(Storage):
         :return dict:
         """
         # read the content
-        non_magic_attr = [
-            attr
-            for attr in dir(store_item)
-            if not attr.startswith("_") or attr.__eq__("e_tag")
-        ]
+        json_dict = Pickler().flatten(store_item)
+        if "e_tag" in json_dict:
+            del json_dict["e_tag"]
+
         # loop through attributes and write and return a dict
-        return {attr: getattr(store_item, attr) for attr in non_magic_attr}
+        return json_dict
 
     def __item_link(self, identifier) -> str:
         """Return the item link of a item in the container.

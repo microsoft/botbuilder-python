@@ -45,7 +45,7 @@ class TestBlobStorage:
 
         data = await storage.read(["user"])
         assert "user" in data
-        assert data["user"].counter == "1"
+        assert data["user"].counter == 1
         assert len(data.keys()) == 1
 
     @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
@@ -57,7 +57,7 @@ class TestBlobStorage:
         data_result["test"].counter = 2
         await storage.write(data_result)
         data_updated = await storage.read(["test"])
-        assert data_updated["test"].counter == "2"
+        assert data_updated["test"].counter == 2
         assert data_updated["test"].e_tag != data_result["test"].e_tag
 
     @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
@@ -77,7 +77,7 @@ class TestBlobStorage:
 
         data = await storage.read(["user"])
         assert "user" in data
-        assert data["user"].counter == "1"
+        assert data["user"].counter == 1
 
     @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
@@ -89,7 +89,7 @@ class TestBlobStorage:
 
         await storage.write({"user": SimpleStoreItem(counter=10, e_tag="*")})
         data = await storage.read(["user"])
-        assert data["user"].counter == "10"
+        assert data["user"].counter == 10
 
     @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
@@ -107,9 +107,9 @@ class TestBlobStorage:
         assert data["batch1"]
         assert data["batch2"]
         assert data["batch3"]
-        assert data["batch1"].counter == "1"
-        assert data["batch2"].counter == "1"
-        assert data["batch3"].counter == "1"
+        assert data["batch1"].counter == 1
+        assert data["batch2"].counter == 1
+        assert data["batch3"].counter == 1
         assert data["batch1"].e_tag
         assert data["batch2"].e_tag
         assert data["batch3"].e_tag
