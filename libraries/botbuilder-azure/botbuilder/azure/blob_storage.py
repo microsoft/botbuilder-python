@@ -1,8 +1,11 @@
 import json
 from typing import Dict, List
 
+from jsonpickle import encode
+from jsonpickle.unpickler import Unpickler
+
 from azure.storage.blob import BlockBlobService, Blob, PublicAccess
-from botbuilder.core import Storage, StoreItem
+from botbuilder.core import Storage
 
 # TODO: sanitize_blob_name
 
@@ -59,7 +62,7 @@ class BlobStorage(Storage):
 
         return items
 
-    async def write(self, changes: Dict[str, StoreItem]):
+    async def write(self, changes: Dict[str, object]):
         self.client.create_container(self.settings.container_name)
         self.client.set_container_acl(
             self.settings.container_name, public_access=PublicAccess.Container
@@ -71,10 +74,11 @@ class BlobStorage(Storage):
             )
             if e_tag:
                 item.e_tag = e_tag.replace('"', '\\"')
+            item_str = self._store_item_to_str(item)
             self.client.create_blob_from_text(
                 container_name=self.settings.container_name,
                 blob_name=name,
-                text=str(item),
+                text=item_str,
                 if_match=e_tag,
             )
 
@@ -95,8 +99,12 @@ class BlobStorage(Storage):
                     container_name=self.settings.container_name, blob_name=key
                 )
 
-    def _blob_to_store_item(self, blob: Blob) -> StoreItem:
+    def _blob_to_store_item(self, blob: Blob) -> object:
         item = json.loads(blob.content)
         item["e_tag"] = blob.properties.etag
         item["id"] = blob.name
-        return StoreItem(**item)
+        result = Unpickler().restore(item)
+        return result
+
+    def _store_item_to_str(self, item: object) -> str:
+        return encode(item)

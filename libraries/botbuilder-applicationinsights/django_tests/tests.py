@@ -1,30 +1,24 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import os
-import sys
 import logging
+import os
 
 import django
-from django.test import TestCase, Client, modify_settings, override_settings
-
-from botbuilder.applicationinsights import (
-    ApplicationInsightsTelemetryClient,
-    bot_telemetry_processor,
-)
-from rest_framework.test import RequestsClient
-from applicationinsights import TelemetryClient
 from applicationinsights.channel import (
-    TelemetryChannel,
-    SynchronousQueue,
-    SenderBase,
-    NullSender,
     AsynchronousSender,
+    NullSender,
+    SenderBase,
+    SynchronousQueue,
+    TelemetryChannel,
 )
 from applicationinsights.channel.SenderBase import (
     DEFAULT_ENDPOINT_URL as DEFAULT_ENDPOINT,
 )
-from applicationinsights.django import common
+from botbuilder.applicationinsights.django import common
+from django.test import TestCase, modify_settings, override_settings
+from rest_framework.test import RequestsClient
+
 
 # Note: MIDDLEWARE_CLASSES for django.VERSION <= (1, 10)
 MIDDLEWARE_NAME = "MIDDLEWARE"
@@ -62,7 +56,7 @@ class AITestCase(TestCase):
 @modify_settings(
     **{
         MIDDLEWARE_NAME: {
-            "append": "applicationinsights.django.ApplicationInsightsMiddleware",
+            "append": "botbuilder.applicationinsights.django.ApplicationInsightsMiddleware",
             "prepend": "botbuilder.applicationinsights.django.BotTelemetryMiddleware",
         }
     }
@@ -101,12 +95,15 @@ class MiddlewareTests(AITestCase):
         self.assertEqual(data["responseCode"], 200, "Status code")
         self.assertEqual(data["success"], True, "Success value")
         self.assertEqual(data["url"], "http://testserver/", "Request url")
-        # TODO: Uncomment once we can inject our TelemetryProcessor to add properties
-        # self.assertEqual(tags["ai.user.id"], 'SLACKFROMID')
-        # self.assertEqual(tags["ai.session.id"], 'CONVERSATIONID')
-        # self.assertEqual(data['properties']['channelId'], 'SLACK', "channelId=SLACK")
-        # self.assertEqual(data['properties']['activityId'], 'bf3cc9a2f5de...', "activityID is set")
-        # self.assertEqual(data['properties']['activityType'], 'message', "activityType == message")
+        self.assertEqual(tags["ai.user.id"], "SLACKFROMID")
+        self.assertEqual(tags["ai.session.id"], "CONVERSATIONID")
+        self.assertEqual(data["properties"]["channelId"], "SLACK", "channelId=SLACK")
+        self.assertEqual(
+            data["properties"]["activityId"], "bf3cc9a2f5de...", "activityID is set"
+        )
+        self.assertEqual(
+            data["properties"]["activityType"], "message", "activityType == message"
+        )
 
     def test_bot_event(self):
         """Tests that traces logged from inside of a view are submitted and parented to the request telemetry item"""
@@ -167,12 +164,15 @@ class MiddlewareTests(AITestCase):
         self.assertEqual(data["name"], "POST /logger", "Operation name")
         self.assertEqual(data["url"], "http://testserver/logger", "Request url")
         self.assertTrue(reqid, "Request id not empty")
-        # TODO: Uncomment once we can inject our TelemetryProcessor to add properties
-        # self.assertEqual(tags["ai.user.id"], 'SLACKFROMID')
-        # self.assertEqual(tags["ai.session.id"], 'CONVERSATIONID')
-        # self.assertEqual(data['properties']['channelId'], 'SLACK', "channelId=SLACK")
-        # self.assertEqual(data['properties']['activityId'], 'bf3cc9a2f5de...', "activityID is set")
-        # self.assertEqual(data['properties']['activityType'], 'message', "activityType == message")
+        self.assertEqual(tags["ai.user.id"], "SLACKFROMID")
+        self.assertEqual(tags["ai.session.id"], "CONVERSATIONID")
+        self.assertEqual(data["properties"]["channelId"], "SLACK", "channelId=SLACK")
+        self.assertEqual(
+            data["properties"]["activityId"], "bf3cc9a2f5de...", "activityID is set"
+        )
+        self.assertEqual(
+            data["properties"]["activityType"], "message", "activityType == message"
+        )
 
         # Check log event
         tags = logev["tags"]
@@ -184,12 +184,15 @@ class MiddlewareTests(AITestCase):
         self.assertEqual(tags["ai.operation.parentId"], reqid, "Parent id")
         self.assertEqual(data["message"], "Logger message", "Log message")
         self.assertEqual(data["properties"]["property"], "value", "Property=value")
-        # TODO: Uncomment once we can inject our TelemetryProcessor to add properties
-        # self.assertEqual(tags["ai.user.id"], 'SLACKFROMID')
-        # self.assertEqual(tags["ai.session.id"], 'CONVERSATIONID')
-        # self.assertEqual(data['properties']['channelId'], 'SLACK', "channelId=SLACK")
-        # self.assertEqual(data['properties']['activityId'], 'bf3cc9a2f5de...', "activityID is set")
-        # self.assertEqual(data['properties']['activityType'], 'message', "activityType == message")
+        self.assertEqual(tags["ai.user.id"], "SLACKFROMID")
+        self.assertEqual(tags["ai.session.id"], "CONVERSATIONID")
+        self.assertEqual(data["properties"]["channelId"], "SLACK", "channelId=SLACK")
+        self.assertEqual(
+            data["properties"]["activityId"], "bf3cc9a2f5de...", "activityID is set"
+        )
+        self.assertEqual(
+            data["properties"]["activityType"], "message", "activityType == message"
+        )
 
     def test_thrower(self):
         """Tests that unhandled exceptions generate an exception telemetry item parented to the request telemetry item"""
@@ -213,12 +216,15 @@ class MiddlewareTests(AITestCase):
         self.assertEqual(data["name"], "POST /thrower", "Request name")
         self.assertEqual(data["url"], "http://testserver/thrower", "Request url")
         self.assertTrue(reqid, "Request id not empty")
-        # TODO: Uncomment once we can inject our TelemetryProcessor to add properties
-        # self.assertEqual(tags["ai.user.id"], 'SLACKFROMID')
-        # self.assertEqual(tags["ai.session.id"], 'CONVERSATIONID')
-        # self.assertEqual(data['properties']['channelId'], 'SLACK', "channelId=SLACK")
-        # self.assertEqual(data['properties']['activityId'], 'bf3cc9a2f5de...', "activityID is set")
-        # self.assertEqual(data['properties']['activityType'], 'message', "activityType == message")
+        self.assertEqual(tags["ai.user.id"], "SLACKFROMID")
+        self.assertEqual(tags["ai.session.id"], "CONVERSATIONID")
+        self.assertEqual(data["properties"]["channelId"], "SLACK", "channelId=SLACK")
+        self.assertEqual(
+            data["properties"]["activityId"], "bf3cc9a2f5de...", "activityID is set"
+        )
+        self.assertEqual(
+            data["properties"]["activityType"], "message", "activityType == message"
+        )
 
         # Check exception event
         tags = errev["tags"]
@@ -234,12 +240,15 @@ class MiddlewareTests(AITestCase):
         self.assertEqual(
             exc["parsedStack"][0]["method"], "thrower", "Stack frame method name"
         )
-        # TODO: Uncomment once we can inject our TelemetryProcessor to add properties
-        # self.assertEqual(tags["ai.user.id"], 'SLACKFROMID')
-        # self.assertEqual(tags["ai.session.id"], 'CONVERSATIONID')
-        # self.assertEqual(data['properties']['channelId'], 'SLACK', "channelId=SLACK")
-        # self.assertEqual(data['properties']['activityId'], 'bf3cc9a2f5de...', "activityID is set")
-        # self.assertEqual(data['properties']['activityType'], 'message', "activityType == message")
+        self.assertEqual(tags["ai.user.id"], "SLACKFROMID")
+        self.assertEqual(tags["ai.session.id"], "CONVERSATIONID")
+        self.assertEqual(data["properties"]["channelId"], "SLACK", "channelId=SLACK")
+        self.assertEqual(
+            data["properties"]["activityId"], "bf3cc9a2f5de...", "activityID is set"
+        )
+        self.assertEqual(
+            data["properties"]["activityType"], "message", "activityType == message"
+        )
 
     def test_error(self):
         """Tests that Http404 exception does not generate an exception event
@@ -350,7 +359,7 @@ class MiddlewareTests(AITestCase):
 @modify_settings(
     **{
         MIDDLEWARE_NAME: {
-            "append": "applicationinsights.django.ApplicationInsightsMiddleware"
+            "append": "botbuilder.applicationinsights.django.ApplicationInsightsMiddleware"
         }
     }
 )
@@ -515,7 +524,7 @@ class SettingsTests(TestCase):
         "version": 1,
         "handlers": {
             "appinsights": {
-                "class": "applicationinsights.django.LoggingHandler",
+                "class": "botbuilder.applicationinsights.django.LoggingHandler",
                 "level": "INFO",
             }
         },
