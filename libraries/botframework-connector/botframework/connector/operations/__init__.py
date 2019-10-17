@@ -12,7 +12,4 @@
 from ._attachments_operations import AttachmentsOperations
 from ._conversations_operations import ConversationsOperations
 
-__all__ = [
-    'AttachmentsOperations',
-    'ConversationsOperations',
-]
+__all__ = ["AttachmentsOperations", "ConversationsOperations"]

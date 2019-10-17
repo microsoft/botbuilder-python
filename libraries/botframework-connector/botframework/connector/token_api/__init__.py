@@ -11,9 +11,9 @@
 
 from ._configuration import TokenApiClientConfiguration
 from ._token_api_client import TokenApiClient
-__all__ = ['TokenApiClient', 'TokenApiClientConfiguration']
+
+__all__ = ["TokenApiClient", "TokenApiClientConfiguration"]
 
 from .version import VERSION
 
 __version__ = VERSION
-

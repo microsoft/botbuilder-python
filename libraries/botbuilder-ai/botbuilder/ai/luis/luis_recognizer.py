@@ -10,24 +10,19 @@ from msrest.authentication import CognitiveServicesCredentials
 
 from botbuilder.core import (
     BotAssert,
-    BotTelemetryClient,
-    NullTelemetryClient,
+    IntentScore,
+    Recognizer,
+    RecognizerResult,
     TurnContext,
 )
-from botbuilder.schema import Activity, ActivityTypes, ChannelAccount
+from botbuilder.schema import ActivityTypes
 
-from . import (
-    IntentScore,
-    LuisApplication,
-    LuisPredictionOptions,
-    LuisTelemetryConstants,
-    RecognizerResult,
-)
+from . import LuisApplication, LuisPredictionOptions, LuisTelemetryConstants
 from .activity_util import ActivityUtil
 from .luis_util import LuisUtil
 
 
-class LuisRecognizer(object):
+class LuisRecognizer(Recognizer):
     """
     A LUIS based implementation of <see cref="IRecognizer"/>.
     """
@@ -45,7 +40,6 @@ class LuisRecognizer(object):
         include_api_results: bool = False,
     ):
         """Initializes a new instance of the <see cref="LuisRecognizer"/> class.
-        
         :param application: The LUIS application to use to recognize text.
         :type application: LuisApplication
         :param prediction_options: The LUIS prediction options to use, defaults to None
@@ -68,67 +62,25 @@ class LuisRecognizer(object):
 
         self._include_api_results = include_api_results
 
-        self._telemetry_client = self._options.telemetry_client
-        self._log_personal_information = self._options.log_personal_information
+        self.telemetry_client = self._options.telemetry_client
+        self.log_personal_information = self._options.log_personal_information
 
         credentials = CognitiveServicesCredentials(self._application.endpoint_key)
         self._runtime = LUISRuntimeClient(self._application.endpoint, credentials)
         self._runtime.config.add_user_agent(LuisUtil.get_user_agent())
         self._runtime.config.connection.timeout = self._options.timeout // 1000
 
-    @property
-    def log_personal_information(self) -> bool:
-        """Gets a value indicating whether to log personal information that came from the user to telemetry.
-        
-        :return: If True, personal information is logged to Telemetry; otherwise the properties will be filtered.
-        :rtype: bool
-        """
-
-        return self._log_personal_information
-
-    @log_personal_information.setter
-    def log_personal_information(self, value: bool) -> None:
-        """Sets a value indicating whether to log personal information that came from the user to telemetry.
-        
-        :param value: If True, personal information is logged to Telemetry; otherwise the properties will be filtered.
-        :type value: bool
-        :return:
-        :rtype: None
-        """
-
-        self._log_personal_information = value
-
-    @property
-    def telemetry_client(self) -> BotTelemetryClient:
-        """Gets the currently configured <see cref="BotTelemetryClient"/> that logs the LuisResult event.
-        
-        :return: The <see cref="BotTelemetryClient"/> being used to log events.
-        :rtype: BotTelemetryClient
-        """
-
-        return self._telemetry_client
-
-    @telemetry_client.setter
-    def telemetry_client(self, value: BotTelemetryClient):
-        """Gets the currently configured <see cref="BotTelemetryClient"/> that logs the LuisResult event.
-        
-        :param value: The <see cref="BotTelemetryClient"/> being used to log events.
-        :type value: BotTelemetryClient
-        """
-
-        self._telemetry_client = value
-
     @staticmethod
     def top_intent(
         results: RecognizerResult, default_intent: str = "None", min_score: float = 0.0
     ) -> str:
         """Returns the name of the top scoring intent from a set of LUIS results.
-        
         :param results: Result set to be searched.
         :type results: RecognizerResult
         :param default_intent: Intent name to return should a top intent be found, defaults to "None"
         :param default_intent: str, optional
-        :param min_score: Minimum score needed for an intent to be considered as a top intent. If all intents in the set are below this threshold then the `defaultIntent` will be returned, defaults to 0.0
+        :param min_score: Minimum score needed for an intent to be considered as a top intent. If all intents in the
+         set are below this threshold then the `defaultIntent` will be returned, defaults to 0.0
         :param min_score: float, optional
         :raises TypeError:
         :return: The top scoring intent name.
@@ -149,26 +101,31 @@ class LuisRecognizer(object):
 
         return top_intent or default_intent
 
-    async def recognize(
+    async def recognize(  # pylint: disable=arguments-differ
         self,
         turn_context: TurnContext,
         telemetry_properties: Dict[str, str] = None,
         telemetry_metrics: Dict[str, float] = None,
+        luis_prediction_options: LuisPredictionOptions = None,
     ) -> RecognizerResult:
         """Return results of the analysis (Suggested actions and intents).
-        
         :param turn_context: Context object containing information for a single turn of conversation with a user.
         :type turn_context: TurnContext
-        :param telemetry_properties: Additional properties to be logged to telemetry with the LuisResult event, defaults to None
+        :param telemetry_properties: Additional properties to be logged to telemetry with the LuisResult event, defaults
+         to None
         :param telemetry_properties: Dict[str, str], optional
-        :param telemetry_metrics: Additional metrics to be logged to telemetry with the LuisResult event, defaults to None
+        :param telemetry_metrics: Additional metrics to be logged to telemetry with the LuisResult event, defaults to
+         None
         :param telemetry_metrics: Dict[str, float], optional
         :return: The LUIS results of the analysis of the current message text in the current turn's context activity.
         :rtype: RecognizerResult
         """
 
         return await self._recognize_internal(
-            turn_context, telemetry_properties, telemetry_metrics
+            turn_context,
+            telemetry_properties,
+            telemetry_metrics,
+            luis_prediction_options,
         )
 
     def on_recognizer_result(
@@ -179,14 +136,15 @@ class LuisRecognizer(object):
         telemetry_metrics: Dict[str, float] = None,
     ):
         """Invoked prior to a LuisResult being logged.
-        
         :param recognizer_result: The Luis Results for the call.
         :type recognizer_result: RecognizerResult
         :param turn_context: Context object containing information for a single turn of conversation with a user.
         :type turn_context: TurnContext
-        :param telemetry_properties: Additional properties to be logged to telemetry with the LuisResult event, defaults to None
+        :param telemetry_properties: Additional properties to be logged to telemetry with the LuisResult event, defaults
+         to None
         :param telemetry_properties: Dict[str, str], optional
-        :param telemetry_metrics: Additional metrics to be logged to telemetry with the LuisResult event, defaults to None
+        :param telemetry_metrics: Additional metrics to be logged to telemetry with the LuisResult event, defaults to
+         None
         :param telemetry_metrics: Dict[str, float], optional
         """
 
@@ -201,7 +159,9 @@ class LuisRecognizer(object):
 
     @staticmethod
     def _get_top_k_intent_score(
-        intent_names: List[str], intents: Dict[str, IntentScore], index: int
+        intent_names: List[str],
+        intents: Dict[str, IntentScore],
+        index: int,  # pylint: disable=unused-argument
     ) -> Tuple[str, str]:
         intent_name = ""
         intent_score = "0.00"
@@ -220,14 +180,15 @@ class LuisRecognizer(object):
     ) -> Dict[str, str]:
         """Fills the event properties for LuisResult event for telemetry.
         These properties are logged when the recognizer is called.
-        
         :param recognizer_result: Last activity sent from user.
         :type recognizer_result: RecognizerResult
         :param turn_context: Context object containing information for a single turn of conversation with a user.
         :type turn_context: TurnContext
-        :param telemetry_properties: Additional properties to be logged to telemetry with the LuisResult event, defaults to None
+        :param telemetry_properties: Additional properties to be logged to telemetry with the LuisResult event,
+         defaults to None
         :param telemetry_properties: Dict[str, str], optional
-        :return: A dictionary that is sent as "Properties" to IBotTelemetryClient.TrackEvent method for the BotMessageSend event.
+        :return: A dictionary that is sent as "Properties" to IBotTelemetryClient.TrackEvent method for the
+         BotMessageSend event.
         :rtype: Dict[str, str]
         """
 
@@ -288,6 +249,7 @@ class LuisRecognizer(object):
         turn_context: TurnContext,
         telemetry_properties: Dict[str, str],
         telemetry_metrics: Dict[str, float],
+        luis_prediction_options: LuisPredictionOptions = None,
     ) -> RecognizerResult:
 
         BotAssert.context_not_none(turn_context)
@@ -299,6 +261,11 @@ class LuisRecognizer(object):
         recognizer_result: RecognizerResult = None
         luis_result: LuisResult = None
 
+        if luis_prediction_options:
+            options = self._merge_options(luis_prediction_options)
+        else:
+            options = self._options
+
         if not utterance or utterance.isspace():
             recognizer_result = RecognizerResult(
                 text=utterance, intents={"": IntentScore(score=1.0)}, entities={}
@@ -307,12 +274,12 @@ class LuisRecognizer(object):
             luis_result = self._runtime.prediction.resolve(
                 self._application.application_id,
                 utterance,
-                timezone_offset=self._options.timezone_offset,
-                verbose=self._options.include_all_intents,
-                staging=self._options.staging,
-                spell_check=self._options.spell_check,
-                bing_spell_check_subscription_key=self._options.bing_spell_check_subscription_key,
-                log=self._options.log if self._options.log is not None else True,
+                timezone_offset=options.timezone_offset,
+                verbose=options.include_all_intents,
+                staging=options.staging,
+                spell_check=options.spell_check,
+                bing_spell_check_subscription_key=options.bing_spell_check_subscription_key,
+                log=options.log if options.log is not None else True,
             )
 
             recognizer_result = RecognizerResult(
@@ -322,8 +289,8 @@ class LuisRecognizer(object):
                 entities=LuisUtil.extract_entities_and_metadata(
                     luis_result.entities,
                     luis_result.composite_entities,
-                    self._options.include_instance_data
-                    if self._options.include_instance_data is not None
+                    options.include_instance_data
+                    if options.include_instance_data is not None
                     else True,
                 ),
             )
@@ -336,7 +303,9 @@ class LuisRecognizer(object):
             recognizer_result, turn_context, telemetry_properties, telemetry_metrics
         )
 
-        await self._emit_trace_info(turn_context, luis_result, recognizer_result)
+        await self._emit_trace_info(
+            turn_context, luis_result, recognizer_result, options
+        )
 
         return recognizer_result
 
@@ -345,11 +314,12 @@ class LuisRecognizer(object):
         turn_context: TurnContext,
         luis_result: LuisResult,
         recognizer_result: RecognizerResult,
+        options: LuisPredictionOptions,
     ) -> None:
         trace_info: Dict[str, object] = {
             "recognizerResult": LuisUtil.recognizer_result_as_dict(recognizer_result),
             "luisModel": {"ModelID": self._application.application_id},
-            "luisOptions": {"Staging": self._options.staging},
+            "luisOptions": {"Staging": options.staging},
             "luisResult": LuisUtil.luis_result_as_dict(luis_result),
         }
 
@@ -362,3 +332,10 @@ class LuisRecognizer(object):
         )
 
         await turn_context.send_activity(trace_activity)
+
+    def _merge_options(
+        self, user_defined_options: LuisPredictionOptions
+    ) -> LuisPredictionOptions:
+        merged_options = LuisPredictionOptions()
+        merged_options.__dict__.update(user_defined_options.__dict__)
+        return merged_options

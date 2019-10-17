@@ -1,28 +1,24 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 from datetime import datetime, timedelta
 from urllib.parse import urlparse
-from msrest.authentication import (
-    BasicTokenAuthentication,
-    Authentication)
+from msrest.authentication import BasicTokenAuthentication, Authentication
 import requests
-import aiohttp
-import asyncio
 from .constants import Constants
 
-#TODO: Decide to move this to Constants or viceversa (when porting OAuth)
+# TODO: Decide to move this to Constants or viceversa (when porting OAuth)
 AUTH_SETTINGS = {
-    "refreshEndpoint": 'https://login.microsoftonline.com/botframework.com/oauth2/v2.0/token',
-    "refreshScope": 'https://api.botframework.com/.default',
-    "botConnectorOpenIdMetadata":
-        'https://login.botframework.com/v1/.well-known/openidconfiguration',
-    "botConnectorIssuer": 'https://api.botframework.com',
-    "emulatorOpenIdMetadata":
-        'https://login.microsoftonline.com/botframework.com/v2.0/.well-known/openid-configuration',
-    "emulatorAuthV31IssuerV1": 'https://sts.windows.net/d6d49420-f39b-4df7-a1dc-d59a935871db/',
-    "emulatorAuthV31IssuerV2":
-        'https://login.microsoftonline.com/d6d49420-f39b-4df7-a1dc-d59a935871db/v2.0',
-    "emulatorAuthV32IssuerV1": 'https://sts.windows.net/f8cdef31-a31e-4b4a-93e4-5f571e91255a/',
-    "emulatorAuthV32IssuerV2":
-        'https://login.microsoftonline.com/f8cdef31-a31e-4b4a-93e4-5f571e91255a/v2.0'
+    "refreshEndpoint": "https://login.microsoftonline.com/botframework.com/oauth2/v2.0/token",
+    "refreshScope": "https://api.botframework.com/.default",
+    "botConnectorOpenIdMetadata": "https://login.botframework.com/v1/.well-known/openidconfiguration",
+    "botConnectorIssuer": "https://api.botframework.com",
+    "emulatorOpenIdMetadata": "https://login.microsoftonline.com/botframework.com/v2.0/"
+    ".well-known/openid-configuration",
+    "emulatorAuthV31IssuerV1": "https://sts.windows.net/d6d49420-f39b-4df7-a1dc-d59a935871db/",
+    "emulatorAuthV31IssuerV2": "https://login.microsoftonline.com/d6d49420-f39b-4df7-a1dc-d59a935871db/v2.0",
+    "emulatorAuthV32IssuerV1": "https://sts.windows.net/f8cdef31-a31e-4b4a-93e4-5f571e91255a/",
+    "emulatorAuthV32IssuerV2": "https://login.microsoftonline.com/f8cdef31-a31e-4b4a-93e4-5f571e91255a/v2.0",
 }
 
 
@@ -49,11 +45,17 @@ class MicrosoftAppCredentials(Authentication):
     """
     MicrosoftAppCredentials auth implementation and cache.
     """
-    refreshEndpoint = AUTH_SETTINGS["refreshEndpoint"]
-    refreshScope = AUTH_SETTINGS["refreshScope"]
-    schema = 'Bearer'
 
-    trustedHostNames = {}
+    schema = "Bearer"
+
+    trustedHostNames = {
+        "state.botframework.com": datetime.max,
+        "api.botframework.com": datetime.max,
+        "token.botframework.com": datetime.max,
+        "state.botframework.azure.us": datetime.max,
+        "api.botframework.azure.us": datetime.max,
+        "token.botframework.azure.us": datetime.max,
+    }
     cache = {}
 
     def __init__(self, app_id: str, password: str, channel_auth_tenant: str = None):
@@ -63,22 +65,29 @@ class MicrosoftAppCredentials(Authentication):
         :param app_password: The Microsoft app password.
         :param channel_auth_tenant: Optional. The oauth token tenant.
         """
-        #The configuration property for the Microsoft app ID.
+        # The configuration property for the Microsoft app ID.
         self.microsoft_app_id = app_id
         # The configuration property for the Microsoft app Password.
         self.microsoft_app_password = password
-        tenant = (channel_auth_tenant if channel_auth_tenant is not None and len(channel_auth_tenant) > 0
-                  else Constants.DEFAULT_CHANNEL_AUTH_TENANT)
-        self.oauth_endpoint = (Constants.TO_CHANNEL_FROM_BOT_LOGIN_URL_PREFIX + tenant +
-                               Constants.TO_CHANNEL_FROM_BOT_TOKEN_ENDPOINT_PATH)
-        self.token_cache_key = app_id + '-cache'
+        tenant = (
+            channel_auth_tenant
+            if channel_auth_tenant
+            else Constants.DEFAULT_CHANNEL_AUTH_TENANT
+        )
+        self.oauth_endpoint = (
+            Constants.TO_CHANNEL_FROM_BOT_LOGIN_URL_PREFIX
+            + tenant
+            + Constants.TO_CHANNEL_FROM_BOT_TOKEN_ENDPOINT_PATH
+        )
+        self.oauth_scope = AUTH_SETTINGS["refreshScope"]
+        self.token_cache_key = app_id + "-cache"
 
-    def signed_session(self) -> requests.Session:
+    def signed_session(self) -> requests.Session:  # pylint: disable=arguments-differ
         """
         Gets the signed session.
         :returns: Signed requests.Session object
         """
-        auth_token = asyncio.ensure_future(self.get_access_token())
+        auth_token = self.get_access_token()
 
         basic_authentication = BasicTokenAuthentication({"access_token": auth_token})
         session = basic_authentication.signed_session()
@@ -86,10 +95,10 @@ class MicrosoftAppCredentials(Authentication):
         # If there is no microsoft_app_id and no self.microsoft_app_password, then there shouldn't
         # be an "Authorization" header on the outgoing activity.
         if not self.microsoft_app_id and not self.microsoft_app_password:
-            del session.headers['Authorization']
+            del session.headers["Authorization"]
         return session
 
-    async def get_access_token(self, force_refresh: bool=False) -> str:
+    def get_access_token(self, force_refresh: bool = False) -> str:
         """
         Gets an OAuth access token.
         :param force_refresh: True to force a refresh of the token; or false to get
@@ -99,7 +108,9 @@ class MicrosoftAppCredentials(Authentication):
         if self.microsoft_app_id and self.microsoft_app_password:
             if not force_refresh:
                 # check the global cache for the token. If we have it, and it's valid, we're done.
-                oauth_token = MicrosoftAppCredentials.cache.get(self.token_cache_key, None)
+                oauth_token = MicrosoftAppCredentials.cache.get(
+                    self.token_cache_key, None
+                )
                 if oauth_token is not None:
                     # we have the token. Is it valid?
                     if oauth_token.expiration_time > datetime.now():
@@ -108,26 +119,30 @@ class MicrosoftAppCredentials(Authentication):
             #   1. The user requested it via the force_refresh parameter
             #   2. We have it, but it's expired
             #   3. We don't have it in the cache.
-            oauth_token = await self.refresh_token()
+            oauth_token = self.refresh_token()
             MicrosoftAppCredentials.cache.setdefault(self.token_cache_key, oauth_token)
             return oauth_token.access_token
-        else:
-            return ''
-    async def refresh_token(self) -> _OAuthResponse:
+        return ""
+
+    def refresh_token(self) -> _OAuthResponse:
         """
         returns: _OAuthResponse
         """
         options = {
-            'grant_type': 'client_credentials',
-            'client_id': self.microsoft_app_id,
-            'client_secret': self.microsoft_app_password,
-            'scope': MicrosoftAppCredentials.refreshScope}
-        async with aiohttp.ClientSession() as session:
-            async with session.post(self.oauth_endpoint, data=aiohttp.FormData(options)) as response:
-                response.raise_for_status()
-                oauth_response = _OAuthResponse.from_json(await response.json())
-                oauth_response.expiration_time = datetime.now() + \
-                                                timedelta(seconds=(oauth_response.expires_in - 300))
+            "grant_type": "client_credentials",
+            "client_id": self.microsoft_app_id,
+            "client_secret": self.microsoft_app_password,
+            "scope": self.oauth_scope,
+        }
+
+        response = requests.post(self.oauth_endpoint, data=options)
+        response.raise_for_status()
+
+        oauth_response = _OAuthResponse.from_json(response.json())
+        oauth_response.expiration_time = datetime.now() + timedelta(
+            seconds=(oauth_response.expires_in - 300)
+        )
+
         return oauth_response
 
     @staticmethod

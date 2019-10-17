@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+# pylint: disable=protected-access
+
 import json
 from os import path
 from typing import Dict, Tuple, Union
@@ -16,16 +18,15 @@ from msrest import Deserializer
 from requests import Session
 from requests.models import Response
 
-from botbuilder.ai.luis import (
-    IntentScore,
-    LuisApplication,
-    LuisPredictionOptions,
-    LuisRecognizer,
-    RecognizerResult,
-    TopIntent,
-)
+from botbuilder.ai.luis import LuisApplication, LuisPredictionOptions, LuisRecognizer
 from botbuilder.ai.luis.luis_util import LuisUtil
-from botbuilder.core import BotAdapter, BotTelemetryClient, TurnContext
+from botbuilder.core import (
+    BotAdapter,
+    BotTelemetryClient,
+    IntentScore,
+    RecognizerResult,
+    TurnContext,
+)
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.schema import (
     Activity,
@@ -54,7 +55,11 @@ class LuisRecognizerTest(AsyncTestCase):
 
     def test_luis_recognizer_construction(self):
         # Arrange
-        endpoint = "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/b31aeaf3-3511-495b-a07f-571fc873214b?verbose=true&timezoneOffset=-360&subscription-key=048ec46dc58e495482b0c447cfdbd291&q="
+        endpoint = (
+            "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/"
+            "b31aeaf3-3511-495b-a07f-571fc873214b?verbose=true&timezoneOffset=-360"
+            "&subscription-key=048ec46dc58e495482b0c447cfdbd291&q="
+        )
 
         # Act
         recognizer = LuisRecognizer(endpoint)
@@ -66,7 +71,11 @@ class LuisRecognizerTest(AsyncTestCase):
         self.assertEqual("https://westus.api.cognitive.microsoft.com", app.endpoint)
 
     def test_luis_recognizer_timeout(self):
-        endpoint = "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/b31aeaf3-3511-495b-a07f-571fc873214b?verbose=true&timezoneOffset=-360&subscription-key=048ec46dc58e495482b0c447cfdbd291&q="
+        endpoint = (
+            "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/"
+            "b31aeaf3-3511-495b-a07f-571fc873214b?verbose=true&timezoneOffset=-360"
+            "&subscription-key=048ec46dc58e495482b0c447cfdbd291&q="
+        )
         expected_timeout = 300
         options_with_timeout = LuisPredictionOptions(timeout=expected_timeout * 1000)
 
@@ -431,7 +440,11 @@ class LuisRecognizerTest(AsyncTestCase):
         # Arrange
         # Note this is NOT a real LUIS application ID nor a real LUIS subscription-key
         # theses are GUIDs edited to look right to the parsing and validation code.
-        endpoint = "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/b31aeaf3-3511-495b-a07f-571fc873214b?verbose=true&timezoneOffset=-360&subscription-key=048ec46dc58e495482b0c447cfdbd291&q="
+        endpoint = (
+            "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/"
+            "b31aeaf3-3511-495b-a07f-571fc873214b?verbose=true&timezoneOffset=-360"
+            "&subscription-key=048ec46dc58e495482b0c447cfdbd291&q="
+        )
 
         # Act
         recognizer = LuisRecognizer(endpoint)
@@ -635,6 +648,44 @@ class LuisRecognizerTest(AsyncTestCase):
         self.assertTrue("fromId" in call0_args[1])
         self.assertTrue("entities" in call0_args[1])
 
+    def test_pass_luis_prediction_options_to_recognizer(self):
+        # Arrange
+        my_app = LuisApplication(
+            LuisRecognizerTest._luisAppId,
+            LuisRecognizerTest._subscriptionKey,
+            endpoint=None,
+        )
+
+        luis_prediction_options = LuisPredictionOptions(
+            log_personal_information=True,
+            include_all_intents=True,
+            include_instance_data=True,
+        )
+
+        # Assert
+        recognizer = LuisRecognizer(my_app)
+        merged_options = recognizer._merge_options(luis_prediction_options)
+        self.assertTrue(merged_options.log_personal_information)
+        self.assertTrue(merged_options.include_all_intents)
+        self.assertTrue(merged_options.include_instance_data)
+        self.assertFalse(recognizer._options.log_personal_information)
+        self.assertFalse(recognizer._options.include_all_intents)
+        self.assertFalse(recognizer._options.include_instance_data)
+
+    def test_dont_pass_luis_prediction_options_to_recognizer(self):
+        # Arrange
+        my_app = LuisApplication(
+            LuisRecognizerTest._luisAppId,
+            LuisRecognizerTest._subscriptionKey,
+            endpoint=None,
+        )
+
+        # Assert
+        recognizer = LuisRecognizer(my_app)
+        self.assertFalse(recognizer._options.log_personal_information)
+        self.assertFalse(recognizer._options.include_all_intents)
+        self.assertFalse(recognizer._options.include_instance_data)
+
     async def test_composite1(self):
         await self._test_json("Composite1.json")
 
@@ -676,13 +727,13 @@ class LuisRecognizerTest(AsyncTestCase):
         self.assertEqual(trimmed_expected, trimmed_actual)
 
     @staticmethod
-    def _remove_none_property(d: Dict[str, object]) -> Dict[str, object]:
-        for key, value in list(d.items()):
+    def _remove_none_property(dictionary: Dict[str, object]) -> Dict[str, object]:
+        for key, value in list(dictionary.items()):
             if value is None:
-                del d[key]
+                del dictionary[key]
             elif isinstance(value, dict):
                 LuisRecognizerTest._remove_none_property(value)
-        return d
+        return dictionary
 
     @classmethod
     async def _get_recognizer_result(
@@ -723,8 +774,8 @@ class LuisRecognizerTest(AsyncTestCase):
         curr_dir = path.dirname(path.abspath(__file__))
         response_path = path.join(curr_dir, "test_data", response_file)
 
-        with open(response_path, "r", encoding="utf-8-sig") as f:
-            response_str = f.read()
+        with open(response_path, "r", encoding="utf-8-sig") as file:
+            response_str = file.read()
         response_json = json.loads(response_str)
         return response_json
 

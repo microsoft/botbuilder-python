@@ -2,14 +2,30 @@
 # Licensed under the MIT License.
 
 from typing import List, Union
-from botbuilder.schema import (ActivityTypes, Activity, Attachment,
-                               AttachmentLayoutTypes, CardAction, CardImage, SuggestedActions, InputHints)
+from botbuilder.schema import (
+    ActivityTypes,
+    Activity,
+    Attachment,
+    AttachmentLayoutTypes,
+    CardAction,
+    SuggestedActions,
+    InputHints,
+)
 
 
-def attachment_activity(attachment_layout: AttachmentLayoutTypes, attachments: List[Attachment], text: str = None,
-                        speak: str = None, input_hint: Union[InputHints, str] = InputHints.accepting_input) -> Activity:
-    message = Activity(type=ActivityTypes.message, attachment_layout=attachment_layout, attachments=attachments,
-                       input_hint=input_hint)
+def attachment_activity(
+    attachment_layout: AttachmentLayoutTypes,
+    attachments: List[Attachment],
+    text: str = None,
+    speak: str = None,
+    input_hint: Union[InputHints, str] = InputHints.accepting_input,
+) -> Activity:
+    message = Activity(
+        type=ActivityTypes.message,
+        attachment_layout=attachment_layout,
+        attachments=attachments,
+        input_hint=input_hint,
+    )
     if text:
         message.text = text
     if speak:
@@ -24,7 +40,11 @@ class MessageFactory:
     """
 
     @staticmethod
-    def text(text: str, speak: str = None, input_hint: Union[InputHints, str] = InputHints.accepting_input) -> Activity:
+    def text(
+        text: str,
+        speak: str = None,
+        input_hint: Union[InputHints, str] = InputHints.accepting_input,
+    ) -> Activity:
         """
         Returns a simple text message.
 
@@ -44,15 +64,20 @@ class MessageFactory:
         return message
 
     @staticmethod
-    def suggested_actions(actions: List[CardAction], text: str = None, speak: str = None,
-                          input_hint: Union[InputHints, str] = InputHints.accepting_input) -> Activity:
+    def suggested_actions(
+        actions: List[CardAction],
+        text: str = None,
+        speak: str = None,
+        input_hint: Union[InputHints, str] = InputHints.accepting_input,
+    ) -> Activity:
         """
         Returns a message that includes a set of suggested actions and optional text.
 
         :Example:
         message = MessageFactory.suggested_actions([CardAction(title='a', type=ActionTypes.im_back, value='a'),
                                                     CardAction(title='b', type=ActionTypes.im_back, value='b'),
-                                                    CardAction(title='c', type=ActionTypes.im_back, value='c')], 'Choose a color')
+                                                    CardAction(title='c', type=ActionTypes.im_back, value='c')],
+                                                    'Choose a color')
         await context.send_activity(message)
 
         :param actions:
@@ -62,7 +87,9 @@ class MessageFactory:
         :return:
         """
         actions = SuggestedActions(actions=actions)
-        message = Activity(type=ActivityTypes.message, input_hint=input_hint, suggested_actions=actions)
+        message = Activity(
+            type=ActivityTypes.message, input_hint=input_hint, suggested_actions=actions
+        )
         if text:
             message.text = text
         if speak:
@@ -70,14 +97,20 @@ class MessageFactory:
         return message
 
     @staticmethod
-    def attachment(attachment: Attachment, text: str = None, speak: str = None,
-                   input_hint: Union[InputHints, str] = None):
+    def attachment(
+        attachment: Attachment,
+        text: str = None,
+        speak: str = None,
+        input_hint: Union[InputHints, str] = None,
+    ):
         """
         Returns a single message activity containing an attachment.
 
         :Example:
         message = MessageFactory.attachment(CardFactory.hero_card(HeroCard(title='White T-Shirt',
-                                                                  images=[CardImage(url='https://example.com/whiteShirt.jpg')],
+                                                                  images=[CardImage(url=
+                                                                    'https://example.com/whiteShirt.jpg'
+                                                                    )],
                                                                   buttons=[CardAction(title='buy')])))
         await context.send_activity(message)
 
@@ -87,11 +120,17 @@ class MessageFactory:
         :param input_hint:
         :return:
         """
-        return attachment_activity(AttachmentLayoutTypes.list, [attachment], text, speak, input_hint)
+        return attachment_activity(
+            AttachmentLayoutTypes.list, [attachment], text, speak, input_hint
+        )
 
     @staticmethod
-    def list(attachments: List[Attachment], text: str = None, speak: str = None,
-             input_hint: Union[InputHints, str] = None) -> Activity:
+    def list(
+        attachments: List[Attachment],
+        text: str = None,
+        speak: str = None,
+        input_hint: Union[InputHints, str] = None,
+    ) -> Activity:
         """
         Returns a message that will display a set of attachments in list form.
 
@@ -113,11 +152,17 @@ class MessageFactory:
         :param input_hint:
         :return:
         """
-        return attachment_activity(AttachmentLayoutTypes.list, attachments, text, speak, input_hint)
+        return attachment_activity(
+            AttachmentLayoutTypes.list, attachments, text, speak, input_hint
+        )
 
     @staticmethod
-    def carousel(attachments: List[Attachment], text: str = None, speak: str = None,
-                 input_hint: Union[InputHints, str] = None) -> Activity:
+    def carousel(
+        attachments: List[Attachment],
+        text: str = None,
+        speak: str = None,
+        input_hint: Union[InputHints, str] = None,
+    ) -> Activity:
         """
         Returns a message that will display a set of attachments using a carousel layout.
 
@@ -139,11 +184,19 @@ class MessageFactory:
         :param input_hint:
         :return:
         """
-        return attachment_activity(AttachmentLayoutTypes.carousel, attachments, text, speak, input_hint)
+        return attachment_activity(
+            AttachmentLayoutTypes.carousel, attachments, text, speak, input_hint
+        )
 
     @staticmethod
-    def content_url(url: str, content_type: str, name: str = None, text: str = None, speak: str = None,
-                    input_hint: Union[InputHints, str] = None):
+    def content_url(
+        url: str,
+        content_type: str,
+        name: str = None,
+        text: str = None,
+        speak: str = None,
+        input_hint: Union[InputHints, str] = None,
+    ):
         """
         Returns a message that will display a single image or video to a user.
 
@@ -163,4 +216,6 @@ class MessageFactory:
         attachment = Attachment(content_type=content_type, content_url=url)
         if name:
             attachment.name = name
-        return attachment_activity(AttachmentLayoutTypes.list, [attachment], text, speak, input_hint)
+        return attachment_activity(
+            AttachmentLayoutTypes.list, [attachment], text, speak, input_hint
+        )

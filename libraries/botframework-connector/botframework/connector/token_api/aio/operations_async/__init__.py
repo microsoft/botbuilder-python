@@ -12,7 +12,4 @@
 from ._bot_sign_in_operations_async import BotSignInOperations
 from ._user_token_operations_async import UserTokenOperations
 
-__all__ = [
-    'BotSignInOperations',
-    'UserTokenOperations',
-]
+__all__ = ["BotSignInOperations", "UserTokenOperations"]

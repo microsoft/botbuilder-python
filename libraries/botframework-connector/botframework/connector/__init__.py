@@ -11,9 +11,9 @@
 
 from .channels import Channels
 from .connector_client import ConnectorClient
+from .emulator_api_client import EmulatorApiClient
 from .version import VERSION
 
-__all__ = ["Channels", "ConnectorClient"]
+__all__ = ["Channels", "ConnectorClient", "EmulatorApiClient"]
 
 __version__ = VERSION
-

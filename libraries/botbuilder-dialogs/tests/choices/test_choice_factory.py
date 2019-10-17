@@ -4,7 +4,6 @@
 import unittest
 from typing import List
 
-from botbuilder.core import CardFactory, MessageFactory
 from botbuilder.dialogs.choices import Choice, ChoiceFactory, ChoiceFactoryOptions
 from botbuilder.schema import (
     ActionTypes,
@@ -51,8 +50,10 @@ class ChoiceFactoryTest(unittest.TestCase):
         activity = ChoiceFactory.inline(ChoiceFactoryTest.color_choices, "select from:")
         self.assertEqual("select from: (1) red, (2) green, or (3) blue", activity.text)
 
-    def test_ShouldRenderChoicesAsAList(self):
-        activity = ChoiceFactory.list_style(ChoiceFactoryTest.color_choices, "select from:")
+    def test_should_render_choices_as_a_list(self):
+        activity = ChoiceFactory.list_style(
+            ChoiceFactoryTest.color_choices, "select from:"
+        )
         self.assertEqual(
             "select from:\n\n   1. red\n   2. green\n   3. blue", activity.text
         )
@@ -229,7 +230,7 @@ class ChoiceFactoryTest(unittest.TestCase):
         )
         self.assertEqual(expected, activity)
 
-    def test_ShouldIncludeChoiceActionsInHeroCards(self):
+    def test_should_include_choice_actions_in_hero_cards(self):
         expected = Activity(
             type=ActivityTypes.message,
             input_hint=InputHints.expecting_input,

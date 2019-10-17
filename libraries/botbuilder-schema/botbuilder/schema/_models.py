@@ -29,12 +29,12 @@ class Activity(Model):
     :param timestamp: Contains the date and time that the message was sent, in
      UTC, expressed in ISO-8601 format.
     :type timestamp: datetime
-    :param local_timestamp: Contains the date and time that the message was
-     sent, in local time, expressed in ISO-8601 format.
+    :param local_timestamp: Contains the local date and time of the message
+     expressed in ISO-8601 format.
      For example, 2016-09-23T13:07:49.4714686-07:00.
     :type local_timestamp: datetime
-    :param local_timezone: Contains the name of the timezone in which the
-     message, in local time, expressed in IANA Time Zone database format.
+    :param local_timezone: Contains the name of the local timezone of the message,
+     expressed in IANA Time Zone database format.
      For example, America/Los_Angeles.
     :type local_timezone: str
     :param service_url: Contains the URL that specifies the channel's service
@@ -144,95 +144,102 @@ class Activity(Model):
     :param semantic_action: An optional programmatic action accompanying this
      request
     :type semantic_action: ~botframework.connector.models.SemanticAction
+    :param caller_id: A string containing an IRI identifying the caller of a
+     bot. This field is not intended to be transmitted over the wire, but is
+     instead populated by bots and clients based on cryptographically 
+     verifiable data that asserts the identity of the callers (e.g. tokens).
+    :type caller_id: str
     """
 
     _attribute_map = {
-        'type': {'key': 'type', 'type': 'str'},
-        'id': {'key': 'id', 'type': 'str'},
-        'timestamp': {'key': 'timestamp', 'type': 'iso-8601'},
-        'local_timestamp': {'key': 'localTimestamp', 'type': 'iso-8601'},
-        'local_timezone': {'key': 'localTimezone', 'type': 'str'},
-        'service_url': {'key': 'serviceUrl', 'type': 'str'},
-        'channel_id': {'key': 'channelId', 'type': 'str'},
-        'from_property': {'key': 'from', 'type': 'ChannelAccount'},
-        'conversation': {'key': 'conversation', 'type': 'ConversationAccount'},
-        'recipient': {'key': 'recipient', 'type': 'ChannelAccount'},
-        'text_format': {'key': 'textFormat', 'type': 'str'},
-        'attachment_layout': {'key': 'attachmentLayout', 'type': 'str'},
-        'members_added': {'key': 'membersAdded', 'type': '[ChannelAccount]'},
-        'members_removed': {'key': 'membersRemoved', 'type': '[ChannelAccount]'},
-        'reactions_added': {'key': 'reactionsAdded', 'type': '[MessageReaction]'},
-        'reactions_removed': {'key': 'reactionsRemoved', 'type': '[MessageReaction]'},
-        'topic_name': {'key': 'topicName', 'type': 'str'},
-        'history_disclosed': {'key': 'historyDisclosed', 'type': 'bool'},
-        'locale': {'key': 'locale', 'type': 'str'},
-        'text': {'key': 'text', 'type': 'str'},
-        'speak': {'key': 'speak', 'type': 'str'},
-        'input_hint': {'key': 'inputHint', 'type': 'str'},
-        'summary': {'key': 'summary', 'type': 'str'},
-        'suggested_actions': {'key': 'suggestedActions', 'type': 'SuggestedActions'},
-        'attachments': {'key': 'attachments', 'type': '[Attachment]'},
-        'entities': {'key': 'entities', 'type': '[Entity]'},
-        'channel_data': {'key': 'channelData', 'type': 'object'},
-        'action': {'key': 'action', 'type': 'str'},
-        'reply_to_id': {'key': 'replyToId', 'type': 'str'},
-        'label': {'key': 'label', 'type': 'str'},
-        'value_type': {'key': 'valueType', 'type': 'str'},
-        'value': {'key': 'value', 'type': 'object'},
-        'name': {'key': 'name', 'type': 'str'},
-        'relates_to': {'key': 'relatesTo', 'type': 'ConversationReference'},
-        'code': {'key': 'code', 'type': 'str'},
-        'expiration': {'key': 'expiration', 'type': 'iso-8601'},
-        'importance': {'key': 'importance', 'type': 'str'},
-        'delivery_mode': {'key': 'deliveryMode', 'type': 'str'},
-        'listen_for': {'key': 'listenFor', 'type': '[str]'},
-        'text_highlights': {'key': 'textHighlights', 'type': '[TextHighlight]'},
-        'semantic_action': {'key': 'semanticAction', 'type': 'SemanticAction'},
+        "type": {"key": "type", "type": "str"},
+        "id": {"key": "id", "type": "str"},
+        "timestamp": {"key": "timestamp", "type": "iso-8601"},
+        "local_timestamp": {"key": "localTimestamp", "type": "iso-8601"},
+        "local_timezone": {"key": "localTimezone", "type": "str"},
+        "service_url": {"key": "serviceUrl", "type": "str"},
+        "channel_id": {"key": "channelId", "type": "str"},
+        "from_property": {"key": "from", "type": "ChannelAccount"},
+        "conversation": {"key": "conversation", "type": "ConversationAccount"},
+        "recipient": {"key": "recipient", "type": "ChannelAccount"},
+        "text_format": {"key": "textFormat", "type": "str"},
+        "attachment_layout": {"key": "attachmentLayout", "type": "str"},
+        "members_added": {"key": "membersAdded", "type": "[ChannelAccount]"},
+        "members_removed": {"key": "membersRemoved", "type": "[ChannelAccount]"},
+        "reactions_added": {"key": "reactionsAdded", "type": "[MessageReaction]"},
+        "reactions_removed": {"key": "reactionsRemoved", "type": "[MessageReaction]"},
+        "topic_name": {"key": "topicName", "type": "str"},
+        "history_disclosed": {"key": "historyDisclosed", "type": "bool"},
+        "locale": {"key": "locale", "type": "str"},
+        "text": {"key": "text", "type": "str"},
+        "speak": {"key": "speak", "type": "str"},
+        "input_hint": {"key": "inputHint", "type": "str"},
+        "summary": {"key": "summary", "type": "str"},
+        "suggested_actions": {"key": "suggestedActions", "type": "SuggestedActions"},
+        "attachments": {"key": "attachments", "type": "[Attachment]"},
+        "entities": {"key": "entities", "type": "[Entity]"},
+        "channel_data": {"key": "channelData", "type": "object"},
+        "action": {"key": "action", "type": "str"},
+        "reply_to_id": {"key": "replyToId", "type": "str"},
+        "label": {"key": "label", "type": "str"},
+        "value_type": {"key": "valueType", "type": "str"},
+        "value": {"key": "value", "type": "object"},
+        "name": {"key": "name", "type": "str"},
+        "relates_to": {"key": "relatesTo", "type": "ConversationReference"},
+        "code": {"key": "code", "type": "str"},
+        "expiration": {"key": "expiration", "type": "iso-8601"},
+        "importance": {"key": "importance", "type": "str"},
+        "delivery_mode": {"key": "deliveryMode", "type": "str"},
+        "listen_for": {"key": "listenFor", "type": "[str]"},
+        "text_highlights": {"key": "textHighlights", "type": "[TextHighlight]"},
+        "semantic_action": {"key": "semanticAction", "type": "SemanticAction"},
+        "caller_id": {"key": "callerId", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(Activity, self).__init__(**kwargs)
-        self.type = kwargs.get('type', None)
-        self.id = kwargs.get('id', None)
-        self.timestamp = kwargs.get('timestamp', None)
-        self.local_timestamp = kwargs.get('local_timestamp', None)
-        self.local_timezone = kwargs.get('local_timezone', None)
-        self.service_url = kwargs.get('service_url', None)
-        self.channel_id = kwargs.get('channel_id', None)
-        self.from_property = kwargs.get('from_property', None)
-        self.conversation = kwargs.get('conversation', None)
-        self.recipient = kwargs.get('recipient', None)
-        self.text_format = kwargs.get('text_format', None)
-        self.attachment_layout = kwargs.get('attachment_layout', None)
-        self.members_added = kwargs.get('members_added', None)
-        self.members_removed = kwargs.get('members_removed', None)
-        self.reactions_added = kwargs.get('reactions_added', None)
-        self.reactions_removed = kwargs.get('reactions_removed', None)
-        self.topic_name = kwargs.get('topic_name', None)
-        self.history_disclosed = kwargs.get('history_disclosed', None)
-        self.locale = kwargs.get('locale', None)
-        self.text = kwargs.get('text', None)
-        self.speak = kwargs.get('speak', None)
-        self.input_hint = kwargs.get('input_hint', None)
-        self.summary = kwargs.get('summary', None)
-        self.suggested_actions = kwargs.get('suggested_actions', None)
-        self.attachments = kwargs.get('attachments', None)
-        self.entities = kwargs.get('entities', None)
-        self.channel_data = kwargs.get('channel_data', None)
-        self.action = kwargs.get('action', None)
-        self.reply_to_id = kwargs.get('reply_to_id', None)
-        self.label = kwargs.get('label', None)
-        self.value_type = kwargs.get('value_type', None)
-        self.value = kwargs.get('value', None)
-        self.name = kwargs.get('name', None)
-        self.relates_to = kwargs.get('relates_to', None)
-        self.code = kwargs.get('code', None)
-        self.expiration = kwargs.get('expiration', None)
-        self.importance = kwargs.get('importance', None)
-        self.delivery_mode = kwargs.get('delivery_mode', None)
-        self.listen_for = kwargs.get('listen_for', None)
-        self.text_highlights = kwargs.get('text_highlights', None)
-        self.semantic_action = kwargs.get('semantic_action', None)
+        self.type = kwargs.get("type", None)
+        self.id = kwargs.get("id", None)
+        self.timestamp = kwargs.get("timestamp", None)
+        self.local_timestamp = kwargs.get("local_timestamp", None)
+        self.local_timezone = kwargs.get("local_timezone", None)
+        self.service_url = kwargs.get("service_url", None)
+        self.channel_id = kwargs.get("channel_id", None)
+        self.from_property = kwargs.get("from_property", None)
+        self.conversation = kwargs.get("conversation", None)
+        self.recipient = kwargs.get("recipient", None)
+        self.text_format = kwargs.get("text_format", None)
+        self.attachment_layout = kwargs.get("attachment_layout", None)
+        self.members_added = kwargs.get("members_added", None)
+        self.members_removed = kwargs.get("members_removed", None)
+        self.reactions_added = kwargs.get("reactions_added", None)
+        self.reactions_removed = kwargs.get("reactions_removed", None)
+        self.topic_name = kwargs.get("topic_name", None)
+        self.history_disclosed = kwargs.get("history_disclosed", None)
+        self.locale = kwargs.get("locale", None)
+        self.text = kwargs.get("text", None)
+        self.speak = kwargs.get("speak", None)
+        self.input_hint = kwargs.get("input_hint", None)
+        self.summary = kwargs.get("summary", None)
+        self.suggested_actions = kwargs.get("suggested_actions", None)
+        self.attachments = kwargs.get("attachments", None)
+        self.entities = kwargs.get("entities", None)
+        self.channel_data = kwargs.get("channel_data", None)
+        self.action = kwargs.get("action", None)
+        self.reply_to_id = kwargs.get("reply_to_id", None)
+        self.label = kwargs.get("label", None)
+        self.value_type = kwargs.get("value_type", None)
+        self.value = kwargs.get("value", None)
+        self.name = kwargs.get("name", None)
+        self.relates_to = kwargs.get("relates_to", None)
+        self.code = kwargs.get("code", None)
+        self.expiration = kwargs.get("expiration", None)
+        self.importance = kwargs.get("importance", None)
+        self.delivery_mode = kwargs.get("delivery_mode", None)
+        self.listen_for = kwargs.get("listen_for", None)
+        self.text_highlights = kwargs.get("text_highlights", None)
+        self.semantic_action = kwargs.get("semantic_action", None)
+        self.caller_id = kwargs.get("caller_id", None)
 
 
 class AnimationCard(Model):
@@ -271,34 +278,34 @@ class AnimationCard(Model):
     """
 
     _attribute_map = {
-        'title': {'key': 'title', 'type': 'str'},
-        'subtitle': {'key': 'subtitle', 'type': 'str'},
-        'text': {'key': 'text', 'type': 'str'},
-        'image': {'key': 'image', 'type': 'ThumbnailUrl'},
-        'media': {'key': 'media', 'type': '[MediaUrl]'},
-        'buttons': {'key': 'buttons', 'type': '[CardAction]'},
-        'shareable': {'key': 'shareable', 'type': 'bool'},
-        'autoloop': {'key': 'autoloop', 'type': 'bool'},
-        'autostart': {'key': 'autostart', 'type': 'bool'},
-        'aspect': {'key': 'aspect', 'type': 'str'},
-        'duration': {'key': 'duration', 'type': 'str'},
-        'value': {'key': 'value', 'type': 'object'},
+        "title": {"key": "title", "type": "str"},
+        "subtitle": {"key": "subtitle", "type": "str"},
+        "text": {"key": "text", "type": "str"},
+        "image": {"key": "image", "type": "ThumbnailUrl"},
+        "media": {"key": "media", "type": "[MediaUrl]"},
+        "buttons": {"key": "buttons", "type": "[CardAction]"},
+        "shareable": {"key": "shareable", "type": "bool"},
+        "autoloop": {"key": "autoloop", "type": "bool"},
+        "autostart": {"key": "autostart", "type": "bool"},
+        "aspect": {"key": "aspect", "type": "str"},
+        "duration": {"key": "duration", "type": "str"},
+        "value": {"key": "value", "type": "object"},
     }
 
     def __init__(self, **kwargs):
         super(AnimationCard, self).__init__(**kwargs)
-        self.title = kwargs.get('title', None)
-        self.subtitle = kwargs.get('subtitle', None)
-        self.text = kwargs.get('text', None)
-        self.image = kwargs.get('image', None)
-        self.media = kwargs.get('media', None)
-        self.buttons = kwargs.get('buttons', None)
-        self.shareable = kwargs.get('shareable', None)
-        self.autoloop = kwargs.get('autoloop', None)
-        self.autostart = kwargs.get('autostart', None)
-        self.aspect = kwargs.get('aspect', None)
-        self.duration = kwargs.get('duration', None)
-        self.value = kwargs.get('value', None)
+        self.title = kwargs.get("title", None)
+        self.subtitle = kwargs.get("subtitle", None)
+        self.text = kwargs.get("text", None)
+        self.image = kwargs.get("image", None)
+        self.media = kwargs.get("media", None)
+        self.buttons = kwargs.get("buttons", None)
+        self.shareable = kwargs.get("shareable", None)
+        self.autoloop = kwargs.get("autoloop", None)
+        self.autostart = kwargs.get("autostart", None)
+        self.aspect = kwargs.get("aspect", None)
+        self.duration = kwargs.get("duration", None)
+        self.value = kwargs.get("value", None)
 
 
 class Attachment(Model):
@@ -317,20 +324,20 @@ class Attachment(Model):
     """
 
     _attribute_map = {
-        'content_type': {'key': 'contentType', 'type': 'str'},
-        'content_url': {'key': 'contentUrl', 'type': 'str'},
-        'content': {'key': 'content', 'type': 'object'},
-        'name': {'key': 'name', 'type': 'str'},
-        'thumbnail_url': {'key': 'thumbnailUrl', 'type': 'str'},
+        "content_type": {"key": "contentType", "type": "str"},
+        "content_url": {"key": "contentUrl", "type": "str"},
+        "content": {"key": "content", "type": "object"},
+        "name": {"key": "name", "type": "str"},
+        "thumbnail_url": {"key": "thumbnailUrl", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(Attachment, self).__init__(**kwargs)
-        self.content_type = kwargs.get('content_type', None)
-        self.content_url = kwargs.get('content_url', None)
-        self.content = kwargs.get('content', None)
-        self.name = kwargs.get('name', None)
-        self.thumbnail_url = kwargs.get('thumbnail_url', None)
+        self.content_type = kwargs.get("content_type", None)
+        self.content_url = kwargs.get("content_url", None)
+        self.content = kwargs.get("content", None)
+        self.name = kwargs.get("name", None)
+        self.thumbnail_url = kwargs.get("thumbnail_url", None)
 
 
 class AttachmentData(Model):
@@ -347,18 +354,18 @@ class AttachmentData(Model):
     """
 
     _attribute_map = {
-        'type': {'key': 'type', 'type': 'str'},
-        'name': {'key': 'name', 'type': 'str'},
-        'original_base64': {'key': 'originalBase64', 'type': 'bytearray'},
-        'thumbnail_base64': {'key': 'thumbnailBase64', 'type': 'bytearray'},
+        "type": {"key": "type", "type": "str"},
+        "name": {"key": "name", "type": "str"},
+        "original_base64": {"key": "originalBase64", "type": "bytearray"},
+        "thumbnail_base64": {"key": "thumbnailBase64", "type": "bytearray"},
     }
 
     def __init__(self, **kwargs):
         super(AttachmentData, self).__init__(**kwargs)
-        self.type = kwargs.get('type', None)
-        self.name = kwargs.get('name', None)
-        self.original_base64 = kwargs.get('original_base64', None)
-        self.thumbnail_base64 = kwargs.get('thumbnail_base64', None)
+        self.type = kwargs.get("type", None)
+        self.name = kwargs.get("name", None)
+        self.original_base64 = kwargs.get("original_base64", None)
+        self.thumbnail_base64 = kwargs.get("thumbnail_base64", None)
 
 
 class AttachmentInfo(Model):
@@ -373,36 +380,36 @@ class AttachmentInfo(Model):
     """
 
     _attribute_map = {
-        'name': {'key': 'name', 'type': 'str'},
-        'type': {'key': 'type', 'type': 'str'},
-        'views': {'key': 'views', 'type': '[AttachmentView]'},
+        "name": {"key": "name", "type": "str"},
+        "type": {"key": "type", "type": "str"},
+        "views": {"key": "views", "type": "[AttachmentView]"},
     }
 
     def __init__(self, **kwargs):
         super(AttachmentInfo, self).__init__(**kwargs)
-        self.name = kwargs.get('name', None)
-        self.type = kwargs.get('type', None)
-        self.views = kwargs.get('views', None)
+        self.name = kwargs.get("name", None)
+        self.type = kwargs.get("type", None)
+        self.views = kwargs.get("views", None)
 
 
 class AttachmentView(Model):
     """Attachment View name and size.
 
-    :param view_id: Content type of the attachment
+    :param view_id: Id of the attachment
     :type view_id: str
-    :param size: Name of the attachment
+    :param size: Size of the attachment
     :type size: int
     """
 
     _attribute_map = {
-        'view_id': {'key': 'viewId', 'type': 'str'},
-        'size': {'key': 'size', 'type': 'int'},
+        "view_id": {"key": "viewId", "type": "str"},
+        "size": {"key": "size", "type": "int"},
     }
 
     def __init__(self, **kwargs):
         super(AttachmentView, self).__init__(**kwargs)
-        self.view_id = kwargs.get('view_id', None)
-        self.size = kwargs.get('size', None)
+        self.view_id = kwargs.get("view_id", None)
+        self.size = kwargs.get("size", None)
 
 
 class AudioCard(Model):
@@ -441,34 +448,34 @@ class AudioCard(Model):
     """
 
     _attribute_map = {
-        'title': {'key': 'title', 'type': 'str'},
-        'subtitle': {'key': 'subtitle', 'type': 'str'},
-        'text': {'key': 'text', 'type': 'str'},
-        'image': {'key': 'image', 'type': 'ThumbnailUrl'},
-        'media': {'key': 'media', 'type': '[MediaUrl]'},
-        'buttons': {'key': 'buttons', 'type': '[CardAction]'},
-        'shareable': {'key': 'shareable', 'type': 'bool'},
-        'autoloop': {'key': 'autoloop', 'type': 'bool'},
-        'autostart': {'key': 'autostart', 'type': 'bool'},
-        'aspect': {'key': 'aspect', 'type': 'str'},
-        'duration': {'key': 'duration', 'type': 'str'},
-        'value': {'key': 'value', 'type': 'object'},
+        "title": {"key": "title", "type": "str"},
+        "subtitle": {"key": "subtitle", "type": "str"},
+        "text": {"key": "text", "type": "str"},
+        "image": {"key": "image", "type": "ThumbnailUrl"},
+        "media": {"key": "media", "type": "[MediaUrl]"},
+        "buttons": {"key": "buttons", "type": "[CardAction]"},
+        "shareable": {"key": "shareable", "type": "bool"},
+        "autoloop": {"key": "autoloop", "type": "bool"},
+        "autostart": {"key": "autostart", "type": "bool"},
+        "aspect": {"key": "aspect", "type": "str"},
+        "duration": {"key": "duration", "type": "str"},
+        "value": {"key": "value", "type": "object"},
     }
 
     def __init__(self, **kwargs):
         super(AudioCard, self).__init__(**kwargs)
-        self.title = kwargs.get('title', None)
-        self.subtitle = kwargs.get('subtitle', None)
-        self.text = kwargs.get('text', None)
-        self.image = kwargs.get('image', None)
-        self.media = kwargs.get('media', None)
-        self.buttons = kwargs.get('buttons', None)
-        self.shareable = kwargs.get('shareable', None)
-        self.autoloop = kwargs.get('autoloop', None)
-        self.autostart = kwargs.get('autostart', None)
-        self.aspect = kwargs.get('aspect', None)
-        self.duration = kwargs.get('duration', None)
-        self.value = kwargs.get('value', None)
+        self.title = kwargs.get("title", None)
+        self.subtitle = kwargs.get("subtitle", None)
+        self.text = kwargs.get("text", None)
+        self.image = kwargs.get("image", None)
+        self.media = kwargs.get("media", None)
+        self.buttons = kwargs.get("buttons", None)
+        self.shareable = kwargs.get("shareable", None)
+        self.autoloop = kwargs.get("autoloop", None)
+        self.autostart = kwargs.get("autostart", None)
+        self.aspect = kwargs.get("aspect", None)
+        self.duration = kwargs.get("duration", None)
+        self.value = kwargs.get("value", None)
 
 
 class BasicCard(Model):
@@ -490,22 +497,22 @@ class BasicCard(Model):
     """
 
     _attribute_map = {
-        'title': {'key': 'title', 'type': 'str'},
-        'subtitle': {'key': 'subtitle', 'type': 'str'},
-        'text': {'key': 'text', 'type': 'str'},
-        'images': {'key': 'images', 'type': '[CardImage]'},
-        'buttons': {'key': 'buttons', 'type': '[CardAction]'},
-        'tap': {'key': 'tap', 'type': 'CardAction'},
+        "title": {"key": "title", "type": "str"},
+        "subtitle": {"key": "subtitle", "type": "str"},
+        "text": {"key": "text", "type": "str"},
+        "images": {"key": "images", "type": "[CardImage]"},
+        "buttons": {"key": "buttons", "type": "[CardAction]"},
+        "tap": {"key": "tap", "type": "CardAction"},
     }
 
     def __init__(self, **kwargs):
         super(BasicCard, self).__init__(**kwargs)
-        self.title = kwargs.get('title', None)
-        self.subtitle = kwargs.get('subtitle', None)
-        self.text = kwargs.get('text', None)
-        self.images = kwargs.get('images', None)
-        self.buttons = kwargs.get('buttons', None)
-        self.tap = kwargs.get('tap', None)
+        self.title = kwargs.get("title", None)
+        self.subtitle = kwargs.get("subtitle", None)
+        self.text = kwargs.get("text", None)
+        self.images = kwargs.get("images", None)
+        self.buttons = kwargs.get("buttons", None)
+        self.tap = kwargs.get("tap", None)
 
 
 class CardAction(Model):
@@ -533,24 +540,24 @@ class CardAction(Model):
     """
 
     _attribute_map = {
-        'type': {'key': 'type', 'type': 'str'},
-        'title': {'key': 'title', 'type': 'str'},
-        'image': {'key': 'image', 'type': 'str'},
-        'text': {'key': 'text', 'type': 'str'},
-        'display_text': {'key': 'displayText', 'type': 'str'},
-        'value': {'key': 'value', 'type': 'object'},
-        'channel_data': {'key': 'channelData', 'type': 'object'},
+        "type": {"key": "type", "type": "str"},
+        "title": {"key": "title", "type": "str"},
+        "image": {"key": "image", "type": "str"},
+        "text": {"key": "text", "type": "str"},
+        "display_text": {"key": "displayText", "type": "str"},
+        "value": {"key": "value", "type": "object"},
+        "channel_data": {"key": "channelData", "type": "object"},
     }
 
     def __init__(self, **kwargs):
         super(CardAction, self).__init__(**kwargs)
-        self.type = kwargs.get('type', None)
-        self.title = kwargs.get('title', None)
-        self.image = kwargs.get('image', None)
-        self.text = kwargs.get('text', None)
-        self.display_text = kwargs.get('display_text', None)
-        self.value = kwargs.get('value', None)
-        self.channel_data = kwargs.get('channel_data', None)
+        self.type = kwargs.get("type", None)
+        self.title = kwargs.get("title", None)
+        self.image = kwargs.get("image", None)
+        self.text = kwargs.get("text", None)
+        self.display_text = kwargs.get("display_text", None)
+        self.value = kwargs.get("value", None)
+        self.channel_data = kwargs.get("channel_data", None)
 
 
 class CardImage(Model):
@@ -565,16 +572,16 @@ class CardImage(Model):
     """
 
     _attribute_map = {
-        'url': {'key': 'url', 'type': 'str'},
-        'alt': {'key': 'alt', 'type': 'str'},
-        'tap': {'key': 'tap', 'type': 'CardAction'},
+        "url": {"key": "url", "type": "str"},
+        "alt": {"key": "alt", "type": "str"},
+        "tap": {"key": "tap", "type": "CardAction"},
     }
 
     def __init__(self, **kwargs):
         super(CardImage, self).__init__(**kwargs)
-        self.url = kwargs.get('url', None)
-        self.alt = kwargs.get('alt', None)
-        self.tap = kwargs.get('tap', None)
+        self.url = kwargs.get("url", None)
+        self.alt = kwargs.get("alt", None)
+        self.tap = kwargs.get("tap", None)
 
 
 class ChannelAccount(Model):
@@ -594,22 +601,22 @@ class ChannelAccount(Model):
     """
 
     _attribute_map = {
-        'id': {'key': 'id', 'type': 'str'},
-        'name': {'key': 'name', 'type': 'str'},
-        'aad_object_id': {'key': 'aadObjectId', 'type': 'str'},
-        'role': {'key': 'role', 'type': 'str'},
+        "id": {"key": "id", "type": "str"},
+        "name": {"key": "name", "type": "str"},
+        "aad_object_id": {"key": "aadObjectId", "type": "str"},
+        "role": {"key": "role", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(ChannelAccount, self).__init__(**kwargs)
-        self.id = kwargs.get('id', None)
-        self.name = kwargs.get('name', None)
-        self.aad_object_id = kwargs.get('aad_object_id', None)
-        self.role = kwargs.get('role', None)
+        self.id = kwargs.get("id", None)
+        self.name = kwargs.get("name", None)
+        self.aad_object_id = kwargs.get("aad_object_id", None)
+        self.role = kwargs.get("role", None)
 
 
 class ConversationAccount(Model):
-    """Channel account information for a conversation.
+    """Conversation account represents the identity of the conversation within a channel.
 
     :param is_group: Indicates whether the conversation contains more than two
      participants at the time the activity was generated
@@ -633,24 +640,24 @@ class ConversationAccount(Model):
     """
 
     _attribute_map = {
-        'is_group': {'key': 'isGroup', 'type': 'bool'},
-        'conversation_type': {'key': 'conversationType', 'type': 'str'},
-        'id': {'key': 'id', 'type': 'str'},
-        'name': {'key': 'name', 'type': 'str'},
-        'aad_object_id': {'key': 'aadObjectId', 'type': 'str'},
-        'role': {'key': 'role', 'type': 'str'},
-        'tenant_id': {'key': 'tenantID', 'type': 'str'},
+        "is_group": {"key": "isGroup", "type": "bool"},
+        "conversation_type": {"key": "conversationType", "type": "str"},
+        "id": {"key": "id", "type": "str"},
+        "name": {"key": "name", "type": "str"},
+        "aad_object_id": {"key": "aadObjectId", "type": "str"},
+        "role": {"key": "role", "type": "str"},
+        "tenant_id": {"key": "tenantID", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(ConversationAccount, self).__init__(**kwargs)
-        self.is_group = kwargs.get('is_group', None)
-        self.conversation_type = kwargs.get('conversation_type', None)
-        self.id = kwargs.get('id', None)
-        self.name = kwargs.get('name', None)
-        self.aad_object_id = kwargs.get('aad_object_id', None)
-        self.role = kwargs.get('role', None)
-        self.tenant_id = kwargs.get('tenant_id', None)
+        self.is_group = kwargs.get("is_group", None)
+        self.conversation_type = kwargs.get("conversation_type", None)
+        self.id = kwargs.get("id", None)
+        self.name = kwargs.get("name", None)
+        self.aad_object_id = kwargs.get("aad_object_id", None)
+        self.role = kwargs.get("role", None)
+        self.tenant_id = kwargs.get("tenant_id", None)
 
 
 class ConversationMembers(Model):
@@ -663,14 +670,14 @@ class ConversationMembers(Model):
     """
 
     _attribute_map = {
-        'id': {'key': 'id', 'type': 'str'},
-        'members': {'key': 'members', 'type': '[ChannelAccount]'},
+        "id": {"key": "id", "type": "str"},
+        "members": {"key": "members", "type": "[ChannelAccount]"},
     }
 
     def __init__(self, **kwargs):
         super(ConversationMembers, self).__init__(**kwargs)
-        self.id = kwargs.get('id', None)
-        self.members = kwargs.get('members', None)
+        self.id = kwargs.get("id", None)
+        self.members = kwargs.get("members", None)
 
 
 class ConversationParameters(Model):
@@ -696,24 +703,24 @@ class ConversationParameters(Model):
     """
 
     _attribute_map = {
-        'is_group': {'key': 'isGroup', 'type': 'bool'},
-        'bot': {'key': 'bot', 'type': 'ChannelAccount'},
-        'members': {'key': 'members', 'type': '[ChannelAccount]'},
-        'topic_name': {'key': 'topicName', 'type': 'str'},
-        'activity': {'key': 'activity', 'type': 'Activity'},
-        'channel_data': {'key': 'channelData', 'type': 'object'},
-        'tenant_id': {'key': 'tenantID', 'type': 'str'},
+        "is_group": {"key": "isGroup", "type": "bool"},
+        "bot": {"key": "bot", "type": "ChannelAccount"},
+        "members": {"key": "members", "type": "[ChannelAccount]"},
+        "topic_name": {"key": "topicName", "type": "str"},
+        "activity": {"key": "activity", "type": "Activity"},
+        "channel_data": {"key": "channelData", "type": "object"},
+        "tenant_id": {"key": "tenantID", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(ConversationParameters, self).__init__(**kwargs)
-        self.is_group = kwargs.get('is_group', None)
-        self.bot = kwargs.get('bot', None)
-        self.members = kwargs.get('members', None)
-        self.topic_name = kwargs.get('topic_name', None)
-        self.activity = kwargs.get('activity', None)
-        self.channel_data = kwargs.get('channel_data', None)
-        self.tenant_id = kwargs.get('tenant_id', None)
+        self.is_group = kwargs.get("is_group", None)
+        self.bot = kwargs.get("bot", None)
+        self.members = kwargs.get("members", None)
+        self.topic_name = kwargs.get("topic_name", None)
+        self.activity = kwargs.get("activity", None)
+        self.channel_data = kwargs.get("channel_data", None)
+        self.tenant_id = kwargs.get("tenant_id", None)
 
 
 class ConversationReference(Model):
@@ -735,22 +742,22 @@ class ConversationReference(Model):
     """
 
     _attribute_map = {
-        'activity_id': {'key': 'activityId', 'type': 'str'},
-        'user': {'key': 'user', 'type': 'ChannelAccount'},
-        'bot': {'key': 'bot', 'type': 'ChannelAccount'},
-        'conversation': {'key': 'conversation', 'type': 'ConversationAccount'},
-        'channel_id': {'key': 'channelId', 'type': 'str'},
-        'service_url': {'key': 'serviceUrl', 'type': 'str'},
+        "activity_id": {"key": "activityId", "type": "str"},
+        "user": {"key": "user", "type": "ChannelAccount"},
+        "bot": {"key": "bot", "type": "ChannelAccount"},
+        "conversation": {"key": "conversation", "type": "ConversationAccount"},
+        "channel_id": {"key": "channelId", "type": "str"},
+        "service_url": {"key": "serviceUrl", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(ConversationReference, self).__init__(**kwargs)
-        self.activity_id = kwargs.get('activity_id', None)
-        self.user = kwargs.get('user', None)
-        self.bot = kwargs.get('bot', None)
-        self.conversation = kwargs.get('conversation', None)
-        self.channel_id = kwargs.get('channel_id', None)
-        self.service_url = kwargs.get('service_url', None)
+        self.activity_id = kwargs.get("activity_id", None)
+        self.user = kwargs.get("user", None)
+        self.bot = kwargs.get("bot", None)
+        self.conversation = kwargs.get("conversation", None)
+        self.channel_id = kwargs.get("channel_id", None)
+        self.service_url = kwargs.get("service_url", None)
 
 
 class ConversationResourceResponse(Model):
@@ -766,16 +773,16 @@ class ConversationResourceResponse(Model):
     """
 
     _attribute_map = {
-        'activity_id': {'key': 'activityId', 'type': 'str'},
-        'service_url': {'key': 'serviceUrl', 'type': 'str'},
-        'id': {'key': 'id', 'type': 'str'},
+        "activity_id": {"key": "activityId", "type": "str"},
+        "service_url": {"key": "serviceUrl", "type": "str"},
+        "id": {"key": "id", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(ConversationResourceResponse, self).__init__(**kwargs)
-        self.activity_id = kwargs.get('activity_id', None)
-        self.service_url = kwargs.get('service_url', None)
-        self.id = kwargs.get('id', None)
+        self.activity_id = kwargs.get("activity_id", None)
+        self.service_url = kwargs.get("service_url", None)
+        self.id = kwargs.get("id", None)
 
 
 class ConversationsResult(Model):
@@ -789,14 +796,14 @@ class ConversationsResult(Model):
     """
 
     _attribute_map = {
-        'continuation_token': {'key': 'continuationToken', 'type': 'str'},
-        'conversations': {'key': 'conversations', 'type': '[ConversationMembers]'},
+        "continuation_token": {"key": "continuationToken", "type": "str"},
+        "conversations": {"key": "conversations", "type": "[ConversationMembers]"},
     }
 
     def __init__(self, **kwargs):
         super(ConversationsResult, self).__init__(**kwargs)
-        self.continuation_token = kwargs.get('continuation_token', None)
-        self.conversations = kwargs.get('conversations', None)
+        self.continuation_token = kwargs.get("continuation_token", None)
+        self.conversations = kwargs.get("conversations", None)
 
 
 class Entity(Model):
@@ -806,13 +813,11 @@ class Entity(Model):
     :type type: str
     """
 
-    _attribute_map = {
-        'type': {'key': 'type', 'type': 'str'},
-    }
+    _attribute_map = {"type": {"key": "type", "type": "str"}}
 
     def __init__(self, **kwargs):
         super(Entity, self).__init__(**kwargs)
-        self.type = kwargs.get('type', None)
+        self.type = kwargs.get("type", None)
 
 
 class Error(Model):
@@ -827,16 +832,16 @@ class Error(Model):
     """
 
     _attribute_map = {
-        'code': {'key': 'code', 'type': 'str'},
-        'message': {'key': 'message', 'type': 'str'},
-        'inner_http_error': {'key': 'innerHttpError', 'type': 'InnerHttpError'},
+        "code": {"key": "code", "type": "str"},
+        "message": {"key": "message", "type": "str"},
+        "inner_http_error": {"key": "innerHttpError", "type": "InnerHttpError"},
     }
 
     def __init__(self, **kwargs):
         super(Error, self).__init__(**kwargs)
-        self.code = kwargs.get('code', None)
-        self.message = kwargs.get('message', None)
-        self.inner_http_error = kwargs.get('inner_http_error', None)
+        self.code = kwargs.get("code", None)
+        self.message = kwargs.get("message", None)
+        self.inner_http_error = kwargs.get("inner_http_error", None)
 
 
 class ErrorResponse(Model):
@@ -846,13 +851,11 @@ class ErrorResponse(Model):
     :type error: ~botframework.connector.models.Error
     """
 
-    _attribute_map = {
-        'error': {'key': 'error', 'type': 'Error'},
-    }
+    _attribute_map = {"error": {"key": "error", "type": "Error"}}
 
     def __init__(self, **kwargs):
         super(ErrorResponse, self).__init__(**kwargs)
-        self.error = kwargs.get('error', None)
+        self.error = kwargs.get("error", None)
 
 
 class ErrorResponseException(HttpOperationError):
@@ -864,7 +867,9 @@ class ErrorResponseException(HttpOperationError):
 
     def __init__(self, deserialize, response, *args):
 
-        super(ErrorResponseException, self).__init__(deserialize, response, 'ErrorResponse', *args)
+        super(ErrorResponseException, self).__init__(
+            deserialize, response, "ErrorResponse", *args
+        )
 
 
 class Fact(Model):
@@ -880,14 +885,14 @@ class Fact(Model):
     """
 
     _attribute_map = {
-        'key': {'key': 'key', 'type': 'str'},
-        'value': {'key': 'value', 'type': 'str'},
+        "key": {"key": "key", "type": "str"},
+        "value": {"key": "value", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(Fact, self).__init__(**kwargs)
-        self.key = kwargs.get('key', None)
-        self.value = kwargs.get('value', None)
+        self.key = kwargs.get("key", None)
+        self.value = kwargs.get("value", None)
 
 
 class GeoCoordinates(Model):
@@ -909,20 +914,20 @@ class GeoCoordinates(Model):
     """
 
     _attribute_map = {
-        'elevation': {'key': 'elevation', 'type': 'float'},
-        'latitude': {'key': 'latitude', 'type': 'float'},
-        'longitude': {'key': 'longitude', 'type': 'float'},
-        'type': {'key': 'type', 'type': 'str'},
-        'name': {'key': 'name', 'type': 'str'},
+        "elevation": {"key": "elevation", "type": "float"},
+        "latitude": {"key": "latitude", "type": "float"},
+        "longitude": {"key": "longitude", "type": "float"},
+        "type": {"key": "type", "type": "str"},
+        "name": {"key": "name", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(GeoCoordinates, self).__init__(**kwargs)
-        self.elevation = kwargs.get('elevation', None)
-        self.latitude = kwargs.get('latitude', None)
-        self.longitude = kwargs.get('longitude', None)
-        self.type = kwargs.get('type', None)
-        self.name = kwargs.get('name', None)
+        self.elevation = kwargs.get("elevation", None)
+        self.latitude = kwargs.get("latitude", None)
+        self.longitude = kwargs.get("longitude", None)
+        self.type = kwargs.get("type", None)
+        self.name = kwargs.get("name", None)
 
 
 class HeroCard(Model):
@@ -944,22 +949,22 @@ class HeroCard(Model):
     """
 
     _attribute_map = {
-        'title': {'key': 'title', 'type': 'str'},
-        'subtitle': {'key': 'subtitle', 'type': 'str'},
-        'text': {'key': 'text', 'type': 'str'},
-        'images': {'key': 'images', 'type': '[CardImage]'},
-        'buttons': {'key': 'buttons', 'type': '[CardAction]'},
-        'tap': {'key': 'tap', 'type': 'CardAction'},
+        "title": {"key": "title", "type": "str"},
+        "subtitle": {"key": "subtitle", "type": "str"},
+        "text": {"key": "text", "type": "str"},
+        "images": {"key": "images", "type": "[CardImage]"},
+        "buttons": {"key": "buttons", "type": "[CardAction]"},
+        "tap": {"key": "tap", "type": "CardAction"},
     }
 
     def __init__(self, **kwargs):
         super(HeroCard, self).__init__(**kwargs)
-        self.title = kwargs.get('title', None)
-        self.subtitle = kwargs.get('subtitle', None)
-        self.text = kwargs.get('text', None)
-        self.images = kwargs.get('images', None)
-        self.buttons = kwargs.get('buttons', None)
-        self.tap = kwargs.get('tap', None)
+        self.title = kwargs.get("title", None)
+        self.subtitle = kwargs.get("subtitle", None)
+        self.text = kwargs.get("text", None)
+        self.images = kwargs.get("images", None)
+        self.buttons = kwargs.get("buttons", None)
+        self.tap = kwargs.get("tap", None)
 
 
 class InnerHttpError(Model):
@@ -972,14 +977,14 @@ class InnerHttpError(Model):
     """
 
     _attribute_map = {
-        'status_code': {'key': 'statusCode', 'type': 'int'},
-        'body': {'key': 'body', 'type': 'object'},
+        "status_code": {"key": "statusCode", "type": "int"},
+        "body": {"key": "body", "type": "object"},
     }
 
     def __init__(self, **kwargs):
         super(InnerHttpError, self).__init__(**kwargs)
-        self.status_code = kwargs.get('status_code', None)
-        self.body = kwargs.get('body', None)
+        self.status_code = kwargs.get("status_code", None)
+        self.body = kwargs.get("body", None)
 
 
 class MediaCard(Model):
@@ -1018,34 +1023,34 @@ class MediaCard(Model):
     """
 
     _attribute_map = {
-        'title': {'key': 'title', 'type': 'str'},
-        'subtitle': {'key': 'subtitle', 'type': 'str'},
-        'text': {'key': 'text', 'type': 'str'},
-        'image': {'key': 'image', 'type': 'ThumbnailUrl'},
-        'media': {'key': 'media', 'type': '[MediaUrl]'},
-        'buttons': {'key': 'buttons', 'type': '[CardAction]'},
-        'shareable': {'key': 'shareable', 'type': 'bool'},
-        'autoloop': {'key': 'autoloop', 'type': 'bool'},
-        'autostart': {'key': 'autostart', 'type': 'bool'},
-        'aspect': {'key': 'aspect', 'type': 'str'},
-        'duration': {'key': 'duration', 'type': 'str'},
-        'value': {'key': 'value', 'type': 'object'},
+        "title": {"key": "title", "type": "str"},
+        "subtitle": {"key": "subtitle", "type": "str"},
+        "text": {"key": "text", "type": "str"},
+        "image": {"key": "image", "type": "ThumbnailUrl"},
+        "media": {"key": "media", "type": "[MediaUrl]"},
+        "buttons": {"key": "buttons", "type": "[CardAction]"},
+        "shareable": {"key": "shareable", "type": "bool"},
+        "autoloop": {"key": "autoloop", "type": "bool"},
+        "autostart": {"key": "autostart", "type": "bool"},
+        "aspect": {"key": "aspect", "type": "str"},
+        "duration": {"key": "duration", "type": "str"},
+        "value": {"key": "value", "type": "object"},
     }
 
     def __init__(self, **kwargs):
         super(MediaCard, self).__init__(**kwargs)
-        self.title = kwargs.get('title', None)
-        self.subtitle = kwargs.get('subtitle', None)
-        self.text = kwargs.get('text', None)
-        self.image = kwargs.get('image', None)
-        self.media = kwargs.get('media', None)
-        self.buttons = kwargs.get('buttons', None)
-        self.shareable = kwargs.get('shareable', None)
-        self.autoloop = kwargs.get('autoloop', None)
-        self.autostart = kwargs.get('autostart', None)
-        self.aspect = kwargs.get('aspect', None)
-        self.duration = kwargs.get('duration', None)
-        self.value = kwargs.get('value', None)
+        self.title = kwargs.get("title", None)
+        self.subtitle = kwargs.get("subtitle", None)
+        self.text = kwargs.get("text", None)
+        self.image = kwargs.get("image", None)
+        self.media = kwargs.get("media", None)
+        self.buttons = kwargs.get("buttons", None)
+        self.shareable = kwargs.get("shareable", None)
+        self.autoloop = kwargs.get("autoloop", None)
+        self.autostart = kwargs.get("autostart", None)
+        self.aspect = kwargs.get("aspect", None)
+        self.duration = kwargs.get("duration", None)
+        self.value = kwargs.get("value", None)
 
 
 class MediaEventValue(Model):
@@ -1056,13 +1061,11 @@ class MediaEventValue(Model):
     :type card_value: object
     """
 
-    _attribute_map = {
-        'card_value': {'key': 'cardValue', 'type': 'object'},
-    }
+    _attribute_map = {"card_value": {"key": "cardValue", "type": "object"}}
 
     def __init__(self, **kwargs):
         super(MediaEventValue, self).__init__(**kwargs)
-        self.card_value = kwargs.get('card_value', None)
+        self.card_value = kwargs.get("card_value", None)
 
 
 class MediaUrl(Model):
@@ -1076,14 +1079,14 @@ class MediaUrl(Model):
     """
 
     _attribute_map = {
-        'url': {'key': 'url', 'type': 'str'},
-        'profile': {'key': 'profile', 'type': 'str'},
+        "url": {"key": "url", "type": "str"},
+        "profile": {"key": "profile", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(MediaUrl, self).__init__(**kwargs)
-        self.url = kwargs.get('url', None)
-        self.profile = kwargs.get('profile', None)
+        self.url = kwargs.get("url", None)
+        self.profile = kwargs.get("profile", None)
 
 
 class Mention(Model):
@@ -1098,16 +1101,16 @@ class Mention(Model):
     """
 
     _attribute_map = {
-        'mentioned': {'key': 'mentioned', 'type': 'ChannelAccount'},
-        'text': {'key': 'text', 'type': 'str'},
-        'type': {'key': 'type', 'type': 'str'},
+        "mentioned": {"key": "mentioned", "type": "ChannelAccount"},
+        "text": {"key": "text", "type": "str"},
+        "type": {"key": "type", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(Mention, self).__init__(**kwargs)
-        self.mentioned = kwargs.get('mentioned', None)
-        self.text = kwargs.get('text', None)
-        self.type = kwargs.get('type', None)
+        self.mentioned = kwargs.get("mentioned", None)
+        self.text = kwargs.get("text", None)
+        self.type = kwargs.get("type", None)
 
 
 class MessageReaction(Model):
@@ -1118,13 +1121,11 @@ class MessageReaction(Model):
     :type type: str or ~botframework.connector.models.MessageReactionTypes
     """
 
-    _attribute_map = {
-        'type': {'key': 'type', 'type': 'str'},
-    }
+    _attribute_map = {"type": {"key": "type", "type": "str"}}
 
     def __init__(self, **kwargs):
         super(MessageReaction, self).__init__(**kwargs)
-        self.type = kwargs.get('type', None)
+        self.type = kwargs.get("type", None)
 
 
 class MicrosoftPayMethodData(Model):
@@ -1140,16 +1141,16 @@ class MicrosoftPayMethodData(Model):
     """
 
     _attribute_map = {
-        'merchant_id': {'key': 'merchantId', 'type': 'str'},
-        'supported_networks': {'key': 'supportedNetworks', 'type': '[str]'},
-        'supported_types': {'key': 'supportedTypes', 'type': '[str]'},
+        "merchant_id": {"key": "merchantId", "type": "str"},
+        "supported_networks": {"key": "supportedNetworks", "type": "[str]"},
+        "supported_types": {"key": "supportedTypes", "type": "[str]"},
     }
 
     def __init__(self, **kwargs):
         super(MicrosoftPayMethodData, self).__init__(**kwargs)
-        self.merchant_id = kwargs.get('merchant_id', None)
-        self.supported_networks = kwargs.get('supported_networks', None)
-        self.supported_types = kwargs.get('supported_types', None)
+        self.merchant_id = kwargs.get("merchant_id", None)
+        self.supported_networks = kwargs.get("supported_networks", None)
+        self.supported_types = kwargs.get("supported_types", None)
 
 
 class OAuthCard(Model):
@@ -1164,16 +1165,16 @@ class OAuthCard(Model):
     """
 
     _attribute_map = {
-        'text': {'key': 'text', 'type': 'str'},
-        'connection_name': {'key': 'connectionName', 'type': 'str'},
-        'buttons': {'key': 'buttons', 'type': '[CardAction]'},
+        "text": {"key": "text", "type": "str"},
+        "connection_name": {"key": "connectionName", "type": "str"},
+        "buttons": {"key": "buttons", "type": "[CardAction]"},
     }
 
     def __init__(self, **kwargs):
         super(OAuthCard, self).__init__(**kwargs)
-        self.text = kwargs.get('text', None)
-        self.connection_name = kwargs.get('connection_name', None)
-        self.buttons = kwargs.get('buttons', None)
+        self.text = kwargs.get("text", None)
+        self.connection_name = kwargs.get("connection_name", None)
+        self.buttons = kwargs.get("buttons", None)
 
 
 class PagedMembersResult(Model):
@@ -1186,14 +1187,14 @@ class PagedMembersResult(Model):
     """
 
     _attribute_map = {
-        'continuation_token': {'key': 'continuationToken', 'type': 'str'},
-        'members': {'key': 'members', 'type': '[ChannelAccount]'},
+        "continuation_token": {"key": "continuationToken", "type": "str"},
+        "members": {"key": "members", "type": "[ChannelAccount]"},
     }
 
     def __init__(self, **kwargs):
         super(PagedMembersResult, self).__init__(**kwargs)
-        self.continuation_token = kwargs.get('continuation_token', None)
-        self.members = kwargs.get('members', None)
+        self.continuation_token = kwargs.get("continuation_token", None)
+        self.members = kwargs.get("members", None)
 
 
 class PaymentAddress(Model):
@@ -1237,32 +1238,32 @@ class PaymentAddress(Model):
     """
 
     _attribute_map = {
-        'country': {'key': 'country', 'type': 'str'},
-        'address_line': {'key': 'addressLine', 'type': '[str]'},
-        'region': {'key': 'region', 'type': 'str'},
-        'city': {'key': 'city', 'type': 'str'},
-        'dependent_locality': {'key': 'dependentLocality', 'type': 'str'},
-        'postal_code': {'key': 'postalCode', 'type': 'str'},
-        'sorting_code': {'key': 'sortingCode', 'type': 'str'},
-        'language_code': {'key': 'languageCode', 'type': 'str'},
-        'organization': {'key': 'organization', 'type': 'str'},
-        'recipient': {'key': 'recipient', 'type': 'str'},
-        'phone': {'key': 'phone', 'type': 'str'},
+        "country": {"key": "country", "type": "str"},
+        "address_line": {"key": "addressLine", "type": "[str]"},
+        "region": {"key": "region", "type": "str"},
+        "city": {"key": "city", "type": "str"},
+        "dependent_locality": {"key": "dependentLocality", "type": "str"},
+        "postal_code": {"key": "postalCode", "type": "str"},
+        "sorting_code": {"key": "sortingCode", "type": "str"},
+        "language_code": {"key": "languageCode", "type": "str"},
+        "organization": {"key": "organization", "type": "str"},
+        "recipient": {"key": "recipient", "type": "str"},
+        "phone": {"key": "phone", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(PaymentAddress, self).__init__(**kwargs)
-        self.country = kwargs.get('country', None)
-        self.address_line = kwargs.get('address_line', None)
-        self.region = kwargs.get('region', None)
-        self.city = kwargs.get('city', None)
-        self.dependent_locality = kwargs.get('dependent_locality', None)
-        self.postal_code = kwargs.get('postal_code', None)
-        self.sorting_code = kwargs.get('sorting_code', None)
-        self.language_code = kwargs.get('language_code', None)
-        self.organization = kwargs.get('organization', None)
-        self.recipient = kwargs.get('recipient', None)
-        self.phone = kwargs.get('phone', None)
+        self.country = kwargs.get("country", None)
+        self.address_line = kwargs.get("address_line", None)
+        self.region = kwargs.get("region", None)
+        self.city = kwargs.get("city", None)
+        self.dependent_locality = kwargs.get("dependent_locality", None)
+        self.postal_code = kwargs.get("postal_code", None)
+        self.sorting_code = kwargs.get("sorting_code", None)
+        self.language_code = kwargs.get("language_code", None)
+        self.organization = kwargs.get("organization", None)
+        self.recipient = kwargs.get("recipient", None)
+        self.phone = kwargs.get("phone", None)
 
 
 class PaymentCurrencyAmount(Model):
@@ -1277,16 +1278,16 @@ class PaymentCurrencyAmount(Model):
     """
 
     _attribute_map = {
-        'currency': {'key': 'currency', 'type': 'str'},
-        'value': {'key': 'value', 'type': 'str'},
-        'currency_system': {'key': 'currencySystem', 'type': 'str'},
+        "currency": {"key": "currency", "type": "str"},
+        "value": {"key": "value", "type": "str"},
+        "currency_system": {"key": "currencySystem", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(PaymentCurrencyAmount, self).__init__(**kwargs)
-        self.currency = kwargs.get('currency', None)
-        self.value = kwargs.get('value', None)
-        self.currency_system = kwargs.get('currency_system', None)
+        self.currency = kwargs.get("currency", None)
+        self.value = kwargs.get("value", None)
+        self.currency_system = kwargs.get("currency_system", None)
 
 
 class PaymentDetails(Model):
@@ -1310,20 +1311,23 @@ class PaymentDetails(Model):
     """
 
     _attribute_map = {
-        'total': {'key': 'total', 'type': 'PaymentItem'},
-        'display_items': {'key': 'displayItems', 'type': '[PaymentItem]'},
-        'shipping_options': {'key': 'shippingOptions', 'type': '[PaymentShippingOption]'},
-        'modifiers': {'key': 'modifiers', 'type': '[PaymentDetailsModifier]'},
-        'error': {'key': 'error', 'type': 'str'},
+        "total": {"key": "total", "type": "PaymentItem"},
+        "display_items": {"key": "displayItems", "type": "[PaymentItem]"},
+        "shipping_options": {
+            "key": "shippingOptions",
+            "type": "[PaymentShippingOption]",
+        },
+        "modifiers": {"key": "modifiers", "type": "[PaymentDetailsModifier]"},
+        "error": {"key": "error", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(PaymentDetails, self).__init__(**kwargs)
-        self.total = kwargs.get('total', None)
-        self.display_items = kwargs.get('display_items', None)
-        self.shipping_options = kwargs.get('shipping_options', None)
-        self.modifiers = kwargs.get('modifiers', None)
-        self.error = kwargs.get('error', None)
+        self.total = kwargs.get("total", None)
+        self.display_items = kwargs.get("display_items", None)
+        self.shipping_options = kwargs.get("shipping_options", None)
+        self.modifiers = kwargs.get("modifiers", None)
+        self.error = kwargs.get("error", None)
 
 
 class PaymentDetailsModifier(Model):
@@ -1348,18 +1352,21 @@ class PaymentDetailsModifier(Model):
     """
 
     _attribute_map = {
-        'supported_methods': {'key': 'supportedMethods', 'type': '[str]'},
-        'total': {'key': 'total', 'type': 'PaymentItem'},
-        'additional_display_items': {'key': 'additionalDisplayItems', 'type': '[PaymentItem]'},
-        'data': {'key': 'data', 'type': 'object'},
+        "supported_methods": {"key": "supportedMethods", "type": "[str]"},
+        "total": {"key": "total", "type": "PaymentItem"},
+        "additional_display_items": {
+            "key": "additionalDisplayItems",
+            "type": "[PaymentItem]",
+        },
+        "data": {"key": "data", "type": "object"},
     }
 
     def __init__(self, **kwargs):
         super(PaymentDetailsModifier, self).__init__(**kwargs)
-        self.supported_methods = kwargs.get('supported_methods', None)
-        self.total = kwargs.get('total', None)
-        self.additional_display_items = kwargs.get('additional_display_items', None)
-        self.data = kwargs.get('data', None)
+        self.supported_methods = kwargs.get("supported_methods", None)
+        self.total = kwargs.get("total", None)
+        self.additional_display_items = kwargs.get("additional_display_items", None)
+        self.data = kwargs.get("data", None)
 
 
 class PaymentItem(Model):
@@ -1375,16 +1382,16 @@ class PaymentItem(Model):
     """
 
     _attribute_map = {
-        'label': {'key': 'label', 'type': 'str'},
-        'amount': {'key': 'amount', 'type': 'PaymentCurrencyAmount'},
-        'pending': {'key': 'pending', 'type': 'bool'},
+        "label": {"key": "label", "type": "str"},
+        "amount": {"key": "amount", "type": "PaymentCurrencyAmount"},
+        "pending": {"key": "pending", "type": "bool"},
     }
 
     def __init__(self, **kwargs):
         super(PaymentItem, self).__init__(**kwargs)
-        self.label = kwargs.get('label', None)
-        self.amount = kwargs.get('amount', None)
-        self.pending = kwargs.get('pending', None)
+        self.label = kwargs.get("label", None)
+        self.amount = kwargs.get("amount", None)
+        self.pending = kwargs.get("pending", None)
 
 
 class PaymentMethodData(Model):
@@ -1400,14 +1407,14 @@ class PaymentMethodData(Model):
     """
 
     _attribute_map = {
-        'supported_methods': {'key': 'supportedMethods', 'type': '[str]'},
-        'data': {'key': 'data', 'type': 'object'},
+        "supported_methods": {"key": "supportedMethods", "type": "[str]"},
+        "data": {"key": "data", "type": "object"},
     }
 
     def __init__(self, **kwargs):
         super(PaymentMethodData, self).__init__(**kwargs)
-        self.supported_methods = kwargs.get('supported_methods', None)
-        self.data = kwargs.get('data', None)
+        self.supported_methods = kwargs.get("supported_methods", None)
+        self.data = kwargs.get("data", None)
 
 
 class PaymentOptions(Model):
@@ -1433,20 +1440,20 @@ class PaymentOptions(Model):
     """
 
     _attribute_map = {
-        'request_payer_name': {'key': 'requestPayerName', 'type': 'bool'},
-        'request_payer_email': {'key': 'requestPayerEmail', 'type': 'bool'},
-        'request_payer_phone': {'key': 'requestPayerPhone', 'type': 'bool'},
-        'request_shipping': {'key': 'requestShipping', 'type': 'bool'},
-        'shipping_type': {'key': 'shippingType', 'type': 'str'},
+        "request_payer_name": {"key": "requestPayerName", "type": "bool"},
+        "request_payer_email": {"key": "requestPayerEmail", "type": "bool"},
+        "request_payer_phone": {"key": "requestPayerPhone", "type": "bool"},
+        "request_shipping": {"key": "requestShipping", "type": "bool"},
+        "shipping_type": {"key": "shippingType", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(PaymentOptions, self).__init__(**kwargs)
-        self.request_payer_name = kwargs.get('request_payer_name', None)
-        self.request_payer_email = kwargs.get('request_payer_email', None)
-        self.request_payer_phone = kwargs.get('request_payer_phone', None)
-        self.request_shipping = kwargs.get('request_shipping', None)
-        self.shipping_type = kwargs.get('shipping_type', None)
+        self.request_payer_name = kwargs.get("request_payer_name", None)
+        self.request_payer_email = kwargs.get("request_payer_email", None)
+        self.request_payer_phone = kwargs.get("request_payer_phone", None)
+        self.request_shipping = kwargs.get("request_shipping", None)
+        self.shipping_type = kwargs.get("shipping_type", None)
 
 
 class PaymentRequest(Model):
@@ -1467,20 +1474,20 @@ class PaymentRequest(Model):
     """
 
     _attribute_map = {
-        'id': {'key': 'id', 'type': 'str'},
-        'method_data': {'key': 'methodData', 'type': '[PaymentMethodData]'},
-        'details': {'key': 'details', 'type': 'PaymentDetails'},
-        'options': {'key': 'options', 'type': 'PaymentOptions'},
-        'expires': {'key': 'expires', 'type': 'str'},
+        "id": {"key": "id", "type": "str"},
+        "method_data": {"key": "methodData", "type": "[PaymentMethodData]"},
+        "details": {"key": "details", "type": "PaymentDetails"},
+        "options": {"key": "options", "type": "PaymentOptions"},
+        "expires": {"key": "expires", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(PaymentRequest, self).__init__(**kwargs)
-        self.id = kwargs.get('id', None)
-        self.method_data = kwargs.get('method_data', None)
-        self.details = kwargs.get('details', None)
-        self.options = kwargs.get('options', None)
-        self.expires = kwargs.get('expires', None)
+        self.id = kwargs.get("id", None)
+        self.method_data = kwargs.get("method_data", None)
+        self.details = kwargs.get("details", None)
+        self.options = kwargs.get("options", None)
+        self.expires = kwargs.get("expires", None)
 
 
 class PaymentRequestComplete(Model):
@@ -1495,16 +1502,16 @@ class PaymentRequestComplete(Model):
     """
 
     _attribute_map = {
-        'id': {'key': 'id', 'type': 'str'},
-        'payment_request': {'key': 'paymentRequest', 'type': 'PaymentRequest'},
-        'payment_response': {'key': 'paymentResponse', 'type': 'PaymentResponse'},
+        "id": {"key": "id", "type": "str"},
+        "payment_request": {"key": "paymentRequest", "type": "PaymentRequest"},
+        "payment_response": {"key": "paymentResponse", "type": "PaymentResponse"},
     }
 
     def __init__(self, **kwargs):
         super(PaymentRequestComplete, self).__init__(**kwargs)
-        self.id = kwargs.get('id', None)
-        self.payment_request = kwargs.get('payment_request', None)
-        self.payment_response = kwargs.get('payment_response', None)
+        self.id = kwargs.get("id", None)
+        self.payment_request = kwargs.get("payment_request", None)
+        self.payment_response = kwargs.get("payment_response", None)
 
 
 class PaymentRequestCompleteResult(Model):
@@ -1514,13 +1521,11 @@ class PaymentRequestCompleteResult(Model):
     :type result: str
     """
 
-    _attribute_map = {
-        'result': {'key': 'result', 'type': 'str'},
-    }
+    _attribute_map = {"result": {"key": "result", "type": "str"}}
 
     def __init__(self, **kwargs):
         super(PaymentRequestCompleteResult, self).__init__(**kwargs)
-        self.result = kwargs.get('result', None)
+        self.result = kwargs.get("result", None)
 
 
 class PaymentRequestUpdate(Model):
@@ -1537,18 +1542,18 @@ class PaymentRequestUpdate(Model):
     """
 
     _attribute_map = {
-        'id': {'key': 'id', 'type': 'str'},
-        'details': {'key': 'details', 'type': 'PaymentDetails'},
-        'shipping_address': {'key': 'shippingAddress', 'type': 'PaymentAddress'},
-        'shipping_option': {'key': 'shippingOption', 'type': 'str'},
+        "id": {"key": "id", "type": "str"},
+        "details": {"key": "details", "type": "PaymentDetails"},
+        "shipping_address": {"key": "shippingAddress", "type": "PaymentAddress"},
+        "shipping_option": {"key": "shippingOption", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(PaymentRequestUpdate, self).__init__(**kwargs)
-        self.id = kwargs.get('id', None)
-        self.details = kwargs.get('details', None)
-        self.shipping_address = kwargs.get('shipping_address', None)
-        self.shipping_option = kwargs.get('shipping_option', None)
+        self.id = kwargs.get("id", None)
+        self.details = kwargs.get("details", None)
+        self.shipping_address = kwargs.get("shipping_address", None)
+        self.shipping_option = kwargs.get("shipping_option", None)
 
 
 class PaymentRequestUpdateResult(Model):
@@ -1558,13 +1563,11 @@ class PaymentRequestUpdateResult(Model):
     :type details: ~botframework.connector.models.PaymentDetails
     """
 
-    _attribute_map = {
-        'details': {'key': 'details', 'type': 'PaymentDetails'},
-    }
+    _attribute_map = {"details": {"key": "details", "type": "PaymentDetails"}}
 
     def __init__(self, **kwargs):
         super(PaymentRequestUpdateResult, self).__init__(**kwargs)
-        self.details = kwargs.get('details', None)
+        self.details = kwargs.get("details", None)
 
 
 class PaymentResponse(Model):
@@ -1598,22 +1601,22 @@ class PaymentResponse(Model):
     """
 
     _attribute_map = {
-        'method_name': {'key': 'methodName', 'type': 'str'},
-        'details': {'key': 'details', 'type': 'object'},
-        'shipping_address': {'key': 'shippingAddress', 'type': 'PaymentAddress'},
-        'shipping_option': {'key': 'shippingOption', 'type': 'str'},
-        'payer_email': {'key': 'payerEmail', 'type': 'str'},
-        'payer_phone': {'key': 'payerPhone', 'type': 'str'},
+        "method_name": {"key": "methodName", "type": "str"},
+        "details": {"key": "details", "type": "object"},
+        "shipping_address": {"key": "shippingAddress", "type": "PaymentAddress"},
+        "shipping_option": {"key": "shippingOption", "type": "str"},
+        "payer_email": {"key": "payerEmail", "type": "str"},
+        "payer_phone": {"key": "payerPhone", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(PaymentResponse, self).__init__(**kwargs)
-        self.method_name = kwargs.get('method_name', None)
-        self.details = kwargs.get('details', None)
-        self.shipping_address = kwargs.get('shipping_address', None)
-        self.shipping_option = kwargs.get('shipping_option', None)
-        self.payer_email = kwargs.get('payer_email', None)
-        self.payer_phone = kwargs.get('payer_phone', None)
+        self.method_name = kwargs.get("method_name", None)
+        self.details = kwargs.get("details", None)
+        self.shipping_address = kwargs.get("shipping_address", None)
+        self.shipping_option = kwargs.get("shipping_option", None)
+        self.payer_email = kwargs.get("payer_email", None)
+        self.payer_phone = kwargs.get("payer_phone", None)
 
 
 class PaymentShippingOption(Model):
@@ -1631,18 +1634,18 @@ class PaymentShippingOption(Model):
     """
 
     _attribute_map = {
-        'id': {'key': 'id', 'type': 'str'},
-        'label': {'key': 'label', 'type': 'str'},
-        'amount': {'key': 'amount', 'type': 'PaymentCurrencyAmount'},
-        'selected': {'key': 'selected', 'type': 'bool'},
+        "id": {"key": "id", "type": "str"},
+        "label": {"key": "label", "type": "str"},
+        "amount": {"key": "amount", "type": "PaymentCurrencyAmount"},
+        "selected": {"key": "selected", "type": "bool"},
     }
 
     def __init__(self, **kwargs):
         super(PaymentShippingOption, self).__init__(**kwargs)
-        self.id = kwargs.get('id', None)
-        self.label = kwargs.get('label', None)
-        self.amount = kwargs.get('amount', None)
-        self.selected = kwargs.get('selected', None)
+        self.id = kwargs.get("id", None)
+        self.label = kwargs.get("label", None)
+        self.amount = kwargs.get("amount", None)
+        self.selected = kwargs.get("selected", None)
 
 
 class Place(Model):
@@ -1664,20 +1667,20 @@ class Place(Model):
     """
 
     _attribute_map = {
-        'address': {'key': 'address', 'type': 'object'},
-        'geo': {'key': 'geo', 'type': 'object'},
-        'has_map': {'key': 'hasMap', 'type': 'object'},
-        'type': {'key': 'type', 'type': 'str'},
-        'name': {'key': 'name', 'type': 'str'},
+        "address": {"key": "address", "type": "object"},
+        "geo": {"key": "geo", "type": "object"},
+        "has_map": {"key": "hasMap", "type": "object"},
+        "type": {"key": "type", "type": "str"},
+        "name": {"key": "name", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(Place, self).__init__(**kwargs)
-        self.address = kwargs.get('address', None)
-        self.geo = kwargs.get('geo', None)
-        self.has_map = kwargs.get('has_map', None)
-        self.type = kwargs.get('type', None)
-        self.name = kwargs.get('name', None)
+        self.address = kwargs.get("address", None)
+        self.geo = kwargs.get("geo", None)
+        self.has_map = kwargs.get("has_map", None)
+        self.type = kwargs.get("type", None)
+        self.name = kwargs.get("name", None)
 
 
 class ReceiptCard(Model):
@@ -1702,26 +1705,26 @@ class ReceiptCard(Model):
     """
 
     _attribute_map = {
-        'title': {'key': 'title', 'type': 'str'},
-        'facts': {'key': 'facts', 'type': '[Fact]'},
-        'items': {'key': 'items', 'type': '[ReceiptItem]'},
-        'tap': {'key': 'tap', 'type': 'CardAction'},
-        'total': {'key': 'total', 'type': 'str'},
-        'tax': {'key': 'tax', 'type': 'str'},
-        'vat': {'key': 'vat', 'type': 'str'},
-        'buttons': {'key': 'buttons', 'type': '[CardAction]'},
+        "title": {"key": "title", "type": "str"},
+        "facts": {"key": "facts", "type": "[Fact]"},
+        "items": {"key": "items", "type": "[ReceiptItem]"},
+        "tap": {"key": "tap", "type": "CardAction"},
+        "total": {"key": "total", "type": "str"},
+        "tax": {"key": "tax", "type": "str"},
+        "vat": {"key": "vat", "type": "str"},
+        "buttons": {"key": "buttons", "type": "[CardAction]"},
     }
 
     def __init__(self, **kwargs):
         super(ReceiptCard, self).__init__(**kwargs)
-        self.title = kwargs.get('title', None)
-        self.facts = kwargs.get('facts', None)
-        self.items = kwargs.get('items', None)
-        self.tap = kwargs.get('tap', None)
-        self.total = kwargs.get('total', None)
-        self.tax = kwargs.get('tax', None)
-        self.vat = kwargs.get('vat', None)
-        self.buttons = kwargs.get('buttons', None)
+        self.title = kwargs.get("title", None)
+        self.facts = kwargs.get("facts", None)
+        self.items = kwargs.get("items", None)
+        self.tap = kwargs.get("tap", None)
+        self.total = kwargs.get("total", None)
+        self.tax = kwargs.get("tax", None)
+        self.vat = kwargs.get("vat", None)
+        self.buttons = kwargs.get("buttons", None)
 
 
 class ReceiptItem(Model):
@@ -1747,24 +1750,24 @@ class ReceiptItem(Model):
     """
 
     _attribute_map = {
-        'title': {'key': 'title', 'type': 'str'},
-        'subtitle': {'key': 'subtitle', 'type': 'str'},
-        'text': {'key': 'text', 'type': 'str'},
-        'image': {'key': 'image', 'type': 'CardImage'},
-        'price': {'key': 'price', 'type': 'str'},
-        'quantity': {'key': 'quantity', 'type': 'str'},
-        'tap': {'key': 'tap', 'type': 'CardAction'},
+        "title": {"key": "title", "type": "str"},
+        "subtitle": {"key": "subtitle", "type": "str"},
+        "text": {"key": "text", "type": "str"},
+        "image": {"key": "image", "type": "CardImage"},
+        "price": {"key": "price", "type": "str"},
+        "quantity": {"key": "quantity", "type": "str"},
+        "tap": {"key": "tap", "type": "CardAction"},
     }
 
     def __init__(self, **kwargs):
         super(ReceiptItem, self).__init__(**kwargs)
-        self.title = kwargs.get('title', None)
-        self.subtitle = kwargs.get('subtitle', None)
-        self.text = kwargs.get('text', None)
-        self.image = kwargs.get('image', None)
-        self.price = kwargs.get('price', None)
-        self.quantity = kwargs.get('quantity', None)
-        self.tap = kwargs.get('tap', None)
+        self.title = kwargs.get("title", None)
+        self.subtitle = kwargs.get("subtitle", None)
+        self.text = kwargs.get("text", None)
+        self.image = kwargs.get("image", None)
+        self.price = kwargs.get("price", None)
+        self.quantity = kwargs.get("quantity", None)
+        self.tap = kwargs.get("tap", None)
 
 
 class ResourceResponse(Model):
@@ -1774,13 +1777,11 @@ class ResourceResponse(Model):
     :type id: str
     """
 
-    _attribute_map = {
-        'id': {'key': 'id', 'type': 'str'},
-    }
+    _attribute_map = {"id": {"key": "id", "type": "str"}}
 
     def __init__(self, **kwargs):
         super(ResourceResponse, self).__init__(**kwargs)
-        self.id = kwargs.get('id', None)
+        self.id = kwargs.get("id", None)
 
 
 class SemanticAction(Model):
@@ -1790,17 +1791,21 @@ class SemanticAction(Model):
     :type id: str
     :param entities: Entities associated with this action
     :type entities: dict[str, ~botframework.connector.models.Entity]
+    :param state: State of this action. Allowed values: `start`, `continue`, `done`
+    :type state: str or ~botframework.connector.models.SemanticActionStates
     """
 
     _attribute_map = {
-        'id': {'key': 'id', 'type': 'str'},
-        'entities': {'key': 'entities', 'type': '{Entity}'},
+        "id": {"key": "id", "type": "str"},
+        "entities": {"key": "entities", "type": "{Entity}"},
+        "state": {"key": "state", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(SemanticAction, self).__init__(**kwargs)
-        self.id = kwargs.get('id', None)
-        self.entities = kwargs.get('entities', None)
+        self.id = kwargs.get("id", None)
+        self.entities = kwargs.get("entities", None)
+        self.state = kwargs.get("state", None)
 
 
 class SigninCard(Model):
@@ -1813,14 +1818,14 @@ class SigninCard(Model):
     """
 
     _attribute_map = {
-        'text': {'key': 'text', 'type': 'str'},
-        'buttons': {'key': 'buttons', 'type': '[CardAction]'},
+        "text": {"key": "text", "type": "str"},
+        "buttons": {"key": "buttons", "type": "[CardAction]"},
     }
 
     def __init__(self, **kwargs):
         super(SigninCard, self).__init__(**kwargs)
-        self.text = kwargs.get('text', None)
-        self.buttons = kwargs.get('buttons', None)
+        self.text = kwargs.get("text", None)
+        self.buttons = kwargs.get("buttons", None)
 
 
 class SuggestedActions(Model):
@@ -1835,14 +1840,14 @@ class SuggestedActions(Model):
     """
 
     _attribute_map = {
-        'to': {'key': 'to', 'type': '[str]'},
-        'actions': {'key': 'actions', 'type': '[CardAction]'},
+        "to": {"key": "to", "type": "[str]"},
+        "actions": {"key": "actions", "type": "[CardAction]"},
     }
 
     def __init__(self, **kwargs):
         super(SuggestedActions, self).__init__(**kwargs)
-        self.to = kwargs.get('to', None)
-        self.actions = kwargs.get('actions', None)
+        self.to = kwargs.get("to", None)
+        self.actions = kwargs.get("actions", None)
 
 
 class TextHighlight(Model):
@@ -1856,14 +1861,14 @@ class TextHighlight(Model):
     """
 
     _attribute_map = {
-        'text': {'key': 'text', 'type': 'str'},
-        'occurrence': {'key': 'occurrence', 'type': 'int'},
+        "text": {"key": "text", "type": "str"},
+        "occurrence": {"key": "occurrence", "type": "int"},
     }
 
     def __init__(self, **kwargs):
         super(TextHighlight, self).__init__(**kwargs)
-        self.text = kwargs.get('text', None)
-        self.occurrence = kwargs.get('occurrence', None)
+        self.text = kwargs.get("text", None)
+        self.occurrence = kwargs.get("occurrence", None)
 
 
 class Thing(Model):
@@ -1876,14 +1881,14 @@ class Thing(Model):
     """
 
     _attribute_map = {
-        'type': {'key': 'type', 'type': 'str'},
-        'name': {'key': 'name', 'type': 'str'},
+        "type": {"key": "type", "type": "str"},
+        "name": {"key": "name", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(Thing, self).__init__(**kwargs)
-        self.type = kwargs.get('type', None)
-        self.name = kwargs.get('name', None)
+        self.type = kwargs.get("type", None)
+        self.name = kwargs.get("name", None)
 
 
 class ThumbnailCard(Model):
@@ -1905,22 +1910,22 @@ class ThumbnailCard(Model):
     """
 
     _attribute_map = {
-        'title': {'key': 'title', 'type': 'str'},
-        'subtitle': {'key': 'subtitle', 'type': 'str'},
-        'text': {'key': 'text', 'type': 'str'},
-        'images': {'key': 'images', 'type': '[CardImage]'},
-        'buttons': {'key': 'buttons', 'type': '[CardAction]'},
-        'tap': {'key': 'tap', 'type': 'CardAction'},
+        "title": {"key": "title", "type": "str"},
+        "subtitle": {"key": "subtitle", "type": "str"},
+        "text": {"key": "text", "type": "str"},
+        "images": {"key": "images", "type": "[CardImage]"},
+        "buttons": {"key": "buttons", "type": "[CardAction]"},
+        "tap": {"key": "tap", "type": "CardAction"},
     }
 
     def __init__(self, **kwargs):
         super(ThumbnailCard, self).__init__(**kwargs)
-        self.title = kwargs.get('title', None)
-        self.subtitle = kwargs.get('subtitle', None)
-        self.text = kwargs.get('text', None)
-        self.images = kwargs.get('images', None)
-        self.buttons = kwargs.get('buttons', None)
-        self.tap = kwargs.get('tap', None)
+        self.title = kwargs.get("title", None)
+        self.subtitle = kwargs.get("subtitle", None)
+        self.text = kwargs.get("text", None)
+        self.images = kwargs.get("images", None)
+        self.buttons = kwargs.get("buttons", None)
+        self.tap = kwargs.get("tap", None)
 
 
 class ThumbnailUrl(Model):
@@ -1933,14 +1938,14 @@ class ThumbnailUrl(Model):
     """
 
     _attribute_map = {
-        'url': {'key': 'url', 'type': 'str'},
-        'alt': {'key': 'alt', 'type': 'str'},
+        "url": {"key": "url", "type": "str"},
+        "alt": {"key": "alt", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(ThumbnailUrl, self).__init__(**kwargs)
-        self.url = kwargs.get('url', None)
-        self.alt = kwargs.get('alt', None)
+        self.url = kwargs.get("url", None)
+        self.alt = kwargs.get("alt", None)
 
 
 class TokenRequest(Model):
@@ -1954,14 +1959,14 @@ class TokenRequest(Model):
     """
 
     _attribute_map = {
-        'provider': {'key': 'provider', 'type': 'str'},
-        'settings': {'key': 'settings', 'type': '{object}'},
+        "provider": {"key": "provider", "type": "str"},
+        "settings": {"key": "settings", "type": "{object}"},
     }
 
     def __init__(self, **kwargs):
         super(TokenRequest, self).__init__(**kwargs)
-        self.provider = kwargs.get('provider', None)
-        self.settings = kwargs.get('settings', None)
+        self.provider = kwargs.get("provider", None)
+        self.settings = kwargs.get("settings", None)
 
 
 class TokenResponse(Model):
@@ -1974,19 +1979,23 @@ class TokenResponse(Model):
     :param expiration: Expiration for the token, in ISO 8601 format (e.g.
      "2007-04-05T14:30Z")
     :type expiration: str
+    :param channel_id: The channelId of the TokenResponse
+    :type channel_id: str
     """
 
     _attribute_map = {
-        'connection_name': {'key': 'connectionName', 'type': 'str'},
-        'token': {'key': 'token', 'type': 'str'},
-        'expiration': {'key': 'expiration', 'type': 'str'},
+        "connection_name": {"key": "connectionName", "type": "str"},
+        "token": {"key": "token", "type": "str"},
+        "expiration": {"key": "expiration", "type": "str"},
+        "channel_id": {"key": "channelId", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(TokenResponse, self).__init__(**kwargs)
-        self.connection_name = kwargs.get('connection_name', None)
-        self.token = kwargs.get('token', None)
-        self.expiration = kwargs.get('expiration', None)
+        self.connection_name = kwargs.get("connection_name", None)
+        self.token = kwargs.get("token", None)
+        self.expiration = kwargs.get("expiration", None)
+        self.channel_id = kwargs.get("channel_id", None)
 
 
 class Transcript(Model):
@@ -1997,13 +2006,11 @@ class Transcript(Model):
     :type activities: list[~botframework.connector.models.Activity]
     """
 
-    _attribute_map = {
-        'activities': {'key': 'activities', 'type': '[Activity]'},
-    }
+    _attribute_map = {"activities": {"key": "activities", "type": "[Activity]"}}
 
     def __init__(self, **kwargs):
         super(Transcript, self).__init__(**kwargs)
-        self.activities = kwargs.get('activities', None)
+        self.activities = kwargs.get("activities", None)
 
 
 class VideoCard(Model):
@@ -2042,31 +2049,31 @@ class VideoCard(Model):
     """
 
     _attribute_map = {
-        'title': {'key': 'title', 'type': 'str'},
-        'subtitle': {'key': 'subtitle', 'type': 'str'},
-        'text': {'key': 'text', 'type': 'str'},
-        'image': {'key': 'image', 'type': 'ThumbnailUrl'},
-        'media': {'key': 'media', 'type': '[MediaUrl]'},
-        'buttons': {'key': 'buttons', 'type': '[CardAction]'},
-        'shareable': {'key': 'shareable', 'type': 'bool'},
-        'autoloop': {'key': 'autoloop', 'type': 'bool'},
-        'autostart': {'key': 'autostart', 'type': 'bool'},
-        'aspect': {'key': 'aspect', 'type': 'str'},
-        'duration': {'key': 'duration', 'type': 'str'},
-        'value': {'key': 'value', 'type': 'object'},
+        "title": {"key": "title", "type": "str"},
+        "subtitle": {"key": "subtitle", "type": "str"},
+        "text": {"key": "text", "type": "str"},
+        "image": {"key": "image", "type": "ThumbnailUrl"},
+        "media": {"key": "media", "type": "[MediaUrl]"},
+        "buttons": {"key": "buttons", "type": "[CardAction]"},
+        "shareable": {"key": "shareable", "type": "bool"},
+        "autoloop": {"key": "autoloop", "type": "bool"},
+        "autostart": {"key": "autostart", "type": "bool"},
+        "aspect": {"key": "aspect", "type": "str"},
+        "duration": {"key": "duration", "type": "str"},
+        "value": {"key": "value", "type": "object"},
     }
 
     def __init__(self, **kwargs):
         super(VideoCard, self).__init__(**kwargs)
-        self.title = kwargs.get('title', None)
-        self.subtitle = kwargs.get('subtitle', None)
-        self.text = kwargs.get('text', None)
-        self.image = kwargs.get('image', None)
-        self.media = kwargs.get('media', None)
-        self.buttons = kwargs.get('buttons', None)
-        self.shareable = kwargs.get('shareable', None)
-        self.autoloop = kwargs.get('autoloop', None)
-        self.autostart = kwargs.get('autostart', None)
-        self.aspect = kwargs.get('aspect', None)
-        self.duration = kwargs.get('duration', None)
-        self.value = kwargs.get('value', None)
+        self.title = kwargs.get("title", None)
+        self.subtitle = kwargs.get("subtitle", None)
+        self.text = kwargs.get("text", None)
+        self.image = kwargs.get("image", None)
+        self.media = kwargs.get("media", None)
+        self.buttons = kwargs.get("buttons", None)
+        self.shareable = kwargs.get("shareable", None)
+        self.autoloop = kwargs.get("autoloop", None)
+        self.autostart = kwargs.get("autostart", None)
+        self.aspect = kwargs.get("aspect", None)
+        self.duration = kwargs.get("duration", None)
+        self.value = kwargs.get("value", None)

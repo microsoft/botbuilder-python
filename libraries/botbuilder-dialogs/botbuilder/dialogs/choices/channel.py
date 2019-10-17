@@ -5,9 +5,9 @@ from botbuilder.core import TurnContext
 from botframework.connector import Channels
 
 
-class Channel(object):
+class Channel:
     """
-    Methods for determining channel specific functionality.
+    Methods for determining channel-specific functionality.
     """
 
     @staticmethod
@@ -19,7 +19,8 @@ class Channel(object):
             button_cnt (int, optional): Defaults to 100. The number of Suggested Actions to check for the Channel.
 
         Returns:
-            bool: True if the Channel supports the button_cnt total Suggested Actions, False if the Channel does not support that number of Suggested Actions.
+            bool: True if the Channel supports the button_cnt total Suggested Actions, False if the Channel does not
+             support that number of Suggested Actions.
         """
 
         max_actions = {
@@ -36,7 +37,11 @@ class Channel(object):
             Channels.direct_line: 100,
             Channels.webchat: 100,
         }
-        return button_cnt <= max_actions[channel_id] if channel_id in max_actions else False
+        return (
+            button_cnt <= max_actions[channel_id]
+            if channel_id in max_actions
+            else False
+        )
 
     @staticmethod
     def supports_card_actions(channel_id: str, button_cnt: int = 100) -> bool:
@@ -47,7 +52,8 @@ class Channel(object):
             button_cnt (int, optional): Defaults to 100. The number of Card Actions to check for the Channel.
 
         Returns:
-            bool: True if the Channel supports the button_cnt total Card Actions, False if the Channel does not support that number of Card Actions.
+            bool: True if the Channel supports the button_cnt total Card Actions, False if the Channel does not support
+             that number of Card Actions.
         """
 
         max_actions = {
@@ -61,7 +67,11 @@ class Channel(object):
             Channels.webchat: 100,
             Channels.cortana: 100,
         }
-        return button_cnt <= max_actions[channel_id] if channel_id in max_actions else False
+        return (
+            button_cnt <= max_actions[channel_id]
+            if channel_id in max_actions
+            else False
+        )
 
     @staticmethod
     def has_message_feed(channel_id: str) -> bool:
@@ -74,10 +84,12 @@ class Channel(object):
             bool: True if the Channel has a Message Feed, False if it does not.
         """
 
-        return False if channel_id == Channels.cortana else True
+        return not channel_id == Channels.cortana
 
     @staticmethod
-    def max_action_title_length(channel_id: str) -> int:
+    def max_action_title_length(  # pylint: disable=unused-argument
+        channel_id: str
+    ) -> int:
         """Maximum length allowed for Action Titles.
 
         Args:
@@ -102,5 +114,5 @@ class Channel(object):
 
         if turn_context.activity.channel_id is None:
             return ""
-        else:
-            return turn_context.activity.channel_id
+
+        return turn_context.activity.channel_id

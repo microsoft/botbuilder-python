@@ -3,17 +3,25 @@
 
 import aiounittest
 
-from botbuilder.schema import Activity, ChannelAccount, ResourceResponse, ConversationAccount
+from botbuilder.schema import (
+    Activity,
+    ChannelAccount,
+    ConversationAccount,
+    Mention,
+    ResourceResponse,
+)
 from botbuilder.core import BotAdapter, TurnContext
-ACTIVITY = Activity(id='1234',
-                    type='message',
-                    text='test',
-                    from_property=ChannelAccount(id='user', name='User Name'),
-                    recipient=ChannelAccount(id='bot', name='Bot Name'),
-                    conversation=ConversationAccount(id='convo', name='Convo Name'),
-                    channel_id='UnitTest',
-                    service_url='https://example.org'
-                    )
+
+ACTIVITY = Activity(
+    id="1234",
+    type="message",
+    text="test",
+    from_property=ChannelAccount(id="user", name="User Name"),
+    recipient=ChannelAccount(id="bot", name="Bot Name"),
+    conversation=ConversationAccount(id="convo", name="Convo Name"),
+    channel_id="UnitTest",
+    service_url="https://example.org",
+)
 
 
 class SimpleAdapter(BotAdapter):
@@ -21,12 +29,12 @@ class SimpleAdapter(BotAdapter):
         responses = []
         assert context is not None
         assert activities is not None
-        assert type(activities) == list
-        assert len(activities) > 0
-        for (idx, activity) in enumerate(activities):
+        assert isinstance(activities, list)
+        assert activities
+        for (idx, activity) in enumerate(activities):  # pylint: disable=unused-variable
             assert isinstance(activity, Activity)
-            assert activity.type == 'message'
-            responses.append(ResourceResponse(id='5678'))
+            assert activity.type == "message"
+            responses.append(ResourceResponse(id="5678"))
         return responses
 
     async def update_activity(self, context, activity):
@@ -36,36 +44,37 @@ class SimpleAdapter(BotAdapter):
     async def delete_activity(self, context, reference):
         assert context is not None
         assert reference is not None
-        assert reference.activity_id == '1234'
+        assert reference.activity_id == "1234"
 
 
 class TestBotContext(aiounittest.AsyncTestCase):
     def test_should_create_context_with_request_and_adapter(self):
-        context = TurnContext(SimpleAdapter(), ACTIVITY)
+        TurnContext(SimpleAdapter(), ACTIVITY)
 
     def test_should_not_create_context_without_request(self):
         try:
-            context = TurnContext(SimpleAdapter(), None)
+            TurnContext(SimpleAdapter(), None)
         except TypeError:
             pass
-        except Exception as e:
-            raise e
+        except Exception as error:
+            raise error
 
     def test_should_not_create_context_without_adapter(self):
         try:
-            context = TurnContext(None, ACTIVITY)
+            TurnContext(None, ACTIVITY)
         except TypeError:
             pass
-        except Exception as e:
-            raise e
+        except Exception as error:
+            raise error
 
     def test_should_create_context_with_older_context(self):
         context = TurnContext(SimpleAdapter(), ACTIVITY)
-        new_context = TurnContext(context)
+        TurnContext(context)
 
     def test_copy_to_should_copy_all_references(self):
+        # pylint: disable=protected-access
         old_adapter = SimpleAdapter()
-        old_activity = Activity(id='2', type='message', text='test copy')
+        old_activity = Activity(id="2", type="message", text="test copy")
         old_context = TurnContext(old_adapter, old_activity)
         old_context.responded = True
 
@@ -93,39 +102,44 @@ class TestBotContext(aiounittest.AsyncTestCase):
 
         adapter = SimpleAdapter()
         new_context = TurnContext(adapter, ACTIVITY)
-        assert len(new_context._on_send_activities) == 0
-        assert len(new_context._on_update_activity) == 0
-        assert len(new_context._on_delete_activity) == 0
+        assert not new_context._on_send_activities  # pylint: disable=protected-access
+        assert not new_context._on_update_activity  # pylint: disable=protected-access
+        assert not new_context._on_delete_activity  # pylint: disable=protected-access
 
         old_context.copy_to(new_context)
 
         assert new_context.adapter == old_adapter
         assert new_context.activity == old_activity
         assert new_context.responded is True
-        assert len(new_context._on_send_activities) == 1
-        assert len(new_context._on_update_activity) == 1
-        assert len(new_context._on_delete_activity) == 1
+        assert (
+            len(new_context._on_send_activities) == 1
+        )  # pylint: disable=protected-access
+        assert (
+            len(new_context._on_update_activity) == 1
+        )  # pylint: disable=protected-access
+        assert (
+            len(new_context._on_delete_activity) == 1
+        )  # pylint: disable=protected-access
 
-    def test_responded_should_be_automatically_set_to_False(self):
+    def test_responded_should_be_automatically_set_to_false(self):
         context = TurnContext(SimpleAdapter(), ACTIVITY)
         assert context.responded is False
 
-    def test_should_be_able_to_set_responded_to_True(self):
+    def test_should_be_able_to_set_responded_to_true(self):
         context = TurnContext(SimpleAdapter(), ACTIVITY)
         assert context.responded is False
         context.responded = True
         assert context.responded
 
-    def test_should_not_be_able_to_set_responded_to_False(self):
+    def test_should_not_be_able_to_set_responded_to_false(self):
         context = TurnContext(SimpleAdapter(), ACTIVITY)
         try:
             context.responded = False
         except ValueError:
             pass
-        except Exception as e:
-            raise e
+        except Exception as error:
+            raise error
 
-    
     async def test_should_call_on_delete_activity_handlers_before_deletion(self):
         context = TurnContext(SimpleAdapter(), ACTIVITY)
         called = False
@@ -135,14 +149,13 @@ class TestBotContext(aiounittest.AsyncTestCase):
             called = True
             assert reference is not None
             assert context is not None
-            assert reference.activity_id == '1234'
+            assert reference.activity_id == "1234"
             await next_handler_coroutine()
 
         context.on_delete_activity(delete_handler)
         await context.delete_activity(ACTIVITY.id)
         assert called is True
 
-    
     async def test_should_call_multiple_on_delete_activity_handlers_in_order(self):
         context = TurnContext(SimpleAdapter(), ACTIVITY)
         called_first = False
@@ -150,22 +163,28 @@ class TestBotContext(aiounittest.AsyncTestCase):
 
         async def first_delete_handler(context, reference, next_handler_coroutine):
             nonlocal called_first, called_second
-            assert called_first is False, 'called_first should not be True before first_delete_handler is called.'
+            assert (
+                called_first is False
+            ), "called_first should not be True before first_delete_handler is called."
             called_first = True
-            assert called_second is False, 'Second on_delete_activity handler was called before first.'
+            assert (
+                called_second is False
+            ), "Second on_delete_activity handler was called before first."
             assert reference is not None
             assert context is not None
-            assert reference.activity_id == '1234'
+            assert reference.activity_id == "1234"
             await next_handler_coroutine()
 
         async def second_delete_handler(context, reference, next_handler_coroutine):
             nonlocal called_first, called_second
             assert called_first
-            assert called_second is False, 'called_second was set to True before second handler was called.'
+            assert (
+                called_second is False
+            ), "called_second was set to True before second handler was called."
             called_second = True
             assert reference is not None
             assert context is not None
-            assert reference.activity_id == '1234'
+            assert reference.activity_id == "1234"
             await next_handler_coroutine()
 
         context.on_delete_activity(first_delete_handler)
@@ -174,7 +193,6 @@ class TestBotContext(aiounittest.AsyncTestCase):
         assert called_first is True
         assert called_second is True
 
-    
     async def test_should_call_send_on_activities_handler_before_send(self):
         context = TurnContext(SimpleAdapter(), ACTIVITY)
         called = False
@@ -184,14 +202,13 @@ class TestBotContext(aiounittest.AsyncTestCase):
             called = True
             assert activities is not None
             assert context is not None
-            assert activities[0].id == '1234'
+            assert activities[0].id == "1234"
             await next_handler_coroutine()
 
         context.on_send_activities(send_handler)
         await context.send_activity(ACTIVITY)
         assert called is True
 
-    
     async def test_should_call_on_update_activity_handler_before_update(self):
         context = TurnContext(SimpleAdapter(), ACTIVITY)
         called = False
@@ -201,7 +218,7 @@ class TestBotContext(aiounittest.AsyncTestCase):
             called = True
             assert activity is not None
             assert context is not None
-            assert activity.id == '1234'
+            assert activity.id == "1234"
             await next_handler_coroutine()
 
         context.on_update_activity(update_handler)
@@ -218,9 +235,13 @@ class TestBotContext(aiounittest.AsyncTestCase):
         assert reference.channel_id == ACTIVITY.channel_id
         assert reference.service_url == ACTIVITY.service_url
 
-    def test_apply_conversation_reference_should_return_prepare_reply_when_is_incoming_is_False(self):
+    def test_apply_conversation_reference_should_return_prepare_reply_when_is_incoming_is_false(
+        self
+    ):
         reference = TurnContext.get_conversation_reference(ACTIVITY)
-        reply = TurnContext.apply_conversation_reference(Activity(type='message', text='reply'), reference)
+        reply = TurnContext.apply_conversation_reference(
+            Activity(type="message", text="reply"), reference
+        )
 
         assert reply.recipient == ACTIVITY.from_property
         assert reply.from_property == ACTIVITY.recipient
@@ -228,12 +249,52 @@ class TestBotContext(aiounittest.AsyncTestCase):
         assert reply.service_url == ACTIVITY.service_url
         assert reply.channel_id == ACTIVITY.channel_id
 
-    def test_apply_conversation_reference_when_is_incoming_is_True_should_not_prepare_a_reply(self):
+    def test_apply_conversation_reference_when_is_incoming_is_true_should_not_prepare_a_reply(
+        self
+    ):
         reference = TurnContext.get_conversation_reference(ACTIVITY)
-        reply = TurnContext.apply_conversation_reference(Activity(type='message', text='reply'), reference, True)
+        reply = TurnContext.apply_conversation_reference(
+            Activity(type="message", text="reply"), reference, True
+        )
 
         assert reply.recipient == ACTIVITY.recipient
         assert reply.from_property == ACTIVITY.from_property
         assert reply.conversation == ACTIVITY.conversation
         assert reply.service_url == ACTIVITY.service_url
         assert reply.channel_id == ACTIVITY.channel_id
+
+    async def test_should_get_conversation_reference_using_get_reply_conversation_reference(
+        self
+    ):
+        context = TurnContext(SimpleAdapter(), ACTIVITY)
+        reply = await context.send_activity("test")
+
+        assert reply.id, "reply has an id"
+
+        reference = TurnContext.get_reply_conversation_reference(
+            context.activity, reply
+        )
+
+        assert reference.activity_id, "reference has an activity id"
+        assert (
+            reference.activity_id == reply.id
+        ), "reference id matches outgoing reply id"
+
+    def test_should_remove_at_mention_from_activity(self):
+        activity = Activity(
+            type="message",
+            text="<at>TestOAuth619</at> test activity",
+            recipient=ChannelAccount(id="TestOAuth619"),
+            entities=[
+                Mention(
+                    type="mention",
+                    text="<at>TestOAuth619</at>",
+                    mentioned=ChannelAccount(name="Bot", id="TestOAuth619"),
+                )
+            ],
+        )
+
+        text = TurnContext.remove_recipient_mention(activity)
+
+        assert text, " test activity"
+        assert activity.text, " test activity"

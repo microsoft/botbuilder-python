@@ -7,8 +7,8 @@ from botbuilder.schema import Activity, ConversationReference
 from .middleware_set import Middleware
 from .turn_context import TurnContext
 
-class BotAssert():
 
+class BotAssert:
     @staticmethod
     def activity_not_none(activity: Activity) -> None:
         """
@@ -17,7 +17,7 @@ class BotAssert():
         """
         if activity is None:
             raise TypeError(activity.__class__.__name__)
-       
+
     @staticmethod
     def context_not_none(turn_context: TurnContext) -> None:
         """
@@ -26,7 +26,7 @@ class BotAssert():
         """
         if turn_context is None:
             raise TypeError(turn_context.__class__.__name__)
-       
+
     @staticmethod
     def conversation_reference_not_none(reference: ConversationReference) -> None:
         """
@@ -35,7 +35,7 @@ class BotAssert():
         """
         if reference is None:
             raise TypeError(reference.__class__.__name__)
-    
+
     @staticmethod
     def activity_list_not_none(activities: List[Activity]) -> None:
         """
@@ -44,7 +44,7 @@ class BotAssert():
         """
         if activities is None:
             raise TypeError(activities.__class__.__name__)
-       
+
     @staticmethod
     def middleware_not_none(middleware: Middleware) -> None:
         """
@@ -53,7 +53,7 @@ class BotAssert():
         """
         if middleware is None:
             raise TypeError(middleware.__class__.__name__)
-       
+
     @staticmethod
     def middleware_list_not_none(middleware: List[Middleware]) -> None:
         """
@@ -62,5 +62,3 @@ class BotAssert():
         """
         if middleware is None:
             raise TypeError(middleware.__class__.__name__)
-       
-   

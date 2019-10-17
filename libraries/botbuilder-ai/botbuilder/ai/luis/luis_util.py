@@ -3,7 +3,7 @@
 
 import platform
 from collections import OrderedDict
-from typing import Dict, List, Set, Union
+from typing import Dict, List, Union
 
 import azure.cognitiveservices.language.luis.runtime.models as runtime_models
 from azure.cognitiveservices.language.luis.runtime.models import (
@@ -12,9 +12,9 @@ from azure.cognitiveservices.language.luis.runtime.models import (
     LuisResult,
 )
 from msrest import Serializer
+from botbuilder.core import IntentScore, RecognizerResult
 
 from .. import __title__, __version__
-from . import IntentScore, RecognizerResult
 
 
 class LuisUtil:
@@ -35,12 +35,11 @@ class LuisUtil:
                 LuisUtil.normalized_intent(i.intent): IntentScore(i.score or 0)
                 for i in luis_result.intents
             }
-        else:
-            return {
-                LuisUtil.normalized_intent(
-                    luis_result.top_scoring_intent.intent
-                ): IntentScore(luis_result.top_scoring_intent.score or 0)
-            }
+        return {
+            LuisUtil.normalized_intent(
+                luis_result.top_scoring_intent.intent
+            ): IntentScore(luis_result.top_scoring_intent.score or 0)
+        }
 
     @staticmethod
     def extract_entities_and_metadata(
@@ -58,9 +57,9 @@ class LuisUtil:
         if composite_entities:
             composite_entity_types = set(ce.parent_type for ce in composite_entities)
             current = entities
-            for compositeEntity in composite_entities:
+            for composite_entity in composite_entities:
                 current = LuisUtil.populate_composite_entity_model(
-                    compositeEntity, current, entities_and_metadata, verbose
+                    composite_entity, current, entities_and_metadata, verbose
                 )
             entities = current
 
@@ -90,12 +89,12 @@ class LuisUtil:
             return None
 
         try:
-            s = str(value)
-            i = int(s)
-            return i
+            str_value = str(value)
+            int_value = int(str_value)
+            return int_value
         except ValueError:
-            f = float(s)
-            return f
+            float_value = float(str_value)
+            return float_value
 
     @staticmethod
     def extract_entity_value(entity: EntityModel) -> object:
@@ -108,7 +107,7 @@ class LuisUtil:
         resolution = entity.additional_properties["resolution"]
         if entity.type.startswith("builtin.datetime."):
             return resolution
-        elif entity.type.startswith("builtin.datetimeV2."):
+        if entity.type.startswith("builtin.datetimeV2."):
             if not resolution["values"]:
                 return resolution
 
@@ -117,32 +116,31 @@ class LuisUtil:
             timexes = [val["timex"] for val in resolution_values]
             distinct_timexes = list(OrderedDict.fromkeys(timexes))
             return {"type": val_type, "timex": distinct_timexes}
-        else:
-            if entity.type in {"builtin.number", "builtin.ordinal"}:
-                return LuisUtil.number(resolution["value"])
-            elif entity.type == "builtin.percentage":
-                svalue = str(resolution["value"])
-                if svalue.endswith("%"):
-                    svalue = svalue[:-1]
 
-                return LuisUtil.number(svalue)
-            elif entity.type in {
-                "builtin.age",
-                "builtin.dimension",
-                "builtin.currency",
-                "builtin.temperature",
-            }:
-                units = resolution["unit"]
-                val = LuisUtil.number(resolution["value"])
-                obj = {}
-                if val is not None:
-                    obj["number"] = val
+        if entity.type in {"builtin.number", "builtin.ordinal"}:
+            return LuisUtil.number(resolution["value"])
+        if entity.type == "builtin.percentage":
+            svalue = str(resolution["value"])
+            if svalue.endswith("%"):
+                svalue = svalue[:-1]
 
-                obj["units"] = units
-                return obj
-            else:
-                value = resolution.get("value")
-                return value if value is not None else resolution.get("values")
+            return LuisUtil.number(svalue)
+        if entity.type in {
+            "builtin.age",
+            "builtin.dimension",
+            "builtin.currency",
+            "builtin.temperature",
+        }:
+            units = resolution["unit"]
+            val = LuisUtil.number(resolution["value"])
+            obj = {}
+            if val is not None:
+                obj["number"] = val
+
+            obj["units"] = units
+            return obj
+        value = resolution.get("value")
+        return value if value is not None else resolution.get("values")
 
     @staticmethod
     def extract_entity_metadata(entity: EntityModel) -> Dict:
@@ -202,10 +200,10 @@ class LuisUtil:
         # This is now implemented as O(n^2) search and can be reduced to O(2n) using a map as an optimization if n grows
         composite_entity_metadata = next(
             (
-                e
-                for e in entities
-                if e.type == composite_entity.parent_type
-                and e.entity == composite_entity.value
+                ent
+                for ent in entities
+                if ent.type == composite_entity.parent_type
+                and ent.entity == composite_entity.value
             ),
             None,
         )
@@ -310,7 +308,7 @@ class LuisUtil:
             for name, intent_score in recognizer_result.intents.items()
         } if recognizer_result.intents is not None else None
 
-        d: Dict[str, object] = {
+        dictionary: Dict[str, object] = {
             "text": recognizer_result.text,
             "alteredText": recognizer_result.altered_text,
             "intents": intents,
@@ -319,13 +317,13 @@ class LuisUtil:
 
         if recognizer_result.properties is not None:
             for key, value in recognizer_result.properties.items():
-                if key not in d:
+                if key not in dictionary:
                     if isinstance(value, LuisResult):
-                        d[key] = LuisUtil.luis_result_as_dict(value)
+                        dictionary[key] = LuisUtil.luis_result_as_dict(value)
                     else:
-                        d[key] = value
+                        dictionary[key] = value
 
-        return d
+        return dictionary
 
     @staticmethod
     def intent_score_as_dict(intent_score: IntentScore) -> Dict[str, float]:
@@ -343,5 +341,5 @@ class LuisUtil:
             k: v for k, v in runtime_models.__dict__.items() if isinstance(v, type)
         }
         serializer = Serializer(client_models)
-        d = serializer.body(luis_result, "LuisResult")
-        return d
+        result = serializer.body(luis_result, "LuisResult")
+        return result

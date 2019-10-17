@@ -1,7 +1,7 @@
 
-==================================
+==============================
 BotBuilder-Core SDK for Python
-==================================
+==============================
 
 .. image:: https://fuselabs.visualstudio.com/SDK_v4/_apis/build/status/Python/SDK_v4-Python-CI?branchName=master
    :target:  https://fuselabs.visualstudio.com/SDK_v4/_apis/build/status/Python/SDK_v4-Python-CI
@@ -29,7 +29,7 @@ You can find more information on the botbuilder-python project by visiting our `
 Requirements
 ============
 
-* `Python >= 3.6.4`_
+* `Python >= 3.7.0`_
 
 
 Source Code
@@ -71,7 +71,7 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT_ License.
 
 .. _Wiki: https://github.com/Microsoft/botbuilder-python/wiki
-.. _Python >= 3.6.4: https://www.python.org/downloads/
+.. _Python >= 3.7.0: https://www.python.org/downloads/
 .. _MIT: https://github.com/Microsoft/vscode/blob/master/LICENSE.txt
 .. _Microsoft Open Source Code of Conduct: https://opensource.microsoft.com/codeofconduct/
 .. _Code of Conduct FAQ: https://opensource.microsoft.com/codeofconduct/faq/

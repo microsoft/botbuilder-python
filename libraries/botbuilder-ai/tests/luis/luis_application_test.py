@@ -30,10 +30,10 @@ class LuisApplicationTest(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     LuisApplication(app_id, key, LuisApplicationTest.endpoint)
 
-        luisApp = LuisApplication(
+        luis_app = LuisApplication(
             str(uuid4()), str(uuid4()), LuisApplicationTest.endpoint
         )
-        self.assertEqual(LuisApplicationTest.endpoint, luisApp.endpoint)
+        self.assertEqual(LuisApplicationTest.endpoint, luis_app.endpoint)
 
     @unittest.skip("revisit")
     def test_luis_application_serialization(self) -> None:
@@ -48,7 +48,11 @@ class LuisApplicationTest(unittest.TestCase):
         # Arrange
         # Note this is NOT a real LUIS application ID nor a real LUIS subscription-key
         # theses are GUIDs edited to look right to the parsing and validation code.
-        endpoint = "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/b31aeaf3-3511-495b-a07f-571fc873214b?verbose=true&timezoneOffset=-360&subscription-key=048ec46dc58e495482b0c447cfdbd291&q="
+        endpoint = (
+            "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/"
+            "b31aeaf3-3511-495b-a07f-571fc873214b?verbose=true&timezoneOffset=-360"
+            "&subscription-key=048ec46dc58e495482b0c447cfdbd291&q="
+        )
 
         # Act
         app = LuisApplication.from_application_endpoint(endpoint)
@@ -61,8 +65,10 @@ class LuisApplicationTest(unittest.TestCase):
     def test_list_application_from_luis_endpoint_bad_arguments(self) -> None:
         application_endpoint_data: List[str] = [
             "this.is.not.a.uri",
-            "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/b31aeaf3-3511-495b-a07f-571fc873214b?verbose=true&timezoneOffset=-360&q=",
-            "https://westus.api.cognitive.microsoft.com?verbose=true&timezoneOffset=-360&subscription-key=048ec46dc58e495482b0c447cfdbd291&q=",
+            "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/"
+            "b31aeaf3-3511-495b-a07f-571fc873214b?verbose=true&timezoneOffset=-360&q=",
+            "https://westus.api.cognitive.microsoft.com?"
+            "verbose=true&timezoneOffset=-360&subscription-key=048ec46dc58e495482b0c447cfdbd291&q=",
         ]
 
         for application_endpoint in application_endpoint_data:

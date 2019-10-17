@@ -1,0 +1,47 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+from abc import ABC
+
+
+class GovernmentConstants(ABC):
+
+    """
+    Government Channel Service property value
+    """
+
+    CHANNEL_SERVICE = "https://botframework.azure.us"
+
+    """
+    TO CHANNEL FROM BOT: Login URL
+    """
+    TO_CHANNEL_FROM_BOT_LOGIN_URL = (
+        "https://login.microsoftonline.us/"
+        "cab8a31a-1906-4287-a0d8-4eef66b95f6e/"
+        "oauth2/v2.0/token"
+    )
+
+    """
+    TO CHANNEL FROM BOT: OAuth scope to request
+    """
+    TO_CHANNEL_FROM_BOT_OAUTH_SCOPE = "https://api.botframework.us/.default"
+
+    """
+    TO BOT FROM CHANNEL: Token issuer
+    """
+    TO_BOT_FROM_CHANNEL_TOKEN_ISSUER = "https://api.botframework.us"
+
+    """
+    TO BOT FROM CHANNEL: OpenID metadata document for tokens coming from MSA
+    """
+    TO_BOT_FROM_CHANNEL_OPEN_ID_METADATA_URL = (
+        "https://login.botframework.azure.us/v1/.well-known/openidconfiguration"
+    )
+
+    """
+    TO BOT FROM GOV EMULATOR: OpenID metadata document for tokens coming from MSA
+    """
+    TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL = (
+        "https://login.microsoftonline.us/"
+        "cab8a31a-1906-4287-a0d8-4eef66b95f6e/v2.0/"
+        ".well-known/openid-configuration"
+    )

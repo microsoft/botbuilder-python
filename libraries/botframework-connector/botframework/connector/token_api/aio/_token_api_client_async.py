@@ -13,7 +13,6 @@ from msrest.async_client import SDKClientAsync
 from msrest import Serializer, Deserializer
 
 from .._configuration import TokenApiClientConfiguration
-from msrest.exceptions import HttpOperationError
 from .operations_async import BotSignInOperations
 from .operations_async import UserTokenOperations
 from .. import models
@@ -36,18 +35,21 @@ class TokenApiClient(SDKClientAsync):
     :param str base_url: Service URL
     """
 
-    def __init__(
-            self, credentials, base_url=None):
+    def __init__(self, credentials, base_url=None):
 
         self.config = TokenApiClientConfiguration(credentials, base_url)
         super(TokenApiClient, self).__init__(self.config)
 
-        client_models = {k: v for k, v in models.__dict__.items() if isinstance(v, type)}
-        self.api_version = 'token'
+        client_models = {
+            k: v for k, v in models.__dict__.items() if isinstance(v, type)
+        }
+        self.api_version = "token"
         self._serialize = Serializer(client_models)
         self._deserialize = Deserializer(client_models)
 
         self.bot_sign_in = BotSignInOperations(
-            self._client, self.config, self._serialize, self._deserialize)
+            self._client, self.config, self._serialize, self._deserialize
+        )
         self.user_token = UserTokenOperations(
-            self._client, self.config, self._serialize, self._deserialize)
+            self._client, self.config, self._serialize, self._deserialize
+        )

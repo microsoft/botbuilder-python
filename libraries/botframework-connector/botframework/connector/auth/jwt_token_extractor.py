@@ -1,4 +1,6 @@
-import asyncio
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 import json
 from datetime import datetime, timedelta
 import requests
@@ -8,12 +10,18 @@ from .claims_identity import ClaimsIdentity
 from .verify_options import VerifyOptions
 from .endorsements_validator import EndorsementsValidator
 
+
 class JwtTokenExtractor:
     metadataCache = {}
 
-    def __init__(self, validationParams: VerifyOptions, metadata_url: str, allowedAlgorithms: list):
-        self.validation_parameters = validationParams
-        self.validation_parameters.algorithms = allowedAlgorithms
+    def __init__(
+        self,
+        validation_params: VerifyOptions,
+        metadata_url: str,
+        allowed_algorithms: list,
+    ):
+        self.validation_parameters = validation_params
+        self.validation_parameters.algorithms = allowed_algorithms
         self.open_id_metadata = JwtTokenExtractor.get_open_id_metadata(metadata_url)
 
     @staticmethod
@@ -24,7 +32,9 @@ class JwtTokenExtractor:
             JwtTokenExtractor.metadataCache.setdefault(metadata_url, metadata)
         return metadata
 
-    async def get_identity_from_auth_header(self, auth_header: str, channel_id: str) -> ClaimsIdentity:
+    async def get_identity_from_auth_header(
+        self, auth_header: str, channel_id: str
+    ) -> ClaimsIdentity:
         if not auth_header:
             return None
         parts = auth_header.split(" ")
@@ -32,7 +42,9 @@ class JwtTokenExtractor:
             return await self.get_identity(parts[0], parts[1], channel_id)
         return None
 
-    async def get_identity(self, schema: str, parameter: str, channel_id) -> ClaimsIdentity:
+    async def get_identity(
+        self, schema: str, parameter: str, channel_id
+    ) -> ClaimsIdentity:
         # No header in correct scheme or no token
         if schema != "Bearer" or not parameter:
             return None
@@ -43,8 +55,8 @@ class JwtTokenExtractor:
 
         try:
             return await self._validate_token(parameter, channel_id)
-        except:
-            raise
+        except Exception as error:
+            raise error
 
     def _has_allowed_issuer(self, jwt_token: str) -> bool:
         decoded = jwt.decode(jwt_token, verify=False)
@@ -63,18 +75,20 @@ class JwtTokenExtractor:
 
         if key_id and metadata.endorsements:
             if not EndorsementsValidator.validate(channel_id, metadata.endorsements):
-                raise Exception('Could not validate endorsement key')
+                raise Exception("Could not validate endorsement key")
 
         if headers.get("alg", None) not in self.validation_parameters.algorithms:
-            raise Exception('Token signing algorithm not in allowed list')
+            raise Exception("Token signing algorithm not in allowed list")
 
         options = {
-            'verify_aud': False,
-            'verify_exp': not self.validation_parameters.ignore_expiration}
+            "verify_aud": False,
+            "verify_exp": not self.validation_parameters.ignore_expiration,
+        }
         decoded_payload = jwt.decode(jwt_token, metadata.public_key, options=options)
         claims = ClaimsIdentity(decoded_payload, True)
 
         return claims
+
 
 class _OpenIdMetadata:
     def __init__(self, url):
@@ -104,6 +118,7 @@ class _OpenIdMetadata:
         public_key = RSAAlgorithm.from_jwk(json.dumps(key))
         endorsements = key.get("endorsements", [])
         return _OpenIdConfig(public_key, endorsements)
+
 
 class _OpenIdConfig:
     def __init__(self, public_key, endorsements):

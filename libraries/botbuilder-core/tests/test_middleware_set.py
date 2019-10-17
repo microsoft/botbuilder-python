@@ -1,21 +1,25 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from typing import Awaitable, Callable
 import aiounittest
 
-from botbuilder.core import AnonymousReceiveMiddleware, MiddlewareSet, Middleware
+from botbuilder.core import (
+    AnonymousReceiveMiddleware,
+    MiddlewareSet,
+    Middleware,
+    TurnContext,
+)
 
 
 class TestMiddlewareSet(aiounittest.AsyncTestCase):
-
-    
+    # pylint: disable=unused-argument
     async def test_no_middleware(self):
         middleware_set = MiddlewareSet()
 
         # This shouldn't explode.
         await middleware_set.receive_activity(None)
 
-    
     async def test_no_middleware_with_callback(self):
         callback_complete = False
 
@@ -28,69 +32,60 @@ class TestMiddlewareSet(aiounittest.AsyncTestCase):
         await middleware_set.receive_activity_with_status(None, runs_after_pipeline)
         assert callback_complete
 
-    
     async def test_middleware_set_receive_activity_internal(self):
-
-        class PrintMiddleware(object):
-            def __init__(self):
-                super(PrintMiddleware, self).__init__()
-
-            async def on_process_request(self, context_or_string, next_middleware):
-                print('PrintMiddleware says: %s.' % context_or_string)
+        class PrintMiddleware:
+            async def on_turn(self, context_or_string, next_middleware):
+                print("PrintMiddleware says: %s." % context_or_string)
                 return next_middleware
 
         class ModifyInputMiddleware(Middleware):
-            def __init__(self):
-                super(ModifyInputMiddleware, self).__init__()
-
-            async def on_process_request(self, context_or_string, next_middleware):
-                context_or_string = 'Hello'
-                print(context_or_string)
-                print('Here is the current context_or_string: %s' % context_or_string)
-                return next_middleware
+            async def on_turn(
+                self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]
+            ):
+                context = "Hello"
+                print(context)
+                print("Here is the current context_or_string: %s" % context)
+                return logic
 
         async def request_handler(context_or_string):
-            assert context_or_string == 'Hello'
+            assert context_or_string == "Hello"
 
         middleware_set = MiddlewareSet().use(PrintMiddleware())
         middleware_set.use(ModifyInputMiddleware())
 
-        await middleware_set.receive_activity_internal('Bye', request_handler)
+        await middleware_set.receive_activity_internal("Bye", request_handler)
 
-    
     async def test_middleware_run_in_order(self):
+
         called_first = False
         called_second = False
 
         class FirstMiddleware(Middleware):
-            async def on_process_request(self, context, logic):
+            async def on_turn(self, context, logic):
                 nonlocal called_first, called_second
                 assert called_second is False
                 called_first = True
                 return await logic()
 
         class SecondMiddleware(Middleware):
-            async def on_process_request(self, context, logic):
+            async def on_turn(self, context, logic):
                 nonlocal called_first, called_second
                 assert called_first
                 called_second = True
                 return await logic()
 
-        middleware_set = MiddlewareSet()\
-            .use(FirstMiddleware())\
-            .use(SecondMiddleware())
+        middleware_set = MiddlewareSet().use(FirstMiddleware()).use(SecondMiddleware())
 
         await middleware_set.receive_activity(None)
         assert called_first
         assert called_second
 
-    
     async def test_run_one_middleware(self):
         called_first = False
         finished_pipeline = False
 
         class FirstMiddleware(Middleware):
-            async def on_process_request(self, context, logic):
+            async def on_turn(self, context, logic):
                 nonlocal called_first
                 called_first = True
                 return await logic()
@@ -106,7 +101,6 @@ class TestMiddlewareSet(aiounittest.AsyncTestCase):
         assert called_first
         assert finished_pipeline
 
-    
     async def test_run_empty_pipeline(self):
         ran_empty_pipeline = False
         middleware_set = MiddlewareSet()
@@ -118,7 +112,6 @@ class TestMiddlewareSet(aiounittest.AsyncTestCase):
         await middleware_set.receive_activity_with_status(None, runs_after_pipeline)
         assert ran_empty_pipeline
 
-    
     async def test_two_middleware_one_does_not_call_next(self):
         called_first = False
         called_second = False
@@ -126,34 +119,32 @@ class TestMiddlewareSet(aiounittest.AsyncTestCase):
 
         class FirstMiddleware(Middleware):
             """First Middleware, does not call next."""
-            async def on_process_request(self, context, logic):
+
+            async def on_turn(self, context, logic):
                 nonlocal called_first, called_second
                 assert called_second is False
                 called_first = True
                 return
 
         class SecondMiddleware(Middleware):
-            async def on_process_request(self, context, logic):
+            async def on_turn(self, context, logic):
                 nonlocal called_all_middleware
                 called_all_middleware = True
                 return await logic()
 
-        middleware_set = MiddlewareSet()\
-            .use(FirstMiddleware())\
-            .use(SecondMiddleware())
+        middleware_set = MiddlewareSet().use(FirstMiddleware()).use(SecondMiddleware())
 
         await middleware_set.receive_activity(None)
         assert called_first
         assert not called_second
         assert not called_all_middleware
 
-    
     async def test_one_middleware_does_not_call_next(self):
         called_first = False
         finished_pipeline = False
 
         class FirstMiddleware(Middleware):
-            async def on_process_request(self, context, logic):
+            async def on_turn(self, context, logic):
                 nonlocal called_first
                 called_first = True
                 return
@@ -169,7 +160,6 @@ class TestMiddlewareSet(aiounittest.AsyncTestCase):
         assert called_first
         assert not finished_pipeline
 
-    
     async def test_anonymous_middleware(self):
         did_run = False
 
@@ -186,7 +176,6 @@ class TestMiddlewareSet(aiounittest.AsyncTestCase):
         await middleware_set.receive_activity(None)
         assert did_run
 
-    
     async def test_anonymous_two_middleware_and_in_order(self):
         called_first = False
         called_second = False
@@ -211,7 +200,6 @@ class TestMiddlewareSet(aiounittest.AsyncTestCase):
         assert called_first
         assert called_second
 
-    
     async def test_mixed_middleware_anonymous_first(self):
         called_regular_middleware = False
         called_anonymous_middleware = False
@@ -219,7 +207,7 @@ class TestMiddlewareSet(aiounittest.AsyncTestCase):
         middleware_set = MiddlewareSet()
 
         class MyFirstMiddleware(Middleware):
-            async def on_process_request(self, context, logic):
+            async def on_turn(self, context, logic):
                 nonlocal called_regular_middleware, called_anonymous_middleware
                 assert called_anonymous_middleware
                 called_regular_middleware = True
@@ -238,7 +226,6 @@ class TestMiddlewareSet(aiounittest.AsyncTestCase):
         assert called_regular_middleware
         assert called_anonymous_middleware
 
-    
     async def test_mixed_middleware_anonymous_last(self):
         called_regular_middleware = False
         called_anonymous_middleware = False
@@ -246,7 +233,7 @@ class TestMiddlewareSet(aiounittest.AsyncTestCase):
         middleware_set = MiddlewareSet()
 
         class MyFirstMiddleware(Middleware):
-            async def on_process_request(self, context, logic):
+            async def on_turn(self, context, logic):
                 nonlocal called_regular_middleware, called_anonymous_middleware
                 assert not called_anonymous_middleware
                 called_regular_middleware = True
@@ -272,7 +259,9 @@ class TestMiddlewareSet(aiounittest.AsyncTestCase):
             middleware_set.use(2)
         except TypeError:
             pass
-        except Exception as e:
-            raise e
+        except Exception as error:
+            raise error
         else:
-            raise AssertionError('MiddlewareSet.use(): should not have added an invalid middleware.')
+            raise AssertionError(
+                "MiddlewareSet.use(): should not have added an invalid middleware."
+            )

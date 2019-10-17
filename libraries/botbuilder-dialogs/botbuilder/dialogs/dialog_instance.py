@@ -10,51 +10,12 @@ class DialogInstance:
     """
 
     def __init__(self):
-        self._id: str = None
-        self._state: Dict[str, object] = {}
-
-    @property
-    def id(self) -> str:
-        """Gets the ID of the dialog this instance is for.
-
-        :param:
-        :return str:
-        """
-        return self._id
-
-    @id.setter
-    def id(self, value: str) -> None:
-        """Sets the ID of the dialog this instance is for.
-
-        :param:
-        :param value: ID of the dialog this instance is for.
-        :return:
-        """
-        self._id = value
-
-    @property
-    def state(self) -> Dict[str, object]:
-        """Gets the instance's persisted state.
-
-        :param:
-        :return Dict[str, object]:
-        """
-        return self._state
-
-    @state.setter
-    def state(self, value: Dict[str, object]) -> None:
-        """Sets the instance's persisted state.
-
-        :param:
-        :param value: The instance's persisted state.
-        :return:
-        """
-        
-        self._state = value
+        self.id: str = None  # pylint: disable=invalid-name
+        self.state: Dict[str, object] = {}
 
     def __str__(self):
         result = "\ndialog_instance_id: %s\n" % self.id
-        if not self._state is None:
-            for key, value in self._state.items():
+        if self.state is not None:
+            for key, value in self.state.items():
                 result += "   {} ({})\n".format(key, str(value))
         return result
