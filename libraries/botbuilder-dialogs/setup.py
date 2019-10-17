@@ -5,13 +5,11 @@ import os
 from setuptools import setup
 
 REQUIRES = [
-    "recognizers-text-date-time>=1.0.1a0",
-    "recognizers-text-number-with-unit>=1.0.1a0",
-    "recognizers-text-number>=1.0.1a0",
-    "recognizers-text>=1.0.1a0",
-    "recognizers-text-choice>=1.0.1a0",
-    "grapheme>=0.5.0",
-    "emoji>=0.5.2",
+    "recognizers-text-date-time>=1.0.2a0",
+    "recognizers-text-number-with-unit>=1.0.2a0",
+    "recognizers-text-number>=1.0.2a0",
+    "recognizers-text>=1.0.2a0",
+    "recognizers-text-choice>=1.0.2a0",
     "babel>=2.7.0",
     "botbuilder-schema>=4.4.0b1",
     "botframework-connector>=4.4.0b1",
