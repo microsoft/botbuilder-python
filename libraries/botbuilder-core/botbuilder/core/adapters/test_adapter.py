@@ -367,17 +367,20 @@ class TestFlow:
 
         return TestFlow(await new_previous(), self.adapter)
 
+
     async def assert_reply(
         self,
         expected: Union[str, Activity, Callable[[Activity, str], None]],
         description=None,
         timeout=None,  # pylint: disable=unused-argument
+        is_substring=False,
     ) -> "TestFlow":
         """
         Generates an assertion if the bots response doesn't match the expected text/activity.
         :param expected:
         :param description:
         :param timeout:
+        :param is_substring:
         :return:
         """
         # TODO: refactor method so expected can take a Callable[[Activity], None]
@@ -386,9 +389,14 @@ class TestFlow:
                 validate_activity(reply, expected)
             else:
                 assert reply.type == "message", description + f" type == {reply.type}"
-                assert reply.text.strip() == expected.strip(), (
-                    description + f" text == {reply.text}"
-                )
+                if is_substring:
+                    assert expected in reply.text.strip(), (
+                        description + f" text == {reply.text}"
+                    )
+                else:
+                    assert reply.text.strip() == expected.strip(), (
+                        description + f" text == {reply.text}"
+                    )
 
         if description is None:
             description = ""
