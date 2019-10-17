@@ -18,6 +18,7 @@ from .dialog import Dialog
 from .waterfall_dialog import WaterfallDialog
 from .waterfall_step_context import WaterfallStepContext
 from .prompts import *
+from .choices import *
 
 __all__ = [
     "ComponentDialog",
