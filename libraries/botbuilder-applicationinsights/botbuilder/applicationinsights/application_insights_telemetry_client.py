@@ -1,75 +1,43 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
-"""Application Insights Telemetry Processor for Bots."""
+"""Application Insights Telemetry Client for Bots."""
 
 import traceback
-from typing import Dict
+from typing import Dict, Callable
+
 from applicationinsights import TelemetryClient  # pylint: disable=no-name-in-module
 from botbuilder.core.bot_telemetry_client import (
     BotTelemetryClient,
     Severity,
     TelemetryDataPointType,
 )
-from .integration_post_data import IntegrationPostData
+
+from .bot_telemetry_processor import BotTelemetryProcessor
 
 
 def bot_telemetry_processor(data, context) -> bool:
-    """ Application Insights Telemetry Processor for Bot
-    Traditional Web user and session ID's don't apply for Bots.  This processor
-    replaces the identifiers to be consistent with Bot Framework's notion of
-    user and session id's.
-
-    Each event that gets logged (with this processor added) will contain additional
-    properties.
-
-    The following properties are replaced:
-     - context.user.id    - The user ID that Application Insights uses to identify
-                            a unique user.
-     - context.session.id - The session ID that APplication Insights uses to
-                            identify a unique session.
-
-     In addition, the additional data properties are added:
-     - activityId - The Bot Framework's Activity ID which represents a unique
-                    message identifier.
-     - channelId - The Bot Framework "Channel" (ie, slack/facebook/directline/etc)
-     - activityType - The Bot Framework message classification (ie, message)
+    """Bot Telemetry Processor as a method for backward compatibility. Refer to
+    callable object :class:`BotTelemetryProcessor` for details.
 
     :param data: Data from Application Insights
     :type data: telemetry item
     :param context: Context from Application Insights
     :type context: context object
-    :returns:  bool -- determines if the event is passed to the server (False = Filtered).
+    :return: determines if the event is passed to the server (False = Filtered).
+    :rtype: bool
     """
-    post_data = IntegrationPostData().activity_json
-    if post_data is None:
-        # If there is no body (not a BOT request or not configured correctly).
-        # We *could* filter here, but we're allowing event to go through.
-        return True
-
-    # Override session and user id
-    from_prop = post_data["from"] if "from" in post_data else None
-    user_id = from_prop["id"] if from_prop is not None else None
-    channel_id = post_data["channelId"] if "channelId" in post_data else None
-    conversation = post_data["conversation"] if "conversation" in post_data else None
-    conversation_id = conversation["id"] if "id" in conversation else None
-    context.user.id = channel_id + user_id
-    context.session.id = conversation_id
-
-    # Additional bot-specific properties
-    if "id" in post_data:
-        data.properties["activityId"] = post_data["id"]
-    if "channelId" in post_data:
-        data.properties["channelId"] = post_data["channelId"]
-    if "type" in post_data:
-        data.properties["activityType"] = post_data["type"]
-    return True
+    processor = BotTelemetryProcessor()
+    return processor(data, context)
 
 
 class ApplicationInsightsTelemetryClient(BotTelemetryClient):
     """Application Insights Telemetry Client."""
 
     def __init__(
-        self, instrumentation_key: str, telemetry_client: TelemetryClient = None
+        self,
+        instrumentation_key: str,
+        telemetry_client: TelemetryClient = None,
+        telemetry_processor: Callable[[object, object], bool] = None,
     ):
         self._instrumentation_key = instrumentation_key
         self._client = (
@@ -78,7 +46,12 @@ class ApplicationInsightsTelemetryClient(BotTelemetryClient):
             else TelemetryClient(self._instrumentation_key)
         )
         # Telemetry Processor
-        self._client.add_telemetry_processor(bot_telemetry_processor)
+        processor = (
+            telemetry_processor
+            if telemetry_processor is not None
+            else bot_telemetry_processor
+        )
+        self._client.add_telemetry_processor(processor)
 
     def track_pageview(
         self,

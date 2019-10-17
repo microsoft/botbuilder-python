@@ -9,12 +9,13 @@ from .turn_context import TurnContext
 class StatePropertyAccessor(ABC):
     @abstractmethod
     async def get(
-        self, turn_context: TurnContext, default_value_factory=None
+        self, turn_context: TurnContext, default_value_or_factory=None
     ) -> object:
         """
         Get the property value from the source
         :param turn_context: Turn Context.
-        :param default_value_factory: Function which defines the property value to be returned if no value has been set.
+        :param default_value_or_factory: Function which defines the property
+        value to be returned if no value has been set.
 
         :return:
         """

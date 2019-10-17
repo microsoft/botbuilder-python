@@ -6,7 +6,7 @@ from typing import List
 import aiounittest
 from recognizers_text import Culture
 
-from botbuilder.core import ConversationState, MemoryStorage, TurnContext
+from botbuilder.core import CardFactory, ConversationState, MemoryStorage, TurnContext
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.dialogs import DialogSet, DialogTurnResult, DialogTurnStatus
 from botbuilder.dialogs.choices import Choice, ListStyle
@@ -588,3 +588,108 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
         )
         step3 = await step2.send("1")
         await step3.assert_reply("red")
+
+    async def test_should_display_choices_on_hero_card(self):
+        size_choices = ["large", "medium", "small"]
+
+        async def exec_test(turn_context: TurnContext):
+            dialog_context = await dialogs.create_context(turn_context)
+
+            results: DialogTurnResult = await dialog_context.continue_dialog()
+
+            if results.status == DialogTurnStatus.Empty:
+                options = PromptOptions(
+                    prompt=Activity(
+                        type=ActivityTypes.message, text="Please choose a size."
+                    ),
+                    choices=size_choices,
+                )
+                await dialog_context.prompt("prompt", options)
+            elif results.status == DialogTurnStatus.Complete:
+                selected_choice = results.result
+                await turn_context.send_activity(selected_choice.value)
+
+            await convo_state.save_changes(turn_context)
+
+        def assert_expected_activity(
+            activity: Activity, description
+        ):  # pylint: disable=unused-argument
+            assert len(activity.attachments) == 1
+            assert (
+                activity.attachments[0].content_type
+                == CardFactory.content_types.hero_card
+            )
+            assert activity.attachments[0].content.text == "Please choose a size."
+
+        adapter = TestAdapter(exec_test)
+
+        convo_state = ConversationState(MemoryStorage())
+        dialog_state = convo_state.create_property("dialogState")
+        dialogs = DialogSet(dialog_state)
+
+        choice_prompt = ChoicePrompt("prompt")
+
+        # Change the ListStyle of the prompt to ListStyle.none.
+        choice_prompt.style = ListStyle.hero_card
+
+        dialogs.add(choice_prompt)
+
+        step1 = await adapter.send("Hello")
+        step2 = await step1.assert_reply(assert_expected_activity)
+        step3 = await step2.send("1")
+        await step3.assert_reply(size_choices[0])
+
+    async def test_should_display_choices_on_hero_card_with_additional_attachment(self):
+        size_choices = ["large", "medium", "small"]
+        card = CardFactory.adaptive_card(
+            {
+                "type": "AdaptiveCard",
+                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                "version": "1.2",
+                "body": [],
+            }
+        )
+        card_activity = Activity(attachments=[card])
+
+        async def exec_test(turn_context: TurnContext):
+            dialog_context = await dialogs.create_context(turn_context)
+
+            results: DialogTurnResult = await dialog_context.continue_dialog()
+
+            if results.status == DialogTurnStatus.Empty:
+                options = PromptOptions(prompt=card_activity, choices=size_choices)
+                await dialog_context.prompt("prompt", options)
+            elif results.status == DialogTurnStatus.Complete:
+                selected_choice = results.result
+                await turn_context.send_activity(selected_choice.value)
+
+            await convo_state.save_changes(turn_context)
+
+        def assert_expected_activity(
+            activity: Activity, description
+        ):  # pylint: disable=unused-argument
+            assert len(activity.attachments) == 2
+            assert (
+                activity.attachments[0].content_type
+                == CardFactory.content_types.adaptive_card
+            )
+            assert (
+                activity.attachments[1].content_type
+                == CardFactory.content_types.hero_card
+            )
+
+        adapter = TestAdapter(exec_test)
+
+        convo_state = ConversationState(MemoryStorage())
+        dialog_state = convo_state.create_property("dialogState")
+        dialogs = DialogSet(dialog_state)
+
+        choice_prompt = ChoicePrompt("prompt")
+
+        # Change the ListStyle of the prompt to ListStyle.none.
+        choice_prompt.style = ListStyle.hero_card
+
+        dialogs.add(choice_prompt)
+
+        step1 = await adapter.send("Hello")
+        await step1.assert_reply(assert_expected_activity)

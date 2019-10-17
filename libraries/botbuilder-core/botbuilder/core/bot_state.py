@@ -2,7 +2,8 @@
 # Licensed under the MIT License.
 
 from abc import abstractmethod
-from typing import Callable, Dict
+from copy import deepcopy
+from typing import Callable, Dict, Union
 from botbuilder.core.state_property_accessor import StatePropertyAccessor
 from .turn_context import TurnContext
 from .storage import Storage
@@ -41,9 +42,7 @@ class BotState(PropertyManager):
         :return: If successful, the state property accessor created.
         """
         if not name:
-            raise TypeError(
-                "BotState.create_property(): BotState cannot be None or empty."
-            )
+            raise TypeError("BotState.create_property(): name cannot be None or empty.")
         return BotStatePropertyAccessor(self, name)
 
     def get(self, turn_context: TurnContext) -> Dict[str, object]:
@@ -186,7 +185,9 @@ class BotStatePropertyAccessor(StatePropertyAccessor):
         await self._bot_state.delete_property_value(turn_context, self._name)
 
     async def get(
-        self, turn_context: TurnContext, default_value_factory: Callable = None
+        self,
+        turn_context: TurnContext,
+        default_value_or_factory: Union[Callable, object] = None,
     ) -> object:
         await self._bot_state.load(turn_context, False)
         try:
@@ -194,9 +195,13 @@ class BotStatePropertyAccessor(StatePropertyAccessor):
             return result
         except:
             # ask for default value from factory
-            if not default_value_factory:
+            if not default_value_or_factory:
                 return None
-            result = default_value_factory()
+            result = (
+                default_value_or_factory()
+                if callable(default_value_or_factory)
+                else deepcopy(default_value_or_factory)
+            )
             # save default value for any further calls
             await self.set(turn_context, result)
             return result

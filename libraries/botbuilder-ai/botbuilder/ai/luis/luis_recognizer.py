@@ -8,7 +8,13 @@ from azure.cognitiveservices.language.luis.runtime import LUISRuntimeClient
 from azure.cognitiveservices.language.luis.runtime.models import LuisResult
 from msrest.authentication import CognitiveServicesCredentials
 
-from botbuilder.core import BotAssert, IntentScore, RecognizerResult, TurnContext
+from botbuilder.core import (
+    BotAssert,
+    IntentScore,
+    Recognizer,
+    RecognizerResult,
+    TurnContext,
+)
 from botbuilder.schema import ActivityTypes
 
 from . import LuisApplication, LuisPredictionOptions, LuisTelemetryConstants
@@ -16,7 +22,7 @@ from .activity_util import ActivityUtil
 from .luis_util import LuisUtil
 
 
-class LuisRecognizer:
+class LuisRecognizer(Recognizer):
     """
     A LUIS based implementation of <see cref="IRecognizer"/>.
     """
@@ -95,7 +101,7 @@ class LuisRecognizer:
 
         return top_intent or default_intent
 
-    async def recognize(
+    async def recognize(  # pylint: disable=arguments-differ
         self,
         turn_context: TurnContext,
         telemetry_properties: Dict[str, str] = None,
