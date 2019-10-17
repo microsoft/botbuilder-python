@@ -43,7 +43,7 @@ class BotState(PropertyManager):
         """
         if not name:
             raise TypeError(
-                "BotState.create_property(): BotState cannot be None or empty."
+                "BotState.create_property(): name cannot be None or empty."
             )
         return BotStatePropertyAccessor(self, name)
 
