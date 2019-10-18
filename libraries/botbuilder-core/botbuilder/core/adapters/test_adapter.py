@@ -367,7 +367,6 @@ class TestFlow:
 
         return TestFlow(await new_previous(), self.adapter)
 
-
     async def assert_reply(
         self,
         expected: Union[str, Activity, Callable[[Activity, str], None]],
