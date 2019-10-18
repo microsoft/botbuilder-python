@@ -20,6 +20,7 @@ class DialogSet:
                 except KeyError:
                     raise TypeError("DialogSet(): dialog_state cannot be None.")
                 # Only ComponentDialog can initialize with None dialog_state
+                # pylint: disable=import-outside-toplevel
                 from .component_dialog import ComponentDialog
 
                 if not isinstance(self_obj, ComponentDialog):

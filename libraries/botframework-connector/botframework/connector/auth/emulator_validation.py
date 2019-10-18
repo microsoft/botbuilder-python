@@ -108,6 +108,7 @@ class EmulatorValidation:
         :return: A valid ClaimsIdentity.
         :raises Exception:
         """
+        # pylint: disable=import-outside-toplevel
         from .jwt_token_validation import JwtTokenValidation
 
         open_id_metadata = (
