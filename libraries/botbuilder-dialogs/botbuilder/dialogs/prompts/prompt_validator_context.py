@@ -36,6 +36,7 @@ class PromptValidatorContext:
         """
         Gets the number of times the prompt has been executed.
         """
+        # pylint: disable=import-outside-toplevel
         from botbuilder.dialogs.prompts import Prompt
 
         return self.state.get(Prompt.ATTEMPT_COUNT_KEY, 0)
