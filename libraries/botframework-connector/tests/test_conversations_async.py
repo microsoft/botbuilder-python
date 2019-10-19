@@ -31,6 +31,7 @@ CONVERSATION_ID = "B21UTEF8S:T03CWQ0QB:D2369CT7C"
 
 async def get_auth_token():
     try:
+        # pylint: disable=import-outside-toplevel
         from .app_creds_real import MICROSOFT_APP_PASSWORD, MICROSOFT_APP_ID
 
         # # Define a "app_creds_real.py" file with your bot credentials as follows:
