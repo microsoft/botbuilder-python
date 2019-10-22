@@ -1,5 +1,4 @@
 {
-    "project_name": "echo-bot",
-    "bot_name": "Echo Bot",
-    "bot_description": "This project shows a simple echo bot and demonstrates basic Bot Framework functionality."
+    "bot_name": "my-chat-bot",
+    "bot_description": "Demonstrate the core capabilities of the Microsoft Bot Framework"
 }
