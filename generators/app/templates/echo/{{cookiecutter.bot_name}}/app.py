@@ -49,12 +49,6 @@ async def on_error(self, context: TurnContext, error: Exception):
         # Send a trace activity, which will be displayed in Bot Framework Emulator
         await context.send_activity(trace_activity)
 
-    # pylint: disable=protected-access
-    if hasattr(self, "_conversation_state"):
-        # If state was defined, cleare it.
-        await self._conversation_state.delete(context)
-
-
 ADAPTER.on_turn_error = MethodType(on_error, ADAPTER)
 
 # Create the main dialog

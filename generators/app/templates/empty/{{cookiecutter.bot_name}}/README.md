@@ -8,7 +8,7 @@ This bot has been created using [Bot Framework](https://dev.botframework.com), i
 
 This sample **requires** prerequisites in order to run.
 
-### Install Python 3.7
+### Install Python 3.6
 
 ## Running the sample
 - Run `pip install -r requirements.txt` to install all dependencies

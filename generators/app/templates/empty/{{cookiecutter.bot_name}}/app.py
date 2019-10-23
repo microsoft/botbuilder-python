@@ -35,12 +35,6 @@ async def on_error(self, context: TurnContext, error: Exception):
     await context.send_activity("The bot encounted an error or bug.")
     await context.send_activity("To continue to run this bot, please fix the bot source code.")
 
-    # pylint: disable=protected-access
-    if hasattr(self, "_conversation_state"):
-        # If state was defined, cleare it.
-        await self._conversation_state.delete(context)
-
-
 ADAPTER.on_turn_error = MethodType(on_error, ADAPTER)
 
 # Create the main dialog
