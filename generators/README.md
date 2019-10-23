@@ -51,7 +51,7 @@ The Empty Bot template is the minimal skeleton code for a bot.  It provides a st
 
 ## Features by Template
 
-|  Feature  |  Empty&nbsp;Bot*  |  Echo&nbsp;Bot   |  Core&nbsp;Bot*  |
+|  Feature  |  Empty&nbsp;Bot  |  Echo&nbsp;Bot   |  Core&nbsp;Bot*  |
 | --------- | :-----: | :-----: | :-----: |
 | Generate code in Python | X | X | X |
 | Support local development and testing using the [Bot Framework Emulator v4](https://www.github.com/microsoft/botframework-emulator) | X | X | X |
@@ -64,7 +64,7 @@ The Empty Bot template is the minimal skeleton code for a bot.  It provides a st
 | Handle user interruptions |  |  | X |
 | Unit test a bot using Bot Framework Testing framework (optional) |  |  | X |
 
-*Empty Bot and Core Bot templates are work in progress landing soon. 
+*Core Bot template is a work in progress landing soon. 
 ## Installation
 
 1. Install [cookiecutter](https://github.com/cookiecutter/cookiecutter) using [pip](https://pip.pypa.io/en/stable/) (we assume you have pre-installed [python 3](https://www.python.org/downloads/)).
@@ -99,7 +99,7 @@ To create a Core Bot project:
 To create an Empty Bot project:
 
 ```bash
-# Work in progress
+cookiecutter https://github.com/microsoft/botbuilder-python/releases/download/Templates/empty.zip
 ```
 
 When the generator is launched, it will prompt for the information required to create a new bot.
