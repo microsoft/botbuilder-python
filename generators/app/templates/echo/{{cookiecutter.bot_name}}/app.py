@@ -15,7 +15,7 @@ from botbuilder.core import (
 from botbuilder.schema import Activity, InputHints
 from bot import MyBot
 
-#Create the loop and Flask app
+# Create the loop and Flask app
 LOOP = asyncio.get_event_loop()
 APP = Flask(__name__, instance_relative_config=True)
 APP.config.from_object("config.DefaultConfig")
@@ -43,6 +43,7 @@ async def on_error(self, context: TurnContext, error: Exception):
     if self._conversation_state:
         # If state was defined, cleare it.
         await self._conversation_state.delete(context)
+
 
 ADAPTER.on_turn_error = MethodType(on_error, ADAPTER)
 
