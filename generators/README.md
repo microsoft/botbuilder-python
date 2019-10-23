@@ -37,8 +37,8 @@ The Core Bot template consists of set of core features most every bot is likely 
 
 | Core&nbsp;Bot&nbsp;Features | Description |
 | ------------------ | ----------- |
-| [Send and receive messages](https://docs.microsoft.com/azure/bot-service/bot-builder-howto-send-messages?view=azure-bot-service-4.0&tabs=javascript) | The primary way your bot will communicate with users, and likewise receive communication, is through message activities. Some messages may simply consist of plain text, while others may contain richer content such as cards or attachments. |
-| [Proactive messaging](https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-howto-proactive-message?view=azure-bot-service-4.0) using [Adaptive Cards](https://docs.microsoft.com/azure/bot-service/bot-builder-send-welcome-message?view=azure-bot-service-4.0?#using-adaptive-card-greeting) | The primary goal when creating any bot is to engage your user in a meaningful conversation. One of the best ways to achieve this goal is to ensure that from the moment a user first connects to your bot, they understand your bot’s main purpose and capabilities.  We refer to this as "welcoming the user."  The Core template uses an [Adaptive Card](http://adaptivecards.io) to implement this behavior.  |
+| [Send and receive messages](https://docs.microsoft.com/azure/bot-service/bot-builder-howto-send-messages?view=azure-bot-service-4.0) | The primary way your bot will communicate with users, and likewise receive communication, is through message activities. Some messages may simply consist of plain text, while others may contain richer content such as cards or attachments. |
+| [Proactive messaging](https://docs.microsoft.com/azure/bot-service/bot-builder-howto-proactive-message?view=azure-bot-service-4.0) using [Adaptive Cards](https://docs.microsoft.com/azure/bot-service/bot-builder-send-welcome-message?view=azure-bot-service-4.0?#using-adaptive-card-greeting) | The primary goal when creating any bot is to engage your user in a meaningful conversation. One of the best ways to achieve this goal is to ensure that from the moment a user first connects to your bot, they understand your bot’s main purpose and capabilities.  We refer to this as "welcoming the user."  The Core template uses an [Adaptive Card](http://adaptivecards.io) to implement this behavior.  |
 | [Language understanding using LUIS](https://docs.microsoft.com/azure/bot-service/bot-builder-howto-v4-luis?view=azure-bot-service-4.0) | The ability to understand what your user means conversationally and contextually can be a difficult task, but can provide your bot a more natural conversation feel. Language Understanding, called LUIS, enables you to do just that so that your bot can recognize the intent of user messages, allow for more natural language from your user, and better direct the conversation flow. |
 | [Multi-turn conversation support using Dialogs](https://docs.microsoft.com/azure/bot-service/bot-builder-concept-dialog?view=azure-bot-service-4.0) | The ability to manage conversations is an important part of the bot/user interation.  Bot Framework introduces the  concept of a Dialog to handle this conversational pattern.  Dialog objects process inbound Activities and generate outbound responses. The business logic of the bot runs either directly or indirectly within Dialog classes.  |
 | [Managing conversation state](https://docs.microsoft.com/azure/bot-service/bot-builder-howto-v4-state?view=azure-bot-service-4.0) | A key to good bot design is to track the context of a conversation, so that your bot remembers things like the answers to previous questions. |
@@ -51,7 +51,7 @@ The Empty Bot template is the minimal skeleton code for a bot.  It provides a st
 
 ## Features by Template
 
-|  Feature  |  Empty&nbsp;Bot*  |  Echo&nbsp;Bot   |  Core&nbsp;Bot*  |
+|  Feature  |  Empty&nbsp;Bot  |  Echo&nbsp;Bot   |  Core&nbsp;Bot*  |
 | --------- | :-----: | :-----: | :-----: |
 | Generate code in Python | X | X | X |
 | Support local development and testing using the [Bot Framework Emulator v4](https://www.github.com/microsoft/botframework-emulator) | X | X | X |
@@ -64,7 +64,7 @@ The Empty Bot template is the minimal skeleton code for a bot.  It provides a st
 | Handle user interruptions |  |  | X |
 | Unit test a bot using Bot Framework Testing framework (optional) |  |  | X |
 
-*Empty Bot and Core Bot templates are work in progress landing soon. 
+*Core Bot template is a work in progress landing soon. 
 ## Installation
 
 1. Install [cookiecutter](https://github.com/cookiecutter/cookiecutter) using [pip](https://pip.pypa.io/en/stable/) (we assume you have pre-installed [python 3](https://www.python.org/downloads/)).
@@ -99,7 +99,7 @@ To create a Core Bot project:
 To create an Empty Bot project:
 
 ```bash
-# Work in progress
+cookiecutter https://github.com/microsoft/botbuilder-python/releases/download/Templates/empty.zip
 ```
 
 When the generator is launched, it will prompt for the information required to create a new bot.
