@@ -3,8 +3,15 @@
 
 import re
 from copy import copy
+from datetime import datetime
 from typing import List, Callable, Union, Dict
-from botbuilder.schema import Activity, ConversationReference, Mention, ResourceResponse
+from botbuilder.schema import (
+    Activity,
+    ActivityTypes,
+    ConversationReference,
+    Mention,
+    ResourceResponse,
+)
 
 
 class TurnContext:
@@ -244,6 +251,20 @@ class TurnContext:
         await emit_next(0)
         # logic does not use parentheses because it's a coroutine
         return await logic
+
+    async def send_trace_activity(
+        self, name: str, value: object, value_type: str, label: str
+    ) -> ResourceResponse:
+        trace_activity = Activity(
+            type=ActivityTypes.trace,
+            timestamp=datetime.utcnow(),
+            name=name,
+            value=value,
+            value_type=value_type,
+            label=label,
+        )
+
+        return await self.send_activity(trace_activity)
 
     @staticmethod
     def get_conversation_reference(activity: Activity) -> ConversationReference:
