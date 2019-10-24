@@ -8,7 +8,7 @@ trigger:
 variables:
   # Container registry service connection established during pipeline creation
   imageName: 'functionaltestpy'
-  dockerRegistryServiceConnection: 'E2E Functional Docker Registry'
+  dockerRegistryServiceConnection: 'NightlyE2E-Acr'
   dockerFilePath: 'libraries/functional-tests/functionaltestbot/Dockerfile'
   tag: 'python'
 
@@ -34,6 +34,6 @@ jobs:
 - job: provisionContainer
   container:
     image: nightlye2etest.azurecr.io/functionaltestpy:latest
-    endpoint: AzureCR
+    endpoint: NightlyE2E-Acr
   steps:
   - script: echo hello
