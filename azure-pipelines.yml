@@ -7,7 +7,7 @@ trigger:
 
 variables:
   imageName: 'functionaltestpy'
-  dockerRegistryServiceConnection: 'E2E Functional Docker Registry'
+  dockerRegistryServiceConnection: 'nightlye2etest.azurecr.io'
   dockerFilePath: 'libraries/functional-tests/functionaltestbot/Dockerfile'
   tag: 'python'
 
