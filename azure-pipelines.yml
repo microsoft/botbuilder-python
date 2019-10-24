@@ -32,8 +32,8 @@ jobs:
 
 - job: provisionContainer
   displayName: Provision bot container
-  dependsOn:
-  - buildPush
+  # dependsOn:
+  # - buildPush
   container:
     image: NightlyE2eTest/functionaltestpy:latest
     endpoint: NightlyE2E-Acr
