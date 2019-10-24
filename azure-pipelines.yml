@@ -14,28 +14,28 @@ variables:
 
 jobs:
 # Build and publish container
-- job: buildPush
-  pool:
-    vmImage: 'Ubuntu-16.04'
-  displayName: Build and push bot image
-  continueOnError: false
+# - job: buildPush
+#   pool:
+#     vmImage: 'Ubuntu-16.04'
+#   displayName: Build and push bot image
+#   continueOnError: false
 
-  steps:
-  - task: Docker@2
-    displayName: Build and push bot image
-    inputs:
-      command: buildAndPush
-      repository: $(imageName)
-      dockerfile: $(dockerFilePath)
-      containerRegistry: $(dockerRegistryServiceConnection)
-      tags: $(tag)
+#   steps:
+#   - task: Docker@2
+#     displayName: Build and push bot image
+#     inputs:
+#       command: buildAndPush
+#       repository: $(imageName)
+#       dockerfile: $(dockerFilePath)
+#       containerRegistry: $(dockerRegistryServiceConnection)
+#       tags: $(tag)
 
 - job: provisionContainer
   displayName: Provision bot container
   dependsOn:
   - buildPush
   container:
-    image: nightlye2etest.azurecr.io/functionaltestpy
+    image: functionaltestpy:latest
     endpoint: NightlyE2E-Acr
   steps:
   - script: flask run --port 3978 --host 0.0.0.0
