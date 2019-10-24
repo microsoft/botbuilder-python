@@ -21,7 +21,6 @@ jobs:
   continueOnError: false
 
   steps:
-  - script: echo Building..
   - task: Docker@2
     displayName: Build and push bot image
     inputs:
@@ -34,6 +33,6 @@ jobs:
 - job: provisionContainer
   container:
     image: nightlye2etest.azurecr.io/functionaltestpy:latest
-    endpoint: NightlyE2E-Acr
+    endpoint: $(dockerRegistryServiceConnection)
   steps:
-  - script: echo hello
+  - script: flask run --port 3978 --host 0.0.0.0
