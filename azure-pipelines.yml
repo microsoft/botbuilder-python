@@ -1,16 +1,22 @@
 trigger:
-- master
+  daveta-python-functional
 
 pool:
   vmImage: 'Ubuntu-16.04'
 
 variables:
-  imageName: 'pipelines-javascript-docker'
+  imageName: 'functionaltestpy'
+  dockerRegistryServiceConnection: 'E2E Functional Docker Registry'
+  dockerFilePath: 'libraries/functional-tests/functionaltestbot/Dockerfile'
+  tag: 'python'
 
 steps:
 - task: Docker@2
-  displayName: Build an image
+  displayName: Build and push bot image
   inputs:
+    command: buildAndPush
     repository: $(imageName)
-    command: build
-    Dockerfile: app/Dockerfile
+    dockerfile: $(dockerFilePath)
+    containerRegistry: $(dockerRegistryServiceConnection)
+    tags: |
+      $(tag)
