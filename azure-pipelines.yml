@@ -33,7 +33,7 @@ jobs:
 
 - job: provisionContainer
   container:
-    image: $(imageName)
-    endpoint: $(dockerRegistryServiceConnection)
+    image: nightlye2etest.azurecr.io/functionaltestpy:latest
+    endpoint: AzureCR
   steps:
   - script: echo hello
