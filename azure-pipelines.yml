@@ -1,22 +1,33 @@
 trigger:
-  daveta-python-functional
-
+- daveta-python-functional
 pool:
-  vmImage: 'Ubuntu-16.04'
-
+  vmImage: 'Ubuntu-16.04'
 variables:
-  imageName: 'functionaltestpy'
-  dockerRegistryServiceConnection: 'E2E Functional Docker Registry'
-  dockerFilePath: 'libraries/functional-tests/functionaltestbot/Dockerfile'
-  tag: 'python'
-
-steps:
-- task: Docker@2
-  displayName: Build and push bot image
-  inputs:
-    command: buildAndPush
-    repository: $(imageName)
-    dockerfile: $(dockerFilePath)
-    containerRegistry: $(dockerRegistryServiceConnection)
-    tags: |
-      $(tag)
+  imageName: 'functionaltestpy'
+  dockerRegistryServiceConnection: 'E2E Functional Docker Registry'
+  dockerFilePath: 'libraries/functional-tests/functionaltestbot/Dockerfile'
+  tag: 'python'
+jobs:
+# Build the container
+- job: buildPush
+  displayName: Build and push bot image
+  continueOnError: false
+  workspace:
+    clean: outputs
+  steps:
+  - script: echo Building..
+  - task: Docker@2
+    displayName: Build and push bot image
+    inputs:
+      command: buildAndPush
+      repository: $(imageName)
+      dockerfile: $(dockerFilePath)
+      containerRegistry: $(dockerRegistryServiceConnection)
+      tags: |
+        $(tag)
+# Run the container
+- job: provisionContainer
+  image: $(imageName)
+  endpoint: $(dockerRegistryServiceConnection)
+  steps:
+  - script: echo hello
