@@ -5,12 +5,12 @@ pool:
   vmImage: 'Ubuntu-16.04'
 
 variables:
-  imageName: 'pipelines-javascript-docker'
+  imageName: 'functionaltestpy'
 
 steps:
 - task: Docker@2
-  displayName: Build an image
+  displayName: Build an bot image
   inputs:
     repository: $(imageName)
     command: build
-    Dockerfile: app/Dockerfile
+    Dockerfile: libraries/functional-tests/functionaltestbot/Dockerfile
