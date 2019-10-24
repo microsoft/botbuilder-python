@@ -6,8 +6,9 @@ trigger:
     - master
 
 variables:
+  # Container registry service connection established during pipeline creation
   imageName: 'functionaltestpy'
-  dockerRegistryServiceConnection: 'nightlye2etest.azurecr.io'
+  dockerRegistryServiceConnection: 'E2E Functional Docker Registry'
   dockerFilePath: 'libraries/functional-tests/functionaltestbot/Dockerfile'
   tag: 'python'
 
@@ -18,6 +19,7 @@ jobs:
     vmImage: 'Ubuntu-16.04'
   displayName: Build and push bot image
   continueOnError: false
+
   steps:
   - script: echo Building..
   - task: Docker@2
@@ -28,9 +30,10 @@ jobs:
       dockerfile: $(dockerFilePath)
       containerRegistry: $(dockerRegistryServiceConnection)
       tags: $(tag)
+
 - job: provisionContainer
   container:
     image: $(imageName)
-    endpoint: $(dockerRegistryServiceConnection)
+    endpoint: 'nightlye2etest.azurecr.io'
   steps:
   - script: echo hello
