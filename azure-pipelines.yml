@@ -6,36 +6,31 @@ trigger:
     - master
 
 variables:
-  - name: imageName
-    value: 'functionaltestpy'
-  - name: dockerRegistryServiceConnection3
-    value: 'E2E Functional Docker Registry'
-  - name: dockerFilePath
-    value: 'libraries/functional-tests/functionaltestbot/Dockerfile'
-  - name: tag
-    value: 'python'
+  imageName: 'functionaltestpy'
+  dockerRegistryServiceConnection: 'E2E Functional Docker Registry'
+  dockerFilePath: 'libraries/functional-tests/functionaltestbot/Dockerfile'
+  tag: 'python'
 
 jobs:
-  # Build and publish container
-  - job: buildPush
-    pool: 
-      vmImage: 'Ubuntu-16.04'
-    displayName: Build and push bot image
-    continueOnError: false
-    steps:
-    - script: echo Building..
-    - task: Docker@2
-      displayName: Build and push bot image
-      inputs:
-        command: buildAndPush
-        repository: $(imageName)
-        dockerfile: $(dockerFilePath)
-        containerRegistry: $(dockerRegistryServiceConnection)
-        tags: |
-          $(tag)
-  # Provision container
-  - job: provisionContainer
-    image: $(imageName)
-    endpoint: $(dockerRegistryServiceConnection)
-    steps:
-    - script: echo hello
+# Build and publish container
+- job: buildPush
+  pool:
+    vmImage: 'Ubuntu-16.04'
+  displayName: Build and push bot image
+  continueOnError: false
+  steps:
+  - script: echo Building..
+  - task: Docker@2
+    displayName: Build and push bot image
+    inputs:
+      command: buildAndPush
+      repository: $(imageName)
+      dockerfile: $(dockerFilePath)
+      containerRegistry: $(dockerRegistryServiceConnection)
+      tags: $(tag)
+- job: provisionContainer
+  container:
+    image: $(imageName)
+    endpoint: $(dockerRegistryServiceConnection)
+  steps:
+  - script: echo hello
