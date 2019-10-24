@@ -1,5 +1,5 @@
 trigger:
-- master
+- daveta-python-functional
 
 pool:
   vmImage: 'Ubuntu-16.04'
