@@ -10,7 +10,7 @@ from botbuilder.schema import (
     Mention,
     ResourceResponse,
 )
-from botbuilder.core import BotAdapter, TurnContext
+from botbuilder.core import BotAdapter, MessageFactory, TurnContext
 
 ACTIVITY = Activity(
     id="1234",
@@ -40,11 +40,12 @@ class SimpleAdapter(BotAdapter):
     async def update_activity(self, context, activity):
         assert context is not None
         assert activity is not None
+        return ResourceResponse(id=activity.id)
 
     async def delete_activity(self, context, reference):
         assert context is not None
         assert reference is not None
-        assert reference.activity_id == "1234"
+        assert reference.activity_id == ACTIVITY.id
 
 
 class TestBotContext(aiounittest.AsyncTestCase):
@@ -224,6 +225,26 @@ class TestBotContext(aiounittest.AsyncTestCase):
         context.on_update_activity(update_handler)
         await context.update_activity(ACTIVITY)
         assert called is True
+
+    async def test_update_activity_should_apply_conversation_reference(self):
+        activity_id = "activity ID"
+        context = TurnContext(SimpleAdapter(), ACTIVITY)
+        called = False
+
+        async def update_handler(context, activity, next_handler_coroutine):
+            nonlocal called
+            called = True
+            assert context is not None
+            assert activity.id == activity_id
+            assert activity.conversation.id == ACTIVITY.conversation.id
+            await next_handler_coroutine()
+
+        context.on_update_activity(update_handler)
+        new_activity = MessageFactory.text("test text")
+        new_activity.id = activity_id
+        update_result = await context.update_activity(new_activity)
+        assert called is True
+        assert update_result.id == activity_id
 
     def test_get_conversation_reference_should_return_valid_reference(self):
         reference = TurnContext.get_conversation_reference(ACTIVITY)

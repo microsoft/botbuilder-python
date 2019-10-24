@@ -173,9 +173,11 @@ class TurnContext:
         :param activity:
         :return:
         """
+        reference = TurnContext.get_conversation_reference(self.activity)
+
         return await self._emit(
             self._on_update_activity,
-            activity,
+            TurnContext.apply_conversation_reference(activity, reference),
             self.adapter.update_activity(self, activity),
         )
 
@@ -240,7 +242,7 @@ class TurnContext:
                 raise error
 
         await emit_next(0)
-        # This should be changed to `return await logic()`
+        # logic does not use parentheses because it's a coroutine
         return await logic
 
     @staticmethod
