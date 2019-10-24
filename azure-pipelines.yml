@@ -15,21 +15,21 @@ jobs:
 - job: buildPush
   pool: 
     vmImage: 'Ubuntu-16.04'
-  displayName: Build and push bot image
-  continueOnError: false
-  steps:
-  - script: echo Building..
-  - task: Docker@2
-    displayName: Build and push bot image
-    inputs:
-      command: buildAndPush
-      repository: $(imageName)
-      dockerfile: $(dockerFilePath)
-      containerRegistry: $(dockerRegistryServiceConnection)
-      tags: |
-        $(tag)
+  displayName: Build and push bot image
+  continueOnError: false
+  steps:
+  - script: echo Building..
+  - task: Docker@2
+    displayName: Build and push bot image
+    inputs:
+      command: buildAndPush
+      repository: $(imageName)
+      dockerfile: $(dockerFilePath)
+      containerRegistry: $(dockerRegistryServiceConnection)
+      tags: |
+        $(tag)
 - job: provisionContainer
-  image: $(imageName)
-  endpoint: $(dockerRegistryServiceConnection)
-  steps:
-  - script: echo hello
+  image: $(imageName)
+  endpoint: $(dockerRegistryServiceConnection)
+  steps:
+  - script: echo hello
