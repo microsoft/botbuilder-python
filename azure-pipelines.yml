@@ -31,6 +31,9 @@ jobs:
       tags: $(tag)
 
 - job: provisionContainer
+  displayName: Provision bot container
+  dependsOn:
+  - buildPush
   container:
     image: nightlye2etest.azurecr.io/functionaltestpy:latest
     endpoint: NightlyE2E-Acr
