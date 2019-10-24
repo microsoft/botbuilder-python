@@ -33,6 +33,6 @@ jobs:
 - job: provisionContainer
   container:
     image: nightlye2etest.azurecr.io/functionaltestpy:latest
-    endpoint: $(dockerRegistryServiceConnection)
+    endpoint: NightlyE2E-Acr
   steps:
   - script: flask run --port 3978 --host 0.0.0.0
