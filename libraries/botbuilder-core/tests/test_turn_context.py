@@ -1,10 +1,12 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from typing import Callable, List
 import aiounittest
 
 from botbuilder.schema import (
     Activity,
+    ActivityTypes,
     ChannelAccount,
     ConversationAccount,
     Mention,
@@ -33,7 +35,7 @@ class SimpleAdapter(BotAdapter):
         assert activities
         for (idx, activity) in enumerate(activities):  # pylint: disable=unused-variable
             assert isinstance(activity, Activity)
-            assert activity.type == "message"
+            assert activity.type == "message" or activity.type == ActivityTypes.trace
             responses.append(ResourceResponse(id="5678"))
         return responses
 
@@ -319,3 +321,28 @@ class TestBotContext(aiounittest.AsyncTestCase):
 
         assert text, " test activity"
         assert activity.text, " test activity"
+
+    async def test_should_send_a_trace_activity(self):
+        context = TurnContext(SimpleAdapter(), ACTIVITY)
+        called = False
+
+        #  pylint: disable=unused-argument
+        async def aux_func(
+            ctx: TurnContext, activities: List[Activity], next: Callable
+        ):
+            nonlocal called
+            called = True
+            assert isinstance(activities, list), "activities not array."
+            assert len(activities) == 1, "invalid count of activities."
+            assert activities[0].type == ActivityTypes.trace, "type wrong."
+            assert activities[0].name == "name-text", "name wrong."
+            assert activities[0].value == "value-text", "value worng."
+            assert activities[0].value_type == "valueType-text", "valeuType wrong."
+            assert activities[0].label == "label-text", "label wrong."
+            return []
+
+        context.on_send_activities(aux_func)
+        await context.send_trace_activity(
+            "name-text", "value-text", "valueType-text", "label-text"
+        )
+        assert called
