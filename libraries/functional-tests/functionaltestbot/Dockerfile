@@ -26,5 +26,8 @@ WORKDIR bot
 
 # For Debugging, uncomment the following: 
 #ENTRYPOINT ["python3.6", "-c", "import time ; time.sleep(500000)"]
-ENTRYPOINT [ "flask" ]
-CMD [ "run", "--port", "3978", "--host", "0.0.0.0" ]
+
+# For Devops, they don't like entry points.  This is now in the devops 
+# pipeline.
+#ENTRYPOINT [ "flask" ]
+#CMD [ "run", "--port", "3978", "--host", "0.0.0.0" ]
