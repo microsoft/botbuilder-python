@@ -6,11 +6,17 @@ pool:
 
 variables:
   imageName: 'functionaltestpy'
+  dockerRegistryServiceConnection: 'E2E Functional Docker Registry'
+  dockerFilePath: 'libraries/functional-tests/functionaltestbot/Dockerfile'
+  tag: 'python'
 
 steps:
 - task: Docker@2
-  displayName: Build an bot image
+  displayName: Build and push bot image
   inputs:
+    command: buildAndPush
     repository: $(imageName)
-    command: build
-    Dockerfile: libraries/functional-tests/functionaltestbot/Dockerfile
+    dockerfile: $(dockerFilePath)
+    containerRegistry: $(dockerRegistryServiceConnection)
+    tags: |
+      $(tag)
