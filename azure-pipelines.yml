@@ -5,6 +5,12 @@ trigger:
     exclude:
     - master
 
+resources:
+  containers:
+  - container: functionaltest
+    image: nightlye2etest.azurecr.io/functionaltestpy:latest
+    endpoint: NightlyE2E-Acr
+
 variables:
   # Container registry service connection established during pipeline creation
   imageName: 'functionaltestpy'
@@ -34,8 +40,6 @@ jobs:
   displayName: Provision bot container
   # dependsOn:
   # - buildPush
-  container:
-    image: NightlyE2E-Acr/functionaltestpy:latest
-    endpoint: NightlyE2E-Acr
+  container: functionaltest
   steps:
   - script: flask run --port 3978 --host 0.0.0.0
