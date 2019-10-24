@@ -40,11 +40,12 @@ class SimpleAdapter(BotAdapter):
     async def update_activity(self, context, activity):
         assert context is not None
         assert activity is not None
+        return ResourceResponse(id=activity.id)
 
     async def delete_activity(self, context, reference):
         assert context is not None
         assert reference is not None
-        assert reference.activity_id == "1234"
+        assert reference.activity_id == ACTIVITY.id
 
 
 class TestBotContext(aiounittest.AsyncTestCase):
