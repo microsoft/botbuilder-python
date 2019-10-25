@@ -5,23 +5,28 @@ trigger:
     exclude:
     - master
 
-resources:
-  containers:
-  - container: functionaltest
-    image: nightlye2etest.azurecr.io/functionaltestpy:latest
-    endpoint: NightlyE2E-Acr
+# resources:
+#   containers:
+#   - container: functionaltest
+#     image: nightlye2etest.azurecr.io/functionaltestpy:latest
+#     endpoint: NightlyE2E-Acr
 
 variables:
   # Container registry service connection established during pipeline creation
-  imageName: 'functionaltestpy'
   dockerRegistryServiceConnection: 'NightlyE2E-Acr'
   azureRmServiceConnection: 'NightlyE2E-RM'
   dockerFilePath: 'libraries/functional-tests/functionaltestbot/Dockerfile'
-  MyBuildId: $(Build.BuildNumber)
-  WebAppName: 'functionaltestpy'
+  buildIdTag: $(Build.BuildNumber)
+  webAppName: 'functionaltestpy'
+  containerRegistry: 'nightlye2etest.azurecr.io'
+  imageRepository: 'functionaltestpy'
+
+
+
+
 jobs:
 # Build and publish container
-- job: buildPush
+- job: Build
   pool:
     vmImage: 'Ubuntu-16.04'
   displayName: Build and push bot image
@@ -32,34 +37,34 @@ jobs:
     displayName: Build and push bot image
     inputs:
       command: buildAndPush
-      repository: $(imageName)
+      repository: $(imageRepository)
       dockerfile: $(dockerFilePath)
       containerRegistry: $(dockerRegistryServiceConnection)
-      tags: $(MyBuildId)
+      tags: $(buildIdTag)
   - task: PublishPipelineArtifact@0
     inputs:
       artifactName: 'manifests'
       targetPath: 'manifests'
 
-- job: provisionContainer
+- job: Deploy
   displayName: Provision bot container
   pool:
     vmImage: 'Ubuntu-16.04'
   dependsOn:
-  - buildPush
+  - Build
   steps:
   - task: DownloadPipelineArtifact@1
     inputs:
       artifactName: 'manifests'
       downloadPath: '$(System.ArtifactsDirectory)/manifests'
   - task: AzureRMWebAppDeployment@4
-    displayName: Azure App Service Deploy
+    displayName: Python Functional E2E test.
     inputs:
       ConnectionType: AzureRM
       ConnectedServiceName: $(azureRmServiceConnection)
       appType: webAppContainer
-      WebAppName: $(WebAppName)
-      DockerNamespace: $(DockerNamespace)
-      DockerRepository: $(DockerRepository)
-      DockerImageTag: $(Build.BuildId)
-  - script: flask run --port 3978 --host 0.0.0.0
+      WebAppName: $(webAppName)
+      DockerNamespace: $(containerRegistry)
+      DockerRepository: $(imageRepository)
+      DockerImageTag: $(buildIdTag)
+
