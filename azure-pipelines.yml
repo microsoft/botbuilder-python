@@ -20,11 +20,11 @@ variables:
 
 jobs:
 # Build and publish container
-# - job: buildPush
-#   pool:
-#     vmImage: 'Ubuntu-16.04'
-#   displayName: Build and push bot image
-#   continueOnError: false
+- job: buildPush
+  pool:
+    vmImage: 'Ubuntu-16.04'
+  displayName: Build and push bot image
+  continueOnError: false
 
   steps:
   - task: Docker@2
@@ -38,8 +38,10 @@ jobs:
 
 - job: provisionContainer
   displayName: Provision bot container
-  # dependsOn:
-  # - buildPush
+  pool:
+    vmImage: 'Ubuntu-16.04'
+  dependsOn:
+  - buildPush
   container:
     image: functionaltestpy:latest
     endpoint: NightlyE2E-Acr
