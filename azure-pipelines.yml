@@ -43,7 +43,7 @@ jobs:
   dependsOn:
   - buildPush
   container:
-    image: functionaltestpy:latest
+    image: functionaltestpy
     endpoint: NightlyE2E-Acr
   steps:
   - script: flask run --port 3978 --host 0.0.0.0
