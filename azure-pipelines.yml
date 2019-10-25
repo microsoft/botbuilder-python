@@ -35,6 +35,10 @@ jobs:
       dockerfile: $(dockerFilePath)
       containerRegistry: $(dockerRegistryServiceConnection)
       tags: $(MyBuildId)
+  - task: PublishPipelineArtifact@0
+    inputs:
+      artifactName: 'manifests'
+      targetPath: 'manifests'
 
 - job: provisionContainer
   displayName: Provision bot container
@@ -42,8 +46,18 @@ jobs:
     vmImage: 'Ubuntu-16.04'
   dependsOn:
   - buildPush
-  container:
-    image: functionaltestpy
-    endpoint: NightlyE2E-Acr
   steps:
+  - task: DownloadPipelineArtifact@1
+    inputs:
+      artifactName: 'manifests'
+      downloadPath: '$(System.ArtifactsDirectory)/manifests'
+  - task: AzureRMWebAppDeployment@4
+    displayName: Azure App Service Deploy
+    inputs:
+      appType: webAppContainer
+      ConnectedServiceName: $(azureSubscriptionEndpoint)
+      WebAppName: $(WebAppName)
+      DockerNamespace: $(DockerNamespace)
+      DockerRepository: $(DockerRepository)
+      DockerImageTag: $(Build.BuildId)
   - script: flask run --port 3978 --host 0.0.0.0
