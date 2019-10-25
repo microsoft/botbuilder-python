@@ -26,37 +26,36 @@ variables:
 
 jobs:
 # Build and publish container
-- job: Build
-  pool:
-    vmImage: 'Ubuntu-16.04'
-  displayName: Build and push bot image
-  continueOnError: false
-
-  steps:
-  - task: Docker@2
-    displayName: Build and push bot image
-    inputs:
-      command: buildAndPush
-      repository: $(imageRepository)
-      dockerfile: $(dockerFilePath)
-      containerRegistry: $(dockerRegistryServiceConnection)
-      tags: $(buildIdTag)
-  - task: PublishPipelineArtifact@0
-    inputs:
-      artifactName: 'manifests'
-      targetPath: 'manifests'
+# - job: Build
+#   pool:
+#     vmImage: 'Ubuntu-16.04'
+#   displayName: Build and push bot image
+#   continueOnError: false
+#   steps:
+#   - task: Docker@2
+#     displayName: Build and push bot image
+#     inputs:
+#       command: buildAndPush
+#       repository: $(imageRepository)
+#       dockerfile: $(dockerFilePath)
+#       containerRegistry: $(dockerRegistryServiceConnection)
+#       tags: $(buildIdTag)
+#   # - task: PublishPipelineArtifact@0
+#   #   inputs:
+#   #     artifactName: 'manifests'
+#   #     targetPath: 'manifests'
 
 - job: Deploy
   displayName: Provision bot container
   pool:
     vmImage: 'Ubuntu-16.04'
-  dependsOn:
-  - Build
+  # dependsOn:
+  # - Build
   steps:
-  - task: DownloadPipelineArtifact@1
-    inputs:
-      artifactName: 'manifests'
-      downloadPath: '$(System.ArtifactsDirectory)/manifests'
+  # - task: DownloadPipelineArtifact@1
+  #   inputs:
+  #     artifactName: 'manifests'
+  #     downloadPath: '$(System.ArtifactsDirectory)/manifests'
   - task: AzureRMWebAppDeployment@4
     displayName: Python Functional E2E test.
     inputs:
