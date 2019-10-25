@@ -15,9 +15,10 @@ variables:
   # Container registry service connection established during pipeline creation
   imageName: 'functionaltestpy'
   dockerRegistryServiceConnection: 'NightlyE2E-Acr'
+  azureRmServiceConnection: 'NightlyE2E-RM'
   dockerFilePath: 'libraries/functional-tests/functionaltestbot/Dockerfile'
   MyBuildId: $(Build.BuildNumber)
-
+  WebAppName: 'functionaltestpy'
 jobs:
 # Build and publish container
 - job: buildPush
@@ -54,8 +55,9 @@ jobs:
   - task: AzureRMWebAppDeployment@4
     displayName: Azure App Service Deploy
     inputs:
+      ConnectionType: AzureRM
+      ConnectedServiceName: $(azureRmServiceConnection)
       appType: webAppContainer
-      ConnectedServiceName: $(azureSubscriptionEndpoint)
       WebAppName: $(WebAppName)
       DockerNamespace: $(DockerNamespace)
       DockerRepository: $(DockerRepository)
