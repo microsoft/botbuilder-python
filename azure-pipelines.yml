@@ -16,7 +16,7 @@ variables:
   imageName: 'functionaltestpy'
   dockerRegistryServiceConnection: 'NightlyE2E-Acr'
   dockerFilePath: 'libraries/functional-tests/functionaltestbot/Dockerfile'
-  tag: 'python'
+  MyBuildId: $(Build.BuildNumber)
 
 jobs:
 # Build and publish container
@@ -26,15 +26,15 @@ jobs:
 #   displayName: Build and push bot image
 #   continueOnError: false
 
-#   steps:
-#   - task: Docker@2
-#     displayName: Build and push bot image
-#     inputs:
-#       command: buildAndPush
-#       repository: $(imageName)
-#       dockerfile: $(dockerFilePath)
-#       containerRegistry: $(dockerRegistryServiceConnection)
-#       tags: $(tag)
+  steps:
+  - task: Docker@2
+    displayName: Build and push bot image
+    inputs:
+      command: buildAndPush
+      repository: $(imageName)
+      dockerfile: $(dockerFilePath)
+      containerRegistry: $(dockerRegistryServiceConnection)
+      tags: $(MyBuildId)
 
 - job: provisionContainer
   displayName: Provision bot container
