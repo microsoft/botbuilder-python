@@ -1,22 +1,70 @@
 trigger:
-  daveta-python-functional
+  branches:
+    include:
+    - daveta-python-functional
+    exclude:
+    - master
 
-pool:
-  vmImage: 'Ubuntu-16.04'
+# resources:
+#   containers:
+#   - container: functionaltest
+#     image: nightlye2etest.azurecr.io/functionaltestpy:latest
+#     endpoint: NightlyE2E-Acr
 
 variables:
-  imageName: 'functionaltestpy'
-  dockerRegistryServiceConnection: 'E2E Functional Docker Registry'
+  # Container registry service connection established during pipeline creation
+  dockerRegistryServiceConnection: 'NightlyE2E-Acr'
+  azureRmServiceConnection: 'NightlyE2E-RM'
   dockerFilePath: 'libraries/functional-tests/functionaltestbot/Dockerfile'
-  tag: 'python'
+  buildIdTag: $(Build.BuildNumber)
+  webAppName: 'functionaltestpy'
+  containerRegistry: 'nightlye2etest.azurecr.io'
+  imageRepository: 'functionaltestpy'
 
-steps:
-- task: Docker@2
+
+
+
+jobs:
+# Build and publish container
+- job: Build
+  pool:
+    vmImage: 'Ubuntu-16.04'
   displayName: Build and push bot image
-  inputs:
-    command: buildAndPush
-    repository: $(imageName)
-    dockerfile: $(dockerFilePath)
-    containerRegistry: $(dockerRegistryServiceConnection)
-    tags: |
-      $(tag)
+  continueOnError: false
+
+  steps:
+  - task: Docker@2
+    displayName: Build and push bot image
+    inputs:
+      command: buildAndPush
+      repository: $(imageRepository)
+      dockerfile: $(dockerFilePath)
+      containerRegistry: $(dockerRegistryServiceConnection)
+      tags: $(buildIdTag)
+  - task: PublishPipelineArtifact@0
+    inputs:
+      artifactName: 'manifests'
+      targetPath: 'manifests'
+
+- job: Deploy
+  displayName: Provision bot container
+  pool:
+    vmImage: 'Ubuntu-16.04'
+  dependsOn:
+  - Build
+  steps:
+  - task: DownloadPipelineArtifact@1
+    inputs:
+      artifactName: 'manifests'
+      downloadPath: '$(System.ArtifactsDirectory)/manifests'
+  - task: AzureRMWebAppDeployment@4
+    displayName: Python Functional E2E test.
+    inputs:
+      ConnectionType: AzureRM
+      ConnectedServiceName: $(azureRmServiceConnection)
+      appType: webAppContainer
+      WebAppName: $(webAppName)
+      DockerNamespace: $(containerRegistry)
+      DockerRepository: $(imageRepository)
+      DockerImageTag: $(buildIdTag)
+
