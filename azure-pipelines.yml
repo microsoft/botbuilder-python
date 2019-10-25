@@ -26,20 +26,20 @@ variables:
 
 jobs:
 # Build and publish container
-- job: Build
-  pool:
-    vmImage: 'Ubuntu-16.04'
-  displayName: Build and push bot image
-  continueOnError: false
-  steps:
-  # - task: Docker@2
-  #   displayName: Build and push bot image
-  #   inputs:
-  #     command: buildAndPush
-  #     repository: $(imageRepository)
-  #     dockerfile: $(dockerFilePath)
-  #     containerRegistry: $(dockerRegistryServiceConnection)
-  #     tags: $(buildIdTag)
+# - job: Build
+#   pool:
+#     vmImage: 'Ubuntu-16.04'
+#   displayName: Build and push bot image
+#   continueOnError: false
+#   steps:
+#   - task: Docker@2
+#     displayName: Build and push bot image
+#     inputs:
+#       command: buildAndPush
+#       repository: $(imageRepository)
+#       dockerfile: $(dockerFilePath)
+#       containerRegistry: $(dockerRegistryServiceConnection)
+#       tags: $(buildIdTag)
 
 
 
