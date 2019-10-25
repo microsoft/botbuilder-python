@@ -47,8 +47,8 @@ jobs:
   displayName: Provision bot container
   pool:
     vmImage: 'Ubuntu-16.04'
-  dependsOn:
-  - Build
+  # dependsOn:
+  # - Build
   steps:
   - task: AzureRMWebAppDeployment@4
     displayName: Python Functional E2E test.
