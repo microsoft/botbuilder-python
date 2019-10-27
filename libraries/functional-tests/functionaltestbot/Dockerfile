@@ -29,5 +29,5 @@ WORKDIR bot
 
 # For Devops, they don't like entry points.  This is now in the devops 
 # pipeline.
-# ENTRYPOINT [ "flask" ]
-# CMD [ "run", "--port", "3978", "--host", "0.0.0.0" ]
+ENTRYPOINT [ "flask" ]
+CMD [ "run", "--port", "3978", "--host", "0.0.0.0" ]
