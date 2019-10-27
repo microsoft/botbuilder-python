@@ -15,12 +15,12 @@ COPY /functionaltestbot /functionaltestbot
 
 RUN  pip3 install -r /functionaltestbot/requirements.txt
 
-ENV FLASK_APP=/functionaltestbot/main.py
+ENV FLASK_APP=/functionaltestbot/app.py
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
 ENV PATH ${PATH}:/home/site/wwwroot
 
-WORKDIR bot
+#WORKDIR functionaltestbot
 # Initialize models
 
 
