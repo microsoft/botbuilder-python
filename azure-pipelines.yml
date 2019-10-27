@@ -54,7 +54,7 @@ jobs:
       DockerNamespace: $(containerRegistry)
       DockerRepository: $(imageRepository)
       DockerImageTag: $(buildIdTag)
-      AppSettings: '-MicrosoftAppId $(botAppId) -MicrosoftAppPassword $(botAppPassword) -FLASK_APP functionaltestbot/app.py -FLASK_DEBUG 1'
+      AppSettings: '-MicrosoftAppId $(botAppId) -MicrosoftAppPassword $(botAppPassword) -FLASK_APP /functionaltestbot/app.py -FLASK_DEBUG 1'
 
       StartupCommand: 'flask run --host=0.0.0.0 --port=3978'
 
