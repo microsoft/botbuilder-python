@@ -54,8 +54,8 @@ jobs:
       DockerNamespace: $(containerRegistry)
       DockerRepository: $(imageRepository)
       DockerImageTag: $(buildIdTag)
-      AppSettings: '-MicrosoftAppId $(botAppId) -MicrosoftAppPassword $(botAppPassword) -FLASK_APP functionaltestbot/main.py -FLASK_DEBUG 1'
+      AppSettings: '-MicrosoftAppId $(botAppId) -MicrosoftAppPassword $(botAppPassword) -FLASK_APP functionaltestbot/app.py -FLASK_DEBUG 1'
 
-      StartupCommand: 'gunicorn --bind=0.0.0.0 --timeout 600 app:app'
+      StartupCommand: '/functionaltestbot:/app'
 
 
