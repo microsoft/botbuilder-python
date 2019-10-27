@@ -55,6 +55,6 @@ jobs:
       DockerRepository: $(imageRepository)
       DockerImageTag: $(buildIdTag)
       AppSettings: '-MicrosoftAppId $(botAppId) -MicrosoftAppPassword $(botAppPassword)'
-      # StartupCommand: 'MicrosoftAppId=$(botAppId) MicrosoftAppPassword=$(botAppPassword) flask run --port 3979 --host 0.0.0.0'
+      StartupCommand: 'flask run --port 3979 --host 0.0.0.0'
 
 
