@@ -55,6 +55,7 @@ jobs:
       DockerRepository: $(imageRepository)
       DockerImageTag: $(buildIdTag)
       AppSettings: '-MicrosoftAppId $(botAppId) -MicrosoftAppPassword $(botAppPassword)'
-      StartupCommand: 'flask run --port 3978 --host 0.0.0.0'
+
+      StartupCommand: 'gunicorn --bind=0.0.0.0 --timeout 600 app:app'
 
 
