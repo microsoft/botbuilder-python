@@ -11,7 +11,7 @@ variables:
   azureRmServiceConnection: 'NightlyE2E-RM'
   dockerFilePath: 'libraries/functional-tests/functionaltestbot/Dockerfile'
   buildIdTag: $(Build.BuildNumber)
-  webAppName: 'functionaltestpy'
+  webAppName: 'e2epython'
   containerRegistry: 'nightlye2etest.azurecr.io'
   imageRepository: 'functionaltestpy'
 
