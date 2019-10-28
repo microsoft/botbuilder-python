@@ -46,7 +46,7 @@ ADAPTER.on_turn_error = MethodType(on_error, ADAPTER)
 BOT = MyBot()
 
 # Listen for incoming requests on GET / for Azure monitoring
-@APP.route("/api/messages", methods=["POST"])
+@APP.route("/", methods=["GET"])
 def ping():
     return Response(status=200)
 
