@@ -45,6 +45,11 @@ ADAPTER.on_turn_error = MethodType(on_error, ADAPTER)
 # Create the main dialog
 BOT = MyBot()
 
+# Listen for incoming requests on GET / for Azure monitoring
+@APP.route("/api/messages", methods=["POST"])
+def ping():
+    return Response(status=200)
+
 # Listen for incoming requests on /api/messages.
 @APP.route("/api/messages", methods=["POST"])
 def messages():
