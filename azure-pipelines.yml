@@ -53,7 +53,7 @@ jobs:
       WebAppName: $(webAppName)
       deployToSlotOrASE: true
       resourceGroupName: 'NightlyPythonLinuxTestBotRG'
-      slotName: 'production'
+      slotName: 'functionaltestpy'
       DockerNamespace: $(containerRegistry)
       DockerRepository: $(imageRepository)
       DockerImageTag: $(buildIdTag)
