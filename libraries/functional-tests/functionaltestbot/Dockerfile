@@ -11,6 +11,7 @@ EXPOSE 3978
 
 COPY ./functionaltestbot /functionaltestbot
 COPY setup.py /
+COPY test.sh /
 # RUN ls -ltr
 # RUN cat prestart.sh
 # RUN cat main.py
