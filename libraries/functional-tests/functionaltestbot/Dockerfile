@@ -13,16 +13,17 @@ EXPOSE 3978
 COPY /functionaltestbot /functionaltestbot
 
 
-RUN  pip3 install -r /functionaltestbot/requirements.txt
+
 
 ENV FLASK_APP=/functionaltestbot/app.py
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
 ENV PATH ${PATH}:/home/site/wwwroot
 
-#WORKDIR functionaltestbot
-# Initialize models
+WORKDIR functionaltestbot
 
+# Initialize models
+RUN  pip3 install -e .
 
 # For Debugging, uncomment the following: 
 #ENTRYPOINT ["python3.6", "-c", "import time ; time.sleep(500000)"]
