@@ -6,7 +6,7 @@ FROM  python:3.6
 
 RUN  mkdir /functionaltestbot 
 
-EXPOSE 3978 2222
+EXPOSE 3978
 # EXPOSE 2222
 
 COPY ./functionaltestbot /functionaltestbot
