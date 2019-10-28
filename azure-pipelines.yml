@@ -51,9 +51,6 @@ jobs:
       ConnectedServiceName: $(azureRmServiceConnection)
       appType: webAppContainer
       WebAppName: $(webAppName)
-      deployToSlotOrASE: true
-      resourceGroupName: 'NightlyPythonLinuxTestBotRG'
-      slotName: 'functionaltestpy'
       DockerNamespace: $(containerRegistry)
       DockerRepository: $(imageRepository)
       DockerImageTag: $(buildIdTag)
