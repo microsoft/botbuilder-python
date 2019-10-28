@@ -1,14 +1,12 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-FROM    tiangolo/uwsgi-nginx-flask:python3.6
+FROM  python:3.6
 
-# Setup for nginx
-RUN  mkdir -p /home/LogFiles \
-     && apt update \
-     && apt install -y --no-install-recommends vim 
 
-EXPOSE 3978
+RUN  mkdir /functionaltestbot 
+
+EXPOSE 3978 2222
  
 COPY ./functionaltestbot /functionaltestbot
 COPY setup.py /
@@ -23,11 +21,24 @@ ENV PATH ${PATH}:/home/site/wwwroot
 
 WORKDIR /
 
-# Initialize models
+# Initialize the bot
 RUN  pip3 install -e .
 
+# ssh
+ENV SSH_PASSWD "root:Docker!"
+RUN apt-get update \
+        && apt-get install -y --no-install-recommends dialog \
+        && apt-get update \
+	&& apt-get install -y --no-install-recommends openssh-server \
+	&& echo "$SSH_PASSWD" | chpasswd \
+    && apt install -y --no-install-recommends vim 
+COPY sshd_config /etc/ssh/
+COPY init.sh /usr/local/bin/
+RUN chmod u+x /usr/local/bin/init.sh
+
 # For Debugging, uncomment the following: 
-ENTRYPOINT ["python3.6", "-c", "import time ; time.sleep(500000)"]
+# ENTRYPOINT ["python3.6", "-c", "import time ; time.sleep(500000)"]
+ENTRYPOINT ["init.sh"]
  
 # For Devops, they don't like entry points.  This is now in the devops 
 # pipeline.
