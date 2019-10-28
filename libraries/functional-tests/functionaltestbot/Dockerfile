@@ -6,7 +6,7 @@ FROM  tiangolo/uwsgi-nginx-flask:python3.6
 
 RUN  mkdir /functionaltestbot 
 
-EXPOSE 3978
+EXPOSE 443
 # EXPOSE 2222
 
 COPY ./functionaltestbot /functionaltestbot
