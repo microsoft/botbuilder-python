@@ -19,11 +19,11 @@ from botbuilder.core import (
     UserState,
 )
 from botbuilder.schema import Activity
-from dialogs import MainDialog, BookingDialog
-from bots import DialogAndWelcomeBot
 
-from adapter_with_error_handler import AdapterWithErrorHandler
-from flight_booking_recognizer import FlightBookingRecognizer
+from .adapter_with_error_handler import AdapterWithErrorHandler
+from .bots import DialogAndWelcomeBot
+from .dialogs import MainDialog, BookingDialog
+from .flight_booking_recognizer import FlightBookingRecognizer
 
 LOOP = asyncio.get_event_loop()
 APP = Flask(__name__, instance_relative_config=True)
@@ -56,12 +56,9 @@ def messages():
         request.headers["Authorization"] if "Authorization" in request.headers else ""
     )
 
-    async def aux_func(turn_context):
-        await BOT.on_turn(turn_context)
-
     try:
         task = LOOP.create_task(
-            ADAPTER.process_activity(activity, auth_header, aux_func)
+            ADAPTER.process_activity(activity, auth_header, BOT.on_turn)
         )
         LOOP.run_until_complete(task)
         return Response(status=201)

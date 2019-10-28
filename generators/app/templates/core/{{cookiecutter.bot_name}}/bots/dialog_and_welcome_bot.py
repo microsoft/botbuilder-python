@@ -5,31 +5,14 @@ import json
 import os.path
 
 from typing import List
-from botbuilder.core import CardFactory
-from botbuilder.core import (
-    ActivityHandler,
-    ConversationState,
-    MessageFactory,
-    UserState,
-    TurnContext,
-)
-from botbuilder.dialogs import Dialog
-from botbuilder.schema import Activity, Attachment, ChannelAccount
-from helpers.dialog_helper import DialogHelper
+from botbuilder.core import MessageFactory, TurnContext
+from botbuilder.schema import Attachment, ChannelAccount
 
 from .dialog_bot import DialogBot
+from ..helpers import DialogHelper
 
 
 class DialogAndWelcomeBot(DialogBot):
-    def __init__(
-        self,
-        conversation_state: ConversationState,
-        user_state: UserState,
-        dialog: Dialog,
-    ):
-        super(DialogAndWelcomeBot, self).__init__(
-            conversation_state, user_state, dialog
-        )
 
     async def on_members_added_activity(
         self, members_added: List[ChannelAccount], turn_context: TurnContext
@@ -51,8 +34,8 @@ class DialogAndWelcomeBot(DialogBot):
     def create_adaptive_card_attachment(self):
         relative_path = os.path.abspath(os.path.dirname(__file__))
         path = os.path.join(relative_path, "../cards/welcomeCard.json")
-        with open(path) as f:
-            card = json.load(f)
+        with open(path) as card_file:
+            card = json.load(card_file)
 
         return Attachment(
             content_type="application/vnd.microsoft.card.adaptive", content=card

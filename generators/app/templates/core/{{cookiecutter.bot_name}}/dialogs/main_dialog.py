@@ -11,10 +11,11 @@ from botbuilder.dialogs.prompts import TextPrompt, PromptOptions
 from botbuilder.core import MessageFactory, TurnContext
 from botbuilder.schema import InputHints
 
-from .booking_dialog import BookingDialog
 from booking_details import BookingDetails
 from flight_booking_recognizer import FlightBookingRecognizer
-from helpers.luis_helper import LuisHelper, Intent
+
+from .booking_dialog import BookingDialog
+from ..helpers import LuisHelper, Intent
 
 
 class MainDialog(ComponentDialog):
@@ -81,7 +82,7 @@ class MainDialog(ComponentDialog):
             # Run the BookingDialog giving it whatever details we have from the LUIS call.
             return await step_context.begin_dialog(self._booking_dialog_id, luis_result)
 
-        elif intent == Intent.GET_WEATHER.value:
+        if intent == Intent.GET_WEATHER.value:
             get_weather_text = "TODO: get weather flow here"
             get_weather_message = MessageFactory.text(
                 get_weather_text, get_weather_text, InputHints.ignoring_input

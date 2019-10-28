@@ -5,7 +5,7 @@ from typing import Dict
 from botbuilder.ai.luis import LuisRecognizer
 from botbuilder.core import IntentScore, TopIntent, TurnContext
 
-from booking_details import BookingDetails
+from ..booking_details import BookingDetails
 
 
 class Intent(Enum):
@@ -33,7 +33,7 @@ class LuisHelper:
         luis_recognizer: LuisRecognizer, turn_context: TurnContext
     ) -> (Intent, object):
         """
-        Returns an object with preformatted LUIS results for the bot's dialogs to consume.
+        Returns an object with pre-formatted LUIS results for the bot's dialogs to consume.
         """
         result = None
         intent = None
@@ -54,7 +54,8 @@ class LuisHelper:
             if intent == Intent.BOOK_FLIGHT.value:
                 result = BookingDetails()
 
-                # We need to get the result from the LUIS JSON which at every level returns an array.
+                # We need to get the result from the LUIS JSON which at every level
+                # returns an array.
                 to_entities = recognizer_result.entities.get("$instance", {}).get(
                     "To", []
                 )
@@ -81,8 +82,10 @@ class LuisHelper:
                             from_entities[0]["text"].capitalize()
                         )
 
-                # This value will be a TIMEX. And we are only interested in a Date so grab the first result and drop the Time part.
-                # TIMEX is a format that represents DateTime expressions that include some ambiguity. e.g. missing a Year.
+                # This value will be a TIMEX. And we are only interested in a Date so
+                # grab the first result and drop the Time part.
+                # TIMEX is a format that represents DateTime expressions that include
+                # some ambiguity. e.g. missing a Year.
                 date_entities = recognizer_result.entities.get("datetime", [])
                 if date_entities:
                     timex = date_entities[0]["timex"]
@@ -95,7 +98,7 @@ class LuisHelper:
                 else:
                     result.travel_date = None
 
-        except Exception as e:
-            print(e)
+        except Exception as err:
+            print(err)
 
         return intent, result

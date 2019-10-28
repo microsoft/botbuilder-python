@@ -10,9 +10,9 @@ from botbuilder.dialogs.prompts import (
     DateTimeResolution,
 )
 from botbuilder.schema import InputHints
-from .cancel_and_help_dialog import CancelAndHelpDialog
-
 from datatypes_date_time.timex import Timex
+
+from .cancel_and_help_dialog import CancelAndHelpDialog
 
 
 class DateResolverDialog(CancelAndHelpDialog):
@@ -44,7 +44,8 @@ class DateResolverDialog(CancelAndHelpDialog):
             prompt_msg_text, prompt_msg_text, InputHints.expecting_input
         )
 
-        reprompt_msg_text = "I'm sorry, for best results, please enter your travel date including the month, day and year."
+        reprompt_msg_text = "I'm sorry, for best results, please enter your travel date " \
+                            "including the month, day and year."
         reprompt_msg = MessageFactory.text(
             reprompt_msg_text, reprompt_msg_text, InputHints.expecting_input
         )
@@ -73,7 +74,6 @@ class DateResolverDialog(CancelAndHelpDialog):
         if prompt_context.recognized.succeeded:
             timex = prompt_context.recognized.value[0].timex.split("T")[0]
 
-            # TODO: Needs TimexProperty
             return "definite" in Timex(timex).types
 
         return False
