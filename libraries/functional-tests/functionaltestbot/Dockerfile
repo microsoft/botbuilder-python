@@ -10,17 +10,18 @@ RUN  mkdir -p /home/LogFiles \
 
 EXPOSE 3978
  
-COPY /functionaltestbot /functionaltestbot
+COPY ./functionaltestbot /functionaltestbot
+COPY setup.py /
+# RUN ls -ltr
+# RUN cat prestart.sh
+# RUN cat main.py
 
-
-
-
-ENV FLASK_APP=functionaltestbot
+ENV FLASK_APP=/functionaltestbot/app.py
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
 ENV PATH ${PATH}:/home/site/wwwroot
 
-WORKDIR /functionaltestbot
+WORKDIR /
 
 # Initialize models
 RUN  pip3 install -e .
@@ -30,5 +31,5 @@ RUN  pip3 install -e .
 
 # For Devops, they don't like entry points.  This is now in the devops 
 # pipeline.
-# ENTRYPOINT [ "flask" ]
-# CMD [ "run", "--port", "3978", "--host", "0.0.0.0" ]
+ENTRYPOINT [ "flask" ]
+CMD [ "run", "--port", "3978", "--host", "0.0.0.0" ]
