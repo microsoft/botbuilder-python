@@ -17,7 +17,8 @@ from botbuilder.core import (
 )
 from botbuilder.schema import Activity, ActivityTypes
 
-from bots import StateManagementBot
+from dialogs import UserProfileDialog
+from bots import DialogBot
 
 # Create the loop and Flask app
 LOOP = asyncio.get_event_loop()
@@ -31,11 +32,11 @@ ADAPTER = BotFrameworkAdapter(SETTINGS)
 
 
 # Catch-all for errors.
-async def on_error(self, context: TurnContext, error: Exception):
-    # This check writes out errors to console log .vs. app insights.
+async def on_error(context: TurnContext, error: Exception):
+    # This check writes out errors to console log
     # NOTE: In production environment, you should consider logging this to Azure
     #       application insights.
-    print(f"\n [on_turn_error] unhandled error: {error}", file=sys.stderr)
+    print(f"\n [on_turn_error]: { error }", file=sys.stderr)
 
     # Send a message to the user
     await context.send_activity("The bot encountered an error or bug.")
@@ -51,27 +52,29 @@ async def on_error(self, context: TurnContext, error: Exception):
             value=f"{error}",
             value_type="https://www.botframework.com/schemas/error"
         )
+
         # Send a trace activity, which will be displayed in Bot Framework Emulator
         await context.send_activity(trace_activity)
-        
+
     # Clear out state
     await CONVERSATION_STATE.delete(context)
 
 ADAPTER.on_turn_error = MethodType(on_error, ADAPTER)
 
-# Create MemoryStorage and state
+# Create MemoryStorage, UserState and ConversationState
 MEMORY = MemoryStorage()
-USER_STATE = UserState(MEMORY)
 CONVERSATION_STATE = ConversationState(MEMORY)
+USER_STATE = UserState(MEMORY)
 
-# Create Bot
-BOT = StateManagementBot(CONVERSATION_STATE, USER_STATE)
+# create main dialog and bot
+DIALOG = UserProfileDialog(USER_STATE)
+BOT = DialogBot(CONVERSATION_STATE, USER_STATE, DIALOG)
 
 
 # Listen for incoming requests on /api/messages.
 @APP.route("/api/messages", methods=["POST"])
 def messages():
-    # Main bot message handler.
+    # Main bot message handler.s
     if "application/json" in request.headers["Content-Type"]:
         body = request.json
     else:

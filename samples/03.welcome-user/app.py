@@ -10,14 +10,13 @@ from flask import Flask, request, Response
 from botbuilder.core import (
     BotFrameworkAdapter,
     BotFrameworkAdapterSettings,
-    ConversationState,
     MemoryStorage,
     TurnContext,
     UserState,
 )
 from botbuilder.schema import Activity, ActivityTypes
 
-from bots import StateManagementBot
+from bots import WelcomeUserBot
 
 # Create the loop and Flask app
 LOOP = asyncio.get_event_loop()
@@ -53,20 +52,15 @@ async def on_error(self, context: TurnContext, error: Exception):
         )
         # Send a trace activity, which will be displayed in Bot Framework Emulator
         await context.send_activity(trace_activity)
-        
-    # Clear out state
-    await CONVERSATION_STATE.delete(context)
 
 ADAPTER.on_turn_error = MethodType(on_error, ADAPTER)
 
-# Create MemoryStorage and state
+# Create MemoryStorage, UserState
 MEMORY = MemoryStorage()
 USER_STATE = UserState(MEMORY)
-CONVERSATION_STATE = ConversationState(MEMORY)
 
-# Create Bot
-BOT = StateManagementBot(CONVERSATION_STATE, USER_STATE)
-
+# Create the Bot
+BOT = WelcomeUserBot(USER_STATE)
 
 # Listen for incoming requests on /api/messages.
 @APP.route("/api/messages", methods=["POST"])
