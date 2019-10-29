@@ -88,7 +88,7 @@ class Channel:
 
     @staticmethod
     def max_action_title_length(  # pylint: disable=unused-argument
-        channel_id: str
+        channel_id: str,
     ) -> int:
         """Maximum length allowed for Action Titles.
 

@@ -17,7 +17,7 @@ class ActiveLearningUtils:
 
     @staticmethod
     def get_low_score_variation(
-        qna_search_results: List[QueryResult]
+        qna_search_results: List[QueryResult],
     ) -> List[QueryResult]:
         """
         Returns a list of QnA search results, which have low score variation.
