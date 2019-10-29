@@ -24,7 +24,7 @@ class TestMemoryStorage(aiounittest.AsyncTestCase):
         assert storage._e_tag == 0  # pylint: disable=protected-access
 
     async def test_memory_storage_initialized_with_memory_should_have_accessible_data(
-        self
+        self,
     ):
         storage = MemoryStorage({"test": SimpleStoreItem()})
         data = await storage.read(["test"])
@@ -53,7 +53,7 @@ class TestMemoryStorage(aiounittest.AsyncTestCase):
         assert data["user"].counter == 1
 
     async def test_memory_storage_write_should_overwrite_when_new_e_tag_is_an_asterisk_1(
-        self
+        self,
     ):
         storage = MemoryStorage()
         await storage.write({"user": SimpleStoreItem(e_tag="1")})
@@ -63,7 +63,7 @@ class TestMemoryStorage(aiounittest.AsyncTestCase):
         assert data["user"].counter == 10
 
     async def test_memory_storage_write_should_overwrite_when_new_e_tag_is_an_asterisk_2(
-        self
+        self,
     ):
         storage = MemoryStorage()
         await storage.write({"user": SimpleStoreItem(e_tag="1")})
@@ -92,7 +92,7 @@ class TestMemoryStorage(aiounittest.AsyncTestCase):
             assert not data.keys()
 
     async def test_memory_storage_delete_should_delete_multiple_values_when_given_multiple_valid_keys(
-        self
+        self,
     ):
         storage = MemoryStorage(
             {"test": SimpleStoreItem(), "test2": SimpleStoreItem(2, "2")}
@@ -103,7 +103,7 @@ class TestMemoryStorage(aiounittest.AsyncTestCase):
         assert not data.keys()
 
     async def test_memory_storage_delete_should_delete_values_when_given_multiple_valid_keys_and_ignore_other_data(
-        self
+        self,
     ):
         storage = MemoryStorage(
             {
@@ -118,7 +118,7 @@ class TestMemoryStorage(aiounittest.AsyncTestCase):
         assert len(data.keys()) == 1
 
     async def test_memory_storage_delete_invalid_key_should_do_nothing_and_not_affect_cached_data(
-        self
+        self,
     ):
         storage = MemoryStorage({"test": "test"})
 
@@ -129,7 +129,7 @@ class TestMemoryStorage(aiounittest.AsyncTestCase):
         assert not data.keys()
 
     async def test_memory_storage_delete_invalid_keys_should_do_nothing_and_not_affect_cached_data(
-        self
+        self,
     ):
         storage = MemoryStorage({"test": "test"})
 
