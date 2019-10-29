@@ -15,7 +15,7 @@ from botbuilder.core import (
 from botbuilder.schema import Activity, InputHints
 from bot import MyBot
 
-#Create the loop and Flask app
+# Create the loop and Flask app
 LOOP = asyncio.get_event_loop()
 APP = Flask(__name__, instance_relative_config=True)
 APP.config.from_object("config.DefaultConfig")
@@ -49,6 +49,7 @@ BOT = MyBot()
 @APP.route("/", methods=["GET"])
 def ping():
     return Response(status=200)
+
 
 # Listen for incoming requests on /api/messages.
 @APP.route("/api/messages", methods=["POST"])
