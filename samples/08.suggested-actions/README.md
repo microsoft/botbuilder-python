@@ -9,14 +9,7 @@ This bot has been created using [Bot Framework](https://dev.botframework.com), i
 ```bash
 git clone https://github.com/Microsoft/botbuilder-python.git
 ```
-- Run `pip install -r requirements.txt` to install all dependencies
-- Run `python app.py`
-- Alternatively to the last command, you can set the file in an environment variable with `set FLASK_APP=app.py` in windows (`export FLASK_APP=app.py` in mac/linux) and then run `flask run --host=127.0.0.1 --port=3978`
-
-### Visual studio code
-- Activate your desired virtual environment
-- Open `botbuilder-python\samples\45.state-management` folder
-- Bring up a terminal, navigate to `botbuilder-python\samples\02.echo-bot` folder
+- Bring up a terminal, navigate to `botbuilder-python\samples\08.suggested-actions` folder
 - In the terminal, type `pip install -r requirements.txt`
 - In the terminal, type `python app.py`
 
@@ -27,6 +20,9 @@ git clone https://github.com/Microsoft/botbuilder-python.git
 
 ### Connect to bot using Bot Framework Emulator
 - Launch Bot Framework Emulator
+- File -> Open Bot
 - Paste this URL in the emulator window - http://localhost:3978/api/messages
+
+## Suggested actions
 
 Suggested actions enable your bot to present buttons that the user can tap to provide input. Suggested actions appear close to the composer and enhance user experience.
