@@ -29,7 +29,7 @@ class TestShowTypingMiddleware(aiounittest.AsyncTestCase):
         await step5.assert_reply("echo:bar")
 
     async def test_should_not_automatically_send_a_typing_indicator_if_no_middleware(
-        self
+        self,
     ):
         async def aux(context):
             await context.send_activity(f"echo:{context.activity.text}")

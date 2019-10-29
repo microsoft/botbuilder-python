@@ -37,7 +37,7 @@ class TestTestAdapter(aiounittest.AsyncTestCase):
         await adapter.receive_activity(Activity(type="message", text="test"))
 
     async def test_should_set_activity_type_when_receive_activity_receives_activity_without_type(
-        self
+        self,
     ):
         async def logic(context: TurnContext):
             assert context.activity.type == "message"

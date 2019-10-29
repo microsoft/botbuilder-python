@@ -37,7 +37,7 @@ class TestConversationState(aiounittest.AsyncTestCase):
         assert outbound_activity.text, "hi"
 
     async def test_should_replicate_activity_data_to_listening_emulator_following_open_and_attach(
-        self
+        self,
     ):
         inbound_expectation, outbound_expectation, state_expectation = (
             False,
@@ -147,7 +147,7 @@ class TestConversationState(aiounittest.AsyncTestCase):
         assert mocker.call_count, 3
 
     async def test_should_replicate_activity_data_to_listening_emulator_following_open_and_attach_with_at_mention(
-        self
+        self,
     ):
         inbound_expectation, outbound_expectation, state_expectation = (
             False,
