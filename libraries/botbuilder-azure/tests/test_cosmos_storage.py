@@ -27,7 +27,7 @@ async def reset():
 
 
 def get_mock_client(identifier: str = "1"):
-    # pylint: disable=invalid-name
+    # pylint: disable=attribute-defined-outside-init
     mock = MockClient()
 
     mock.QueryDatabases = Mock(return_value=[])
