@@ -4,6 +4,7 @@
 
 import os
 
+
 class DefaultConfig:
     """ Bot Configuration """
 
