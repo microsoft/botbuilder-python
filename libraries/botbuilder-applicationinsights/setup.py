@@ -47,6 +47,7 @@ setup(
         "botbuilder.applicationinsights",
         "botbuilder.applicationinsights.django",
         "botbuilder.applicationinsights.flask",
+        "botbuilder.applicationinsights.processor",
     ],
     install_requires=REQUIRES + TESTS_REQUIRES,
     tests_require=TESTS_REQUIRES,
