@@ -8,8 +8,8 @@ from typing import List
 from botbuilder.core import MessageFactory, TurnContext
 from botbuilder.schema import Attachment, ChannelAccount
 
+from helpers import DialogHelper
 from .dialog_bot import DialogBot
-from ..helpers import DialogHelper
 
 
 class DialogAndWelcomeBot(DialogBot):

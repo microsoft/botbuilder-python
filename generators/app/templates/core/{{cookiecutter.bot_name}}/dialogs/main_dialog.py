@@ -14,8 +14,8 @@ from botbuilder.schema import InputHints
 from booking_details import BookingDetails
 from flight_booking_recognizer import FlightBookingRecognizer
 
+from helpers import LuisHelper, Intent
 from .booking_dialog import BookingDialog
-from ..helpers import LuisHelper, Intent
 
 
 class MainDialog(ComponentDialog):

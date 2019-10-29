@@ -4,7 +4,7 @@
 from botbuilder.core import ActivityHandler, ConversationState, UserState, TurnContext
 from botbuilder.dialogs import Dialog
 
-from ..helpers import DialogHelper
+from helpers import DialogHelper
 
 
 class DialogBot(ActivityHandler):

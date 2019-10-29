@@ -5,7 +5,7 @@ from typing import Dict
 from botbuilder.ai.luis import LuisRecognizer
 from botbuilder.core import IntentScore, TopIntent, TurnContext
 
-from ..booking_details import BookingDetails
+from booking_details import BookingDetails
 
 
 class Intent(Enum):
