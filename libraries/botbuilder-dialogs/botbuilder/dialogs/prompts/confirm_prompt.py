@@ -165,6 +165,6 @@ class ConfirmPrompt(Prompt):
         )
         if not culture or culture not in self.choice_defaults:
             culture = (
-                "English"
-            )  # TODO: Fix to reference recognizer to use proper constants
+                "English"  # TODO: Fix to reference recognizer to use proper constants
+            )
         return culture

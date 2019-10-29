@@ -299,7 +299,7 @@ class LuisUtil:
 
     @staticmethod
     def recognizer_result_as_dict(
-        recognizer_result: RecognizerResult
+        recognizer_result: RecognizerResult,
     ) -> Dict[str, object]:
         # an internal method that returns a dict for json serialization.
 
