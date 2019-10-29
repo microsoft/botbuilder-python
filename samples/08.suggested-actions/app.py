@@ -1,9 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-"""
-This sample shows a simple Bot that echos messages back to the user.
-"""
 import asyncio
 
 from flask import Flask, request, Response
@@ -13,21 +10,24 @@ from botbuilder.schema import Activity
 from bots import SuggestActionsBot
 from adapter_with_error_handler import AdapterWithErrorHandler
 
+# Create the loop and Flask app
 LOOP = asyncio.get_event_loop()
 APP = Flask(__name__, instance_relative_config=True)
 APP.config.from_object("config.DefaultConfig")
 
-SETTINGS = BotFrameworkAdapterSettings(
-    APP.config["APP_ID"], APP.config["APP_PASSWORD"]
-)
+# Create adapter.
+# See https://aka.ms/about-bot-adapter to learn more about how bots work.
+SETTINGS = BotFrameworkAdapterSettings(APP.config["APP_ID"], APP.config["APP_PASSWORD"])
 ADAPTER = AdapterWithErrorHandler(SETTINGS)
 
+# Create Bot
 BOT = SuggestActionsBot()
 
 
+# Listen for incoming requests on /api/messages.
 @APP.route("/api/messages", methods=["POST"])
 def messages():
-    """Main bot message handler."""
+    # Main bot message handler.
     if "application/json" in request.headers["Content-Type"]:
         body = request.json
     else:
@@ -38,12 +38,9 @@ def messages():
         request.headers["Authorization"] if "Authorization" in request.headers else ""
     )
 
-    async def aux_func(turn_context):
-        await BOT.on_turn(turn_context)
-
     try:
         task = LOOP.create_task(
-            ADAPTER.process_activity(activity, auth_header, aux_func)
+            ADAPTER.process_activity(activity, auth_header, BOT.on_turn)
         )
         LOOP.run_until_complete(task)
         return Response(status=201)
