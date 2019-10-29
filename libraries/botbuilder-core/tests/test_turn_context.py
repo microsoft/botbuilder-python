@@ -259,7 +259,7 @@ class TestBotContext(aiounittest.AsyncTestCase):
         assert reference.service_url == ACTIVITY.service_url
 
     def test_apply_conversation_reference_should_return_prepare_reply_when_is_incoming_is_false(
-        self
+        self,
     ):
         reference = TurnContext.get_conversation_reference(ACTIVITY)
         reply = TurnContext.apply_conversation_reference(
@@ -273,7 +273,7 @@ class TestBotContext(aiounittest.AsyncTestCase):
         assert reply.channel_id == ACTIVITY.channel_id
 
     def test_apply_conversation_reference_when_is_incoming_is_true_should_not_prepare_a_reply(
-        self
+        self,
     ):
         reference = TurnContext.get_conversation_reference(ACTIVITY)
         reply = TurnContext.apply_conversation_reference(
@@ -287,7 +287,7 @@ class TestBotContext(aiounittest.AsyncTestCase):
         assert reply.channel_id == ACTIVITY.channel_id
 
     async def test_should_get_conversation_reference_using_get_reply_conversation_reference(
-        self
+        self,
     ):
         context = TurnContext(SimpleAdapter(), ACTIVITY)
         reply = await context.send_activity("test")
