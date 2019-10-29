@@ -4,6 +4,7 @@
 import asyncio
 import sys
 from types import MethodType
+from flask import Flask, Response, request
 
 from botbuilder.core import (
     BotFrameworkAdapter,
@@ -12,7 +13,6 @@ from botbuilder.core import (
     TurnContext,
 )
 from botbuilder.schema import Activity, InputHints
-from flask import Flask, Response, request
 
 from .default_config import DefaultConfig
 from .my_bot import MyBot
