@@ -1,11 +1,10 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-"""
-This sample shows how to use a WaterfallDialog to prompt the user.
-"""
 import asyncio
 import sys
+from datetime import datetime
+from types import MethodType
 
 from flask import Flask, request, Response
 from botbuilder.core import (
@@ -16,18 +15,19 @@ from botbuilder.core import (
     TurnContext,
     UserState,
 )
-from botbuilder.schema import Activity
+from botbuilder.schema import Activity, ActivityTypes
 
 from dialogs import UserProfileDialog
 from bots import DialogBot
 
+# Create the loop and Flask app
 LOOP = asyncio.get_event_loop()
 APP = Flask(__name__, instance_relative_config=True)
 APP.config.from_object("config.DefaultConfig")
 
-SETTINGS = BotFrameworkAdapterSettings(
-    APP.config["APP_ID"], APP.config["APP_PASSWORD"]
-)
+# Create adapter.
+# See https://aka.ms/about-bot-adapter to learn more about how bots work.
+SETTINGS = BotFrameworkAdapterSettings(APP.config["APP_ID"], APP.config["APP_PASSWORD"])
 ADAPTER = BotFrameworkAdapter(SETTINGS)
 
 
@@ -37,13 +37,29 @@ async def on_error(context: TurnContext, error: Exception):
     # NOTE: In production environment, you should consider logging this to Azure
     #       application insights.
     print(f"\n [on_turn_error]: { error }", file=sys.stderr)
+
     # Send a message to the user
-    await context.send_activity("Oops. Something went wrong!")
+    await context.send_activity("The bot encountered an error or bug.")
+    await context.send_activity("To continue to run this bot, please fix the bot source code.")
+    # Send a trace activity if we're talking to the Bot Framework Emulator
+    if context.activity.channel_id == 'emulator':
+        # Create a trace activity that contains the error object
+        trace_activity = Activity(
+            label="TurnError",
+            name="on_turn_error Trace",
+            timestamp=datetime.utcnow(),
+            type=ActivityTypes.trace,
+            value=f"{error}",
+            value_type="https://www.botframework.com/schemas/error"
+        )
+
+        # Send a trace activity, which will be displayed in Bot Framework Emulator
+        await context.send_activity(trace_activity)
+
     # Clear out state
     await CONVERSATION_STATE.delete(context)
 
-
-ADAPTER.on_turn_error = on_error
+ADAPTER.on_turn_error = MethodType(on_error, ADAPTER)
 
 # Create MemoryStorage, UserState and ConversationState
 MEMORY = MemoryStorage()
@@ -55,9 +71,10 @@ DIALOG = UserProfileDialog(USER_STATE)
 BOT = DialogBot(CONVERSATION_STATE, USER_STATE, DIALOG)
 
 
+# Listen for incoming requests on /api/messages.
 @APP.route("/api/messages", methods=["POST"])
 def messages():
-    """Main bot message handler."""
+    # Main bot message handler.s
     if "application/json" in request.headers["Content-Type"]:
         body = request.json
     else:
@@ -68,12 +85,9 @@ def messages():
         request.headers["Authorization"] if "Authorization" in request.headers else ""
     )
 
-    async def aux_func(turn_context):
-        await BOT.on_turn(turn_context)
-
     try:
         task = LOOP.create_task(
-            ADAPTER.process_activity(activity, auth_header, aux_func)
+            ADAPTER.process_activity(activity, auth_header, BOT.on_turn)
         )
         LOOP.run_until_complete(task)
         return Response(status=201)
