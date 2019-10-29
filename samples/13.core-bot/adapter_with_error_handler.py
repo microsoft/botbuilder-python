@@ -1,14 +1,15 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 import sys
+from datetime import datetime
+
 from botbuilder.core import (
     BotFrameworkAdapter,
     BotFrameworkAdapterSettings,
     ConversationState,
-    MessageFactory,
     TurnContext,
 )
-from botbuilder.schema import InputHints
+from botbuilder.schema import InputHints, ActivityTypes, Activity
 
 
 class AdapterWithErrorHandler(BotFrameworkAdapter):
@@ -25,14 +26,25 @@ class AdapterWithErrorHandler(BotFrameworkAdapter):
             # This check writes out errors to console log
             # NOTE: In production environment, you should consider logging this to Azure
             #       application insights.
-            print(f"\n [on_turn_error]: {error}", file=sys.stderr)
+            print(f"\n [on_turn_error] unhandled error: {error}", file=sys.stderr)
 
             # Send a message to the user
-            error_message_text = "Sorry, it looks like something went wrong."
-            error_message = MessageFactory.text(
-                error_message_text, error_message_text, InputHints.expecting_input
-            )
-            await context.send_activity(error_message)
+            await context.send_activity("The bot encountered an error or bug.")
+            await context.send_activity("To continue to run this bot, please fix the bot source code.")
+            # Send a trace activity if we're talking to the Bot Framework Emulator
+            if context.activity.channel_id == 'emulator':
+                # Create a trace activity that contains the error object
+                trace_activity = Activity(
+                    label="TurnError",
+                    name="on_turn_error Trace",
+                    timestamp=datetime.utcnow(),
+                    type=ActivityTypes.trace,
+                    value=f"{error}",
+                    value_type="https://www.botframework.com/schemas/error"
+                )
+                # Send a trace activity, which will be displayed in Bot Framework Emulator
+                await context.send_activity(trace_activity)
+
             # Clear out state
             nonlocal self
             await self._conversation_state.delete(context)
