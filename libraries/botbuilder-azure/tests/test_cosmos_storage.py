@@ -159,7 +159,7 @@ class TestCosmosDbStorage:
     @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
     async def test_cosmos_storage_write_should_overwrite_when_new_e_tag_is_an_asterisk(
-        self
+        self,
     ):
         await reset()
         storage = CosmosDbStorage(COSMOS_DB_CONFIG)
@@ -228,7 +228,7 @@ class TestCosmosDbStorage:
     @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
     async def test_cosmos_storage_delete_should_delete_multiple_values_when_given_multiple_valid_keys(
-        self
+        self,
     ):
         await reset()
         storage = CosmosDbStorage(COSMOS_DB_CONFIG)
@@ -241,7 +241,7 @@ class TestCosmosDbStorage:
     @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
     async def test_cosmos_storage_delete_should_delete_values_when_given_multiple_valid_keys_and_ignore_other_data(
-        self
+        self,
     ):
         await reset()
         storage = CosmosDbStorage(COSMOS_DB_CONFIG)
@@ -260,7 +260,7 @@ class TestCosmosDbStorage:
     @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
     async def test_cosmos_storage_delete_invalid_key_should_do_nothing_and_not_affect_cached_data(
-        self
+        self,
     ):
         await reset()
         storage = CosmosDbStorage(COSMOS_DB_CONFIG)
@@ -275,7 +275,7 @@ class TestCosmosDbStorage:
     @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
     async def test_cosmos_storage_delete_invalid_keys_should_do_nothing_and_not_affect_cached_data(
-        self
+        self,
     ):
         await reset()
         storage = CosmosDbStorage(COSMOS_DB_CONFIG)

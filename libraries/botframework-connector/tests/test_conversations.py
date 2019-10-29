@@ -190,7 +190,7 @@ class ConversationTest(ReplayableTest):
         assert response is not None
 
     def test_conversations_send_to_conversation_with_invalid_conversation_id_fails(
-        self
+        self,
     ):
         activity = Activity(
             type=ActivityTypes.message,
