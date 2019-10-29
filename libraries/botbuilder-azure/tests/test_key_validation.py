@@ -65,7 +65,7 @@ class TestKeyValidation(TestCase):
         assert len(fixed2) == 16, "short key was truncated improperly"
 
     def test_should_create_sufficiently_different_truncated_keys_of_similar_origin(
-        self
+        self,
     ):
         # create 2 very similar extra long key where the difference will definitely be trimmed off by truncate function
         long_key = "x" * 300 + "1"

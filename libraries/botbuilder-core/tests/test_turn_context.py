@@ -1,16 +1,18 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from typing import Callable, List
 import aiounittest
 
 from botbuilder.schema import (
     Activity,
+    ActivityTypes,
     ChannelAccount,
     ConversationAccount,
     Mention,
     ResourceResponse,
 )
-from botbuilder.core import BotAdapter, TurnContext
+from botbuilder.core import BotAdapter, MessageFactory, TurnContext
 
 ACTIVITY = Activity(
     id="1234",
@@ -33,18 +35,19 @@ class SimpleAdapter(BotAdapter):
         assert activities
         for (idx, activity) in enumerate(activities):  # pylint: disable=unused-variable
             assert isinstance(activity, Activity)
-            assert activity.type == "message"
+            assert activity.type == "message" or activity.type == ActivityTypes.trace
             responses.append(ResourceResponse(id="5678"))
         return responses
 
     async def update_activity(self, context, activity):
         assert context is not None
         assert activity is not None
+        return ResourceResponse(id=activity.id)
 
     async def delete_activity(self, context, reference):
         assert context is not None
         assert reference is not None
-        assert reference.activity_id == "1234"
+        assert reference.activity_id == ACTIVITY.id
 
 
 class TestBotContext(aiounittest.AsyncTestCase):
@@ -225,6 +228,26 @@ class TestBotContext(aiounittest.AsyncTestCase):
         await context.update_activity(ACTIVITY)
         assert called is True
 
+    async def test_update_activity_should_apply_conversation_reference(self):
+        activity_id = "activity ID"
+        context = TurnContext(SimpleAdapter(), ACTIVITY)
+        called = False
+
+        async def update_handler(context, activity, next_handler_coroutine):
+            nonlocal called
+            called = True
+            assert context is not None
+            assert activity.id == activity_id
+            assert activity.conversation.id == ACTIVITY.conversation.id
+            await next_handler_coroutine()
+
+        context.on_update_activity(update_handler)
+        new_activity = MessageFactory.text("test text")
+        new_activity.id = activity_id
+        update_result = await context.update_activity(new_activity)
+        assert called is True
+        assert update_result.id == activity_id
+
     def test_get_conversation_reference_should_return_valid_reference(self):
         reference = TurnContext.get_conversation_reference(ACTIVITY)
 
@@ -236,7 +259,7 @@ class TestBotContext(aiounittest.AsyncTestCase):
         assert reference.service_url == ACTIVITY.service_url
 
     def test_apply_conversation_reference_should_return_prepare_reply_when_is_incoming_is_false(
-        self
+        self,
     ):
         reference = TurnContext.get_conversation_reference(ACTIVITY)
         reply = TurnContext.apply_conversation_reference(
@@ -250,7 +273,7 @@ class TestBotContext(aiounittest.AsyncTestCase):
         assert reply.channel_id == ACTIVITY.channel_id
 
     def test_apply_conversation_reference_when_is_incoming_is_true_should_not_prepare_a_reply(
-        self
+        self,
     ):
         reference = TurnContext.get_conversation_reference(ACTIVITY)
         reply = TurnContext.apply_conversation_reference(
@@ -264,7 +287,7 @@ class TestBotContext(aiounittest.AsyncTestCase):
         assert reply.channel_id == ACTIVITY.channel_id
 
     async def test_should_get_conversation_reference_using_get_reply_conversation_reference(
-        self
+        self,
     ):
         context = TurnContext(SimpleAdapter(), ACTIVITY)
         reply = await context.send_activity("test")
@@ -298,3 +321,28 @@ class TestBotContext(aiounittest.AsyncTestCase):
 
         assert text, " test activity"
         assert activity.text, " test activity"
+
+    async def test_should_send_a_trace_activity(self):
+        context = TurnContext(SimpleAdapter(), ACTIVITY)
+        called = False
+
+        #  pylint: disable=unused-argument
+        async def aux_func(
+            ctx: TurnContext, activities: List[Activity], next: Callable
+        ):
+            nonlocal called
+            called = True
+            assert isinstance(activities, list), "activities not array."
+            assert len(activities) == 1, "invalid count of activities."
+            assert activities[0].type == ActivityTypes.trace, "type wrong."
+            assert activities[0].name == "name-text", "name wrong."
+            assert activities[0].value == "value-text", "value worng."
+            assert activities[0].value_type == "valueType-text", "valeuType wrong."
+            assert activities[0].label == "label-text", "label wrong."
+            return []
+
+        context.on_send_activities(aux_func)
+        await context.send_trace_activity(
+            "name-text", "value-text", "valueType-text", "label-text"
+        )
+        assert called

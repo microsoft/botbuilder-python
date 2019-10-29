@@ -7,8 +7,8 @@ from typing import List
 from ..models import QueryResult
 
 MINIMUM_SCORE_FOR_LOW_SCORE_VARIATION = 20.0
-PREVIOUS_LOW_SCORE_VARIATION_MULTIPLIER = 1.4
-MAX_LOW_SCORE_VARIATION_MULTIPLIER = 2.0
+PREVIOUS_LOW_SCORE_VARIATION_MULTIPLIER = 0.7
+MAX_LOW_SCORE_VARIATION_MULTIPLIER = 1.0
 MAX_SCORE_FOR_LOW_SCORE_VARIATION = 95.0
 
 
@@ -17,7 +17,7 @@ class ActiveLearningUtils:
 
     @staticmethod
     def get_low_score_variation(
-        qna_search_results: List[QueryResult]
+        qna_search_results: List[QueryResult],
     ) -> List[QueryResult]:
         """
         Returns a list of QnA search results, which have low score variation.
