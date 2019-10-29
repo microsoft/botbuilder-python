@@ -107,7 +107,7 @@ class TestAutoSaveMiddleware(aiounittest.AsyncTestCase):
         assert foo_state.write_called, "save_all_changes() not called."
 
     async def test_should_not_add_any_bot_state_on_construction_if_none_are_passed_in(
-        self
+        self,
     ):
         middleware = AutoSaveStateMiddleware()
         assert (

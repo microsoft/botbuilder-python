@@ -315,7 +315,7 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
         await step3.assert_reply("red")
 
     async def test_should_use_context_activity_locale_over_default_locale_when_rendering_choices(
-        self
+        self,
     ):
         async def exec_test(turn_context: TurnContext):
             dialog_context = await dialogs.create_context(turn_context)
@@ -477,7 +477,7 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
         await step3.assert_reply("red")
 
     async def test_should_create_prompt_with_suggested_action_style_when_specified(
-        self
+        self,
     ):
         async def exec_test(turn_context: TurnContext):
             dialog_context = await dialogs.create_context(turn_context)
