@@ -30,7 +30,7 @@ class TestBotAdapter(aiounittest.AsyncTestCase):
 
     async def test_pass_resource_responses_through(self):
         def validate_responses(  # pylint: disable=unused-argument
-            activities: List[Activity]
+            activities: List[Activity],
         ):
             pass  # no need to do anything.
 

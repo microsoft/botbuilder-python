@@ -39,7 +39,7 @@ class TestAuth:
 
     @pytest.mark.asyncio
     async def test_connector_auth_header_correct_app_id_and_service_url_should_validate(
-        self
+        self,
     ):
         header = (
             "Bearer "
@@ -58,7 +58,7 @@ class TestAuth:
 
     @pytest.mark.asyncio
     async def test_connector_auth_header_with_different_bot_app_id_should_not_validate(
-        self
+        self,
     ):
         header = (
             "Bearer "
@@ -100,7 +100,7 @@ class TestAuth:
 
     @pytest.mark.asyncio
     async def test_emulator_msa_header_correct_app_id_and_service_url_should_validate(
-        self
+        self,
     ):
         header = (
             "Bearer "
@@ -212,7 +212,7 @@ class TestAuth:
     @pytest.mark.asyncio
     # Tests with no authentication header and makes sure the service URL is not added to the trusted list.
     async def test_channel_authentication_disabled_service_url_should_not_be_trusted(
-        self
+        self,
     ):
         activity = Activity(service_url="https://webchat.botframework.com/")
         header = ""
@@ -226,7 +226,7 @@ class TestAuth:
 
     @pytest.mark.asyncio
     async def test_emulator_auth_header_correct_app_id_and_service_url_with_gov_channel_service_should_validate(
-        self
+        self,
     ):
         await jwt_token_validation_validate_auth_header_with_channel_service_succeeds(
             "2cd87869-38a0-4182-9251-d056e8f0ac24",  # emulator creds
@@ -236,7 +236,7 @@ class TestAuth:
 
     @pytest.mark.asyncio
     async def test_emulator_auth_header_correct_app_id_and_service_url_with_private_channel_service_should_validate(
-        self
+        self,
     ):
         await jwt_token_validation_validate_auth_header_with_channel_service_succeeds(
             "2cd87869-38a0-4182-9251-d056e8f0ac24",  # emulator creds

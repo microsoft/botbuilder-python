@@ -21,19 +21,19 @@ class MyWaterfallDialog(WaterfallDialog):
         super(MyWaterfallDialog, self).__init__(dialog_id)
 
         async def waterfall2_step1(
-            step_context: WaterfallStepContext
+            step_context: WaterfallStepContext,
         ) -> DialogTurnResult:
             await step_context.context.send_activity("step1")
             return Dialog.end_of_turn
 
         async def waterfall2_step2(
-            step_context: WaterfallStepContext
+            step_context: WaterfallStepContext,
         ) -> DialogTurnResult:
             await step_context.context.send_activity("step2")
             return Dialog.end_of_turn
 
         async def waterfall2_step3(
-            step_context: WaterfallStepContext
+            step_context: WaterfallStepContext,
         ) -> DialogTurnResult:
             await step_context.context.send_activity("step3")
             return Dialog.end_of_turn

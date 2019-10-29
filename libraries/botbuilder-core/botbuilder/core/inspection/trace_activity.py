@@ -42,7 +42,7 @@ def from_state(bot_state: Union[BotState, Dict]) -> Activity:
 
 
 def from_conversation_reference(
-    conversation_reference: ConversationReference
+    conversation_reference: ConversationReference,
 ) -> Activity:
     return Activity(
         type=ActivityTypes.trace,
