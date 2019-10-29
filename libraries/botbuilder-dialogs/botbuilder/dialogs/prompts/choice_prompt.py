@@ -121,7 +121,9 @@ class ChoicePrompt(Prompt):
             if self.choice_options
             else ChoicePrompt._default_choice_options[culture]
         )
-        choice_style = 0 if options.style == 0 else options.style if options.style else self.style
+        choice_style = (
+            0 if options.style == 0 else options.style if options.style else self.style
+        )
 
         if is_retry and options.retry_prompt is not None:
             prompt = self.append_choices(
