@@ -81,7 +81,8 @@ class WelcomeUserBot(ActivityHandler):
             )
             
         else:
-            # This example hardcodes specific utterances. You should use LUIS or QnA for more advance language understanding.
+            # This example hardcodes specific utterances. You should use LUIS or QnA for more advance language
+            # understanding.
             text = turn_context.activity.text.lower()
             if text in ("hello", "hi"):
                 await turn_context.send_activity(
