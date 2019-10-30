@@ -26,6 +26,7 @@ SETTINGS = BotFrameworkAdapterSettings(APP.config["APP_ID"], APP.config["APP_PAS
 ADAPTER = BotFrameworkAdapter(SETTINGS)
 
 # Catch-all for errors.
+# pylint: disable=unused-argument
 async def on_error(self, context: TurnContext, error: Exception):
     # This check writes out errors to console log .vs. app insights.
     # NOTE: In production environment, you should consider logging this to Azure

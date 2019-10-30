@@ -1,23 +1,48 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+# pylint: disable=import-error
+
+"""
+This sample shows how to create a bot that demonstrates the following:
+- Use [LUIS](https://www.luis.ai) to implement core AI capabilities.
+- Implement a multi-turn conversation using Dialogs.
+- Handle user interruptions for such things as `Help` or `Cancel`.
+- Prompt for and validate requests for information from the user.
+"""
 
 import asyncio
 import sys
+from datetime import datetime
 from types import MethodType
 
 from flask import Flask, request, Response
 from botbuilder.core import (
     BotFrameworkAdapter,
     BotFrameworkAdapterSettings,
-    TurnContext,
+    ConversationState,
+    MemoryStorage,
+    UserState,
+    TurnContext
 )
-from botbuilder.schema import Activity
-from bot import MyBot
+from botbuilder.schema import Activity, ActivityTypes
 
-# Create the loop and Flask app
+from bots import DialogAndWelcomeBot
+from dialogs import MainDialog, BookingDialog
+from flight_booking_recognizer import FlightBookingRecognizer
+
 LOOP = asyncio.get_event_loop()
 APP = Flask(__name__, instance_relative_config=True)
 APP.config.from_object("config.DefaultConfig")
+
+SETTINGS = BotFrameworkAdapterSettings(APP.config["APP_ID"], APP.config["APP_PASSWORD"])
+ADAPTER = BotFrameworkAdapter(SETTINGS)
+
+# Create MemoryStorage, UserState and ConversationState
+MEMORY = MemoryStorage()
+USER_STATE = UserState(MEMORY)
+CONVERSATION_STATE = ConversationState(MEMORY)
+RECOGNIZER = FlightBookingRecognizer(APP.config)
+BOOKING_DIALOG = BookingDialog()
 
 # Create adapter.
 # See https://aka.ms/about-bot-adapter to learn more about how bots work.
@@ -35,16 +60,29 @@ async def on_error(self, context: TurnContext, error: Exception):
     # Send a message to the user
     await context.send_activity("The bot encounted an error or bug.")
     await context.send_activity("To continue to run this bot, please fix the bot source code.")
+    # Send a trace activity if we're talking to the Bot Framework Emulator
+    if context.activity.channel_id == 'emulator':
+        # Create a trace activity that contains the error object
+        trace_activity = Activity(
+            label="TurnError",
+            name="on_turn_error Trace",
+            timestamp=datetime.utcnow(),
+            type=ActivityTypes.trace,
+            value=f"{error}",
+            value_type="https://www.botframework.com/schemas/error"
+        )
+        # Send a trace activity, which will be displayed in Bot Framework Emulator
+        await context.send_activity(trace_activity)
 
 ADAPTER.on_turn_error = MethodType(on_error, ADAPTER)
 
-# Create the main dialog
-BOT = MyBot()
+DIALOG = MainDialog(RECOGNIZER, BOOKING_DIALOG)
+BOT = DialogAndWelcomeBot(CONVERSATION_STATE, USER_STATE, DIALOG)
 
-# Listen for incoming requests on /api/messages.
+
 @APP.route("/api/messages", methods=["POST"])
 def messages():
-    # Main bot message handler.
+    """Main bot message handler."""
     if "application/json" in request.headers["Content-Type"]:
         body = request.json
     else:
