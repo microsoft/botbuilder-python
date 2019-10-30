@@ -3,8 +3,9 @@
 
 from datetime import datetime, timedelta
 from urllib.parse import urlparse
-from msrest.authentication import BasicTokenAuthentication, Authentication
 import requests
+
+from msrest.authentication import Authentication
 from .constants import Constants
 
 # TODO: Decide to move this to Constants or viceversa (when porting OAuth)
@@ -82,20 +83,25 @@ class MicrosoftAppCredentials(Authentication):
         self.oauth_scope = AUTH_SETTINGS["refreshScope"]
         self.token_cache_key = app_id + "-cache"
 
-    def signed_session(self) -> requests.Session:  # pylint: disable=arguments-differ
+    # pylint: disable=arguments-differ
+    def signed_session(self, session: requests.Session = None) -> requests.Session:
         """
         Gets the signed session.
         :returns: Signed requests.Session object
         """
-        auth_token = self.get_access_token()
-
-        basic_authentication = BasicTokenAuthentication({"access_token": auth_token})
-        session = basic_authentication.signed_session()
+        if not session:
+            session = requests.Session()
 
         # If there is no microsoft_app_id and no self.microsoft_app_password, then there shouldn't
         # be an "Authorization" header on the outgoing activity.
         if not self.microsoft_app_id and not self.microsoft_app_password:
-            del session.headers["Authorization"]
+            session.headers.pop("Authorization", None)
+
+        elif not session.headers.get("Authorization"):
+            auth_token = self.get_access_token()
+            header = "{} {}".format("Bearer", auth_token)
+            session.headers["Authorization"] = header
+
         return session
 
     def get_access_token(self, force_refresh: bool = False) -> str:
