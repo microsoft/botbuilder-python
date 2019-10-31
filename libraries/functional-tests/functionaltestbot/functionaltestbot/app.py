@@ -9,9 +9,10 @@ from flask import Flask, request, Response
 from botbuilder.core import (
     BotFrameworkAdapter,
     BotFrameworkAdapterSettings,
+    MessageFactory,
     TurnContext,
 )
-from botbuilder.schema import Activity
+from botbuilder.schema import Activity, InputHints
 from bot import MyBot
 
 # Create the loop and Flask app
@@ -30,16 +31,26 @@ async def on_error(self, context: TurnContext, error: Exception):
     # This check writes out errors to console log .vs. app insights.
     # NOTE: In production environment, you should consider logging this to Azure
     #       application insights.
-    print(f"\n [on_turn_error] unhandled error: {error}", file=sys.stderr)
+    print(f"\n [on_turn_error]: {error}", file=sys.stderr)
 
     # Send a message to the user
-    await context.send_activity("The bot encounted an error or bug.")
-    await context.send_activity("To continue to run this bot, please fix the bot source code.")
+    error_message_text = "Sorry, it looks like something went wrong."
+    error_message = MessageFactory.text(
+        error_message_text, error_message_text, InputHints.expecting_input
+    )
+    await context.send_activity(error_message)
+
 
 ADAPTER.on_turn_error = MethodType(on_error, ADAPTER)
 
 # Create the main dialog
 BOT = MyBot()
+
+# Listen for incoming requests on GET / for Azure monitoring
+@APP.route("/", methods=["GET"])
+def ping():
+    return Response(status=200)
+
 
 # Listen for incoming requests on /api/messages.
 @APP.route("/api/messages", methods=["POST"])
@@ -55,9 +66,12 @@ def messages():
         request.headers["Authorization"] if "Authorization" in request.headers else ""
     )
 
+    async def aux_func(turn_context):
+        await BOT.on_turn(turn_context)
+
     try:
         task = LOOP.create_task(
-            ADAPTER.process_activity(activity, auth_header, BOT.on_turn)
+            ADAPTER.process_activity(activity, auth_header, aux_func)
         )
         LOOP.run_until_complete(task)
         return Response(status=201)
