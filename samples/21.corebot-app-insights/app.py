@@ -45,7 +45,7 @@ ADAPTER = BotFrameworkAdapter(SETTINGS)
 
 
 # Catch-all for errors.
-async def on_error(self, context: TurnContext, error: Exception):
+async def on_error(context: TurnContext, error: Exception):
     # This check writes out errors to console log .vs. app insights.
     # NOTE: In production environment, you should consider logging this to Azure
     #       application insights.
@@ -69,10 +69,11 @@ async def on_error(self, context: TurnContext, error: Exception):
         await context.send_activity(trace_activity)
 
     # Clear out state
-    nonlocal self
     await CONVERSATION_STATE.delete(context)
 
-ADAPTER.on_turn_error = MethodType(on_error, ADAPTER)
+# Set the error handler on the Adapter.
+# In this case, we want an unbound method, so MethodType is not needed.
+ADAPTER.on_turn_error = on_error
 
 # Create MemoryStorage, UserState and ConversationState
 MEMORY = MemoryStorage()
