@@ -7,7 +7,6 @@ This sample shows how to use different types of rich cards.
 import asyncio
 import sys
 from datetime import datetime
-from types import MethodType
 
 from flask import Flask, request, Response
 from botbuilder.core import (

@@ -14,7 +14,6 @@ This sample shows how to create a bot that demonstrates the following:
 import asyncio
 import sys
 from datetime import datetime
-from types import MethodType
 
 from flask import Flask, request, Response
 from botbuilder.core import (
