@@ -8,7 +8,7 @@ VERSION = os.environ["packageVersion"] if "packageVersion" in os.environ else "4
 REQUIRES = [
     "botbuilder-schema>=4.4.0b1",
     "botframework-connector>=4.4.0b1",
-    "jsonpickle>=1.2",
+    "jsonpickle==1.2",
 ]
 
 root = os.path.abspath(os.path.dirname(__file__))
