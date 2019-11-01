@@ -10,7 +10,7 @@ REQUIRES = [
     "botbuilder-dialogs>=4.4.0b1",
 ]
 
-TESTS_REQUIRES = ["aiounittest>=1.1.0"]
+TESTS_REQUIRES = ["aiounittest==1.3.0"]
 
 root = os.path.abspath(os.path.dirname(__file__))
 
