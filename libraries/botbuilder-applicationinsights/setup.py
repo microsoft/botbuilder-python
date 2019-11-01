@@ -11,10 +11,10 @@ REQUIRES = [
     "botbuilder-core>=4.4.0b1",
 ]
 TESTS_REQUIRES = [
-    "aiounittest>=1.1.0",
-    "django>=2.2",  # For samples
-    "djangorestframework>=3.9.2",  # For samples
-    "flask>=1.0.2",  # For samples
+    "aiounittest==1.3.0",
+    "django==2.2.6",  # For samples
+    "djangorestframework==3.10.3",  # For samples
+    "flask==1.1.1",  # For samples
 ]
 
 root = os.path.abspath(os.path.dirname(__file__))

@@ -1,5 +1,2 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
-
-botbuilder-core>=4.5.0.b4
-flask==1.1.1
