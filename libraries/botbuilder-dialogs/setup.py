@@ -10,13 +10,13 @@ REQUIRES = [
     "recognizers-text-number>=1.0.2a1",
     "recognizers-text>=1.0.2a1",
     "recognizers-text-choice>=1.0.2a1",
-    "babel>=2.7.0",
+    "babel==2.7.0",
     "botbuilder-schema>=4.4.0b1",
     "botframework-connector>=4.4.0b1",
     "botbuilder-core>=4.4.0b1",
 ]
 
-TEST_REQUIRES = ["aiounittest>=1.1.0"]
+TEST_REQUIRES = ["aiounittest==1.3.0"]
 
 root = os.path.abspath(os.path.dirname(__file__))
 
