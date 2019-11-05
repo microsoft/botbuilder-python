@@ -4,6 +4,7 @@
 import asyncio
 import sys
 from datetime import datetime
+from types import MethodType
 
 from flask import Flask, request, Response
 from botbuilder.core import (
@@ -16,9 +17,11 @@ from botbuilder.core import (
 )
 from botbuilder.schema import Activity, ActivityTypes
 
-from bots import StateManagementBot
+from bots import DialogBot
 
 # Create the loop and Flask app
+from dialogs.root_dialog import RootDialog
+
 LOOP = asyncio.get_event_loop()
 APP = Flask(__name__, instance_relative_config=True)
 APP.config.from_object("config.DefaultConfig")
@@ -30,7 +33,7 @@ ADAPTER = BotFrameworkAdapter(SETTINGS)
 
 
 # Catch-all for errors.
-async def on_error(context: TurnContext, error: Exception):
+async def on_error(self, context: TurnContext, error: Exception):
     # This check writes out errors to console log .vs. app insights.
     # NOTE: In production environment, you should consider logging this to Azure
     #       application insights.
@@ -52,21 +55,17 @@ async def on_error(context: TurnContext, error: Exception):
         )
         # Send a trace activity, which will be displayed in Bot Framework Emulator
         await context.send_activity(trace_activity)
-        
-    # Clear out state
-    await CONVERSATION_STATE.delete(context)
 
-# Set the error handler on the Adapter.
-# In this case, we want an unbound method, so MethodType is not needed.
-ADAPTER.on_turn_error = on_error
+ADAPTER.on_turn_error = MethodType(on_error, ADAPTER)
 
 # Create MemoryStorage and state
 MEMORY = MemoryStorage()
 USER_STATE = UserState(MEMORY)
 CONVERSATION_STATE = ConversationState(MEMORY)
 
-# Create Bot
-BOT = StateManagementBot(CONVERSATION_STATE, USER_STATE)
+# Create Dialog and Bot
+DIALOG = RootDialog(USER_STATE)
+BOT = DialogBot(CONVERSATION_STATE, USER_STATE, DIALOG)
 
 
 # Listen for incoming requests on /api/messages.

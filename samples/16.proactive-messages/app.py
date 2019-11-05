@@ -3,20 +3,16 @@
 
 import asyncio
 import sys
+import uuid
 from datetime import datetime
+from types import MethodType
+from typing import Dict
 
 from flask import Flask, request, Response
-from botbuilder.core import (
-    BotFrameworkAdapter,
-    BotFrameworkAdapterSettings,
-    ConversationState,
-    MemoryStorage,
-    TurnContext,
-    UserState,
-)
-from botbuilder.schema import Activity, ActivityTypes
+from botbuilder.core import BotFrameworkAdapterSettings, TurnContext, BotFrameworkAdapter
+from botbuilder.schema import Activity, ActivityTypes, ConversationReference
 
-from bots import StateManagementBot
+from bots import ProactiveBot
 
 # Create the loop and Flask app
 LOOP = asyncio.get_event_loop()
@@ -30,7 +26,7 @@ ADAPTER = BotFrameworkAdapter(SETTINGS)
 
 
 # Catch-all for errors.
-async def on_error(context: TurnContext, error: Exception):
+async def on_error(self, context: TurnContext, error: Exception):
     # This check writes out errors to console log .vs. app insights.
     # NOTE: In production environment, you should consider logging this to Azure
     #       application insights.
@@ -52,22 +48,20 @@ async def on_error(context: TurnContext, error: Exception):
         )
         # Send a trace activity, which will be displayed in Bot Framework Emulator
         await context.send_activity(trace_activity)
-        
-    # Clear out state
-    await CONVERSATION_STATE.delete(context)
 
-# Set the error handler on the Adapter.
-# In this case, we want an unbound method, so MethodType is not needed.
-ADAPTER.on_turn_error = on_error
+ADAPTER.on_turn_error = MethodType(on_error, ADAPTER)
 
-# Create MemoryStorage and state
-MEMORY = MemoryStorage()
-USER_STATE = UserState(MEMORY)
-CONVERSATION_STATE = ConversationState(MEMORY)
+# Create a shared dictionary.  The Bot will add conversation references when users
+# join the conversation and send messages.
+CONVERSATION_REFERENCES: Dict[str, ConversationReference] = dict()
 
-# Create Bot
-BOT = StateManagementBot(CONVERSATION_STATE, USER_STATE)
+# If the channel is the Emulator, and authentication is not in use, the AppId will be null.
+# We generate a random AppId for this case only. This is not required for production, since
+# the AppId will have a value.
+APP_ID = SETTINGS.app_id if SETTINGS.app_id else uuid.uuid4()
 
+# Create the Bot
+BOT = ProactiveBot(CONVERSATION_REFERENCES)
 
 # Listen for incoming requests on /api/messages.
 @APP.route("/api/messages", methods=["POST"])
@@ -91,6 +85,31 @@ def messages():
         return Response(status=201)
     except Exception as exception:
         raise exception
+
+
+# Listen for requests on /api/notify, and send a messages to all conversation members.
+@APP.route("/api/notify")
+def notify():
+    try:
+        task = LOOP.create_task(
+            _send_proactive_message()
+        )
+        LOOP.run_until_complete(task)
+
+        return Response(status=201, response="Proactive messages have been sent")
+    except Exception as exception:
+        raise exception
+
+
+# Send a message to all conversation members.
+# This uses the shared Dictionary that the Bot adds conversation references to.
+async def _send_proactive_message():
+    for conversation_reference in CONVERSATION_REFERENCES.values():
+        return await ADAPTER.continue_conversation(
+            APP_ID,
+            conversation_reference,
+            lambda turn_context: turn_context.send_activity("proactive hello")
+        )
 
 
 if __name__ == "__main__":
