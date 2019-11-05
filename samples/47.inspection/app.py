@@ -4,7 +4,10 @@
 import asyncio
 import sys
 from datetime import datetime
+from types import MethodType
 
+from botbuilder.core.inspection import InspectionMiddleware, InspectionState
+from botframework.connector.auth import MicrosoftAppCredentials
 from flask import Flask, request, Response
 from botbuilder.core import (
     BotFrameworkAdapter,
@@ -16,7 +19,7 @@ from botbuilder.core import (
 )
 from botbuilder.schema import Activity, ActivityTypes
 
-from bots import StateManagementBot
+from bots import EchoBot
 
 # Create the loop and Flask app
 LOOP = asyncio.get_event_loop()
@@ -65,8 +68,20 @@ MEMORY = MemoryStorage()
 USER_STATE = UserState(MEMORY)
 CONVERSATION_STATE = ConversationState(MEMORY)
 
+# Create InspectionMiddleware
+INSPECTION_MIDDLEWARE = InspectionMiddleware(
+    inspection_state=InspectionState(MEMORY),
+    user_state=USER_STATE,
+    conversation_state=CONVERSATION_STATE,
+    credentials=MicrosoftAppCredentials(
+        app_id=APP.config["APP_ID"],
+        password=APP.config["APP_PASSWORD"]
+    )
+)
+ADAPTER.use(INSPECTION_MIDDLEWARE)
+
 # Create Bot
-BOT = StateManagementBot(CONVERSATION_STATE, USER_STATE)
+BOT = EchoBot(CONVERSATION_STATE, USER_STATE)
 
 
 # Listen for incoming requests on /api/messages.
