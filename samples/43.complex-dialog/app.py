@@ -16,9 +16,11 @@ from botbuilder.core import (
 )
 from botbuilder.schema import Activity, ActivityTypes
 
-from bots import StateManagementBot
+from bots import DialogAndWelcomeBot
 
 # Create the loop and Flask app
+from dialogs import MainDialog
+
 LOOP = asyncio.get_event_loop()
 APP = Flask(__name__, instance_relative_config=True)
 APP.config.from_object("config.DefaultConfig")
@@ -57,7 +59,7 @@ async def on_error(context: TurnContext, error: Exception):
     await CONVERSATION_STATE.delete(context)
 
 # Set the error handler on the Adapter.
-# In this case, we want an unbound method, so MethodType is not needed.
+# In this case, we want an unbound function, so MethodType is not needed.
 ADAPTER.on_turn_error = on_error
 
 # Create MemoryStorage and state
@@ -65,8 +67,9 @@ MEMORY = MemoryStorage()
 USER_STATE = UserState(MEMORY)
 CONVERSATION_STATE = ConversationState(MEMORY)
 
-# Create Bot
-BOT = StateManagementBot(CONVERSATION_STATE, USER_STATE)
+# Create Dialog and Bot
+DIALOG = MainDialog(USER_STATE)
+BOT = DialogAndWelcomeBot(CONVERSATION_STATE, USER_STATE, DIALOG)
 
 
 # Listen for incoming requests on /api/messages.

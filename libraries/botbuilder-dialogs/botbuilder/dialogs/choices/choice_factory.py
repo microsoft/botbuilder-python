@@ -69,7 +69,7 @@ class ChoiceFactory:
             # If the titles are short and there are 3 or less choices we'll use an inline list.
             return ChoiceFactory.inline(choices, text, speak, options)
         # Show a numbered list.
-        return [choices, text, speak, options]
+        return ChoiceFactory.list_style(choices, text, speak, options)
 
     @staticmethod
     def inline(
