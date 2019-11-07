@@ -3,6 +3,7 @@
 
 from abc import ABC
 
+from .authentication_configuration import AuthenticationConfiguration
 from .authentication_constants import AuthenticationConstants
 from .channel_validation import ChannelValidation
 from .claims_identity import ClaimsIdentity
@@ -26,6 +27,7 @@ class EnterpriseChannelValidation(ABC):
         credentials: CredentialProvider,
         channel_id: str,
         channel_service: str,
+        auth_configuration: AuthenticationConfiguration = None,
     ) -> ClaimsIdentity:
         endpoint = (
             ChannelValidation.open_id_metadata_endpoint
@@ -41,7 +43,7 @@ class EnterpriseChannelValidation(ABC):
         )
 
         identity: ClaimsIdentity = await token_extractor.get_identity_from_auth_header(
-            auth_header, channel_id
+            auth_header, channel_id, auth_configuration.required_endorsements
         )
         return await EnterpriseChannelValidation.validate_identity(
             identity, credentials
@@ -54,9 +56,10 @@ class EnterpriseChannelValidation(ABC):
         service_url: str,
         channel_id: str,
         channel_service: str,
+        auth_configuration: AuthenticationConfiguration = None,
     ) -> ClaimsIdentity:
         identity: ClaimsIdentity = await EnterpriseChannelValidation.authenticate_channel_token(
-            auth_header, credentials, channel_id, channel_service
+            auth_header, credentials, channel_id, channel_service, auth_configuration
         )
 
         service_url_claim: str = identity.get_claim_value(

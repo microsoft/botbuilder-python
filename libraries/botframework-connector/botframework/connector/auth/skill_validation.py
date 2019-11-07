@@ -13,10 +13,12 @@ from .credential_provider import CredentialProvider
 from .government_constants import GovernmentConstants
 from .verify_options import VerifyOptions
 from .jwt_token_extractor import JwtTokenExtractor
-from .jwt_token_validation import JwtTokenValidation
 
 
 class SkillValidation:
+    # TODO: Remove circular dependcies after C# refactor
+    # pylint: disable=import-outside-toplevel
+
     """
     Validates JWT tokens sent to and from a Skill.
     """
@@ -42,6 +44,8 @@ class SkillValidation:
         :param auth_header: Bearer Token, in the "Bearer [Long String]" Format.
         :return bool:
         """
+        from .jwt_token_validation import JwtTokenValidation
+
         if not JwtTokenValidation.is_valid_token_format(auth_header):
             return False
 
@@ -52,7 +56,7 @@ class SkillValidation:
         return SkillValidation.is_skill_claim(token)
 
     @staticmethod
-    def is_skill_claim(claims: Dict["str":object]) -> bool:
+    def is_skill_claim(claims: Dict[str, object]) -> bool:
         """
         Checks if the given list of claims represents a skill.
         :param claims: A dict of claims.
@@ -69,6 +73,8 @@ class SkillValidation:
             or audience == AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER
         ):
             return False
+
+        from .jwt_token_validation import JwtTokenValidation
 
         app_id = JwtTokenValidation.get_app_id_from_claims(claims)
 
@@ -90,6 +96,8 @@ class SkillValidation:
             raise Exception(
                 "auth_configuration cannot be None in SkillValidation.authenticate_channel_token"
             )
+
+        from .jwt_token_validation import JwtTokenValidation
 
         open_id_metadata_url = (
             GovernmentConstants.TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL
@@ -140,6 +148,8 @@ class SkillValidation:
         if not await credentials.is_valid_appid(audience_claim):
             # The AppId is not valid. Not Authorized.
             raise PermissionError("Invalid audience.")
+
+        from .jwt_token_validation import JwtTokenValidation
 
         app_id = JwtTokenValidation.get_app_id_from_claims(identity.claims)
         if not app_id:

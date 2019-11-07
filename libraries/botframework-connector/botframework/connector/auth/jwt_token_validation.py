@@ -91,31 +91,44 @@ class JwtTokenValidation:
         if not channel_service:
             if service_url:
                 return await ChannelValidation.authenticate_channel_token_with_service_url(
-                    auth_header, credentials, service_url, channel_id
+                    auth_header,
+                    credentials,
+                    service_url,
+                    channel_id,
+                    auth_configuration,
                 )
 
             return await ChannelValidation.authenticate_channel_token(
-                auth_header, credentials, channel_id
+                auth_header, credentials, channel_id, auth_configuration
             )
 
         if JwtTokenValidation.is_government(channel_service):
             if service_url:
                 return await GovernmentChannelValidation.authenticate_channel_token_with_service_url(
-                    auth_header, credentials, service_url, channel_id
+                    auth_header,
+                    credentials,
+                    service_url,
+                    channel_id,
+                    auth_configuration,
                 )
 
             return await GovernmentChannelValidation.authenticate_channel_token(
-                auth_header, credentials, channel_id
+                auth_header, credentials, channel_id, auth_configuration
             )
 
         # Otherwise use Enterprise Channel Validation
         if service_url:
             return await EnterpriseChannelValidation.authenticate_channel_token_with_service_url(
-                auth_header, credentials, service_url, channel_id, channel_service
+                auth_header,
+                credentials,
+                service_url,
+                channel_id,
+                channel_service,
+                auth_configuration,
             )
 
         return await EnterpriseChannelValidation.authenticate_channel_token(
-            auth_header, credentials, channel_id, channel_service
+            auth_header, credentials, channel_id, channel_service, auth_configuration
         )
 
     @staticmethod
