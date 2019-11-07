@@ -59,7 +59,13 @@ class MicrosoftAppCredentials(Authentication):
     }
     cache = {}
 
-    def __init__(self, app_id: str, password: str, channel_auth_tenant: str = None):
+    def __init__(
+        self,
+        app_id: str,
+        password: str,
+        channel_auth_tenant: str = None,
+        oauth_scope: str = None,
+    ):
         """
         Initializes a new instance of MicrosoftAppCredentials class
         :param app_id: The Microsoft app ID.
@@ -80,7 +86,7 @@ class MicrosoftAppCredentials(Authentication):
             + tenant
             + Constants.TO_CHANNEL_FROM_BOT_TOKEN_ENDPOINT_PATH
         )
-        self.oauth_scope = AUTH_SETTINGS["refreshScope"]
+        self.oauth_scope = oauth_scope or AUTH_SETTINGS["refreshScope"]
         self.token_cache_key = app_id + "-cache"
 
     # pylint: disable=arguments-differ

@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 import asyncio
 import jwt
 
@@ -44,27 +47,14 @@ class EmulatorValidation:
 
         :return: True, if the token was issued by the Emulator. Otherwise, false.
         """
-        # The Auth Header generally looks like this:
-        # "Bearer eyJ0e[...Big Long String...]XAiO"
-        if not auth_header:
-            # No token. Can't be an emulator token.
+        from .jwt_token_validation import (  # pylint: disable=import-outside-toplevel
+            JwtTokenValidation,
+        )
+
+        if not JwtTokenValidation.is_valid_token_format(auth_header):
             return False
 
-        parts = auth_header.split(" ")
-        if len(parts) != 2:
-            # Emulator tokens MUST have exactly 2 parts.
-            # If we don't have 2 parts, it's not an emulator token
-            return False
-
-        auth_scheme = parts[0]
-        bearer_token = parts[1]
-
-        # We now have an array that should be:
-        # [0] = "Bearer"
-        # [1] = "[Big Long String]"
-        if auth_scheme != "Bearer":
-            # The scheme from the emulator MUST be "Bearer"
-            return False
+        bearer_token = auth_header.split(" ")[1]
 
         # Parse the Big Long String into an actual token.
         token = jwt.decode(bearer_token, verify=False)
