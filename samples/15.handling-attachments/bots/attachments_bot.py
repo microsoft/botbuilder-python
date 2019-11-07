@@ -110,7 +110,7 @@ class AttachmentsBot(ActivityHandler):
 
         return Attachment(
             name="architecture-resize.png",
-            type="image/png",
+            content_type="image/png",
             content_url=f"data:image/png;base64,{base64_image}"
         )
 
@@ -138,7 +138,7 @@ class AttachmentsBot(ActivityHandler):
 
         return Attachment(
             name="architecture-resize.png",
-            type="image/png",
+            content_type="image/png",
             content_url=attachment_uri
         )
 
