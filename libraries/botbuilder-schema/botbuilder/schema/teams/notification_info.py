@@ -6,15 +6,14 @@
 # Changes may cause incorrect behavior and will be lost if the code is
 # regenerated.
 
-class TeamInfo:
-    def __init__(self, id: string = "", name: string = ""):
-        self.id = id
-        self.name = name
-
+class NotificationInfo():
+    def __init__(self, alert: bool = False):
+        self._alert = alert
+    
     @property
-    def id():
-        return self.id
-
-    @property
-    def name():
-        return self.name
+    def alert():
+        return self._alert
+    
+    @alert.setter
+    def alert(alert):
+        self._alert = alert
