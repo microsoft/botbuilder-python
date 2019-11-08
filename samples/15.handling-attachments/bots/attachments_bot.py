@@ -1,14 +1,32 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+
 import os
 import urllib.parse
 import urllib.request
 import base64
+import json
 
 from botbuilder.core import ActivityHandler, MessageFactory, TurnContext, CardFactory
-from botbuilder.schema import ChannelAccount, HeroCard, CardAction, ActivityTypes, Attachment, AttachmentData, Activity, \
+from botbuilder.schema import (
+    ChannelAccount,
+    HeroCard,
+    CardAction,
+    ActivityTypes,
+    Attachment,
+    AttachmentData,
+    Activity,
     ActionTypes
-import json
+)
+
+"""
+Represents a bot that processes incoming activities.
+For each user interaction, an instance of this class is created and the OnTurnAsync method is called.
+This is a Transient lifetime service. Transient lifetime services are created
+each time they're requested. For each Activity received, a new instance of this
+class is created. Objects that are expensive to construct, or have a lifetime
+beyond the single turn, should be carefully managed.
+"""
 
 
 class AttachmentsBot(ActivityHandler):
@@ -24,6 +42,11 @@ class AttachmentsBot(ActivityHandler):
         await self._display_options(turn_context)
 
     async def _send_welcome_message(self, turn_context: TurnContext):
+        """
+        Greet the user and give them instructions on how to interact with the bot.
+        :param turn_context:
+        :return:
+        """
         for member in turn_context.activity.members_added:
             if member.id != turn_context.activity.recipient.id:
                 await turn_context.send_activity(f"Welcome to AttachmentsBot {member.name}. This bot will introduce "
@@ -31,32 +54,50 @@ class AttachmentsBot(ActivityHandler):
                 await self._display_options(turn_context)
 
     async def _handle_incoming_attachment(self, turn_context: TurnContext):
+        """
+        Handle attachments uploaded by users. The bot receives an Attachment in an Activity.
+        The activity has a List of attachments.
+        Not all channels allow users to upload files. Some channels have restrictions
+        on file type, size, and other attributes. Consult the documentation for the channel for
+        more information. For example Skype's limits are here
+        <see ref="https://support.skype.com/en/faq/FA34644/skype-file-sharing-file-types-size-and-time-limits"/>.
+        :param turn_context:
+        :return:
+        """
         for attachment in turn_context.activity.attachments:
             attachment_info = await self._download_attachment_and_write(attachment)
-            await turn_context.send_activity(
-                f"Attachment {attachment_info['filename']} has been received to {attachment_info['local_path']}")
+            if "filename" in attachment_info:
+                await turn_context.send_activity(
+                    f"Attachment {attachment_info['filename']} has been received to {attachment_info['local_path']}")
 
     async def _download_attachment_and_write(self, attachment: Attachment) -> dict:
-        url = attachment.content_url
-
-        local_filename = os.path.join(os.getcwd(), attachment.name)
-
+        """
+        Retrieve the attachment via the attachment's contentUrl.
+        :param attachment:
+        :return: Dict: keys "filename", "local_path"
+        """
         try:
-            response = urllib.request.urlopen("http://www.python.org")
+            response = urllib.request.urlopen(attachment.content_url)
             headers = response.info()
-            if headers["content-type"] == "application/json":
-                data = json.load(response.data)
-                with open(local_filename, "w") as out_file:
-                    out_file.write(data)
 
-                return {
-                    "filename": attachment.name,
-                    "local_path": local_filename
-                }
+            # If user uploads JSON file, this prevents it from being written as
+            # "{"type":"Buffer","data":[123,13,10,32,32,34,108..."
+            if headers["content-type"] == "application/json":
+                data = bytes(json.load(response)["data"])
             else:
-                return None
-        except:
-            return None
+                data = response.read()
+
+            local_filename = os.path.join(os.getcwd(), attachment.name)
+            with open(local_filename, "wb") as out_file:
+                out_file.write(data)
+
+            return {
+                "filename": attachment.name,
+                "local_path": local_filename
+            }
+        except Exception as e:
+            print(e)
+            return {}
 
     async def _handle_outgoing_attachment(self, turn_context: TurnContext):
         reply = Activity(
@@ -79,6 +120,15 @@ class AttachmentsBot(ActivityHandler):
         await turn_context.send_activity(reply)
 
     async def _display_options(self, turn_context: TurnContext):
+        """
+        Create a HeroCard with options for the user to interact with the bot.
+        :param turn_context:
+        :return:
+        """
+
+        # Note that some channels require different values to be used in order to get buttons to display text.
+        # In this code the emulator is accounted for with the 'title' parameter, but in other channels you may
+        # need to provide a value for other parameters like 'text' or 'displayText'.
         card = HeroCard(
             text="You can upload an image or select one of the following choices",
             buttons=[
@@ -104,9 +154,17 @@ class AttachmentsBot(ActivityHandler):
         await turn_context.send_activity(reply)
 
     def _get_inline_attachment(self) -> Attachment:
+        """
+        Creates an inline attachment sent from the bot to the user using a base64 string.
+        Using a base64 string to send an attachment will not work on all channels.
+        Additionally, some channels will only allow certain file types to be sent this way.
+        For example a .png file may work but a .pdf file may not on some channels.
+        Please consult the channel documentation for specifics.
+        :return: Attachment
+        """
         file_path = os.path.join(os.getcwd(), "resources/architecture-resize.png")
         with open(file_path, "rb") as in_file:
-            base64_image = base64.b64encode(in_file.read())
+            base64_image = base64.b64encode(in_file.read()).decode()
 
         return Attachment(
             name="architecture-resize.png",
@@ -115,6 +173,11 @@ class AttachmentsBot(ActivityHandler):
         )
 
     async def _get_upload_attachment(self, turn_context: TurnContext) -> Attachment:
+        """
+        Creates an "Attachment" to be sent from the bot to the user from an uploaded file.
+        :param turn_context:
+        :return: Attachment
+        """
         with open(os.path.join(os.getcwd(), "resources/architecture-resize.png"), "rb") as in_file:
             image_data = in_file.read()
 
@@ -125,7 +188,6 @@ class AttachmentsBot(ActivityHandler):
             AttachmentData(
                 name="architecture-resize.png",
                 original_base64=image_data,
-                thumbnail_base64=image_data,
                 type="image/png"
             )
         )
@@ -134,7 +196,7 @@ class AttachmentsBot(ActivityHandler):
         attachment_uri = \
             base_uri \
             + ("" if base_uri.endswith("/") else "/") \
-            + f"v3/attachments/${urllib.parse.urlencode(response.id)}/views/original"
+            + f"v3/attachments/{response.id}/views/original"
 
         return Attachment(
             name="architecture-resize.png",
@@ -143,8 +205,12 @@ class AttachmentsBot(ActivityHandler):
         )
 
     def _get_internet_attachment(self) -> Attachment:
+        """
+        Creates an Attachment to be sent from the bot to the user from a HTTP URL.
+        :return: Attachment
+        """
         return Attachment(
-            name="Resources\architecture-resize.png",
+            name="architecture-resize.png",
             content_type="image/png",
             content_url="https://docs.microsoft.com/en-us/bot-framework/media/how-it-works/architecture-resize.png"
         )
