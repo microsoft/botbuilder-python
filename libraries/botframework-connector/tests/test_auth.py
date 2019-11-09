@@ -1,18 +1,21 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
-
+import uuid
 import pytest
 
 from botbuilder.schema import Activity
-from botframework.connector.auth import JwtTokenValidation
-from botframework.connector.auth import SimpleCredentialProvider
-from botframework.connector.auth import EmulatorValidation
-from botframework.connector.auth import EnterpriseChannelValidation
-from botframework.connector.auth import ChannelValidation
-from botframework.connector.auth import ClaimsIdentity
-from botframework.connector.auth import MicrosoftAppCredentials
-from botframework.connector.auth import GovernmentConstants
-from botframework.connector.auth import GovernmentChannelValidation
+from botframework.connector.auth import (
+    AuthenticationConstants,
+    JwtTokenValidation,
+    SimpleCredentialProvider,
+    EmulatorValidation,
+    EnterpriseChannelValidation,
+    ChannelValidation,
+    ClaimsIdentity,
+    MicrosoftAppCredentials,
+    GovernmentConstants,
+    GovernmentChannelValidation,
+)
 
 
 async def jwt_token_validation_validate_auth_header_with_channel_service_succeeds(
@@ -381,3 +384,28 @@ class TestAuth:
                 credentials,
             )
         assert "Unauthorized" in str(excinfo.value)
+
+    def test_get_app_id_from_claims(self):
+        v1_claims = {}
+        v2_claims = {}
+
+        app_id = str(uuid.uuid4())
+
+        # Empty list
+        assert not JwtTokenValidation.get_app_id_from_claims(v1_claims)
+
+        # AppId there but no version (assumes v1)
+        v1_claims[AuthenticationConstants.APP_ID_CLAIM] = app_id
+        assert JwtTokenValidation.get_app_id_from_claims(v1_claims) == app_id
+
+        # AppId there with v1 version
+        v1_claims[AuthenticationConstants.VERSION_CLAIM] = "1.0"
+        assert JwtTokenValidation.get_app_id_from_claims(v1_claims) == app_id
+
+        # v2 version but no azp
+        v2_claims[AuthenticationConstants.VERSION_CLAIM] = "2.0"
+        assert not JwtTokenValidation.get_app_id_from_claims(v2_claims)
+
+        # v2 version but no azp
+        v2_claims[AuthenticationConstants.AUTHORIZED_PARTY] = app_id
+        assert JwtTokenValidation.get_app_id_from_claims(v2_claims) == app_id
