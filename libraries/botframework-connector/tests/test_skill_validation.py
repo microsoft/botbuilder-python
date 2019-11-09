@@ -143,13 +143,13 @@ class TestSkillValidation(aiounittest.AsyncTestCase):
 
         claims[AuthenticationConstants.AUDIENCE_CLAIM] = audience
         mock_credentials.is_valid_appid.side_effect = validate_appid
-        mock_credentials.is_valid_appid.return_value = future_builder(False)
+        mock_credentials.is_valid_appid.return_value = future_builder(return_val=False)
         with self.assertRaises(PermissionError) as exception:
             await SkillValidation._validate_identity(mock_identity, mock_credentials)
         assert str(exception.exception), "Invalid audience."
 
         # Invalid AppId in in app_id or azp
-        mock_credentials.is_valid_appid.return_value = future_builder(True)
+        mock_credentials.is_valid_appid.return_value = future_builder(return_val=True)
         with self.assertRaises(PermissionError) as exception:
             await SkillValidation._validate_identity(mock_identity, mock_credentials)
         assert str(exception.exception), "Invalid app_id."
