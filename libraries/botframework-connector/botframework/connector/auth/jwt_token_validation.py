@@ -77,7 +77,7 @@ class JwtTokenValidation:
             return await SkillValidation.authenticate_channel_token(
                 auth_header,
                 credentials,
-                channel_service,  # TODO
+                channel_service,
                 channel_id,
                 auth_configuration,
             )
