@@ -6,14 +6,15 @@
 # Changes may cause incorrect behavior and will be lost if the code is
 # regenerated.
 
-class TenantInfo():
-    def __init__(self, id = ""):
+
+class TenantInfo:
+    def __init__(self, id=""):
         self._id = id
-    
+
     @property
     def id():
         return self._id
-    
+
     @id.setter
     def id(self, id):
         self._id = id

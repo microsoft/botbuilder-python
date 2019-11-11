@@ -6,14 +6,15 @@
 # Changes may cause incorrect behavior and will be lost if the code is
 # regenerated.
 
-class NotificationInfo():
+
+class NotificationInfo:
     def __init__(self, alert: bool = False):
         self._alert = alert
-    
+
     @property
     def alert():
         return self._alert
-    
+
     @alert.setter
     def alert(alert):
         self._alert = alert

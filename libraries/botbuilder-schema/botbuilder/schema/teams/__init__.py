@@ -6,10 +6,10 @@ from .teams_channel_data import TeamsChannelData
 from .teams_channel_account import TeamsChannelAccount
 
 __all__ = [
-            "TeamInfo", 
-            "ChannelInfo", 
-            "TeamsChannelData", 
-            "TeamsChannelData", 
-            "TenantInfo", 
-            "NotificationInfo"
-            ]
+    "TeamInfo",
+    "ChannelInfo",
+    "TeamsChannelData",
+    "TeamsChannelData",
+    "TenantInfo",
+    "NotificationInfo",
+]
