@@ -33,7 +33,7 @@ class MicrosoftTranslator:
             'text': text_input
         }]
         response = requests.post(constructed_url, headers=headers, json=body)
-        j = response.json()
+        json_response = response.json()
 
         # for this sample, return the first translation
-        return j[0]["translations"][0]["text"]
+        return json_response[0]["translations"][0]["text"]

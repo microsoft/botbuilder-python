@@ -28,7 +28,7 @@ class MultiLingualBot(ActivityHandler):
         self.language_preference_accessor = self.user_state.create_property("LanguagePreference")
 
     async def on_members_added_activity(
-        self, members_added: [ChannelAccount], turn_context: TurnContext
+            self, members_added: [ChannelAccount], turn_context: TurnContext
     ):
         # Greet anyone that was not the target (recipient) of this message.
         # To learn more about Adaptive Cards, see https://aka.ms/msbot-adaptivecards for more details.
@@ -99,8 +99,7 @@ class MultiLingualBot(ActivityHandler):
             return False
 
         utterance = utterance.lower()
-        return utterance == TranslationSettings.english_spanish.value \
-            or utterance == TranslationSettings.english_english.value \
-            or utterance == TranslationSettings.spanish_spanish.value \
-            or utterance == TranslationSettings.spanish_english.value
-
+        return (utterance == TranslationSettings.english_spanish.value
+                or utterance == TranslationSettings.english_english.value
+                or utterance == TranslationSettings.spanish_spanish.value
+                or utterance == TranslationSettings.spanish_english.value)
