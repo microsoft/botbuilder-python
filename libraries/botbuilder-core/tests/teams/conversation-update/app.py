@@ -7,7 +7,11 @@ from datetime import datetime
 from types import MethodType
 
 from flask import Flask, request, Response
-from botbuilder.core import BotFrameworkAdapterSettings, TurnContext, BotFrameworkAdapter
+from botbuilder.core import (
+    BotFrameworkAdapterSettings,
+    TurnContext,
+    BotFrameworkAdapter,
+)
 from botbuilder.schema import Activity, ActivityTypes
 
 from bots import ConversationUpdateBot
@@ -24,7 +28,9 @@ ADAPTER = BotFrameworkAdapter(SETTINGS)
 
 
 # Catch-all for errors.
-async def on_error(self, context: TurnContext, error: Exception):
+async def on_error( # pylint: disable=unused-argument
+    self, context: TurnContext, error: Exception
+):
     # This check writes out errors to console log .vs. app insights.
     # NOTE: In production environment, you should consider logging this to Azure
     #       application insights.
@@ -32,9 +38,11 @@ async def on_error(self, context: TurnContext, error: Exception):
 
     # Send a message to the user
     await context.send_activity("The bot encountered an error or bug.")
-    await context.send_activity("To continue to run this bot, please fix the bot source code.")
+    await context.send_activity(
+        "To continue to run this bot, please fix the bot source code."
+    )
     # Send a trace activity if we're talking to the Bot Framework Emulator
-    if context.activity.channel_id == 'emulator':
+    if context.activity.channel_id == "emulator":
         # Create a trace activity that contains the error object
         trace_activity = Activity(
             label="TurnError",
@@ -42,10 +50,11 @@ async def on_error(self, context: TurnContext, error: Exception):
             timestamp=datetime.utcnow(),
             type=ActivityTypes.trace,
             value=f"{error}",
-            value_type="https://www.botframework.com/schemas/error"
+            value_type="https://www.botframework.com/schemas/error",
         )
         # Send a trace activity, which will be displayed in Bot Framework Emulator
         await context.send_activity(trace_activity)
+
 
 ADAPTER.on_turn_error = MethodType(on_error, ADAPTER)
 

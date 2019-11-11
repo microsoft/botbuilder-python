@@ -6,20 +6,21 @@
 # Changes may cause incorrect behavior and will be lost if the code is
 # regenerated.
 
+
 class ChannelInfo:
-    def __init__(self, id = "", name = ""):
+    def __init__(self, id="", name=""):
         self._id = id
         self._name = name
-    
+
     @property
     def id(self):
         return self._id
-    
+
     @id.setter
     def id(self, id):
         self._id = id
-    
-    @property 
+
+    @property
     def name(self):
         return self._name
 
