@@ -193,10 +193,9 @@ class AttachmentsBot(ActivityHandler):
         )
 
         base_uri: str = connector.config.base_url
-        attachment_uri = \
-            base_uri \
-            + ("" if base_uri.endswith("/") else "/") \
-            + f"v3/attachments/{response.id}/views/original"
+        attachment_uri = (base_uri
+                          + ("" if base_uri.endswith("/") else "/")
+                          + f"v3/attachments/{response.id}/views/original")
 
         return Attachment(
             name="architecture-resize.png",
