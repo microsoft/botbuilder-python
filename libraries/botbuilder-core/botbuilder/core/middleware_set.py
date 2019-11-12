@@ -16,6 +16,21 @@ class Middleware(ABC):
         pass
 
 
+class MiddlewareIterator:
+    def __init__(self, middleware_set: "MiddlewareSet" = None):
+        self._middleware_set = middleware_set
+        self._index = 0
+
+    def __next__(self):
+        # This should be the only external method accessing ._middleware directly
+        # pylint: disable=protected-access
+        if self._index < len(self._middleware_set._middleware):
+            result = self._middleware_set._middleware[self._index]
+            self._index += 1
+            return result
+        raise StopIteration
+
+
 class AnonymousReceiveMiddleware(Middleware):
     def __init__(self, anonymous_handler):
         if not iscoroutinefunction(anonymous_handler):
@@ -38,6 +53,9 @@ class MiddlewareSet(Middleware):
     def __init__(self):
         super(MiddlewareSet, self).__init__()
         self._middleware = []
+
+    def __iter__(self):
+        return MiddlewareIterator(self)
 
     def use(self, *middleware: Middleware):
         """

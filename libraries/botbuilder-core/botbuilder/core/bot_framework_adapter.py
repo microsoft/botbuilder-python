@@ -345,7 +345,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                     else:
                         await asyncio.sleep(delay_in_ms)
                 elif activity.type == "invokeResponse":
-                    context.turn_state.add(self._INVOKE_RESPONSE_KEY)
+                    context.turn_state[self._INVOKE_RESPONSE_KEY] = activity
                 elif activity.reply_to_id:
                     client = self.create_connector_client(activity.service_url)
                     await client.conversations.reply_to_activity(

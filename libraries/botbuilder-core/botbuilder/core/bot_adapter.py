@@ -15,7 +15,7 @@ class BotAdapter(ABC):
     def __init__(
         self, on_turn_error: Callable[[TurnContext, Exception], Awaitable] = None
     ):
-        self._middleware = MiddlewareSet()
+        self.middleware_set = MiddlewareSet()
         self.on_turn_error = on_turn_error
 
     @abstractmethod
@@ -56,7 +56,7 @@ class BotAdapter(ABC):
         :param middleware:
         :return:
         """
-        self._middleware.use(middleware)
+        self.middleware_set.use(middleware)
         return self
 
     async def continue_conversation(
@@ -91,7 +91,7 @@ class BotAdapter(ABC):
 
         if context.activity is not None:
             try:
-                return await self._middleware.receive_activity_with_status(
+                return await self.middleware_set.receive_activity_with_status(
                     context, callback
                 )
             except Exception as error:
