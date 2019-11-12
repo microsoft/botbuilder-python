@@ -86,11 +86,9 @@ class ChannelApiMiddleware(Middleware):
                     return
 
                 invoke_args.result = await context.send_activity(activity_payload)
-                return
 
-            elif invoke_args.method == ChannelApiMethods.UPDATE_ACTIVITY:
+            if invoke_args.method == ChannelApiMethods.UPDATE_ACTIVITY:
                 invoke_args.result = await context.update_activity(invoke_args.args[0])
-                return
 
             elif invoke_args.method == ChannelApiMethods.DELETE_ACTIVITY:
                 invoke_args.result = await context.delete_activity(invoke_args[0])
