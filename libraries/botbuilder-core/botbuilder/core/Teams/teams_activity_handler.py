@@ -64,6 +64,7 @@ class TeamsActivityHandler(ActivityHandler):
                     turn_context,
                 )
 
+            print(turn_context.activity)
             if channel_data is not None:
                 if channel_data.event_type == "channelCreated":
                     return await self.on_teams_channel_created_activity(
