@@ -5,9 +5,9 @@ from botbuilder.dialogs.choices import Choice, ChoiceFactory
 from botbuilder.core import ActivityHandler, MessageFactory, TurnContext, CardFactory
 from botbuilder.schema import ChannelAccount, CardAction, ActionTypes, HeroCard
 
-FacebookPageIdOption = "Facebook Id"
-QuickRepliesOption = "Quick Replies"
-PostBackOption = "PostBack"
+FACEBOOK_PAGEID_OPTION = "Facebook Id"
+QUICK_REPLIES_OPTION = "Quick Replies"
+POSTBACK_OPTION = "PostBack"
 
 
 class FacebookBot(ActivityHandler):
@@ -19,7 +19,9 @@ class FacebookBot(ActivityHandler):
                 await turn_context.send_activity("Hello and welcome!")
 
     async def on_message_activity(self, turn_context: TurnContext):
-        if not await self._process_facebook_payload(turn_context, turn_context.activity.channel_data):
+        if not await self._process_facebook_payload(
+            turn_context, turn_context.activity.channel_data
+        ):
             await self._show_choices(turn_context)
 
     async def on_event_activity(self, turn_context: TurnContext):
@@ -28,35 +30,35 @@ class FacebookBot(ActivityHandler):
     async def _show_choices(self, turn_context: TurnContext):
         choices = [
             Choice(
-                value=QuickRepliesOption,
+                value=QUICK_REPLIES_OPTION,
                 action=CardAction(
-                    title=QuickRepliesOption,
+                    title=QUICK_REPLIES_OPTION,
                     type=ActionTypes.post_back,
-                    value=QuickRepliesOption
-                )
+                    value=QUICK_REPLIES_OPTION,
+                ),
             ),
             Choice(
-                value=FacebookPageIdOption,
+                value=FACEBOOK_PAGEID_OPTION,
                 action=CardAction(
-                    title=FacebookPageIdOption,
+                    title=FACEBOOK_PAGEID_OPTION,
                     type=ActionTypes.post_back,
-                    value=FacebookPageIdOption
-                )
+                    value=FACEBOOK_PAGEID_OPTION,
+                ),
             ),
             Choice(
-                value=PostBackOption,
+                value=POSTBACK_OPTION,
                 action=CardAction(
-                    title=PostBackOption,
+                    title=POSTBACK_OPTION,
                     type=ActionTypes.post_back,
-                    value=PostBackOption
-                )
-            )
+                    value=POSTBACK_OPTION,
+                ),
+            ),
         ]
 
         message = ChoiceFactory.for_channel(
             turn_context.activity.channel_id,
             choices,
-            "What Facebook feature would you like to try? Here are some quick replies to choose from!"
+            "What Facebook feature would you like to try? Here are some quick replies to choose from!",
         )
         await turn_context.send_activity(message)
 
@@ -64,60 +66,64 @@ class FacebookBot(ActivityHandler):
         if "postback" in data:
             await self._on_facebook_postback(turn_context, data["postback"])
             return True
-        elif "optin" in data:
+
+        if "optin" in data:
             await self._on_facebook_optin(turn_context, data["optin"])
             return True
-        elif "message" in data and "quick_reply" in data["message"]:
-            await self._on_facebook_quick_reply(turn_context, data["message"]["quick_reply"])
+
+        if "message" in data and "quick_reply" in data["message"]:
+            await self._on_facebook_quick_reply(
+                turn_context, data["message"]["quick_reply"]
+            )
             return True
-        elif "message" in data and data["message"]["is_echo"]:
+
+        if "message" in data and data["message"]["is_echo"]:
             await self._on_facebook_echo(turn_context, data["message"])
             return True
 
-    async def _on_facebook_postback(self, turn_context: TurnContext, facebook_postback: dict):
+    async def _on_facebook_postback(
+        self, turn_context: TurnContext, facebook_postback: dict
+    ):
         # TODO: Your PostBack handling logic here...
 
-        reply = MessageFactory.text("Postback")
+        reply = MessageFactory.text(f"Postback: {facebook_postback}")
         await turn_context.send_activity(reply)
         await self._show_choices(turn_context)
 
-    async def _on_facebook_quick_reply(self, turn_context: TurnContext, facebook_quick_reply: dict):
+    async def _on_facebook_quick_reply(
+        self, turn_context: TurnContext, facebook_quick_reply: dict
+    ):
         # TODO: Your quick reply event handling logic here...
 
-        if turn_context.activity.text == FacebookPageIdOption:
+        if turn_context.activity.text == FACEBOOK_PAGEID_OPTION:
             reply = MessageFactory.text(
                 f"This message comes from the following Facebook Page: {turn_context.activity.recipient.id}"
             )
             await turn_context.send_activity(reply)
             await self._show_choices(turn_context)
-        elif turn_context.activity.text == PostBackOption:
+        elif turn_context.activity.text == POSTBACK_OPTION:
             card = HeroCard(
                 text="Is 42 the answer to the ultimate question of Life, the Universe, and Everything?",
                 buttons=[
-                    CardAction(
-                        title="Yes",
-                        type=ActionTypes.post_back,
-                        value="Yes"
-                    ),
-                    CardAction(
-                        title="No",
-                        type=ActionTypes.post_back,
-                        value="No"
-                    )
-                ]
+                    CardAction(title="Yes", type=ActionTypes.post_back, value="Yes"),
+                    CardAction(title="No", type=ActionTypes.post_back, value="No"),
+                ],
             )
             reply = MessageFactory.attachment(CardFactory.hero_card(card))
             await turn_context.send_activity(reply)
         else:
+            print(facebook_quick_reply)
             await turn_context.send_activity("Quick Reply")
             await self._show_choices(turn_context)
 
     async def _on_facebook_optin(self, turn_context: TurnContext, facebook_optin: dict):
         # TODO: Your optin event handling logic here...
+        print(facebook_optin)
         await turn_context.send_activity("Opt In")
-        pass
 
-    async def _on_facebook_echo(self, turn_context: TurnContext, facebook_message: dict):
+    async def _on_facebook_echo(
+        self, turn_context: TurnContext, facebook_message: dict
+    ):
         # TODO: Your echo event handling logic here...
+        print(facebook_message)
         await turn_context.send_activity("Echo")
-        pass
