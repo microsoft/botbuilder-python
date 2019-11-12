@@ -63,13 +63,13 @@ class MainDialog(ComponentDialog):
             )
 
             return await step_context.next(None)
-        else:
-            return await step_context.prompt(
-                TextPrompt.__name__,
-                PromptOptions(
-                    prompt=MessageFactory.text("What can I help you with today?")
-                ),
-            )  # pylint: disable=bad-continuation
+
+        return await step_context.prompt(
+            TextPrompt.__name__,
+            PromptOptions(
+                prompt=MessageFactory.text("What can I help you with today?")
+            ),
+        )
 
     async def act_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
         """Use language understanding to gather details about booking."""

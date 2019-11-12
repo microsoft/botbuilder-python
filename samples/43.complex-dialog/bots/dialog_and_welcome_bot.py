@@ -31,7 +31,9 @@ class DialogAndWelcomeBot(DialogBot):
         for member in members_added:
             # Greet anyone that was not the target (recipient) of this message.
             if member.id != turn_context.activity.recipient.id:
-                await turn_context.send_activity(MessageFactory.text(
-                    f"Welcome to Complex Dialog Bot {member.name}. This bot provides a complex conversation, with "
-                    f"multiple dialogs. Type anything to get started. ")
+                await turn_context.send_activity(
+                    MessageFactory.text(
+                        f"Welcome to Complex Dialog Bot {member.name}. This bot provides a complex conversation, with "
+                        f"multiple dialogs. Type anything to get started. "
+                    )
                 )

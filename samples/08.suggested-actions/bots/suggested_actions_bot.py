@@ -4,15 +4,17 @@
 from botbuilder.core import ActivityHandler, MessageFactory, TurnContext
 from botbuilder.schema import ChannelAccount, CardAction, ActionTypes, SuggestedActions
 
-"""
-This bot will respond to the user's input with suggested actions.
-Suggested actions enable your bot to present buttons that the user
-can tap to provide input. 
-"""
-
 
 class SuggestActionsBot(ActivityHandler):
-    async def on_members_added_activity(self, members_added: [ChannelAccount], turn_context: TurnContext):
+    """
+    This bot will respond to the user's input with suggested actions.
+    Suggested actions enable your bot to present buttons that the user
+    can tap to provide input.
+    """
+
+    async def on_members_added_activity(
+        self, members_added: [ChannelAccount], turn_context: TurnContext
+    ):
         """
         Send a welcome message to the user and tell them what actions they may perform to use this bot
         """
@@ -34,10 +36,13 @@ class SuggestActionsBot(ActivityHandler):
     async def _send_welcome_message(self, turn_context: TurnContext):
         for member in turn_context.activity.members_added:
             if member.id != turn_context.activity.recipient.id:
-                await turn_context.send_activity(MessageFactory.text(
-                    f"Welcome to SuggestedActionsBot {member.name}. This bot will introduce you to suggestedActions. "
-                    f"Please answer the question: "
-                ))
+                await turn_context.send_activity(
+                    MessageFactory.text(
+                        f"Welcome to SuggestedActionsBot {member.name}."
+                        f" This bot will introduce you to suggestedActions."
+                        f" Please answer the question: "
+                    )
+                )
 
                 await self._send_suggested_actions(turn_context)
 
@@ -67,21 +72,9 @@ class SuggestActionsBot(ActivityHandler):
 
         reply.suggested_actions = SuggestedActions(
             actions=[
-                CardAction(
-                    title="Red",
-                    type=ActionTypes.im_back,
-                    value="Read"
-                ),
-                CardAction(
-                    title="Yellow",
-                    type=ActionTypes.im_back,
-                    value="Yellow"
-                ),
-                CardAction(
-                    title="Blue",
-                    type=ActionTypes.im_back,
-                    value="Blue"
-                )
+                CardAction(title="Red", type=ActionTypes.im_back, value="Red"),
+                CardAction(title="Yellow", type=ActionTypes.im_back, value="Yellow"),
+                CardAction(title="Blue", type=ActionTypes.im_back, value="Blue"),
             ]
         )
 

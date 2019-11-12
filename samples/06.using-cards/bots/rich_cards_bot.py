@@ -5,13 +5,13 @@ from botbuilder.core import MessageFactory, TurnContext
 from botbuilder.schema import ChannelAccount
 from .dialog_bot import DialogBot
 
-"""
- RichCardsBot prompts a user to select a Rich Card and then returns the card
- that matches the user's selection.
-"""
-
 
 class RichCardsBot(DialogBot):
+    """
+    RichCardsBot prompts a user to select a Rich Card and then returns the card
+    that matches the user's selection.
+    """
+
     def __init__(self, conversation_state, user_state, dialog):
         super().__init__(conversation_state, user_state, dialog)
 
