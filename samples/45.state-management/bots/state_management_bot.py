@@ -2,7 +2,6 @@
 # Licensed under the MIT License.
 
 import time
-import pytz
 from datetime import datetime
 
 from botbuilder.core import ActivityHandler, ConversationState, TurnContext, UserState
@@ -25,10 +24,10 @@ class StateManagementBot(ActivityHandler):
         self.conversation_state = conversation_state
         self.user_state = user_state
 
-        self.conversation_data = self.conversation_state.create_property(
+        self.conversation_data_accessor = self.conversation_state.create_property(
             "ConversationData"
         )
-        self.user_profile = self.conversation_state.create_property("UserProfile")
+        self.user_profile_accessor = self.user_state.create_property("UserProfile")
 
     async def on_turn(self, turn_context: TurnContext):
         await super().on_turn(turn_context)
@@ -47,8 +46,8 @@ class StateManagementBot(ActivityHandler):
 
     async def on_message_activity(self, turn_context: TurnContext):
         # Get the state properties from the turn context.
-        user_profile = await self.user_profile.get(turn_context, UserProfile)
-        conversation_data = await self.conversation_data.get(
+        user_profile = await self.user_profile_accessor.get(turn_context, UserProfile)
+        conversation_data = await self.conversation_data_accessor.get(
             turn_context, ConversationData
         )
 
