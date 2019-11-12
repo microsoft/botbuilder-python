@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from datatypes_date_time import Timex, Constants
+from datatypes_timex_expression import Timex, Constants
 
 
 class Parsing:
@@ -20,15 +20,13 @@ class Parsing:
     def __describe(timex_pattern: str):
         timex = Timex(timex_pattern)
 
-        # This is not working in recognizers-text: 1.0.2a1
-        # print(timex.time_value(), end='')
-        print(timex_pattern, end=" ")
+        print(timex.timex_value(), end=" ")
 
         if Constants.TIMEX_TYPES_DATE in timex.types:
             if Constants.TIMEX_TYPES_DEFINITE in timex.types:
-                print("We have a definite calendar date.  ", end=" ")
+                print("We have a definite calendar date.", end=" ")
             else:
-                print("We have a date but there is some ambiguity. ", end=" ")
+                print("We have a date but there is some ambiguity.", end=" ")
 
         if Constants.TIMEX_TYPES_TIME in timex.types:
             print("We have a time.")

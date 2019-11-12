@@ -3,10 +3,16 @@
 
 import datetime
 
-from datatypes_date_time import Timex
+from datatypes_timex_expression import Timex
 
 
 class LanguageGeneration:
+    """
+    This language generation capabilities are the logical opposite of what the recognizer does.
+    As an experiment try feeding the result of language generation back into a recognizer.
+    You should get back the same TIMEX expression in the result.
+    """
+
     @staticmethod
     def examples():
         LanguageGeneration.__describe(Timex("2019-05-29"))
@@ -14,14 +20,14 @@ class LanguageGeneration:
         LanguageGeneration.__describe(Timex("XXXX-WXX-6T16"))
         LanguageGeneration.__describe(Timex("T12"))
 
-        # 1.0.2a1 doesn't support this
-        # LanguageGeneration.__describe(Timex.from_date(datetime.datetime.now()))
-        # LanguageGeneration.__describe(Timex.from_date(datetime.datetime.now() + datetime.timedelta(days=1)))
+        LanguageGeneration.__describe(Timex.from_date(datetime.datetime.now()))
+        LanguageGeneration.__describe(
+            Timex.from_date(datetime.datetime.now() + datetime.timedelta(days=1))
+        )
 
     @staticmethod
     def __describe(timex: Timex):
+        # Note natural language is often relative, for example the sentence "Yesterday all my troubles seemed so far
+        # away." Having your bot say something like "next Wednesday" in a response can make it sound more natural.
         reference_date = datetime.datetime.now()
-
-        # 1.0.2a1: exception using time_value()
-        # print(f"{timex.time_value()} {timex.to_natural_language(reference_date)}")
-        print("LanguageGeneration: 1.0.2a1 time_value() issue")
+        print(f"{timex.timex_value()} : {timex.to_natural_language(reference_date)}")
