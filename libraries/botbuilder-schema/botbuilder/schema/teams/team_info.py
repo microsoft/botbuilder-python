@@ -9,28 +9,6 @@
 
 class TeamInfo:
     def __init__(self, id="", name="", aadGroupId=""):
-        self._id = id
-        self._name = name
-        self._aad_group_id = aadGroupId
-
-    def get_id(self):
-        return self._id
-
-    def set_id(self, id):
-        self._id = id
-
-    def get_name(self):
-        return self._name
-
-    def set_name(self, name):
-        self._name = name
-
-    def get_aad_group_id(self):
-        return self._aad_group_id
-
-    def set_aad_group_id(self, aad_group_id):
-        self._aad_group_id = aad_group_id
-
-    id = property(get_id, set_id)
-    name = property(get_name, set_name)
-    aad_group_id = property(get_aad_group_id, set_aad_group_id)
+        self.id = id
+        self.name = name
+        self.aad_group_id = aadGroupId
