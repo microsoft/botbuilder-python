@@ -6,21 +6,24 @@ from typing import List, Dict
 from botbuilder.dialogs import (
     DialogContext,
     DialogTurnResult,
-    Dialog, DialogInstance, DialogReason)
+    Dialog,
+    DialogInstance,
+    DialogReason,
+)
 from botbuilder.schema import ActivityTypes
 
 from dialogs.slot_details import SlotDetails
 
-"""
-This is an example of implementing a custom Dialog class. This is similar to the Waterfall dialog in the 
-framework; however, it is based on a Dictionary rather than a sequential set of functions. The dialog is defined by a 
-list of 'slots', each slot represents a property we want to gather and the dialog we will be using to collect it. 
-Often the property is simply an atomic piece of data such as a number or a date. But sometimes the property is itself 
-a complex object, in which case we can use the slot dialog to collect that compound property. 
-"""
-
 
 class SlotFillingDialog(Dialog):
+    """
+    This is an example of implementing a custom Dialog class. This is similar to the Waterfall dialog in the
+    framework; however, it is based on a Dictionary rather than a sequential set of functions. The dialog is defined
+    by a list of 'slots', each slot represents a property we want to gather and the dialog we will be using to
+    collect it. Often the property is simply an atomic piece of data such as a number or a date. But sometimes the
+    property is itself a complex object, in which case we can use the slot dialog to collect that compound property.
+    """
+
     def __init__(self, dialog_id: str, slots: List[SlotDetails]):
         super(SlotFillingDialog, self).__init__(dialog_id)
 
@@ -34,17 +37,21 @@ class SlotFillingDialog(Dialog):
         # The list of slots defines the properties to collect and the dialogs to use to collect them.
         self.slots = slots
 
-    async def begin_dialog(self, dialog_context: DialogContext, options: object = None):
+    async def begin_dialog(
+        self, dialog_context: "DialogContext", options: object = None
+    ):
         if dialog_context.context.activity.type != ActivityTypes.message:
             return await dialog_context.end_dialog({})
         return await self._run_prompt(dialog_context)
 
-    async def continue_dialog(self, dialog_context: DialogContext, options: object = None):
+    async def continue_dialog(self, dialog_context: "DialogContext"):
         if dialog_context.context.activity.type != ActivityTypes.message:
             return Dialog.end_of_turn
         return await self._run_prompt(dialog_context)
 
-    async def resume_dialog(self, dialog_context: DialogContext, reason: DialogReason, result: object):
+    async def resume_dialog(
+        self, dialog_context: DialogContext, reason: DialogReason, result: object
+    ):
         slot_name = dialog_context.active_dialog.state[self.SLOT_NAME]
         values = self._get_persisted_values(dialog_context.active_dialog)
         values[slot_name] = result
@@ -74,12 +81,16 @@ class SlotFillingDialog(Dialog):
             dialog_context.active_dialog.state[self.SLOT_NAME] = unfilled_slot.name
 
             # Run the child dialog
-            return await dialog_context.begin_dialog(unfilled_slot.dialog_id, unfilled_slot.options)
-        else:
-            # No more slots to fill so end the dialog.
-            return await dialog_context.end_dialog(state)
+            return await dialog_context.begin_dialog(
+                unfilled_slot.dialog_id, unfilled_slot.options
+            )
 
-    def _get_persisted_values(self, dialog_instance: DialogInstance) -> Dict[str, object]:
+        # No more slots to fill so end the dialog.
+        return await dialog_context.end_dialog(state)
+
+    def _get_persisted_values(
+        self, dialog_instance: DialogInstance
+    ) -> Dict[str, object]:
         obj = dialog_instance.state.get(self.PERSISTED_VALUES)
 
         if not obj:
