@@ -81,6 +81,7 @@ class SkillHostAdapter(ABC):
         :param continuation_token:
         :return:
         """
+        # pylint: disable=unnecessary-pass
         pass
 
     async def _invoke_channel_api(

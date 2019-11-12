@@ -7,6 +7,7 @@ class BotFrameworkSkill:
     Registration for a BotFrameworkHttpProtocol based Skill endpoint.
     """
 
+    # pylint: disable=invalid-name
     def __init__(self, id: str = None, app_id: str = None, skill_endpoint: str = None):
         self.id = id
         self.app_aid = app_id
