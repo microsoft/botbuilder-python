@@ -8,9 +8,7 @@ from botbuilder.schema import ChannelAccount, ConversationReference, Activity
 
 
 class ProactiveBot(ActivityHandler):
-    def __init__(
-            self, conversation_references: Dict[str, ConversationReference]
-    ):
+    def __init__(self, conversation_references: Dict[str, ConversationReference]):
         self.conversation_references = conversation_references
 
     async def on_conversation_update_activity(self, turn_context: TurnContext):
@@ -22,13 +20,17 @@ class ProactiveBot(ActivityHandler):
     ):
         for member in members_added:
             if member.id != turn_context.activity.recipient.id:
-                await turn_context.send_activity("Welcome to the Proactive Bot sample.  Navigate to "
-                                                 "http://localhost:3978/api/notify to proactively message everyone "
-                                                 "who has previously messaged this bot.")
+                await turn_context.send_activity(
+                    "Welcome to the Proactive Bot sample.  Navigate to "
+                    "http://localhost:3978/api/notify to proactively message everyone "
+                    "who has previously messaged this bot."
+                )
 
     async def on_message_activity(self, turn_context: TurnContext):
         self._add_conversation_reference(turn_context.activity)
-        return await turn_context.send_activity(f"You sent: {turn_context.activity.text}")
+        return await turn_context.send_activity(
+            f"You sent: {turn_context.activity.text}"
+        )
 
     def _add_conversation_reference(self, activity: Activity):
         """
@@ -38,4 +40,6 @@ class ProactiveBot(ActivityHandler):
         :return:
         """
         conversation_reference = TurnContext.get_conversation_reference(activity)
-        self.conversation_references[conversation_reference.user.id] = conversation_reference
+        self.conversation_references[
+            conversation_reference.user.id
+        ] = conversation_reference

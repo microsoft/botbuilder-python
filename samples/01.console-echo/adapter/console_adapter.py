@@ -116,7 +116,7 @@ class ConsoleAdapter(BotAdapter):
             raise TypeError(
                 "ConsoleAdapter.send_activities(): `context` argument cannot be None."
             )
-        if type(activities) != list:
+        if not isinstance(activities, list):
             raise TypeError(
                 "ConsoleAdapter.send_activities(): `activities` argument must be a list."
             )
@@ -130,24 +130,27 @@ class ConsoleAdapter(BotAdapter):
 
             if i < len(activities):
                 responses.append(ResourceResponse())
-                a = activities[i]
+                activity = activities[i]
 
-                if a.type == "delay":
-                    await asyncio.sleep(a.delay)
+                if activity.type == "delay":
+                    await asyncio.sleep(activity.delay)
                     await next_activity(i + 1)
-                elif a.type == ActivityTypes.message:
-                    if a.attachments is not None and len(a.attachments) > 0:
+                elif activity.type == ActivityTypes.message:
+                    if (
+                        activity.attachments is not None
+                        and len(activity.attachments) > 0
+                    ):
                         append = (
                             "(1 attachment)"
-                            if len(a.attachments) == 1
-                            else f"({len(a.attachments)} attachments)"
+                            if len(activity.attachments) == 1
+                            else f"({len(activity.attachments)} attachments)"
                         )
-                        print(f"{a.text} {append}")
+                        print(f"{activity.text} {append}")
                     else:
-                        print(a.text)
+                        print(activity.text)
                     await next_activity(i + 1)
                 else:
-                    print(f"[{a.type}]")
+                    print(f"[{activity.type}]")
                     await next_activity(i + 1)
             else:
                 return responses

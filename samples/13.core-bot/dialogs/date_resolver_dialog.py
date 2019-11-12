@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from datatypes_date_time.timex import Timex
+
 from botbuilder.core import MessageFactory
 from botbuilder.dialogs import WaterfallDialog, DialogTurnResult, WaterfallStepContext
 from botbuilder.dialogs.prompts import (
@@ -11,8 +13,6 @@ from botbuilder.dialogs.prompts import (
 )
 from botbuilder.schema import InputHints
 from .cancel_and_help_dialog import CancelAndHelpDialog
-
-from datatypes_date_time.timex import Timex
 
 
 class DateResolverDialog(CancelAndHelpDialog):
@@ -44,7 +44,8 @@ class DateResolverDialog(CancelAndHelpDialog):
             prompt_msg_text, prompt_msg_text, InputHints.expecting_input
         )
 
-        reprompt_msg_text = "I'm sorry, for best results, please enter your travel date including the month, day and year."
+        reprompt_msg_text = "I'm sorry, for best results, please enter your travel date including the month, " \
+                            "day and year. "
         reprompt_msg = MessageFactory.text(
             reprompt_msg_text, reprompt_msg_text, InputHints.expecting_input
         )

@@ -4,19 +4,31 @@
 import json
 import os
 
-from botbuilder.core import ActivityHandler, TurnContext, UserState, CardFactory, MessageFactory
-from botbuilder.schema import ChannelAccount, Attachment, SuggestedActions, CardAction, ActionTypes
+from botbuilder.core import (
+    ActivityHandler,
+    TurnContext,
+    UserState,
+    CardFactory,
+    MessageFactory,
+)
+from botbuilder.schema import (
+    ChannelAccount,
+    Attachment,
+    SuggestedActions,
+    CardAction,
+    ActionTypes,
+)
 
 from translation.translation_settings import TranslationSettings
 
-"""
-This bot demonstrates how to use Microsoft Translator.
-More information can be found at:
-https://docs.microsoft.com/en-us/azure/cognitive-services/translator/translator-info-overview"
-"""
-
 
 class MultiLingualBot(ActivityHandler):
+    """
+    This bot demonstrates how to use Microsoft Translator.
+    More information can be found at:
+    https://docs.microsoft.com/en-us/azure/cognitive-services/translator/translator-info-overview"
+    """
+
     def __init__(self, user_state: UserState):
         if user_state is None:
             raise TypeError(
@@ -25,10 +37,12 @@ class MultiLingualBot(ActivityHandler):
 
         self.user_state = user_state
 
-        self.language_preference_accessor = self.user_state.create_property("LanguagePreference")
+        self.language_preference_accessor = self.user_state.create_property(
+            "LanguagePreference"
+        )
 
     async def on_members_added_activity(
-            self, members_added: [ChannelAccount], turn_context: TurnContext
+        self, members_added: [ChannelAccount], turn_context: TurnContext
     ):
         # Greet anyone that was not the target (recipient) of this message.
         # To learn more about Adaptive Cards, see https://aka.ms/msbot-adaptivecards for more details.
@@ -38,7 +52,7 @@ class MultiLingualBot(ActivityHandler):
                     MessageFactory.attachment(self._create_adaptive_card_attachment())
                 )
                 await turn_context.send_activity(
-                    "This bot will introduce you to translation middleware. Say \'hi\' to get started."
+                    "This bot will introduce you to translation middleware. Say 'hi' to get started."
                 )
 
     async def on_message_activity(self, turn_context: TurnContext):
@@ -49,8 +63,9 @@ class MultiLingualBot(ActivityHandler):
             # selected language.
             # If Spanish was selected by the user, the reply below will actually be shown in Spanish to the user.
             current_language = turn_context.activity.text.lower()
-            if current_language == TranslationSettings.english_english.value \
-                    or current_language == TranslationSettings.spanish_english.value:
+            if current_language in (
+                    TranslationSettings.english_english.value, TranslationSettings.spanish_english.value
+            ):
                 lang = TranslationSettings.english_english.value
             else:
                 lang = TranslationSettings.english_spanish.value
@@ -71,13 +86,13 @@ class MultiLingualBot(ActivityHandler):
                     CardAction(
                         title="Español",
                         type=ActionTypes.post_back,
-                        value=TranslationSettings.english_spanish.value
+                        value=TranslationSettings.english_spanish.value,
                     ),
                     CardAction(
                         title="English",
                         type=ActionTypes.post_back,
-                        value=TranslationSettings.english_english.value
-                    )
+                        value=TranslationSettings.english_english.value,
+                    ),
                 ]
             )
 
@@ -99,7 +114,9 @@ class MultiLingualBot(ActivityHandler):
             return False
 
         utterance = utterance.lower()
-        return (utterance == TranslationSettings.english_spanish.value
-                or utterance == TranslationSettings.english_english.value
-                or utterance == TranslationSettings.spanish_spanish.value
-                or utterance == TranslationSettings.spanish_english.value)
+        return utterance in (
+            TranslationSettings.english_spanish.value,
+            TranslationSettings.english_english.value,
+            TranslationSettings.spanish_spanish.value,
+            TranslationSettings.spanish_english.value
+        )

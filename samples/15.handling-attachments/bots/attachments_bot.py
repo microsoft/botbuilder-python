@@ -16,25 +16,30 @@ from botbuilder.schema import (
     Attachment,
     AttachmentData,
     Activity,
-    ActionTypes
+    ActionTypes,
 )
-
-"""
-Represents a bot that processes incoming activities.
-For each user interaction, an instance of this class is created and the OnTurnAsync method is called.
-This is a Transient lifetime service. Transient lifetime services are created
-each time they're requested. For each Activity received, a new instance of this
-class is created. Objects that are expensive to construct, or have a lifetime
-beyond the single turn, should be carefully managed.
-"""
 
 
 class AttachmentsBot(ActivityHandler):
-    async def on_members_added_activity(self, members_added: [ChannelAccount], turn_context: TurnContext):
+    """
+    Represents a bot that processes incoming activities.
+    For each user interaction, an instance of this class is created and the OnTurnAsync method is called.
+    This is a Transient lifetime service. Transient lifetime services are created
+    each time they're requested. For each Activity received, a new instance of this
+    class is created. Objects that are expensive to construct, or have a lifetime
+    beyond the single turn, should be carefully managed.
+    """
+
+    async def on_members_added_activity(
+        self, members_added: [ChannelAccount], turn_context: TurnContext
+    ):
         await self._send_welcome_message(turn_context)
 
     async def on_message_activity(self, turn_context: TurnContext):
-        if turn_context.activity.attachments and len(turn_context.activity.attachments) > 0:
+        if (
+            turn_context.activity.attachments
+            and len(turn_context.activity.attachments) > 0
+        ):
             await self._handle_incoming_attachment(turn_context)
         else:
             await self._handle_outgoing_attachment(turn_context)
@@ -49,8 +54,10 @@ class AttachmentsBot(ActivityHandler):
         """
         for member in turn_context.activity.members_added:
             if member.id != turn_context.activity.recipient.id:
-                await turn_context.send_activity(f"Welcome to AttachmentsBot {member.name}. This bot will introduce "
-                                                 f"you to Attachments. Please select an option")
+                await turn_context.send_activity(
+                    f"Welcome to AttachmentsBot {member.name}. This bot will introduce "
+                    f"you to Attachments. Please select an option"
+                )
                 await self._display_options(turn_context)
 
     async def _handle_incoming_attachment(self, turn_context: TurnContext):
@@ -68,7 +75,8 @@ class AttachmentsBot(ActivityHandler):
             attachment_info = await self._download_attachment_and_write(attachment)
             if "filename" in attachment_info:
                 await turn_context.send_activity(
-                    f"Attachment {attachment_info['filename']} has been received to {attachment_info['local_path']}")
+                    f"Attachment {attachment_info['filename']} has been received to {attachment_info['local_path']}"
+                )
 
     async def _download_attachment_and_write(self, attachment: Attachment) -> dict:
         """
@@ -91,18 +99,13 @@ class AttachmentsBot(ActivityHandler):
             with open(local_filename, "wb") as out_file:
                 out_file.write(data)
 
-            return {
-                "filename": attachment.name,
-                "local_path": local_filename
-            }
-        except Exception as e:
-            print(e)
+            return {"filename": attachment.name, "local_path": local_filename}
+        except Exception as exception:
+            print(exception)
             return {}
 
     async def _handle_outgoing_attachment(self, turn_context: TurnContext):
-        reply = Activity(
-            type=ActivityTypes.message
-        )
+        reply = Activity(type=ActivityTypes.message)
 
         first_char = turn_context.activity.text[0]
         if first_char == "1":
@@ -133,21 +136,15 @@ class AttachmentsBot(ActivityHandler):
             text="You can upload an image or select one of the following choices",
             buttons=[
                 CardAction(
-                    type=ActionTypes.im_back,
-                    title="1. Inline Attachment",
-                    value="1"
+                    type=ActionTypes.im_back, title="1. Inline Attachment", value="1"
                 ),
                 CardAction(
-                    type=ActionTypes.im_back,
-                    title="2. Internet Attachment",
-                    value="2"
+                    type=ActionTypes.im_back, title="2. Internet Attachment", value="2"
                 ),
                 CardAction(
-                    type=ActionTypes.im_back,
-                    title="3. Uploaded Attachment",
-                    value="3"
-                )
-            ]
+                    type=ActionTypes.im_back, title="3. Uploaded Attachment", value="3"
+                ),
+            ],
         )
 
         reply = MessageFactory.attachment(CardFactory.hero_card(card))
@@ -169,7 +166,7 @@ class AttachmentsBot(ActivityHandler):
         return Attachment(
             name="architecture-resize.png",
             content_type="image/png",
-            content_url=f"data:image/png;base64,{base64_image}"
+            content_url=f"data:image/png;base64,{base64_image}",
         )
 
     async def _get_upload_attachment(self, turn_context: TurnContext) -> Attachment:
@@ -178,29 +175,35 @@ class AttachmentsBot(ActivityHandler):
         :param turn_context:
         :return: Attachment
         """
-        with open(os.path.join(os.getcwd(), "resources/architecture-resize.png"), "rb") as in_file:
+        with open(
+            os.path.join(os.getcwd(), "resources/architecture-resize.png"), "rb"
+        ) as in_file:
             image_data = in_file.read()
 
-        connector = turn_context.adapter.create_connector_client(turn_context.activity.service_url)
+        connector = turn_context.adapter.create_connector_client(
+            turn_context.activity.service_url
+        )
         conversation_id = turn_context.activity.conversation.id
         response = await connector.conversations.upload_attachment(
             conversation_id,
             AttachmentData(
                 name="architecture-resize.png",
                 original_base64=image_data,
-                type="image/png"
-            )
+                type="image/png",
+            ),
         )
 
         base_uri: str = connector.config.base_url
-        attachment_uri = (base_uri
-                          + ("" if base_uri.endswith("/") else "/")
-                          + f"v3/attachments/{response.id}/views/original")
+        attachment_uri = (
+            base_uri
+            + ("" if base_uri.endswith("/") else "/")
+            + f"v3/attachments/{response.id}/views/original"
+        )
 
         return Attachment(
             name="architecture-resize.png",
             content_type="image/png",
-            content_url=attachment_uri
+            content_url=attachment_uri,
         )
 
     def _get_internet_attachment(self) -> Attachment:
@@ -211,5 +214,5 @@ class AttachmentsBot(ActivityHandler):
         return Attachment(
             name="architecture-resize.png",
             content_type="image/png",
-            content_url="https://docs.microsoft.com/en-us/bot-framework/media/how-it-works/architecture-resize.png"
+            content_url="https://docs.microsoft.com/en-us/bot-framework/media/how-it-works/architecture-resize.png",
         )
