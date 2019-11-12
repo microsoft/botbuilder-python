@@ -8,7 +8,12 @@ from helpers.dialog_helper import DialogHelper
 
 
 class DialogBot(ActivityHandler):
-    def __init__(self, conversation_state: ConversationState, user_state: UserState, dialog: Dialog):
+    def __init__(
+        self,
+        conversation_state: ConversationState,
+        user_state: UserState,
+        dialog: Dialog,
+    ):
         self.conversation_state = conversation_state
         self.user_state = user_state
         self.dialog = dialog

@@ -81,8 +81,9 @@ class LuisHelper:
                             from_entities[0]["text"].capitalize()
                         )
 
-                # This value will be a TIMEX. And we are only interested in a Date so grab the first result and drop the Time part.
-                # TIMEX is a format that represents DateTime expressions that include some ambiguity. e.g. missing a Year.
+                # This value will be a TIMEX. And we are only interested in a Date so grab the first result and drop
+                # the Time part. TIMEX is a format that represents DateTime expressions that include some ambiguity.
+                # e.g. missing a Year.
                 date_entities = recognizer_result.entities.get("datetime", [])
                 if date_entities:
                     timex = date_entities[0]["timex"]
@@ -95,7 +96,7 @@ class LuisHelper:
                 else:
                     result.travel_date = None
 
-        except Exception as e:
-            print(e)
+        except Exception as exception:
+            print(exception)
 
         return intent, result

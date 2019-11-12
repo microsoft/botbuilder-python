@@ -36,9 +36,6 @@ class DialogBot(ActivityHandler):
         self.conversation_state = conversation_state
         self.user_state = user_state
         self.dialog = dialog
-        self.dialogState = self.conversation_state.create_property(
-            "DialogState"
-        )  # pylint:disable=invalid-name
         self.telemetry_client = telemetry_client
 
     async def on_turn(self, turn_context: TurnContext):
@@ -49,7 +46,6 @@ class DialogBot(ActivityHandler):
         await self.user_state.save_changes(turn_context, False)
 
     async def on_message_activity(self, turn_context: TurnContext):
-        # pylint:disable=invalid-name
         await DialogHelper.run_dialog(
             self.dialog,
             turn_context,
