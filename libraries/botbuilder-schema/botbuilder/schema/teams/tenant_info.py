@@ -10,11 +10,3 @@
 class TenantInfo:
     def __init__(self, id=""):
         self._id = id
-
-    @property
-    def id():
-        return self._id
-
-    @id.setter
-    def id(self, id):
-        self._id = id

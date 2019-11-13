@@ -39,7 +39,7 @@ class TeamsActivityHandler(ActivityHandler):
     async def on_invoke_activity(self, turn_context: TurnContext):
         try:
             if (
-                turn_context.activity.name is None
+                not turn_context.activity.name
                 and turn_context.activity.channel_id == Channels.Msteams
             ):
                 return  # await on_teams_card_action_invoke_activity(turn_context)
@@ -52,20 +52,19 @@ class TeamsActivityHandler(ActivityHandler):
         if turn_context.activity.channel_id == Channels.ms_teams:
             channel_data = TeamsChannelData(**turn_context.activity.channel_data)
 
-            if turn_context.activity.members_added is not None:
+            if turn_context.activity.members_added:
                 return await self.on_teams_members_added_dispatch_activity(
                     turn_context.activity.members_added, channel_data.team, turn_context
                 )
 
-            if turn_context.activity.members_removed is not None:
+            if turn_context.activity.members_removed:
                 return await self.on_teams_members_removed_dispatch_activity(
                     turn_context.activity.members_removed,
                     channel_data.team,
                     turn_context,
                 )
 
-            print(turn_context.activity)
-            if channel_data is not None:
+            if channel_data:
                 if channel_data.event_type == "channelCreated":
                     return await self.on_teams_channel_created_activity(
                         channel_data.channel, channel_data.team, turn_context
