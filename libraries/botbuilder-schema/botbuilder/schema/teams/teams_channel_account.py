@@ -27,4 +27,5 @@ class TeamsChannelAccount(ChannelAccount):
         self.given_name = given_name
         self.surname = surname
         self.email = email
+        # This isn't camel_cased because the JSON that makes this object isn't camel_case
         self.user_principal_name = userPrincipalName
