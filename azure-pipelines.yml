@@ -51,9 +51,8 @@ jobs:
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '3.6'
-  - task: PythonScript@0
-    displayName: 'Run tests'
-    inputs:
-      workingDirectory:  $(Agent.TempDirectory)
-      arguments: -m unittest $(Build.SourcesDirectory)/libraries/functional-tests/functionaltestbot/tests/test_py_bot.py
+  - bash: '/usr/bin/python3 -m unittest $(Build.SourcesDirectory)/libraries/functional-tests/functionaltestbot/tests/test_py_bot.py'
+    workingDirectory: $(Agent.TempDirectory)
+    displayName: 'Run Test'
     continueOnError: false
+    
