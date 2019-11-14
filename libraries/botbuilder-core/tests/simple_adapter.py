@@ -24,7 +24,9 @@ class SimpleAdapter(BotAdapter):
         if self._call_on_delete is not None:
             self._call_on_delete(reference)
 
-    async def send_activities(self, context: TurnContext, activities: List[Activity]):
+    async def send_activities(
+        self, context: TurnContext, activities: List[Activity]
+    ) -> List[ResourceResponse]:
         self.test_aux.assertIsNotNone(
             activities, "SimpleAdapter.delete_activity: missing reference"
         )
