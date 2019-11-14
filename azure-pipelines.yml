@@ -1,61 +1,53 @@
 trigger:
   branches:
     include:
-    - daveta-python-functional
+    - daveta-funtest
     exclude:
     - master
 
 variables:
   # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: 'NightlyE2E-Acr'
-  azureRmServiceConnection: 'NightlyE2E-RM'
-  dockerFilePath: 'libraries/functional-tests/functionaltestbot/Dockerfile'
   buildIdTag: $(Build.BuildNumber)
-  webAppName: 'e2epython'
-  containerRegistry: 'nightlye2etest.azurecr.io'
-  imageRepository: 'functionaltestpy'
-
-
-
+  webAppName: 'pyfuntest'
+  resourceGroupName: 'pyfuntest'
 
 jobs:
-# Build and publish container
+# Build and publish
 - job: Build
   pool:
     vmImage: 'Ubuntu-16.04'
-  displayName: Build and push bot image
+  displayName: Build environment
   continueOnError: false
   steps:
-  - task: Docker@2
-    displayName: Build and push bot image
+  - task: AzureCLI@2
     inputs:
-      command: buildAndPush
-      repository: $(imageRepository)
-      dockerfile: $(dockerFilePath)
-      containerRegistry: $(dockerRegistryServiceConnection)
-      tags: $(buildIdTag)
+      azureSubscription: 'FUSE Temporary (174c5021-8109-4087-a3e2-a1de20420569)'
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        az group delete --name $(resourceGroupName) -y
+        az group create --location westus --name $(resourceGroupName)
+        cd $(Build.SourcesDirectory)/libraries/functional-tests/functionaltestbot
+        az webapp up --sku F1 -n $(webAppName) -l westus --resource-group $(resourceGroupName)
+        az bot create --appid $(botAppId) --name $(webAppName) --password $(botAppPassword) --resource-group $(resourceGroupName) --sku F0 --kind registration --location westus --endpoint "https://pyfuntest.azurewebsites.net/api/messages"
+        az webapp config appsettings set -g $(resourceGroupName) -n $(webAppName) --settings MicrosoftAppId=$(botAppId) MicrosoftAppPassword=$(botAppPassword) botId="pythonfunctional"
 
 
-
-- job: Deploy
-  displayName: Provision bot container
+- job: Run
+  displayName: Run Test
   pool:
     vmImage: 'Ubuntu-16.04'
   dependsOn:
   - Build
   steps:
-  - task: AzureRMWebAppDeployment@4
-    displayName: Python Functional E2E test.
+  - task: AzureCLI@2
     inputs:
-      ConnectionType: AzureRM
-      ConnectedServiceName: $(azureRmServiceConnection)
-      appType: webAppContainer
-      WebAppName: $(webAppName)
-      DockerNamespace: $(containerRegistry)
-      DockerRepository: $(imageRepository)
-      DockerImageTag: $(buildIdTag)
-      AppSettings: '-MicrosoftAppId $(botAppId) -MicrosoftAppPassword $(botAppPassword) -FLASK_APP /functionaltestbot/app.py -FLASK_DEBUG 1'
-
-      #StartupCommand: 'flask run --host=0.0.0.0 --port=3978'
+      azureSubscription: 'FUSE Temporary (174c5021-8109-4087-a3e2-a1de20420569)'
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        cd $(Build.SourcesDirectory)/libraries/functional-tests/functionaltestbot/tests
+        az bot directline create --name "pyfuntest" --resource-group "pyfuntest" > "DirectLineConfig.json"
+        python -m unittest test_py_bot.py
 
 
