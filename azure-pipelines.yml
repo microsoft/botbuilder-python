@@ -39,15 +39,15 @@ jobs:
   #       az bot create --appid $(botAppId) --name $(webAppName) --password $(botAppPassword) --resource-group $(resourceGroupName) --sku F0 --kind registration --location westus --endpoint "https://pyfuntest.azurewebsites.net/api/messages"
   #       az webapp config appsettings set -g $(resourceGroupName) -n $(webAppName) --settings MicrosoftAppId=$(botAppId) MicrosoftAppPassword=$(botAppPassword) botId="pythonfunctional"
   #   continueOnError: false
-  - task: AzureCLI@2
-    displayName: 'Create DirectLine'
-    inputs:
-      azureSubscription: 'FUSE Temporary (174c5021-8109-4087-a3e2-a1de20420569)'
-      scriptType: 'bash'
-      scriptLocation: 'inlineScript'
-      inlineScript: |
-        az bot directline create --name "pyfuntest" --resource-group "pyfuntest" > $(Agent.TempDirectory)/DirectLineConfig.json
-    continueOnError: false
+  # - task: AzureCLI@2
+  #   displayName: 'Create DirectLine'
+  #   inputs:
+  #     azureSubscription: 'FUSE Temporary (174c5021-8109-4087-a3e2-a1de20420569)'
+  #     scriptType: 'bash'
+  #     scriptLocation: 'inlineScript'
+  #     inlineScript: |
+  #       az bot directline create --name "pyfuntest" --resource-group "pyfuntest" > $(Agent.TempDirectory)/DirectLineConfig.json
+  #   continueOnError: false
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '3.6'
@@ -57,8 +57,11 @@ jobs:
     displayName: 'Copy Tests'
     continueOnError: false
 
-  - bash: 'python -m unittest test_py_bot.py'
+  - bash: 'python --version'
     workingDirectory: $(Agent.TempDirectory)
-    displayName: 'Run Test'
+    displayName: 'VERSION'
     continueOnError: false
-    
+  # - bash: 'python -m unittest test_py_bot.py'
+  #   workingDirectory: $(Agent.TempDirectory)
+  #   displayName: 'Run Test'
+  #   continueOnError: false
