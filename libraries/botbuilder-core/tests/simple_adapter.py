@@ -8,6 +8,8 @@ from botbuilder.schema import Activity, ConversationReference, ResourceResponse
 
 
 class SimpleAdapter(BotAdapter):
+    # pylint: disable=unused-argument
+
     def __init__(self, call_on_send=None, call_on_update=None, call_on_delete=None):
         super(SimpleAdapter, self).__init__()
         self.test_aux = unittest.TestCase("__init__")
