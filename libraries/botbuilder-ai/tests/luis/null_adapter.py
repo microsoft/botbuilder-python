@@ -11,6 +11,7 @@ class NullAdapter(BotAdapter):
     """
     This is a BotAdapter that does nothing on the Send operation, equivalent to piping to /dev/null.
     """
+
     # pylint: disable=unused-argument
 
     async def send_activities(
