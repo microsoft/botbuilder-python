@@ -4,7 +4,6 @@
 import asyncio
 import sys
 from datetime import datetime
-from types import MethodType
 
 from flask import Flask, request, Response
 from botbuilder.core import BotFrameworkAdapterSettings, TurnContext, BotFrameworkAdapter
@@ -24,7 +23,7 @@ ADAPTER = BotFrameworkAdapter(SETTINGS)
 
 
 # Catch-all for errors.
-async def on_error(self, context: TurnContext, error: Exception):
+async def on_error(context: TurnContext, error: Exception):
     # This check writes out errors to console log .vs. app insights.
     # NOTE: In production environment, you should consider logging this to Azure
     #       application insights.
@@ -47,7 +46,7 @@ async def on_error(self, context: TurnContext, error: Exception):
         # Send a trace activity, which will be displayed in Bot Framework Emulator
         await context.send_activity(trace_activity)
 
-ADAPTER.on_turn_error = MethodType(on_error, ADAPTER)
+ADAPTER.on_turn_error = on_error
 
 # Create the Bot
 BOT = EchoBot()

@@ -31,7 +31,7 @@ class CancelAndHelpDialog(ComponentDialog):
                 help_message_text, help_message_text, InputHints.expecting_input
             )
 
-            if text == "help" or text == "?":
+            if text in ("help", "?"):
                 await inner_dc.context.send_activity(help_message)
                 return DialogTurnResult(DialogTurnStatus.Waiting)
 
@@ -40,7 +40,7 @@ class CancelAndHelpDialog(ComponentDialog):
                 cancel_message_text, cancel_message_text, InputHints.ignoring_input
             )
 
-            if text == "cancel" or text == "quit":
+            if text in ("cancel", "quit"):
                 await inner_dc.context.send_activity(cancel_message)
                 return await inner_dc.cancel_all_dialogs()
 
