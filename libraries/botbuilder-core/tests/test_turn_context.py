@@ -27,7 +27,7 @@ ACTIVITY = Activity(
 
 
 class SimpleAdapter(BotAdapter):
-    async def send_activities(self, context, activities):
+    async def send_activities(self, context, activities) -> List[ResourceResponse]:
         responses = []
         assert context is not None
         assert activities is not None
@@ -205,7 +205,7 @@ class TestBotContext(aiounittest.AsyncTestCase):
             called = True
             assert activities is not None
             assert context is not None
-            assert activities[0].id == "1234"
+            assert not activities[0].id
             await next_handler_coroutine()
 
         context.on_send_activities(send_handler)
