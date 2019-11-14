@@ -52,9 +52,14 @@ jobs:
     inputs:
       versionSpec: '3.6'
 
+  
   - bash: 'cp $(Build.SourcesDirectory)/libraries/functional-tests/functionaltestbot/tests/* $(Agent.TempDirectory)'
     workingDirectory: $(Agent.TempDirectory)
     displayName: 'Copy Tests'
+    continueOnError: false
+
+  - bash: 'pip install requests'
+    displayName: 'Install dependencies for test'
     continueOnError: false
 
   - bash: 'python -m unittest test_py_bot.py'
