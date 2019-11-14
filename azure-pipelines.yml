@@ -55,6 +55,9 @@ jobs:
   dependsOn:
   - Build
   steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.6'  
   - task: AzureCLI@2
     inputs:
       azureSubscription: 'FUSE Temporary (174c5021-8109-4087-a3e2-a1de20420569)'
@@ -63,6 +66,9 @@ jobs:
       inlineScript: |
         cd $(Build.SourcesDirectory)/libraries/functional-tests/functionaltestbot/tests
         az bot directline create --name "pyfuntest" --resource-group "pyfuntest" > "DirectLineConfig.json"
-        python3 -m unittest test_py_bot.py
+        
+  - task: PythonScript@0
+    inputs:
+      script: python3 -m unittest test_py_bot.py
 
 
