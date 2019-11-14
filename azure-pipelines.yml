@@ -54,11 +54,11 @@ jobs:
       scriptType: 'bash'
       scriptLocation: 'inlineScript'
       inlineScript: |
-        az bot directline create --name "pyfuntest" --resource-group "pyfuntest" > $(Build.SourcesDirectory)/libraries/functional-tests/functionaltestbot/tests/DirectLineConfig.json
+        az bot directline create --name "pyfuntest" --resource-group "pyfuntest" > $(Agent.TempDirectory)/DirectLineConfig.json
   - task: PythonScript@0
     displayName: 'Run tests'
     inputs:
-      pythonInterpreter: '/usr/bin/python3'
-      workingDirectory: $(Build.SourcesDirectory)/libraries/functional-tests/functionaltestbot/tests
-      arguments: -m unittest test_py_bot.py
+      versionSpec: '3.6'
+      workingDirectory:  $(Agent.TempDirectory)
+      arguments: -m unittest $(Build.SourcesDirectory)/libraries/functional-tests/functionaltestbot/tests/test_py_bot.py
     continueOnError: false
