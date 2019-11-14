@@ -58,6 +58,6 @@ jobs:
     displayName: 'Upgrade pip/setuptools. Install deps, pytorch and fastai'
     inputs:
       versionSpec: '3.6'
-    script: |
+  - script: |
       python3 -m unittest test_py_bot.py
     continueOnError: false
