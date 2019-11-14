@@ -17,28 +17,28 @@ jobs:
     vmImage: 'Ubuntu-16.04'
   
   steps:
-  - task: AzureCLI@2
-    displayName: Cleanup old resource group
-    inputs:
-      azureSubscription: 'FUSE Temporary (174c5021-8109-4087-a3e2-a1de20420569)'
-      scriptType: 'bash'
-      scriptLocation: 'inlineScript'
-      inlineScript: |
-        az group delete --name $(resourceGroupName) -y
-        az group create --location westus --name $(resourceGroupName)
-    continueOnError: true
-  - task: AzureCLI@2
-    displayName: 'Provision/Deploy Bot'
-    inputs:
-      azureSubscription: 'FUSE Temporary (174c5021-8109-4087-a3e2-a1de20420569)'
-      scriptType: 'bash'
-      scriptLocation: 'inlineScript'
-      inlineScript: |
-        cd $(Build.SourcesDirectory)/libraries/functional-tests/functionaltestbot
-        az webapp up --sku F1 -n $(webAppName) -l westus --resource-group $(resourceGroupName)
-        az bot create --appid $(botAppId) --name $(webAppName) --password $(botAppPassword) --resource-group $(resourceGroupName) --sku F0 --kind registration --location westus --endpoint "https://pyfuntest.azurewebsites.net/api/messages"
-        az webapp config appsettings set -g $(resourceGroupName) -n $(webAppName) --settings MicrosoftAppId=$(botAppId) MicrosoftAppPassword=$(botAppPassword) botId="pythonfunctional"
-    continueOnError: false
+  # - task: AzureCLI@2
+  #   displayName: Cleanup old resource group
+  #   inputs:
+  #     azureSubscription: 'FUSE Temporary (174c5021-8109-4087-a3e2-a1de20420569)'
+  #     scriptType: 'bash'
+  #     scriptLocation: 'inlineScript'
+  #     inlineScript: |
+  #       az group delete --name $(resourceGroupName) -y
+  #       az group create --location westus --name $(resourceGroupName)
+  #   continueOnError: true
+  # - task: AzureCLI@2
+  #   displayName: 'Provision/Deploy Bot'
+  #   inputs:
+  #     azureSubscription: 'FUSE Temporary (174c5021-8109-4087-a3e2-a1de20420569)'
+  #     scriptType: 'bash'
+  #     scriptLocation: 'inlineScript'
+  #     inlineScript: |
+  #       cd $(Build.SourcesDirectory)/libraries/functional-tests/functionaltestbot
+  #       az webapp up --sku F1 -n $(webAppName) -l westus --resource-group $(resourceGroupName)
+  #       az bot create --appid $(botAppId) --name $(webAppName) --password $(botAppPassword) --resource-group $(resourceGroupName) --sku F0 --kind registration --location westus --endpoint "https://pyfuntest.azurewebsites.net/api/messages"
+  #       az webapp config appsettings set -g $(resourceGroupName) -n $(webAppName) --settings MicrosoftAppId=$(botAppId) MicrosoftAppPassword=$(botAppPassword) botId="pythonfunctional"
+  #   continueOnError: false
   - task: AzureCLI@2
     displayName: 'Create DirectLine'
     inputs:
