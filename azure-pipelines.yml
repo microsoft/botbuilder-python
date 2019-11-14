@@ -15,10 +15,10 @@ jobs:
 - job: Cleanup
   pool:
     vmImage: 'Ubuntu-16.04'
-  displayName: Cleanup old resource group
-  continueOnError: true
+  
   steps:
   - task: AzureCLI@2
+    displayName: Cleanup old resource group
     inputs:
       azureSubscription: 'FUSE Temporary (174c5021-8109-4087-a3e2-a1de20420569)'
       scriptType: 'bash'
@@ -26,16 +26,7 @@ jobs:
       inlineScript: |
         az group delete --name $(resourceGroupName) -y
         az group create --location westus --name $(resourceGroupName)
-
-# Build and publish
-- job: Build
-  pool:
-    vmImage: 'Ubuntu-16.04'
-  dependsOn:
-  - Cleanup
-  displayName: Provision/Deploy/Test Azure Bot
-  continueOnError: false
-  steps:
+    continueOnError: true
   - task: AzureCLI@2
     displayName: 'Provision/Deploy Bot'
     inputs:
@@ -47,6 +38,7 @@ jobs:
         az webapp up --sku F1 -n $(webAppName) -l westus --resource-group $(resourceGroupName)
         az bot create --appid $(botAppId) --name $(webAppName) --password $(botAppPassword) --resource-group $(resourceGroupName) --sku F0 --kind registration --location westus --endpoint "https://pyfuntest.azurewebsites.net/api/messages"
         az webapp config appsettings set -g $(resourceGroupName) -n $(webAppName) --settings MicrosoftAppId=$(botAppId) MicrosoftAppPassword=$(botAppPassword) botId="pythonfunctional"
+    continueOnError: false
   - task: AzureCLI@2
     displayName: 'Create DirectLine'
     inputs:
@@ -55,10 +47,13 @@ jobs:
       scriptLocation: 'inlineScript'
       inlineScript: |
         az bot directline create --name "pyfuntest" --resource-group "pyfuntest" > $(Agent.TempDirectory)/DirectLineConfig.json
+    continueOnError: false
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.6'
   - task: PythonScript@0
     displayName: 'Run tests'
     inputs:
-      versionSpec: '3.6'
       workingDirectory:  $(Agent.TempDirectory)
       arguments: -m unittest $(Build.SourcesDirectory)/libraries/functional-tests/functionaltestbot/tests/test_py_bot.py
     continueOnError: false
