@@ -51,19 +51,19 @@ jobs:
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '3.6'
-  - bash: 'ls -ltr $(Build.SourcesDirectory)'
+  - bash: 'ls -ltr $(Build.SourcesDirectory)/libraries/functional-tests/functionaltestbot/tests/'
     workingDirectory: $(Agent.TempDirectory)
     displayName: 'SHOW SOURCES'
-    continueOnError: false
+    continueOnError: true
   - bash: 'ls -ltr $(Agent.TempDirectory)'
     workingDirectory: $(Agent.TempDirectory)
     displayName: 'SHOW TEMP'
-    continueOnError: false
+    continueOnError: true
 
-  - bash: 'pip3 install unittest'
+  - bash: '/usr/bin/python3 -m unittest'
     workingDirectory: $(Agent.TempDirectory)
-    displayName: 'Install Unittest'
-    continueOnError: false
+    displayName: 'TRY UNITTEST'
+    continueOnError: true
 
   - bash: '/usr/bin/python3 -m unittest $(Build.SourcesDirectory)/libraries/functional-tests/functionaltestbot/tests/test_py_bot.py'
     workingDirectory: $(Agent.TempDirectory)
