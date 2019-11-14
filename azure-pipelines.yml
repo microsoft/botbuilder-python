@@ -57,7 +57,7 @@ jobs:
     displayName: 'Copy Tests'
     continueOnError: false
 
-  - bash: '/usr/bin/python3 -m unittest test_py_bot.py'
+  - bash: 'python -m unittest test_py_bot.py'
     workingDirectory: $(Agent.TempDirectory)
     displayName: 'Run Test'
     continueOnError: false
