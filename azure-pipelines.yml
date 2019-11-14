@@ -33,10 +33,11 @@ jobs:
     vmImage: 'Ubuntu-16.04'
   dependsOn:
   - Cleanup
-  displayName: Provision and Deploy Azure Bot
+  displayName: Provision/Deploy/Test Azure Bot
   continueOnError: false
   steps:
   - task: AzureCLI@2
+    displayName: 'Provision/Deploy Bot'
     inputs:
       azureSubscription: 'FUSE Temporary (174c5021-8109-4087-a3e2-a1de20420569)'
       scriptType: 'bash'
@@ -47,17 +48,17 @@ jobs:
         az bot create --appid $(botAppId) --name $(webAppName) --password $(botAppPassword) --resource-group $(resourceGroupName) --sku F0 --kind registration --location westus --endpoint "https://pyfuntest.azurewebsites.net/api/messages"
         az webapp config appsettings set -g $(resourceGroupName) -n $(webAppName) --settings MicrosoftAppId=$(botAppId) MicrosoftAppPassword=$(botAppPassword) botId="pythonfunctional"
   - task: AzureCLI@2
+    displayName: 'Create DirectLine'
     inputs:
       azureSubscription: 'FUSE Temporary (174c5021-8109-4087-a3e2-a1de20420569)'
       scriptType: 'bash'
       scriptLocation: 'inlineScript'
       inlineScript: |
-        cd $(Build.SourcesDirectory)/libraries/functional-tests/functionaltestbot/tests
-        az bot directline create --name "pyfuntest" --resource-group "pyfuntest" > "DirectLineConfig.json"
+        az bot directline create --name "pyfuntest" --resource-group "pyfuntest" > $(Build.SourcesDirectory)/libraries/functional-tests/functionaltestbot/tests/DirectLineConfig.json
   - task: PythonScript@0
-    displayName: 'Upgrade pip/setuptools. Install deps, pytorch and fastai'
+    displayName: 'Run tests'
     inputs:
-      versionSpec: '3.6'
-  - script: |
-      python3 -m unittest test_py_bot.py
+      pythonInterpreter: '/usr/bin/python3'
+      workingDirectory: $(Build.SourcesDirectory)/libraries/functional-tests/functionaltestbot/tests
+      arguments: -m unittest test_py_bot.py
     continueOnError: false
