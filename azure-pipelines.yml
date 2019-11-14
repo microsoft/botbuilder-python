@@ -60,6 +60,11 @@ jobs:
     displayName: 'SHOW TEMP'
     continueOnError: false
 
+  - bash: 'pip3 install unittest'
+    workingDirectory: $(Agent.TempDirectory)
+    displayName: 'Install Unittest'
+    continueOnError: false
+
   - bash: '/usr/bin/python3 -m unittest $(Build.SourcesDirectory)/libraries/functional-tests/functionaltestbot/tests/test_py_bot.py'
     workingDirectory: $(Agent.TempDirectory)
     displayName: 'Run Test'
