@@ -48,6 +48,6 @@ jobs:
       inlineScript: |
         cd $(Build.SourcesDirectory)/libraries/functional-tests/functionaltestbot/tests
         az bot directline create --name "pyfuntest" --resource-group "pyfuntest" > "DirectLineConfig.json"
-        python -m unittest test_py_bot.py
+        python3 -m unittest test_py_bot.py
 
 
