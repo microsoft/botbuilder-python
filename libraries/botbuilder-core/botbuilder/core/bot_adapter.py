@@ -4,6 +4,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Callable, Awaitable
 from botbuilder.schema import Activity, ConversationReference
+from botframework.connector.auth import ClaimsIdentity
 
 from . import conversation_reference_extension
 from .bot_assert import BotAssert
@@ -76,6 +77,14 @@ class BotAdapter(ABC):
             self, conversation_reference_extension.get_continuation_activity(reference)
         )
         return await self.run_pipeline(context, callback)
+
+    async def process_activity_with_claims(
+        self,
+        identity: ClaimsIdentity,
+        activity: Activity,
+        callback: Callable[[TurnContext], Awaitable],
+    ):  # pylint: disable=unused-argument
+        raise NotImplementedError()
 
     async def run_pipeline(
         self, context: TurnContext, callback: Callable[[TurnContext], Awaitable] = None

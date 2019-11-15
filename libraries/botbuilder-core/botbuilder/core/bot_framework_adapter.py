@@ -7,8 +7,10 @@ import json
 import os
 from typing import List, Callable, Awaitable, Union, Dict
 from msrest.serialization import Model
+from botbuilder.core import InvokeResponse
 from botbuilder.schema import (
     Activity,
+    ActivityTypes,
     ConversationAccount,
     ConversationParameters,
     ConversationReference,
@@ -19,10 +21,13 @@ from botframework.connector.aio import ConnectorClient
 from botframework.connector.auth import (
     AuthenticationConstants,
     ChannelValidation,
+    ClaimsIdentity,
+    CredentialProvider,
     GovernmentChannelValidation,
     GovernmentConstants,
     MicrosoftAppCredentials,
     JwtTokenValidation,
+    SkillValidation,
     SimpleCredentialProvider,
 )
 from botframework.connector.token_api import TokenApiClient
@@ -71,6 +76,7 @@ class BotFrameworkAdapterSettings:
         oauth_endpoint: str = None,
         open_id_metadata: str = None,
         channel_service: str = None,
+        credential_provider: CredentialProvider = None,
     ):
         self.app_id = app_id
         self.app_password = app_password
@@ -78,10 +84,12 @@ class BotFrameworkAdapterSettings:
         self.oauth_endpoint = oauth_endpoint
         self.open_id_metadata = open_id_metadata
         self.channel_service = channel_service
+        self.credential_provider = credential_provider
 
 
 class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
     _INVOKE_RESPONSE_KEY = "BotFrameworkAdapter.InvokeResponse"
+    _BOT_IDENTITY_KEY = "BotIdentity"
 
     def __init__(self, settings: BotFrameworkAdapterSettings):
         super(BotFrameworkAdapter, self).__init__()
@@ -98,8 +106,11 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             self.settings.app_password,
             self.settings.channel_auth_tenant,
         )
-        self._credential_provider = SimpleCredentialProvider(
-            self.settings.app_id, self.settings.app_password
+        self._credential_provider = (
+            settings.credential_provider
+            or SimpleCredentialProvider(
+                self.settings.app_id, self.settings.app_password
+            )
         )
         self._is_emulating_oauth_cards = False
 
@@ -116,6 +127,8 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             self._credentials.oauth_scope = (
                 GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
             )
+
+        self._APP_CREDENTIALS_CACHE: Dict[str, MicrosoftAppCredentials] = {}
 
     async def continue_conversation(
         self, bot_id: str, reference: ConversationReference, callback: Callable
@@ -226,6 +239,40 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                 )
 
         return await self.run_pipeline(context, logic)
+
+    async def process_activity_with_claims(
+        self,
+        identity: ClaimsIdentity,
+        activity: Activity,
+        logic: Callable[[TurnContext], Awaitable],
+    ) -> InvokeResponse:
+        if not activity:
+            raise TypeError(f"{Activity.__name__} can not be None")
+
+        context = TurnContext(self, activity)
+
+        context.turn_state[BotFrameworkAdapter._BOT_IDENTITY_KEY] = identity
+        context.turn_state["BotCallbackHandler"] = logic
+
+        client = await self.create_connector_client_with_claims(
+            activity.service_url, identity
+        )
+        context.turn_state[client.__class__.__name__] = client
+
+        await self.run_pipeline(context, logic)
+
+        # Handle Invoke scenarios, which deviate from the request/response model in that
+        # the Bot will return a specific body and return code.
+        if activity.type == ActivityTypes.invoke:
+            activity_invoke_response = context.turn_state.get(self._INVOKE_RESPONSE_KEY)
+            if not activity_invoke_response:
+                return InvokeResponse(status=501)
+
+            return activity_invoke_response
+
+        # For all non-invoke scenarios, the HTTP layers above don't have to mess
+        # with the Body and return codes.
+        return None
 
     async def authenticate_request(self, request: Activity, auth_header: str):
         """
@@ -579,6 +626,31 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         client.config.add_user_agent(USER_AGENT)
         return client
 
+    def create_connector_client_with_claims(
+        self, service_url: str, identity: ClaimsIdentity = None
+    ) -> ConnectorClient:
+        credentials: MicrosoftAppCredentials = None
+        if identity:
+            # For requests from channel App Id is in Audience claim of JWT token. For emulator it is in AppId claim. For
+            # unauthenticated requests we have anonymous identity provided auth is disabled.
+            # For Activities coming from Emulator AppId claim contains the Bot's AAD AppId.
+            bot_app_id_claim = identity.claims.get(
+                AuthenticationConstants.AUDIENCE_CLAIM
+            ) or identity.claims.get(AuthenticationConstants.APP_ID_CLAIM)
+
+            # For anonymous requests (requests with no header) appId is not set in claims.
+            if bot_app_id_claim:
+                scope = None
+                if SkillValidation.is_skill_claim(identity.claims):
+                    # The skill connector has the target skill in the OAuthScope.
+                    scope = JwtTokenValidation.get_app_id_from_claims(identity.claims)
+
+                credentials = await self._get_app_credentials(bot_app_id_claim, scope)
+
+        client = ConnectorClient(credentials, base_url=service_url)
+        client.config.add_user_agent(USER_AGENT)
+        return client
+
     def create_token_api_client(self, service_url: str) -> TokenApiClient:
         client = TokenApiClient(self._credentials, service_url)
         client.config.add_user_agent(USER_AGENT)
@@ -593,7 +665,6 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         await EmulatorApiClient.emulate_oauth_cards(self._credentials, url, emulate)
 
     def oauth_api_url(self, context_or_service_url: Union[TurnContext, str]) -> str:
-        url = None
         if self._is_emulating_oauth_cards:
             url = (
                 context_or_service_url.activity.service_url
@@ -622,3 +693,36 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             )
         ):
             self._is_emulating_oauth_cards = True
+
+    async def _get_app_credentials(
+        self, app_id: str, oauth_scope: str
+    ) -> MicrosoftAppCredentials:
+        if not app_id:
+            return MicrosoftAppCredentials(None, None)
+
+        cache_key = f"{app_id}{oauth_scope}"
+        app_credentials = self._APP_CREDENTIALS_CACHE.get(cache_key)
+
+        if app_credentials:
+            return app_credentials
+
+        # If app credentials were provided, use them as they are the preferred choice moving forward
+        if self._credentials.microsoft_app_id:
+            # Cache credentials
+            self._APP_CREDENTIALS_CACHE[cache_key] = self._credentials
+            return self._credentials
+
+        app_password = await self._credential_provider.get_app_password(app_id)
+        app_credentials = MicrosoftAppCredentials(
+            app_id, app_password, oauth_scope=oauth_scope
+        )
+        if JwtTokenValidation.is_government(self.settings.channel_service):
+            app_credentials.oauth_endpoint = (
+                GovernmentConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL
+            )
+            app_credentials.oauth_scope = (
+                GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
+            )
+
+        self._APP_CREDENTIALS_CACHE[cache_key] = app_credentials
+        return app_credentials

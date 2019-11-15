@@ -4,32 +4,29 @@
 import uuid
 from typing import Callable, Awaitable
 
-from botbuilder.core import BotFrameworkAdapter, Middleware, TurnContext
+from botbuilder.core import BotAdapter, Middleware, TurnContext
 from botbuilder.schema import Activity, ActivityTypes, ResourceResponse
 from .channel_api_args import ChannelApiArgs
 from .channel_api_methods import ChannelApiMethods
-from .skill_host_adapter import SkillHostAdapter
+from .skill_client import SkillClient
 
 
 class ChannelApiMiddleware(Middleware):
-    def __init__(self, skill_adapter: SkillHostAdapter):
-        self._skill_adapter = skill_adapter
+    def __init__(self, skill_adapter: SkillClient):
+        self._SKILL_ADAPTER = skill_adapter
 
     async def on_turn(
         self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]
     ):
-        # register the  skill adapter
-        context.turn_state[self._skill_adapter.__class__.__name__] = self._skill_adapter
-
         if (
             context.activity.type == ActivityTypes.invoke
-            and context.activity.name == SkillHostAdapter.INVOKE_ACTIVITY_NAME
+            and context.activity.name == SkillClient.INVOKE_ACTIVITY_NAME
         ):
             # process invoke activity TODO: (implement next 2 lines)
             invoke_activity = context.activity.as_invoke_activity()
             invoke_args: ChannelApiArgs = invoke_activity.value
 
-            await self.call_channel_api(context, logic, invoke_args)
+            await self._process_skill_activity(context, logic, invoke_args)
         else:
             await logic()
 
@@ -39,6 +36,7 @@ class ChannelApiMiddleware(Middleware):
         logic: Callable[[TurnContext], Awaitable],
         activity_payload: Activity,
     ):
+        # TODO: implement 'as_end_of_conversation_activity'
         end_of_conversation = activity_payload.as_end_of_conversation_activity()
         context.activity.type = end_of_conversation.type
         context.activity.text = end_of_conversation.text
@@ -53,14 +51,14 @@ class ChannelApiMiddleware(Middleware):
 
         await logic()
 
-    async def _call_chanel_api(
+    async def _process_skill_activity(
         self,
         context: TurnContext,
         logic: Callable[[TurnContext], Awaitable],
         invoke_args: ChannelApiArgs,
     ):
         try:
-            adapter: BotFrameworkAdapter = context.adapter
+            adapter: BotAdapter = context.adapter
 
             if invoke_args.method == ChannelApiMethods.SEND_TO_CONVERSATION:
                 activity_payload: Activity = invoke_args.args[0]
@@ -75,7 +73,7 @@ class ChannelApiMiddleware(Middleware):
 
             elif invoke_args.method == ChannelApiMethods.REPLY_TO_ACTIVITY:
                 activity_payload: Activity = invoke_args.args[1]
-                activity_payload.reply_to_id = invoke_args[0]
+                activity_payload.reply_to_id = invoke_args.args[0]
 
                 if activity_payload.type == ActivityTypes.end_of_conversation:
                     await ChannelApiMiddleware._process_end_of_conversation(
@@ -90,7 +88,7 @@ class ChannelApiMiddleware(Middleware):
                 invoke_args.result = await context.update_activity(invoke_args.args[0])
 
             elif invoke_args.method == ChannelApiMethods.DELETE_ACTIVITY:
-                invoke_args.result = await context.delete_activity(invoke_args[0])
+                invoke_args.result = await context.delete_activity(invoke_args.args[0])
 
             elif invoke_args == ChannelApiMethods.SEND_CONVERSATION_HISTORY:
                 raise NotImplementedError(
@@ -109,13 +107,13 @@ class ChannelApiMiddleware(Middleware):
             elif invoke_args == ChannelApiMethods.DELETE_CONVERSATION_MEMBER:
                 if adapter:
                     invoke_args.result = await adapter.delete_conversation_member(
-                        context, invoke_args[0]
+                        context, invoke_args.args[0]
                     )
 
             elif invoke_args == ChannelApiMethods.GET_ACTIVITY_MEMBERS:
                 if adapter:
                     invoke_args.result = await adapter.get_activity_members(
-                        context, invoke_args[0]
+                        context, invoke_args.args[0]
                     )
 
             elif invoke_args == ChannelApiMethods.UPLOAD_ATTACHMENT:
