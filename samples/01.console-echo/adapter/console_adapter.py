@@ -105,7 +105,7 @@ class ConsoleAdapter(BotAdapter):
                 context = TurnContext(self, activity)
                 await self.run_pipeline(context, logic)
 
-    async def send_activities(self, context: TurnContext, activities: List[Activity]):
+    async def send_activities(self, context: TurnContext, activities: List[Activity]) -> List[ResourceResponse]:
         """
         Logs a series of activities to the console.
         :param context:

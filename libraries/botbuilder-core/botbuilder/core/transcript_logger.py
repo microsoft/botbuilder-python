@@ -4,6 +4,8 @@
 
 import datetime
 import copy
+import random
+import string
 from queue import Queue
 from abc import ABC, abstractmethod
 from typing import Awaitable, Callable, List
@@ -57,8 +59,27 @@ class TranscriptLoggerMiddleware(Middleware):
         ):
             # Run full pipeline
             responses = await next_send()
-            for activity in activities:
-                self.log_activity(transcript, copy.copy(activity))
+            for index, activity in enumerate(activities):
+                cloned_activity = copy.copy(activity)
+                if index < len(responses):
+                    cloned_activity.id = responses[index].id
+
+                # For certain channels, a ResourceResponse with an id is not always sent to the bot.
+                # This fix uses the timestamp on the activity to populate its id for logging the transcript
+                # If there is no outgoing timestamp, the current time for the bot is used for the activity.id
+                if not cloned_activity.id:
+                    alphanumeric = string.ascii_lowercase + string.digits
+                    prefix = "g_" + "".join(
+                        random.choice(alphanumeric) for i in range(5)
+                    )
+                    epoch = datetime.datetime.utcfromtimestamp(0)
+                    if cloned_activity.timestamp:
+                        reference = cloned_activity.timestamp
+                    else:
+                        reference = datetime.datetime.today()
+                    delta = (reference - epoch).total_seconds() * 1000
+                    cloned_activity.id = f"{prefix}{delta}"
+                self.log_activity(transcript, cloned_activity)
             return responses
 
         context.on_send_activities(send_activities_handler)
