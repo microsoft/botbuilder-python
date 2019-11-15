@@ -1,8 +1,6 @@
 trigger:
   branches:
     include:
-    - daveta-funtest
-    exclude:
     - master
 
 variables:
