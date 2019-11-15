@@ -86,7 +86,7 @@ class BotAdapter(ABC):
         activity: Activity,
         logic: Callable[[TurnContext], Awaitable],
     ):  # pylint: disable=unused-argument
-        raise NotImplementedError()
+        return
 
     async def run_pipeline(
         self, context: TurnContext, callback: Callable[[TurnContext], Awaitable] = None
