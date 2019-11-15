@@ -12,7 +12,13 @@ jobs:
 - job: Doit
   pool:
     vmImage: 'Ubuntu-16.04'
+
   steps:
+  - task: UsePythonVersion@0
+    displayName: Use Python 3.6
+    inputs:
+      versionSpec: '3.6'
+
   - task: AzureCLI@2
     displayName: Provision, Deploy and run tests
     inputs:
