@@ -108,7 +108,8 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         )
         self._credential_provider = (
             settings.credential_provider
-            or SimpleCredentialProvider(
+            if settings and settings.credential_provider
+            else SimpleCredentialProvider(
                 self.settings.app_id, self.settings.app_password
             )
         )
@@ -626,7 +627,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         client.config.add_user_agent(USER_AGENT)
         return client
 
-    def create_connector_client_with_claims(
+    async def create_connector_client_with_claims(
         self, service_url: str, identity: ClaimsIdentity = None
     ) -> ConnectorClient:
         credentials: MicrosoftAppCredentials = None

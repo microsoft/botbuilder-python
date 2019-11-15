@@ -5,6 +5,7 @@
 # license information.
 # --------------------------------------------------------------------------
 from . import conversation_reference_extension
+from .invoke_response import InvokeResponse
 
 from .about import __version__
 from .activity_handler import ActivityHandler
@@ -19,7 +20,6 @@ from .bot_telemetry_client import BotTelemetryClient, Severity
 from .card_factory import CardFactory
 from .conversation_state import ConversationState
 from .intent_score import IntentScore
-from .invoke_response import InvokeResponse
 from .memory_storage import MemoryStorage
 from .memory_transcript_store import MemoryTranscriptStore
 from .message_factory import MessageFactory
