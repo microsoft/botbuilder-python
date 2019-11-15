@@ -107,8 +107,12 @@ until [ $n -ge 3 ]
 do
    az group create --location westus --name ${AZURE_RESOURCE_GROUP} && break
    n=$[$n+1]
-   sleep 15
+   sleep 25
 done
+if [[ $n -ge 3 ]]; then
+    echo "Could not create group ${AZURE_RESOURCE_GROUP}"
+    exit 3
+fi
 
 # Push Web App
 n=0
@@ -116,18 +120,26 @@ until [ $n -ge 3 ]
 do
    az webapp up --sku F1 -n ${WEBAPP_NAME} -l westus --resource-group ${AZURE_RESOURCE_GROUP} && break  
    n=$[$n+1]
-   sleep 15
+   sleep 25
 done
+if [[ $n -ge 3 ]]; then
+    echo "Could not create webapp ${WEBAPP_NAME}"
+    exit 4
+fi
 
 
-# Create Bot
 n=0
 until [ $n -ge 3 ]
 do
    az bot create --appid ${BOT_APPID} --name ${BOT_NAME} --password ${BOT_PASSWORD} --resource-group ${AZURE_RESOURCE_GROUP} --sku F0 --kind registration --location westus --endpoint "https://${WEBAPP_NAME}.azurewebsites.net/api/messages" && break
    n=$[$n+1]
-   sleep 15
+   sleep 25
 done
+if [[ $n -ge 3 ]]; then
+    echo "Could not create BOT ${BOT_NAME}"
+    exit 5
+fi
+
 
 # Create bot settings
 n=0
@@ -135,8 +147,12 @@ until [ $n -ge 3 ]
 do
    az webapp config appsettings set -g ${AZURE_RESOURCE_GROUP} -n ${AZURE_RESOURCE_GROUP} --settings MicrosoftAppId=${BOT_APPID} MicrosoftAppPassword=${BOT_PASSWORD} botId=${BOT_ID} && break
    n=$[$n+1]
-   sleep 15
+   sleep 25
 done
+if [[ $n -ge 3 ]]; then
+    echo "Could not create BOT configuration"
+    exit 6
+fi
 
 # Create DirectLine
 cd tests
@@ -145,8 +161,13 @@ until [ $n -ge 3 ]
 do
    az bot directline create --name ${BOT_NAME} --resource-group ${AZURE_RESOURCE_GROUP} > "DirectLineConfig.json" && break
    n=$[$n+1]
-   sleep 15
+   sleep 25
 done
+if [[ $n -ge 3 ]]; then
+    echo "Could not create Directline configuration"
+    exit 7
+fi
+
 
 # Run Tests
 pip install requests
@@ -155,6 +176,11 @@ until [ $n -ge 3 ]
 do
    python -m unittest test_py_bot.py && break
    n=$[$n+1]
-   sleep 15
+   sleep 25
 done
+if [[ $n -ge 3 ]]; then
+    echo "Tests failed!"
+    exit 8
+fi
+
 
