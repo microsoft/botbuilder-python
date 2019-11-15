@@ -128,7 +128,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                 GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
             )
 
-        self._APP_CREDENTIALS_CACHE: Dict[str, MicrosoftAppCredentials] = {}
+        self._app_credentials_cache: Dict[str, MicrosoftAppCredentials] = {}
 
     async def continue_conversation(
         self, bot_id: str, reference: ConversationReference, callback: Callable
@@ -701,7 +701,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             return MicrosoftAppCredentials(None, None)
 
         cache_key = f"{app_id}{oauth_scope}"
-        app_credentials = self._APP_CREDENTIALS_CACHE.get(cache_key)
+        app_credentials = self._app_credentials_cache.get(cache_key)
 
         if app_credentials:
             return app_credentials
@@ -709,7 +709,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         # If app credentials were provided, use them as they are the preferred choice moving forward
         if self._credentials.microsoft_app_id:
             # Cache credentials
-            self._APP_CREDENTIALS_CACHE[cache_key] = self._credentials
+            self._app_credentials_cache[cache_key] = self._credentials
             return self._credentials
 
         app_password = await self._credential_provider.get_app_password(app_id)
@@ -724,5 +724,5 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                 GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
             )
 
-        self._APP_CREDENTIALS_CACHE[cache_key] = app_credentials
+        self._app_credentials_cache[cache_key] = app_credentials
         return app_credentials

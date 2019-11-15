@@ -82,7 +82,7 @@ class BotAdapter(ABC):
         self,
         identity: ClaimsIdentity,
         activity: Activity,
-        callback: Callable[[TurnContext], Awaitable],
+        logic: Callable[[TurnContext], Awaitable],
     ):  # pylint: disable=unused-argument
         raise NotImplementedError()
 

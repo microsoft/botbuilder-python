@@ -13,7 +13,7 @@ from .skill_client import SkillClient
 
 class ChannelApiMiddleware(Middleware):
     def __init__(self, skill_adapter: SkillClient):
-        self._SKILL_ADAPTER = skill_adapter
+        self._skill_adapter = skill_adapter
 
     async def on_turn(
         self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]
