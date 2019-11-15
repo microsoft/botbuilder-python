@@ -1,14 +1,14 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from datatypes_date_time.timex import Timex
+
 from botbuilder.dialogs import WaterfallDialog, WaterfallStepContext, DialogTurnResult
 from botbuilder.dialogs.prompts import ConfirmPrompt, TextPrompt, PromptOptions
 from botbuilder.core import MessageFactory
 from botbuilder.schema import InputHints
 from .cancel_and_help_dialog import CancelAndHelpDialog
 from .date_resolver_dialog import DateResolverDialog
-
-from datatypes_date_time.timex import Timex
 
 
 class BookingDialog(CancelAndHelpDialog):
@@ -33,15 +33,14 @@ class BookingDialog(CancelAndHelpDialog):
 
         self.initial_dialog_id = WaterfallDialog.__name__
 
-    """
-    If a destination city has not been provided, prompt for one.
-    :param step_context:
-    :return DialogTurnResult:
-    """
-
     async def destination_step(
         self, step_context: WaterfallStepContext
     ) -> DialogTurnResult:
+        """
+        If a destination city has not been provided, prompt for one.
+        :param step_context:
+        :return DialogTurnResult:
+        """
         booking_details = step_context.options
 
         if booking_details.destination is None:
@@ -54,13 +53,12 @@ class BookingDialog(CancelAndHelpDialog):
             )
         return await step_context.next(booking_details.destination)
 
-    """
-    If an origin city has not been provided, prompt for one.
-    :param step_context:
-    :return DialogTurnResult:
-    """
-
     async def origin_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
+        """
+        If an origin city has not been provided, prompt for one.
+        :param step_context:
+        :return DialogTurnResult:
+        """
         booking_details = step_context.options
 
         # Capture the response to the previous step's prompt
@@ -75,16 +73,15 @@ class BookingDialog(CancelAndHelpDialog):
             )
         return await step_context.next(booking_details.origin)
 
-    """
-    If a travel date has not been provided, prompt for one.
-    This will use the DATE_RESOLVER_DIALOG.
-    :param step_context:
-    :return DialogTurnResult:
-    """
-
     async def travel_date_step(
         self, step_context: WaterfallStepContext
     ) -> DialogTurnResult:
+        """
+        If a travel date has not been provided, prompt for one.
+        This will use the DATE_RESOLVER_DIALOG.
+        :param step_context:
+        :return DialogTurnResult:
+        """
         booking_details = step_context.options
 
         # Capture the results of the previous step
@@ -97,15 +94,14 @@ class BookingDialog(CancelAndHelpDialog):
             )
         return await step_context.next(booking_details.travel_date)
 
-    """
-    Confirm the information the user has provided.
-    :param step_context:
-    :return DialogTurnResult:
-    """
-
     async def confirm_step(
         self, step_context: WaterfallStepContext
     ) -> DialogTurnResult:
+        """
+        Confirm the information the user has provided.
+        :param step_context:
+        :return DialogTurnResult:
+        """
         booking_details = step_context.options
 
         # Capture the results of the previous step
@@ -123,14 +119,12 @@ class BookingDialog(CancelAndHelpDialog):
             ConfirmPrompt.__name__, PromptOptions(prompt=prompt_message)
         )
 
-    """
-    Complete the interaction and end the dialog.
-    :param step_context:
-    :return DialogTurnResult:
-    """
-
     async def final_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
-
+        """
+        Complete the interaction and end the dialog.
+        :param step_context:
+        :return DialogTurnResult:
+        """
         if step_context.result:
             booking_details = step_context.options
 

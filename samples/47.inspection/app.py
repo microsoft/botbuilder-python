@@ -4,20 +4,20 @@
 import asyncio
 import sys
 from datetime import datetime
-from types import MethodType
 
-from botbuilder.core.inspection import InspectionMiddleware, InspectionState
-from botframework.connector.auth import MicrosoftAppCredentials
 from flask import Flask, request, Response
+
 from botbuilder.core import (
     BotFrameworkAdapter,
     BotFrameworkAdapterSettings,
     ConversationState,
     MemoryStorage,
     TurnContext,
-    UserState,
+    UserState
 )
+from botbuilder.core.inspection import InspectionMiddleware, InspectionState
 from botbuilder.schema import Activity, ActivityTypes
+from botframework.connector.auth import MicrosoftAppCredentials
 
 from bots import EchoBot
 
@@ -41,9 +41,11 @@ async def on_error(context: TurnContext, error: Exception):
 
     # Send a message to the user
     await context.send_activity("The bot encountered an error or bug.")
-    await context.send_activity("To continue to run this bot, please fix the bot source code.")
+    await context.send_activity(
+        "To continue to run this bot, please fix the bot source code."
+    )
     # Send a trace activity if we're talking to the Bot Framework Emulator
-    if context.activity.channel_id == 'emulator':
+    if context.activity.channel_id == "emulator":
         # Create a trace activity that contains the error object
         trace_activity = Activity(
             label="TurnError",
@@ -51,13 +53,14 @@ async def on_error(context: TurnContext, error: Exception):
             timestamp=datetime.utcnow(),
             type=ActivityTypes.trace,
             value=f"{error}",
-            value_type="https://www.botframework.com/schemas/error"
+            value_type="https://www.botframework.com/schemas/error",
         )
         # Send a trace activity, which will be displayed in Bot Framework Emulator
         await context.send_activity(trace_activity)
-        
+
     # Clear out state
     await CONVERSATION_STATE.delete(context)
+
 
 # Set the error handler on the Adapter.
 # In this case, we want an unbound method, so MethodType is not needed.
@@ -74,9 +77,8 @@ INSPECTION_MIDDLEWARE = InspectionMiddleware(
     user_state=USER_STATE,
     conversation_state=CONVERSATION_STATE,
     credentials=MicrosoftAppCredentials(
-        app_id=APP.config["APP_ID"],
-        password=APP.config["APP_PASSWORD"]
-    )
+        app_id=APP.config["APP_ID"], password=APP.config["APP_PASSWORD"]
+    ),
 )
 ADAPTER.use(INSPECTION_MIDDLEWARE)
 

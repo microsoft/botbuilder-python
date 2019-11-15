@@ -13,7 +13,6 @@ class Question(Enum):
 
 class ConversationFlow:
     def __init__(
-        self,
-        last_question_asked: Question = Question.NONE,
+        self, last_question_asked: Question = Question.NONE,
     ):
         self.last_question_asked = last_question_asked
