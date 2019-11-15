@@ -3,7 +3,7 @@
 
 from abc import ABC, abstractmethod
 from typing import List, Callable, Awaitable
-from botbuilder.schema import Activity, ConversationReference
+from botbuilder.schema import Activity, ConversationReference, ResourceResponse
 
 from . import conversation_reference_extension
 from .bot_assert import BotAssert
@@ -19,7 +19,9 @@ class BotAdapter(ABC):
         self.on_turn_error = on_turn_error
 
     @abstractmethod
-    async def send_activities(self, context: TurnContext, activities: List[Activity]):
+    async def send_activities(
+        self, context: TurnContext, activities: List[Activity]
+    ) -> List[ResourceResponse]:
         """
         Sends a set of activities to the user. An array of responses from the server will be returned.
         :param context:
