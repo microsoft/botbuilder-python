@@ -4,8 +4,8 @@
 import base64
 from copy import deepcopy
 import json
-import requests
 from typing import Dict, List
+import requests
 
 from botbuilder.core import Bot, BotAdapter, InvokeResponse
 from botbuilder.schema import (
@@ -115,6 +115,7 @@ class BotFrameworkSkillClient:
 
     async def get_conversations(
         self,
+        adapter: BotAdater,
         bot: Bot,
         claims_identity: ClaimsIdentity,
         conversation_id: str,
@@ -141,6 +142,7 @@ class BotFrameworkSkillClient:
         :return:
         """
         return await self._invoke_channel_api(
+            adapter,
             bot,
             claims_identity,
             ChannelApiMethods.GET_CONVERSATIONS,
@@ -150,6 +152,7 @@ class BotFrameworkSkillClient:
 
     async def create_conversation(
         self,
+        adapter: BotAdater,
         bot: Bot,
         claims_identity: ClaimsIdentity,
         conversation_id: str,
@@ -186,6 +189,7 @@ class BotFrameworkSkillClient:
         :return:
         """
         return await self._invoke_channel_api(
+            adapter,
             bot,
             claims_identity,
             ChannelApiMethods.CREATE_CONVERSATION,
@@ -195,6 +199,7 @@ class BotFrameworkSkillClient:
 
     async def send_to_conversation(
         self,
+        adapter: BotAdater,
         bot: Bot,
         claims_identity: ClaimsIdentity,
         conversation_id: str,
@@ -223,6 +228,7 @@ class BotFrameworkSkillClient:
         :return:
         """
         return await self._invoke_channel_api(
+            adapter,
             bot,
             claims_identity,
             ChannelApiMethods.SEND_TO_CONVERSATION,
@@ -232,6 +238,7 @@ class BotFrameworkSkillClient:
 
     async def send_conversation_history(
         self,
+        adapter: BotAdater,
         bot: Bot,
         claims_identity: ClaimsIdentity,
         conversation_id: str,
@@ -254,6 +261,7 @@ class BotFrameworkSkillClient:
         :return:
         """
         return await self._invoke_channel_api(
+            adapter,
             bot,
             claims_identity,
             ChannelApiMethods.SEND_CONVERSATION_HISTORY,
@@ -263,6 +271,7 @@ class BotFrameworkSkillClient:
 
     async def update_activity(
         self,
+        adapter: BotAdater,
         bot: Bot,
         claims_identity: ClaimsIdentity,
         conversation_id: str,
@@ -287,6 +296,7 @@ class BotFrameworkSkillClient:
         :return:
         """
         return await self._invoke_channel_api(
+            adapter,
             bot,
             claims_identity,
             ChannelApiMethods.UPDATE_ACTIVITY,
@@ -297,6 +307,7 @@ class BotFrameworkSkillClient:
 
     async def reply_to_activity(
         self,
+        adapter: BotAdater,
         bot: Bot,
         claims_identity: ClaimsIdentity,
         conversation_id: str,
@@ -327,6 +338,7 @@ class BotFrameworkSkillClient:
         :return:
         """
         return await self._invoke_channel_api(
+            adapter,
             bot,
             claims_identity,
             ChannelApiMethods.REPLY_TO_ACTIVITY,
@@ -337,6 +349,7 @@ class BotFrameworkSkillClient:
 
     async def delete_activity(
         self,
+        adapter: BotAdater,
         bot: Bot,
         claims_identity: ClaimsIdentity,
         conversation_id: str,
@@ -356,6 +369,7 @@ class BotFrameworkSkillClient:
         :return:
         """
         return await self._invoke_channel_api(
+            adapter,
             bot,
             claims_identity,
             ChannelApiMethods.DELETE_ACTIVITY,
@@ -364,7 +378,11 @@ class BotFrameworkSkillClient:
         )
 
     async def get_conversation_members(
-        self, bot: Bot, claims_identity: ClaimsIdentity, conversation_id: str,
+        self,
+        adapter: BotAdater,
+        bot: Bot,
+        claims_identity: ClaimsIdentity,
+        conversation_id: str,
     ) -> List[ChannelAccount]:
         """
         get_conversation_members() API for Skill.
@@ -379,6 +397,7 @@ class BotFrameworkSkillClient:
         :return:
         """
         return await self._invoke_channel_api(
+            adapter,
             bot,
             claims_identity,
             ChannelApiMethods.GET_CONVERSATION_MEMBERS,
@@ -387,6 +406,7 @@ class BotFrameworkSkillClient:
 
     async def get_conversation_paged_members(
         self,
+        adapter: BotAdater,
         bot: Bot,
         claims_identity: ClaimsIdentity,
         conversation_id: str,
@@ -421,6 +441,7 @@ class BotFrameworkSkillClient:
         :return:
         """
         return await self._invoke_channel_api(
+            adapter,
             bot,
             claims_identity,
             ChannelApiMethods.GET_CONVERSATION_PAGED_MEMBERS,
@@ -431,6 +452,7 @@ class BotFrameworkSkillClient:
 
     async def delete_conversation_member(
         self,
+        adapter: BotAdater,
         bot: Bot,
         claims_identity: ClaimsIdentity,
         conversation_id: str,
@@ -452,6 +474,7 @@ class BotFrameworkSkillClient:
         :return:
         """
         return await self._invoke_channel_api(
+            adapter,
             bot,
             claims_identity,
             ChannelApiMethods.DELETE_CONVERSATION_MEMBER,
@@ -461,6 +484,7 @@ class BotFrameworkSkillClient:
 
     async def get_activity_members(
         self,
+        adapter: BotAdater,
         bot: Bot,
         claims_identity: ClaimsIdentity,
         conversation_id: str,
@@ -481,6 +505,7 @@ class BotFrameworkSkillClient:
         :return:
         """
         return await self._invoke_channel_api(
+            adapter,
             bot,
             claims_identity,
             ChannelApiMethods.GET_ACTIVITY_MEMBERS,
@@ -490,6 +515,7 @@ class BotFrameworkSkillClient:
 
     async def upload_attachment(
         self,
+        adapter: BotAdater,
         bot: Bot,
         claims_identity: ClaimsIdentity,
         conversation_id: str,
@@ -512,6 +538,7 @@ class BotFrameworkSkillClient:
         :return:
         """
         return await self._invoke_channel_api(
+            adapter,
             bot,
             claims_identity,
             ChannelApiMethods.UPLOAD_ATTACHMENT,
