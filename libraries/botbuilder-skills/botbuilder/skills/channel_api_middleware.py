@@ -8,11 +8,11 @@ from botbuilder.core import BotAdapter, Middleware, TurnContext
 from botbuilder.schema import Activity, ActivityTypes, ResourceResponse
 from .channel_api_args import ChannelApiArgs
 from .channel_api_methods import ChannelApiMethods
-from .skill_client import SkillClient
+from .bot_framework_skill_client import BotFrameworkSkillClient
 
 
 class ChannelApiMiddleware(Middleware):
-    def __init__(self, skill_adapter: SkillClient):
+    def __init__(self, skill_adapter: BotFrameworkSkillClient):
         self._skill_adapter = skill_adapter
 
     async def on_turn(
@@ -20,7 +20,7 @@ class ChannelApiMiddleware(Middleware):
     ):
         if (
             context.activity.type == ActivityTypes.invoke
-            and context.activity.name == SkillClient.INVOKE_ACTIVITY_NAME
+            and context.activity.name == BotFrameworkSkillClient.INVOKE_ACTIVITY_NAME
         ):
             # process invoke activity TODO: (implement next 2 lines)
             invoke_activity = context.activity.as_invoke_activity()
