@@ -23,10 +23,14 @@ from direct_line_client import DirectLineClient
 
 class PyBotTest(TestCase):
     def setUp(self):
-        direct_line_config = os.environ.get("DIRECT_LINE_CONFIG", "DirectLineConfig.json")
+        direct_line_config = os.environ.get(
+            "DIRECT_LINE_CONFIG", "DirectLineConfig.json"
+        )
         with open(direct_line_config) as direct_line_file:
             self.direct_line_config = json.load(direct_line_file)
-        self.direct_line_secret = self.direct_line_config['properties']['properties']['sites'][0]['key']
+        self.direct_line_secret = self.direct_line_config["properties"]["properties"][
+            "sites"
+        ][0]["key"]
         self.assertIsNotNone(self.direct_line_secret)
 
     def test_deployed_bot_answer(self):
@@ -41,4 +45,4 @@ class PyBotTest(TestCase):
         self.assertIsNotNone(response)
         self.assertEqual(200, response.status_code)
         self.assertEqual(f"Echo: {user_message}", text)
-        print('SUCCESS!')
+        print("SUCCESS!")

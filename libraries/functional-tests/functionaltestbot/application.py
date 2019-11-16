@@ -7,21 +7,26 @@ import os
 from datetime import datetime
 
 from flask import Flask, request, Response
-from botbuilder.core import BotFrameworkAdapterSettings, TurnContext, BotFrameworkAdapter, \
-ActivityHandler, MessageFactory, TurnContext
+from botbuilder.core import (
+    BotFrameworkAdapterSettings,
+    BotFrameworkAdapter,
+    TurnContext,
+)
 from botbuilder.schema import Activity, ActivityTypes
-from botbuilder.schema import ChannelAccount
 
 from bots import EchoBot
 
 # Create the loop and Flask app
 LOOP = asyncio.get_event_loop()
+# pylint: disable=invalid-name
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_object("config.DefaultConfig")
 
 # Create adapter.
 # See https://aka.ms/about-bot-adapter to learn more about how bots work.
-SETTINGS = BotFrameworkAdapterSettings(os.environ.get("MicrosoftAppId", ""), os.environ.get("MicrosoftAppPassword", ""))
+SETTINGS = BotFrameworkAdapterSettings(
+    os.environ.get("MicrosoftAppId", ""), os.environ.get("MicrosoftAppPassword", "")
+)
 ADAPTER = BotFrameworkAdapter(SETTINGS)
 
 
@@ -34,9 +39,11 @@ async def on_error(context: TurnContext, error: Exception):
 
     # Send a message to the user
     await context.send_activity("The bot encountered an error or bug.")
-    await context.send_activity("To continue to run this bot, please fix the bot source code.")
+    await context.send_activity(
+        "To continue to run this bot, please fix the bot source code."
+    )
     # Send a trace activity if we're talking to the Bot Framework Emulator
-    if context.activity.channel_id == 'emulator':
+    if context.activity.channel_id == "emulator":
         # Create a trace activity that contains the error object
         trace_activity = Activity(
             label="TurnError",
@@ -44,10 +51,11 @@ async def on_error(context: TurnContext, error: Exception):
             timestamp=datetime.utcnow(),
             type=ActivityTypes.trace,
             value=f"{error}",
-            value_type="https://www.botframework.com/schemas/error"
+            value_type="https://www.botframework.com/schemas/error",
         )
         # Send a trace activity, which will be displayed in Bot Framework Emulator
         await context.send_activity(trace_activity)
+
 
 ADAPTER.on_turn_error = on_error
 
@@ -76,6 +84,7 @@ def messages():
         return Response(status=201)
     except Exception as exception:
         raise exception
+
 
 @app.route("/", methods=["GET"])
 def ping():
