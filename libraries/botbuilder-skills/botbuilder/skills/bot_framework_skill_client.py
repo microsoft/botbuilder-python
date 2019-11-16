@@ -115,7 +115,7 @@ class BotFrameworkSkillClient:
 
     async def get_conversations(
         self,
-        adapter: BotAdater,
+        adapter: BotAdapter,
         bot: Bot,
         claims_identity: ClaimsIdentity,
         conversation_id: str,
@@ -152,7 +152,7 @@ class BotFrameworkSkillClient:
 
     async def create_conversation(
         self,
-        adapter: BotAdater,
+        adapter: BotAdapter,
         bot: Bot,
         claims_identity: ClaimsIdentity,
         conversation_id: str,
@@ -199,7 +199,7 @@ class BotFrameworkSkillClient:
 
     async def send_to_conversation(
         self,
-        adapter: BotAdater,
+        adapter: BotAdapter,
         bot: Bot,
         claims_identity: ClaimsIdentity,
         conversation_id: str,
@@ -238,7 +238,7 @@ class BotFrameworkSkillClient:
 
     async def send_conversation_history(
         self,
-        adapter: BotAdater,
+        adapter: BotAdapter,
         bot: Bot,
         claims_identity: ClaimsIdentity,
         conversation_id: str,
@@ -271,7 +271,7 @@ class BotFrameworkSkillClient:
 
     async def update_activity(
         self,
-        adapter: BotAdater,
+        adapter: BotAdapter,
         bot: Bot,
         claims_identity: ClaimsIdentity,
         conversation_id: str,
@@ -307,7 +307,7 @@ class BotFrameworkSkillClient:
 
     async def reply_to_activity(
         self,
-        adapter: BotAdater,
+        adapter: BotAdapter,
         bot: Bot,
         claims_identity: ClaimsIdentity,
         conversation_id: str,
@@ -349,7 +349,7 @@ class BotFrameworkSkillClient:
 
     async def delete_activity(
         self,
-        adapter: BotAdater,
+        adapter: BotAdapter,
         bot: Bot,
         claims_identity: ClaimsIdentity,
         conversation_id: str,
@@ -379,7 +379,7 @@ class BotFrameworkSkillClient:
 
     async def get_conversation_members(
         self,
-        adapter: BotAdater,
+        adapter: BotAdapter,
         bot: Bot,
         claims_identity: ClaimsIdentity,
         conversation_id: str,
@@ -406,7 +406,7 @@ class BotFrameworkSkillClient:
 
     async def get_conversation_paged_members(
         self,
-        adapter: BotAdater,
+        adapter: BotAdapter,
         bot: Bot,
         claims_identity: ClaimsIdentity,
         conversation_id: str,
@@ -452,7 +452,7 @@ class BotFrameworkSkillClient:
 
     async def delete_conversation_member(
         self,
-        adapter: BotAdater,
+        adapter: BotAdapter,
         bot: Bot,
         claims_identity: ClaimsIdentity,
         conversation_id: str,
@@ -484,7 +484,7 @@ class BotFrameworkSkillClient:
 
     async def get_activity_members(
         self,
-        adapter: BotAdater,
+        adapter: BotAdapter,
         bot: Bot,
         claims_identity: ClaimsIdentity,
         conversation_id: str,
@@ -515,7 +515,7 @@ class BotFrameworkSkillClient:
 
     async def upload_attachment(
         self,
-        adapter: BotAdater,
+        adapter: BotAdapter,
         bot: Bot,
         claims_identity: ClaimsIdentity,
         conversation_id: str,
