@@ -18,13 +18,13 @@ class TeamsChannelData:
         notification: NotificationInfo = None,
         tenant: TenantInfo = None,
     ):
-        self._channel = ChannelInfo(**channel) if channel is not None else ChannelInfo()
+        self.channel = ChannelInfo(**channel) if channel is not None else ChannelInfo()
         # This is not camel case because the JSON that makes this object isn't
-        self._event_type = eventType
-        self._team = TeamInfo(**team) if team is not None else TeamInfo()
-        self._notification = (
+        self.event_type = eventType
+        self.team = TeamInfo(**team) if team is not None else TeamInfo()
+        self.notification = (
             NotificationInfo(**notification)
             if notification is not None
             else NotificationInfo()
         )
-        self._tenant = TenantInfo(**tenant) if tenant is not None else TenantInfo()
+        self.tenant = TenantInfo(**tenant) if tenant is not None else TenantInfo()
