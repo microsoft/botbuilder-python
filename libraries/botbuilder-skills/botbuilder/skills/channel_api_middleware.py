@@ -11,6 +11,14 @@ from .channel_api_methods import ChannelApiMethods
 from .bot_framework_skill_client import BotFrameworkSkillClient
 
 
+def _check_type(activity: Activity, activity_type: str) -> Activity:
+    aux_type = activity.type
+
+    # If there's no type set then we can't tell if it's the type they're looking for
+    if not aux_type:
+        return None
+
+
 class ChannelApiMiddleware(Middleware):
     def __init__(self, skill_adapter: BotFrameworkSkillClient):
         self._skill_adapter = skill_adapter
@@ -22,9 +30,7 @@ class ChannelApiMiddleware(Middleware):
             context.activity.type == ActivityTypes.invoke
             and context.activity.name == BotFrameworkSkillClient.INVOKE_ACTIVITY_NAME
         ):
-            # process invoke activity TODO: (implement next 2 lines)
-            invoke_activity = context.activity.as_invoke_activity()
-            invoke_args: ChannelApiArgs = invoke_activity.value
+            invoke_args: ChannelApiArgs = context.activity.value
 
             await self._process_skill_activity(context, logic, invoke_args)
         else:
@@ -36,8 +42,7 @@ class ChannelApiMiddleware(Middleware):
         logic: Callable[[TurnContext], Awaitable],
         activity_payload: Activity,
     ):
-        # TODO: implement 'as_end_of_conversation_activity'
-        end_of_conversation = activity_payload.as_end_of_conversation_activity()
+        end_of_conversation = activity_payload
         context.activity.type = end_of_conversation.type
         context.activity.text = end_of_conversation.text
         context.activity.code = end_of_conversation.code
@@ -46,7 +51,6 @@ class ChannelApiMiddleware(Middleware):
         context.activity.timestamp = end_of_conversation.timestamp
         context.activity.value = activity_payload.value
         context.activity.channel_data = end_of_conversation.channel_data
-        # TODO: these properties are in extensions so currently they doesnt exist
         context.activity.properties = end_of_conversation.properties
 
         await logic()

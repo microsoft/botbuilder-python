@@ -10,6 +10,7 @@ import requests
 from botbuilder.core import Bot, BotAdapter, InvokeResponse
 from botbuilder.schema import (
     Activity,
+    ActivityTypes,
     AttachmentData,
     ChannelAccount,
     ConversationAccount,
@@ -567,8 +568,7 @@ class BotFrameworkSkillClient:
 
         skill_conversation = SkillConversation(conversation_id)
 
-        # TODO: Extension for create_invoke_activity
-        channel_api_invoke_activity: Activity = Activity.create_invoke_activity()
+        channel_api_invoke_activity: Activity = Activity(type=ActivityTypes.invoke)
         channel_api_invoke_activity.name = BotFrameworkSkillClient.INVOKE_ACTIVITY_NAME
         channel_api_invoke_activity.channel_id = "unknown"
         channel_api_invoke_activity.service_url = skill_conversation.service_url
