@@ -67,7 +67,8 @@ class BotFrameworkSkillRequestHandler:
         ChannelRoute(
             method=ChannelApiMethods.GET_ACTIVITY_MEMBERS,
             pattern=re.compile(
-                r"/GET:(?P<path>.*)/v3/conversations/(?P<conversation_id>[^\s/]*)/activities/(?P<activity_id>.*)/members",
+                r"/GET:(?P<path>.*)/v3/conversations/(?P<conversation_id>[^\s/]*)"
+                r"/activities/(?P<activity_id>.*)/members",
                 flags=re.IGNORECASE,
             ),
             action=get_activity_members_action,

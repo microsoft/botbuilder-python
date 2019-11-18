@@ -11,14 +11,6 @@ from .channel_api_methods import ChannelApiMethods
 from .bot_framework_skill_client import BotFrameworkSkillClient
 
 
-def _check_type(activity: Activity, activity_type: str) -> Activity:
-    aux_type = activity.type
-
-    # If there's no type set then we can't tell if it's the type they're looking for
-    if not aux_type:
-        return None
-
-
 class ChannelApiMiddleware(Middleware):
     def __init__(self, skill_adapter: BotFrameworkSkillClient):
         self._skill_adapter = skill_adapter
