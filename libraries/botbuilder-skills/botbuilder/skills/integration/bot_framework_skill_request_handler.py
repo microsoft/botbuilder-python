@@ -30,12 +30,12 @@ from .actions import (
     get_conversations_action,
     create_conversation_action,
 )
-from ..bot_framework_skill_client import BotFrameworkSkillClient
+from ..bot_framework_skill_client import BotFrameworkClient
 from ..channel_api_methods import ChannelApiMethods
 from ..http_helper import HttpHelper
 
 RouteAction = Callable[
-    [BotAdapter, BotFrameworkSkillClient, Bot, ClaimsIdentity, Request, Dict[str, str]],
+    [BotAdapter, BotFrameworkClient, Bot, ClaimsIdentity, Request, Dict[str, str]],
     Awaitable[object],
 ]
 
@@ -163,7 +163,7 @@ class BotFrameworkSkillRequestHandler:
 
     def __init__(
         self,
-        skill_client: BotFrameworkSkillClient,
+        skill_client: BotFrameworkClient,
         credential_provider: CredentialProvider,
         auth_config: AuthenticationConfiguration,
         channel_provider: ChannelProvider = None,

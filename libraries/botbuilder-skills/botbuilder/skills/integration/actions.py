@@ -14,13 +14,13 @@ from botbuilder.schema import (
 
 from botframework.connector.auth import ClaimsIdentity
 
-from ..bot_framework_skill_client import BotFrameworkSkillClient
+from ..bot_framework_skill_client import BotFrameworkClient
 from ..http_helper import HttpHelper
 
 
 async def get_activity_members_action(
     adapter: BotAdapter,
-    skill_client: BotFrameworkSkillClient,
+    skill_client: BotFrameworkClient,
     bot: Bot,
     claims_identity: ClaimsIdentity,
     request: Request,  # pylint: disable=unused-argument
@@ -37,7 +37,7 @@ async def get_activity_members_action(
 
 async def send_conversation_history_action(
     adapter: BotAdapter,
-    skill_client: BotFrameworkSkillClient,
+    skill_client: BotFrameworkClient,
     bot: Bot,
     claims_identity: ClaimsIdentity,
     request: Request,
@@ -51,7 +51,7 @@ async def send_conversation_history_action(
 
 async def reply_to_activity_action(
     adapter: BotAdapter,
-    skill_client: BotFrameworkSkillClient,
+    skill_client: BotFrameworkClient,
     bot: Bot,
     claims_identity: ClaimsIdentity,
     request: Request,
@@ -70,7 +70,7 @@ async def reply_to_activity_action(
 
 async def update_activity_action(
     adapter: BotAdapter,
-    skill_client: BotFrameworkSkillClient,
+    skill_client: BotFrameworkClient,
     bot: Bot,
     claims_identity: ClaimsIdentity,
     request: Request,
@@ -89,7 +89,7 @@ async def update_activity_action(
 
 async def delete_activity_action(
     adapter: BotAdapter,
-    skill_client: BotFrameworkSkillClient,
+    skill_client: BotFrameworkClient,
     bot: Bot,
     claims_identity: ClaimsIdentity,
     request: Request,  # pylint: disable=unused-argument
@@ -107,7 +107,7 @@ async def delete_activity_action(
 
 async def send_to_conversaiton_action(
     adapter: BotAdapter,
-    skill_client: BotFrameworkSkillClient,
+    skill_client: BotFrameworkClient,
     bot: Bot,
     claims_identity: ClaimsIdentity,
     request: Request,
@@ -125,7 +125,7 @@ async def send_to_conversaiton_action(
 
 async def delete_conversation_member_action(
     adapter: BotAdapter,
-    skill_client: BotFrameworkSkillClient,
+    skill_client: BotFrameworkClient,
     bot: Bot,
     claims_identity: ClaimsIdentity,
     request: Request,  # pylint: disable=unused-argument
@@ -143,7 +143,7 @@ async def delete_conversation_member_action(
 
 async def upload_attachment_action(
     adapter: BotAdapter,
-    skill_client: BotFrameworkSkillClient,
+    skill_client: BotFrameworkClient,
     bot: Bot,
     claims_identity: ClaimsIdentity,
     request: Request,
@@ -157,7 +157,7 @@ async def upload_attachment_action(
 
 async def get_conversation_members_action(
     adapter: BotAdapter,
-    skill_client: BotFrameworkSkillClient,
+    skill_client: BotFrameworkClient,
     bot: Bot,
     claims_identity: ClaimsIdentity,
     request: Request,  # pylint: disable=unused-argument
@@ -170,7 +170,7 @@ async def get_conversation_members_action(
 
 async def get_conversation_paged_members_action(
     adapter: BotAdapter,
-    skill_client: BotFrameworkSkillClient,
+    skill_client: BotFrameworkClient,
     bot: Bot,
     claims_identity: ClaimsIdentity,
     request: Request,  # pylint: disable=unused-argument
@@ -189,7 +189,7 @@ async def get_conversation_paged_members_action(
 
 async def get_conversations_action(
     adapter: BotAdapter,
-    skill_client: BotFrameworkSkillClient,
+    skill_client: BotFrameworkClient,
     bot: Bot,
     claims_identity: ClaimsIdentity,
     request: Request,  # pylint: disable=unused-argument
@@ -202,7 +202,7 @@ async def get_conversations_action(
 
 async def create_conversation_action(
     adapter: BotAdapter,
-    skill_client: BotFrameworkSkillClient,
+    skill_client: BotFrameworkClient,
     bot: Bot,
     claims_identity: ClaimsIdentity,
     request: Request,

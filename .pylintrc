@@ -158,7 +158,8 @@ disable=print-statement,
         too-many-return-statements,
         import-error,
         no-name-in-module,
-        too-many-branches
+        too-many-branches,
+        pointless-string-statement
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option

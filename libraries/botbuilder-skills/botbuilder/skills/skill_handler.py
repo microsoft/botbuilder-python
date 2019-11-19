@@ -1,13 +1,9 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import base64
-from copy import deepcopy
-import json
-from typing import Dict, List
-import requests
+from typing import List
 
-from botbuilder.core import Bot, BotAdapter, InvokeResponse
+from botbuilder.core import Bot, BotAdapter
 from botbuilder.schema import (
     Activity,
     ActivityTypes,
@@ -22,97 +18,26 @@ from botbuilder.schema import (
     RoleTypes,
     Transcript,
 )
-from botframework.connector.auth import (
-    AuthenticationConfiguration,
-    ChannelProvider,
-    ClaimsIdentity,
-    CredentialProvider,
-    GovernmentConstants,
-    MicrosoftAppCredentials,
-)
+from botframework.connector.auth import ClaimsIdentity
 
-from .bot_framework_skill import BotFrameworkSkill
 from .channel_api_args import ChannelApiArgs
 from .channel_api_methods import ChannelApiMethods
 from .channel_api_middleware import ChannelApiMiddleware
 from .skill_conversation import SkillConversation
 
 
-class BotFrameworkSkillClient:
-
-    """
-    A skill host adapter implements API to forward activity to a skill and
-    implements routing ChannelAPI calls from the Skill up through the bot/adapter.
-    """
-
+class SkillHandler:
     INVOKE_ACTIVITY_NAME = "SkillEvents.ChannelApiInvoke"
-    _BOT_IDENTITY_KEY = "BotIdentity"
 
-    def __init__(
-        self,
-        credential_provider: CredentialProvider,
-        auth_config: AuthenticationConfiguration,
-        channel_provider: ChannelProvider = None,
-        logger: object = None,
-    ):
-        if not credential_provider:
-            raise TypeError("credential_provider can't be None")
+    def __init__(self, adapter: BotAdapter, bot: Bot, logger: object = None):
+        if not adapter:
+            raise TypeError("adapter can't be None")
+        if not bot:
+            raise TypeError("bot can't be None")
 
-        if not auth_config:
-            raise TypeError("auth_config can't be None")
-        self._credential_provider = credential_provider
-        self._auth_config = auth_config
-        self._channel_provider = channel_provider
+        self._adapter = adapter
+        self._bot = bot
         self._logger = logger
-
-        self._app_credentials_cache: Dict[str:MicrosoftAppCredentials] = {}
-
-    async def forward_activity(
-        self,
-        bot_id: str,
-        skill: BotFrameworkSkill,
-        skill_host_endpoint: str,
-        activity: Activity,
-    ) -> InvokeResponse:
-        app_credentials = await self._get_app_credentials(bot_id, skill.app_id)
-
-        if not app_credentials:
-            raise RuntimeError("Unable to get appCredentials to connect to the skill")
-
-        # Get token for the skill call
-        token = app_credentials.get_access_token()
-        activity_clone = deepcopy(activity)
-
-        # TODO use SkillConversation class here instead of hard coded encoding...
-        # Encode original bot service URL and ConversationId in the new conversation ID so we can unpack it later.
-        # var skillConversation = new SkillConversation()
-        # { ServiceUrl = activity.ServiceUrl, ConversationId = activity.Conversation.Id };
-        # activity.Conversation.Id = skillConversation.GetSkillConversationId()
-        json_str = json.dumps(
-            [activity_clone.conversation.conversation_id, activity_clone.service_url]
-        )
-        activity_clone.conversation.id = str(
-            base64.b64encode(json_str.encode("utf-8")), "utf-8"
-        )
-        activity_clone.service_url = skill_host_endpoint
-        activity_clone.recipient.properties["skillId"] = skill.id
-        json_content = json.dumps(activity_clone.as_dict())
-        with requests.Session() as session:
-            resp = session.post(
-                skill.skill_endpoint,
-                data=json_content.encode("utf-8"),
-                headers={
-                    "Authorization": f"Bearer:{token}",
-                    "Content-type": "application/json; charset=utf-8",
-                },
-            )
-            resp.raise_for_status()
-            content = resp.json
-
-            if content:
-                return InvokeResponse(status=resp.status_code, body=content)
-
-        return None
 
     async def get_conversations(
         self,
@@ -569,7 +494,7 @@ class BotFrameworkSkillClient:
         skill_conversation = SkillConversation(conversation_id)
 
         channel_api_invoke_activity: Activity = Activity(type=ActivityTypes.invoke)
-        channel_api_invoke_activity.name = BotFrameworkSkillClient.INVOKE_ACTIVITY_NAME
+        channel_api_invoke_activity.name = SkillHandler.INVOKE_ACTIVITY_NAME
         channel_api_invoke_activity.channel_id = "unknown"
         channel_api_invoke_activity.service_url = skill_conversation.service_url
         channel_api_invoke_activity.conversation = ConversationAccount(
@@ -618,30 +543,3 @@ class BotFrameworkSkillClient:
 
         # Return the result that was captured in the middleware handler.
         return channel_api_args.result
-
-    async def _get_app_credentials(
-        self, app_id: str, oauth_scope: str
-    ) -> MicrosoftAppCredentials:
-        if not app_id:
-            return MicrosoftAppCredentials(None, None)
-
-        cache_key = f"{app_id}{oauth_scope}"
-        app_credentials = self._app_credentials_cache.get(cache_key)
-
-        if app_credentials:
-            return app_credentials
-
-        app_password = await self._credential_provider.get_app_password(app_id)
-        app_credentials = MicrosoftAppCredentials(
-            app_id, app_password, oauth_scope=oauth_scope
-        )
-        if self._channel_provider.is_government():
-            app_credentials.oauth_endpoint = (
-                GovernmentConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL
-            )
-            app_credentials.oauth_scope = (
-                GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
-            )
-
-        self._app_credentials_cache[cache_key] = app_credentials
-        return app_credentials

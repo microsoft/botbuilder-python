@@ -8,7 +8,12 @@ from typing import List
 
 
 class SkillConversation:
-    def __init__(self, packed_conversation_id: str = None):
+    def __init__(
+        self,
+        packed_conversation_id: str = None,
+        conversation_id: str = None,
+        service_url: str = None,
+    ):
         if packed_conversation_id:
             parts: List[str] = json.loads(
                 base64.b64decode(packed_conversation_id).decode("utf-8")
@@ -17,8 +22,8 @@ class SkillConversation:
             self.conversation_id = parts[0]
             self.service_url = parts[1]
         else:
-            self.conversation_id = None
-            self.service_url = None
+            self.conversation_id = conversation_id
+            self.service_url = service_url
 
     def get_skill_conversation_id(self) -> str:
         """
