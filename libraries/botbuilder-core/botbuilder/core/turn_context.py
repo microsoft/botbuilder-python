@@ -159,6 +159,7 @@ class TurnContext:
             )
             for a in activity_or_text
         ]
+
         for activity in output:
             if not activity.input_hint:
                 activity.input_hint = "acceptingInput"
@@ -171,7 +172,6 @@ class TurnContext:
         result = await self._emit(
             self._on_send_activities, output, callback(self, output)
         )
-
         return result[0] if result else ResourceResponse()
 
     async def update_activity(self, activity: Activity):

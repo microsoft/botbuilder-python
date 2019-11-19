@@ -13,6 +13,7 @@ from botbuilder.schema import (
     ConversationParameters,
     ConversationReference,
     TokenResponse,
+    ResourceResponse,
 )
 from botframework.connector import Channels, EmulatorApiClient
 from botframework.connector.aio import ConnectorClient
@@ -330,9 +331,12 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         except Exception as error:
             raise error
 
-    async def send_activities(self, context: TurnContext, activities: List[Activity]):
+    async def send_activities(self, context: TurnContext, activities: List[Activity]) -> List[ResourceResponse]:
         try:
+            responses = []
+            
             for activity in activities:
+                response = ResourceResponse()    
                 if activity.type == "delay":
                     try:
                         delay_in_ms = float(activity.value) / 1000
@@ -348,14 +352,20 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                     context.turn_state.add(self._INVOKE_RESPONSE_KEY)
                 elif activity.reply_to_id:
                     client = self.create_connector_client(activity.service_url)
-                    await client.conversations.reply_to_activity(
+                    response = await client.conversations.reply_to_activity(
                         activity.conversation.id, activity.reply_to_id, activity
                     )
                 else:
                     client = self.create_connector_client(activity.service_url)
-                    await client.conversations.send_to_conversation(
+                    response = await client.conversations.send_to_conversation(
                         activity.conversation.id, activity
                     )
+
+                if not response:
+                    response.id = activity_id if activity_id else ""
+                
+                responses.append(response)
+            return responses
         except Exception as error:
             raise error
 
