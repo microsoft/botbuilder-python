@@ -9,9 +9,9 @@ from botbuilder.schema import Mention
 class MentionBot(TeamsActivityHandler):
     async def on_message_activity(self, turn_context: TurnContext):
         mention_data = {
-         "mentioned": turn_context.activity.from_property,
-         "text": f"<at>{turn_context.activity.from_property.name}</at>",
-         "type": "mention"
+            "mentioned": turn_context.activity.from_property,
+            "text": f"<at>{turn_context.activity.from_property.name}</at>",
+            "type": "mention",
         }
 
         mention_object = Mention(**mention_data)
