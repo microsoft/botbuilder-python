@@ -11,7 +11,6 @@ from botbuilder.core import (
     BotFrameworkAdapterSettings,
     TurnContext,
     BotFrameworkAdapter,
-    MemoryStorage
 )
 from botbuilder.schema import Activity, ActivityTypes
 
@@ -29,7 +28,7 @@ ADAPTER = BotFrameworkAdapter(SETTINGS)
 
 
 # Catch-all for errors.
-async def on_error( # pylint: disable=unused-argument
+async def on_error(  # pylint: disable=unused-argument
     self, context: TurnContext, error: Exception
 ):
     # This check writes out errors to console log .vs. app insights.
@@ -58,9 +57,9 @@ async def on_error( # pylint: disable=unused-argument
 
 
 ADAPTER.on_turn_error = MethodType(on_error, ADAPTER)
-activity_ids = []
+ACTIVITY_IDS = []
 # Create the Bot
-BOT = ActivitiyUpdateAndDeleteBot(activity_ids)
+BOT = ActivitiyUpdateAndDeleteBot(ACTIVITY_IDS)
 
 # Listen for incoming requests on /api/messages.s
 @APP.route("/api/messages", methods=["POST"])
