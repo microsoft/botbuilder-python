@@ -1,7 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import asyncio
 import sys
 from datetime import datetime
 from types import MethodType
@@ -16,9 +15,9 @@ from botbuilder.core import (
 from botbuilder.schema import Activity, ActivityTypes
 from activity_log import ActivityLog
 from bots import MessageReactionBot
+from threading_helper import run_coroutine
 
-# Create the loop and Flask app
-LOOP = asyncio.get_event_loop()
+# Create the Flask app
 APP = Flask(__name__, instance_relative_config=True)
 APP.config.from_object("config.DefaultConfig")
 
@@ -80,11 +79,8 @@ def messages():
 
     try:
         print("about to create task")
-        task = LOOP.create_task(
-            ADAPTER.process_activity(activity, auth_header, BOT.on_turn)
-        )
         print("about to run until complete")
-        LOOP.run_until_complete(task)
+        run_coroutine(ADAPTER.process_activity(activity, auth_header, BOT.on_turn))
         print("is now complete")
         return Response(status=201)
     except Exception as exception:
