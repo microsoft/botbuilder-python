@@ -15,10 +15,6 @@ from botbuilder.core import (
 from botbuilder.schema import Activity, ActivityTypes
 
 from bots import MentionBot
-<<<<<<< HEAD
-
-=======
->>>>>>> a010860... updating mention bot
 
 # Create the loop and Flask app
 LOOP = asyncio.get_event_loop()
@@ -32,7 +28,7 @@ ADAPTER = BotFrameworkAdapter(SETTINGS)
 
 
 # Catch-all for errors.
-async def on_error( # pylint: disable=unused-argument
+async def on_error(  # pylint: disable=unused-argument
     context: TurnContext, error: Exception
 ):
     # This check writes out errors to console log .vs. app insights.
