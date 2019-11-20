@@ -1,8 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from typing import List
-
 
 class BookingDetails:
     def __init__(
@@ -10,8 +8,10 @@ class BookingDetails:
         destination: str = None,
         origin: str = None,
         travel_date: str = None,
-        unsupported_airports: List[str] = [],
+            unsupported_airports=None,
     ):
+        if unsupported_airports is None:
+            unsupported_airports = []
         self.destination = destination
         self.origin = origin
         self.travel_date = travel_date

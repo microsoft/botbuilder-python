@@ -6,7 +6,7 @@ from setuptools import setup
 
 REQUIRES = [
     "botbuilder-core>=4.5.0.b4",
-    "flask>=1.0.3",
+    "flask==1.1.1",
 ]
 
 root = os.path.abspath(os.path.dirname(__file__))

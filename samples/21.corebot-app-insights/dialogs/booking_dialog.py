@@ -2,10 +2,11 @@
 # Licensed under the MIT License.
 """Flight booking dialog."""
 
+from datatypes_date_time.timex import Timex
+
 from botbuilder.dialogs import WaterfallDialog, WaterfallStepContext, DialogTurnResult
 from botbuilder.dialogs.prompts import ConfirmPrompt, TextPrompt, PromptOptions
 from botbuilder.core import MessageFactory, BotTelemetryClient, NullTelemetryClient
-from datatypes_date_time.timex import Timex
 from .cancel_and_help_dialog import CancelAndHelpDialog
 from .date_resolver_dialog import DateResolverDialog
 
@@ -59,8 +60,8 @@ class BookingDialog(CancelAndHelpDialog):
                     prompt=MessageFactory.text("To what city would you like to travel?")
                 ),
             )  # pylint: disable=line-too-long,bad-continuation
-        else:
-            return await step_context.next(booking_details.destination)
+
+        return await step_context.next(booking_details.destination)
 
     async def origin_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
         """Prompt for origin city."""
@@ -75,8 +76,8 @@ class BookingDialog(CancelAndHelpDialog):
                     prompt=MessageFactory.text("From what city will you be travelling?")
                 ),
             )  # pylint: disable=line-too-long,bad-continuation
-        else:
-            return await step_context.next(booking_details.origin)
+
+        return await step_context.next(booking_details.origin)
 
     async def travel_date_step(
         self, step_context: WaterfallStepContext
@@ -94,8 +95,8 @@ class BookingDialog(CancelAndHelpDialog):
             return await step_context.begin_dialog(
                 DateResolverDialog.__name__, booking_details.travel_date
             )  # pylint: disable=line-too-long
-        else:
-            return await step_context.next(booking_details.travel_date)
+
+        return await step_context.next(booking_details.travel_date)
 
     async def confirm_step(
         self, step_context: WaterfallStepContext
@@ -122,8 +123,8 @@ class BookingDialog(CancelAndHelpDialog):
             booking_details.travel_date = step_context.result
 
             return await step_context.end_dialog(booking_details)
-        else:
-            return await step_context.end_dialog()
+
+        return await step_context.end_dialog()
 
     def is_ambiguous(self, timex: str) -> bool:
         """Ensure time is correct."""
