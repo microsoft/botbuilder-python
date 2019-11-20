@@ -3,6 +3,7 @@
 
 from botbuilder.core import MessageFactory, TurnContext, ActivityHandler
 
+
 class ActivitiyUpdateAndDeleteBot(ActivityHandler):
     def __init__(self, activity_ids):
         self.activity_ids = activity_ids
