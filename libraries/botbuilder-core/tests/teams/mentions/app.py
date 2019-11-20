@@ -15,7 +15,10 @@ from botbuilder.core import (
 from botbuilder.schema import Activity, ActivityTypes
 
 from bots import MentionBot
+<<<<<<< HEAD
 
+=======
+>>>>>>> a010860... updating mention bot
 
 # Create the loop and Flask app
 LOOP = asyncio.get_event_loop()
