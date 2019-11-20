@@ -58,9 +58,9 @@ async def on_error( # pylint: disable=unused-argument
 
 
 ADAPTER.on_turn_error = MethodType(on_error, ADAPTER)
-
+activity_ids = []
 # Create the Bot
-BOT = ActivitiyUpdateAndDeleteBot()
+BOT = ActivitiyUpdateAndDeleteBot(activity_ids)
 
 # Listen for incoming requests on /api/messages.s
 @APP.route("/api/messages", methods=["POST"])

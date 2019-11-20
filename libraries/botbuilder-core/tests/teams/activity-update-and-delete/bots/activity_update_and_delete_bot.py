@@ -5,8 +5,8 @@ from botbuilder.core import MessageFactory, TurnContext, ActivityHandler
 from botbuilder.schema import ActivityTypes
 
 class ActivitiyUpdateAndDeleteBot(ActivityHandler):
-    def __init__(self):
-        self.activity_ids = []
+    def __init__(self, activity_ids):
+        self.activity_ids = activity_ids
 
     async def on_message_activity(self, turn_context: TurnContext):
         TurnContext.remove_recipient_mention(turn_context.activity)
