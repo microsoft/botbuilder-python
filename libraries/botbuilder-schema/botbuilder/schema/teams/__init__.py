@@ -9,7 +9,7 @@ __all__ = [
     "TeamInfo",
     "ChannelInfo",
     "TeamsChannelData",
-    "TeamsChannelData",
+    "TeamsChannelAccount",
     "TenantInfo",
     "NotificationInfo",
 ]
