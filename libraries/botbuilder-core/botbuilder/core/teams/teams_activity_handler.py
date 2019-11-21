@@ -13,7 +13,6 @@ from botbuilder.schema.teams import (
 )
 from botframework.connector import Channels
 
-
 class TeamsActivityHandler(ActivityHandler):
     async def on_turn(self, turn_context: TurnContext):
         if turn_context is None:
