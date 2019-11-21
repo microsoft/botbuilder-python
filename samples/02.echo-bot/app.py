@@ -4,7 +4,6 @@
 import asyncio
 import sys
 from datetime import datetime
-from types import MethodType
 
 from flask import Flask, request, Response
 from botbuilder.core import BotFrameworkAdapterSettings, TurnContext, BotFrameworkAdapter
@@ -14,17 +13,17 @@ from bots import EchoBot
 
 # Create the loop and Flask app
 LOOP = asyncio.get_event_loop()
-APP = Flask(__name__, instance_relative_config=True)
-APP.config.from_object("config.DefaultConfig")
+app = Flask(__name__, instance_relative_config=True)
+app.config.from_object("config.DefaultConfig")
 
 # Create adapter.
 # See https://aka.ms/about-bot-adapter to learn more about how bots work.
-SETTINGS = BotFrameworkAdapterSettings(APP.config["APP_ID"], APP.config["APP_PASSWORD"])
+SETTINGS = BotFrameworkAdapterSettings(app.config["APP_ID"], app.config["APP_PASSWORD"])
 ADAPTER = BotFrameworkAdapter(SETTINGS)
 
 
 # Catch-all for errors.
-async def on_error(self, context: TurnContext, error: Exception):
+async def on_error(context: TurnContext, error: Exception):
     # This check writes out errors to console log .vs. app insights.
     # NOTE: In production environment, you should consider logging this to Azure
     #       application insights.
@@ -47,13 +46,13 @@ async def on_error(self, context: TurnContext, error: Exception):
         # Send a trace activity, which will be displayed in Bot Framework Emulator
         await context.send_activity(trace_activity)
 
-ADAPTER.on_turn_error = MethodType(on_error, ADAPTER)
+ADAPTER.on_turn_error = on_error
 
 # Create the Bot
 BOT = EchoBot()
 
-# Listen for incoming requests on /api/messages.s
-@APP.route("/api/messages", methods=["POST"])
+# Listen for incoming requests on /api/messages
+@app.route("/api/messages", methods=["POST"])
 def messages():
     # Main bot message handler.
     if "application/json" in request.headers["Content-Type"]:
@@ -78,6 +77,6 @@ def messages():
 
 if __name__ == "__main__":
     try:
-        APP.run(debug=False, port=APP.config["PORT"])  # nosec debug
+        app.run(debug=False, port=app.config["PORT"])  # nosec debug
     except Exception as exception:
         raise exception

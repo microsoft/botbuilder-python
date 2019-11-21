@@ -4,8 +4,6 @@
 from botbuilder.core import CardFactory, MessageFactory
 from botbuilder.dialogs import (
     ComponentDialog,
-    DialogSet,
-    DialogTurnStatus,
     WaterfallDialog,
     WaterfallStepContext,
 )
@@ -28,8 +26,8 @@ from botbuilder.schema import (
     ReceiptItem,
 )
 
-from .resources.adaptive_card_example import ADAPTIVE_CARD_CONTENT
 from helpers.activity_helper import create_activity_reply
+from .resources.adaptive_card_example import ADAPTIVE_CARD_CONTENT
 
 MAIN_WATERFALL_DIALOG = "mainWaterfallDialog"
 
@@ -49,12 +47,11 @@ class MainDialog(ComponentDialog):
         # The initial child Dialog to run.
         self.initial_dialog_id = MAIN_WATERFALL_DIALOG
 
-    """
-     1. Prompts the user if the user is not in the middle of a dialog.
-     2. Re-prompts the user when an invalid input is received.
-     """
-
     async def choice_card_step(self, step_context: WaterfallStepContext):
+        """
+        1. Prompts the user if the user is not in the middle of a dialog.
+        2. Re-prompts the user when an invalid input is received.
+        """
         menu_text = (
             "Which card would you like to see?\n"
             "(1) Adaptive Card\n"
@@ -73,12 +70,12 @@ class MainDialog(ComponentDialog):
             "TextPrompt", PromptOptions(prompt=MessageFactory.text(menu_text))
         )
 
-    """
-     Send a Rich Card response to the user based on their choice.
-     self method is only called when a valid prompt response is parsed from the user's response to the ChoicePrompt.
-    """
-
     async def show_card_step(self, step_context: WaterfallStepContext):
+        """
+        Send a Rich Card response to the user based on their choice.
+        self method is only called when a valid prompt response is parsed from the user's
+        response to the ChoicePrompt.
+        """
         response = step_context.result.lower().strip()
         choice_dict = {
             "1": [self.create_adaptive_card],
@@ -141,11 +138,9 @@ class MainDialog(ComponentDialog):
 
         return await step_context.end_dialog()
 
-    """
-    ======================================
-     Helper functions used to create cards.
-    ======================================
-    """
+    # ======================================
+    # Helper functions used to create cards.
+    # ======================================
 
     # Methods to generate cards
     def create_adaptive_card(self) -> Attachment:
