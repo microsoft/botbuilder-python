@@ -61,7 +61,6 @@ ACTIVITY_IDS = []
 # Create the Bot
 BOT = ActivitiyUpdateAndDeleteBot(ACTIVITY_IDS)
 
-
 # Listen for incoming requests on /api/messages.s
 @APP.route("/api/messages", methods=["POST"])
 def messages():
