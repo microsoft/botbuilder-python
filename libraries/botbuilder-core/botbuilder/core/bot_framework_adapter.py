@@ -14,6 +14,7 @@ from botbuilder.schema import (
     ConversationReference,
     ResourceResponse,
     TokenResponse,
+    ResourceResponse,
 )
 from botframework.connector import Channels, EmulatorApiClient
 from botframework.connector.aio import ConnectorClient
@@ -331,7 +332,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         except Exception as error:
             raise error
 
-    async def send_activities(
+async def send_activities(
         self, context: TurnContext, activities: List[Activity]
     ) -> List[ResourceResponse]:
         try:
