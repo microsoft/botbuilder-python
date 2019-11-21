@@ -12,6 +12,7 @@ from botbuilder.schema import (
     ConversationAccount,
     ConversationParameters,
     ConversationReference,
+    ResourceResponse,
     TokenResponse,
     ResourceResponse,
 )
@@ -331,12 +332,13 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         except Exception as error:
             raise error
 
-    async def send_activities(self, context: TurnContext, activities: List[Activity]) -> List[ResourceResponse]:
+async def send_activities(
+        self, context: TurnContext, activities: List[Activity]
+    ) -> List[ResourceResponse]:
         try:
-            responses = []
-            
+            responses: List[ResourceResponse] = []
             for activity in activities:
-                response = ResourceResponse()    
+                response: ResourceResponse = None
                 if activity.type == "delay":
                     try:
                         delay_in_ms = float(activity.value) / 1000
@@ -349,21 +351,36 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                     else:
                         await asyncio.sleep(delay_in_ms)
                 elif activity.type == "invokeResponse":
-                    context.turn_state.add(self._INVOKE_RESPONSE_KEY)
-                elif activity.reply_to_id:
-                    client = self.create_connector_client(activity.service_url)
-                    response = await client.conversations.reply_to_activity(
-                        activity.conversation.id, activity.reply_to_id, activity
-                    )
+                    context.turn_state[self._INVOKE_RESPONSE_KEY] = activity
                 else:
+                    if not getattr(activity, "service_url", None):
+                        raise TypeError(
+                            "BotFrameworkAdapter.send_activity(): service_url can not be None."
+                        )
+                    if (
+                        not hasattr(activity, "conversation")
+                        or not activity.conversation
+                        or not getattr(activity.conversation, "id", None)
+                    ):
+                        raise TypeError(
+                            "BotFrameworkAdapter.send_activity(): conversation.id can not be None."
+                        )
+
                     client = self.create_connector_client(activity.service_url)
-                    response = await client.conversations.send_to_conversation(
-                        activity.conversation.id, activity
-                    )
+                    if activity.type == "trace" and activity.channel_id != "emulator":
+                        pass
+                    elif activity.reply_to_id:
+                        response = await client.conversations.reply_to_activity(
+                            activity.conversation.id, activity.reply_to_id, activity
+                        )
+                    else:
+                        response = await client.conversations.send_to_conversation(
+                            activity.conversation.id, activity
+                        )
 
                 if not response:
-                    response.id = activity_id if activity_id else ""
-                
+                    response = ResourceResponse(activity.id or "")
+
                 responses.append(response)
             return responses
         except Exception as error:

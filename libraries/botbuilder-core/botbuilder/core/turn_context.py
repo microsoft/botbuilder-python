@@ -2,13 +2,14 @@
 # Licensed under the MIT License.
 
 import re
-from copy import copy
+from copy import copy, deepcopy
 from datetime import datetime
 from typing import List, Callable, Union, Dict
 from botbuilder.schema import (
     Activity,
     ActivityTypes,
     ConversationReference,
+    InputHints,
     Mention,
     ResourceResponse,
 )
@@ -144,35 +145,57 @@ class TurnContext:
         self._services[key] = value
 
     async def send_activity(
-        self, *activity_or_text: Union[Activity, str]
+        self,
+        activity_or_text: Union[Activity, str],
+        speak: str = None,
+        input_hint: str = None,
     ) -> ResourceResponse:
         """
         Sends a single activity or message to the user.
         :param activity_or_text:
         :return:
         """
-        reference = TurnContext.get_conversation_reference(self.activity)
-
-        output = [
-            TurnContext.apply_conversation_reference(
-                Activity(text=a, type="message") if isinstance(a, str) else a, reference
+        if isinstance(activity_or_text, str):
+            activity_or_text = Activity(
+                text=activity_or_text,
+                input_hint=input_hint or InputHints.accepting_input,
+                speak=speak,
             )
-            for a in activity_or_text
-        ]
 
-        for activity in output:
+        result = await self.send_activities([activity_or_text])
+        return result[0] if result else None
+
+    async def send_activities(
+        self, activities: List[Activity]
+    ) -> List[ResourceResponse]:
+        sent_non_trace_activity = False
+        ref = TurnContext.get_conversation_reference(self.activity)
+
+        def activity_validator(activity: Activity) -> Activity:
+            if not getattr(activity, "type", None):
+                activity.type = ActivityTypes.message
+            if activity.type != ActivityTypes.trace:
+                nonlocal sent_non_trace_activity
+                sent_non_trace_activity = True
             if not activity.input_hint:
                 activity.input_hint = "acceptingInput"
+            activity.id = None
+            return activity
 
-        async def callback(context: "TurnContext", output):
-            responses = await context.adapter.send_activities(context, output)
-            context._responded = True  # pylint: disable=protected-access
+        output = [
+            activity_validator(
+                TurnContext.apply_conversation_reference(deepcopy(act), ref)
+            )
+            for act in activities
+        ]
+
+        async def logic():
+            responses = await self.adapter.send_activities(self, output)
+            if sent_non_trace_activity:
+                self.responded = True
             return responses
 
-        result = await self._emit(
-            self._on_send_activities, output, callback(self, output)
-        )
-        return result[0] if result else ResourceResponse()
+        return await self._emit(self._on_send_activities, output, logic())
 
     async def update_activity(self, activity: Activity):
         """
