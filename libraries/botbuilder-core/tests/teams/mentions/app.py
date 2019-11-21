@@ -14,7 +14,7 @@ from botbuilder.core import (
 )
 from botbuilder.schema import Activity, ActivityTypes
 
-from bots import ConversationUpdateBot
+from bots import MentionBot
 
 # Create the loop and Flask app
 LOOP = asyncio.get_event_loop()
@@ -29,7 +29,7 @@ ADAPTER = BotFrameworkAdapter(SETTINGS)
 
 # Catch-all for errors.
 async def on_error(  # pylint: disable=unused-argument
-    self, context: TurnContext, error: Exception
+    context: TurnContext, error: Exception
 ):
     # This check writes out errors to console log .vs. app insights.
     # NOTE: In production environment, you should consider logging this to Azure
@@ -59,7 +59,7 @@ async def on_error(  # pylint: disable=unused-argument
 ADAPTER.on_turn_error = MethodType(on_error, ADAPTER)
 
 # Create the Bot
-BOT = ConversationUpdateBot()
+BOT = MentionBot()
 
 # Listen for incoming requests on /api/messages.s
 @APP.route("/api/messages", methods=["POST"])
