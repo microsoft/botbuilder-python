@@ -59,7 +59,7 @@ class SimpleStoreItem(StoreItem):
         self.e_tag = e_tag
 
 
-class TestCosmosDbStorageConstructor:
+class TestCosmosDbPartitionedStorageConstructor:
     @pytest.mark.asyncio
     async def test_raises_error_when_instantiated_with_no_arguments(self):
         try:
@@ -123,7 +123,7 @@ class TestCosmosDbStorageConstructor:
         assert client.client.default_headers['x-ms-consistency-level'] == documents.ConsistencyLevel.Eventual
 
 
-class TestCosmosDbStorageBaseStorageTests:
+class TestCosmosDbPartitionedStorageBaseStorageTests:
     @pytest.mark.asyncio
     async def test_return_empty_object_when_reading_unknown_key(self):
         await reset()
