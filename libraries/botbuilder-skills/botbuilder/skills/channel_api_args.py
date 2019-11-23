@@ -1,14 +1,14 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from typing import Dict
+from typing import List
 
 
 class ChannelApiArgs:
     def __init__(
         self,
         method: str = None,
-        args: Dict = None,
+        args: List[object] = None,
         result: object = None,
         exception: Exception = None,
     ):

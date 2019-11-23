@@ -3,7 +3,8 @@
 
 import json
 from typing import Dict
-import requests
+from logging import Logger
+import aiohttp
 
 from botbuilder.core import InvokeResponse
 from botbuilder.schema import Activity
@@ -13,9 +14,6 @@ from botframework.connector.auth import (
     GovernmentConstants,
     MicrosoftAppCredentials,
 )
-
-# from .referr_info import ReferrInfo
-from .skill_conversation import SkillConversation
 
 
 class BotFrameworkHttpClient:
@@ -33,7 +31,7 @@ class BotFrameworkHttpClient:
         self,
         credential_provider: CredentialProvider,
         channel_provider: ChannelProvider = None,
-        logger: object = None,
+        logger: Logger = None,
     ):
         if not credential_provider:
             raise TypeError("credential_provider can't be None")
@@ -41,6 +39,7 @@ class BotFrameworkHttpClient:
         self._credential_provider = credential_provider
         self._channel_provider = channel_provider
         self._logger = logger
+        self._session = aiohttp.ClientSession()
 
     async def post_activity(
         self,
@@ -65,43 +64,23 @@ class BotFrameworkHttpClient:
         original_service_url = activity.service_url
 
         try:
-            # TODO: figure out a better way of passing the original ServiceUrl when calling
-            # the skill so we don't have to encode it in the conversation ID.
-            # Encode original bot service URL and ConversationId in the new conversation ID so we can unpack it later.
-            skill_conversation = SkillConversation(
-                service_url=activity.service_url, conversation_id=conversation_id
-            )
-            activity.conversation.id = skill_conversation.get_skill_conversation_id()
+            activity.conversation.id = conversation_id
             activity.service_url = service_url
 
-            # TODO: Review the rest of the code and see if we can remove this. Gabo
-            # TODO: can we use this property back to store the source conversation ID and the ServiceUrl?
-            """
-            activity.recipient.properties["skillId"] = to_bot_id
-            referr = ReferrInfo(
-                from_bot_id=from_bot_id,
-                to_bot_id=to_bot_id,
-                conversation_id=original_conversation_id,
-                service_url=original_service_url
-            )
-
-            activity.recipient.properties[ReferrInfo.KEY] = referr.serialize()
-            """
             json_content = json.dumps(activity.serialize())
-            with requests.Session() as session:
-                resp = session.post(
-                    to_url,
-                    data=json_content.encode("utf-8"),
-                    headers={
-                        "Authorization": f"Bearer:{token}",
-                        "Content-type": "application/json; charset=utf-8",
-                    },
-                )
-                resp.raise_for_status()
-                content = resp.json
+            resp = await self._session.post(
+                to_url,
+                data=json_content.encode("utf-8"),
+                headers={
+                    "Authorization": f"Bearer:{token}",
+                    "Content-type": "application/json; charset=utf-8",
+                },
+            )
+            resp.raise_for_status()
+            content = await resp.json()
 
-                if content:
-                    return InvokeResponse(status=resp.status_code, body=content)
+            if content:
+                return InvokeResponse(status=resp.status_code, body=content)
 
         finally:
             # Restore activity properties.
