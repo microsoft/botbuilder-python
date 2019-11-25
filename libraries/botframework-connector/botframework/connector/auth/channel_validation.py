@@ -1,5 +1,6 @@
 import asyncio
 
+from .authentication_configuration import AuthenticationConfiguration
 from .verify_options import VerifyOptions
 from .constants import Constants
 from .jwt_token_extractor import JwtTokenExtractor
@@ -30,6 +31,7 @@ class ChannelValidation:
         credentials: CredentialProvider,
         service_url: str,
         channel_id: str,
+        auth_configuration: AuthenticationConfiguration = None,
     ) -> ClaimsIdentity:
         """ Validate the incoming Auth Header
 
@@ -48,7 +50,7 @@ class ChannelValidation:
         """
         identity = await asyncio.ensure_future(
             ChannelValidation.authenticate_channel_token(
-                auth_header, credentials, channel_id
+                auth_header, credentials, channel_id, auth_configuration
             )
         )
 
@@ -63,7 +65,10 @@ class ChannelValidation:
 
     @staticmethod
     async def authenticate_channel_token(
-        auth_header: str, credentials: CredentialProvider, channel_id: str
+        auth_header: str,
+        credentials: CredentialProvider,
+        channel_id: str,
+        auth_configuration: AuthenticationConfiguration = None,
     ) -> ClaimsIdentity:
         """ Validate the incoming Auth Header
 
@@ -78,6 +83,7 @@ class ChannelValidation:
         :return: A valid ClaimsIdentity.
         :raises Exception:
         """
+        auth_configuration = auth_configuration or AuthenticationConfiguration()
         metadata_endpoint = (
             ChannelValidation.open_id_metadata_endpoint
             if ChannelValidation.open_id_metadata_endpoint
@@ -91,7 +97,9 @@ class ChannelValidation:
         )
 
         identity = await asyncio.ensure_future(
-            token_extractor.get_identity_from_auth_header(auth_header, channel_id)
+            token_extractor.get_identity_from_auth_header(
+                auth_header, channel_id, auth_configuration.required_endorsements
+            )
         )
 
         return await ChannelValidation.validate_identity(identity, credentials)
