@@ -63,8 +63,8 @@ class LuisHelper:
                     )
                     if date_entities:
                         booking_details.travel_date = (
-                            None
-                        )  # Set when we get a timex format
+                            None  # Set when we get a timex format
+                        )
         except Exception as exception:
             print(exception)
 

@@ -6,13 +6,9 @@ from botbuilder.dialogs import (
     WaterfallDialog,
     DialogTurnResult,
     WaterfallStepContext,
-    ComponentDialog
+    ComponentDialog,
 )
-from botbuilder.dialogs.prompts import (
-    PromptOptions,
-    TextPrompt,
-    NumberPrompt
-)
+from botbuilder.dialogs.prompts import PromptOptions, TextPrompt, NumberPrompt
 
 from data_models import UserProfile
 from dialogs.review_selection_dialog import ReviewSelectionDialog
@@ -20,9 +16,7 @@ from dialogs.review_selection_dialog import ReviewSelectionDialog
 
 class TopLevelDialog(ComponentDialog):
     def __init__(self, dialog_id: str = None):
-        super(TopLevelDialog, self).__init__(
-            dialog_id or TopLevelDialog.__name__
-        )
+        super(TopLevelDialog, self).__init__(dialog_id or TopLevelDialog.__name__)
 
         # Key name to store this dialogs state info in the StepContext
         self.USER_INFO = "value-userInfo"
@@ -34,12 +28,13 @@ class TopLevelDialog(ComponentDialog):
 
         self.add_dialog(
             WaterfallDialog(
-                "WFDialog", [
+                "WFDialog",
+                [
                     self.name_step,
                     self.age_step,
                     self.start_selection_step,
-                    self.acknowledgement_step
-                ]
+                    self.acknowledgement_step,
+                ],
             )
         )
 
@@ -66,23 +61,27 @@ class TopLevelDialog(ComponentDialog):
         )
         return await step_context.prompt(NumberPrompt.__name__, prompt_options)
 
-    async def start_selection_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
+    async def start_selection_step(
+        self, step_context: WaterfallStepContext
+    ) -> DialogTurnResult:
         # Set the user's age to what they entered in response to the age prompt.
         user_profile: UserProfile = step_context.values[self.USER_INFO]
         user_profile.age = step_context.result
 
         if user_profile.age < 25:
             # If they are too young, skip the review selection dialog, and pass an empty list to the next step.
-            await step_context.context.send_activity(MessageFactory.text(
-                "You must be 25 or older to participate.")
+            await step_context.context.send_activity(
+                MessageFactory.text("You must be 25 or older to participate.")
             )
 
             return await step_context.next([])
-        else:
-            # Otherwise, start the review selection dialog.
-            return await step_context.begin_dialog(ReviewSelectionDialog.__name__)
 
-    async def acknowledgement_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
+        # Otherwise, start the review selection dialog.
+        return await step_context.begin_dialog(ReviewSelectionDialog.__name__)
+
+    async def acknowledgement_step(
+        self, step_context: WaterfallStepContext
+    ) -> DialogTurnResult:
         # Set the user's company selection to what they entered in the review-selection dialog.
         user_profile: UserProfile = step_context.values[self.USER_INFO]
         user_profile.companies_to_review = step_context.result
