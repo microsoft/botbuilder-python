@@ -34,11 +34,8 @@ class TeamsActivityHandler(ActivityHandler):
 
         if turn_context.activity.type == ActivityTypes.invoke:
             invoke_response = await self.on_invoke_activity(turn_context)
-            if (
-                invoke_response
-                and not turn_context.turn_state.get(
-                    BotFrameworkAdapter._INVOKE_RESPONSE_KEY # pylint: disable=protected-access
-                )
+            if invoke_response and not turn_context.turn_state.get(
+                BotFrameworkAdapter._INVOKE_RESPONSE_KEY  # pylint: disable=protected-access
             ):
                 await turn_context.send_activity(
                     Activity(value=invoke_response, type=ActivityTypes.invoke_response)
@@ -119,9 +116,7 @@ class TeamsActivityHandler(ActivityHandler):
                 )
                 return self._create_invoke_response()
 
-            if (
-                turn_context.activity.name == "composeExtension/onCardButtonClicked"
-            ):
+            if turn_context.activity.name == "composeExtension/onCardButtonClicked":
                 await self.on_teams_messaging_extension_card_button_clicked_activity(
                     turn_context, turn_context.activity.value
                 )
@@ -399,6 +394,7 @@ class TeamsActivityHandler(ActivityHandler):
     @staticmethod
     def _create_invoke_response(body: object = None) -> InvokeResponse:
         return InvokeResponse(status=int(HTTPStatus.OK), body=body)
+
 
 class _InvokeResponseException(BaseException):
     def __init__(self, status_code: HTTPStatus, body: object = None):

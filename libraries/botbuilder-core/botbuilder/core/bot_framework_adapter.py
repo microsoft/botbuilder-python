@@ -38,6 +38,7 @@ USER_AGENT = f"Microsoft-BotFramework/3.1 (BotBuilder Python/{__version__})"
 OAUTH_ENDPOINT = "https://api.botframework.com"
 US_GOV_OAUTH_ENDPOINT = "https://api.botframework.azure.us"
 
+
 class TokenExchangeState(Model):
     _attribute_map = {
         "connection_name": {"key": "connectionName", "type": "str"},
