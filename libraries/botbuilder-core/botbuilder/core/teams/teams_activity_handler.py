@@ -36,9 +36,9 @@ class TeamsActivityHandler(ActivityHandler):
             invoke_response = await self.on_invoke_activity(turn_context)
             if (
                 invoke_response
-                and not turn_context.turn_state[
-                    BotFrameworkAdapter(settings=None)._INVOKE_RESPONSE_KEY
-                ]
+                and not turn_context.turn_state.get(
+                    BotFrameworkAdapter._INVOKE_RESPONSE_KEY # pylint: disable=protected-access
+                )
             ):
                 await turn_context.send_activity(
                     Activity(value=invoke_response, type=ActivityTypes.invoke_response)
@@ -143,7 +143,7 @@ class TeamsActivityHandler(ActivityHandler):
 
             raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
         except _InvokeResponseException as err:
-            raise err.create_invoke_response()
+            return err.create_invoke_response()
 
     async def on_teams_card_action_invoke_activity(self, turn_context: TurnContext):
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
@@ -400,7 +400,7 @@ class TeamsActivityHandler(ActivityHandler):
     def _create_invoke_response(body: object = None) -> InvokeResponse:
         return InvokeResponse(status=int(HTTPStatus.OK), body=body)
 
-class _InvokeResponseException(Exception):
+class _InvokeResponseException(BaseException):
     def __init__(self, status_code: HTTPStatus, body: object = None):
         super(_InvokeResponseException, self).__init__()
         self._status_code = status_code
