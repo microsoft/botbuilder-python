@@ -19,14 +19,13 @@ class TeamsActivityHandler(ActivityHandler):
         if turn_context is None:
             raise TypeError("ActivityHandler.on_turn(): turn_context cannot be None.")
 
-        if hasattr(turn_context, "activity") and turn_context.activity is None:
+        if not getattr(turn_context, "activity", None):
             raise TypeError(
                 "ActivityHandler.on_turn(): turn_context must have a non-None activity."
             )
 
         if (
-            hasattr(turn_context.activity, "type")
-            and turn_context.activity.type is None
+           not getattr(turn_context.activity, "type", None)
         ):
             raise TypeError(
                 "ActivityHandler.on_turn(): turn_context activity must have a non-None type."
@@ -43,7 +42,6 @@ class TeamsActivityHandler(ActivityHandler):
             return
 
         await super().on_turn(turn_context)
-        return
 
     async def on_invoke_activity(self, turn_context: TurnContext):
         try:
@@ -342,7 +340,7 @@ class TeamsActivityHandler(ActivityHandler):
         return await self.on_teams_members_added_activity(teams_members_added, team_info, turn_context)
         """
         for member in members_added:
-            new_account_json = member.__dict__
+            new_account_json = member.seralize()
             del new_account_json["additional_properties"]
             member = TeamsChannelAccount(**new_account_json)
         return await self.on_teams_members_added_activity(members_added, turn_context)
@@ -362,7 +360,7 @@ class TeamsActivityHandler(ActivityHandler):
     ):
         teams_members_removed = []
         for member in members_removed:
-            new_account_json = member.__dict__
+            new_account_json = member.seralize()
             del new_account_json["additional_properties"]
             teams_members_removed.append(TeamsChannelAccount(**new_account_json))
 
@@ -396,7 +394,7 @@ class TeamsActivityHandler(ActivityHandler):
         return InvokeResponse(status=int(HTTPStatus.OK), body=body)
 
 
-class _InvokeResponseException(BaseException):
+class _InvokeResponseException(Exception):
     def __init__(self, status_code: HTTPStatus, body: object = None):
         super(_InvokeResponseException, self).__init__()
         self._status_code = status_code
