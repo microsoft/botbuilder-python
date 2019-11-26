@@ -24,9 +24,7 @@ class TeamsActivityHandler(ActivityHandler):
                 "ActivityHandler.on_turn(): turn_context must have a non-None activity."
             )
 
-        if (
-           not getattr(turn_context.activity, "type", None)
-        ):
+        if not getattr(turn_context.activity, "type", None):
             raise TypeError(
                 "ActivityHandler.on_turn(): turn_context activity must have a non-None type."
             )
