@@ -9,8 +9,7 @@ Therefore, all tests using theses static tests should strictly check that the me
 TODO: write example
 """
 import pytest
-from botbuilder.azure import BlobStorage, BlobStorageSettings
-from botbuilder.core import ConversationState, TurnContext, MessageFactory, MemoryStorage
+from botbuilder.core import ConversationState, TurnContext, MessageFactory
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.dialogs import DialogSet, DialogTurnStatus, TextPrompt, PromptValidatorContext, WaterfallStepContext, \
     Dialog, WaterfallDialog, PromptOptions
@@ -237,11 +236,6 @@ class StorageBaseTests:
 
     @staticmethod
     async def proceeds_through_waterfall(storage) -> bool:
-        # storage = MemoryStorage()
-        # BLOB_STORAGE_SETTINGS = BlobStorageSettings(
-        #     account_key="Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==", container_name="test", connection_string="AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;DefaultEndpointsProtocol=http;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;"
-        # )
-        # storage = BlobStorage(BLOB_STORAGE_SETTINGS)
         convo_state = ConversationState(storage)
 
         dialog_state = convo_state.create_property("dialogState")
@@ -292,12 +286,12 @@ class StorageBaseTests:
 
         dialogs.add(TextPrompt(TextPrompt.__name__, prompt_validator))
 
-        step1 = await adapter.send("hello") # None
-        step2 = await step1.assert_reply("step1") # None
-        step3 = await step2.send("hello") # Tab1
+        step1 = await adapter.send("hello")
+        step2 = await step1.assert_reply("step1")
+        step3 = await step2.send("hello")
         step4 = await step3.assert_reply("Please type your name") # None
-        step5 = await step4.send("hi") # Tab2
-        step6 = await step5.assert_reply("Please send a name that is longer than 3 characters. 0") # None
+        step5 = await step4.send("hi")
+        step6 = await step5.assert_reply("Please send a name that is longer than 3 characters. 0")
         step7 = await step6.send("hi")
         step8 = await step7.assert_reply("Please send a name that is longer than 3 characters. 1")
         step9 = await step8.send("hi")
