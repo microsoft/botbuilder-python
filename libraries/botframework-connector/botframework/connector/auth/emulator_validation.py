@@ -2,6 +2,8 @@
 # Licensed under the MIT License.
 
 import asyncio
+from typing import Union
+
 import jwt
 
 from .jwt_token_extractor import JwtTokenExtractor
@@ -10,6 +12,7 @@ from .constants import Constants
 from .credential_provider import CredentialProvider
 from .claims_identity import ClaimsIdentity
 from .government_constants import GovernmentConstants
+from .channel_provider import ChannelProvider
 
 
 class EmulatorValidation:
@@ -82,7 +85,7 @@ class EmulatorValidation:
     async def authenticate_emulator_token(
         auth_header: str,
         credentials: CredentialProvider,
-        channel_service: str,
+        channel_service_or_provider: Union[str, ChannelProvider],
         channel_id: str,
     ) -> ClaimsIdentity:
         """ Validate the incoming Auth Header
@@ -101,12 +104,14 @@ class EmulatorValidation:
         # pylint: disable=import-outside-toplevel
         from .jwt_token_validation import JwtTokenValidation
 
+        if isinstance(channel_service_or_provider, ChannelProvider):
+            is_gov = channel_service_or_provider.is_government()
+        else:
+            is_gov = JwtTokenValidation.is_government(channel_service_or_provider)
+
         open_id_metadata = (
             GovernmentConstants.TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL
-            if (
-                channel_service is not None
-                and JwtTokenValidation.is_government(channel_service)
-            )
+            if is_gov
             else Constants.TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL
         )
 

@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 from datetime import timedelta
-from typing import Dict
+from typing import Dict, Union
 
 import jwt
 
@@ -13,6 +13,7 @@ from .credential_provider import CredentialProvider
 from .government_constants import GovernmentConstants
 from .verify_options import VerifyOptions
 from .jwt_token_extractor import JwtTokenExtractor
+from .channel_provider import ChannelProvider
 
 
 class SkillValidation:
@@ -88,7 +89,7 @@ class SkillValidation:
     async def authenticate_channel_token(
         auth_header: str,
         credentials: CredentialProvider,
-        channel_service: str,
+        channel_service_or_provider: Union[str, ChannelProvider],
         channel_id: str,
         auth_configuration: AuthenticationConfiguration,
     ) -> ClaimsIdentity:
@@ -99,9 +100,14 @@ class SkillValidation:
 
         from .jwt_token_validation import JwtTokenValidation
 
+        if isinstance(channel_service_or_provider, ChannelProvider):
+            is_gov = channel_service_or_provider.is_government()
+        else:
+            is_gov = JwtTokenValidation.is_government(channel_service_or_provider)
+
         open_id_metadata_url = (
             GovernmentConstants.TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL
-            if channel_service and JwtTokenValidation.is_government(channel_service)
+            if is_gov
             else AuthenticationConstants.TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL
         )
 
