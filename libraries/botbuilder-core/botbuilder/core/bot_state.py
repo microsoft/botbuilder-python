@@ -24,8 +24,7 @@ class CachedBotState:
         return self.hash != self.compute_hash(self.state)
 
     def compute_hash(self, obj: object) -> str:
-        # TODO: Should this be compatible with C# JsonConvert.SerializeObject ?
-        return str(obj)
+        return str(Pickler().flatten(obj))
 
 
 class BotState(PropertyManager):
