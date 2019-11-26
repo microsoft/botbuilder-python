@@ -18,6 +18,7 @@ async def deserialize_activity(request: Request) -> Activity:
 
 
 def channel_service_routes(handler: ChannelServiceHandler) -> RouteTableDef:
+    # pylint: disable=unused-variable
     routes = RouteTableDef()
 
     @routes.post("/{conversation_id}/activities")
