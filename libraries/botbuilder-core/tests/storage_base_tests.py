@@ -6,10 +6,16 @@ All tests return true if assertions pass to indicate that the code ran to comple
 Therefore, all tests using theses static tests should strictly check that the method returns true.
 
 :Example:
-TODO: write example
+    async def test_handle_null_keys_when_reading(self):
+        await reset()
+
+        test_ran = await StorageBaseTests.handle_null_keys_when_reading(get_storage())
+
+        assert test_ran
 """
 import pytest
-from botbuilder.core import ConversationState, TurnContext, MessageFactory
+from botbuilder.azure import CosmosDbStorage
+from botbuilder.core import ConversationState, TurnContext, MessageFactory, MemoryStorage
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.dialogs import DialogSet, DialogTurnStatus, TextPrompt, PromptValidatorContext, WaterfallStepContext, \
     Dialog, WaterfallDialog, PromptOptions
@@ -27,9 +33,14 @@ class StorageBaseTests:
 
     @staticmethod
     async def handle_null_keys_when_reading(storage) -> bool:
-        with pytest.raises(Exception) as err:
-            await storage.read(None)
-        assert err.value.args[0] == "Keys are required when reading"
+        if isinstance(storage, CosmosDbStorage):
+            result = await storage.read(None)
+            assert len(result.keys()) == 0
+        # Catch-all
+        else:
+            with pytest.raises(Exception) as err:
+                await storage.read(None)
+            assert err.value.args[0] == "Keys are required when reading"
 
         return True
 

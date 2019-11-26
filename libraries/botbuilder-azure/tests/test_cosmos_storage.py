@@ -7,10 +7,9 @@ from azure.cosmos.cosmos_client import CosmosClient
 import pytest
 from botbuilder.core import StoreItem
 from botbuilder.azure import CosmosDbStorage, CosmosDbConfig
-
-# local cosmosdb emulator instance cosmos_db_config
 from tests import StorageBaseTests
 
+# local cosmosdb emulator instance cosmos_db_config
 COSMOS_DB_CONFIG = CosmosDbConfig(
     endpoint="https://localhost:8081",
     masterkey="C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==",
@@ -65,7 +64,7 @@ class TestCosmosDbStorageConstructor:
             assert error
 
     @pytest.mark.asyncio
-    async def test_creation_request_options_era_being_called(self):
+    async def test_creation_request_options_are_being_called(self):
         # pylint: disable=protected-access
         test_config = CosmosDbConfig(
             endpoint="https://localhost:8081",
@@ -94,14 +93,18 @@ class TestCosmosDbStorageConstructor:
 
 
 class TestCosmosDbStorageBaseStorageTests:
+    @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
     async def test_return_empty_object_when_reading_unknown_key(self):
         await reset()
 
-        test_ran = await StorageBaseTests.return_empty_object_when_reading_unknown_key(get_storage())
+        test_ran = await StorageBaseTests.return_empty_object_when_reading_unknown_key(
+            get_storage()
+        )
 
         assert test_ran
 
+    @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
     async def test_handle_null_keys_when_reading(self):
         await reset()
@@ -110,6 +113,7 @@ class TestCosmosDbStorageBaseStorageTests:
 
         assert test_ran
 
+    @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
     async def test_handle_null_keys_when_writing(self):
         await reset()
@@ -118,14 +122,18 @@ class TestCosmosDbStorageBaseStorageTests:
 
         assert test_ran
 
+    @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
     async def test_does_not_raise_when_writing_no_items(self):
         await reset()
 
-        test_ran = await StorageBaseTests.does_not_raise_when_writing_no_items(get_storage())
+        test_ran = await StorageBaseTests.does_not_raise_when_writing_no_items(
+            get_storage()
+        )
 
         assert test_ran
 
+    @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
     async def test_create_object(self):
         await reset()
@@ -134,6 +142,7 @@ class TestCosmosDbStorageBaseStorageTests:
 
         assert test_ran
 
+    @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
     async def test_handle_crazy_keys(self):
         await reset()
@@ -142,6 +151,7 @@ class TestCosmosDbStorageBaseStorageTests:
 
         assert test_ran
 
+    @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
     async def test_update_object(self):
         await reset()
@@ -150,6 +160,7 @@ class TestCosmosDbStorageBaseStorageTests:
 
         assert test_ran
 
+    @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
     async def test_delete_object(self):
         await reset()
@@ -158,6 +169,7 @@ class TestCosmosDbStorageBaseStorageTests:
 
         assert test_ran
 
+    @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
     async def test_perform_batch_operations(self):
         await reset()
@@ -166,7 +178,7 @@ class TestCosmosDbStorageBaseStorageTests:
 
         assert test_ran
 
-    # TODO: Re-enable after the dialog_stack PR gets merged
+    @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
     async def test_proceeds_through_waterfall(self):
         await reset()
@@ -177,8 +189,6 @@ class TestCosmosDbStorageBaseStorageTests:
 
 
 class TestCosmosDbStorage:
-
-
     @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
     async def test_cosmos_storage_init_should_work_with_just_endpoint_and_key(self):
@@ -188,18 +198,6 @@ class TestCosmosDbStorage:
             )
         )
         await storage.write({"user": SimpleStoreItem()})
-        data = await storage.read(["user"])
-        assert "user" in data
-        assert data["user"].counter == 1
-        assert len(data.keys()) == 1
-
-    @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
-    @pytest.mark.asyncio
-    async def test_cosmos_storage_read_should_return_data_with_valid_key(self):
-        await reset()
-        storage = CosmosDbStorage(COSMOS_DB_CONFIG)
-        await storage.write({"user": SimpleStoreItem()})
-
         data = await storage.read(["user"])
         assert "user" in data
         assert data["user"].counter == 1
@@ -230,27 +228,6 @@ class TestCosmosDbStorage:
 
     @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
-    async def test_cosmos_storage_read_no_key_should_throw(self):
-        try:
-            await reset()
-            storage = CosmosDbStorage(COSMOS_DB_CONFIG)
-            await storage.read([])
-        except Exception as error:
-            assert error
-
-    @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
-    @pytest.mark.asyncio
-    async def test_cosmos_storage_write_should_add_new_value(self):
-        await reset()
-        storage = CosmosDbStorage(COSMOS_DB_CONFIG)
-        await storage.write({"user": SimpleStoreItem(counter=1)})
-
-        data = await storage.read(["user"])
-        assert "user" in data
-        assert data["user"].counter == 1
-
-    @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
-    @pytest.mark.asyncio
     async def test_cosmos_storage_write_should_overwrite_when_new_e_tag_is_an_asterisk(
         self,
     ):
@@ -261,62 +238,6 @@ class TestCosmosDbStorage:
         await storage.write({"user": SimpleStoreItem(counter=10, e_tag="*")})
         data = await storage.read(["user"])
         assert data["user"].counter == 10
-
-    @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
-    @pytest.mark.asyncio
-    async def test_cosmos_storage_write_batch_operation(self):
-        await reset()
-        storage = CosmosDbStorage(COSMOS_DB_CONFIG)
-        await storage.write(
-            {
-                "batch1": SimpleStoreItem(counter=1),
-                "batch2": SimpleStoreItem(counter=1),
-                "batch3": SimpleStoreItem(counter=1),
-            }
-        )
-        data = await storage.read(["batch1", "batch2", "batch3"])
-        assert len(data.keys()) == 3
-        assert data["batch1"]
-        assert data["batch2"]
-        assert data["batch3"]
-        assert data["batch1"].counter == 1
-        assert data["batch2"].counter == 1
-        assert data["batch3"].counter == 1
-        assert data["batch1"].e_tag
-        assert data["batch2"].e_tag
-        assert data["batch3"].e_tag
-        await storage.delete(["batch1", "batch2", "batch3"])
-        data = await storage.read(["batch1", "batch2", "batch3"])
-        assert not data.keys()
-
-    @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
-    @pytest.mark.asyncio
-    async def test_cosmos_storage_write_crazy_keys_work(self):
-        await reset()
-        storage = CosmosDbStorage(COSMOS_DB_CONFIG)
-        crazy_key = '!@#$%^&*()_+??><":QASD~`'
-        await storage.write({crazy_key: SimpleStoreItem(counter=1)})
-        data = await storage.read([crazy_key])
-        assert len(data.keys()) == 1
-        assert data[crazy_key]
-        assert data[crazy_key].counter == 1
-        assert data[crazy_key].e_tag
-
-    @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
-    @pytest.mark.asyncio
-    async def test_cosmos_storage_delete_should_delete_according_cached_data(self):
-        await reset()
-        storage = CosmosDbStorage(COSMOS_DB_CONFIG)
-        await storage.write({"test": SimpleStoreItem()})
-        try:
-            await storage.delete(["test"])
-        except Exception as error:
-            raise error
-        else:
-            data = await storage.read(["test"])
-
-            assert isinstance(data, dict)
-            assert not data.keys()
 
     @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio

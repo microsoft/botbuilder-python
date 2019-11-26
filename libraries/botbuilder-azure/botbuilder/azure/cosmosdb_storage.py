@@ -14,7 +14,7 @@ from jsonpickle.pickler import Pickler
 from jsonpickle.unpickler import Unpickler
 import azure.cosmos.cosmos_client as cosmos_client  # pylint: disable=no-name-in-module,import-error
 import azure.cosmos.errors as cosmos_errors  # pylint: disable=no-name-in-module,import-error
-from botbuilder.core.storage import Storage
+from botbuilder.core.storage import Storage, StoreItem
 
 
 class CosmosDbConfig:
@@ -160,6 +160,10 @@ class CosmosDbStorage(Storage):
         :param changes:
         :return:
         """
+        if changes is None:
+            raise Exception("Changes are required when writing")
+        elif not changes:
+            return
         try:
             # check if the database and container exists and if not create
             if not self.__container_exists:
@@ -167,15 +171,17 @@ class CosmosDbStorage(Storage):
                 # iterate over the changes
             for (key, change) in changes.items():
                 # store the e_tag
-                e_tag = change.get("e_tag", None)
+                e_tag = change.e_tag if isinstance(change, StoreItem) else change.get("e_tag", None)
                 # create the new document
                 doc = {
                     "id": CosmosDbKeyEscape.sanitize_key(key),
                     "realId": key,
                     "document": self.__create_dict(change),
                 }
+                if e_tag == "":
+                    raise Exception("cosmosdb_storage.write(): etag missing")
                 # the e_tag will be * for new docs so do an insert
-                if e_tag == "*" or not e_tag:
+                elif e_tag == "*" or not e_tag:
                     self.client.UpsertItem(
                         database_or_Container_link=self.__container_link,
                         document=doc,
@@ -191,9 +197,6 @@ class CosmosDbStorage(Storage):
                         new_document=doc,
                         options={"accessCondition": access_condition},
                     )
-                # error when there is no e_tag
-                else:
-                    raise Exception("cosmosdb_storage.write(): etag missing")
         except Exception as error:
             raise error
 
