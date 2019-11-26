@@ -4,6 +4,10 @@
 from typing import List
 
 from botbuilder.core import Bot, BotAdapter
+from botbuilder.core.integration import (
+    ChannelServiceHandler,
+    SkillConversationIdFactory,
+)
 from botbuilder.schema import (
     Activity,
     ActivityTypes,
@@ -18,31 +22,46 @@ from botbuilder.schema import (
     RoleTypes,
     Transcript,
 )
-from botframework.connector.auth import ClaimsIdentity
+from botframework.connector.auth import (
+    AuthenticationConfiguration,
+    ChannelProvider,
+    CredentialProvider,
+    ClaimsIdentity,
+)
 
 from .channel_api_args import ChannelApiArgs
 from .channel_api_methods import ChannelApiMethods
 from .channel_api_middleware import ChannelApiMiddleware
-from .skill_conversation import SkillConversation
 
 
-class SkillHandler:
+class SkillHandler(ChannelServiceHandler):
     INVOKE_ACTIVITY_NAME = "SkillEvents.ChannelApiInvoke"
 
-    def __init__(self, adapter: BotAdapter, bot: Bot, logger: object = None):
+    def __init__(
+        self,
+        adapter: BotAdapter,
+        bot: Bot,
+        conversation_id_factory: SkillConversationIdFactory,
+        credential_provider: CredentialProvider,
+        auth_config: AuthenticationConfiguration,
+        channel_provider: ChannelProvider,
+        logger: object = None,
+    ):
+        super().__init__(credential_provider, auth_config, channel_provider)
         if not adapter:
             raise TypeError("adapter can't be None")
         if not bot:
             raise TypeError("bot can't be None")
+        if not conversation_id_factory:
+            raise TypeError("conversation_id_factory can't be None")
 
         self._adapter = adapter
         self._bot = bot
+        self._conversation_id_factory = conversation_id_factory
         self._logger = logger
 
-    async def get_conversations(
+    async def on_get_conversations(
         self,
-        adapter: BotAdapter,
-        bot: Bot,
         claims_identity: ClaimsIdentity,
         conversation_id: str,
         continuation_token: str = "",
@@ -68,18 +87,16 @@ class SkillHandler:
         :return:
         """
         return await self._invoke_channel_api(
-            adapter,
-            bot,
+            self._adapter,
+            self._bot,
             claims_identity,
             ChannelApiMethods.GET_CONVERSATIONS,
             conversation_id,
             continuation_token,
         )
 
-    async def create_conversation(
+    async def on_create_conversation(
         self,
-        adapter: BotAdapter,
-        bot: Bot,
         claims_identity: ClaimsIdentity,
         conversation_id: str,
         parameters: ConversationParameters,
@@ -115,21 +132,16 @@ class SkillHandler:
         :return:
         """
         return await self._invoke_channel_api(
-            adapter,
-            bot,
+            self._adapter,
+            self._bot,
             claims_identity,
             ChannelApiMethods.CREATE_CONVERSATION,
             conversation_id,
             parameters,
         )
 
-    async def send_to_conversation(
-        self,
-        adapter: BotAdapter,
-        bot: Bot,
-        claims_identity: ClaimsIdentity,
-        conversation_id: str,
-        activity: Activity,
+    async def on_send_to_conversation(
+        self, claims_identity: ClaimsIdentity, conversation_id: str, activity: Activity,
     ) -> ResourceResponse:
         """
         send_to_conversation() API for Skill
@@ -154,18 +166,16 @@ class SkillHandler:
         :return:
         """
         return await self._invoke_channel_api(
-            adapter,
-            bot,
+            self._adapter,
+            self._bot,
             claims_identity,
             ChannelApiMethods.SEND_TO_CONVERSATION,
             conversation_id,
             activity,
         )
 
-    async def send_conversation_history(
+    async def on_send_conversation_history(
         self,
-        adapter: BotAdapter,
-        bot: Bot,
         claims_identity: ClaimsIdentity,
         conversation_id: str,
         transcript: Transcript,
@@ -187,18 +197,16 @@ class SkillHandler:
         :return:
         """
         return await self._invoke_channel_api(
-            adapter,
-            bot,
+            self._adapter,
+            self._bot,
             claims_identity,
             ChannelApiMethods.SEND_CONVERSATION_HISTORY,
             conversation_id,
             transcript,
         )
 
-    async def update_activity(
+    async def on_update_activity(
         self,
-        adapter: BotAdapter,
-        bot: Bot,
         claims_identity: ClaimsIdentity,
         conversation_id: str,
         activity_id: str,
@@ -222,8 +230,8 @@ class SkillHandler:
         :return:
         """
         return await self._invoke_channel_api(
-            adapter,
-            bot,
+            self._adapter,
+            self._bot,
             claims_identity,
             ChannelApiMethods.UPDATE_ACTIVITY,
             conversation_id,
@@ -231,10 +239,8 @@ class SkillHandler:
             activity,
         )
 
-    async def reply_to_activity(
+    async def on_reply_to_activity(
         self,
-        adapter: BotAdapter,
-        bot: Bot,
         claims_identity: ClaimsIdentity,
         conversation_id: str,
         activity_id: str,
@@ -264,8 +270,8 @@ class SkillHandler:
         :return:
         """
         return await self._invoke_channel_api(
-            adapter,
-            bot,
+            self._adapter,
+            self._bot,
             claims_identity,
             ChannelApiMethods.REPLY_TO_ACTIVITY,
             conversation_id,
@@ -273,13 +279,8 @@ class SkillHandler:
             activity,
         )
 
-    async def delete_activity(
-        self,
-        adapter: BotAdapter,
-        bot: Bot,
-        claims_identity: ClaimsIdentity,
-        conversation_id: str,
-        activity_id: str,
+    async def on_delete_activity(
+        self, claims_identity: ClaimsIdentity, conversation_id: str, activity_id: str,
     ):
         """
         delete_activity() API for Skill.
@@ -295,20 +296,16 @@ class SkillHandler:
         :return:
         """
         return await self._invoke_channel_api(
-            adapter,
-            bot,
+            self._adapter,
+            self._bot,
             claims_identity,
             ChannelApiMethods.DELETE_ACTIVITY,
             conversation_id,
             activity_id,
         )
 
-    async def get_conversation_members(
-        self,
-        adapter: BotAdapter,
-        bot: Bot,
-        claims_identity: ClaimsIdentity,
-        conversation_id: str,
+    async def on_get_conversation_members(
+        self, claims_identity: ClaimsIdentity, conversation_id: str,
     ) -> List[ChannelAccount]:
         """
         get_conversation_members() API for Skill.
@@ -323,17 +320,15 @@ class SkillHandler:
         :return:
         """
         return await self._invoke_channel_api(
-            adapter,
-            bot,
+            self._adapter,
+            self._bot,
             claims_identity,
             ChannelApiMethods.GET_CONVERSATION_MEMBERS,
             conversation_id,
         )
 
-    async def get_conversation_paged_members(
+    async def on_get_conversation_paged_members(
         self,
-        adapter: BotAdapter,
-        bot: Bot,
         claims_identity: ClaimsIdentity,
         conversation_id: str,
         page_size: int = None,
@@ -367,8 +362,8 @@ class SkillHandler:
         :return:
         """
         return await self._invoke_channel_api(
-            adapter,
-            bot,
+            self._adapter,
+            self._bot,
             claims_identity,
             ChannelApiMethods.GET_CONVERSATION_PAGED_MEMBERS,
             conversation_id,
@@ -376,13 +371,8 @@ class SkillHandler:
             continuation_token,
         )
 
-    async def delete_conversation_member(
-        self,
-        adapter: BotAdapter,
-        bot: Bot,
-        claims_identity: ClaimsIdentity,
-        conversation_id: str,
-        member_id: str,
+    async def on_delete_conversation_member(
+        self, claims_identity: ClaimsIdentity, conversation_id: str, member_id: str,
     ):
         """
         delete_conversation_member() API for Skill.
@@ -400,21 +390,16 @@ class SkillHandler:
         :return:
         """
         return await self._invoke_channel_api(
-            adapter,
-            bot,
+            self._adapter,
+            self._bot,
             claims_identity,
             ChannelApiMethods.DELETE_CONVERSATION_MEMBER,
             conversation_id,
             member_id,
         )
 
-    async def get_activity_members(
-        self,
-        adapter: BotAdapter,
-        bot: Bot,
-        claims_identity: ClaimsIdentity,
-        conversation_id: str,
-        activity_id: str,
+    async def on_get_activity_members(
+        self, claims_identity: ClaimsIdentity, conversation_id: str, activity_id: str,
     ) -> List[ChannelAccount]:
         """
         get_activity_members() API for Skill.
@@ -431,18 +416,16 @@ class SkillHandler:
         :return:
         """
         return await self._invoke_channel_api(
-            adapter,
-            bot,
+            self._adapter,
+            self._bot,
             claims_identity,
             ChannelApiMethods.GET_ACTIVITY_MEMBERS,
             conversation_id,
             activity_id,
         )
 
-    async def upload_attachment(
+    async def on_upload_attachment(
         self,
-        adapter: BotAdapter,
-        bot: Bot,
         claims_identity: ClaimsIdentity,
         conversation_id: str,
         attachment_upload: AttachmentData,
@@ -464,8 +447,8 @@ class SkillHandler:
         :return:
         """
         return await self._invoke_channel_api(
-            adapter,
-            bot,
+            self._adapter,
+            self._bot,
             claims_identity,
             ChannelApiMethods.UPLOAD_ATTACHMENT,
             conversation_id,
@@ -491,14 +474,17 @@ class SkillHandler:
         if self._logger:
             self._logger.log(f'InvokeChannelApiAsync(). Invoking method "{method}"')
 
-        skill_conversation = SkillConversation(conversation_id)
+        (
+            skill_conversation_id,
+            caller_service_url,
+        ) = self._conversation_id_factory.get_conversation_info(conversation_id)
 
         channel_api_invoke_activity: Activity = Activity(type=ActivityTypes.invoke)
         channel_api_invoke_activity.name = SkillHandler.INVOKE_ACTIVITY_NAME
         channel_api_invoke_activity.channel_id = "unknown"
-        channel_api_invoke_activity.service_url = skill_conversation.service_url
+        channel_api_invoke_activity.service_url = caller_service_url
         channel_api_invoke_activity.conversation = ConversationAccount(
-            id=skill_conversation.conversation_id
+            id=skill_conversation_id
         )
         channel_api_invoke_activity.from_property = ChannelAccount(id="unknown")
         channel_api_invoke_activity.recipient = ChannelAccount(
@@ -513,8 +499,8 @@ class SkillHandler:
         if activity_payload:
 
             # fix up activityPayload with original conversation.Id and id
-            activity_payload.conversation.id = skill_conversation.conversation_id
-            activity_payload.service_url = skill_conversation.service_url
+            activity_payload.conversation.id = skill_conversation_id
+            activity_payload.service_url = caller_service_url
 
             # Use the activityPayload for channel accounts, it will be in From=Bot/Skill Recipient=User,
             # We want to send it to the bot as From=User, Recipient=Bot so we have correct state context.

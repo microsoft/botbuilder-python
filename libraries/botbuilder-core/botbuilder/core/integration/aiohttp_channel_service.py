@@ -7,6 +7,7 @@ from botbuilder.schema import Activity
 
 from .channel_service_handler import ChannelServiceHandler
 
+
 async def deserialize_activity(request: Request) -> Activity:
     if "application/json" in request.headers["Content-Type"]:
         body = await request.json()
@@ -14,6 +15,7 @@ async def deserialize_activity(request: Request) -> Activity:
         return Response(status=415)
 
     return Activity().deserialize(body)
+
 
 def channel_service_routes(handler: ChannelServiceHandler) -> RouteTableDef:
     routes = RouteTableDef()
@@ -24,7 +26,7 @@ def channel_service_routes(handler: ChannelServiceHandler) -> RouteTableDef:
         return await handler.handle_send_to_conversation(
             request.headers.get("Authorization"),
             request.match_info["conversation_id"],
-            activity
+            activity,
         )
 
     @routes.post("/{conversation_id}/activities/{activity_id}")
@@ -34,7 +36,7 @@ def channel_service_routes(handler: ChannelServiceHandler) -> RouteTableDef:
             request.headers.get("Authorization"),
             request.match_info["conversation_id"],
             request.match_info["activity_id"],
-            activity
+            activity,
         )
 
     @routes.put("/{conversation_id}/activities/{activity_id}")
@@ -44,7 +46,7 @@ def channel_service_routes(handler: ChannelServiceHandler) -> RouteTableDef:
             request.headers.get("Authorization"),
             request.match_info["conversation_id"],
             request.match_info["activity_id"],
-            activity
+            activity,
         )
 
     @routes.delete("/{conversation_id}/activities/{activity_id}")
@@ -52,7 +54,7 @@ def channel_service_routes(handler: ChannelServiceHandler) -> RouteTableDef:
         return await handler.handle_delete_activity(
             request.headers.get("Authorization"),
             request.match_info["conversation_id"],
-            request.match_info["activity_id"]
+            request.match_info["activity_id"],
         )
 
     @routes.get("/{conversation_id}/activities/{activity_id}/members")

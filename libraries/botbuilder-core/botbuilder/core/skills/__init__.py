@@ -6,6 +6,8 @@
 # --------------------------------------------------------------------------
 
 from .about import __version__
-from .adapters import *
+from .bot_framework_skill import BotFrameworkSkill
+from .skill_handler import SkillHandler
 
-__all__ = []
+
+__all__ = ["BotFrameworkSkill", "SkillHandler"]

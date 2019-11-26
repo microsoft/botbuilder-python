@@ -50,7 +50,9 @@ class ChannelServiceHandler:
         self, auth_header, conversation_id, activity
     ) -> ResourceResponse:
         claims_identity = await self._authenticate(auth_header)
-        return await self.on_send_to_conversation(claims_identity, conversation_id, activity)
+        return await self.on_send_to_conversation(
+            claims_identity, conversation_id, activity
+        )
 
     async def handle_reply_to_activity(
         self, auth_header, conversation_id, activity_id, activity
@@ -118,7 +120,9 @@ class ChannelServiceHandler:
         self, auth_header, conversation_id, member_id
     ):
         claims_identity = await self._authenticate(auth_header)
-        await self.on_delete_conversation_member(claims_identity, conversation_id, member_id)
+        await self.on_delete_conversation_member(
+            claims_identity, conversation_id, member_id
+        )
 
     async def handle_send_conversation_history(
         self, auth_header, conversation_id, transcript: Transcript
