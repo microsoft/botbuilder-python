@@ -2,10 +2,12 @@
 # Licensed under the MIT License.
 
 from abc import ABC
+from typing import Union
 
 from .authentication_configuration import AuthenticationConfiguration
 from .authentication_constants import AuthenticationConstants
 from .channel_validation import ChannelValidation
+from .channel_provider import ChannelProvider
 from .claims_identity import ClaimsIdentity
 from .credential_provider import CredentialProvider
 from .jwt_token_extractor import JwtTokenExtractor
@@ -26,9 +28,13 @@ class EnterpriseChannelValidation(ABC):
         auth_header: str,
         credentials: CredentialProvider,
         channel_id: str,
-        channel_service: str,
+        channel_service_or_provider: Union[str, ChannelProvider],
         auth_configuration: AuthenticationConfiguration = None,
     ) -> ClaimsIdentity:
+        channel_service = channel_service_or_provider
+        if isinstance(channel_service_or_provider, ChannelProvider):
+            channel_service = await channel_service_or_provider.get_channel_service()
+
         endpoint = (
             ChannelValidation.open_id_metadata_endpoint
             if ChannelValidation.open_id_metadata_endpoint
@@ -55,11 +61,15 @@ class EnterpriseChannelValidation(ABC):
         credentials: CredentialProvider,
         service_url: str,
         channel_id: str,
-        channel_service: str,
+        channel_service_or_provider: Union[str, ChannelProvider],
         auth_configuration: AuthenticationConfiguration = None,
     ) -> ClaimsIdentity:
         identity: ClaimsIdentity = await EnterpriseChannelValidation.authenticate_channel_token(
-            auth_header, credentials, channel_id, channel_service, auth_configuration
+            auth_header,
+            credentials,
+            channel_id,
+            channel_service_or_provider,
+            auth_configuration,
         )
 
         service_url_claim: str = identity.get_claim_value(
