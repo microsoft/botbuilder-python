@@ -37,8 +37,6 @@ from .user_token_provider import UserTokenProvider
 USER_AGENT = f"Microsoft-BotFramework/3.1 (BotBuilder Python/{__version__})"
 OAUTH_ENDPOINT = "https://api.botframework.com"
 US_GOV_OAUTH_ENDPOINT = "https://api.botframework.azure.us"
-INVOKE_RESPONSE_KEY = "BotFrameworkAdapter.InvokeResponse"
-
 
 class TokenExchangeState(Model):
     _attribute_map = {
