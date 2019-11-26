@@ -83,20 +83,16 @@ class ChannelServiceHandler:
         )
 
     async def handle_create_conversation(
-        self, auth_header, conversation_id, parameters: ConversationParameters
+        self, auth_header, parameters: ConversationParameters
     ) -> ConversationResourceResponse:
         claims_identity = await self._authenticate(auth_header)
-        return await self.on_create_conversation(
-            claims_identity, conversation_id, parameters
-        )
+        return await self.on_create_conversation(claims_identity, parameters)
 
     async def handle_get_conversations(
-        self, auth_header, conversation_id, continuation_token: str = ""
+        self, auth_header, continuation_token: str = ""
     ) -> ConversationsResult:
         claims_identity = await self._authenticate(auth_header)
-        return await self.on_get_conversations(
-            claims_identity, conversation_id, continuation_token
-        )
+        return await self.on_get_conversations(claims_identity, continuation_token)
 
     async def handle_get_conversation_members(
         self, auth_header, conversation_id
@@ -141,10 +137,7 @@ class ChannelServiceHandler:
         )
 
     async def on_get_conversations(
-        self,
-        claims_identity: ClaimsIdentity,
-        conversation_id: str,
-        continuation_token: str = "",
+        self, claims_identity: ClaimsIdentity, continuation_token: str = "",
     ) -> ConversationsResult:
         """
         get_conversations() API for Skill
@@ -169,10 +162,7 @@ class ChannelServiceHandler:
         raise NotImplementedError()
 
     async def on_create_conversation(
-        self,
-        claims_identity: ClaimsIdentity,
-        conversation_id: str,
-        parameters: ConversationParameters,
+        self, claims_identity: ClaimsIdentity, parameters: ConversationParameters,
     ) -> ConversationResourceResponse:
         """
         create_conversation() API for Skill
@@ -200,7 +190,6 @@ class ChannelServiceHandler:
         end.
 
         :param claims_identity:
-        :param conversation_id:
         :param parameters:
         :return:
         """
