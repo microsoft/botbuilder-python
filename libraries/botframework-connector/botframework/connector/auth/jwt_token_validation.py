@@ -1,5 +1,11 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+from typing import Dict, List
+
 from botbuilder.schema import Activity
 
+from .authentication_configuration import AuthenticationConfiguration
+from .authentication_constants import AuthenticationConstants
 from .emulator_validation import EmulatorValidation
 from .enterprise_channel_validation import EnterpriseChannelValidation
 from .channel_validation import ChannelValidation
@@ -8,6 +14,7 @@ from .credential_provider import CredentialProvider
 from .claims_identity import ClaimsIdentity
 from .government_constants import GovernmentConstants
 from .government_channel_validation import GovernmentChannelValidation
+from .skill_validation import SkillValidation
 
 
 class JwtTokenValidation:
@@ -61,47 +68,87 @@ class JwtTokenValidation:
         channel_service: str,
         channel_id: str,
         service_url: str = None,
+        auth_configuration: AuthenticationConfiguration = None,
     ) -> ClaimsIdentity:
         if not auth_header:
             raise ValueError("argument auth_header is null")
 
-        using_emulator = EmulatorValidation.is_token_from_emulator(auth_header)
-
-        if using_emulator:
-            return await EmulatorValidation.authenticate_emulator_token(
-                auth_header, credentials, channel_service, channel_id
-            )
-
-        # If the channel is Public Azure
-        if not channel_service:
-            if service_url:
-                return await ChannelValidation.authenticate_channel_token_with_service_url(
-                    auth_header, credentials, service_url, channel_id
+        async def get_claims() -> ClaimsIdentity:
+            if SkillValidation.is_skill_token(auth_header):
+                return await SkillValidation.authenticate_channel_token(
+                    auth_header,
+                    credentials,
+                    channel_service,
+                    channel_id,
+                    auth_configuration,
                 )
 
-            return await ChannelValidation.authenticate_channel_token(
-                auth_header, credentials, channel_id
-            )
-
-        if JwtTokenValidation.is_government(channel_service):
-            if service_url:
-                return await GovernmentChannelValidation.authenticate_channel_token_with_service_url(
-                    auth_header, credentials, service_url, channel_id
+            if EmulatorValidation.is_token_from_emulator(auth_header):
+                return await EmulatorValidation.authenticate_emulator_token(
+                    auth_header, credentials, channel_service, channel_id
                 )
 
-            return await GovernmentChannelValidation.authenticate_channel_token(
-                auth_header, credentials, channel_id
+            # If the channel is Public Azure
+            if not channel_service:
+                if service_url:
+                    return await ChannelValidation.authenticate_channel_token_with_service_url(
+                        auth_header,
+                        credentials,
+                        service_url,
+                        channel_id,
+                        auth_configuration,
+                    )
+
+                return await ChannelValidation.authenticate_channel_token(
+                    auth_header, credentials, channel_id, auth_configuration
+                )
+
+            if JwtTokenValidation.is_government(channel_service):
+                if service_url:
+                    return await GovernmentChannelValidation.authenticate_channel_token_with_service_url(
+                        auth_header,
+                        credentials,
+                        service_url,
+                        channel_id,
+                        auth_configuration,
+                    )
+
+                return await GovernmentChannelValidation.authenticate_channel_token(
+                    auth_header, credentials, channel_id, auth_configuration
+                )
+
+            # Otherwise use Enterprise Channel Validation
+            if service_url:
+                return await EnterpriseChannelValidation.authenticate_channel_token_with_service_url(
+                    auth_header,
+                    credentials,
+                    service_url,
+                    channel_id,
+                    channel_service,
+                    auth_configuration,
+                )
+
+            return await EnterpriseChannelValidation.authenticate_channel_token(
+                auth_header,
+                credentials,
+                channel_id,
+                channel_service,
+                auth_configuration,
             )
 
-        # Otherwise use Enterprise Channel Validation
-        if service_url:
-            return await EnterpriseChannelValidation.authenticate_channel_token_with_service_url(
-                auth_header, credentials, service_url, channel_id, channel_service
-            )
+        claims = await get_claims()
 
-        return await EnterpriseChannelValidation.authenticate_channel_token(
-            auth_header, credentials, channel_id, channel_service
-        )
+        if claims:
+            await JwtTokenValidation.validate_claims(auth_configuration, claims.claims)
+
+        return claims
+
+    @staticmethod
+    async def validate_claims(
+        auth_config: AuthenticationConfiguration, claims: List[Dict]
+    ):
+        if auth_config and auth_config.claims_validator:
+            await auth_config.claims_validator(claims)
 
     @staticmethod
     def is_government(channel_service: str) -> bool:
@@ -109,3 +156,37 @@ class JwtTokenValidation:
             channel_service
             and channel_service.lower() == GovernmentConstants.CHANNEL_SERVICE
         )
+
+    @staticmethod
+    def get_app_id_from_claims(claims: Dict[str, object]) -> bool:
+        app_id = None
+
+        # Depending on Version, the is either in the
+        # appid claim (Version 1) or the Authorized Party claim (Version 2).
+        token_version = claims.get(AuthenticationConstants.VERSION_CLAIM)
+
+        if not token_version or token_version == "1.0":
+            # either no Version or a version of "1.0" means we should look for
+            # the claim in the "appid" claim.
+            app_id = claims.get(AuthenticationConstants.APP_ID_CLAIM)
+        elif token_version == "2.0":
+            app_id = claims.get(AuthenticationConstants.AUTHORIZED_PARTY)
+
+        return app_id
+
+    @staticmethod
+    def is_valid_token_format(auth_header: str) -> bool:
+        if not auth_header:
+            # No token. Can't be an emulator token.
+            return False
+
+        parts = auth_header.split(" ")
+        if len(parts) != 2:
+            # Emulator tokens MUST have exactly 2 parts.
+            # If we don't have 2 parts, it's not an emulator token
+            return False
+
+        auth_scheme = parts[0]
+
+        # The scheme MUST be "Bearer"
+        return auth_scheme == "Bearer"
