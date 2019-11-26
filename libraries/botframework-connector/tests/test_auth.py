@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 import uuid
-from typing import List
+from typing import Dict, List
 from unittest.mock import Mock
 
 import pytest
@@ -16,7 +16,6 @@ from botframework.connector.auth import (
     EnterpriseChannelValidation,
     ChannelValidation,
     ClaimsIdentity,
-    Claim,
     MicrosoftAppCredentials,
     GovernmentConstants,
     GovernmentChannelValidation,
@@ -47,7 +46,7 @@ class TestAuth:
 
     @pytest.mark.asyncio
     async def test_claims_validation(self):
-        claims: List[Claim] = []
+        claims: List[Dict] = []
         default_auth_config = AuthenticationConfiguration()
 
         # No validator should pass.
