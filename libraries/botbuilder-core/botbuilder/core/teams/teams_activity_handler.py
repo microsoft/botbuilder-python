@@ -108,7 +108,7 @@ class TeamsActivityHandler(ActivityHandler):
 
             if turn_context.activity.name == "composeExtension/setting":
                 await self.on_teams_messaging_extension_configuration_setting_activity(
-                    turn_context, turn_context.turn_context.activity.value
+                    turn_context, turn_context.activity.value
                 )
                 return self._create_invoke_response()
 
@@ -379,11 +379,6 @@ class TeamsActivityHandler(ActivityHandler):
 
     async def on_teams_channel_renamed_activity(  # pylint: disable=unused-argument
         self, channel_info: ChannelInfo, team_info: TeamInfo, turn_context: TurnContext
-    ):
-        return  # Task.CompleteTask
-
-    async def on_teams_team_reanamed_async(  # pylint: disable=unused-argument
-        self, team_info: TeamInfo, turn_context: TurnContext
     ):
         return  # Task.CompleteTask
 
