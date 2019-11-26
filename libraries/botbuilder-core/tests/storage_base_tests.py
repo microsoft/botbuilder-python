@@ -9,10 +9,11 @@ Therefore, all tests using theses static tests should strictly check that the me
 TODO: write example
 """
 import pytest
-from botbuilder.core import ConversationState, TurnContext, MessageFactory
+from botbuilder.azure import BlobStorage, BlobStorageSettings
+from botbuilder.core import ConversationState, TurnContext, MessageFactory, MemoryStorage
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.dialogs import DialogSet, DialogTurnStatus, TextPrompt, PromptValidatorContext, WaterfallStepContext, \
-    Dialog, WaterfallDialog
+    Dialog, WaterfallDialog, PromptOptions
 
 
 class StorageBaseTests:
@@ -234,69 +235,75 @@ class StorageBaseTests:
 
         return True
 
-# TODO: Re-enable after the dialog_stack PR gets merged
-    # @staticmethod
-    # async def proceeds_through_waterfall(storage) -> bool:
-    #     convo_state = ConversationState(storage)
-    #
-    #     dialog_state = convo_state.create_property("dialog_state")
-    #     dialogs = DialogSet(dialog_state)
-    #
-    #     async def exec_test(turn_context: TurnContext) -> None:
-    #         dialog_context = await dialogs.create_context(turn_context)
-    #         results = await dialog_context.continue_dialog()
-    #         if results.status == DialogTurnStatus.Empty:
-    #             await dialog_context.begin_dialog("waterfall_dialog")
-    #         else:
-    #             if results.status == DialogTurnStatus.Complete:
-    #                 await turn_context.send_activity(results.result)
-    #         await convo_state.save_changes(turn_context)
-    #
-    #     adapter = TestAdapter(exec_test)
-    #
-    #     async def prompt_validator(prompt_context: PromptValidatorContext) -> bool:
-    #         result = prompt_context.recognized.value
-    #         if len(result) > 3:
-    #             succeeded_message = MessageFactory.text(f"You got it at the {prompt_context.attempt_count}th try!")
-    #             await prompt_context.context.send_activity(succeeded_message)
-    #             return True
-    #
-    #         reply = MessageFactory.text(f"Please send a name that is longer than 3 characters. {prompt_context.attempt_count}")
-    #         await prompt_context.context.send_activity(reply)
-    #         return False
-    #
-    #     dialogs.add(TextPrompt("text_prompt", prompt_validator))
-    #
-    #     async def step_1(step_context: WaterfallStepContext) -> DialogTurnStatus:
-    #         assert isinstance(step_context.active_dialog.state["stepIndex"], int)
-    #         await step_context.context.send_activity("step1")
-    #         return Dialog.end_of_turn
-    #
-    #     async def step_2(step_context: WaterfallStepContext) -> None:
-    #         assert isinstance(step_context.active_dialog.state["stepIndex"], int)
-    #         await step_context.prompt("text_prompt", {"prompt": MessageFactory.text("Please type your name.")})
-    #
-    #     async def step_3(step_context: WaterfallStepContext) -> DialogTurnStatus:
-    #         assert isinstance(step_context.active_dialog.state["stepIndex"], int)
-    #         await step_context.context.send_activity("step3")
-    #         return Dialog.end_of_turn
-    #
-    #     steps = [step_1, step_2, step_3]
-    #
-    #     dialogs.add(WaterfallDialog("waterfall_dialog", steps))
-    #
-    #     step1 = await adapter.send("hello")
-    #     step2 = await step1.assert_reply("step1")
-    #     step3 = await step2.send("hello")
-    #     step4 = await step3.assert_reply("Please type your name")
-    #     step5 = await step4.send("hi")
-    #     step6 = await step5.assert_reply("Please send a name that is longer than 3 characters. 1")
-    #     step7 = await step6.send("hi")
-    #     step8 = await step7.assert_reply("Please send a name that is longer than 3 characters. 2")
-    #     step9 = await step8.send("hi")
-    #     step10 = await step9.assert_reply("Please send a name that is longer than 3 characters. 3")
-    #     step11 = await step10.send("Kyle")
-    #     step12 = await step11.assert_reply("You got it at the 4th try!")
-    #     await step12.assert_reply("step3")
-    #
-    #     return True
+    @staticmethod
+    async def proceeds_through_waterfall(storage) -> bool:
+        # storage = MemoryStorage()
+        # BLOB_STORAGE_SETTINGS = BlobStorageSettings(
+        #     account_key="Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==", container_name="test", connection_string="AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;DefaultEndpointsProtocol=http;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;"
+        # )
+        # storage = BlobStorage(BLOB_STORAGE_SETTINGS)
+        convo_state = ConversationState(storage)
+
+        dialog_state = convo_state.create_property("dialogState")
+        dialogs = DialogSet(dialog_state)
+
+        async def exec_test(turn_context: TurnContext) -> None:
+            dc = await dialogs.create_context(turn_context)
+
+            await dc.continue_dialog()
+            if not turn_context.responded:
+                await dc.begin_dialog(WaterfallDialog.__name__)
+            await convo_state.save_changes(turn_context)
+
+        adapter = TestAdapter(exec_test)
+
+        async def prompt_validator(prompt_context: PromptValidatorContext):
+            result = prompt_context.recognized.value
+            if len(result) > 3:
+                succeeded_message = MessageFactory.text(f"You got it at the {prompt_context.options.number_of_attempts}rd try!")
+                await prompt_context.context.send_activity(succeeded_message)
+                return True
+
+            reply = MessageFactory.text(
+                f"Please send a name that is longer than 3 characters. {prompt_context.options.number_of_attempts}"
+            )
+            await prompt_context.context.send_activity(reply)
+            return False
+
+        async def step_1(step_context: WaterfallStepContext) -> DialogTurnStatus:
+            assert isinstance(step_context.active_dialog.state["stepIndex"], int)
+            await step_context.context.send_activity("step1")
+            return Dialog.end_of_turn
+
+        async def step_2(step_context: WaterfallStepContext) -> None:
+            assert isinstance(step_context.active_dialog.state["stepIndex"], int)
+            await step_context.prompt(TextPrompt.__name__, PromptOptions(
+                prompt=MessageFactory.text("Please type your name")
+            ))
+
+        async def step_3(step_context: WaterfallStepContext) -> DialogTurnStatus:
+            assert isinstance(step_context.active_dialog.state["stepIndex"], int)
+            await step_context.context.send_activity("step3")
+            return Dialog.end_of_turn
+
+        steps = [step_1, step_2, step_3]
+
+        dialogs.add(WaterfallDialog(WaterfallDialog.__name__, steps))
+
+        dialogs.add(TextPrompt(TextPrompt.__name__, prompt_validator))
+
+        step1 = await adapter.send("hello") # None
+        step2 = await step1.assert_reply("step1") # None
+        step3 = await step2.send("hello") # Tab1
+        step4 = await step3.assert_reply("Please type your name") # None
+        step5 = await step4.send("hi") # Tab2
+        step6 = await step5.assert_reply("Please send a name that is longer than 3 characters. 0") # None
+        step7 = await step6.send("hi")
+        step8 = await step7.assert_reply("Please send a name that is longer than 3 characters. 1")
+        step9 = await step8.send("hi")
+        step10 = await step9.assert_reply("Please send a name that is longer than 3 characters. 2")
+        step11 = await step10.send("Kyle")
+        step12 = await step11.assert_reply("You got it at the 3rd try!")
+        await step12.assert_reply("step3")
+
+        return True

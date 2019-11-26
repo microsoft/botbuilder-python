@@ -196,11 +196,10 @@ class TestCosmosDbPartitionedStorageBaseStorageTests:
 
         assert test_ran
 
-    # TODO: Re-enable after the dialog_stack PR gets merged
-    # @pytest.mark.asyncio
-    # async def test_proceeds_through_waterfall(self):
-    #     await reset()
-    #
-    #     test_ran = await StorageBaseTests.proceeds_through_waterfall(get_storage())
-    #
-    #     assert test_ran
+    @pytest.mark.asyncio
+    async def test_proceeds_through_waterfall(self):
+        await reset()
+
+        test_ran = await StorageBaseTests.proceeds_through_waterfall(get_storage())
+
+        assert test_ran

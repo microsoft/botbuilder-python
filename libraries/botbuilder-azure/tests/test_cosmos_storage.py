@@ -9,6 +9,8 @@ from botbuilder.core import StoreItem
 from botbuilder.azure import CosmosDbStorage, CosmosDbConfig
 
 # local cosmosdb emulator instance cosmos_db_config
+from tests import StorageBaseTests
+
 COSMOS_DB_CONFIG = CosmosDbConfig(
     endpoint="https://localhost:8081",
     masterkey="C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==",
@@ -16,6 +18,10 @@ COSMOS_DB_CONFIG = CosmosDbConfig(
     container="bot-storage",
 )
 EMULATOR_RUNNING = False
+
+
+def get_storage():
+    return CosmosDbStorage(COSMOS_DB_CONFIG)
 
 
 async def reset():
@@ -50,7 +56,7 @@ class SimpleStoreItem(StoreItem):
         self.e_tag = e_tag
 
 
-class TestCosmosDbStorage:
+class TestCosmosDbStorageConstructor:
     @pytest.mark.asyncio
     async def test_cosmos_storage_init_should_error_without_cosmos_db_config(self):
         try:
@@ -85,6 +91,93 @@ class TestCosmosDbStorage:
         client.CreateContainer.assert_called_with(
             "dbs/" + test_id, {"id": test_id}, test_config.container_creation_options
         )
+
+
+class TestCosmosDbStorageBaseStorageTests:
+    @pytest.mark.asyncio
+    async def test_return_empty_object_when_reading_unknown_key(self):
+        await reset()
+
+        test_ran = await StorageBaseTests.return_empty_object_when_reading_unknown_key(get_storage())
+
+        assert test_ran
+
+    @pytest.mark.asyncio
+    async def test_handle_null_keys_when_reading(self):
+        await reset()
+
+        test_ran = await StorageBaseTests.handle_null_keys_when_reading(get_storage())
+
+        assert test_ran
+
+    @pytest.mark.asyncio
+    async def test_handle_null_keys_when_writing(self):
+        await reset()
+
+        test_ran = await StorageBaseTests.handle_null_keys_when_writing(get_storage())
+
+        assert test_ran
+
+    @pytest.mark.asyncio
+    async def test_does_not_raise_when_writing_no_items(self):
+        await reset()
+
+        test_ran = await StorageBaseTests.does_not_raise_when_writing_no_items(get_storage())
+
+        assert test_ran
+
+    @pytest.mark.asyncio
+    async def test_create_object(self):
+        await reset()
+
+        test_ran = await StorageBaseTests.create_object(get_storage())
+
+        assert test_ran
+
+    @pytest.mark.asyncio
+    async def test_handle_crazy_keys(self):
+        await reset()
+
+        test_ran = await StorageBaseTests.handle_crazy_keys(get_storage())
+
+        assert test_ran
+
+    @pytest.mark.asyncio
+    async def test_update_object(self):
+        await reset()
+
+        test_ran = await StorageBaseTests.update_object(get_storage())
+
+        assert test_ran
+
+    @pytest.mark.asyncio
+    async def test_delete_object(self):
+        await reset()
+
+        test_ran = await StorageBaseTests.delete_object(get_storage())
+
+        assert test_ran
+
+    @pytest.mark.asyncio
+    async def test_perform_batch_operations(self):
+        await reset()
+
+        test_ran = await StorageBaseTests.perform_batch_operations(get_storage())
+
+        assert test_ran
+
+    # TODO: Re-enable after the dialog_stack PR gets merged
+    @pytest.mark.asyncio
+    async def test_proceeds_through_waterfall(self):
+        await reset()
+
+        test_ran = await StorageBaseTests.proceeds_through_waterfall(get_storage())
+
+        assert test_ran
+
+
+class TestCosmosDbStorage:
+
 
     @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio

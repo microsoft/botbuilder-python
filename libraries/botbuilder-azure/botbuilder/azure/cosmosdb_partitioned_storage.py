@@ -99,8 +99,7 @@ class CosmosDbPartitionedStorage(Storage):
                 )
                 document_store_item = read_item_response
                 if document_store_item:
-                    store_items[document_store_item["realId"]] = document_store_item["document"]
-                    store_items[document_store_item["realId"]]["e_tag"] = document_store_item["_etag"]
+                    store_items[document_store_item["realId"]] = self.__create_si(document_store_item)
             # When an item is not found a CosmosException is thrown, but we want to
             # return an empty collection so in this instance we catch and do not rethrow.
             # Throw for any other exception.
@@ -172,41 +171,6 @@ class CosmosDbPartitionedStorage(Storage):
             except Exception as err:
                 raise err
 
-    @staticmethod
-    def __create_si(result) -> object:
-        """Create an object from a result out of CosmosDB.
-
-        :param result:
-        :return object:
-        """
-        # get the document item from the result and turn into a dict
-        doc = result.get("document")
-        # read the e_tag from Cosmos
-        if result.get("_etag"):
-            doc["e_tag"] = result["_etag"]
-
-        result_obj = Unpickler().restore(doc)
-
-        # create and return the object
-        return result_obj
-
-    @staticmethod
-    def __create_dict(store_item: object) -> Dict:
-        """Return the dict of an object.
-
-        This eliminates non_magic attributes and the e_tag.
-
-        :param store_item:
-        :return dict:
-        """
-        # read the content
-        json_dict = Pickler().flatten(store_item)
-        if "e_tag" in json_dict:
-            del json_dict["e_tag"]
-
-        # loop through attributes and write and return a dict
-        return json_dict
-
     async def initialize(self):
         if not self.container:
             if not self.client:
@@ -253,6 +217,42 @@ class CosmosDbPartitionedStorage(Storage):
                             )
                         else:
                             raise err
+
+    @staticmethod
+    def __create_si(result) -> object:
+        """Create an object from a result out of CosmosDB.
+
+        :param result:
+        :return object:
+        """
+        # get the document item from the result and turn into a dict
+        doc = result.get("document")
+        # read the e_tag from Cosmos
+        if result.get("_etag"):
+            doc["e_tag"] = result["_etag"]
+
+        result_obj = Unpickler().restore(doc)
+
+        # create and return the object
+        return result_obj
+
+    @staticmethod
+    def __create_dict(store_item: object) -> Dict:
+        """Return the dict of an object.
+
+        This eliminates non_magic attributes and the e_tag.
+
+        :param store_item:
+        :return dict:
+        """
+        # read the content
+        json_dict = Pickler().flatten(store_item)
+        if "e_tag" in json_dict:
+            del json_dict["e_tag"]
+
+        # loop through attributes and write and return a dict
+        return json_dict
+
 
     def __item_link(self, identifier) -> str:
         """Return the item link of a item in the container.
