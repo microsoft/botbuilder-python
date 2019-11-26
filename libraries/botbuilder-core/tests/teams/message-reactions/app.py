@@ -10,7 +10,7 @@ from botbuilder.core import (
     BotFrameworkAdapterSettings,
     TurnContext,
     BotFrameworkAdapter,
-    MemoryStorage
+    MemoryStorage,
 )
 from botbuilder.schema import Activity, ActivityTypes
 from activity_log import ActivityLog
@@ -28,7 +28,7 @@ ADAPTER = BotFrameworkAdapter(SETTINGS)
 
 
 # Catch-all for errors.
-async def on_error( # pylint: disable=unused-argument
+async def on_error(  # pylint: disable=unused-argument
     self, context: TurnContext, error: Exception
 ):
     # This check writes out errors to console log .vs. app insights.
