@@ -12,7 +12,6 @@ from botbuilder.schema import (
     ConversationAccount,
     ConversationParameters,
     ConversationReference,
-    ResourceResponse,
     TokenResponse,
     ResourceResponse,
 )
@@ -38,7 +37,6 @@ from .user_token_provider import UserTokenProvider
 USER_AGENT = f"Microsoft-BotFramework/3.1 (BotBuilder Python/{__version__})"
 OAUTH_ENDPOINT = "https://api.botframework.com"
 US_GOV_OAUTH_ENDPOINT = "https://api.botframework.azure.us"
-
 
 class TokenExchangeState(Model):
     _attribute_map = {
@@ -332,7 +330,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         except Exception as error:
             raise error
 
-async def send_activities(
+    async def send_activities(
         self, context: TurnContext, activities: List[Activity]
     ) -> List[ResourceResponse]:
         try:
