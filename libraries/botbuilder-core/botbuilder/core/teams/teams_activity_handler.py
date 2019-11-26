@@ -42,7 +42,7 @@ class TeamsActivityHandler(ActivityHandler):
 
     async def on_invoke_activity(self, turn_context: TurnContext):
         try:
-            if turn_context.activity.name is None and turn_context.activity.channel_id == Channels.Msteams:
+            if not turn_context.activity.name and turn_context.activity.channel_id == Channels.Msteams:
                 return await self.on_teams_card_action_invoke_activity(turn_context)
             else:
                 if turn_context.activity.name == "signin/verifyState":
