@@ -3,14 +3,14 @@
 
 from typing import Awaitable, Callable, List
 
-from .claims_identity import ClaimsIdentity
+from .claims_identity import Claim
 
 
 class AuthenticationConfiguration:
     def __init__(
         self,
         required_endorsements: List[str] = None,
-        claims_validator: Callable[[List[ClaimsIdentity]], Awaitable] = None,
+        claims_validator: Callable[[List[Claim]], Awaitable] = None,
     ):
         self.required_endorsements = required_endorsements or []
         self.claims_validator = claims_validator

@@ -16,6 +16,7 @@ from botframework.connector.auth import (
     EnterpriseChannelValidation,
     ChannelValidation,
     ClaimsIdentity,
+    Claim,
     MicrosoftAppCredentials,
     GovernmentConstants,
     GovernmentChannelValidation,
@@ -46,18 +47,19 @@ class TestAuth:
 
     @pytest.mark.asyncio
     async def test_claims_validation(self):
-        claims: List[ClaimsIdentity] = []
+        claims: List[Claim] = []
         default_auth_config = AuthenticationConfiguration()
 
         # No validator should pass.
         await JwtTokenValidation.validate_claims(default_auth_config, claims)
 
+        # ClaimsValidator configured but no exception should pass.
         mock_validator = Mock()
         auth_with_validator = AuthenticationConfiguration(
             claims_validator=mock_validator
         )
 
-        # ClaimsValidator configured but no exception should pass.
+        # Configure IClaimsValidator to fail
         mock_validator.side_effect = PermissionError("Invalid claims.")
         with pytest.raises(PermissionError) as excinfo:
             await JwtTokenValidation.validate_claims(auth_with_validator, claims)

@@ -11,7 +11,7 @@ from .enterprise_channel_validation import EnterpriseChannelValidation
 from .channel_validation import ChannelValidation
 from .microsoft_app_credentials import MicrosoftAppCredentials
 from .credential_provider import CredentialProvider
-from .claims_identity import ClaimsIdentity
+from .claims_identity import Claim, ClaimsIdentity
 from .government_constants import GovernmentConstants
 from .government_channel_validation import GovernmentChannelValidation
 from .skill_validation import SkillValidation
@@ -73,7 +73,7 @@ class JwtTokenValidation:
         if not auth_header:
             raise ValueError("argument auth_header is null")
 
-        async def get_claims():
+        async def get_claims() -> ClaimsIdentity:
             if SkillValidation.is_skill_token(auth_header):
                 return await SkillValidation.authenticate_channel_token(
                     auth_header,
@@ -139,13 +139,13 @@ class JwtTokenValidation:
         claims = await get_claims()
 
         if claims:
-            await JwtTokenValidation.validate_claims(auth_configuration, claims)
+            await JwtTokenValidation.validate_claims(auth_configuration, claims.claims)
 
         return claims
 
     @staticmethod
     async def validate_claims(
-        auth_config: AuthenticationConfiguration, claims: List[ClaimsIdentity]
+        auth_config: AuthenticationConfiguration, claims: List[Claim]
     ):
         if auth_config and auth_config.claims_validator:
             await auth_config.claims_validator(claims)
