@@ -87,7 +87,10 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         activity = Activity(
             type=ActivityTypes.message_reaction,
             reactions_added=[MessageReaction(type="sad")],
+<<<<<<< HEAD
             reactions_removed=[MessageReaction(type="angry")],
+=======
+>>>>>>> a0ccb8c120f6c17230b3db8ebaf815b5143fa06b
         )
         turn_context = TurnContext(NotImplementedAdapter(), activity)
 
@@ -96,7 +99,13 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         await bot.on_turn(turn_context)
 
         # Assert
+<<<<<<< HEAD
         assert len(bot.record) == 3
         assert bot.record[0] == "on_message_reaction_activity"
         assert bot.record[1] == "on_reactions_added"
         assert bot.record[2] == "on_reactions_removed"
+=======
+        assert len(bot.record) == 2
+        assert bot.record[0] == "on_message_reaction_activity"
+        assert bot.record[1] == "on_reactions_added"
+>>>>>>> a0ccb8c120f6c17230b3db8ebaf815b5143fa06b

@@ -102,6 +102,7 @@ __all__ = ["EventLoopThread", "get_event_loop", "stop_event_loop", "run_coroutin
 
 logger = logging.getLogger(__name__)
 
+
 class EventLoopThread(threading.Thread):
     loop = None
     _count = itertools.count(0)
@@ -142,8 +143,10 @@ class EventLoopThread(threading.Thread):
         loop.call_soon_threadsafe(loop.stop)
         self.join()
 
+
 _lock = threading.Lock()
 _loop_thread = None
+
 
 def get_event_loop():
     global _loop_thread
@@ -153,12 +156,14 @@ def get_event_loop():
             _loop_thread.start()
         return _loop_thread.loop
 
+
 def stop_event_loop():
     global _loop_thread
     with _lock:
         if _loop_thread is not None:
             _loop_thread.stop()
             _loop_thread = None
+
 
 def run_coroutine(coro):
     return asyncio.run_coroutine_threadsafe(coro, get_event_loop())
