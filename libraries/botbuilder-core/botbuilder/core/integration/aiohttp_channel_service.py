@@ -18,44 +18,53 @@ async def deserialize_activity(request: Request) -> Activity:
 
 
 def channel_service_routes(handler: ChannelServiceHandler) -> RouteTableDef:
+    # pylint: disable=unused-variable
     routes = RouteTableDef()
 
     @routes.post("/{conversation_id}/activities")
     async def send_to_conversation(request: Request):
         activity = await deserialize_activity(request)
-        return await handler.handle_send_to_conversation(
+        result = await handler.handle_send_to_conversation(
             request.headers.get("Authorization"),
             request.match_info["conversation_id"],
             activity,
         )
+
+        return Response(body=result.serialize())
 
     @routes.post("/{conversation_id}/activities/{activity_id}")
     async def reply_to_activity(request: Request):
         activity = await deserialize_activity(request)
-        return await handler.handle_reply_to_activity(
+        result = await handler.handle_reply_to_activity(
             request.headers.get("Authorization"),
             request.match_info["conversation_id"],
             request.match_info["activity_id"],
             activity,
         )
+
+        return Response(body=result.serialize())
 
     @routes.put("/{conversation_id}/activities/{activity_id}")
     async def update_activity(request: Request):
         activity = await deserialize_activity(request)
-        return await handler.handle_update_activity(
+        result = await handler.handle_update_activity(
             request.headers.get("Authorization"),
             request.match_info["conversation_id"],
             request.match_info["activity_id"],
             activity,
         )
 
+        return Response(body=result.serialize())
+
     @routes.delete("/{conversation_id}/activities/{activity_id}")
     async def delete_activity(request: Request):
-        return await handler.handle_delete_activity(
+        await handler.handle_delete_activity(
             request.headers.get("Authorization"),
             request.match_info["conversation_id"],
             request.match_info["activity_id"],
         )
+
+        return Response()
 
     @routes.get("/{conversation_id}/activities/{activity_id}/members")
     async def get_activity_members(request: Request):
