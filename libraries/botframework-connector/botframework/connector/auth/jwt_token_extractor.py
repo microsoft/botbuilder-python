@@ -49,7 +49,7 @@ class JwtTokenExtractor:
         self,
         schema: str,
         parameter: str,
-        channel_id,
+        channel_id: str,
         required_endorsements: List[str] = None,
     ) -> ClaimsIdentity:
         # No header in correct scheme or no token

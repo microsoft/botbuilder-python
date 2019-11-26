@@ -1,10 +1,14 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 import uuid
+from typing import Dict, List
+from unittest.mock import Mock
+
 import pytest
 
 from botbuilder.schema import Activity
 from botframework.connector.auth import (
+    AuthenticationConfiguration,
     AuthenticationConstants,
     JwtTokenValidation,
     SimpleCredentialProvider,
@@ -39,6 +43,27 @@ class TestAuth:
     ChannelValidation.TO_BOT_FROM_CHANNEL_TOKEN_VALIDATION_PARAMETERS.ignore_expiration = (
         True
     )
+
+    @pytest.mark.asyncio
+    async def test_claims_validation(self):
+        claims: List[Dict] = []
+        default_auth_config = AuthenticationConfiguration()
+
+        # No validator should pass.
+        await JwtTokenValidation.validate_claims(default_auth_config, claims)
+
+        # ClaimsValidator configured but no exception should pass.
+        mock_validator = Mock()
+        auth_with_validator = AuthenticationConfiguration(
+            claims_validator=mock_validator
+        )
+
+        # Configure IClaimsValidator to fail
+        mock_validator.side_effect = PermissionError("Invalid claims.")
+        with pytest.raises(PermissionError) as excinfo:
+            await JwtTokenValidation.validate_claims(auth_with_validator, claims)
+
+        assert "Invalid claims." in str(excinfo.value)
 
     @pytest.mark.asyncio
     async def test_connector_auth_header_correct_app_id_and_service_url_should_validate(

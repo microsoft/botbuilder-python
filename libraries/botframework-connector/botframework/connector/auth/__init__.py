@@ -11,6 +11,7 @@
 # pylint: disable=missing-docstring
 
 from .microsoft_app_credentials import *
+from .claims_identity import *
 from .jwt_token_validation import *
 from .credential_provider import *
 from .channel_validation import *
@@ -20,3 +21,4 @@ from .government_constants import *
 from .authentication_constants import *
 from .channel_provider import *
 from .simple_channel_provider import *
+from .authentication_configuration import *
