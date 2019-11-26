@@ -33,20 +33,75 @@ class TeamsActivityHandler(ActivityHandler):
 
         if turn_context.activity.type == ActivityTypes.invoke:
             invoke_response = await self.on_invoke_activity(turn_context)
+            if invoke_response and not turn_context.turn_state[BotFrameworkAdapter()._INVOKE_RESPONSE_KEY]:
+                await turn_context.send_activity(Activity(value=invoke_response, type=ActivityTypes.InvokeResponse))
+            return
         else:
             await super().on_turn(turn_context)
+            return
 
     async def on_invoke_activity(self, turn_context: TurnContext):
         try:
-            if (
-                not turn_context.activity.name
-                and turn_context.activity.channel_id == Channels.Msteams
-            ):
-                return  # await on_teams_card_action_invoke_activity(turn_context)
+            if turn_context.activity.name is None and turn_context.activity.channel_id == Channels.Msteams:
+                return await self.on_teams_card_action_invoke_activity(turn_context)
+            else:
+                if turn_context.activity.name == "signin/verifyState":
+                    await self.on_teams_signin_verify_state_activity(turn_context)
+                    return self._create_invoke_response()
+                elif turn_context.activity.name == "fileConsent/invoke":
+                    return await self.on_teams_file_consent_activity(turn_context)
+                elif turn_context.activity.name == "actionableMessage/executeAction":
+                    await on_teams_o365_connector_card_action_activity(turn_context)
+                    return self._create_invoke_response()
+                elif turn_context.activity.name == "composeExtension/queryLink":
+                    return self._create_invoke_response(await self.on_teams_app_based_link_query_activity(turn_context, turn_context.activity.value))
+                elif turn_context.activity.name == "composeExtension/query":
+                    return self._create_invoke_response(await self.on_teams_messaging_extension_query_activity(turn_context, turn_context.activity.value))
+                elif turn_context.activity.name == "composeExtension/selectItem":
+                    return self._create_invoke_response(await self.on_teams_messaging_extension_select_item_activity(turn_context, turn_context.activity.value))
+                elif turn_context.activity.name == "composeExtension/submitAction":
+                    return self._create_invoke_response(await self.on_teams_messaging_etension_submit_action_dispatch_activity(turn_context, turn_context
+                    .activity.value))
+                elif turn_context.activity.name == "composeExtension/fetchTask":
+                    return self._create_invoke_response(await self.on_teams_messaging_extension_fetch_task_activity(turn_context, turn_context
+                    .activity.value))
+                elif turn_context.activity.name == "composeExtension/querySettingUrl":
+                    return self._create_invoke_response(await on_teams_messaging_extension_configuration_query_settings_url_activity(turn_context, turn_context.activity.value))
+                elif turn_context.activity.name == "composeExtension/setting":
+                    await on_Teams_messaging_extension_configuration_setting_activity(turn_context, turn_context.turn_context.activity.value)
+                    return self._create_invoke_response()
+                elif turn_context.activity.name == "composeExtension/onCardButtonClicked":
+                    await self.on_teams_messaging_extension_card_button_clicked_activity(turn_context, turn_context.activity.value)
+                    return self._create_invoke_response()
+                elif turn_context.activity.name == "task/fetch":
+                    return self._create_invoke_response(await self.on_Teams_task_module_fetch_activity(turn_context, turn_context.activity.value))
+                elif turn_context.activity.name == "task/submit":
+                    return self._create_invoke_response(await self.on_teams_task_module_submit_activity(turn_context, turn_context.activity.value))
+                else:
+                    raise InvokeResponseException(HTTPStatus.NotImplemented)
+        except(Exception e):
+            raise self._create_invoke_response(e)
 
-            turn_context.send_activity(MessageFactory.text("working"))
-        except:
-            return
+    async def on_teams_file_consent_activity(self, turn_context: TurnContext, file_consent_card_response):
+        if file_consent_card_response.action == "accept":
+            await self.on_teams_file_consent_accept_activity(turn_context, file_consent_card_response)
+            return self._create_invoke_response()
+        elif file_consent_card_response.action == "decline":
+            await on_teams_file_consent_decline_activity(turn_context, file_consent_card_response)
+            return self._create_invoke_response()
+        else:
+            raise InvokeResponseException(HTTPStatus.BadRequest, f"{file_consent_card_response.action} is not a supported Action.")
+
+    async def on_teams_messaging_extension_submit_action_dispatch_activity(self, turn_context: TurnContext, action):
+        if action:
+            if action.bot_message_preview_action == "edit":
+                return await self.on_teams_messaging_extension_bot_message_preview_edit_activity(turn_context, action)
+            elif action.bot_message_preview_action == "send":
+                return await self.on_teams_messaging_extension_bot_message_send_activity(turn_context, action)
+            else:
+                raise InvokeResponseException(HTTPStatus.BadRequest, f"{action.bot_message_preview_action} is not a supported BotMessagePreviewAction")
+        else:
+            return await on_teams_messaging_extension_submit_action_activity(turn_context, action)
 
     async def on_conversation_update_activity(self, turn_context: TurnContext):
         if turn_context.activity.channel_id == Channels.ms_teams:
