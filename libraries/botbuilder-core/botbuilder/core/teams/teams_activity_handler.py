@@ -346,7 +346,7 @@ class TeamsActivityHandler(ActivityHandler):
     async def on_teams_members_added_activity(
         self, teams_members_added: [TeamsChannelAccount], turn_context: TurnContext
     ):
-        team_members_added = [ChannelAccount(memeber) for member in teams_members_added]
+        team_members_added = [ChannelAccount(member) for member in teams_members_added]
         return super().on_members_added_activity(teams_members_added, turn_context)
 
     async def on_teams_members_removed_dispatch_activity(  # pylint: disable=unused-argument
