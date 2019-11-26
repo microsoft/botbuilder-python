@@ -346,8 +346,7 @@ class TeamsActivityHandler(ActivityHandler):
     async def on_teams_members_added_activity(
         self, teams_members_added: [TeamsChannelAccount], turn_context: TurnContext
     ):
-        for member in teams_members_added:
-            member = ChannelAccount(member)
+        team_members_added = [ChannelAccount(memeber) for member in teams_members_added]
         return super().on_members_added_activity(teams_members_added, turn_context)
 
     async def on_teams_members_removed_dispatch_activity(  # pylint: disable=unused-argument
@@ -369,7 +368,7 @@ class TeamsActivityHandler(ActivityHandler):
     async def on_teams_members_removed_activity(
         self, teams_members_removed: [TeamsChannelAccount], turn_context: TurnContext
     ):
-        members_removed = [ChannelAccount(i) for i in teams_members_removed]
+        members_removed = [ChannelAccount(member) for member in teams_members_removed]
         return super().on_members_removed_activity(members_removed, turn_context)
 
     async def on_teams_channel_deleted_activity(  # pylint: disable=unused-argument
