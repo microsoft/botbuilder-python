@@ -2,8 +2,6 @@ import uuid
 from asyncio import Future
 from unittest.mock import Mock, DEFAULT
 import aiounittest
-from ddt import data, ddt, unpack
-
 from botframework.connector.auth import (
     AuthenticationConstants,
     ClaimsIdentity,
@@ -11,6 +9,7 @@ from botframework.connector.auth import (
     SkillValidation,
 )
 
+from ddt import data, ddt, unpack
 
 def future_builder(return_val: object) -> Future:
     result = Future()
