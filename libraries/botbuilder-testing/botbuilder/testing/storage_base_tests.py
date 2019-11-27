@@ -15,16 +15,29 @@ Therefore, all tests using theses static tests should strictly check that the me
 """
 import pytest
 from botbuilder.azure import CosmosDbStorage
-from botbuilder.core import ConversationState, TurnContext, MessageFactory, MemoryStorage
+from botbuilder.core import (
+    ConversationState,
+    TurnContext,
+    MessageFactory,
+    MemoryStorage,
+)
 from botbuilder.core.adapters import TestAdapter
-from botbuilder.dialogs import DialogSet, DialogTurnStatus, TextPrompt, PromptValidatorContext, WaterfallStepContext, \
-    Dialog, WaterfallDialog, PromptOptions
+from botbuilder.dialogs import (
+    DialogSet,
+    DialogTurnStatus,
+    TextPrompt,
+    PromptValidatorContext,
+    WaterfallStepContext,
+    Dialog,
+    WaterfallDialog,
+    PromptOptions,
+)
 
 
 class StorageBaseTests:
     @staticmethod
     async def return_empty_object_when_reading_unknown_key(storage) -> bool:
-        result = await storage.read(['unknown'])
+        result = await storage.read(["unknown"])
 
         assert result is not None
         assert len(result) == 0
@@ -74,7 +87,10 @@ class StorageBaseTests:
         read_store_items = await storage.read(store_items.keys())
 
         assert store_items["createPoco"]["id"] == read_store_items["createPoco"]["id"]
-        assert store_items["createPocoStoreItem"]["id"] == read_store_items["createPocoStoreItem"]["id"]
+        assert (
+            store_items["createPocoStoreItem"]["id"]
+            == read_store_items["createPocoStoreItem"]["id"]
+        )
         assert read_store_items["createPoco"]["e_tag"] is not None
         assert read_store_items["createPocoStoreItem"]["e_tag"] is not None
 
@@ -82,7 +98,7 @@ class StorageBaseTests:
 
     @staticmethod
     async def handle_crazy_keys(storage) -> bool:
-        key = '!@#$%^&*()~/\\><,.?\';"\`~'
+        key = "!@#$%^&*()~/\\><,.?';\"\`~"
         store_item = {"id": 1}
         store_items = {key: store_item}
 
@@ -99,7 +115,7 @@ class StorageBaseTests:
     async def update_object(storage) -> bool:
         original_store_items = {
             "pocoItem": {"id": 1, "count": 1},
-            "pocoStoreItem": {"id": 1, "count": 1}
+            "pocoStoreItem": {"id": 1, "count": 1},
         }
 
         # 1st write should work
@@ -124,7 +140,9 @@ class StorageBaseTests:
         reloaded_update_poco_store_item = reloaded_store_items["pocoStoreItem"]
 
         assert reloaded_update_poco_item["e_tag"] is not None
-        assert update_poco_store_item["e_tag"] != reloaded_update_poco_store_item["e_tag"]
+        assert (
+            update_poco_store_item["e_tag"] != reloaded_update_poco_store_item["e_tag"]
+        )
         assert reloaded_update_poco_item["count"] == 2
         assert reloaded_update_poco_store_item["count"] == 2
 
@@ -155,7 +173,7 @@ class StorageBaseTests:
 
         wildcard_etag_dict = {
             "pocoItem": reloaded_poco_item2,
-            "pocoStoreItem": reloaded_poco_store_item2
+            "pocoStoreItem": reloaded_poco_store_item2,
         }
 
         await storage.write(wildcard_etag_dict)
@@ -186,9 +204,7 @@ class StorageBaseTests:
 
     @staticmethod
     async def delete_object(storage) -> bool:
-        store_items = {
-            "delete1": {"id": 1, "count": 1}
-        }
+        store_items = {"delete1": {"id": 1, "count": 1}}
 
         await storage.write(store_items)
 
@@ -217,11 +233,9 @@ class StorageBaseTests:
 
     @staticmethod
     async def perform_batch_operations(storage) -> bool:
-        await storage.write({
-            "batch1": {"count": 10},
-            "batch2": {"count": 20},
-            "batch3": {"count": 30},
-        })
+        await storage.write(
+            {"batch1": {"count": 10}, "batch2": {"count": 20}, "batch3": {"count": 30},}
+        )
 
         result = await storage.read(["batch1", "batch2", "batch3"])
 
@@ -265,7 +279,9 @@ class StorageBaseTests:
         async def prompt_validator(prompt_context: PromptValidatorContext):
             result = prompt_context.recognized.value
             if len(result) > 3:
-                succeeded_message = MessageFactory.text(f"You got it at the {prompt_context.options.number_of_attempts}rd try!")
+                succeeded_message = MessageFactory.text(
+                    f"You got it at the {prompt_context.options.number_of_attempts}rd try!"
+                )
                 await prompt_context.context.send_activity(succeeded_message)
                 return True
 
@@ -282,9 +298,10 @@ class StorageBaseTests:
 
         async def step_2(step_context: WaterfallStepContext) -> None:
             assert isinstance(step_context.active_dialog.state["stepIndex"], int)
-            await step_context.prompt(TextPrompt.__name__, PromptOptions(
-                prompt=MessageFactory.text("Please type your name")
-            ))
+            await step_context.prompt(
+                TextPrompt.__name__,
+                PromptOptions(prompt=MessageFactory.text("Please type your name")),
+            )
 
         async def step_3(step_context: WaterfallStepContext) -> DialogTurnStatus:
             assert isinstance(step_context.active_dialog.state["stepIndex"], int)
@@ -300,13 +317,19 @@ class StorageBaseTests:
         step1 = await adapter.send("hello")
         step2 = await step1.assert_reply("step1")
         step3 = await step2.send("hello")
-        step4 = await step3.assert_reply("Please type your name") # None
+        step4 = await step3.assert_reply("Please type your name")  # None
         step5 = await step4.send("hi")
-        step6 = await step5.assert_reply("Please send a name that is longer than 3 characters. 0")
+        step6 = await step5.assert_reply(
+            "Please send a name that is longer than 3 characters. 0"
+        )
         step7 = await step6.send("hi")
-        step8 = await step7.assert_reply("Please send a name that is longer than 3 characters. 1")
+        step8 = await step7.assert_reply(
+            "Please send a name that is longer than 3 characters. 1"
+        )
         step9 = await step8.send("hi")
-        step10 = await step9.assert_reply("Please send a name that is longer than 3 characters. 2")
+        step10 = await step9.assert_reply(
+            "Please send a name that is longer than 3 characters. 2"
+        )
         step11 = await step10.send("Kyle")
         step12 = await step11.assert_reply("You got it at the 3rd try!")
         await step12.assert_reply("step3")

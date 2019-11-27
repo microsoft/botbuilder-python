@@ -7,7 +7,10 @@
 
 from .about import __version__
 from .cosmosdb_storage import CosmosDbStorage, CosmosDbConfig, CosmosDbKeyEscape
-from .cosmosdb_partitioned_storage import CosmosDbPartitionedStorage, CosmosDbPartitionedConfig
+from .cosmosdb_partitioned_storage import (
+    CosmosDbPartitionedStorage,
+    CosmosDbPartitionedConfig,
+)
 from .blob_storage import BlobStorage, BlobStorageSettings
 
 __all__ = [

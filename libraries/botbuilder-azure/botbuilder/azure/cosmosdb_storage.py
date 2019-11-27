@@ -171,7 +171,11 @@ class CosmosDbStorage(Storage):
                 # iterate over the changes
             for (key, change) in changes.items():
                 # store the e_tag
-                e_tag = change.e_tag if hasattr(change, "e_tag") else change.get("e_tag", None)
+                e_tag = (
+                    change.e_tag
+                    if hasattr(change, "e_tag")
+                    else change.get("e_tag", None)
+                )
                 # create the new document
                 doc = {
                     "id": CosmosDbKeyEscape.sanitize_key(key),

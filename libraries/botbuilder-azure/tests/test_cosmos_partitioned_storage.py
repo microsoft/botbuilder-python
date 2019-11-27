@@ -15,7 +15,7 @@ def get_settings() -> CosmosDbPartitionedConfig:
         cosmos_db_endpoint="https://localhost:8081",
         auth_key="C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==",
         database_id="test-db",
-        container_id="bot-storage"
+        container_id="bot-storage",
     )
 
 
@@ -92,14 +92,17 @@ class TestCosmosDbPartitionedStorageConstructor:
 
         settings_with_options.cosmos_client_options = {
             "connection_policy": connection_policy,
-            "consistency_level": documents.ConsistencyLevel.Eventual
+            "consistency_level": documents.ConsistencyLevel.Eventual,
         }
 
         client = CosmosDbPartitionedStorage(settings_with_options)
         await client.initialize()
 
         assert client.client.connection_policy.DisableSSLVerification is True
-        assert client.client.default_headers['x-ms-consistency-level'] == documents.ConsistencyLevel.Eventual
+        assert (
+            client.client.default_headers["x-ms-consistency-level"]
+            == documents.ConsistencyLevel.Eventual
+        )
 
 
 class TestCosmosDbPartitionedStorageBaseStorageTests:
@@ -108,7 +111,9 @@ class TestCosmosDbPartitionedStorageBaseStorageTests:
     async def test_return_empty_object_when_reading_unknown_key(self):
         await reset()
 
-        test_ran = await StorageBaseTests.return_empty_object_when_reading_unknown_key(get_storage())
+        test_ran = await StorageBaseTests.return_empty_object_when_reading_unknown_key(
+            get_storage()
+        )
 
         assert test_ran
 
@@ -135,7 +140,9 @@ class TestCosmosDbPartitionedStorageBaseStorageTests:
     async def test_does_not_raise_when_writing_no_items(self):
         await reset()
 
-        test_ran = await StorageBaseTests.does_not_raise_when_writing_no_items(get_storage())
+        test_ran = await StorageBaseTests.does_not_raise_when_writing_no_items(
+            get_storage()
+        )
 
         assert test_ran
 

@@ -62,10 +62,7 @@ class CosmosDbPartitionedConfig:
 class CosmosDbPartitionedStorage(Storage):
     """The class for partitioned CosmosDB middleware for the Azure Bot Framework."""
 
-    def __init__(
-        self,
-        config: CosmosDbPartitionedConfig
-    ):
+    def __init__(self, config: CosmosDbPartitionedConfig):
         """Create the storage object.
 
         :param config:
@@ -99,12 +96,17 @@ class CosmosDbPartitionedStorage(Storage):
                 )
                 document_store_item = read_item_response
                 if document_store_item:
-                    store_items[document_store_item["realId"]] = self.__create_si(document_store_item)
+                    store_items[document_store_item["realId"]] = self.__create_si(
+                        document_store_item
+                    )
             # When an item is not found a CosmosException is thrown, but we want to
             # return an empty collection so in this instance we catch and do not rethrow.
             # Throw for any other exception.
             except cosmos_errors.HTTPFailure as err:
-                if err.status_code == cosmos_errors.http_constants.StatusCodes.NOT_FOUND:
+                if (
+                    err.status_code
+                    == cosmos_errors.http_constants.StatusCodes.NOT_FOUND
+                ):
                     continue
                 else:
                     raise err
@@ -135,8 +137,12 @@ class CosmosDbPartitionedStorage(Storage):
             if e_tag == "":
                 raise Exception("cosmosdb_storage.write(): etag missing")
 
-            accessCondition = {"accessCondition": {"type": "IfMatch", "condition": e_tag}}
-            options = accessCondition if e_tag != "*" and e_tag and e_tag != "" else None
+            accessCondition = {
+                "accessCondition": {"type": "IfMatch", "condition": e_tag}
+            }
+            options = (
+                accessCondition if e_tag != "*" and e_tag and e_tag != "" else None
+            )
             try:
                 self.client.UpsertItem(
                     database_or_Container_link=self.__container_link,
@@ -164,7 +170,10 @@ class CosmosDbPartitionedStorage(Storage):
                     options={"partitionKey": escaped_key},
                 )
             except cosmos_errors.HTTPFailure as err:
-                if err.status_code == cosmos_errors.http_constants.StatusCodes.NOT_FOUND:
+                if (
+                    err.status_code
+                    == cosmos_errors.http_constants.StatusCodes.NOT_FOUND
+                ):
                     continue
                 else:
                     raise err
@@ -252,7 +261,6 @@ class CosmosDbPartitionedStorage(Storage):
 
         # loop through attributes and write and return a dict
         return json_dict
-
 
     def __item_link(self, identifier) -> str:
         """Return the item link of a item in the container.
