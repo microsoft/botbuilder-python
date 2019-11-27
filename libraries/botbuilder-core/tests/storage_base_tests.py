@@ -33,7 +33,7 @@ class StorageBaseTests:
 
     @staticmethod
     async def handle_null_keys_when_reading(storage) -> bool:
-        if isinstance(storage, CosmosDbStorage):
+        if isinstance(storage, CosmosDbStorage) or isinstance(storage, MemoryStorage):
             result = await storage.read(None)
             assert len(result.keys()) == 0
         # Catch-all
