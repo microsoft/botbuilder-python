@@ -12,21 +12,26 @@
 from msrest.serialization import Model
 
 
-class ChannelInfo(Model):
-    """A channel info object which describes the channel.
+class O365ConnectorCardActionBase(Model):
+    """O365 connector card action base.
 
-    :param id: Unique identifier representing a channel
-    :type id: str
-    :param name: Name of the channel
+    :param type: Type of the action. Possible values include: 'ViewAction',
+     'OpenUri', 'HttpPOST', 'ActionCard'
+    :type type: str or ~botframework.connector.teams.models.enum
+    :param name: Name of the action that will be used as button title
     :type name: str
+    :param id: Action Id
+    :type id: str
     """
 
     _attribute_map = {
-        "id": {"key": "id", "type": "str"},
+        "type": {"key": "@type", "type": "str"},
         "name": {"key": "name", "type": "str"},
+        "id": {"key": "@id", "type": "str"},
     }
 
     def __init__(self, **kwargs):
-        super(ChannelInfo, self).__init__(**kwargs)
-        self.id = kwargs.get("id", None)
+        super(O365ConnectorCardActionBase, self).__init__(**kwargs)
+        self.type = kwargs.get("type", None)
         self.name = kwargs.get("name", None)
+        self.id = kwargs.get("id", None)

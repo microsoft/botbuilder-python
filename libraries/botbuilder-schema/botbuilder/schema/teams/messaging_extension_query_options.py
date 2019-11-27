@@ -12,21 +12,21 @@
 from msrest.serialization import Model
 
 
-class ChannelInfo(Model):
-    """A channel info object which describes the channel.
+class MessagingExtensionQueryOptions(Model):
+    """Messaging extension query options.
 
-    :param id: Unique identifier representing a channel
-    :type id: str
-    :param name: Name of the channel
-    :type name: str
+    :param skip: Number of entities to skip
+    :type skip: int
+    :param count: Number of entities to fetch
+    :type count: int
     """
 
     _attribute_map = {
-        "id": {"key": "id", "type": "str"},
-        "name": {"key": "name", "type": "str"},
+        "skip": {"key": "skip", "type": "int"},
+        "count": {"key": "count", "type": "int"},
     }
 
     def __init__(self, **kwargs):
-        super(ChannelInfo, self).__init__(**kwargs)
-        self.id = kwargs.get("id", None)
-        self.name = kwargs.get("name", None)
+        super(MessagingExtensionQueryOptions, self).__init__(**kwargs)
+        self.skip = kwargs.get("skip", None)
+        self.count = kwargs.get("count", None)

@@ -12,12 +12,13 @@
 from msrest.serialization import Model
 
 
-class ChannelInfo(Model):
-    """A channel info object which describes the channel.
+class ChannelAccount(Model):
+    """Channel account information needed to route a message.
 
-    :param id: Unique identifier representing a channel
+    :param id: Channel id for the user or bot on this channel (Example:
+     joe@smith.com, or @joesmith or 123456)
     :type id: str
-    :param name: Name of the channel
+    :param name: Display friendly name
     :type name: str
     """
 
@@ -26,7 +27,7 @@ class ChannelInfo(Model):
         "name": {"key": "name", "type": "str"},
     }
 
-    def __init__(self, **kwargs):
-        super(ChannelInfo, self).__init__(**kwargs)
-        self.id = kwargs.get("id", None)
-        self.name = kwargs.get("name", None)
+    def __init__(self, *, id: str = None, name: str = None, **kwargs) -> None:
+        super(ChannelAccount, self).__init__(**kwargs)
+        self.id = id
+        self.name = name

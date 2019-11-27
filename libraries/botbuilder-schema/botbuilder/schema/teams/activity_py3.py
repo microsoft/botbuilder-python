@@ -12,21 +12,18 @@
 from msrest.serialization import Model
 
 
-class ChannelInfo(Model):
-    """A channel info object which describes the channel.
+class Activity(Model):
+    """Dummy class to shadow Activity.
 
-    :param id: Unique identifier representing a channel
-    :type id: str
-    :param name: Name of the channel
-    :type name: str
+    :param dummy_property: Just a dummy property to make binding class being
+     generated.
+    :type dummy_property: str
     """
 
     _attribute_map = {
-        "id": {"key": "id", "type": "str"},
-        "name": {"key": "name", "type": "str"},
+        "dummy_property": {"key": "dummyProperty", "type": "str"},
     }
 
-    def __init__(self, **kwargs):
-        super(ChannelInfo, self).__init__(**kwargs)
-        self.id = kwargs.get("id", None)
-        self.name = kwargs.get("name", None)
+    def __init__(self, *, dummy_property: str = None, **kwargs) -> None:
+        super(Activity, self).__init__(**kwargs)
+        self.dummy_property = dummy_property

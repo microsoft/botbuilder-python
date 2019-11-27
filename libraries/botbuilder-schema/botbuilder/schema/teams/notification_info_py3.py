@@ -12,21 +12,18 @@
 from msrest.serialization import Model
 
 
-class ChannelInfo(Model):
-    """A channel info object which describes the channel.
+class NotificationInfo(Model):
+    """Specifies if a notification is to be sent for the mentions.
 
-    :param id: Unique identifier representing a channel
-    :type id: str
-    :param name: Name of the channel
-    :type name: str
+    :param alert: true if notification is to be sent to the user, false
+     otherwise.
+    :type alert: bool
     """
 
     _attribute_map = {
-        "id": {"key": "id", "type": "str"},
-        "name": {"key": "name", "type": "str"},
+        "alert": {"key": "alert", "type": "bool"},
     }
 
-    def __init__(self, **kwargs):
-        super(ChannelInfo, self).__init__(**kwargs)
-        self.id = kwargs.get("id", None)
-        self.name = kwargs.get("name", None)
+    def __init__(self, *, alert: bool = None, **kwargs) -> None:
+        super(NotificationInfo, self).__init__(**kwargs)
+        self.alert = alert

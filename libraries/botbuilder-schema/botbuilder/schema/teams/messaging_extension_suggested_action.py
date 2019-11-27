@@ -12,21 +12,17 @@
 from msrest.serialization import Model
 
 
-class ChannelInfo(Model):
-    """A channel info object which describes the channel.
+class MessagingExtensionSuggestedAction(Model):
+    """Messaging extension Actions (Only when type is auth or config).
 
-    :param id: Unique identifier representing a channel
-    :type id: str
-    :param name: Name of the channel
-    :type name: str
+    :param actions: Actions
+    :type actions: list[~botframework.connector.teams.models.CardAction]
     """
 
     _attribute_map = {
-        "id": {"key": "id", "type": "str"},
-        "name": {"key": "name", "type": "str"},
+        "actions": {"key": "actions", "type": "[CardAction]"},
     }
 
     def __init__(self, **kwargs):
-        super(ChannelInfo, self).__init__(**kwargs)
-        self.id = kwargs.get("id", None)
-        self.name = kwargs.get("name", None)
+        super(MessagingExtensionSuggestedAction, self).__init__(**kwargs)
+        self.actions = kwargs.get("actions", None)

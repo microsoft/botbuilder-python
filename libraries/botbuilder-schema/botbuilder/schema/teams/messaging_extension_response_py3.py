@@ -12,21 +12,21 @@
 from msrest.serialization import Model
 
 
-class ChannelInfo(Model):
-    """A channel info object which describes the channel.
+class MessagingExtensionResponse(Model):
+    """Messaging extension response.
 
-    :param id: Unique identifier representing a channel
-    :type id: str
-    :param name: Name of the channel
-    :type name: str
+    :param compose_extension:
+    :type compose_extension:
+     ~botframework.connector.teams.models.MessagingExtensionResult
     """
 
     _attribute_map = {
-        "id": {"key": "id", "type": "str"},
-        "name": {"key": "name", "type": "str"},
+        "compose_extension": {
+            "key": "composeExtension",
+            "type": "MessagingExtensionResult",
+        },
     }
 
-    def __init__(self, **kwargs):
-        super(ChannelInfo, self).__init__(**kwargs)
-        self.id = kwargs.get("id", None)
-        self.name = kwargs.get("name", None)
+    def __init__(self, *, compose_extension=None, **kwargs) -> None:
+        super(MessagingExtensionResponse, self).__init__(**kwargs)
+        self.compose_extension = compose_extension

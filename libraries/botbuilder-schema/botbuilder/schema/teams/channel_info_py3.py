@@ -26,7 +26,7 @@ class ChannelInfo(Model):
         "name": {"key": "name", "type": "str"},
     }
 
-    def __init__(self, **kwargs):
+    def __init__(self, *, id: str = None, name: str = None, **kwargs) -> None:
         super(ChannelInfo, self).__init__(**kwargs)
-        self.id = kwargs.get("id", None)
-        self.name = kwargs.get("name", None)
+        self.id = id
+        self.name = name

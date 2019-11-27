@@ -12,21 +12,17 @@
 from msrest.serialization import Model
 
 
-class ChannelInfo(Model):
-    """A channel info object which describes the channel.
+class TenantInfo(Model):
+    """Describes a tenant.
 
-    :param id: Unique identifier representing a channel
+    :param id: Unique identifier representing a tenant
     :type id: str
-    :param name: Name of the channel
-    :type name: str
     """
 
     _attribute_map = {
         "id": {"key": "id", "type": "str"},
-        "name": {"key": "name", "type": "str"},
     }
 
-    def __init__(self, **kwargs):
-        super(ChannelInfo, self).__init__(**kwargs)
-        self.id = kwargs.get("id", None)
-        self.name = kwargs.get("name", None)
+    def __init__(self, *, id: str = None, **kwargs) -> None:
+        super(TenantInfo, self).__init__(**kwargs)
+        self.id = id

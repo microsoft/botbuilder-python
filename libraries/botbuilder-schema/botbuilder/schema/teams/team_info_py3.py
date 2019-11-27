@@ -12,12 +12,12 @@
 from msrest.serialization import Model
 
 
-class ChannelInfo(Model):
-    """A channel info object which describes the channel.
+class TeamInfo(Model):
+    """Describes a team.
 
-    :param id: Unique identifier representing a channel
+    :param id: Unique identifier representing a team
     :type id: str
-    :param name: Name of the channel
+    :param name: Name of team.
     :type name: str
     """
 
@@ -26,7 +26,7 @@ class ChannelInfo(Model):
         "name": {"key": "name", "type": "str"},
     }
 
-    def __init__(self, **kwargs):
-        super(ChannelInfo, self).__init__(**kwargs)
-        self.id = kwargs.get("id", None)
-        self.name = kwargs.get("name", None)
+    def __init__(self, *, id: str = None, name: str = None, **kwargs) -> None:
+        super(TeamInfo, self).__init__(**kwargs)
+        self.id = id
+        self.name = name

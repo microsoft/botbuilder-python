@@ -12,21 +12,22 @@
 from msrest.serialization import Model
 
 
-class ChannelInfo(Model):
-    """A channel info object which describes the channel.
+class O365ConnectorCardOpenUriTarget(Model):
+    """O365 connector card OpenUri target.
 
-    :param id: Unique identifier representing a channel
-    :type id: str
-    :param name: Name of the channel
-    :type name: str
+    :param os: Target operating system. Possible values include: 'default',
+     'iOS', 'android', 'windows'
+    :type os: str or ~botframework.connector.teams.models.enum
+    :param uri: Target url
+    :type uri: str
     """
 
     _attribute_map = {
-        "id": {"key": "id", "type": "str"},
-        "name": {"key": "name", "type": "str"},
+        "os": {"key": "os", "type": "str"},
+        "uri": {"key": "uri", "type": "str"},
     }
 
     def __init__(self, **kwargs):
-        super(ChannelInfo, self).__init__(**kwargs)
-        self.id = kwargs.get("id", None)
-        self.name = kwargs.get("name", None)
+        super(O365ConnectorCardOpenUriTarget, self).__init__(**kwargs)
+        self.os = kwargs.get("os", None)
+        self.uri = kwargs.get("uri", None)

@@ -12,21 +12,18 @@
 from msrest.serialization import Model
 
 
-class ChannelInfo(Model):
-    """A channel info object which describes the channel.
+class ConversationList(Model):
+    """List of channels under a team.
 
-    :param id: Unique identifier representing a channel
-    :type id: str
-    :param name: Name of the channel
-    :type name: str
+    :param conversations:
+    :type conversations:
+     list[~botframework.connector.teams.models.ChannelInfo]
     """
 
     _attribute_map = {
-        "id": {"key": "id", "type": "str"},
-        "name": {"key": "name", "type": "str"},
+        "conversations": {"key": "conversations", "type": "[ChannelInfo]"},
     }
 
-    def __init__(self, **kwargs):
-        super(ChannelInfo, self).__init__(**kwargs)
-        self.id = kwargs.get("id", None)
-        self.name = kwargs.get("name", None)
+    def __init__(self, *, conversations=None, **kwargs) -> None:
+        super(ConversationList, self).__init__(**kwargs)
+        self.conversations = conversations

@@ -12,21 +12,17 @@
 from msrest.serialization import Model
 
 
-class ChannelInfo(Model):
-    """A channel info object which describes the channel.
+class AppBasedLinkQuery(Model):
+    """Invoke request body type for app-based link query.
 
-    :param id: Unique identifier representing a channel
-    :type id: str
-    :param name: Name of the channel
-    :type name: str
+    :param url: Url queried by user
+    :type url: str
     """
 
     _attribute_map = {
-        "id": {"key": "id", "type": "str"},
-        "name": {"key": "name", "type": "str"},
+        "url": {"key": "url", "type": "str"},
     }
 
     def __init__(self, **kwargs):
-        super(ChannelInfo, self).__init__(**kwargs)
-        self.id = kwargs.get("id", None)
-        self.name = kwargs.get("name", None)
+        super(AppBasedLinkQuery, self).__init__(**kwargs)
+        self.url = kwargs.get("url", None)

@@ -12,21 +12,21 @@
 from msrest.serialization import Model
 
 
-class ChannelInfo(Model):
-    """A channel info object which describes the channel.
+class O365ConnectorCardImage(Model):
+    """O365 connector card image.
 
-    :param id: Unique identifier representing a channel
-    :type id: str
-    :param name: Name of the channel
-    :type name: str
+    :param image: URL for the image
+    :type image: str
+    :param title: Alternative text for the image
+    :type title: str
     """
 
     _attribute_map = {
-        "id": {"key": "id", "type": "str"},
-        "name": {"key": "name", "type": "str"},
+        "image": {"key": "image", "type": "str"},
+        "title": {"key": "title", "type": "str"},
     }
 
     def __init__(self, **kwargs):
-        super(ChannelInfo, self).__init__(**kwargs)
-        self.id = kwargs.get("id", None)
-        self.name = kwargs.get("name", None)
+        super(O365ConnectorCardImage, self).__init__(**kwargs)
+        self.image = kwargs.get("image", None)
+        self.title = kwargs.get("title", None)

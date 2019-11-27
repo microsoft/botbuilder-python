@@ -12,21 +12,19 @@
 from msrest.serialization import Model
 
 
-class ChannelInfo(Model):
-    """A channel info object which describes the channel.
+class SigninStateVerificationQuery(Model):
+    """Signin state (part of signin action auth flow) verification invoke query.
 
-    :param id: Unique identifier representing a channel
-    :type id: str
-    :param name: Name of the channel
-    :type name: str
+    :param state:  The state string originally received when the signin web
+     flow is finished with a state posted back to client via tab SDK
+     microsoftTeams.authentication.notifySuccess(state)
+    :type state: str
     """
 
     _attribute_map = {
-        "id": {"key": "id", "type": "str"},
-        "name": {"key": "name", "type": "str"},
+        "state": {"key": "state", "type": "str"},
     }
 
     def __init__(self, **kwargs):
-        super(ChannelInfo, self).__init__(**kwargs)
-        self.id = kwargs.get("id", None)
-        self.name = kwargs.get("name", None)
+        super(SigninStateVerificationQuery, self).__init__(**kwargs)
+        self.state = kwargs.get("state", None)

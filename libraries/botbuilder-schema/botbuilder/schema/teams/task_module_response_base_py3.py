@@ -12,21 +12,18 @@
 from msrest.serialization import Model
 
 
-class ChannelInfo(Model):
-    """A channel info object which describes the channel.
+class TaskModuleResponseBase(Model):
+    """Base class for Task Module responses.
 
-    :param id: Unique identifier representing a channel
-    :type id: str
-    :param name: Name of the channel
-    :type name: str
+    :param type: Choice of action options when responding to the task/submit
+     message. Possible values include: 'message', 'continue'
+    :type type: str or ~botframework.connector.teams.models.enum
     """
 
     _attribute_map = {
-        "id": {"key": "id", "type": "str"},
-        "name": {"key": "name", "type": "str"},
+        "type": {"key": "type", "type": "str"},
     }
 
-    def __init__(self, **kwargs):
-        super(ChannelInfo, self).__init__(**kwargs)
-        self.id = kwargs.get("id", None)
-        self.name = kwargs.get("name", None)
+    def __init__(self, *, type=None, **kwargs) -> None:
+        super(TaskModuleResponseBase, self).__init__(**kwargs)
+        self.type = type

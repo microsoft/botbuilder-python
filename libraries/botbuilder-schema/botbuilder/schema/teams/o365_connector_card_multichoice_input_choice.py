@@ -12,21 +12,21 @@
 from msrest.serialization import Model
 
 
-class ChannelInfo(Model):
-    """A channel info object which describes the channel.
+class O365ConnectorCardMultichoiceInputChoice(Model):
+    """O365O365 connector card multiple choice input item.
 
-    :param id: Unique identifier representing a channel
-    :type id: str
-    :param name: Name of the channel
-    :type name: str
+    :param display: The text rendered on ActionCard.
+    :type display: str
+    :param value: The value received as results.
+    :type value: str
     """
 
     _attribute_map = {
-        "id": {"key": "id", "type": "str"},
-        "name": {"key": "name", "type": "str"},
+        "display": {"key": "display", "type": "str"},
+        "value": {"key": "value", "type": "str"},
     }
 
     def __init__(self, **kwargs):
-        super(ChannelInfo, self).__init__(**kwargs)
-        self.id = kwargs.get("id", None)
-        self.name = kwargs.get("name", None)
+        super(O365ConnectorCardMultichoiceInputChoice, self).__init__(**kwargs)
+        self.display = kwargs.get("display", None)
+        self.value = kwargs.get("value", None)
