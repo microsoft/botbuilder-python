@@ -4,7 +4,7 @@
 import pytest
 
 from botbuilder.core import MemoryStorage, StoreItem
-from tests import StorageBaseTests
+from tests.storage_base_tests import StorageBaseTests
 
 
 def get_storage():

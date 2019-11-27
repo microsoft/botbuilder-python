@@ -3,7 +3,6 @@ from typing import Dict, List
 
 from jsonpickle import encode
 from jsonpickle.unpickler import Unpickler
-
 from azure.storage.blob import BlockBlobService, Blob, PublicAccess
 from botbuilder.core import Storage
 

@@ -5,7 +5,7 @@ import azure.cosmos.errors as cosmos_errors
 from azure.cosmos import documents
 import pytest
 from botbuilder.azure import CosmosDbPartitionedStorage, CosmosDbPartitionedConfig
-from tests import StorageBaseTests
+from tests.storage_base_tests import StorageBaseTests
 
 EMULATOR_RUNNING = False
 

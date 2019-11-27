@@ -4,9 +4,9 @@
 import pytest
 from botbuilder.core import StoreItem
 from botbuilder.azure import BlobStorage, BlobStorageSettings
+from tests.storage_base_tests import StorageBaseTests
 
 # local blob emulator instance blob
-from tests import StorageBaseTests
 
 BLOB_STORAGE_SETTINGS = BlobStorageSettings(
     account_name="",
