@@ -162,7 +162,7 @@ class CosmosDbStorage(Storage):
         """
         if changes is None:
             raise Exception("Changes are required when writing")
-        elif not changes:
+        if not changes:
             return
         try:
             # check if the database and container exists and if not create
@@ -185,7 +185,7 @@ class CosmosDbStorage(Storage):
                 if e_tag == "":
                     raise Exception("cosmosdb_storage.write(): etag missing")
                 # the e_tag will be * for new docs so do an insert
-                elif e_tag == "*" or not e_tag:
+                if e_tag == "*" or not e_tag:
                     self.client.UpsertItem(
                         database_or_Container_link=self.__container_link,
                         document=doc,

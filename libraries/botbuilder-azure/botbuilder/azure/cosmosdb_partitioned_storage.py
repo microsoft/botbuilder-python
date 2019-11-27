@@ -6,7 +6,6 @@ Part of the Azure Bot Framework in Python.
 
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
-from hashlib import sha256
 from typing import Dict, List
 from threading import Semaphore
 import json
@@ -108,8 +107,7 @@ class CosmosDbPartitionedStorage(Storage):
                     == cosmos_errors.http_constants.StatusCodes.NOT_FOUND
                 ):
                     continue
-                else:
-                    raise err
+                raise err
             except Exception as err:
                 raise err
         return store_items
@@ -122,7 +120,7 @@ class CosmosDbPartitionedStorage(Storage):
         """
         if changes is None:
             raise Exception("Changes are required when writing")
-        elif not changes:
+        if not changes:
             return
 
         await self.initialize()
@@ -137,11 +135,11 @@ class CosmosDbPartitionedStorage(Storage):
             if e_tag == "":
                 raise Exception("cosmosdb_storage.write(): etag missing")
 
-            accessCondition = {
+            access_condition = {
                 "accessCondition": {"type": "IfMatch", "condition": e_tag}
             }
             options = (
-                accessCondition if e_tag != "*" and e_tag and e_tag != "" else None
+                access_condition if e_tag != "*" and e_tag and e_tag != "" else None
             )
             try:
                 self.client.UpsertItem(
@@ -175,8 +173,7 @@ class CosmosDbPartitionedStorage(Storage):
                     == cosmos_errors.http_constants.StatusCodes.NOT_FOUND
                 ):
                     continue
-                else:
-                    raise err
+                raise err
             except Exception as err:
                 raise err
 

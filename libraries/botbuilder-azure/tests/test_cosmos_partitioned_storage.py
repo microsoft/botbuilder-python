@@ -38,9 +38,10 @@ class TestCosmosDbPartitionedStorageConstructor:
     async def test_raises_error_when_instantiated_with_no_arguments(self):
         try:
             # noinspection PyArgumentList
+            # pylint: disable=no-value-for-parameter
             CosmosDbPartitionedStorage()
-        except Exception as e:
-            assert e
+        except Exception as error:
+            assert error
 
     @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
@@ -49,8 +50,8 @@ class TestCosmosDbPartitionedStorageConstructor:
         no_endpoint.cosmos_db_endpoint = None
         try:
             CosmosDbPartitionedStorage(no_endpoint)
-        except Exception as e:
-            assert e
+        except Exception as error:
+            assert error
 
     @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
@@ -59,8 +60,8 @@ class TestCosmosDbPartitionedStorageConstructor:
         no_auth_key.auth_key = None
         try:
             CosmosDbPartitionedStorage(no_auth_key)
-        except Exception as e:
-            assert e
+        except Exception as error:
+            assert error
 
     @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
@@ -69,8 +70,8 @@ class TestCosmosDbPartitionedStorageConstructor:
         no_database_id.database_id = None
         try:
             CosmosDbPartitionedStorage(no_database_id)
-        except Exception as e:
-            assert e
+        except Exception as error:
+            assert error
 
     @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
@@ -79,8 +80,8 @@ class TestCosmosDbPartitionedStorageConstructor:
         no_container_id.container_id = None
         try:
             CosmosDbPartitionedStorage(no_container_id)
-        except Exception as e:
-            assert e
+        except Exception as error:
+            assert error
 
     @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio

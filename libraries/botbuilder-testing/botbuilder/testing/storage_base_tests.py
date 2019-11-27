@@ -46,7 +46,7 @@ class StorageBaseTests:
 
     @staticmethod
     async def handle_null_keys_when_reading(storage) -> bool:
-        if isinstance(storage, CosmosDbStorage) or isinstance(storage, MemoryStorage):
+        if isinstance(storage, (CosmosDbStorage, MemoryStorage)):
             result = await storage.read(None)
             assert len(result.keys()) == 0
         # Catch-all
@@ -98,7 +98,7 @@ class StorageBaseTests:
 
     @staticmethod
     async def handle_crazy_keys(storage) -> bool:
-        key = "!@#$%^&*()~/\\><,.?';\"\`~"
+        key = '!@#$%^&*()_+??><":QASD~`'
         store_item = {"id": 1}
         store_items = {key: store_item}
 
@@ -267,11 +267,11 @@ class StorageBaseTests:
         dialogs = DialogSet(dialog_state)
 
         async def exec_test(turn_context: TurnContext) -> None:
-            dc = await dialogs.create_context(turn_context)
+            dialog_context = await dialogs.create_context(turn_context)
 
-            await dc.continue_dialog()
+            await dialog_context.continue_dialog()
             if not turn_context.responded:
-                await dc.begin_dialog(WaterfallDialog.__name__)
+                await dialog_context.begin_dialog(WaterfallDialog.__name__)
             await convo_state.save_changes(turn_context)
 
         adapter = TestAdapter(exec_test)

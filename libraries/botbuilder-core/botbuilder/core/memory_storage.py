@@ -36,7 +36,7 @@ class MemoryStorage(Storage):
     async def write(self, changes: Dict[str, StoreItem]):
         if changes is None:
             raise Exception("Changes are required when writing")
-        elif not changes:
+        if not changes:
             return
         try:
             # iterate over the changes

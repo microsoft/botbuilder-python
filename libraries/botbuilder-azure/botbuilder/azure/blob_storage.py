@@ -64,7 +64,7 @@ class BlobStorage(Storage):
     async def write(self, changes: Dict[str, object]):
         if changes is None:
             raise Exception("Changes are required when writing")
-        elif not changes:
+        if not changes:
             return
 
         self.client.create_container(self.settings.container_name)

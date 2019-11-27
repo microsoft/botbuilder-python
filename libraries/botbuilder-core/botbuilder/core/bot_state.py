@@ -4,11 +4,11 @@
 from abc import abstractmethod
 from copy import deepcopy
 from typing import Callable, Dict, Union
+from jsonpickle.pickler import Pickler
 from botbuilder.core.state_property_accessor import StatePropertyAccessor
 from .turn_context import TurnContext
 from .storage import Storage
 from .property_manager import PropertyManager
-from jsonpickle.pickler import Pickler
 
 
 class CachedBotState:
