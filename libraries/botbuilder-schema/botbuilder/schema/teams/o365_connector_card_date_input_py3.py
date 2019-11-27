@@ -33,14 +33,31 @@ class O365ConnectorCardDateInput(O365ConnectorCardInputBase):
     """
 
     _attribute_map = {
-        'type': {'key': '@type', 'type': 'str'},
-        'id': {'key': 'id', 'type': 'str'},
-        'is_required': {'key': 'isRequired', 'type': 'bool'},
-        'title': {'key': 'title', 'type': 'str'},
-        'value': {'key': 'value', 'type': 'str'},
-        'include_time': {'key': 'includeTime', 'type': 'bool'},
+        "type": {"key": "@type", "type": "str"},
+        "id": {"key": "id", "type": "str"},
+        "is_required": {"key": "isRequired", "type": "bool"},
+        "title": {"key": "title", "type": "str"},
+        "value": {"key": "value", "type": "str"},
+        "include_time": {"key": "includeTime", "type": "bool"},
     }
 
-    def __init__(self, *, type=None, id: str=None, is_required: bool=None, title: str=None, value: str=None, include_time: bool=None, **kwargs) -> None:
-        super(O365ConnectorCardDateInput, self).__init__(type=type, id=id, is_required=is_required, title=title, value=value, **kwargs)
+    def __init__(
+        self,
+        *,
+        type=None,
+        id: str = None,
+        is_required: bool = None,
+        title: str = None,
+        value: str = None,
+        include_time: bool = None,
+        **kwargs
+    ) -> None:
+        super(O365ConnectorCardDateInput, self).__init__(
+            type=type,
+            id=id,
+            is_required=is_required,
+            title=title,
+            value=value,
+            **kwargs
+        )
         self.include_time = include_time

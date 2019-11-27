@@ -24,12 +24,14 @@ class FileInfoCard(Model):
     """
 
     _attribute_map = {
-        'unique_id': {'key': 'uniqueId', 'type': 'str'},
-        'file_type': {'key': 'fileType', 'type': 'str'},
-        'etag': {'key': 'etag', 'type': 'object'},
+        "unique_id": {"key": "uniqueId", "type": "str"},
+        "file_type": {"key": "fileType", "type": "str"},
+        "etag": {"key": "etag", "type": "object"},
     }
 
-    def __init__(self, *, unique_id: str=None, file_type: str=None, etag=None, **kwargs) -> None:
+    def __init__(
+        self, *, unique_id: str = None, file_type: str = None, etag=None, **kwargs
+    ) -> None:
         super(FileInfoCard, self).__init__(**kwargs)
         self.unique_id = unique_id
         self.file_type = file_type

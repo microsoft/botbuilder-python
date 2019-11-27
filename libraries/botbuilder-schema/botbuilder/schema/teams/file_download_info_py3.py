@@ -26,13 +26,21 @@ class FileDownloadInfo(Model):
     """
 
     _attribute_map = {
-        'download_url': {'key': 'downloadUrl', 'type': 'str'},
-        'unique_id': {'key': 'uniqueId', 'type': 'str'},
-        'file_type': {'key': 'fileType', 'type': 'str'},
-        'etag': {'key': 'etag', 'type': 'object'},
+        "download_url": {"key": "downloadUrl", "type": "str"},
+        "unique_id": {"key": "uniqueId", "type": "str"},
+        "file_type": {"key": "fileType", "type": "str"},
+        "etag": {"key": "etag", "type": "object"},
     }
 
-    def __init__(self, *, download_url: str=None, unique_id: str=None, file_type: str=None, etag=None, **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        download_url: str = None,
+        unique_id: str = None,
+        file_type: str = None,
+        etag=None,
+        **kwargs
+    ) -> None:
         super(FileDownloadInfo, self).__init__(**kwargs)
         self.download_url = download_url
         self.unique_id = unique_id

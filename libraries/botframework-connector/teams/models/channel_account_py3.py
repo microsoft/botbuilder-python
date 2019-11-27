@@ -23,11 +23,11 @@ class ChannelAccount(Model):
     """
 
     _attribute_map = {
-        'id': {'key': 'id', 'type': 'str'},
-        'name': {'key': 'name', 'type': 'str'},
+        "id": {"key": "id", "type": "str"},
+        "name": {"key": "name", "type": "str"},
     }
 
-    def __init__(self, *, id: str=None, name: str=None, **kwargs) -> None:
+    def __init__(self, *, id: str = None, name: str = None, **kwargs) -> None:
         super(ChannelAccount, self).__init__(**kwargs)
         self.id = id
         self.name = name

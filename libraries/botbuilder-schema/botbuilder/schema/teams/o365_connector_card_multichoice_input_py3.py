@@ -40,18 +40,40 @@ class O365ConnectorCardMultichoiceInput(O365ConnectorCardInputBase):
     """
 
     _attribute_map = {
-        'type': {'key': '@type', 'type': 'str'},
-        'id': {'key': 'id', 'type': 'str'},
-        'is_required': {'key': 'isRequired', 'type': 'bool'},
-        'title': {'key': 'title', 'type': 'str'},
-        'value': {'key': 'value', 'type': 'str'},
-        'choices': {'key': 'choices', 'type': '[O365ConnectorCardMultichoiceInputChoice]'},
-        'style': {'key': 'style', 'type': 'str'},
-        'is_multi_select': {'key': 'isMultiSelect', 'type': 'bool'},
+        "type": {"key": "@type", "type": "str"},
+        "id": {"key": "id", "type": "str"},
+        "is_required": {"key": "isRequired", "type": "bool"},
+        "title": {"key": "title", "type": "str"},
+        "value": {"key": "value", "type": "str"},
+        "choices": {
+            "key": "choices",
+            "type": "[O365ConnectorCardMultichoiceInputChoice]",
+        },
+        "style": {"key": "style", "type": "str"},
+        "is_multi_select": {"key": "isMultiSelect", "type": "bool"},
     }
 
-    def __init__(self, *, type=None, id: str=None, is_required: bool=None, title: str=None, value: str=None, choices=None, style=None, is_multi_select: bool=None, **kwargs) -> None:
-        super(O365ConnectorCardMultichoiceInput, self).__init__(type=type, id=id, is_required=is_required, title=title, value=value, **kwargs)
+    def __init__(
+        self,
+        *,
+        type=None,
+        id: str = None,
+        is_required: bool = None,
+        title: str = None,
+        value: str = None,
+        choices=None,
+        style=None,
+        is_multi_select: bool = None,
+        **kwargs
+    ) -> None:
+        super(O365ConnectorCardMultichoiceInput, self).__init__(
+            type=type,
+            id=id,
+            is_required=is_required,
+            title=title,
+            value=value,
+            **kwargs
+        )
         self.choices = choices
         self.style = style
         self.is_multi_select = is_multi_select

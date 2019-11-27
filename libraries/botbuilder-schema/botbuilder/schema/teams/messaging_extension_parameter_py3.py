@@ -22,11 +22,11 @@ class MessagingExtensionParameter(Model):
     """
 
     _attribute_map = {
-        'name': {'key': 'name', 'type': 'str'},
-        'value': {'key': 'value', 'type': 'object'},
+        "name": {"key": "name", "type": "str"},
+        "value": {"key": "value", "type": "object"},
     }
 
-    def __init__(self, *, name: str=None, value=None, **kwargs) -> None:
+    def __init__(self, *, name: str = None, value=None, **kwargs) -> None:
         super(MessagingExtensionParameter, self).__init__(**kwargs)
         self.name = name
         self.value = value

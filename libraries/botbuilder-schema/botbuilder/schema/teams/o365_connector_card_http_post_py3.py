@@ -27,12 +27,16 @@ class O365ConnectorCardHttpPOST(O365ConnectorCardActionBase):
     """
 
     _attribute_map = {
-        'type': {'key': '@type', 'type': 'str'},
-        'name': {'key': 'name', 'type': 'str'},
-        'id': {'key': '@id', 'type': 'str'},
-        'body': {'key': 'body', 'type': 'str'},
+        "type": {"key": "@type", "type": "str"},
+        "name": {"key": "name", "type": "str"},
+        "id": {"key": "@id", "type": "str"},
+        "body": {"key": "body", "type": "str"},
     }
 
-    def __init__(self, *, type=None, name: str=None, id: str=None, body: str=None, **kwargs) -> None:
-        super(O365ConnectorCardHttpPOST, self).__init__(type=type, name=name, id=id, **kwargs)
+    def __init__(
+        self, *, type=None, name: str = None, id: str = None, body: str = None, **kwargs
+    ) -> None:
+        super(O365ConnectorCardHttpPOST, self).__init__(
+            type=type, name=name, id=id, **kwargs
+        )
         self.body = body

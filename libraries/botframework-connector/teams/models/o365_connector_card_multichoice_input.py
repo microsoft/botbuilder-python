@@ -40,18 +40,21 @@ class O365ConnectorCardMultichoiceInput(O365ConnectorCardInputBase):
     """
 
     _attribute_map = {
-        'type': {'key': '@type', 'type': 'str'},
-        'id': {'key': 'id', 'type': 'str'},
-        'is_required': {'key': 'isRequired', 'type': 'bool'},
-        'title': {'key': 'title', 'type': 'str'},
-        'value': {'key': 'value', 'type': 'str'},
-        'choices': {'key': 'choices', 'type': '[O365ConnectorCardMultichoiceInputChoice]'},
-        'style': {'key': 'style', 'type': 'str'},
-        'is_multi_select': {'key': 'isMultiSelect', 'type': 'bool'},
+        "type": {"key": "@type", "type": "str"},
+        "id": {"key": "id", "type": "str"},
+        "is_required": {"key": "isRequired", "type": "bool"},
+        "title": {"key": "title", "type": "str"},
+        "value": {"key": "value", "type": "str"},
+        "choices": {
+            "key": "choices",
+            "type": "[O365ConnectorCardMultichoiceInputChoice]",
+        },
+        "style": {"key": "style", "type": "str"},
+        "is_multi_select": {"key": "isMultiSelect", "type": "bool"},
     }
 
     def __init__(self, **kwargs):
         super(O365ConnectorCardMultichoiceInput, self).__init__(**kwargs)
-        self.choices = kwargs.get('choices', None)
-        self.style = kwargs.get('style', None)
-        self.is_multi_select = kwargs.get('is_multi_select', None)
+        self.choices = kwargs.get("choices", None)
+        self.style = kwargs.get("style", None)
+        self.is_multi_select = kwargs.get("is_multi_select", None)

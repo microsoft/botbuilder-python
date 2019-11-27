@@ -25,13 +25,13 @@ class CardImage(Model):
     """
 
     _attribute_map = {
-        'url': {'key': 'url', 'type': 'str'},
-        'alt': {'key': 'alt', 'type': 'str'},
-        'tap': {'key': 'tap', 'type': 'CardAction'},
+        "url": {"key": "url", "type": "str"},
+        "alt": {"key": "alt", "type": "str"},
+        "tap": {"key": "tap", "type": "CardAction"},
     }
 
     def __init__(self, **kwargs):
         super(CardImage, self).__init__(**kwargs)
-        self.url = kwargs.get('url', None)
-        self.alt = kwargs.get('alt', None)
-        self.tap = kwargs.get('tap', None)
+        self.url = kwargs.get("url", None)
+        self.alt = kwargs.get("alt", None)
+        self.tap = kwargs.get("tap", None)

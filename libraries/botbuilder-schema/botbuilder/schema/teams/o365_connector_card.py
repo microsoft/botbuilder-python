@@ -32,19 +32,22 @@ class O365ConnectorCard(Model):
     """
 
     _attribute_map = {
-        'title': {'key': 'title', 'type': 'str'},
-        'text': {'key': 'text', 'type': 'str'},
-        'summary': {'key': 'summary', 'type': 'str'},
-        'theme_color': {'key': 'themeColor', 'type': 'str'},
-        'sections': {'key': 'sections', 'type': '[O365ConnectorCardSection]'},
-        'potential_action': {'key': 'potentialAction', 'type': '[O365ConnectorCardActionBase]'},
+        "title": {"key": "title", "type": "str"},
+        "text": {"key": "text", "type": "str"},
+        "summary": {"key": "summary", "type": "str"},
+        "theme_color": {"key": "themeColor", "type": "str"},
+        "sections": {"key": "sections", "type": "[O365ConnectorCardSection]"},
+        "potential_action": {
+            "key": "potentialAction",
+            "type": "[O365ConnectorCardActionBase]",
+        },
     }
 
     def __init__(self, **kwargs):
         super(O365ConnectorCard, self).__init__(**kwargs)
-        self.title = kwargs.get('title', None)
-        self.text = kwargs.get('text', None)
-        self.summary = kwargs.get('summary', None)
-        self.theme_color = kwargs.get('theme_color', None)
-        self.sections = kwargs.get('sections', None)
-        self.potential_action = kwargs.get('potential_action', None)
+        self.title = kwargs.get("title", None)
+        self.text = kwargs.get("text", None)
+        self.summary = kwargs.get("summary", None)
+        self.theme_color = kwargs.get("theme_color", None)
+        self.sections = kwargs.get("sections", None)
+        self.potential_action = kwargs.get("potential_action", None)

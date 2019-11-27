@@ -60,39 +60,42 @@ class MessageActionsPayload(Model):
     """
 
     _attribute_map = {
-        'id': {'key': 'id', 'type': 'str'},
-        'reply_to_id': {'key': 'replyToId', 'type': 'str'},
-        'message_type': {'key': 'messageType', 'type': 'str'},
-        'created_date_time': {'key': 'createdDateTime', 'type': 'str'},
-        'last_modified_date_time': {'key': 'lastModifiedDateTime', 'type': 'str'},
-        'deleted': {'key': 'deleted', 'type': 'bool'},
-        'subject': {'key': 'subject', 'type': 'str'},
-        'summary': {'key': 'summary', 'type': 'str'},
-        'importance': {'key': 'importance', 'type': 'str'},
-        'locale': {'key': 'locale', 'type': 'str'},
-        'from_property': {'key': 'from', 'type': 'MessageActionsPayloadFrom'},
-        'body': {'key': 'body', 'type': 'MessageActionsPayloadBody'},
-        'attachment_layout': {'key': 'attachmentLayout', 'type': 'str'},
-        'attachments': {'key': 'attachments', 'type': '[MessageActionsPayloadAttachment]'},
-        'mentions': {'key': 'mentions', 'type': '[MessageActionsPayloadMention]'},
-        'reactions': {'key': 'reactions', 'type': '[MessageActionsPayloadReaction]'},
+        "id": {"key": "id", "type": "str"},
+        "reply_to_id": {"key": "replyToId", "type": "str"},
+        "message_type": {"key": "messageType", "type": "str"},
+        "created_date_time": {"key": "createdDateTime", "type": "str"},
+        "last_modified_date_time": {"key": "lastModifiedDateTime", "type": "str"},
+        "deleted": {"key": "deleted", "type": "bool"},
+        "subject": {"key": "subject", "type": "str"},
+        "summary": {"key": "summary", "type": "str"},
+        "importance": {"key": "importance", "type": "str"},
+        "locale": {"key": "locale", "type": "str"},
+        "from_property": {"key": "from", "type": "MessageActionsPayloadFrom"},
+        "body": {"key": "body", "type": "MessageActionsPayloadBody"},
+        "attachment_layout": {"key": "attachmentLayout", "type": "str"},
+        "attachments": {
+            "key": "attachments",
+            "type": "[MessageActionsPayloadAttachment]",
+        },
+        "mentions": {"key": "mentions", "type": "[MessageActionsPayloadMention]"},
+        "reactions": {"key": "reactions", "type": "[MessageActionsPayloadReaction]"},
     }
 
     def __init__(self, **kwargs):
         super(MessageActionsPayload, self).__init__(**kwargs)
-        self.id = kwargs.get('id', None)
-        self.reply_to_id = kwargs.get('reply_to_id', None)
-        self.message_type = kwargs.get('message_type', None)
-        self.created_date_time = kwargs.get('created_date_time', None)
-        self.last_modified_date_time = kwargs.get('last_modified_date_time', None)
-        self.deleted = kwargs.get('deleted', None)
-        self.subject = kwargs.get('subject', None)
-        self.summary = kwargs.get('summary', None)
-        self.importance = kwargs.get('importance', None)
-        self.locale = kwargs.get('locale', None)
-        self.from_property = kwargs.get('from_property', None)
-        self.body = kwargs.get('body', None)
-        self.attachment_layout = kwargs.get('attachment_layout', None)
-        self.attachments = kwargs.get('attachments', None)
-        self.mentions = kwargs.get('mentions', None)
-        self.reactions = kwargs.get('reactions', None)
+        self.id = kwargs.get("id", None)
+        self.reply_to_id = kwargs.get("reply_to_id", None)
+        self.message_type = kwargs.get("message_type", None)
+        self.created_date_time = kwargs.get("created_date_time", None)
+        self.last_modified_date_time = kwargs.get("last_modified_date_time", None)
+        self.deleted = kwargs.get("deleted", None)
+        self.subject = kwargs.get("subject", None)
+        self.summary = kwargs.get("summary", None)
+        self.importance = kwargs.get("importance", None)
+        self.locale = kwargs.get("locale", None)
+        self.from_property = kwargs.get("from_property", None)
+        self.body = kwargs.get("body", None)
+        self.attachment_layout = kwargs.get("attachment_layout", None)
+        self.attachments = kwargs.get("attachments", None)
+        self.mentions = kwargs.get("mentions", None)
+        self.reactions = kwargs.get("reactions", None)

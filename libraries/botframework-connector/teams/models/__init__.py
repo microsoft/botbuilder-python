@@ -34,8 +34,12 @@ try:
     from .o365_connector_card_action_card_py3 import O365ConnectorCardActionCard
     from .o365_connector_card_text_input_py3 import O365ConnectorCardTextInput
     from .o365_connector_card_date_input_py3 import O365ConnectorCardDateInput
-    from .o365_connector_card_multichoice_input_choice_py3 import O365ConnectorCardMultichoiceInputChoice
-    from .o365_connector_card_multichoice_input_py3 import O365ConnectorCardMultichoiceInput
+    from .o365_connector_card_multichoice_input_choice_py3 import (
+        O365ConnectorCardMultichoiceInputChoice,
+    )
+    from .o365_connector_card_multichoice_input_py3 import (
+        O365ConnectorCardMultichoiceInput,
+    )
     from .o365_connector_card_action_query_py3 import O365ConnectorCardActionQuery
     from .signin_state_verification_query_py3 import SigninStateVerificationQuery
     from .messaging_extension_query_options_py3 import MessagingExtensionQueryOptions
@@ -44,7 +48,9 @@ try:
     from .activity_py3 import Activity
     from .message_actions_payload_user_py3 import MessageActionsPayloadUser
     from .message_actions_payload_app_py3 import MessageActionsPayloadApp
-    from .message_actions_payload_conversation_py3 import MessageActionsPayloadConversation
+    from .message_actions_payload_conversation_py3 import (
+        MessageActionsPayloadConversation,
+    )
     from .message_actions_payload_from_py3 import MessageActionsPayloadFrom
     from .message_actions_payload_body_py3 import MessageActionsPayloadBody
     from .message_actions_payload_attachment_py3 import MessageActionsPayloadAttachment
@@ -55,9 +61,13 @@ try:
     from .task_module_response_base_py3 import TaskModuleResponseBase
     from .attachment_py3 import Attachment
     from .messaging_extension_attachment_py3 import MessagingExtensionAttachment
-    from .messaging_extension_suggested_action_py3 import MessagingExtensionSuggestedAction
+    from .messaging_extension_suggested_action_py3 import (
+        MessagingExtensionSuggestedAction,
+    )
     from .messaging_extension_result_py3 import MessagingExtensionResult
-    from .messaging_extension_action_response_py3 import MessagingExtensionActionResponse
+    from .messaging_extension_action_response_py3 import (
+        MessagingExtensionActionResponse,
+    )
     from .messaging_extension_response_py3 import MessagingExtensionResponse
     from .file_consent_card_py3 import FileConsentCard
     from .file_download_info_py3 import FileDownloadInfo
@@ -96,7 +106,9 @@ except (SyntaxError, ImportError):
     from .o365_connector_card_action_card import O365ConnectorCardActionCard
     from .o365_connector_card_text_input import O365ConnectorCardTextInput
     from .o365_connector_card_date_input import O365ConnectorCardDateInput
-    from .o365_connector_card_multichoice_input_choice import O365ConnectorCardMultichoiceInputChoice
+    from .o365_connector_card_multichoice_input_choice import (
+        O365ConnectorCardMultichoiceInputChoice,
+    )
     from .o365_connector_card_multichoice_input import O365ConnectorCardMultichoiceInput
     from .o365_connector_card_action_query import O365ConnectorCardActionQuery
     from .signin_state_verification_query import SigninStateVerificationQuery
@@ -135,65 +147,65 @@ except (SyntaxError, ImportError):
     from .app_based_link_query import AppBasedLinkQuery
 
 __all__ = [
-    'ChannelInfo',
-    'ConversationList',
-    'TeamDetails',
-    'TeamInfo',
-    'NotificationInfo',
-    'TenantInfo',
-    'TeamsChannelData',
-    'ChannelAccount',
-    'TeamsChannelAccount',
-    'CardAction',
-    'CardImage',
-    'O365ConnectorCardFact',
-    'O365ConnectorCardImage',
-    'O365ConnectorCardActionBase',
-    'O365ConnectorCardSection',
-    'O365ConnectorCard',
-    'O365ConnectorCardViewAction',
-    'O365ConnectorCardOpenUriTarget',
-    'O365ConnectorCardOpenUri',
-    'O365ConnectorCardHttpPOST',
-    'O365ConnectorCardInputBase',
-    'O365ConnectorCardActionCard',
-    'O365ConnectorCardTextInput',
-    'O365ConnectorCardDateInput',
-    'O365ConnectorCardMultichoiceInputChoice',
-    'O365ConnectorCardMultichoiceInput',
-    'O365ConnectorCardActionQuery',
-    'SigninStateVerificationQuery',
-    'MessagingExtensionQueryOptions',
-    'MessagingExtensionParameter',
-    'MessagingExtensionQuery',
-    'Activity',
-    'MessageActionsPayloadUser',
-    'MessageActionsPayloadApp',
-    'MessageActionsPayloadConversation',
-    'MessageActionsPayloadFrom',
-    'MessageActionsPayloadBody',
-    'MessageActionsPayloadAttachment',
-    'MessageActionsPayloadMention',
-    'MessageActionsPayloadReaction',
-    'MessageActionsPayload',
-    'MessagingExtensionAction',
-    'TaskModuleResponseBase',
-    'Attachment',
-    'MessagingExtensionAttachment',
-    'MessagingExtensionSuggestedAction',
-    'MessagingExtensionResult',
-    'MessagingExtensionActionResponse',
-    'MessagingExtensionResponse',
-    'FileConsentCard',
-    'FileDownloadInfo',
-    'FileInfoCard',
-    'FileUploadInfo',
-    'FileConsentCardResponse',
-    'TaskModuleTaskInfo',
-    'TaskModuleContinueResponse',
-    'TaskModuleMessageResponse',
-    'TaskModuleResponse',
-    'TaskModuleRequestContext',
-    'TaskModuleRequest',
-    'AppBasedLinkQuery',
+    "ChannelInfo",
+    "ConversationList",
+    "TeamDetails",
+    "TeamInfo",
+    "NotificationInfo",
+    "TenantInfo",
+    "TeamsChannelData",
+    "ChannelAccount",
+    "TeamsChannelAccount",
+    "CardAction",
+    "CardImage",
+    "O365ConnectorCardFact",
+    "O365ConnectorCardImage",
+    "O365ConnectorCardActionBase",
+    "O365ConnectorCardSection",
+    "O365ConnectorCard",
+    "O365ConnectorCardViewAction",
+    "O365ConnectorCardOpenUriTarget",
+    "O365ConnectorCardOpenUri",
+    "O365ConnectorCardHttpPOST",
+    "O365ConnectorCardInputBase",
+    "O365ConnectorCardActionCard",
+    "O365ConnectorCardTextInput",
+    "O365ConnectorCardDateInput",
+    "O365ConnectorCardMultichoiceInputChoice",
+    "O365ConnectorCardMultichoiceInput",
+    "O365ConnectorCardActionQuery",
+    "SigninStateVerificationQuery",
+    "MessagingExtensionQueryOptions",
+    "MessagingExtensionParameter",
+    "MessagingExtensionQuery",
+    "Activity",
+    "MessageActionsPayloadUser",
+    "MessageActionsPayloadApp",
+    "MessageActionsPayloadConversation",
+    "MessageActionsPayloadFrom",
+    "MessageActionsPayloadBody",
+    "MessageActionsPayloadAttachment",
+    "MessageActionsPayloadMention",
+    "MessageActionsPayloadReaction",
+    "MessageActionsPayload",
+    "MessagingExtensionAction",
+    "TaskModuleResponseBase",
+    "Attachment",
+    "MessagingExtensionAttachment",
+    "MessagingExtensionSuggestedAction",
+    "MessagingExtensionResult",
+    "MessagingExtensionActionResponse",
+    "MessagingExtensionResponse",
+    "FileConsentCard",
+    "FileDownloadInfo",
+    "FileInfoCard",
+    "FileUploadInfo",
+    "FileConsentCardResponse",
+    "TaskModuleTaskInfo",
+    "TaskModuleContinueResponse",
+    "TaskModuleMessageResponse",
+    "TaskModuleResponse",
+    "TaskModuleRequestContext",
+    "TaskModuleRequest",
+    "AppBasedLinkQuery",
 ]

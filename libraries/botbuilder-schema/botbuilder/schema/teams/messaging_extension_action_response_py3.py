@@ -23,8 +23,11 @@ class MessagingExtensionActionResponse(Model):
     """
 
     _attribute_map = {
-        'task': {'key': 'task', 'type': 'TaskModuleResponseBase'},
-        'compose_extension': {'key': 'composeExtension', 'type': 'MessagingExtensionResult'},
+        "task": {"key": "task", "type": "TaskModuleResponseBase"},
+        "compose_extension": {
+            "key": "composeExtension",
+            "type": "MessagingExtensionResult",
+        },
     }
 
     def __init__(self, *, task=None, compose_extension=None, **kwargs) -> None:

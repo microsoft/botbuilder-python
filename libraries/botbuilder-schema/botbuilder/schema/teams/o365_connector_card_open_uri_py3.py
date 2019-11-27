@@ -28,12 +28,16 @@ class O365ConnectorCardOpenUri(O365ConnectorCardActionBase):
     """
 
     _attribute_map = {
-        'type': {'key': '@type', 'type': 'str'},
-        'name': {'key': 'name', 'type': 'str'},
-        'id': {'key': '@id', 'type': 'str'},
-        'targets': {'key': 'targets', 'type': '[O365ConnectorCardOpenUriTarget]'},
+        "type": {"key": "@type", "type": "str"},
+        "name": {"key": "name", "type": "str"},
+        "id": {"key": "@id", "type": "str"},
+        "targets": {"key": "targets", "type": "[O365ConnectorCardOpenUriTarget]"},
     }
 
-    def __init__(self, *, type=None, name: str=None, id: str=None, targets=None, **kwargs) -> None:
-        super(O365ConnectorCardOpenUri, self).__init__(type=type, name=name, id=id, **kwargs)
+    def __init__(
+        self, *, type=None, name: str = None, id: str = None, targets=None, **kwargs
+    ) -> None:
+        super(O365ConnectorCardOpenUri, self).__init__(
+            type=type, name=name, id=id, **kwargs
+        )
         self.targets = targets

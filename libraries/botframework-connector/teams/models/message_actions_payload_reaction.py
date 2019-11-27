@@ -26,13 +26,13 @@ class MessageActionsPayloadReaction(Model):
     """
 
     _attribute_map = {
-        'reaction_type': {'key': 'reactionType', 'type': 'str'},
-        'created_date_time': {'key': 'createdDateTime', 'type': 'str'},
-        'user': {'key': 'user', 'type': 'MessageActionsPayloadFrom'},
+        "reaction_type": {"key": "reactionType", "type": "str"},
+        "created_date_time": {"key": "createdDateTime", "type": "str"},
+        "user": {"key": "user", "type": "MessageActionsPayloadFrom"},
     }
 
     def __init__(self, **kwargs):
         super(MessageActionsPayloadReaction, self).__init__(**kwargs)
-        self.reaction_type = kwargs.get('reaction_type', None)
-        self.created_date_time = kwargs.get('created_date_time', None)
-        self.user = kwargs.get('user', None)
+        self.reaction_type = kwargs.get("reaction_type", None)
+        self.created_date_time = kwargs.get("created_date_time", None)
+        self.user = kwargs.get("user", None)

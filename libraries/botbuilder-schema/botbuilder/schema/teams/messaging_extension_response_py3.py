@@ -21,7 +21,10 @@ class MessagingExtensionResponse(Model):
     """
 
     _attribute_map = {
-        'compose_extension': {'key': 'composeExtension', 'type': 'MessagingExtensionResult'},
+        "compose_extension": {
+            "key": "composeExtension",
+            "type": "MessagingExtensionResult",
+        },
     }
 
     def __init__(self, *, compose_extension=None, **kwargs) -> None:

@@ -27,12 +27,14 @@ class FileConsentCardResponse(Model):
     """
 
     _attribute_map = {
-        'action': {'key': 'action', 'type': 'str'},
-        'context': {'key': 'context', 'type': 'object'},
-        'upload_info': {'key': 'uploadInfo', 'type': 'FileUploadInfo'},
+        "action": {"key": "action", "type": "str"},
+        "context": {"key": "context", "type": "object"},
+        "upload_info": {"key": "uploadInfo", "type": "FileUploadInfo"},
     }
 
-    def __init__(self, *, action=None, context=None, upload_info=None, **kwargs) -> None:
+    def __init__(
+        self, *, action=None, context=None, upload_info=None, **kwargs
+    ) -> None:
         super(FileConsentCardResponse, self).__init__(**kwargs)
         self.action = action
         self.context = context

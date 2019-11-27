@@ -27,13 +27,16 @@ class MessageActionsPayloadFrom(Model):
     """
 
     _attribute_map = {
-        'user': {'key': 'user', 'type': 'MessageActionsPayloadUser'},
-        'application': {'key': 'application', 'type': 'MessageActionsPayloadApp'},
-        'conversation': {'key': 'conversation', 'type': 'MessageActionsPayloadConversation'},
+        "user": {"key": "user", "type": "MessageActionsPayloadUser"},
+        "application": {"key": "application", "type": "MessageActionsPayloadApp"},
+        "conversation": {
+            "key": "conversation",
+            "type": "MessageActionsPayloadConversation",
+        },
     }
 
     def __init__(self, **kwargs):
         super(MessageActionsPayloadFrom, self).__init__(**kwargs)
-        self.user = kwargs.get('user', None)
-        self.application = kwargs.get('application', None)
-        self.conversation = kwargs.get('conversation', None)
+        self.user = kwargs.get("user", None)
+        self.application = kwargs.get("application", None)
+        self.conversation = kwargs.get("conversation", None)

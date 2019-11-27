@@ -25,12 +25,19 @@ class MessageActionsPayloadUser(Model):
     """
 
     _attribute_map = {
-        'user_identity_type': {'key': 'userIdentityType', 'type': 'str'},
-        'id': {'key': 'id', 'type': 'str'},
-        'display_name': {'key': 'displayName', 'type': 'str'},
+        "user_identity_type": {"key": "userIdentityType", "type": "str"},
+        "id": {"key": "id", "type": "str"},
+        "display_name": {"key": "displayName", "type": "str"},
     }
 
-    def __init__(self, *, user_identity_type=None, id: str=None, display_name: str=None, **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        user_identity_type=None,
+        id: str = None,
+        display_name: str = None,
+        **kwargs
+    ) -> None:
         super(MessageActionsPayloadUser, self).__init__(**kwargs)
         self.user_identity_type = user_identity_type
         self.id = id

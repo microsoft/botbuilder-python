@@ -23,8 +23,8 @@ class TaskModuleContinueResponse(TaskModuleResponseBase):
     """
 
     _attribute_map = {
-        'type': {'key': 'type', 'type': 'str'},
-        'value': {'key': 'value', 'type': 'TaskModuleTaskInfo'},
+        "type": {"key": "type", "type": "str"},
+        "value": {"key": "value", "type": "TaskModuleTaskInfo"},
     }
 
     def __init__(self, *, type=None, value=None, **kwargs) -> None:

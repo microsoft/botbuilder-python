@@ -21,7 +21,7 @@ class TaskModuleResponseBase(Model):
     """
 
     _attribute_map = {
-        'type': {'key': 'type', 'type': 'str'},
+        "type": {"key": "type", "type": "str"},
     }
 
     def __init__(self, *, type=None, **kwargs) -> None:

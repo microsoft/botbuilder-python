@@ -24,10 +24,10 @@ class TaskModuleMessageResponse(TaskModuleResponseBase):
     """
 
     _attribute_map = {
-        'type': {'key': 'type', 'type': 'str'},
-        'value': {'key': 'value', 'type': 'str'},
+        "type": {"key": "type", "type": "str"},
+        "value": {"key": "value", "type": "str"},
     }
 
-    def __init__(self, *, type=None, value: str=None, **kwargs) -> None:
+    def __init__(self, *, type=None, value: str = None, **kwargs) -> None:
         super(TaskModuleMessageResponse, self).__init__(type=type, **kwargs)
         self.value = value

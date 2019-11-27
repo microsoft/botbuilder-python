@@ -30,14 +30,23 @@ class O365ConnectorCardInputBase(Model):
     """
 
     _attribute_map = {
-        'type': {'key': '@type', 'type': 'str'},
-        'id': {'key': 'id', 'type': 'str'},
-        'is_required': {'key': 'isRequired', 'type': 'bool'},
-        'title': {'key': 'title', 'type': 'str'},
-        'value': {'key': 'value', 'type': 'str'},
+        "type": {"key": "@type", "type": "str"},
+        "id": {"key": "id", "type": "str"},
+        "is_required": {"key": "isRequired", "type": "bool"},
+        "title": {"key": "title", "type": "str"},
+        "value": {"key": "value", "type": "str"},
     }
 
-    def __init__(self, *, type=None, id: str=None, is_required: bool=None, title: str=None, value: str=None, **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        type=None,
+        id: str = None,
+        is_required: bool = None,
+        title: str = None,
+        value: str = None,
+        **kwargs
+    ) -> None:
         super(O365ConnectorCardInputBase, self).__init__(**kwargs)
         self.type = type
         self.id = id

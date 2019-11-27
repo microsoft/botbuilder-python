@@ -21,7 +21,7 @@ class ConversationList(Model):
     """
 
     _attribute_map = {
-        'conversations': {'key': 'conversations', 'type': '[ChannelInfo]'},
+        "conversations": {"key": "conversations", "type": "[ChannelInfo]"},
     }
 
     def __init__(self, *, conversations=None, **kwargs) -> None:

@@ -29,14 +29,23 @@ class FileUploadInfo(Model):
     """
 
     _attribute_map = {
-        'name': {'key': 'name', 'type': 'str'},
-        'upload_url': {'key': 'uploadUrl', 'type': 'str'},
-        'content_url': {'key': 'contentUrl', 'type': 'str'},
-        'unique_id': {'key': 'uniqueId', 'type': 'str'},
-        'file_type': {'key': 'fileType', 'type': 'str'},
+        "name": {"key": "name", "type": "str"},
+        "upload_url": {"key": "uploadUrl", "type": "str"},
+        "content_url": {"key": "contentUrl", "type": "str"},
+        "unique_id": {"key": "uniqueId", "type": "str"},
+        "file_type": {"key": "fileType", "type": "str"},
     }
 
-    def __init__(self, *, name: str=None, upload_url: str=None, content_url: str=None, unique_id: str=None, file_type: str=None, **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        name: str = None,
+        upload_url: str = None,
+        content_url: str = None,
+        unique_id: str = None,
+        file_type: str = None,
+        **kwargs
+    ) -> None:
         super(FileUploadInfo, self).__init__(**kwargs)
         self.name = name
         self.upload_url = upload_url

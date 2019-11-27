@@ -22,11 +22,11 @@ class ChannelInfo(Model):
     """
 
     _attribute_map = {
-        'id': {'key': 'id', 'type': 'str'},
-        'name': {'key': 'name', 'type': 'str'},
+        "id": {"key": "id", "type": "str"},
+        "name": {"key": "name", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(ChannelInfo, self).__init__(**kwargs)
-        self.id = kwargs.get('id', None)
-        self.name = kwargs.get('name', None)
+        self.id = kwargs.get("id", None)
+        self.name = kwargs.get("name", None)

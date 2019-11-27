@@ -37,16 +37,27 @@ class TaskModuleTaskInfo(Model):
     """
 
     _attribute_map = {
-        'title': {'key': 'title', 'type': 'str'},
-        'height': {'key': 'height', 'type': 'object'},
-        'width': {'key': 'width', 'type': 'object'},
-        'url': {'key': 'url', 'type': 'str'},
-        'card': {'key': 'card', 'type': 'Attachment'},
-        'fallback_url': {'key': 'fallbackUrl', 'type': 'str'},
-        'completion_bot_id': {'key': 'completionBotId', 'type': 'str'},
+        "title": {"key": "title", "type": "str"},
+        "height": {"key": "height", "type": "object"},
+        "width": {"key": "width", "type": "object"},
+        "url": {"key": "url", "type": "str"},
+        "card": {"key": "card", "type": "Attachment"},
+        "fallback_url": {"key": "fallbackUrl", "type": "str"},
+        "completion_bot_id": {"key": "completionBotId", "type": "str"},
     }
 
-    def __init__(self, *, title: str=None, height=None, width=None, url: str=None, card=None, fallback_url: str=None, completion_bot_id: str=None, **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        title: str = None,
+        height=None,
+        width=None,
+        url: str = None,
+        card=None,
+        fallback_url: str = None,
+        completion_bot_id: str = None,
+        **kwargs
+    ) -> None:
         super(TaskModuleTaskInfo, self).__init__(**kwargs)
         self.title = title
         self.height = height

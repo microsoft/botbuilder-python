@@ -29,17 +29,17 @@ class TeamsChannelData(Model):
     """
 
     _attribute_map = {
-        'channel': {'key': 'channel', 'type': 'ChannelInfo'},
-        'event_type': {'key': 'eventType', 'type': 'str'},
-        'team': {'key': 'team', 'type': 'TeamInfo'},
-        'notification': {'key': 'notification', 'type': 'NotificationInfo'},
-        'tenant': {'key': 'tenant', 'type': 'TenantInfo'},
+        "channel": {"key": "channel", "type": "ChannelInfo"},
+        "event_type": {"key": "eventType", "type": "str"},
+        "team": {"key": "team", "type": "TeamInfo"},
+        "notification": {"key": "notification", "type": "NotificationInfo"},
+        "tenant": {"key": "tenant", "type": "TenantInfo"},
     }
 
     def __init__(self, **kwargs):
         super(TeamsChannelData, self).__init__(**kwargs)
-        self.channel = kwargs.get('channel', None)
-        self.event_type = kwargs.get('event_type', None)
-        self.team = kwargs.get('team', None)
-        self.notification = kwargs.get('notification', None)
-        self.tenant = kwargs.get('tenant', None)
+        self.channel = kwargs.get("channel", None)
+        self.event_type = kwargs.get("event_type", None)
+        self.team = kwargs.get("team", None)
+        self.notification = kwargs.get("notification", None)
+        self.tenant = kwargs.get("tenant", None)

@@ -36,16 +36,34 @@ class O365ConnectorCardTextInput(O365ConnectorCardInputBase):
     """
 
     _attribute_map = {
-        'type': {'key': '@type', 'type': 'str'},
-        'id': {'key': 'id', 'type': 'str'},
-        'is_required': {'key': 'isRequired', 'type': 'bool'},
-        'title': {'key': 'title', 'type': 'str'},
-        'value': {'key': 'value', 'type': 'str'},
-        'is_multiline': {'key': 'isMultiline', 'type': 'bool'},
-        'max_length': {'key': 'maxLength', 'type': 'float'},
+        "type": {"key": "@type", "type": "str"},
+        "id": {"key": "id", "type": "str"},
+        "is_required": {"key": "isRequired", "type": "bool"},
+        "title": {"key": "title", "type": "str"},
+        "value": {"key": "value", "type": "str"},
+        "is_multiline": {"key": "isMultiline", "type": "bool"},
+        "max_length": {"key": "maxLength", "type": "float"},
     }
 
-    def __init__(self, *, type=None, id: str=None, is_required: bool=None, title: str=None, value: str=None, is_multiline: bool=None, max_length: float=None, **kwargs) -> None:
-        super(O365ConnectorCardTextInput, self).__init__(type=type, id=id, is_required=is_required, title=title, value=value, **kwargs)
+    def __init__(
+        self,
+        *,
+        type=None,
+        id: str = None,
+        is_required: bool = None,
+        title: str = None,
+        value: str = None,
+        is_multiline: bool = None,
+        max_length: float = None,
+        **kwargs
+    ) -> None:
+        super(O365ConnectorCardTextInput, self).__init__(
+            type=type,
+            id=id,
+            is_required=is_required,
+            title=title,
+            value=value,
+            **kwargs
+        )
         self.is_multiline = is_multiline
         self.max_length = max_length

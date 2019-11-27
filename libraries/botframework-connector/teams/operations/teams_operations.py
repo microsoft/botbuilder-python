@@ -35,7 +35,8 @@ class TeamsOperations(object):
         self.config = config
 
     def fetch_channel_list(
-            self, team_id, custom_headers=None, raw=False, **operation_config):
+        self, team_id, custom_headers=None, raw=False, **operation_config
+    ):
         """Fetches channel list for a given team.
 
         Fetch the channel list.
@@ -54,9 +55,9 @@ class TeamsOperations(object):
          :class:`HttpOperationError<msrest.exceptions.HttpOperationError>`
         """
         # Construct URL
-        url = self.fetch_channel_list.metadata['url']
+        url = self.fetch_channel_list.metadata["url"]
         path_format_arguments = {
-            'teamId': self._serialize.url("team_id", team_id, 'str')
+            "teamId": self._serialize.url("team_id", team_id, "str")
         }
         url = self._client.format_url(url, **path_format_arguments)
 
@@ -65,7 +66,7 @@ class TeamsOperations(object):
 
         # Construct headers
         header_parameters = {}
-        header_parameters['Accept'] = 'application/json'
+        header_parameters["Accept"] = "application/json"
         if custom_headers:
             header_parameters.update(custom_headers)
 
@@ -79,17 +80,19 @@ class TeamsOperations(object):
         deserialized = None
 
         if response.status_code == 200:
-            deserialized = self._deserialize('ConversationList', response)
+            deserialized = self._deserialize("ConversationList", response)
 
         if raw:
             client_raw_response = ClientRawResponse(deserialized, response)
             return client_raw_response
 
         return deserialized
-    fetch_channel_list.metadata = {'url': '/v3/teams/{teamId}/conversations'}
+
+    fetch_channel_list.metadata = {"url": "/v3/teams/{teamId}/conversations"}
 
     def fetch_team_details(
-            self, team_id, custom_headers=None, raw=False, **operation_config):
+        self, team_id, custom_headers=None, raw=False, **operation_config
+    ):
         """Fetches details related to a team.
 
         Fetch details for a team.
@@ -108,9 +111,9 @@ class TeamsOperations(object):
          :class:`HttpOperationError<msrest.exceptions.HttpOperationError>`
         """
         # Construct URL
-        url = self.fetch_team_details.metadata['url']
+        url = self.fetch_team_details.metadata["url"]
         path_format_arguments = {
-            'teamId': self._serialize.url("team_id", team_id, 'str')
+            "teamId": self._serialize.url("team_id", team_id, "str")
         }
         url = self._client.format_url(url, **path_format_arguments)
 
@@ -119,7 +122,7 @@ class TeamsOperations(object):
 
         # Construct headers
         header_parameters = {}
-        header_parameters['Accept'] = 'application/json'
+        header_parameters["Accept"] = "application/json"
         if custom_headers:
             header_parameters.update(custom_headers)
 
@@ -133,11 +136,12 @@ class TeamsOperations(object):
         deserialized = None
 
         if response.status_code == 200:
-            deserialized = self._deserialize('TeamDetails', response)
+            deserialized = self._deserialize("TeamDetails", response)
 
         if raw:
             client_raw_response = ClientRawResponse(deserialized, response)
             return client_raw_response
 
         return deserialized
-    fetch_team_details.metadata = {'url': '/v3/teams/{teamId}'}
+
+    fetch_team_details.metadata = {"url": "/v3/teams/{teamId}"}

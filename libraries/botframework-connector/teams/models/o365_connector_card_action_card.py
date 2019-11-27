@@ -34,14 +34,14 @@ class O365ConnectorCardActionCard(O365ConnectorCardActionBase):
     """
 
     _attribute_map = {
-        'type': {'key': '@type', 'type': 'str'},
-        'name': {'key': 'name', 'type': 'str'},
-        'id': {'key': '@id', 'type': 'str'},
-        'inputs': {'key': 'inputs', 'type': '[O365ConnectorCardInputBase]'},
-        'actions': {'key': 'actions', 'type': '[O365ConnectorCardActionBase]'},
+        "type": {"key": "@type", "type": "str"},
+        "name": {"key": "name", "type": "str"},
+        "id": {"key": "@id", "type": "str"},
+        "inputs": {"key": "inputs", "type": "[O365ConnectorCardInputBase]"},
+        "actions": {"key": "actions", "type": "[O365ConnectorCardActionBase]"},
     }
 
     def __init__(self, **kwargs):
         super(O365ConnectorCardActionCard, self).__init__(**kwargs)
-        self.inputs = kwargs.get('inputs', None)
-        self.actions = kwargs.get('actions', None)
+        self.inputs = kwargs.get("inputs", None)
+        self.actions = kwargs.get("actions", None)

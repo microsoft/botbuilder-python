@@ -23,11 +23,11 @@ class O365ConnectorCardOpenUriTarget(Model):
     """
 
     _attribute_map = {
-        'os': {'key': 'os', 'type': 'str'},
-        'uri': {'key': 'uri', 'type': 'str'},
+        "os": {"key": "os", "type": "str"},
+        "uri": {"key": "uri", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(O365ConnectorCardOpenUriTarget, self).__init__(**kwargs)
-        self.os = kwargs.get('os', None)
-        self.uri = kwargs.get('uri', None)
+        self.os = kwargs.get("os", None)
+        self.uri = kwargs.get("uri", None)

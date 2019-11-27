@@ -60,25 +60,48 @@ class MessageActionsPayload(Model):
     """
 
     _attribute_map = {
-        'id': {'key': 'id', 'type': 'str'},
-        'reply_to_id': {'key': 'replyToId', 'type': 'str'},
-        'message_type': {'key': 'messageType', 'type': 'str'},
-        'created_date_time': {'key': 'createdDateTime', 'type': 'str'},
-        'last_modified_date_time': {'key': 'lastModifiedDateTime', 'type': 'str'},
-        'deleted': {'key': 'deleted', 'type': 'bool'},
-        'subject': {'key': 'subject', 'type': 'str'},
-        'summary': {'key': 'summary', 'type': 'str'},
-        'importance': {'key': 'importance', 'type': 'str'},
-        'locale': {'key': 'locale', 'type': 'str'},
-        'from_property': {'key': 'from', 'type': 'MessageActionsPayloadFrom'},
-        'body': {'key': 'body', 'type': 'MessageActionsPayloadBody'},
-        'attachment_layout': {'key': 'attachmentLayout', 'type': 'str'},
-        'attachments': {'key': 'attachments', 'type': '[MessageActionsPayloadAttachment]'},
-        'mentions': {'key': 'mentions', 'type': '[MessageActionsPayloadMention]'},
-        'reactions': {'key': 'reactions', 'type': '[MessageActionsPayloadReaction]'},
+        "id": {"key": "id", "type": "str"},
+        "reply_to_id": {"key": "replyToId", "type": "str"},
+        "message_type": {"key": "messageType", "type": "str"},
+        "created_date_time": {"key": "createdDateTime", "type": "str"},
+        "last_modified_date_time": {"key": "lastModifiedDateTime", "type": "str"},
+        "deleted": {"key": "deleted", "type": "bool"},
+        "subject": {"key": "subject", "type": "str"},
+        "summary": {"key": "summary", "type": "str"},
+        "importance": {"key": "importance", "type": "str"},
+        "locale": {"key": "locale", "type": "str"},
+        "from_property": {"key": "from", "type": "MessageActionsPayloadFrom"},
+        "body": {"key": "body", "type": "MessageActionsPayloadBody"},
+        "attachment_layout": {"key": "attachmentLayout", "type": "str"},
+        "attachments": {
+            "key": "attachments",
+            "type": "[MessageActionsPayloadAttachment]",
+        },
+        "mentions": {"key": "mentions", "type": "[MessageActionsPayloadMention]"},
+        "reactions": {"key": "reactions", "type": "[MessageActionsPayloadReaction]"},
     }
 
-    def __init__(self, *, id: str=None, reply_to_id: str=None, message_type=None, created_date_time: str=None, last_modified_date_time: str=None, deleted: bool=None, subject: str=None, summary: str=None, importance=None, locale: str=None, from_property=None, body=None, attachment_layout: str=None, attachments=None, mentions=None, reactions=None, **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        id: str = None,
+        reply_to_id: str = None,
+        message_type=None,
+        created_date_time: str = None,
+        last_modified_date_time: str = None,
+        deleted: bool = None,
+        subject: str = None,
+        summary: str = None,
+        importance=None,
+        locale: str = None,
+        from_property=None,
+        body=None,
+        attachment_layout: str = None,
+        attachments=None,
+        mentions=None,
+        reactions=None,
+        **kwargs
+    ) -> None:
         super(MessageActionsPayload, self).__init__(**kwargs)
         self.id = id
         self.reply_to_id = reply_to_id

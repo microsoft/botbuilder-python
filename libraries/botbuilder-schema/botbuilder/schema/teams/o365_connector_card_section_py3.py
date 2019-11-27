@@ -46,20 +46,38 @@ class O365ConnectorCardSection(Model):
     """
 
     _attribute_map = {
-        'title': {'key': 'title', 'type': 'str'},
-        'text': {'key': 'text', 'type': 'str'},
-        'activity_title': {'key': 'activityTitle', 'type': 'str'},
-        'activity_subtitle': {'key': 'activitySubtitle', 'type': 'str'},
-        'activity_text': {'key': 'activityText', 'type': 'str'},
-        'activity_image': {'key': 'activityImage', 'type': 'str'},
-        'activity_image_type': {'key': 'activityImageType', 'type': 'str'},
-        'markdown': {'key': 'markdown', 'type': 'bool'},
-        'facts': {'key': 'facts', 'type': '[O365ConnectorCardFact]'},
-        'images': {'key': 'images', 'type': '[O365ConnectorCardImage]'},
-        'potential_action': {'key': 'potentialAction', 'type': '[O365ConnectorCardActionBase]'},
+        "title": {"key": "title", "type": "str"},
+        "text": {"key": "text", "type": "str"},
+        "activity_title": {"key": "activityTitle", "type": "str"},
+        "activity_subtitle": {"key": "activitySubtitle", "type": "str"},
+        "activity_text": {"key": "activityText", "type": "str"},
+        "activity_image": {"key": "activityImage", "type": "str"},
+        "activity_image_type": {"key": "activityImageType", "type": "str"},
+        "markdown": {"key": "markdown", "type": "bool"},
+        "facts": {"key": "facts", "type": "[O365ConnectorCardFact]"},
+        "images": {"key": "images", "type": "[O365ConnectorCardImage]"},
+        "potential_action": {
+            "key": "potentialAction",
+            "type": "[O365ConnectorCardActionBase]",
+        },
     }
 
-    def __init__(self, *, title: str=None, text: str=None, activity_title: str=None, activity_subtitle: str=None, activity_text: str=None, activity_image: str=None, activity_image_type=None, markdown: bool=None, facts=None, images=None, potential_action=None, **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        title: str = None,
+        text: str = None,
+        activity_title: str = None,
+        activity_subtitle: str = None,
+        activity_text: str = None,
+        activity_image: str = None,
+        activity_image_type=None,
+        markdown: bool = None,
+        facts=None,
+        images=None,
+        potential_action=None,
+        **kwargs
+    ) -> None:
         super(O365ConnectorCardSection, self).__init__(**kwargs)
         self.title = title
         self.text = text

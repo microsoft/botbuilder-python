@@ -24,11 +24,11 @@ class O365ConnectorCardActionQuery(Model):
     """
 
     _attribute_map = {
-        'body': {'key': 'body', 'type': 'str'},
-        'action_id': {'key': 'actionId', 'type': 'str'},
+        "body": {"key": "body", "type": "str"},
+        "action_id": {"key": "actionId", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(O365ConnectorCardActionQuery, self).__init__(**kwargs)
-        self.body = kwargs.get('body', None)
-        self.action_id = kwargs.get('action_id', None)
+        self.body = kwargs.get("body", None)
+        self.action_id = kwargs.get("action_id", None)

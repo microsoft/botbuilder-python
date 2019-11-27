@@ -12,5 +12,5 @@
 from .teams_operations import TeamsOperations
 
 __all__ = [
-    'TeamsOperations',
+    "TeamsOperations",
 ]

@@ -39,19 +39,19 @@ class MessagingExtensionAction(TaskModuleRequest):
     """
 
     _attribute_map = {
-        'data': {'key': 'data', 'type': 'object'},
-        'context': {'key': 'context', 'type': 'TaskModuleRequestContext'},
-        'command_id': {'key': 'commandId', 'type': 'str'},
-        'command_context': {'key': 'commandContext', 'type': 'str'},
-        'bot_message_preview_action': {'key': 'botMessagePreviewAction', 'type': 'str'},
-        'bot_activity_preview': {'key': 'botActivityPreview', 'type': '[Activity]'},
-        'message_payload': {'key': 'messagePayload', 'type': 'MessageActionsPayload'},
+        "data": {"key": "data", "type": "object"},
+        "context": {"key": "context", "type": "TaskModuleRequestContext"},
+        "command_id": {"key": "commandId", "type": "str"},
+        "command_context": {"key": "commandContext", "type": "str"},
+        "bot_message_preview_action": {"key": "botMessagePreviewAction", "type": "str"},
+        "bot_activity_preview": {"key": "botActivityPreview", "type": "[Activity]"},
+        "message_payload": {"key": "messagePayload", "type": "MessageActionsPayload"},
     }
 
     def __init__(self, **kwargs):
         super(MessagingExtensionAction, self).__init__(**kwargs)
-        self.command_id = kwargs.get('command_id', None)
-        self.command_context = kwargs.get('command_context', None)
-        self.bot_message_preview_action = kwargs.get('bot_message_preview_action', None)
-        self.bot_activity_preview = kwargs.get('bot_activity_preview', None)
-        self.message_payload = kwargs.get('message_payload', None)
+        self.command_id = kwargs.get("command_id", None)
+        self.command_context = kwargs.get("command_context", None)
+        self.bot_message_preview_action = kwargs.get("bot_message_preview_action", None)
+        self.bot_activity_preview = kwargs.get("bot_activity_preview", None)
+        self.message_payload = kwargs.get("message_payload", None)

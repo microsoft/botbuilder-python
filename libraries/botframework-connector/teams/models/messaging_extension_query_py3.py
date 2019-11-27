@@ -29,13 +29,24 @@ class MessagingExtensionQuery(Model):
     """
 
     _attribute_map = {
-        'command_id': {'key': 'commandId', 'type': 'str'},
-        'parameters': {'key': 'parameters', 'type': '[MessagingExtensionParameter]'},
-        'query_options': {'key': 'queryOptions', 'type': 'MessagingExtensionQueryOptions'},
-        'state': {'key': 'state', 'type': 'str'},
+        "command_id": {"key": "commandId", "type": "str"},
+        "parameters": {"key": "parameters", "type": "[MessagingExtensionParameter]"},
+        "query_options": {
+            "key": "queryOptions",
+            "type": "MessagingExtensionQueryOptions",
+        },
+        "state": {"key": "state", "type": "str"},
     }
 
-    def __init__(self, *, command_id: str=None, parameters=None, query_options=None, state: str=None, **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        command_id: str = None,
+        parameters=None,
+        query_options=None,
+        state: str = None,
+        **kwargs
+    ) -> None:
         super(MessagingExtensionQuery, self).__init__(**kwargs)
         self.command_id = command_id
         self.parameters = parameters

@@ -27,12 +27,19 @@ class MessageActionsPayloadApp(Model):
     """
 
     _attribute_map = {
-        'application_identity_type': {'key': 'applicationIdentityType', 'type': 'str'},
-        'id': {'key': 'id', 'type': 'str'},
-        'display_name': {'key': 'displayName', 'type': 'str'},
+        "application_identity_type": {"key": "applicationIdentityType", "type": "str"},
+        "id": {"key": "id", "type": "str"},
+        "display_name": {"key": "displayName", "type": "str"},
     }
 
-    def __init__(self, *, application_identity_type=None, id: str=None, display_name: str=None, **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        application_identity_type=None,
+        id: str = None,
+        display_name: str = None,
+        **kwargs
+    ) -> None:
         super(MessageActionsPayloadApp, self).__init__(**kwargs)
         self.application_identity_type = application_identity_type
         self.id = id

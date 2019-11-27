@@ -31,17 +31,17 @@ class TeamsChannelAccount(ChannelAccount):
     """
 
     _attribute_map = {
-        'id': {'key': 'id', 'type': 'str'},
-        'name': {'key': 'name', 'type': 'str'},
-        'given_name': {'key': 'givenName', 'type': 'str'},
-        'surname': {'key': 'surname', 'type': 'str'},
-        'email': {'key': 'email', 'type': 'str'},
-        'user_principal_name': {'key': 'userPrincipalName', 'type': 'str'},
+        "id": {"key": "id", "type": "str"},
+        "name": {"key": "name", "type": "str"},
+        "given_name": {"key": "givenName", "type": "str"},
+        "surname": {"key": "surname", "type": "str"},
+        "email": {"key": "email", "type": "str"},
+        "user_principal_name": {"key": "userPrincipalName", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(TeamsChannelAccount, self).__init__(**kwargs)
-        self.given_name = kwargs.get('given_name', None)
-        self.surname = kwargs.get('surname', None)
-        self.email = kwargs.get('email', None)
-        self.user_principal_name = kwargs.get('user_principal_name', None)
+        self.given_name = kwargs.get("given_name", None)
+        self.surname = kwargs.get("surname", None)
+        self.email = kwargs.get("email", None)
+        self.user_principal_name = kwargs.get("user_principal_name", None)

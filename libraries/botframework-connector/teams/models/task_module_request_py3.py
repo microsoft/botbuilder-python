@@ -23,8 +23,8 @@ class TaskModuleRequest(Model):
     """
 
     _attribute_map = {
-        'data': {'key': 'data', 'type': 'object'},
-        'context': {'key': 'context', 'type': 'TaskModuleRequestContext'},
+        "data": {"key": "data", "type": "object"},
+        "context": {"key": "context", "type": "TaskModuleRequestContext"},
     }
 
     def __init__(self, *, data=None, context=None, **kwargs) -> None:

@@ -23,11 +23,14 @@ class MessagingExtensionActionResponse(Model):
     """
 
     _attribute_map = {
-        'task': {'key': 'task', 'type': 'TaskModuleResponseBase'},
-        'compose_extension': {'key': 'composeExtension', 'type': 'MessagingExtensionResult'},
+        "task": {"key": "task", "type": "TaskModuleResponseBase"},
+        "compose_extension": {
+            "key": "composeExtension",
+            "type": "MessagingExtensionResult",
+        },
     }
 
     def __init__(self, **kwargs):
         super(MessagingExtensionActionResponse, self).__init__(**kwargs)
-        self.task = kwargs.get('task', None)
-        self.compose_extension = kwargs.get('compose_extension', None)
+        self.task = kwargs.get("task", None)
+        self.compose_extension = kwargs.get("compose_extension", None)

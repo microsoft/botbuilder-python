@@ -22,11 +22,11 @@ class MessagingExtensionQueryOptions(Model):
     """
 
     _attribute_map = {
-        'skip': {'key': 'skip', 'type': 'int'},
-        'count': {'key': 'count', 'type': 'int'},
+        "skip": {"key": "skip", "type": "int"},
+        "count": {"key": "count", "type": "int"},
     }
 
     def __init__(self, **kwargs):
         super(MessagingExtensionQueryOptions, self).__init__(**kwargs)
-        self.skip = kwargs.get('skip', None)
-        self.count = kwargs.get('count', None)
+        self.skip = kwargs.get("skip", None)
+        self.count = kwargs.get("count", None)

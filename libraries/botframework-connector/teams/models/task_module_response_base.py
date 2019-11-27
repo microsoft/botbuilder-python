@@ -21,9 +21,9 @@ class TaskModuleResponseBase(Model):
     """
 
     _attribute_map = {
-        'type': {'key': 'type', 'type': 'str'},
+        "type": {"key": "type", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(TaskModuleResponseBase, self).__init__(**kwargs)
-        self.type = kwargs.get('type', None)
+        self.type = kwargs.get("type", None)

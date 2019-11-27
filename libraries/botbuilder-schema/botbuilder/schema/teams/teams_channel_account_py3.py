@@ -31,15 +31,25 @@ class TeamsChannelAccount(ChannelAccount):
     """
 
     _attribute_map = {
-        'id': {'key': 'id', 'type': 'str'},
-        'name': {'key': 'name', 'type': 'str'},
-        'given_name': {'key': 'givenName', 'type': 'str'},
-        'surname': {'key': 'surname', 'type': 'str'},
-        'email': {'key': 'email', 'type': 'str'},
-        'user_principal_name': {'key': 'userPrincipalName', 'type': 'str'},
+        "id": {"key": "id", "type": "str"},
+        "name": {"key": "name", "type": "str"},
+        "given_name": {"key": "givenName", "type": "str"},
+        "surname": {"key": "surname", "type": "str"},
+        "email": {"key": "email", "type": "str"},
+        "user_principal_name": {"key": "userPrincipalName", "type": "str"},
     }
 
-    def __init__(self, *, id: str=None, name: str=None, given_name: str=None, surname: str=None, email: str=None, user_principal_name: str=None, **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        id: str = None,
+        name: str = None,
+        given_name: str = None,
+        surname: str = None,
+        email: str = None,
+        user_principal_name: str = None,
+        **kwargs
+    ) -> None:
         super(TeamsChannelAccount, self).__init__(id=id, name=name, **kwargs)
         self.given_name = given_name
         self.surname = surname

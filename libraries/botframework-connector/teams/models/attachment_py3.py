@@ -28,14 +28,23 @@ class Attachment(Model):
     """
 
     _attribute_map = {
-        'content_type': {'key': 'contentType', 'type': 'str'},
-        'content_url': {'key': 'contentUrl', 'type': 'str'},
-        'content': {'key': 'content', 'type': 'object'},
-        'name': {'key': 'name', 'type': 'str'},
-        'thumbnail_url': {'key': 'thumbnailUrl', 'type': 'str'},
+        "content_type": {"key": "contentType", "type": "str"},
+        "content_url": {"key": "contentUrl", "type": "str"},
+        "content": {"key": "content", "type": "object"},
+        "name": {"key": "name", "type": "str"},
+        "thumbnail_url": {"key": "thumbnailUrl", "type": "str"},
     }
 
-    def __init__(self, *, content_type: str=None, content_url: str=None, content=None, name: str=None, thumbnail_url: str=None, **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        content_type: str = None,
+        content_url: str = None,
+        content=None,
+        name: str = None,
+        thumbnail_url: str = None,
+        **kwargs
+    ) -> None:
         super(Attachment, self).__init__(**kwargs)
         self.content_type = content_type
         self.content_url = content_url

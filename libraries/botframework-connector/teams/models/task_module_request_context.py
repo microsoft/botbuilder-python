@@ -20,9 +20,9 @@ class TaskModuleRequestContext(Model):
     """
 
     _attribute_map = {
-        'theme': {'key': 'theme', 'type': 'str'},
+        "theme": {"key": "theme", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(TaskModuleRequestContext, self).__init__(**kwargs)
-        self.theme = kwargs.get('theme', None)
+        self.theme = kwargs.get("theme", None)

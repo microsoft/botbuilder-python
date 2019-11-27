@@ -46,29 +46,32 @@ class O365ConnectorCardSection(Model):
     """
 
     _attribute_map = {
-        'title': {'key': 'title', 'type': 'str'},
-        'text': {'key': 'text', 'type': 'str'},
-        'activity_title': {'key': 'activityTitle', 'type': 'str'},
-        'activity_subtitle': {'key': 'activitySubtitle', 'type': 'str'},
-        'activity_text': {'key': 'activityText', 'type': 'str'},
-        'activity_image': {'key': 'activityImage', 'type': 'str'},
-        'activity_image_type': {'key': 'activityImageType', 'type': 'str'},
-        'markdown': {'key': 'markdown', 'type': 'bool'},
-        'facts': {'key': 'facts', 'type': '[O365ConnectorCardFact]'},
-        'images': {'key': 'images', 'type': '[O365ConnectorCardImage]'},
-        'potential_action': {'key': 'potentialAction', 'type': '[O365ConnectorCardActionBase]'},
+        "title": {"key": "title", "type": "str"},
+        "text": {"key": "text", "type": "str"},
+        "activity_title": {"key": "activityTitle", "type": "str"},
+        "activity_subtitle": {"key": "activitySubtitle", "type": "str"},
+        "activity_text": {"key": "activityText", "type": "str"},
+        "activity_image": {"key": "activityImage", "type": "str"},
+        "activity_image_type": {"key": "activityImageType", "type": "str"},
+        "markdown": {"key": "markdown", "type": "bool"},
+        "facts": {"key": "facts", "type": "[O365ConnectorCardFact]"},
+        "images": {"key": "images", "type": "[O365ConnectorCardImage]"},
+        "potential_action": {
+            "key": "potentialAction",
+            "type": "[O365ConnectorCardActionBase]",
+        },
     }
 
     def __init__(self, **kwargs):
         super(O365ConnectorCardSection, self).__init__(**kwargs)
-        self.title = kwargs.get('title', None)
-        self.text = kwargs.get('text', None)
-        self.activity_title = kwargs.get('activity_title', None)
-        self.activity_subtitle = kwargs.get('activity_subtitle', None)
-        self.activity_text = kwargs.get('activity_text', None)
-        self.activity_image = kwargs.get('activity_image', None)
-        self.activity_image_type = kwargs.get('activity_image_type', None)
-        self.markdown = kwargs.get('markdown', None)
-        self.facts = kwargs.get('facts', None)
-        self.images = kwargs.get('images', None)
-        self.potential_action = kwargs.get('potential_action', None)
+        self.title = kwargs.get("title", None)
+        self.text = kwargs.get("text", None)
+        self.activity_title = kwargs.get("activity_title", None)
+        self.activity_subtitle = kwargs.get("activity_subtitle", None)
+        self.activity_text = kwargs.get("activity_text", None)
+        self.activity_image = kwargs.get("activity_image", None)
+        self.activity_image_type = kwargs.get("activity_image_type", None)
+        self.markdown = kwargs.get("markdown", None)
+        self.facts = kwargs.get("facts", None)
+        self.images = kwargs.get("images", None)
+        self.potential_action = kwargs.get("potential_action", None)

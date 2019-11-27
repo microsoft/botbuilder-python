@@ -20,7 +20,7 @@ class TaskModuleResponse(Model):
     """
 
     _attribute_map = {
-        'task': {'key': 'task', 'type': 'TaskModuleResponseBase'},
+        "task": {"key": "task", "type": "TaskModuleResponseBase"},
     }
 
     def __init__(self, *, task=None, **kwargs) -> None:

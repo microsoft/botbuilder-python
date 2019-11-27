@@ -29,17 +29,17 @@ class FileUploadInfo(Model):
     """
 
     _attribute_map = {
-        'name': {'key': 'name', 'type': 'str'},
-        'upload_url': {'key': 'uploadUrl', 'type': 'str'},
-        'content_url': {'key': 'contentUrl', 'type': 'str'},
-        'unique_id': {'key': 'uniqueId', 'type': 'str'},
-        'file_type': {'key': 'fileType', 'type': 'str'},
+        "name": {"key": "name", "type": "str"},
+        "upload_url": {"key": "uploadUrl", "type": "str"},
+        "content_url": {"key": "contentUrl", "type": "str"},
+        "unique_id": {"key": "uniqueId", "type": "str"},
+        "file_type": {"key": "fileType", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(FileUploadInfo, self).__init__(**kwargs)
-        self.name = kwargs.get('name', None)
-        self.upload_url = kwargs.get('upload_url', None)
-        self.content_url = kwargs.get('content_url', None)
-        self.unique_id = kwargs.get('unique_id', None)
-        self.file_type = kwargs.get('file_type', None)
+        self.name = kwargs.get("name", None)
+        self.upload_url = kwargs.get("upload_url", None)
+        self.content_url = kwargs.get("content_url", None)
+        self.unique_id = kwargs.get("unique_id", None)
+        self.file_type = kwargs.get("file_type", None)

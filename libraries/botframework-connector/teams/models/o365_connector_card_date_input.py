@@ -33,14 +33,14 @@ class O365ConnectorCardDateInput(O365ConnectorCardInputBase):
     """
 
     _attribute_map = {
-        'type': {'key': '@type', 'type': 'str'},
-        'id': {'key': 'id', 'type': 'str'},
-        'is_required': {'key': 'isRequired', 'type': 'bool'},
-        'title': {'key': 'title', 'type': 'str'},
-        'value': {'key': 'value', 'type': 'str'},
-        'include_time': {'key': 'includeTime', 'type': 'bool'},
+        "type": {"key": "@type", "type": "str"},
+        "id": {"key": "id", "type": "str"},
+        "is_required": {"key": "isRequired", "type": "bool"},
+        "title": {"key": "title", "type": "str"},
+        "value": {"key": "value", "type": "str"},
+        "include_time": {"key": "includeTime", "type": "bool"},
     }
 
     def __init__(self, **kwargs):
         super(O365ConnectorCardDateInput, self).__init__(**kwargs)
-        self.include_time = kwargs.get('include_time', None)
+        self.include_time = kwargs.get("include_time", None)

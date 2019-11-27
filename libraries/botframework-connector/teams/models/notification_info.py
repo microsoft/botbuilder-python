@@ -21,9 +21,9 @@ class NotificationInfo(Model):
     """
 
     _attribute_map = {
-        'alert': {'key': 'alert', 'type': 'bool'},
+        "alert": {"key": "alert", "type": "bool"},
     }
 
     def __init__(self, **kwargs):
         super(NotificationInfo, self).__init__(**kwargs)
-        self.alert = kwargs.get('alert', None)
+        self.alert = kwargs.get("alert", None)

@@ -30,14 +30,31 @@ class MessagingExtensionAttachment(Attachment):
     """
 
     _attribute_map = {
-        'content_type': {'key': 'contentType', 'type': 'str'},
-        'content_url': {'key': 'contentUrl', 'type': 'str'},
-        'content': {'key': 'content', 'type': 'object'},
-        'name': {'key': 'name', 'type': 'str'},
-        'thumbnail_url': {'key': 'thumbnailUrl', 'type': 'str'},
-        'preview': {'key': 'preview', 'type': 'Attachment'},
+        "content_type": {"key": "contentType", "type": "str"},
+        "content_url": {"key": "contentUrl", "type": "str"},
+        "content": {"key": "content", "type": "object"},
+        "name": {"key": "name", "type": "str"},
+        "thumbnail_url": {"key": "thumbnailUrl", "type": "str"},
+        "preview": {"key": "preview", "type": "Attachment"},
     }
 
-    def __init__(self, *, content_type: str=None, content_url: str=None, content=None, name: str=None, thumbnail_url: str=None, preview=None, **kwargs) -> None:
-        super(MessagingExtensionAttachment, self).__init__(content_type=content_type, content_url=content_url, content=content, name=name, thumbnail_url=thumbnail_url, **kwargs)
+    def __init__(
+        self,
+        *,
+        content_type: str = None,
+        content_url: str = None,
+        content=None,
+        name: str = None,
+        thumbnail_url: str = None,
+        preview=None,
+        **kwargs
+    ) -> None:
+        super(MessagingExtensionAttachment, self).__init__(
+            content_type=content_type,
+            content_url=content_url,
+            content=content,
+            name=name,
+            thumbnail_url=thumbnail_url,
+            **kwargs
+        )
         self.preview = preview

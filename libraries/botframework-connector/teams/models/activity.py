@@ -21,9 +21,9 @@ class Activity(Model):
     """
 
     _attribute_map = {
-        'dummy_property': {'key': 'dummyProperty', 'type': 'str'},
+        "dummy_property": {"key": "dummyProperty", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(Activity, self).__init__(**kwargs)
-        self.dummy_property = kwargs.get('dummy_property', None)
+        self.dummy_property = kwargs.get("dummy_property", None)

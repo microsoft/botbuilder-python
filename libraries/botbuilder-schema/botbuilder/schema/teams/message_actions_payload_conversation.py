@@ -27,13 +27,16 @@ class MessageActionsPayloadConversation(Model):
     """
 
     _attribute_map = {
-        'conversation_identity_type': {'key': 'conversationIdentityType', 'type': 'str'},
-        'id': {'key': 'id', 'type': 'str'},
-        'display_name': {'key': 'displayName', 'type': 'str'},
+        "conversation_identity_type": {
+            "key": "conversationIdentityType",
+            "type": "str",
+        },
+        "id": {"key": "id", "type": "str"},
+        "display_name": {"key": "displayName", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(MessageActionsPayloadConversation, self).__init__(**kwargs)
-        self.conversation_identity_type = kwargs.get('conversation_identity_type', None)
-        self.id = kwargs.get('id', None)
-        self.display_name = kwargs.get('display_name', None)
+        self.conversation_identity_type = kwargs.get("conversation_identity_type", None)
+        self.id = kwargs.get("id", None)
+        self.display_name = kwargs.get("display_name", None)

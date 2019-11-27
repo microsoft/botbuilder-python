@@ -37,21 +37,21 @@ class TaskModuleTaskInfo(Model):
     """
 
     _attribute_map = {
-        'title': {'key': 'title', 'type': 'str'},
-        'height': {'key': 'height', 'type': 'object'},
-        'width': {'key': 'width', 'type': 'object'},
-        'url': {'key': 'url', 'type': 'str'},
-        'card': {'key': 'card', 'type': 'Attachment'},
-        'fallback_url': {'key': 'fallbackUrl', 'type': 'str'},
-        'completion_bot_id': {'key': 'completionBotId', 'type': 'str'},
+        "title": {"key": "title", "type": "str"},
+        "height": {"key": "height", "type": "object"},
+        "width": {"key": "width", "type": "object"},
+        "url": {"key": "url", "type": "str"},
+        "card": {"key": "card", "type": "Attachment"},
+        "fallback_url": {"key": "fallbackUrl", "type": "str"},
+        "completion_bot_id": {"key": "completionBotId", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(TaskModuleTaskInfo, self).__init__(**kwargs)
-        self.title = kwargs.get('title', None)
-        self.height = kwargs.get('height', None)
-        self.width = kwargs.get('width', None)
-        self.url = kwargs.get('url', None)
-        self.card = kwargs.get('card', None)
-        self.fallback_url = kwargs.get('fallback_url', None)
-        self.completion_bot_id = kwargs.get('completion_bot_id', None)
+        self.title = kwargs.get("title", None)
+        self.height = kwargs.get("height", None)
+        self.width = kwargs.get("width", None)
+        self.url = kwargs.get("url", None)
+        self.card = kwargs.get("card", None)
+        self.fallback_url = kwargs.get("fallback_url", None)
+        self.completion_bot_id = kwargs.get("completion_bot_id", None)

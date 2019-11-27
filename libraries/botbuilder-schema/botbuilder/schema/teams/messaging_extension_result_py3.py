@@ -35,15 +35,28 @@ class MessagingExtensionResult(Model):
     """
 
     _attribute_map = {
-        'attachment_layout': {'key': 'attachmentLayout', 'type': 'str'},
-        'type': {'key': 'type', 'type': 'str'},
-        'attachments': {'key': 'attachments', 'type': '[MessagingExtensionAttachment]'},
-        'suggested_actions': {'key': 'suggestedActions', 'type': 'MessagingExtensionSuggestedAction'},
-        'text': {'key': 'text', 'type': 'str'},
-        'activity_preview': {'key': 'activityPreview', 'type': 'Activity'},
+        "attachment_layout": {"key": "attachmentLayout", "type": "str"},
+        "type": {"key": "type", "type": "str"},
+        "attachments": {"key": "attachments", "type": "[MessagingExtensionAttachment]"},
+        "suggested_actions": {
+            "key": "suggestedActions",
+            "type": "MessagingExtensionSuggestedAction",
+        },
+        "text": {"key": "text", "type": "str"},
+        "activity_preview": {"key": "activityPreview", "type": "Activity"},
     }
 
-    def __init__(self, *, attachment_layout=None, type=None, attachments=None, suggested_actions=None, text: str=None, activity_preview=None, **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        attachment_layout=None,
+        type=None,
+        attachments=None,
+        suggested_actions=None,
+        text: str = None,
+        activity_preview=None,
+        **kwargs
+    ) -> None:
         super(MessagingExtensionResult, self).__init__(**kwargs)
         self.attachment_layout = attachment_layout
         self.type = type

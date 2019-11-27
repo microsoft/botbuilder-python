@@ -23,11 +23,11 @@ class MessageActionsPayloadBody(Model):
     """
 
     _attribute_map = {
-        'content_type': {'key': 'contentType', 'type': 'str'},
-        'content': {'key': 'content', 'type': 'str'},
+        "content_type": {"key": "contentType", "type": "str"},
+        "content": {"key": "content", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(MessageActionsPayloadBody, self).__init__(**kwargs)
-        self.content_type = kwargs.get('content_type', None)
-        self.content = kwargs.get('content', None)
+        self.content_type = kwargs.get("content_type", None)
+        self.content = kwargs.get("content", None)

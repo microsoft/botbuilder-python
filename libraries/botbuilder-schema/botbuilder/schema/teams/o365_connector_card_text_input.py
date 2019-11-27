@@ -36,16 +36,16 @@ class O365ConnectorCardTextInput(O365ConnectorCardInputBase):
     """
 
     _attribute_map = {
-        'type': {'key': '@type', 'type': 'str'},
-        'id': {'key': 'id', 'type': 'str'},
-        'is_required': {'key': 'isRequired', 'type': 'bool'},
-        'title': {'key': 'title', 'type': 'str'},
-        'value': {'key': 'value', 'type': 'str'},
-        'is_multiline': {'key': 'isMultiline', 'type': 'bool'},
-        'max_length': {'key': 'maxLength', 'type': 'float'},
+        "type": {"key": "@type", "type": "str"},
+        "id": {"key": "id", "type": "str"},
+        "is_required": {"key": "isRequired", "type": "bool"},
+        "title": {"key": "title", "type": "str"},
+        "value": {"key": "value", "type": "str"},
+        "is_multiline": {"key": "isMultiline", "type": "bool"},
+        "max_length": {"key": "maxLength", "type": "float"},
     }
 
     def __init__(self, **kwargs):
         super(O365ConnectorCardTextInput, self).__init__(**kwargs)
-        self.is_multiline = kwargs.get('is_multiline', None)
-        self.max_length = kwargs.get('max_length', None)
+        self.is_multiline = kwargs.get("is_multiline", None)
+        self.max_length = kwargs.get("max_length", None)

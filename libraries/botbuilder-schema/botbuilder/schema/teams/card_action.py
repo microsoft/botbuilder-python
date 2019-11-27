@@ -28,15 +28,15 @@ class CardAction(Model):
     """
 
     _attribute_map = {
-        'type': {'key': 'type', 'type': 'str'},
-        'title': {'key': 'title', 'type': 'str'},
-        'image': {'key': 'image', 'type': 'str'},
-        'value': {'key': 'value', 'type': 'object'},
+        "type": {"key": "type", "type": "str"},
+        "title": {"key": "title", "type": "str"},
+        "image": {"key": "image", "type": "str"},
+        "value": {"key": "value", "type": "object"},
     }
 
     def __init__(self, **kwargs):
         super(CardAction, self).__init__(**kwargs)
-        self.type = kwargs.get('type', None)
-        self.title = kwargs.get('title', None)
-        self.image = kwargs.get('image', None)
-        self.value = kwargs.get('value', None)
+        self.type = kwargs.get("type", None)
+        self.title = kwargs.get("title", None)
+        self.image = kwargs.get("image", None)
+        self.value = kwargs.get("value", None)

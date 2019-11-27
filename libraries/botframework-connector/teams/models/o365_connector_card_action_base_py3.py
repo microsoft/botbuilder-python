@@ -25,12 +25,14 @@ class O365ConnectorCardActionBase(Model):
     """
 
     _attribute_map = {
-        'type': {'key': '@type', 'type': 'str'},
-        'name': {'key': 'name', 'type': 'str'},
-        'id': {'key': '@id', 'type': 'str'},
+        "type": {"key": "@type", "type": "str"},
+        "name": {"key": "name", "type": "str"},
+        "id": {"key": "@id", "type": "str"},
     }
 
-    def __init__(self, *, type=None, name: str=None, id: str=None, **kwargs) -> None:
+    def __init__(
+        self, *, type=None, name: str = None, id: str = None, **kwargs
+    ) -> None:
         super(O365ConnectorCardActionBase, self).__init__(**kwargs)
         self.type = type
         self.name = name

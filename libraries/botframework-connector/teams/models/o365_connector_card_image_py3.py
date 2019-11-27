@@ -22,11 +22,11 @@ class O365ConnectorCardImage(Model):
     """
 
     _attribute_map = {
-        'image': {'key': 'image', 'type': 'str'},
-        'title': {'key': 'title', 'type': 'str'},
+        "image": {"key": "image", "type": "str"},
+        "title": {"key": "title", "type": "str"},
     }
 
-    def __init__(self, *, image: str=None, title: str=None, **kwargs) -> None:
+    def __init__(self, *, image: str = None, title: str = None, **kwargs) -> None:
         super(O365ConnectorCardImage, self).__init__(**kwargs)
         self.image = image
         self.title = title

@@ -22,11 +22,11 @@ class O365ConnectorCardMultichoiceInputChoice(Model):
     """
 
     _attribute_map = {
-        'display': {'key': 'display', 'type': 'str'},
-        'value': {'key': 'value', 'type': 'str'},
+        "display": {"key": "display", "type": "str"},
+        "value": {"key": "value", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(O365ConnectorCardMultichoiceInputChoice, self).__init__(**kwargs)
-        self.display = kwargs.get('display', None)
-        self.value = kwargs.get('value', None)
+        self.display = kwargs.get("display", None)
+        self.value = kwargs.get("value", None)

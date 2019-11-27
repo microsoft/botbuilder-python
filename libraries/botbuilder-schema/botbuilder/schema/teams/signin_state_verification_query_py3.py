@@ -22,9 +22,9 @@ class SigninStateVerificationQuery(Model):
     """
 
     _attribute_map = {
-        'state': {'key': 'state', 'type': 'str'},
+        "state": {"key": "state", "type": "str"},
     }
 
-    def __init__(self, *, state: str=None, **kwargs) -> None:
+    def __init__(self, *, state: str = None, **kwargs) -> None:
         super(SigninStateVerificationQuery, self).__init__(**kwargs)
         self.state = state

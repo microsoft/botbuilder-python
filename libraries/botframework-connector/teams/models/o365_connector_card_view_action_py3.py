@@ -27,12 +27,16 @@ class O365ConnectorCardViewAction(O365ConnectorCardActionBase):
     """
 
     _attribute_map = {
-        'type': {'key': '@type', 'type': 'str'},
-        'name': {'key': 'name', 'type': 'str'},
-        'id': {'key': '@id', 'type': 'str'},
-        'target': {'key': 'target', 'type': '[str]'},
+        "type": {"key": "@type", "type": "str"},
+        "name": {"key": "name", "type": "str"},
+        "id": {"key": "@id", "type": "str"},
+        "target": {"key": "target", "type": "[str]"},
     }
 
-    def __init__(self, *, type=None, name: str=None, id: str=None, target=None, **kwargs) -> None:
-        super(O365ConnectorCardViewAction, self).__init__(type=type, name=name, id=id, **kwargs)
+    def __init__(
+        self, *, type=None, name: str = None, id: str = None, target=None, **kwargs
+    ) -> None:
+        super(O365ConnectorCardViewAction, self).__init__(
+            type=type, name=name, id=id, **kwargs
+        )
         self.target = target

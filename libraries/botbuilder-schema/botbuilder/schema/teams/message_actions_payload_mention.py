@@ -25,13 +25,13 @@ class MessageActionsPayloadMention(Model):
     """
 
     _attribute_map = {
-        'id': {'key': 'id', 'type': 'int'},
-        'mention_text': {'key': 'mentionText', 'type': 'str'},
-        'mentioned': {'key': 'mentioned', 'type': 'MessageActionsPayloadFrom'},
+        "id": {"key": "id", "type": "int"},
+        "mention_text": {"key": "mentionText", "type": "str"},
+        "mentioned": {"key": "mentioned", "type": "MessageActionsPayloadFrom"},
     }
 
     def __init__(self, **kwargs):
         super(MessageActionsPayloadMention, self).__init__(**kwargs)
-        self.id = kwargs.get('id', None)
-        self.mention_text = kwargs.get('mention_text', None)
-        self.mentioned = kwargs.get('mentioned', None)
+        self.id = kwargs.get("id", None)
+        self.mention_text = kwargs.get("mention_text", None)
+        self.mentioned = kwargs.get("mentioned", None)

@@ -22,11 +22,11 @@ class O365ConnectorCardFact(Model):
     """
 
     _attribute_map = {
-        'name': {'key': 'name', 'type': 'str'},
-        'value': {'key': 'value', 'type': 'str'},
+        "name": {"key": "name", "type": "str"},
+        "value": {"key": "value", "type": "str"},
     }
 
-    def __init__(self, *, name: str=None, value: str=None, **kwargs) -> None:
+    def __init__(self, *, name: str = None, value: str = None, **kwargs) -> None:
         super(O365ConnectorCardFact, self).__init__(**kwargs)
         self.name = name
         self.value = value

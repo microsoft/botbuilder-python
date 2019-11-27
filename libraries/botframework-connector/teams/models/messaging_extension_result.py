@@ -35,19 +35,22 @@ class MessagingExtensionResult(Model):
     """
 
     _attribute_map = {
-        'attachment_layout': {'key': 'attachmentLayout', 'type': 'str'},
-        'type': {'key': 'type', 'type': 'str'},
-        'attachments': {'key': 'attachments', 'type': '[MessagingExtensionAttachment]'},
-        'suggested_actions': {'key': 'suggestedActions', 'type': 'MessagingExtensionSuggestedAction'},
-        'text': {'key': 'text', 'type': 'str'},
-        'activity_preview': {'key': 'activityPreview', 'type': 'Activity'},
+        "attachment_layout": {"key": "attachmentLayout", "type": "str"},
+        "type": {"key": "type", "type": "str"},
+        "attachments": {"key": "attachments", "type": "[MessagingExtensionAttachment]"},
+        "suggested_actions": {
+            "key": "suggestedActions",
+            "type": "MessagingExtensionSuggestedAction",
+        },
+        "text": {"key": "text", "type": "str"},
+        "activity_preview": {"key": "activityPreview", "type": "Activity"},
     }
 
     def __init__(self, **kwargs):
         super(MessagingExtensionResult, self).__init__(**kwargs)
-        self.attachment_layout = kwargs.get('attachment_layout', None)
-        self.type = kwargs.get('type', None)
-        self.attachments = kwargs.get('attachments', None)
-        self.suggested_actions = kwargs.get('suggested_actions', None)
-        self.text = kwargs.get('text', None)
-        self.activity_preview = kwargs.get('activity_preview', None)
+        self.attachment_layout = kwargs.get("attachment_layout", None)
+        self.type = kwargs.get("type", None)
+        self.attachments = kwargs.get("attachments", None)
+        self.suggested_actions = kwargs.get("suggested_actions", None)
+        self.text = kwargs.get("text", None)
+        self.activity_preview = kwargs.get("activity_preview", None)

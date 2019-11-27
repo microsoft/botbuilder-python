@@ -32,15 +32,25 @@ class MessageActionsPayloadAttachment(Model):
     """
 
     _attribute_map = {
-        'id': {'key': 'id', 'type': 'str'},
-        'content_type': {'key': 'contentType', 'type': 'str'},
-        'content_url': {'key': 'contentUrl', 'type': 'str'},
-        'content': {'key': 'content', 'type': 'object'},
-        'name': {'key': 'name', 'type': 'str'},
-        'thumbnail_url': {'key': 'thumbnailUrl', 'type': 'str'},
+        "id": {"key": "id", "type": "str"},
+        "content_type": {"key": "contentType", "type": "str"},
+        "content_url": {"key": "contentUrl", "type": "str"},
+        "content": {"key": "content", "type": "object"},
+        "name": {"key": "name", "type": "str"},
+        "thumbnail_url": {"key": "thumbnailUrl", "type": "str"},
     }
 
-    def __init__(self, *, id: str=None, content_type: str=None, content_url: str=None, content=None, name: str=None, thumbnail_url: str=None, **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        id: str = None,
+        content_type: str = None,
+        content_url: str = None,
+        content=None,
+        name: str = None,
+        thumbnail_url: str = None,
+        **kwargs
+    ) -> None:
         super(MessageActionsPayloadAttachment, self).__init__(**kwargs)
         self.id = id
         self.content_type = content_type

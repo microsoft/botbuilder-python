@@ -20,9 +20,9 @@ class AppBasedLinkQuery(Model):
     """
 
     _attribute_map = {
-        'url': {'key': 'url', 'type': 'str'},
+        "url": {"key": "url", "type": "str"},
     }
 
-    def __init__(self, *, url: str=None, **kwargs) -> None:
+    def __init__(self, *, url: str = None, **kwargs) -> None:
         super(AppBasedLinkQuery, self).__init__(**kwargs)
         self.url = url

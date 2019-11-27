@@ -21,9 +21,12 @@ class MessagingExtensionResponse(Model):
     """
 
     _attribute_map = {
-        'compose_extension': {'key': 'composeExtension', 'type': 'MessagingExtensionResult'},
+        "compose_extension": {
+            "key": "composeExtension",
+            "type": "MessagingExtensionResult",
+        },
     }
 
     def __init__(self, **kwargs):
         super(MessagingExtensionResponse, self).__init__(**kwargs)
-        self.compose_extension = kwargs.get('compose_extension', None)
+        self.compose_extension = kwargs.get("compose_extension", None)

@@ -29,13 +29,21 @@ class FileConsentCard(Model):
     """
 
     _attribute_map = {
-        'description': {'key': 'description', 'type': 'str'},
-        'size_in_bytes': {'key': 'sizeInBytes', 'type': 'long'},
-        'accept_context': {'key': 'acceptContext', 'type': 'object'},
-        'decline_context': {'key': 'declineContext', 'type': 'object'},
+        "description": {"key": "description", "type": "str"},
+        "size_in_bytes": {"key": "sizeInBytes", "type": "long"},
+        "accept_context": {"key": "acceptContext", "type": "object"},
+        "decline_context": {"key": "declineContext", "type": "object"},
     }
 
-    def __init__(self, *, description: str=None, size_in_bytes: int=None, accept_context=None, decline_context=None, **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        description: str = None,
+        size_in_bytes: int = None,
+        accept_context=None,
+        decline_context=None,
+        **kwargs
+    ) -> None:
         super(FileConsentCard, self).__init__(**kwargs)
         self.description = description
         self.size_in_bytes = size_in_bytes

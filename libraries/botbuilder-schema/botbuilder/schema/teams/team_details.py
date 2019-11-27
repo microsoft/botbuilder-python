@@ -24,13 +24,13 @@ class TeamDetails(Model):
     """
 
     _attribute_map = {
-        'id': {'key': 'id', 'type': 'str'},
-        'name': {'key': 'name', 'type': 'str'},
-        'aad_group_id': {'key': 'aadGroupId', 'type': 'str'},
+        "id": {"key": "id", "type": "str"},
+        "name": {"key": "name", "type": "str"},
+        "aad_group_id": {"key": "aadGroupId", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(TeamDetails, self).__init__(**kwargs)
-        self.id = kwargs.get('id', None)
-        self.name = kwargs.get('name', None)
-        self.aad_group_id = kwargs.get('aad_group_id', None)
+        self.id = kwargs.get("id", None)
+        self.name = kwargs.get("name", None)
+        self.aad_group_id = kwargs.get("aad_group_id", None)

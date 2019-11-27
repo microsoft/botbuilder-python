@@ -20,7 +20,7 @@ class MessagingExtensionSuggestedAction(Model):
     """
 
     _attribute_map = {
-        'actions': {'key': 'actions', 'type': '[CardAction]'},
+        "actions": {"key": "actions", "type": "[CardAction]"},
     }
 
     def __init__(self, *, actions=None, **kwargs) -> None:

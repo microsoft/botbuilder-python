@@ -32,15 +32,28 @@ class O365ConnectorCard(Model):
     """
 
     _attribute_map = {
-        'title': {'key': 'title', 'type': 'str'},
-        'text': {'key': 'text', 'type': 'str'},
-        'summary': {'key': 'summary', 'type': 'str'},
-        'theme_color': {'key': 'themeColor', 'type': 'str'},
-        'sections': {'key': 'sections', 'type': '[O365ConnectorCardSection]'},
-        'potential_action': {'key': 'potentialAction', 'type': '[O365ConnectorCardActionBase]'},
+        "title": {"key": "title", "type": "str"},
+        "text": {"key": "text", "type": "str"},
+        "summary": {"key": "summary", "type": "str"},
+        "theme_color": {"key": "themeColor", "type": "str"},
+        "sections": {"key": "sections", "type": "[O365ConnectorCardSection]"},
+        "potential_action": {
+            "key": "potentialAction",
+            "type": "[O365ConnectorCardActionBase]",
+        },
     }
 
-    def __init__(self, *, title: str=None, text: str=None, summary: str=None, theme_color: str=None, sections=None, potential_action=None, **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        title: str = None,
+        text: str = None,
+        summary: str = None,
+        theme_color: str = None,
+        sections=None,
+        potential_action=None,
+        **kwargs
+    ) -> None:
         super(O365ConnectorCard, self).__init__(**kwargs)
         self.title = title
         self.text = text

@@ -28,17 +28,17 @@ class Attachment(Model):
     """
 
     _attribute_map = {
-        'content_type': {'key': 'contentType', 'type': 'str'},
-        'content_url': {'key': 'contentUrl', 'type': 'str'},
-        'content': {'key': 'content', 'type': 'object'},
-        'name': {'key': 'name', 'type': 'str'},
-        'thumbnail_url': {'key': 'thumbnailUrl', 'type': 'str'},
+        "content_type": {"key": "contentType", "type": "str"},
+        "content_url": {"key": "contentUrl", "type": "str"},
+        "content": {"key": "content", "type": "object"},
+        "name": {"key": "name", "type": "str"},
+        "thumbnail_url": {"key": "thumbnailUrl", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(Attachment, self).__init__(**kwargs)
-        self.content_type = kwargs.get('content_type', None)
-        self.content_url = kwargs.get('content_url', None)
-        self.content = kwargs.get('content', None)
-        self.name = kwargs.get('name', None)
-        self.thumbnail_url = kwargs.get('thumbnail_url', None)
+        self.content_type = kwargs.get("content_type", None)
+        self.content_url = kwargs.get("content_url", None)
+        self.content = kwargs.get("content", None)
+        self.name = kwargs.get("name", None)
+        self.thumbnail_url = kwargs.get("thumbnail_url", None)
