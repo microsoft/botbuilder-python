@@ -12,8 +12,8 @@ from botbuilder.schema import (
     ConversationAccount,
     ConversationParameters,
     ConversationReference,
-    ResourceResponse,
     TokenResponse,
+    ResourceResponse,
 )
 from botframework.connector import Channels, EmulatorApiClient
 from botframework.connector.aio import ConnectorClient
