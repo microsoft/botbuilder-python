@@ -27,6 +27,7 @@ class ActivityTypes(str, Enum):
     end_of_conversation = "endOfConversation"
     event = "event"
     invoke = "invoke"
+    invoke_response = "invokeResponse"
     delete_user_data = "deleteUserData"
     message_update = "messageUpdate"
     message_delete = "messageDelete"

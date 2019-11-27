@@ -42,7 +42,7 @@ class TestBotAdapter(aiounittest.AsyncTestCase):
 
         resource_response = await context.send_activity(activity)
         self.assertTrue(
-            resource_response.id == activity_id, "Incorrect response Id returned"
+            resource_response.id != activity_id, "Incorrect response Id returned"
         )
 
     async def test_continue_conversation_direct_msg(self):

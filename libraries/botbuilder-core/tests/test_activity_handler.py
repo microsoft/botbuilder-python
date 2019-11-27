@@ -8,6 +8,7 @@ from botbuilder.schema import (
     ChannelAccount,
     ConversationReference,
     MessageReaction,
+    ResourceResponse,
 )
 
 
@@ -66,7 +67,9 @@ class NotImplementedAdapter(BotAdapter):
     ):
         raise NotImplementedError()
 
-    async def send_activities(self, context: TurnContext, activities: List[Activity]):
+    async def send_activities(
+        self, context: TurnContext, activities: List[Activity]
+    ) -> List[ResourceResponse]:
         raise NotImplementedError()
 
     async def update_activity(self, context: TurnContext, activity: Activity):

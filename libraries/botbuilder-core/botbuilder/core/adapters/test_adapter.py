@@ -114,7 +114,9 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         activity.timestamp = activity.timestamp or datetime.utcnow()
         await self.run_pipeline(TurnContext(self, activity), logic)
 
-    async def send_activities(self, context, activities: List[Activity]):
+    async def send_activities(
+        self, context, activities: List[Activity]
+    ) -> List[ResourceResponse]:
         """
         INTERNAL: called by the logic under test to send a set of activities. These will be buffered
         to the current `TestFlow` instance for comparison against the expected results.

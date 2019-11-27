@@ -1,34 +1,51 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+import uuid
+from typing import Dict, List, Union
+from unittest.mock import Mock
 
 import pytest
 
 from botbuilder.schema import Activity
-from botframework.connector.auth import JwtTokenValidation
-from botframework.connector.auth import SimpleCredentialProvider
-from botframework.connector.auth import EmulatorValidation
-from botframework.connector.auth import EnterpriseChannelValidation
-from botframework.connector.auth import ChannelValidation
-from botframework.connector.auth import ClaimsIdentity
-from botframework.connector.auth import MicrosoftAppCredentials
-from botframework.connector.auth import GovernmentConstants
-from botframework.connector.auth import GovernmentChannelValidation
+from botframework.connector.auth import (
+    AuthenticationConfiguration,
+    AuthenticationConstants,
+    JwtTokenValidation,
+    SimpleCredentialProvider,
+    EmulatorValidation,
+    EnterpriseChannelValidation,
+    ChannelValidation,
+    ClaimsIdentity,
+    MicrosoftAppCredentials,
+    GovernmentConstants,
+    GovernmentChannelValidation,
+    SimpleChannelProvider,
+    ChannelProvider,
+)
 
 
 async def jwt_token_validation_validate_auth_header_with_channel_service_succeeds(
-    app_id: str, pwd: str, channel_service: str, header: str = None
+    app_id: str,
+    pwd: str,
+    channel_service_or_provider: Union[str, ChannelProvider],
+    header: str = None,
 ):
     if header is None:
         header = f"Bearer {MicrosoftAppCredentials(app_id, pwd).get_access_token()}"
 
     credentials = SimpleCredentialProvider(app_id, pwd)
     result = await JwtTokenValidation.validate_auth_header(
-        header, credentials, channel_service, "", "https://webchat.botframework.com/"
+        header,
+        credentials,
+        channel_service_or_provider,
+        "",
+        "https://webchat.botframework.com/",
     )
 
     assert result.is_authenticated
 
 
+# TODO: Consider changing to unittest to use ddt for Credentials tests
 class TestAuth:
     EmulatorValidation.TO_BOT_FROM_EMULATOR_TOKEN_VALIDATION_PARAMETERS.ignore_expiration = (
         True
@@ -36,6 +53,27 @@ class TestAuth:
     ChannelValidation.TO_BOT_FROM_CHANNEL_TOKEN_VALIDATION_PARAMETERS.ignore_expiration = (
         True
     )
+
+    @pytest.mark.asyncio
+    async def test_claims_validation(self):
+        claims: List[Dict] = []
+        default_auth_config = AuthenticationConfiguration()
+
+        # No validator should pass.
+        await JwtTokenValidation.validate_claims(default_auth_config, claims)
+
+        # ClaimsValidator configured but no exception should pass.
+        mock_validator = Mock()
+        auth_with_validator = AuthenticationConfiguration(
+            claims_validator=mock_validator
+        )
+
+        # Configure IClaimsValidator to fail
+        mock_validator.side_effect = PermissionError("Invalid claims.")
+        with pytest.raises(PermissionError) as excinfo:
+            await JwtTokenValidation.validate_claims(auth_with_validator, claims)
+
+        assert "Invalid claims." in str(excinfo.value)
 
     @pytest.mark.asyncio
     async def test_connector_auth_header_correct_app_id_and_service_url_should_validate(
@@ -54,7 +92,15 @@ class TestAuth:
             header, credentials, "", "https://webchat.botframework.com/"
         )
 
+        result_with_provider = await JwtTokenValidation.validate_auth_header(
+            header,
+            credentials,
+            SimpleChannelProvider(),
+            "https://webchat.botframework.com/",
+        )
+
         assert result
+        assert result_with_provider
 
     @pytest.mark.asyncio
     async def test_connector_auth_header_with_different_bot_app_id_should_not_validate(
@@ -75,6 +121,15 @@ class TestAuth:
             )
         assert "Unauthorized" in str(excinfo.value)
 
+        with pytest.raises(Exception) as excinfo2:
+            await JwtTokenValidation.validate_auth_header(
+                header,
+                credentials,
+                SimpleChannelProvider(),
+                "https://webchat.botframework.com/",
+            )
+        assert "Unauthorized" in str(excinfo2.value)
+
     @pytest.mark.asyncio
     async def test_connector_auth_header_and_no_credential_should_not_validate(self):
         header = (
@@ -90,6 +145,15 @@ class TestAuth:
             )
         assert "Unauthorized" in str(excinfo.value)
 
+        with pytest.raises(Exception) as excinfo2:
+            await JwtTokenValidation.validate_auth_header(
+                header,
+                credentials,
+                SimpleChannelProvider(),
+                "https://webchat.botframework.com/",
+            )
+        assert "Unauthorized" in str(excinfo2.value)
+
     @pytest.mark.asyncio
     async def test_empty_header_and_no_credential_should_throw(self):
         header = ""
@@ -97,6 +161,12 @@ class TestAuth:
         with pytest.raises(Exception) as excinfo:
             await JwtTokenValidation.validate_auth_header(header, credentials, "", None)
         assert "auth_header" in str(excinfo.value)
+
+        with pytest.raises(Exception) as excinfo2:
+            await JwtTokenValidation.validate_auth_header(
+                header, credentials, SimpleChannelProvider(), None
+            )
+        assert "auth_header" in str(excinfo2.value)
 
     @pytest.mark.asyncio
     async def test_emulator_msa_header_correct_app_id_and_service_url_should_validate(
@@ -115,10 +185,19 @@ class TestAuth:
             header, credentials, "", "https://webchat.botframework.com/"
         )
 
+        result_with_provider = await JwtTokenValidation.validate_auth_header(
+            header,
+            credentials,
+            SimpleChannelProvider(),
+            "https://webchat.botframework.com/",
+        )
+
         assert result
+        assert result_with_provider
 
     @pytest.mark.asyncio
     async def test_emulator_msa_header_and_no_credential_should_not_validate(self):
+        # pylint: disable=protected-access
         header = (
             "Bearer "
             + MicrosoftAppCredentials(
@@ -130,7 +209,13 @@ class TestAuth:
         )
         with pytest.raises(Exception) as excinfo:
             await JwtTokenValidation.validate_auth_header(header, credentials, "", None)
-            assert "Unauthorized" in excinfo
+        assert "Unauthorized" in str(excinfo._excinfo)
+
+        with pytest.raises(Exception) as excinfo2:
+            await JwtTokenValidation.validate_auth_header(
+                header, credentials, SimpleChannelProvider(), None
+            )
+        assert "Unauthorized" in str(excinfo2._excinfo)
 
     # Tests with a valid Token and service url; and ensures that Service url is added to Trusted service url list.
     @pytest.mark.asyncio
@@ -234,6 +319,12 @@ class TestAuth:
             GovernmentConstants.CHANNEL_SERVICE,
         )
 
+        await jwt_token_validation_validate_auth_header_with_channel_service_succeeds(
+            "2cd87869-38a0-4182-9251-d056e8f0ac24",  # emulator creds
+            "2.30Vs3VQLKt974F",
+            SimpleChannelProvider(GovernmentConstants.CHANNEL_SERVICE),
+        )
+
     @pytest.mark.asyncio
     async def test_emulator_auth_header_correct_app_id_and_service_url_with_private_channel_service_should_validate(
         self,
@@ -242,6 +333,12 @@ class TestAuth:
             "2cd87869-38a0-4182-9251-d056e8f0ac24",  # emulator creds
             "2.30Vs3VQLKt974F",
             "TheChannel",
+        )
+
+        await jwt_token_validation_validate_auth_header_with_channel_service_succeeds(
+            "2cd87869-38a0-4182-9251-d056e8f0ac24",  # emulator creds
+            "2.30Vs3VQLKt974F",
+            SimpleChannelProvider("TheChannel"),
         )
 
     @pytest.mark.asyncio
@@ -381,3 +478,28 @@ class TestAuth:
                 credentials,
             )
         assert "Unauthorized" in str(excinfo.value)
+
+    def test_get_app_id_from_claims(self):
+        v1_claims = {}
+        v2_claims = {}
+
+        app_id = str(uuid.uuid4())
+
+        # Empty list
+        assert not JwtTokenValidation.get_app_id_from_claims(v1_claims)
+
+        # AppId there but no version (assumes v1)
+        v1_claims[AuthenticationConstants.APP_ID_CLAIM] = app_id
+        assert JwtTokenValidation.get_app_id_from_claims(v1_claims) == app_id
+
+        # AppId there with v1 version
+        v1_claims[AuthenticationConstants.VERSION_CLAIM] = "1.0"
+        assert JwtTokenValidation.get_app_id_from_claims(v1_claims) == app_id
+
+        # v2 version but no azp
+        v2_claims[AuthenticationConstants.VERSION_CLAIM] = "2.0"
+        assert not JwtTokenValidation.get_app_id_from_claims(v2_claims)
+
+        # v2 version but no azp
+        v2_claims[AuthenticationConstants.AUTHORIZED_PARTY] = app_id
+        assert JwtTokenValidation.get_app_id_from_claims(v2_claims) == app_id
