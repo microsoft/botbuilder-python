@@ -14,7 +14,7 @@ from jsonpickle.pickler import Pickler
 from jsonpickle.unpickler import Unpickler
 import azure.cosmos.cosmos_client as cosmos_client  # pylint: disable=no-name-in-module,import-error
 import azure.cosmos.errors as cosmos_errors  # pylint: disable=no-name-in-module,import-error
-from botbuilder.core.storage import Storage, StoreItem
+from botbuilder.core.storage import Storage
 
 
 class CosmosDbConfig:
@@ -171,7 +171,7 @@ class CosmosDbStorage(Storage):
                 # iterate over the changes
             for (key, change) in changes.items():
                 # store the e_tag
-                e_tag = change.e_tag if isinstance(change, StoreItem) else change.get("e_tag", None)
+                e_tag = change.e_tag if hasattr(change, "e_tag") else change.get("e_tag", None)
                 # create the new document
                 doc = {
                     "id": CosmosDbKeyEscape.sanitize_key(key),
