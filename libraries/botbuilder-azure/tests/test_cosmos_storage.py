@@ -7,7 +7,7 @@ from azure.cosmos.cosmos_client import CosmosClient
 import pytest
 from botbuilder.core import StoreItem
 from botbuilder.azure import CosmosDbStorage, CosmosDbConfig
-from tests.storage_base_tests import StorageBaseTests
+from botbuilder.testing import StorageBaseTests
 
 # local cosmosdb emulator instance cosmos_db_config
 COSMOS_DB_CONFIG = CosmosDbConfig(
