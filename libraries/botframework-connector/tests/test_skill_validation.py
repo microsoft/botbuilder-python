@@ -11,6 +11,7 @@ from botframework.connector.auth import (
     SkillValidation,
 )
 
+
 def future_builder(return_val: object) -> Future:
     result = Future()
     result.set_result(return_val)
