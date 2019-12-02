@@ -1,12 +1,10 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import sys
 from typing import List
 from botbuilder.core import MessageFactory, TurnContext
 from botbuilder.schema import ChannelAccount
 from botbuilder.core.teams import TeamsActivityHandler, TeamsInfo
-from botbuilder.schema.teams import ChannelInfo, TeamInfo, TeamsChannelAccount, TeamsChannelData
 
 class RosterBot(TeamsActivityHandler):
     async def on_members_added_activity(
@@ -23,17 +21,6 @@ class RosterBot(TeamsActivityHandler):
     ):
         await turn_context.send_activity(MessageFactory.text(f"Echo: {turn_context.activity.text}"))
 
-        # TODO: mentions seem to not have a 'mentioned' property ... issue with Entity super classes
-        #for e in turn_context.activity.entities:
-        #    await turn_context.send_activity(MessageFactory.text(f"e: {e.serialize()}"))
-
-        #mentions = TurnContext.get_mentions(turn_context.activity)
-        #for mention in mentions:
-        #    await turn_context.send_activity(MessageFactory.text(f"mention.serialize(): {mention.serialize()}"))
-
- 
-        # TODO: remove_recipient_mention currently crashes...
-        #TurnContext.remove_recipient_mention(turn_context.activity)
         text = turn_context.activity.text.strip()
         if "members" in text:
             await self._show_members(turn_context)
@@ -42,7 +29,7 @@ class RosterBot(TeamsActivityHandler):
         elif "details" in text:
             await self._show_details(turn_context)
         else:
-            await turn_context.send_activity(MessageFactory.text(f"Invalid command. Type \"Show channels\" to see a channel list. Type \"Show members\" to see a list of members in a team."))
+            await turn_context.send_activity(MessageFactory.text(f"Invalid command. Type \"Show channels\" to see a channel list. Type \"Show members\" to see a list of members in a team. Type \"Show details\" to see team information."))
 
     async def _show_members(
         self, turn_context: TurnContext
