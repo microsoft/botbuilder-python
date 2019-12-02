@@ -87,7 +87,7 @@ class MicrosoftAppCredentials(Authentication):
             + Constants.TO_CHANNEL_FROM_BOT_TOKEN_ENDPOINT_PATH
         )
         self.oauth_scope = oauth_scope or AUTH_SETTINGS["refreshScope"]
-        self.token_cache_key = app_id + "-cache"
+        self.token_cache_key = app_id + "-cache" if app_id else None
 
     # pylint: disable=arguments-differ
     def signed_session(self, session: requests.Session = None) -> requests.Session:

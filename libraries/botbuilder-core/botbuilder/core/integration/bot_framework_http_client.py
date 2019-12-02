@@ -25,7 +25,7 @@ class BotFrameworkHttpClient:
 
     INVOKE_ACTIVITY_NAME = "SkillEvents.ChannelApiInvoke"
     _BOT_IDENTITY_KEY = "BotIdentity"
-    _APP_CREDENTIALS_CACHE: Dict[str:MicrosoftAppCredentials] = {}
+    _APP_CREDENTIALS_CACHE: Dict[str, MicrosoftAppCredentials] = {}
 
     def __init__(
         self,
@@ -56,7 +56,11 @@ class BotFrameworkHttpClient:
             raise RuntimeError("Unable to get appCredentials to connect to the skill")
 
         # Get token for the skill call
-        token = app_credentials.get_access_token()
+        token = (
+            app_credentials.get_access_token()
+            if app_credentials.microsoft_app_id
+            else None
+        )
 
         # Capture current activity settings before changing them.
         # TODO: DO we need to set the activity ID? (events that are created manually don't have it).
@@ -67,17 +71,21 @@ class BotFrameworkHttpClient:
             activity.conversation.id = conversation_id
             activity.service_url = service_url
 
+            headers_dict = {
+                "Content-type": "application/json; charset=utf-8",
+            }
+            if token:
+                headers_dict.update(
+                    {"Authorization": f"Bearer:{token}",}
+                )
+
             json_content = json.dumps(activity.serialize())
             resp = await self._session.post(
-                to_url,
-                data=json_content.encode("utf-8"),
-                headers={
-                    "Authorization": f"Bearer:{token}",
-                    "Content-type": "application/json; charset=utf-8",
-                },
+                to_url, data=json_content.encode("utf-8"), headers=headers_dict,
             )
             resp.raise_for_status()
-            content = await resp.json()
+            data = (await resp.read()).decode()
+            content = json.loads(data) if data else None
 
             if content:
                 return InvokeResponse(status=resp.status_code, body=content)

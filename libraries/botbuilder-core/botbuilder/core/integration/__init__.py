@@ -5,12 +5,12 @@
 # license information.
 # --------------------------------------------------------------------------
 
+from .aiohttp_channel_service import aiohttp_channel_service_routes
 from .bot_framework_http_client import BotFrameworkHttpClient
 from .channel_service_handler import ChannelServiceHandler
-from .skill_conversation_id_factory import SkillConversationIdFactory
 
 __all__ = [
+    "aiohttp_channel_service_routes",
     "BotFrameworkHttpClient",
     "ChannelServiceHandler",
-    "SkillConversationIdFactory",
 ]

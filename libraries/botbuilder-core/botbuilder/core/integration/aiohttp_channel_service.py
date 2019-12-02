@@ -35,11 +35,11 @@ def get_serialized_response(model_or_list: Union[Model, List[Model]]) -> Respons
     return Response(body=json.dumps(json_obj), content_type="application/json")
 
 
-def channel_service_routes(handler: ChannelServiceHandler) -> RouteTableDef:
+def aiohttp_channel_service_routes(handler: ChannelServiceHandler, base_url: str = "") -> RouteTableDef:
     # pylint: disable=unused-variable
     routes = RouteTableDef()
 
-    @routes.post("/{conversation_id}/activities")
+    @routes.post(base_url + "/v3/conversations/{conversation_id}/activities")
     async def send_to_conversation(request: Request):
         activity = await deserialize_from_body(request, Activity)
         result = await handler.handle_send_to_conversation(
@@ -50,7 +50,7 @@ def channel_service_routes(handler: ChannelServiceHandler) -> RouteTableDef:
 
         return get_serialized_response(result)
 
-    @routes.post("/{conversation_id}/activities/{activity_id}")
+    @routes.post(base_url + "/v3/conversations/{conversation_id}/activities/{activity_id}")
     async def reply_to_activity(request: Request):
         activity = await deserialize_from_body(request, Activity)
         result = await handler.handle_reply_to_activity(
@@ -62,7 +62,7 @@ def channel_service_routes(handler: ChannelServiceHandler) -> RouteTableDef:
 
         return get_serialized_response(result)
 
-    @routes.put("/{conversation_id}/activities/{activity_id}")
+    @routes.put(base_url + "/v3/conversations/{conversation_id}/activities/{activity_id}")
     async def update_activity(request: Request):
         activity = await deserialize_from_body(request, Activity)
         result = await handler.handle_update_activity(
@@ -74,7 +74,7 @@ def channel_service_routes(handler: ChannelServiceHandler) -> RouteTableDef:
 
         return get_serialized_response(result)
 
-    @routes.delete("/{conversation_id}/activities/{activity_id}")
+    @routes.delete(base_url + "/v3/conversations/{conversation_id}/activities/{activity_id}")
     async def delete_activity(request: Request):
         await handler.handle_delete_activity(
             request.headers.get("Authorization"),
@@ -84,7 +84,7 @@ def channel_service_routes(handler: ChannelServiceHandler) -> RouteTableDef:
 
         return Response()
 
-    @routes.get("/{conversation_id}/activities/{activity_id}/members")
+    @routes.get(base_url + "/v3/conversations/{conversation_id}/activities/{activity_id}/members")
     async def get_activity_members(request: Request):
         result = await handler.handle_get_activity_members(
             request.headers.get("Authorization"),
@@ -94,7 +94,7 @@ def channel_service_routes(handler: ChannelServiceHandler) -> RouteTableDef:
 
         return get_serialized_response(result)
 
-    @routes.post("/")
+    @routes.post(base_url + "/")
     async def create_conversation(request: Request):
         conversation_parameters = deserialize_from_body(request, ConversationParameters)
         result = await handler.handle_create_conversation(
@@ -103,7 +103,7 @@ def channel_service_routes(handler: ChannelServiceHandler) -> RouteTableDef:
 
         return get_serialized_response(result)
 
-    @routes.get("/")
+    @routes.get(base_url + "/")
     async def get_conversation(request: Request):
         # TODO: continuation token?
         result = await handler.handle_get_conversations(
@@ -112,7 +112,7 @@ def channel_service_routes(handler: ChannelServiceHandler) -> RouteTableDef:
 
         return get_serialized_response(result)
 
-    @routes.get("/{conversation_id}/members")
+    @routes.get(base_url + "/v3/conversations/{conversation_id}/members")
     async def get_conversation_members(request: Request):
         result = await handler.handle_get_conversation_members(
             request.headers.get("Authorization"), request.match_info["conversation_id"],
@@ -120,7 +120,7 @@ def channel_service_routes(handler: ChannelServiceHandler) -> RouteTableDef:
 
         return get_serialized_response(result)
 
-    @routes.get("/{conversation_id}/pagedmembers")
+    @routes.get(base_url + "/v3/conversations/{conversation_id}/pagedmembers")
     async def get_conversation_paged_members(request: Request):
         # TODO: continuation token? page size?
         result = await handler.handle_get_conversation_paged_members(
@@ -129,7 +129,7 @@ def channel_service_routes(handler: ChannelServiceHandler) -> RouteTableDef:
 
         return get_serialized_response(result)
 
-    @routes.delete("/{conversation_id}/members/{member_id}")
+    @routes.delete(base_url + "/v3/conversations/{conversation_id}/members/{member_id}")
     async def delete_conversation_member(request: Request):
         result = await handler.handle_delete_conversation_member(
             request.headers.get("Authorization"),
@@ -139,7 +139,7 @@ def channel_service_routes(handler: ChannelServiceHandler) -> RouteTableDef:
 
         return get_serialized_response(result)
 
-    @routes.post("/{conversation_id}/activities/history")
+    @routes.post(base_url + "/v3/conversations/{conversation_id}/activities/history")
     async def send_conversation_history(request: Request):
         transcript = deserialize_from_body(request, Transcript)
         result = await handler.handle_send_conversation_history(
@@ -150,7 +150,7 @@ def channel_service_routes(handler: ChannelServiceHandler) -> RouteTableDef:
 
         return get_serialized_response(result)
 
-    @routes.post("/{conversation_id}/attachments")
+    @routes.post(base_url + "/v3/conversations/{conversation_id}/attachments")
     async def upload_attachment(request: Request):
         attachment_data = deserialize_from_body(request, AttachmentData)
         result = await handler.handle_upload_attachment(
