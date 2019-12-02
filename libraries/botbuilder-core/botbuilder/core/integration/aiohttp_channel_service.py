@@ -35,7 +35,9 @@ def get_serialized_response(model_or_list: Union[Model, List[Model]]) -> Respons
     return Response(body=json.dumps(json_obj), content_type="application/json")
 
 
-def aiohttp_channel_service_routes(handler: ChannelServiceHandler, base_url: str = "") -> RouteTableDef:
+def aiohttp_channel_service_routes(
+    handler: ChannelServiceHandler, base_url: str = ""
+) -> RouteTableDef:
     # pylint: disable=unused-variable
     routes = RouteTableDef()
 
@@ -50,7 +52,9 @@ def aiohttp_channel_service_routes(handler: ChannelServiceHandler, base_url: str
 
         return get_serialized_response(result)
 
-    @routes.post(base_url + "/v3/conversations/{conversation_id}/activities/{activity_id}")
+    @routes.post(
+        base_url + "/v3/conversations/{conversation_id}/activities/{activity_id}"
+    )
     async def reply_to_activity(request: Request):
         activity = await deserialize_from_body(request, Activity)
         result = await handler.handle_reply_to_activity(
@@ -62,7 +66,9 @@ def aiohttp_channel_service_routes(handler: ChannelServiceHandler, base_url: str
 
         return get_serialized_response(result)
 
-    @routes.put(base_url + "/v3/conversations/{conversation_id}/activities/{activity_id}")
+    @routes.put(
+        base_url + "/v3/conversations/{conversation_id}/activities/{activity_id}"
+    )
     async def update_activity(request: Request):
         activity = await deserialize_from_body(request, Activity)
         result = await handler.handle_update_activity(
@@ -74,7 +80,9 @@ def aiohttp_channel_service_routes(handler: ChannelServiceHandler, base_url: str
 
         return get_serialized_response(result)
 
-    @routes.delete(base_url + "/v3/conversations/{conversation_id}/activities/{activity_id}")
+    @routes.delete(
+        base_url + "/v3/conversations/{conversation_id}/activities/{activity_id}"
+    )
     async def delete_activity(request: Request):
         await handler.handle_delete_activity(
             request.headers.get("Authorization"),
@@ -84,7 +92,10 @@ def aiohttp_channel_service_routes(handler: ChannelServiceHandler, base_url: str
 
         return Response()
 
-    @routes.get(base_url + "/v3/conversations/{conversation_id}/activities/{activity_id}/members")
+    @routes.get(
+        base_url
+        + "/v3/conversations/{conversation_id}/activities/{activity_id}/members"
+    )
     async def get_activity_members(request: Request):
         result = await handler.handle_get_activity_members(
             request.headers.get("Authorization"),

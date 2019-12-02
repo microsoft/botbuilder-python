@@ -440,7 +440,9 @@ class ChannelServiceHandler:
 
     async def _authenticate(self, auth_header: str) -> ClaimsIdentity:
         if not auth_header:
-            is_auth_disabled = await self._credential_provider.is_authentication_disabled()
+            is_auth_disabled = (
+                await self._credential_provider.is_authentication_disabled()
+            )
             if is_auth_disabled:
                 # In the scenario where Auth is disabled, we still want to have the
                 # IsAuthenticated flag set in the ClaimsIdentity. To do this requires
