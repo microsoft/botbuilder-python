@@ -10,7 +10,8 @@ from botbuilder.schema.teams import (
     ChannelInfo,
     TeamsChannelData,
     TeamsChannelAccount,
-    FileConsentCardResponse)
+    FileConsentCardResponse,
+)
 from botframework.connector import Channels
 
 
@@ -55,7 +56,8 @@ class TeamsActivityHandler(ActivityHandler):
 
             if turn_context.activity.name == "fileConsent/invoke":
                 return await self.on_teams_file_consent(
-                    turn_context, FileConsentCardResponse.deserialize(turn_context.activity.value)
+                    turn_context,
+                    FileConsentCardResponse.deserialize(turn_context.activity.value),
                 )
 
             if turn_context.activity.name == "actionableMessage/executeAction":
@@ -143,7 +145,9 @@ class TeamsActivityHandler(ActivityHandler):
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
     async def on_teams_file_consent(
-        self, turn_context: TurnContext, file_consent_card_response: FileConsentCardResponse
+        self,
+        turn_context: TurnContext,
+        file_consent_card_response: FileConsentCardResponse,
     ):
         if file_consent_card_response.action == "accept":
             await self.on_teams_file_consent_accept(
@@ -163,12 +167,16 @@ class TeamsActivityHandler(ActivityHandler):
         )
 
     async def on_teams_file_consent_accept(  # pylint: disable=unused-argument
-        self, turn_context: TurnContext, file_consent_card_response: FileConsentCardResponse
+        self,
+        turn_context: TurnContext,
+        file_consent_card_response: FileConsentCardResponse,
     ):
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
     async def on_teams_file_consent_decline(  # pylint: disable=unused-argument
-        self, turn_context: TurnContext, file_consent_card_response: FileConsentCardResponse
+        self,
+        turn_context: TurnContext,
+        file_consent_card_response: FileConsentCardResponse,
     ):
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 

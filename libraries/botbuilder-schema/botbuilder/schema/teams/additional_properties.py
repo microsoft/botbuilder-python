@@ -8,6 +8,7 @@ class ContentType:
     FILE_DOWNLOAD_INFO = "application/vnd.microsoft.teams.file.download.info"
     FILE_INFO_CARD = "application/vnd.microsoft.teams.card.file.info"
 
+
 class Type:
     O365_CONNECTOR_CARD_VIEWACTION = "ViewAction"
     O365_CONNECTOR_CARD_OPEN_URI = "OpenUri"
