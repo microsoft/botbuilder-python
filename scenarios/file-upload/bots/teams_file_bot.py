@@ -46,8 +46,8 @@ class TeamsFileBot(TeamsActivityHandler):
             await turn_context.send_activity(reply)
         else:
             # Attempt to upload a file to Teams.  This will display a confirmation to
-            # the user (Accept/Decline card).  If they accept, on_teams_file_consent_accept_activity
-            # will be called, otherwise on_teams_file_consent_decline_activity.
+            # the user (Accept/Decline card).  If they accept, on_teams_file_consent_accept
+            # will be called, otherwise on_teams_file_consent_decline.
             filename = "teams-logo.png"
             file_path = "files/" + filename
             file_size = os.path.getsize(file_path)
@@ -77,7 +77,7 @@ class TeamsFileBot(TeamsActivityHandler):
         reply_activity.attachments = [as_attachment]
         await turn_context.send_activity(reply_activity)
 
-    async def on_teams_file_consent_accept_activity(
+    async def on_teams_file_consent_accept(
             self,
             turn_context: TurnContext,
             file_consent_card_response: FileConsentCardResponse
@@ -102,7 +102,7 @@ class TeamsFileBot(TeamsActivityHandler):
         else:
             await self._file_upload_complete(turn_context, file_consent_card_response)
 
-    async def on_teams_file_consent_decline_activity(
+    async def on_teams_file_consent_decline(
             self,
             turn_context: TurnContext,
             file_consent_card_response: FileConsentCardResponse
