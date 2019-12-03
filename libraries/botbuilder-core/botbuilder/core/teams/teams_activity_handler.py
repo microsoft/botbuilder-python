@@ -10,7 +10,7 @@ from botbuilder.schema.teams import (
     ChannelInfo,
     TeamsChannelData,
     TeamsChannelAccount,
-)
+    FileConsentCardResponse)
 from botframework.connector import Channels
 
 
@@ -55,7 +55,7 @@ class TeamsActivityHandler(ActivityHandler):
 
             if turn_context.activity.name == "fileConsent/invoke":
                 return await self.on_teams_file_consent_activity(
-                    turn_context, turn_context.activity.value
+                    turn_context, FileConsentCardResponse.deserialize(turn_context.activity.value)
                 )
 
             if turn_context.activity.name == "actionableMessage/executeAction":
@@ -143,7 +143,7 @@ class TeamsActivityHandler(ActivityHandler):
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
     async def on_teams_file_consent_activity(
-        self, turn_context: TurnContext, file_consent_card_response
+        self, turn_context: TurnContext, file_consent_card_response: FileConsentCardResponse
     ):
         if file_consent_card_response.action == "accept":
             await self.on_teams_file_consent_accept_activity(
@@ -163,12 +163,12 @@ class TeamsActivityHandler(ActivityHandler):
         )
 
     async def on_teams_file_consent_accept_activity(  # pylint: disable=unused-argument
-        self, turn_context: TurnContext, file_consent_card_response
+        self, turn_context: TurnContext, file_consent_card_response: FileConsentCardResponse
     ):
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
     async def on_teams_file_consent_decline_activity(  # pylint: disable=unused-argument
-        self, turn_context: TurnContext, file_consent_card_response
+        self, turn_context: TurnContext, file_consent_card_response: FileConsentCardResponse
     ):
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
