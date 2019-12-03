@@ -1796,7 +1796,7 @@ class TeamsChannelAccount(ChannelAccount):
         "given_name": {"key": "givenName", "type": "str"},
         "surname": {"key": "surname", "type": "str"},
         "email": {"key": "email", "type": "str"},
-        "user_principal_name": {"key": "userPrincipalName", "type": "str"},
+        "userPrincipalName": {"key": "userPrincipalName", "type": "str"},
     }
 
     def __init__(
@@ -1807,14 +1807,15 @@ class TeamsChannelAccount(ChannelAccount):
         given_name: str = None,
         surname: str = None,
         email: str = None,
-        user_principal_name: str = None,
+        userPrincipalName: str = None,
         **kwargs
     ) -> None:
         super(TeamsChannelAccount, self).__init__(id=id, name=name, **kwargs)
         self.given_name = given_name
         self.surname = surname
         self.email = email
-        self.user_principal_name = user_principal_name
+        # changing to camel case due to how data comes in off the wire
+        self.userPrincipalName = userPrincipalName
 
 
 class TeamsChannelData(Model):
@@ -1835,7 +1836,7 @@ class TeamsChannelData(Model):
 
     _attribute_map = {
         "channel": {"key": "channel", "type": "ChannelInfo"},
-        "event_type": {"key": "eventType", "type": "str"},
+        "eventType": {"key": "eventType", "type": "str"},
         "team": {"key": "team", "type": "TeamInfo"},
         "notification": {"key": "notification", "type": "NotificationInfo"},
         "tenant": {"key": "tenant", "type": "TenantInfo"},
@@ -1845,7 +1846,7 @@ class TeamsChannelData(Model):
         self,
         *,
         channel=None,
-        event_type: str = None,
+        eventType: str = None,
         team=None,
         notification=None,
         tenant=None,
@@ -1853,7 +1854,8 @@ class TeamsChannelData(Model):
     ) -> None:
         super(TeamsChannelData, self).__init__(**kwargs)
         self.channel = channel
-        self.event_type = event_type
+        # doing camel case here since that's how the data comes in
+        self.eventType = eventType
         self.team = team
         self.notification = notification
         self.tenant = tenant

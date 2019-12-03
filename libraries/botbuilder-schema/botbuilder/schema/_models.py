@@ -611,7 +611,7 @@ class ChannelAccount(Model):
         super(ChannelAccount, self).__init__(**kwargs)
         self.id = kwargs.get("id", None)
         self.name = kwargs.get("name", None)
-        self.aad_object_id = kwargs.get("aad_object_id", None)
+        self.aadObjectId = kwargs.get("aadObjectId", None)
         self.role = kwargs.get("role", None)
 
 

@@ -721,7 +721,7 @@ class ChannelAccount(Model):
     _attribute_map = {
         "id": {"key": "id", "type": "str"},
         "name": {"key": "name", "type": "str"},
-        "aad_object_id": {"key": "aadObjectId", "type": "str"},
+        "aadObjectId": {"key": "aadObjectId", "type": "str"},
         "role": {"key": "role", "type": "str"},
     }
 
@@ -730,14 +730,14 @@ class ChannelAccount(Model):
         *,
         id: str = None,
         name: str = None,
-        aad_object_id: str = None,
+        aadObjectId: str = None,
         role=None,
         **kwargs
     ) -> None:
         super(ChannelAccount, self).__init__(**kwargs)
         self.id = id
         self.name = name
-        self.aad_object_id = aad_object_id
+        self.aadObjectId = aadObjectId
         self.role = role
 
 
