@@ -20,6 +20,7 @@ from botbuilder.schema.teams import (
     TenantInfo,    
 )
 from botframework.connector import Channels
+from .. import SimpleAdapter
 
 class TestingTeamsActivityHandler(TeamsActivityHandler):
     def __init__(self):

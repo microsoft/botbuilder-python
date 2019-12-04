@@ -1796,7 +1796,7 @@ class TeamsChannelAccount(ChannelAccount):
         "given_name": {"key": "givenName", "type": "str"},
         "surname": {"key": "surname", "type": "str"},
         "email": {"key": "email", "type": "str"},
-        "userPrincipalName": {"key": "userPrincipalName", "type": "str"},
+        "user_principal_name": {"key": "userPrincipalName", "type": "str"},
     }
 
     def __init__(
@@ -1807,7 +1807,7 @@ class TeamsChannelAccount(ChannelAccount):
         given_name: str = None,
         surname: str = None,
         email: str = None,
-        userPrincipalName: str = None,
+        user_principal_name: str = None,
         **kwargs
     ) -> None:
         super(TeamsChannelAccount, self).__init__(id=id, name=name, **kwargs)
@@ -1815,7 +1815,7 @@ class TeamsChannelAccount(ChannelAccount):
         self.surname = surname
         self.email = email
         # changing to camel case due to how data comes in off the wire
-        self.userPrincipalName = userPrincipalName
+        self.user_principal_name = user_principal_name
 
 
 class TeamsChannelData(Model):
