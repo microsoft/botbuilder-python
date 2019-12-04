@@ -26,6 +26,7 @@ from botbuilder.schema.teams import (
 from botframework.connector import Channels
 from simple_adapter import SimpleAdapter
 
+
 class TestingTeamsActivityHandler(TeamsActivityHandler):
     def __init__(self):
         self.record: List[str] = []
