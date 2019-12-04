@@ -24,7 +24,7 @@ from botbuilder.schema.teams import (
     TeamsChannelAccount,
 )
 from botframework.connector import Channels
-from .. import SimpleAdapter
+from simple_adapter import SimpleAdapter
 
 class TestingTeamsActivityHandler(TeamsActivityHandler):
     def __init__(self):
