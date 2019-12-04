@@ -285,15 +285,15 @@ class TeamsActivityHandler(ActivityHandler):
                 )
 
             if channel_data:
-                if channel_data.eventType == "channelCreated":
+                if channel_data.event_type == "channelCreated":
                     return await self.on_teams_channel_created_activity(
                         ChannelInfo(**channel_data.channel), channel_data.team, turn_context
                     )
-                if channel_data.eventType == "channelDeleted":
+                if channel_data.event_type == "channelDeleted":
                     return await self.on_teams_channel_deleted_activity(
                         channel_data.channel, channel_data.team, turn_context
                     )
-                if channel_data.eventType == "channelRenamed":
+                if channel_data.event_type == "channelRenamed":
                     return await self.on_teams_channel_renamed_activity(
                         channel_data.channel, channel_data.team, turn_context
                     )
