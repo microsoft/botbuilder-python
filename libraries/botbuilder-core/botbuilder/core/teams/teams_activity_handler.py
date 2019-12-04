@@ -12,7 +12,8 @@ from botbuilder.schema.teams import (
     TeamsChannelAccount,
 )
 from botframework.connector import Channels
-
+import json
+from typing import List
 
 class TeamsActivityHandler(ActivityHandler):
     async def on_turn(self, turn_context: TurnContext):
@@ -261,9 +262,9 @@ class TeamsActivityHandler(ActivityHandler):
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
     async def on_conversation_update_activity(self, turn_context: TurnContext):
+        
         if turn_context.activity.channel_id == Channels.ms_teams:
             channel_data = TeamsChannelData(**turn_context.activity.channel_data)
-
             if turn_context.activity.members_added:
                 return await self.on_teams_members_added_dispatch_activity(
                     turn_context.activity.members_added, channel_data.team, turn_context
@@ -277,22 +278,20 @@ class TeamsActivityHandler(ActivityHandler):
                 )
 
             if channel_data:
-                if channel_data.event_type == "channelCreated":
+                if channel_data.eventType == "channelCreated":
                     return await self.on_teams_channel_created_activity(
-                        channel_data.channel, channel_data.team, turn_context
+                        ChannelInfo(**channel_data.channel), channel_data.team, turn_context
                     )
-                if channel_data.event_type == "channelDeleted":
+                if channel_data.eventType == "channelDeleted":
                     return await self.on_teams_channel_deleted_activity(
                         channel_data.channel, channel_data.team, turn_context
                     )
-                if channel_data.event_type == "channelRenamed":
+                if channel_data.eventType == "channelRenamed":
                     return await self.on_teams_channel_renamed_activity(
                         channel_data.channel, channel_data.team, turn_context
                     )
-                if channel_data.event_type == "teamRenamed":
-                    return await self.on_teams_team_renamed_activity(
-                        channel_data.team, turn_context
-                    )
+                if channel_data.eventType == "teamRenamed":
+                    return await self.on_teams_team_renamed_activity(channel_data.team, turn_context)
                 return await super().on_conversation_update_activity(turn_context)
 
         return await super().on_conversation_update_activity(turn_context)
@@ -300,7 +299,7 @@ class TeamsActivityHandler(ActivityHandler):
     async def on_teams_channel_created_activity(  # pylint: disable=unused-argument
         self, channel_info: ChannelInfo, team_info: TeamInfo, turn_context: TurnContext
     ):
-        return
+        return 
 
     async def on_teams_team_renamed_activity(  # pylint: disable=unused-argument
         self, team_info: TeamInfo, turn_context: TurnContext
@@ -337,17 +336,24 @@ class TeamsActivityHandler(ActivityHandler):
 
         return await self.on_teams_members_added_activity(teams_members_added, team_info, turn_context)
         """
+        team_accounts_added = []
         for member in members_added:
             new_account_json = member.serialize()
+<<<<<<< HEAD
             del new_account_json["additional_properties"]
+=======
+            if "additional_properties" in new_account_json:
+                del new_account_json["additional_properties"]
+>>>>>>> e682f38... saving unit tests so far
             member = TeamsChannelAccount(**new_account_json)
-        return await self.on_teams_members_added_activity(members_added, turn_context)
+            team_accounts_added.append(member)
+        return await self.on_teams_members_added_activity(team_accounts_added, turn_context)
 
     async def on_teams_members_added_activity(
         self, teams_members_added: [TeamsChannelAccount], turn_context: TurnContext
     ):
-        teams_members_added = [ChannelAccount(member) for member in teams_members_added]
-        return super().on_members_added_activity(teams_members_added, turn_context)
+        teams_members_added = [ ChannelAccount(**member.serialize()) for member in teams_members_added ]
+        return await super().on_members_added_activity(teams_members_added, turn_context)
 
     async def on_teams_members_removed_dispatch_activity(  # pylint: disable=unused-argument
         self,
@@ -358,7 +364,12 @@ class TeamsActivityHandler(ActivityHandler):
         teams_members_removed = []
         for member in members_removed:
             new_account_json = member.serialize()
+<<<<<<< HEAD
             del new_account_json["additional_properties"]
+=======
+            if "additional_properties" in new_account_json:
+                del new_account_json["additional_properties"]
+>>>>>>> e682f38... saving unit tests so far
             teams_members_removed.append(TeamsChannelAccount(**new_account_json))
 
         return await self.on_teams_members_removed_activity(
@@ -368,8 +379,8 @@ class TeamsActivityHandler(ActivityHandler):
     async def on_teams_members_removed_activity(
         self, teams_members_removed: [TeamsChannelAccount], turn_context: TurnContext
     ):
-        members_removed = [ChannelAccount(member) for member in teams_members_removed]
-        return super().on_members_removed_activity(members_removed, turn_context)
+        members_removed = [ChannelAccount(**member.serialize()) for member in teams_members_removed]
+        return await super().on_members_removed_activity(members_removed, turn_context)
 
     async def on_teams_channel_deleted_activity(  # pylint: disable=unused-argument
         self, channel_info: ChannelInfo, team_info: TeamInfo, turn_context: TurnContext
