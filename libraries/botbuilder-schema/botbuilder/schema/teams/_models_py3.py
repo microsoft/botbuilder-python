@@ -1132,7 +1132,7 @@ class O365ConnectorCardActionQuery(Model):
     def __init__(self, *, body: str = None, actionId: str = None, **kwargs) -> None:
         super(O365ConnectorCardActionQuery, self).__init__(**kwargs)
         self.body = body
-        # This is how it comes in from Teams 
+        # This is how it comes in from Teams
         self.action_id = actionId
 
 

@@ -1544,7 +1544,7 @@ class TeamsChannelAccount(ChannelAccount):
         self.given_name = kwargs.get("given_name", None)
         self.surname = kwargs.get("surname", None)
         self.email = kwargs.get("email", None)
-        self.userPrincipalName = kwargs.get("userPrincipalName", None)
+        self.user_principal_name = kwargs.get("userPrincipalName", None)
 
 
 class TeamsChannelData(Model):

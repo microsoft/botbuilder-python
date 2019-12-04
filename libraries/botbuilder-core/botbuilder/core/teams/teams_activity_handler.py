@@ -12,15 +12,13 @@ from botbuilder.schema.teams import (
     FileConsentCardResponse,
     TeamsChannelData,
     TeamsChannelAccount,
-    MessageActionsPayload,
     MessagingExtensionAction,
     MessagingExtensionQuery,
     O365ConnectorCardActionQuery,
-    TaskModuleRequest
+    TaskModuleRequest,
 )
 from botframework.connector import Channels
-import json
-from typing import List
+
 
 class TeamsActivityHandler(ActivityHandler):
     async def on_turn(self, turn_context: TurnContext):
@@ -68,7 +66,8 @@ class TeamsActivityHandler(ActivityHandler):
 
             if turn_context.activity.name == "actionableMessage/executeAction":
                 await self.on_teams_o365_connector_card_action(
-                    turn_context, O365ConnectorCardActionQuery(**turn_context.activity.value)
+                    turn_context,
+                    O365ConnectorCardActionQuery(**turn_context.activity.value),
                 )
                 return self._create_invoke_response()
 
@@ -82,7 +81,8 @@ class TeamsActivityHandler(ActivityHandler):
             if turn_context.activity.name == "composeExtension/query":
                 return self._create_invoke_response(
                     await self.on_teams_messaging_extension_query(
-                        turn_context, MessagingExtensionQuery(**turn_context.activity.value)
+                        turn_context,
+                        MessagingExtensionQuery(**turn_context.activity.value),
                     )
                 )
 
@@ -96,21 +96,24 @@ class TeamsActivityHandler(ActivityHandler):
             if turn_context.activity.name == "composeExtension/submitAction":
                 return self._create_invoke_response(
                     await self.on_teams_messaging_extension_submit_action_dispatch(
-                        turn_context, MessagingExtensionAction(**turn_context.activity.value)
+                        turn_context,
+                        MessagingExtensionAction(**turn_context.activity.value),
                     )
                 )
 
             if turn_context.activity.name == "composeExtension/fetchTask":
                 return self._create_invoke_response(
                     await self.on_teams_messaging_extension_fetch_task(
-                        turn_context, MessagingExtensionAction(**turn_context.activity.value)
+                        turn_context,
+                        MessagingExtensionAction(**turn_context.activity.value),
                     )
                 )
 
             if turn_context.activity.name == "composeExtension/querySettingUrl":
                 return self._create_invoke_response(
                     await self.on_teams_messaging_extension_configuration_query_settings_url(
-                        turn_context, MessagingExtensionQuery(**turn_context.activity.value)
+                        turn_context,
+                        MessagingExtensionQuery(**turn_context.activity.value),
                     )
                 )
 
@@ -151,7 +154,9 @@ class TeamsActivityHandler(ActivityHandler):
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
     async def on_teams_file_consent(
-        self, turn_context: TurnContext, file_consent_card_response: FileConsentCardResponse
+        self,
+        turn_context: TurnContext,
+        file_consent_card_response: FileConsentCardResponse,
     ):
         if file_consent_card_response.action == "accept":
             await self.on_teams_file_consent_accept_activity(
@@ -171,12 +176,16 @@ class TeamsActivityHandler(ActivityHandler):
         )
 
     async def on_teams_file_consent_accept_activity(  # pylint: disable=unused-argument
-        self, turn_context: TurnContext, file_consent_card_response: FileConsentCardResponse
+        self,
+        turn_context: TurnContext,
+        file_consent_card_response: FileConsentCardResponse,
     ):
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
     async def on_teams_file_consent_decline_activity(  # pylint: disable=unused-argument
-        self, turn_context: TurnContext, file_consent_card_response: FileConsentCardResponse
+        self,
+        turn_context: TurnContext,
+        file_consent_card_response: FileConsentCardResponse,
     ):
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
@@ -196,7 +205,7 @@ class TeamsActivityHandler(ActivityHandler):
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
     async def on_teams_messaging_extension_select_item(  # pylint: disable=unused-argument
-        self, turn_context: TurnContext, query 
+        self, turn_context: TurnContext, query
     ):
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
@@ -269,7 +278,7 @@ class TeamsActivityHandler(ActivityHandler):
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
     async def on_conversation_update_activity(self, turn_context: TurnContext):
-        
+
         if turn_context.activity.channel_id == Channels.ms_teams:
             channel_data = TeamsChannelData(**turn_context.activity.channel_data)
             if turn_context.activity.members_added:
@@ -287,7 +296,9 @@ class TeamsActivityHandler(ActivityHandler):
             if channel_data:
                 if channel_data.event_type == "channelCreated":
                     return await self.on_teams_channel_created_activity(
-                        ChannelInfo(**channel_data.channel), channel_data.team, turn_context
+                        ChannelInfo(**channel_data.channel),
+                        channel_data.team,
+                        turn_context,
                     )
                 if channel_data.event_type == "channelDeleted":
                     return await self.on_teams_channel_deleted_activity(
@@ -298,7 +309,9 @@ class TeamsActivityHandler(ActivityHandler):
                         channel_data.channel, channel_data.team, turn_context
                     )
                 if channel_data.event_type == "teamRenamed":
-                    return await self.on_teams_team_renamed_activity(channel_data.team, turn_context)
+                    return await self.on_teams_team_renamed_activity(
+                        channel_data.team, turn_context
+                    )
                 return await super().on_conversation_update_activity(turn_context)
 
         return await super().on_conversation_update_activity(turn_context)
@@ -306,7 +319,7 @@ class TeamsActivityHandler(ActivityHandler):
     async def on_teams_channel_created_activity(  # pylint: disable=unused-argument
         self, channel_info: ChannelInfo, team_info: TeamInfo, turn_context: TurnContext
     ):
-        return 
+        return
 
     async def on_teams_team_renamed_activity(  # pylint: disable=unused-argument
         self, team_info: TeamInfo, turn_context: TurnContext
@@ -350,13 +363,19 @@ class TeamsActivityHandler(ActivityHandler):
                 del new_account_json["additional_properties"]
             member = TeamsChannelAccount(**new_account_json)
             team_accounts_added.append(member)
-        return await self.on_teams_members_added_activity(team_accounts_added, turn_context)
+        return await self.on_teams_members_added_activity(
+            team_accounts_added, turn_context
+        )
 
     async def on_teams_members_added_activity(
         self, teams_members_added: [TeamsChannelAccount], turn_context: TurnContext
     ):
-        teams_members_added = [ ChannelAccount(**member.serialize()) for member in teams_members_added ]
-        return await super().on_members_added_activity(teams_members_added, turn_context)
+        teams_members_added = [
+            ChannelAccount(**member.serialize()) for member in teams_members_added
+        ]
+        return await super().on_members_added_activity(
+            teams_members_added, turn_context
+        )
 
     async def on_teams_members_removed_dispatch_activity(  # pylint: disable=unused-argument
         self,
@@ -378,7 +397,9 @@ class TeamsActivityHandler(ActivityHandler):
     async def on_teams_members_removed_activity(
         self, teams_members_removed: [TeamsChannelAccount], turn_context: TurnContext
     ):
-        members_removed = [ChannelAccount(**member.serialize()) for member in teams_members_removed]
+        members_removed = [
+            ChannelAccount(**member.serialize()) for member in teams_members_removed
+        ]
         return await super().on_members_removed_activity(members_removed, turn_context)
 
     async def on_teams_channel_deleted_activity(  # pylint: disable=unused-argument
