@@ -113,7 +113,7 @@ class TeamsActivityHandler(ActivityHandler):
                 return self._create_invoke_response(
                     await self.on_teams_messaging_extension_configuration_query_settings_url(
                         turn_context,
-                        MessagingExtensionQuery(**turn_context.activity.value),
+                        MessagingExtensionQuery().deserialize(turn_context.activity.value),
                     )
                 )
 
@@ -132,14 +132,14 @@ class TeamsActivityHandler(ActivityHandler):
             if turn_context.activity.name == "task/fetch":
                 return self._create_invoke_response(
                     await self.on_teams_task_module_fetch(
-                        turn_context, TaskModuleRequest(**turn_context.activity.value)
+                        turn_context, TaskModuleRequest().deserialize(turn_context.activity.value)
                     )
                 )
 
             if turn_context.activity.name == "task/submit":
                 return self._create_invoke_response(
                     await self.on_teams_task_module_submit(
-                        turn_context, TaskModuleRequest(**turn_context.activity.value)
+                        turn_context, TaskModuleRequest().deserialize(turn_context.activity.value)
                     )
                 )
 
