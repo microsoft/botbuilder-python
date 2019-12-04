@@ -670,7 +670,7 @@ class MessagingExtensionAction(TaskModuleRequest):
         context=None,
         command_id: str = None,
         command_context=None,
-        bot_message_preview_action=None,
+        botMessagePreviewAction=None,
         bot_activity_preview=None,
         message_payload=None,
         **kwargs
@@ -680,7 +680,7 @@ class MessagingExtensionAction(TaskModuleRequest):
         )
         self.command_id = command_id
         self.command_context = command_context
-        self.bot_message_preview_action = bot_message_preview_action
+        self.bot_message_preview_action = botMessagePreviewAction
         self.bot_activity_preview = bot_activity_preview
         self.message_payload = message_payload
 
@@ -1129,10 +1129,11 @@ class O365ConnectorCardActionQuery(Model):
         "action_id": {"key": "actionId", "type": "str"},
     }
 
-    def __init__(self, *, body: str = None, action_id: str = None, **kwargs) -> None:
+    def __init__(self, *, body: str = None, actionId: str = None, **kwargs) -> None:
         super(O365ConnectorCardActionQuery, self).__init__(**kwargs)
         self.body = body
-        self.action_id = action_id
+        # This is how it comes in from Teams
+        self.action_id = actionId
 
 
 class O365ConnectorCardDateInput(O365ConnectorCardInputBase):
@@ -1814,6 +1815,7 @@ class TeamsChannelAccount(ChannelAccount):
         self.given_name = given_name
         self.surname = surname
         self.email = email
+        # changing to camel case due to how data comes in off the wire
         self.user_principal_name = user_principal_name
 
 
@@ -1835,7 +1837,7 @@ class TeamsChannelData(Model):
 
     _attribute_map = {
         "channel": {"key": "channel", "type": "ChannelInfo"},
-        "event_type": {"key": "eventType", "type": "str"},
+        "eventType": {"key": "eventType", "type": "str"},
         "team": {"key": "team", "type": "TeamInfo"},
         "notification": {"key": "notification", "type": "NotificationInfo"},
         "tenant": {"key": "tenant", "type": "TenantInfo"},
@@ -1845,7 +1847,7 @@ class TeamsChannelData(Model):
         self,
         *,
         channel=None,
-        event_type: str = None,
+        eventType: str = None,
         team=None,
         notification=None,
         tenant=None,
@@ -1853,7 +1855,8 @@ class TeamsChannelData(Model):
     ) -> None:
         super(TeamsChannelData, self).__init__(**kwargs)
         self.channel = channel
-        self.event_type = event_type
+        # doing camel case here since that's how the data comes in
+        self.event_type = eventType
         self.team = team
         self.notification = notification
         self.tenant = tenant
