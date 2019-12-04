@@ -339,12 +339,8 @@ class TeamsActivityHandler(ActivityHandler):
         team_accounts_added = []
         for member in members_added:
             new_account_json = member.serialize()
-<<<<<<< HEAD
-            del new_account_json["additional_properties"]
-=======
             if "additional_properties" in new_account_json:
                 del new_account_json["additional_properties"]
->>>>>>> e682f38... saving unit tests so far
             member = TeamsChannelAccount(**new_account_json)
             team_accounts_added.append(member)
         return await self.on_teams_members_added_activity(team_accounts_added, turn_context)
@@ -364,12 +360,8 @@ class TeamsActivityHandler(ActivityHandler):
         teams_members_removed = []
         for member in members_removed:
             new_account_json = member.serialize()
-<<<<<<< HEAD
-            del new_account_json["additional_properties"]
-=======
             if "additional_properties" in new_account_json:
                 del new_account_json["additional_properties"]
->>>>>>> e682f38... saving unit tests so far
             teams_members_removed.append(TeamsChannelAccount(**new_account_json))
 
         return await self.on_teams_members_removed_activity(
