@@ -730,14 +730,14 @@ class ChannelAccount(Model):
         *,
         id: str = None,
         name: str = None,
-        aad_object_id: str = None,
+        aadObjectId: str = None,
         role=None,
         **kwargs
     ) -> None:
         super(ChannelAccount, self).__init__(**kwargs)
         self.id = id
         self.name = name
-        self.aad_object_id = aad_object_id
+        self.aad_object_id = aadObjectId
         self.role = role
 
 

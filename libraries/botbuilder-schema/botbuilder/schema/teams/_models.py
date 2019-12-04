@@ -559,7 +559,7 @@ class MessagingExtensionAction(TaskModuleRequest):
         super(MessagingExtensionAction, self).__init__(**kwargs)
         self.command_id = kwargs.get("command_id", None)
         self.command_context = kwargs.get("command_context", None)
-        self.bot_message_preview_action = kwargs.get("bot_message_preview_action", None)
+        self.bot_message_preview_action = kwargs.get("botMessagePreviewAction", None)
         self.bot_activity_preview = kwargs.get("bot_activity_preview", None)
         self.message_payload = kwargs.get("message_payload", None)
 
@@ -910,7 +910,8 @@ class O365ConnectorCardActionQuery(Model):
     def __init__(self, **kwargs):
         super(O365ConnectorCardActionQuery, self).__init__(**kwargs)
         self.body = kwargs.get("body", None)
-        self.action_id = kwargs.get("action_id", None)
+        # This is how it comes in from Teams
+        self.action_id = kwargs.get("actionId", None)
 
 
 class O365ConnectorCardDateInput(O365ConnectorCardInputBase):
@@ -1574,7 +1575,7 @@ class TeamsChannelData(Model):
         super(TeamsChannelData, self).__init__(**kwargs)
         self.channel = kwargs.get("channel", None)
         # doing camel case here since that's how the data comes in
-        self.eventType = kwargs.get("eventType", None)
+        self.event_type = kwargs.get("eventType", None)
         self.team = kwargs.get("team", None)
         self.notification = kwargs.get("notification", None)
         self.tenant = kwargs.get("tenant", None)
