@@ -50,84 +50,84 @@ class TeamsActivityHandler(ActivityHandler):
                 return await self.on_teams_card_action_invoke_activity(turn_context)
 
             if turn_context.activity.name == "signin/verifyState":
-                await self.on_teams_signin_verify_state_activity(turn_context)
+                await self.on_teams_signin_verify_state(turn_context)
                 return self._create_invoke_response()
 
             if turn_context.activity.name == "fileConsent/invoke":
-                return await self.on_teams_file_consent_activity(
+                return await self.on_teams_file_consent(
                     turn_context, turn_context.activity.value
                 )
 
             if turn_context.activity.name == "actionableMessage/executeAction":
-                await self.on_teams_o365_connector_card_action_activity(
+                await self.on_teams_o365_connector_card_action(
                     turn_context, turn_context.activity.value
                 )
                 return self._create_invoke_response()
 
             if turn_context.activity.name == "composeExtension/queryLink":
                 return self._create_invoke_response(
-                    await self.on_teams_app_based_link_query_activity(
+                    await self.on_teams_app_based_link_query(
                         turn_context, turn_context.activity.value
                     )
                 )
 
             if turn_context.activity.name == "composeExtension/query":
                 return self._create_invoke_response(
-                    await self.on_teams_messaging_extension_query_activity(
+                    await self.on_teams_messaging_extension_query(
                         turn_context, turn_context.activity.value
                     )
                 )
 
             if turn_context.activity.name == "composeExtension/selectItem":
                 return self._create_invoke_response(
-                    await self.on_teams_messaging_extension_select_item_activity(
+                    await self.on_teams_messaging_extension_select_item(
                         turn_context, turn_context.activity.value
                     )
                 )
 
             if turn_context.activity.name == "composeExtension/submitAction":
                 return self._create_invoke_response(
-                    await self.on_teams_messaging_extension_submit_action_dispatch_activity(
+                    await self.on_teams_messaging_extension_submit_action_dispatch(
                         turn_context, turn_context.activity.value
                     )
                 )
 
             if turn_context.activity.name == "composeExtension/fetchTask":
                 return self._create_invoke_response(
-                    await self.on_teams_messaging_extension_fetch_task_activity(
+                    await self.on_teams_messaging_extension_fetch_task(
                         turn_context, turn_context.activity.value
                     )
                 )
 
             if turn_context.activity.name == "composeExtension/querySettingUrl":
                 return self._create_invoke_response(
-                    await self.on_teams_messaging_extension_configuration_query_settings_url_activity(
+                    await self.on_teams_messaging_extension_configuration_query_settings_url(
                         turn_context, turn_context.activity.value
                     )
                 )
 
             if turn_context.activity.name == "composeExtension/setting":
-                await self.on_teams_messaging_extension_configuration_setting_activity(
+                await self.on_teams_messaging_extension_configuration_setting(
                     turn_context, turn_context.activity.value
                 )
                 return self._create_invoke_response()
 
             if turn_context.activity.name == "composeExtension/onCardButtonClicked":
-                await self.on_teams_messaging_extension_card_button_clicked_activity(
+                await self.on_teams_messaging_extension_card_button_clicked(
                     turn_context, turn_context.activity.value
                 )
                 return self._create_invoke_response()
 
             if turn_context.activity.name == "task/fetch":
                 return self._create_invoke_response(
-                    await self.on_teams_task_module_fetch_activity(
+                    await self.on_teams_task_module_fetch(
                         turn_context, turn_context.activity.value
                     )
                 )
 
             if turn_context.activity.name == "task/submit":
                 return self._create_invoke_response(
-                    await self.on_teams_task_module_submit_activity(
+                    await self.on_teams_task_module_submit(
                         turn_context, turn_context.activity.value
                     )
                 )
@@ -139,10 +139,10 @@ class TeamsActivityHandler(ActivityHandler):
     async def on_teams_card_action_invoke_activity(self, turn_context: TurnContext):
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
-    async def on_teams_signin_verify_state_activity(self, turn_context: TurnContext):
+    async def on_teams_signin_verify_state(self, turn_context: TurnContext):
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
-    async def on_teams_file_consent_activity(
+    async def on_teams_file_consent(
         self, turn_context: TurnContext, file_consent_card_response
     ):
         if file_consent_card_response.action == "accept":
@@ -172,27 +172,27 @@ class TeamsActivityHandler(ActivityHandler):
     ):
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
-    async def on_teams_o365_connector_card_action_activity(  # pylint: disable=unused-argument
+    async def on_teams_o365_connector_card_action(  # pylint: disable=unused-argument
         self, turn_context: TurnContext, query
     ):
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
-    async def on_teams_app_based_link_query_activity(  # pylint: disable=unused-argument
+    async def on_teams_app_based_link_query(  # pylint: disable=unused-argument
         self, turn_context: TurnContext, query
     ):
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
-    async def on_teams_messaging_extension_query_activity(  # pylint: disable=unused-argument
+    async def on_teams_messaging_extension_query(  # pylint: disable=unused-argument
         self, turn_context: TurnContext, query
     ):
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
-    async def on_teams_messaging_extension_select_item_activity(  # pylint: disable=unused-argument
+    async def on_teams_messaging_extension_select_item(  # pylint: disable=unused-argument
         self, turn_context: TurnContext, query
     ):
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
-    async def on_teams_messaging_extension_submit_action_dispatch_activity(
+    async def on_teams_messaging_extension_submit_action_dispatch(
         self, turn_context: TurnContext, action
     ):
         if not action:
@@ -230,32 +230,32 @@ class TeamsActivityHandler(ActivityHandler):
     ):
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
-    async def on_teams_messaging_extension_fetch_task_activity(  # pylint: disable=unused-argument
+    async def on_teams_messaging_extension_fetch_task(  # pylint: disable=unused-argument
         self, turn_context: TurnContext, task_module_request
     ):
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
-    async def on_teams_messaging_extension_configuration_query_settings_url_activity(  # pylint: disable=unused-argument
+    async def on_teams_messaging_extension_configuration_query_settings_url(  # pylint: disable=unused-argument
         self, turn_context: TurnContext, query
     ):
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
-    async def on_teams_messaging_extension_configuration_setting_activity(  # pylint: disable=unused-argument
+    async def on_teams_messaging_extension_configuration_setting(  # pylint: disable=unused-argument
         self, turn_context: TurnContext, settings
     ):
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
-    async def on_teams_messaging_extension_card_button_clicked_activity(  # pylint: disable=unused-argument
+    async def on_teams_messaging_extension_card_button_clicked(  # pylint: disable=unused-argument
         self, turn_context: TurnContext, card_data
     ):
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
-    async def on_teams_task_module_fetch_activity(  # pylint: disable=unused-argument
+    async def on_teams_task_module_fetch(  # pylint: disable=unused-argument
         self, turn_context: TurnContext, task_module_request
     ):
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
-    async def on_teams_task_module_submit_activity(  # pylint: disable=unused-argument
+    async def on_teams_task_module_submit(  # pylint: disable=unused-argument
         self, turn_context: TurnContext, task_module_request
     ):
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
