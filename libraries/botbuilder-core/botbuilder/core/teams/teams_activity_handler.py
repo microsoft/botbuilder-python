@@ -61,20 +61,20 @@ class TeamsActivityHandler(ActivityHandler):
 
             if turn_context.activity.name == "fileConsent/invoke":
                 return await self.on_teams_file_consent(
-                    turn_context, FileConsentCardResponse(**turn_context.activity.value)
+                    turn_context, FileConsentCardResponse().deserialize(turn_context.activity.value)
                 )
 
             if turn_context.activity.name == "actionableMessage/executeAction":
                 await self.on_teams_o365_connector_card_action(
                     turn_context,
-                    O365ConnectorCardActionQuery(**turn_context.activity.value),
+                    O365ConnectorCardActionQuery().deserialize(turn_context.activity.value),
                 )
                 return self._create_invoke_response()
 
             if turn_context.activity.name == "composeExtension/queryLink":
                 return self._create_invoke_response(
                     await self.on_teams_app_based_link_query(
-                        turn_context, AppBasedLinkQuery(**turn_context.activity.value)
+                        turn_context, AppBasedLinkQuery().deserialize(turn_context.activity.value)
                     )
                 )
 
@@ -82,7 +82,7 @@ class TeamsActivityHandler(ActivityHandler):
                 return self._create_invoke_response(
                     await self.on_teams_messaging_extension_query(
                         turn_context,
-                        MessagingExtensionQuery(**turn_context.activity.value),
+                        MessagingExtensionQuery().deserialize(turn_context.activity.value),
                     )
                 )
 
