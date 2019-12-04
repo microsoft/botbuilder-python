@@ -8,7 +8,6 @@ from typing import List, Callable, Union, Dict
 from botbuilder.schema import (
     Activity,
     ActivityTypes,
-    ChannelAccount,
     ConversationReference,
     InputHints,
     Mention,
@@ -377,14 +376,6 @@ class TurnContext:
         if activity.entities is not None:
             for entity in activity.entities:
                 if entity.type.lower() == "mention":
-                    mention = Mention(
-                        mentioned=ChannelAccount(
-                            id=entity.additional_properties["mentioned"]["id"],
-                            name=entity.additional_properties["mentioned"]["name"],
-                        ),
-                        text=entity.additional_properties["text"],
-                        type=entity.type,
-                    )
-                    result.append(mention)
+                    result.append(entity)
 
         return result
