@@ -559,7 +559,7 @@ class MessagingExtensionAction(TaskModuleRequest):
         super(MessagingExtensionAction, self).__init__(**kwargs)
         self.command_id = kwargs.get("command_id", None)
         self.command_context = kwargs.get("command_context", None)
-        self.bot_message_preview_action = kwargs.get("bot_message_preview_action", None)
+        self.bot_message_preview_action = kwargs.get("botMessagePreviewAction", None)
         self.bot_activity_preview = kwargs.get("bot_activity_preview", None)
         self.message_payload = kwargs.get("message_payload", None)
 
@@ -910,7 +910,8 @@ class O365ConnectorCardActionQuery(Model):
     def __init__(self, **kwargs):
         super(O365ConnectorCardActionQuery, self).__init__(**kwargs)
         self.body = kwargs.get("body", None)
-        self.action_id = kwargs.get("action_id", None)
+        # This is how it comes in from Teams
+        self.action_id = kwargs.get("actionId", None)
 
 
 class O365ConnectorCardDateInput(O365ConnectorCardInputBase):
@@ -1535,7 +1536,7 @@ class TeamsChannelAccount(ChannelAccount):
         "given_name": {"key": "givenName", "type": "str"},
         "surname": {"key": "surname", "type": "str"},
         "email": {"key": "email", "type": "str"},
-        "user_principal_name": {"key": "userPrincipalName", "type": "str"},
+        "userPrincipalName": {"key": "userPrincipalName", "type": "str"},
     }
 
     def __init__(self, **kwargs):
@@ -1543,7 +1544,7 @@ class TeamsChannelAccount(ChannelAccount):
         self.given_name = kwargs.get("given_name", None)
         self.surname = kwargs.get("surname", None)
         self.email = kwargs.get("email", None)
-        self.user_principal_name = kwargs.get("user_principal_name", None)
+        self.user_principal_name = kwargs.get("userPrincipalName", None)
 
 
 class TeamsChannelData(Model):
@@ -1573,7 +1574,8 @@ class TeamsChannelData(Model):
     def __init__(self, **kwargs):
         super(TeamsChannelData, self).__init__(**kwargs)
         self.channel = kwargs.get("channel", None)
-        self.event_type = kwargs.get("event_type", None)
+        # doing camel case here since that's how the data comes in
+        self.event_type = kwargs.get("eventType", None)
         self.team = kwargs.get("team", None)
         self.notification = kwargs.get("notification", None)
         self.tenant = kwargs.get("tenant", None)
