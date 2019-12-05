@@ -40,7 +40,7 @@ async def messages(req: Request) -> Response:
 
     next_conversation_id = FACTORY.create_skill_conversation_id(current_conversation_id, current_service_url)
 
-    await CLIENT.post_activity(None, None, TO_URI, SERVICE_URL, next_conversation_id, inbound_activity)
+    await CLIENT.post_activity(CONFIG.APP_ID, CONFIG.SKILL_APP_ID, TO_URI, SERVICE_URL, next_conversation_id, inbound_activity)
     return Response(status=201)
 
 APP = web.Application()

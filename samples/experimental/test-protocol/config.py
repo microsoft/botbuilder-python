@@ -15,3 +15,4 @@ class DefaultConfig:
     APP_PASSWORD = os.environ.get("MicrosoftAppPassword", "")
     NEXT = "http://localhost:3978/api/messages"
     SERVICE_URL = "http://localhost:3428/api/connector"
+    SKILL_APP_ID = ""

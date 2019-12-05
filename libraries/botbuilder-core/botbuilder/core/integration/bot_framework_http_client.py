@@ -76,7 +76,7 @@ class BotFrameworkHttpClient:
             }
             if token:
                 headers_dict.update(
-                    {"Authorization": f"Bearer:{token}",}
+                    {"Authorization": f"Bearer {token}",}
                 )
 
             json_content = json.dumps(activity.serialize())
@@ -111,7 +111,7 @@ class BotFrameworkHttpClient:
         app_credentials = MicrosoftAppCredentials(
             app_id, app_password, oauth_scope=oauth_scope
         )
-        if self._channel_provider.is_government():
+        if self._channel_provider and self._channel_provider.is_government():
             app_credentials.oauth_endpoint = (
                 GovernmentConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL
             )

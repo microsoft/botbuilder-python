@@ -27,6 +27,7 @@ class JwtTokenValidation:
         auth_header: str,
         credentials: CredentialProvider,
         channel_service_or_provider: Union[str, ChannelProvider] = "",
+        auth_configuration: AuthenticationConfiguration = None,
     ) -> ClaimsIdentity:
         """Authenticates the request and sets the service url in the set of trusted urls.
         :param activity: The incoming Activity from the Bot Framework or the Emulator
@@ -34,7 +35,8 @@ class JwtTokenValidation:
         :param auth_header: The Bearer token included as part of the request
         :type auth_header: str
         :param credentials: The set of valid credentials, such as the Bot Application ID
-        :param channel_service: String for the channel service
+        :param channel_service_or_provider: String for the channel service
+        :param auth_configuration: Authentication configuration
         :type credentials: CredentialProvider
 
         :raises Exception:
@@ -55,6 +57,7 @@ class JwtTokenValidation:
             channel_service_or_provider,
             activity.channel_id,
             activity.service_url,
+            auth_configuration,
         )
 
         # On the standard Auth path, we need to trust the URL that was incoming.

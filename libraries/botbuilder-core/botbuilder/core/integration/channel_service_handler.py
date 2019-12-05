@@ -454,7 +454,7 @@ class ChannelServiceHandler:
         return await JwtTokenValidation.validate_auth_header(
             auth_header,
             self._credential_provider,
-            self._channel_provider.channel_service,
+            self._channel_provider,
             "unknown",
-            self._auth_config,
+            auth_configuration=self._auth_config,
         )
