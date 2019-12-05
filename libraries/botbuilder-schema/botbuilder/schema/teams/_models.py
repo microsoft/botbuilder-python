@@ -12,6 +12,7 @@
 from msrest.serialization import Model
 from botbuilder.schema import Activity
 
+
 class AppBasedLinkQuery(Model):
     """Invoke request body type for app-based link query.
 
