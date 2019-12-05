@@ -10,7 +10,7 @@
 # --------------------------------------------------------------------------
 
 from msrest.serialization import Model
-
+from botbuilder.schema import Activity
 
 class AppBasedLinkQuery(Model):
     """Invoke request body type for app-based link query.
@@ -1575,7 +1575,7 @@ class TeamsChannelData(Model):
         super(TeamsChannelData, self).__init__(**kwargs)
         self.channel = kwargs.get("channel", None)
         # doing camel case here since that's how the data comes in
-        self.event_type = kwargs.get("eventType", None)
+        self.event_type = kwargs.get("event_type", None)
         self.team = kwargs.get("team", None)
         self.notification = kwargs.get("notification", None)
         self.tenant = kwargs.get("tenant", None)
