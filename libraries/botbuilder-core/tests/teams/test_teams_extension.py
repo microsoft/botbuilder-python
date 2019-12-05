@@ -74,7 +74,7 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         result = teams_get_team_info(activity)
 
         # Assert
-        assert result is TeamInfo(id="id123", name="channel_name")
+        assert result == TeamInfo(id="id123", name="channel_name")
 
     def test_teams_get_team_info_with_no_channel_data(self):
         # Arrange
