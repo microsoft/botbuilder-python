@@ -1,11 +1,12 @@
 from botbuilder.schema import Activity
 from botbuilder.schema.teams import NotificationInfo, TeamsChannelData, TeamInfo
 
+def dummy():
+    return 1
 
 def teams_get_channel_id(activity: Activity) -> str:
     if not activity:
         return None
-    
 
     if activity.channel_data:
         channel_data = TeamsChannelData().deserialize(activity.channel_data)
