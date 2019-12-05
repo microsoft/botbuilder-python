@@ -8,7 +8,7 @@ import jwt
 
 from .jwt_token_extractor import JwtTokenExtractor
 from .verify_options import VerifyOptions
-from .constants import Constants
+from .authentication_constants import AuthenticationConstants
 from .credential_provider import CredentialProvider
 from .claims_identity import ClaimsIdentity
 from .government_constants import GovernmentConstants
@@ -112,13 +112,13 @@ class EmulatorValidation:
         open_id_metadata = (
             GovernmentConstants.TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL
             if is_gov
-            else Constants.TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL
+            else AuthenticationConstants.TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL
         )
 
         token_extractor = JwtTokenExtractor(
             EmulatorValidation.TO_BOT_FROM_EMULATOR_TOKEN_VALIDATION_PARAMETERS,
             open_id_metadata,
-            Constants.ALLOWED_SIGNING_ALGORITHMS,
+            AuthenticationConstants.ALLOWED_SIGNING_ALGORITHMS,
         )
 
         identity = await asyncio.ensure_future(
@@ -158,7 +158,9 @@ class EmulatorValidation:
             app_id = app_id_claim
         elif version_claim == "2.0":
             # Emulator, "2.0" puts the AppId in the "azp" claim.
-            app_authz_claim = identity.get_claim_value(Constants.AUTHORIZED_PARTY)
+            app_authz_claim = identity.get_claim_value(
+                AuthenticationConstants.AUTHORIZED_PARTY
+            )
             if not app_authz_claim:
                 # No claim around AppID. Not Authorized.
                 raise Exception(
