@@ -61,20 +61,24 @@ class TeamsActivityHandler(ActivityHandler):
 
             if turn_context.activity.name == "fileConsent/invoke":
                 return await self.on_teams_file_consent(
-                    turn_context, FileConsentCardResponse(**turn_context.activity.value)
+                    turn_context,
+                    FileConsentCardResponse().deserialize(turn_context.activity.value),
                 )
 
             if turn_context.activity.name == "actionableMessage/executeAction":
                 await self.on_teams_o365_connector_card_action(
                     turn_context,
-                    O365ConnectorCardActionQuery(**turn_context.activity.value),
+                    O365ConnectorCardActionQuery().deserialize(
+                        turn_context.activity.value
+                    ),
                 )
                 return self._create_invoke_response()
 
             if turn_context.activity.name == "composeExtension/queryLink":
                 return self._create_invoke_response(
                     await self.on_teams_app_based_link_query(
-                        turn_context, AppBasedLinkQuery(**turn_context.activity.value)
+                        turn_context,
+                        AppBasedLinkQuery().deserialize(turn_context.activity.value),
                     )
                 )
 
@@ -82,7 +86,9 @@ class TeamsActivityHandler(ActivityHandler):
                 return self._create_invoke_response(
                     await self.on_teams_messaging_extension_query(
                         turn_context,
-                        MessagingExtensionQuery(**turn_context.activity.value),
+                        MessagingExtensionQuery().deserialize(
+                            turn_context.activity.value
+                        ),
                     )
                 )
 
@@ -113,7 +119,9 @@ class TeamsActivityHandler(ActivityHandler):
                 return self._create_invoke_response(
                     await self.on_teams_messaging_extension_configuration_query_settings_url(
                         turn_context,
-                        MessagingExtensionQuery(**turn_context.activity.value),
+                        MessagingExtensionQuery().deserialize(
+                            turn_context.activity.value
+                        ),
                     )
                 )
 
@@ -132,14 +140,16 @@ class TeamsActivityHandler(ActivityHandler):
             if turn_context.activity.name == "task/fetch":
                 return self._create_invoke_response(
                     await self.on_teams_task_module_fetch(
-                        turn_context, TaskModuleRequest(**turn_context.activity.value)
+                        turn_context,
+                        TaskModuleRequest().deserialize(turn_context.activity.value),
                     )
                 )
 
             if turn_context.activity.name == "task/submit":
                 return self._create_invoke_response(
                     await self.on_teams_task_module_submit(
-                        turn_context, TaskModuleRequest(**turn_context.activity.value)
+                        turn_context,
+                        TaskModuleRequest().deserialize(turn_context.activity.value),
                     )
                 )
 
@@ -280,7 +290,9 @@ class TeamsActivityHandler(ActivityHandler):
     async def on_conversation_update_activity(self, turn_context: TurnContext):
 
         if turn_context.activity.channel_id == Channels.ms_teams:
-            channel_data = TeamsChannelData(**turn_context.activity.channel_data)
+            channel_data = TeamsChannelData().deserialize(
+                turn_context.activity.channel_data
+            )
             if turn_context.activity.members_added:
                 return await self.on_teams_members_added_dispatch_activity(
                     turn_context.activity.members_added, channel_data.team, turn_context
@@ -296,7 +308,7 @@ class TeamsActivityHandler(ActivityHandler):
             if channel_data:
                 if channel_data.event_type == "channelCreated":
                     return await self.on_teams_channel_created_activity(
-                        ChannelInfo(**channel_data.channel),
+                        ChannelInfo().deserialize(channel_data.channel),
                         channel_data.team,
                         turn_context,
                     )
