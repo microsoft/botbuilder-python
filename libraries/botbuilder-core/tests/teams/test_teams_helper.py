@@ -5,8 +5,8 @@ from botbuilder.schema import Activity, ChannelAccount, Mention
 from botbuilder.schema.teams import (
     MessageActionsPayload,
     MessagingExtensionAction,
-    TaskModuleRequestContext
-    )
+    TaskModuleRequestContext,
+)
 
 
 class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
@@ -39,7 +39,7 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         data = {
             "mentioned": {"id": "123", "name": "testName"},
             "text": "Hello <at>testName</at>",
-            "type": "mention"
+            "type": "mention",
         }
 
         # Act
