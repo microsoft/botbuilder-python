@@ -510,6 +510,7 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
 
     async def test_on_teams_messaging_extension_bot_message_preview_edit_activity(self):
         # Arrange
+
         activity = Activity(
             type=ActivityTypes.invoke,
             name="composeExtension/submitAction",

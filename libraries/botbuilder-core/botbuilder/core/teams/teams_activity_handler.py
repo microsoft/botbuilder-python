@@ -303,7 +303,9 @@ class TeamsActivityHandler(ActivityHandler):
     async def on_conversation_update_activity(self, turn_context: TurnContext):
 
         if turn_context.activity.channel_id == Channels.ms_teams:
-            channel_data = TeamsChannelData(**turn_context.activity.channel_data)
+            channel_data = TeamsChannelData().deserialize(
+                turn_context.activity.channel_data
+            )
             if turn_context.activity.members_added:
                 return await self.on_teams_members_added_dispatch_activity(
                     turn_context.activity.members_added, channel_data.team, turn_context
@@ -319,7 +321,7 @@ class TeamsActivityHandler(ActivityHandler):
             if channel_data:
                 if channel_data.event_type == "channelCreated":
                     return await self.on_teams_channel_created_activity(
-                        ChannelInfo(**channel_data.channel),
+                        ChannelInfo().deserialize(channel_data.channel),
                         channel_data.team,
                         turn_context,
                     )

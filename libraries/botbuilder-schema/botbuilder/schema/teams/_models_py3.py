@@ -10,7 +10,7 @@
 # --------------------------------------------------------------------------
 
 from msrest.serialization import Model
-from botbuilder.schema import Attachment, ChannelAccount
+from botbuilder.schema import Activity, Attachment, ChannelAccount
 
 
 class TaskModuleRequest(Model):
@@ -646,7 +646,7 @@ class MessagingExtensionAction(TaskModuleRequest):
      ~botframework.connector.teams.models.enum
     :param bot_activity_preview:
     :type bot_activity_preview:
-     list[~botframework.connector.teams.models.Activity]
+     list[~botframework.schema.models.Activity]
     :param message_payload: Message content sent as part of the command
      request.
     :type message_payload:
