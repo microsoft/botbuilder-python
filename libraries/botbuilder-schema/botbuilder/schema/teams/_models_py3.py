@@ -670,7 +670,7 @@ class MessagingExtensionAction(TaskModuleRequest):
         context=None,
         command_id: str = None,
         command_context=None,
-        botMessagePreviewAction=None,
+        bot_message_preview_action=None,
         bot_activity_preview=None,
         message_payload=None,
         **kwargs
@@ -680,7 +680,7 @@ class MessagingExtensionAction(TaskModuleRequest):
         )
         self.command_id = command_id
         self.command_context = command_context
-        self.bot_message_preview_action = botMessagePreviewAction
+        self.bot_message_preview_action = bot_message_preview_action
         self.bot_activity_preview = bot_activity_preview
         self.message_payload = message_payload
 

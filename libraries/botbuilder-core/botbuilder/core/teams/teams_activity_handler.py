@@ -4,6 +4,7 @@
 from http import HTTPStatus
 from botbuilder.schema import Activity, ActivityTypes, ChannelAccount
 from botbuilder.core.turn_context import TurnContext
+from botbuilder.core.teams.teams_helper import deserializer_helper
 from botbuilder.core import ActivityHandler, InvokeResponse, BotFrameworkAdapter
 from botbuilder.schema.teams import (
     AppBasedLinkQuery,
@@ -62,14 +63,16 @@ class TeamsActivityHandler(ActivityHandler):
             if turn_context.activity.name == "fileConsent/invoke":
                 return await self.on_teams_file_consent(
                     turn_context,
-                    FileConsentCardResponse().deserialize(turn_context.activity.value),
+                    deserializer_helper(
+                        FileConsentCardResponse, turn_context.activity.value
+                    ),
                 )
 
             if turn_context.activity.name == "actionableMessage/executeAction":
                 await self.on_teams_o365_connector_card_action(
                     turn_context,
-                    O365ConnectorCardActionQuery().deserialize(
-                        turn_context.activity.value
+                    deserializer_helper(
+                        O365ConnectorCardActionQuery, turn_context.activity.value
                     ),
                 )
                 return self._create_invoke_response()
@@ -78,7 +81,9 @@ class TeamsActivityHandler(ActivityHandler):
                 return self._create_invoke_response(
                     await self.on_teams_app_based_link_query(
                         turn_context,
-                        AppBasedLinkQuery().deserialize(turn_context.activity.value),
+                        deserializer_helper(
+                            AppBasedLinkQuery, turn_context.activity.value
+                        ),
                     )
                 )
 
@@ -86,8 +91,8 @@ class TeamsActivityHandler(ActivityHandler):
                 return self._create_invoke_response(
                     await self.on_teams_messaging_extension_query(
                         turn_context,
-                        MessagingExtensionQuery().deserialize(
-                            turn_context.activity.value
+                        deserializer_helper(
+                            MessagingExtensionQuery, turn_context.activity.value
                         ),
                     )
                 )
@@ -103,7 +108,9 @@ class TeamsActivityHandler(ActivityHandler):
                 return self._create_invoke_response(
                     await self.on_teams_messaging_extension_submit_action_dispatch(
                         turn_context,
-                        MessagingExtensionAction(**turn_context.activity.value),
+                        deserializer_helper(
+                            MessagingExtensionAction, turn_context.activity.value
+                        ),
                     )
                 )
 
@@ -111,7 +118,9 @@ class TeamsActivityHandler(ActivityHandler):
                 return self._create_invoke_response(
                     await self.on_teams_messaging_extension_fetch_task(
                         turn_context,
-                        MessagingExtensionAction(**turn_context.activity.value),
+                        deserializer_helper(
+                            MessagingExtensionAction, turn_context.activity.value,
+                        ),
                     )
                 )
 
@@ -119,8 +128,8 @@ class TeamsActivityHandler(ActivityHandler):
                 return self._create_invoke_response(
                     await self.on_teams_messaging_extension_configuration_query_settings_url(
                         turn_context,
-                        MessagingExtensionQuery().deserialize(
-                            turn_context.activity.value
+                        deserializer_helper(
+                            MessagingExtensionQuery, turn_context.activity.value
                         ),
                     )
                 )
@@ -141,7 +150,9 @@ class TeamsActivityHandler(ActivityHandler):
                 return self._create_invoke_response(
                     await self.on_teams_task_module_fetch(
                         turn_context,
-                        TaskModuleRequest().deserialize(turn_context.activity.value),
+                        deserializer_helper(
+                            TaskModuleRequest, turn_context.activity.value
+                        ),
                     )
                 )
 
@@ -149,7 +160,9 @@ class TeamsActivityHandler(ActivityHandler):
                 return self._create_invoke_response(
                     await self.on_teams_task_module_submit(
                         turn_context,
-                        TaskModuleRequest().deserialize(turn_context.activity.value),
+                        deserializer_helper(
+                            TaskModuleRequest, turn_context.activity.value
+                        ),
                     )
                 )
 
