@@ -516,11 +516,11 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
             value={
                 "data": {"key": "value"},
                 "context": {"theme": "dark"},
-                "comamndId": "test_command",
+                "commandId": "test_command",
                 "commandContext": "command_context_test",
                 "botMessagePreviewAction": "edit",
-                "botActivityPreview": [Activity().serialize()],
-                "messagePayload": MessageActionsPayload().serialize(),
+                "botActivityPreview": [{"id": "activity123"}],
+                "messagePayload": {"id": "payloadid"},
             },
         )
 
@@ -547,11 +547,11 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
             value={
                 "data": {"key": "value"},
                 "context": {"theme": "dark"},
-                "comamndId": "test_command",
+                "commandId": "test_command",
                 "commandContext": "command_context_test",
                 "botMessagePreviewAction": "send",
-                "botActivityPreview": [Activity().serialize()],
-                "messagePayload": MessageActionsPayload().serialize(),
+                "botActivityPreview": [{"id": "123"}],
+                "messagePayload": {"id": "abc"},
             },
         )
 
@@ -577,11 +577,11 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
             value={
                 "data": {"key": "value"},
                 "context": {"theme": "dark"},
-                "comamndId": "test_command",
+                "commandId": "test_command",
                 "commandContext": "command_context_test",
                 "botMessagePreviewAction": None,
-                "botActivityPreview": [Activity().serialize()],
-                "messagePayload": MessageActionsPayload().serialize(),
+                "botActivityPreview": [{"id": "test123"}],
+                "messagePayload": {"id": "payloadid123"},
             },
         )
 
@@ -607,7 +607,7 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
             value={
                 "data": {"key": "value"},
                 "context": {"theme": "dark"},
-                "comamndId": "test_command",
+                "commandId": "test_command",
                 "commandContext": "command_context_test",
                 "botMessagePreviewAction": "",
                 "botActivityPreview": [Activity().serialize()],
@@ -635,14 +635,13 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
             value={
                 "data": {"key": "value"},
                 "context": {"theme": "dark"},
-                "comamndId": "test_command",
+                "commandId": "test_command",
                 "commandContext": "command_context_test",
                 "botMessagePreviewAction": "message_action",
-                "botActivityPreview": [Activity().serialize()],
-                "messagePayload": MessageActionsPayload().serialize(),
+                "botActivityPreview": [{"id": "123"}],
+                "messagePayload": {"id": "abc123"},
             },
         )
-
         turn_context = TurnContext(SimpleAdapter(), activity)
 
         # Act
@@ -660,7 +659,7 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
             type=ActivityTypes.invoke,
             name="composeExtension/querySettingUrl",
             value={
-                "comamndId": "test_command",
+                "commandId": "test_command",
                 "parameters": [],
                 "messagingExtensionQueryOptions": {"skip": 1, "count": 1},
                 "state": "state_string",

@@ -7,8 +7,10 @@
 
 from .teams_activity_handler import TeamsActivityHandler
 from .teams_info import TeamsInfo
+from .teams_helper import deserializer_helper
 
 __all__ = [
+    "deserializer_helper",
     "TeamsActivityHandler",
     "TeamsInfo",
 ]

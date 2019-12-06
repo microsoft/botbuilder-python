@@ -559,7 +559,7 @@ class MessagingExtensionAction(TaskModuleRequest):
         super(MessagingExtensionAction, self).__init__(**kwargs)
         self.command_id = kwargs.get("command_id", None)
         self.command_context = kwargs.get("command_context", None)
-        self.bot_message_preview_action = kwargs.get("botMessagePreviewAction", None)
+        self.bot_message_preview_action = kwargs.get("bot_message_preview_action", None)
         self.bot_activity_preview = kwargs.get("bot_activity_preview", None)
         self.message_payload = kwargs.get("message_payload", None)
 
