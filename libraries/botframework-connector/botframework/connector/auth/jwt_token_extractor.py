@@ -142,7 +142,7 @@ class _OpenIdMetadata:
     def _find(self, key_id: str):
         if not self.keys:
             return None
-        key = next(x for x in self.keys if x["kid"] == key_id)
+        key = [x for x in self.keys if x["kid"] == key_id][0]
         public_key = RSAAlgorithm.from_jwk(json.dumps(key))
         endorsements = key.get("endorsements", [])
         return _OpenIdConfig(public_key, endorsements)
