@@ -2,7 +2,7 @@ import asyncio
 
 from .authentication_configuration import AuthenticationConfiguration
 from .verify_options import VerifyOptions
-from .constants import Constants
+from .authentication_constants import AuthenticationConstants
 from .jwt_token_extractor import JwtTokenExtractor
 from .claims_identity import ClaimsIdentity
 from .credential_provider import CredentialProvider
@@ -18,7 +18,7 @@ class ChannelValidation:
     # TO BOT FROM CHANNEL: Token validation parameters when connecting to a bot
     #
     TO_BOT_FROM_CHANNEL_TOKEN_VALIDATION_PARAMETERS = VerifyOptions(
-        issuer=[Constants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER],
+        issuer=[AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER],
         # Audience validation takes place manually in code.
         audience=None,
         clock_tolerance=5 * 60,
@@ -48,10 +48,8 @@ class ChannelValidation:
         :return: A valid ClaimsIdentity.
         :raises Exception:
         """
-        identity = await asyncio.ensure_future(
-            ChannelValidation.authenticate_channel_token(
-                auth_header, credentials, channel_id, auth_configuration
-            )
+        identity = await ChannelValidation.authenticate_channel_token(
+            auth_header, credentials, channel_id, auth_configuration
         )
 
         service_url_claim = identity.get_claim_value(
@@ -87,19 +85,17 @@ class ChannelValidation:
         metadata_endpoint = (
             ChannelValidation.open_id_metadata_endpoint
             if ChannelValidation.open_id_metadata_endpoint
-            else Constants.TO_BOT_FROM_CHANNEL_OPEN_ID_METADATA_URL
+            else AuthenticationConstants.TO_BOT_FROM_CHANNEL_OPEN_ID_METADATA_URL
         )
 
         token_extractor = JwtTokenExtractor(
             ChannelValidation.TO_BOT_FROM_CHANNEL_TOKEN_VALIDATION_PARAMETERS,
             metadata_endpoint,
-            Constants.ALLOWED_SIGNING_ALGORITHMS,
+            AuthenticationConstants.ALLOWED_SIGNING_ALGORITHMS,
         )
 
-        identity = await asyncio.ensure_future(
-            token_extractor.get_identity_from_auth_header(
-                auth_header, channel_id, auth_configuration.required_endorsements
-            )
+        identity = await token_extractor.get_identity_from_auth_header(
+            auth_header, channel_id, auth_configuration.required_endorsements
         )
 
         return await ChannelValidation.validate_identity(identity, credentials)
@@ -123,15 +119,15 @@ class ChannelValidation:
 
         # Look for the "aud" claim, but only if issued from the Bot Framework
         if (
-            identity.get_claim_value(Constants.ISSUER_CLAIM)
-            != Constants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER
+            identity.get_claim_value(AuthenticationConstants.ISSUER_CLAIM)
+            != AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER
         ):
             # The relevant Audience Claim MUST be present. Not Authorized.
             raise Exception("Unauthorized. Audience Claim MUST be present.")
 
         # The AppId from the claim in the token must match the AppId specified by the developer.
         # Note that the Bot Framework uses the Audience claim ("aud") to pass the AppID.
-        aud_claim = identity.get_claim_value(Constants.AUDIENCE_CLAIM)
+        aud_claim = identity.get_claim_value(AuthenticationConstants.AUDIENCE_CLAIM)
         is_valid_app_id = await asyncio.ensure_future(
             credentials.is_valid_appid(aud_claim or "")
         )

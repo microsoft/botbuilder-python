@@ -12,7 +12,7 @@
 from msrest.pipeline import ClientRawResponse
 from msrest.exceptions import HttpOperationError
 
-from .. import models
+from ... import models
 
 
 class TeamsOperations(object):
@@ -34,7 +34,7 @@ class TeamsOperations(object):
 
         self.config = config
 
-    def fetch_channel_list(
+    def get_teams_channels(
         self, team_id, custom_headers=None, raw=False, **operation_config
     ):
         """Fetches channel list for a given team.
@@ -55,7 +55,7 @@ class TeamsOperations(object):
          :class:`HttpOperationError<msrest.exceptions.HttpOperationError>`
         """
         # Construct URL
-        url = self.fetch_channel_list.metadata["url"]
+        url = self.get_teams_channels.metadata["url"]
         path_format_arguments = {
             "teamId": self._serialize.url("team_id", team_id, "str")
         }
@@ -88,9 +88,9 @@ class TeamsOperations(object):
 
         return deserialized
 
-    fetch_channel_list.metadata = {"url": "/v3/teams/{teamId}/conversations"}
+    get_teams_channels.metadata = {"url": "/v3/teams/{teamId}/conversations"}
 
-    def fetch_team_details(
+    def get_team_details(
         self, team_id, custom_headers=None, raw=False, **operation_config
     ):
         """Fetches details related to a team.
@@ -111,7 +111,7 @@ class TeamsOperations(object):
          :class:`HttpOperationError<msrest.exceptions.HttpOperationError>`
         """
         # Construct URL
-        url = self.fetch_team_details.metadata["url"]
+        url = self.get_team_details.metadata["url"]
         path_format_arguments = {
             "teamId": self._serialize.url("team_id", team_id, "str")
         }
@@ -144,4 +144,4 @@ class TeamsOperations(object):
 
         return deserialized
 
-    fetch_team_details.metadata = {"url": "/v3/teams/{teamId}"}
+    get_team_details.metadata = {"url": "/v3/teams/{teamId}"}

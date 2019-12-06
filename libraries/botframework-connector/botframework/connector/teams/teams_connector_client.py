@@ -11,7 +11,7 @@
 
 from msrest.service_client import SDKClient
 from msrest import Configuration, Serializer, Deserializer
-from botbuilder.schema import models
+from .. import models
 from .version import VERSION
 from .operations.teams_operations import TeamsOperations
 

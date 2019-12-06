@@ -5,10 +5,12 @@
 # license information.
 # --------------------------------------------------------------------------
 
-from .teams_activity_handler import TeamsActivityHandler
-from .teams_info import TeamsInfo
+from .aiohttp_channel_service import aiohttp_channel_service_routes
+from .bot_framework_http_client import BotFrameworkHttpClient
+from .channel_service_handler import ChannelServiceHandler
 
 __all__ = [
-    "TeamsActivityHandler",
-    "TeamsInfo",
+    "aiohttp_channel_service_routes",
+    "BotFrameworkHttpClient",
+    "ChannelServiceHandler",
 ]
