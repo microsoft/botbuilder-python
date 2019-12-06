@@ -399,7 +399,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                         )
 
                 if not response:
-                    response = ResourceResponse(activity.id or "")
+                    response = ResourceResponse(id=activity.id or "")
 
                 responses.append(response)
             return responses

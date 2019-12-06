@@ -54,7 +54,7 @@ class Find:
                 synonyms.append(SortedValue(value=choice.action.title, index=index))
 
             if choice.synonyms is not None:
-                for synonym in synonyms:
+                for synonym in choice.synonyms:
                     synonyms.append(SortedValue(value=synonym, index=index))
 
         def found_choice_constructor(value_model: ModelResult) -> ModelResult:
