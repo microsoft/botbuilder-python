@@ -653,6 +653,8 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                     credentials.oauth_scope = (
                         GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
                     )
+            else:
+                credentials = self._credentials
         else:
             credentials = self._credentials
 
