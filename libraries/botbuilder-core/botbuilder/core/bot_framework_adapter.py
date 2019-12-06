@@ -18,13 +18,17 @@ from botbuilder.schema import (
 from botframework.connector import Channels, EmulatorApiClient
 from botframework.connector.aio import ConnectorClient
 from botframework.connector.auth import (
+    AuthenticationConfiguration,
     AuthenticationConstants,
     ChannelValidation,
+    ChannelProvider,
+    ClaimsIdentity,
     GovernmentChannelValidation,
     GovernmentConstants,
     MicrosoftAppCredentials,
     JwtTokenValidation,
     SimpleCredentialProvider,
+    SkillValidation,
 )
 from botframework.connector.token_api import TokenApiClient
 from botframework.connector.token_api.models import TokenStatus
@@ -37,6 +41,7 @@ from .user_token_provider import UserTokenProvider
 USER_AGENT = f"Microsoft-BotFramework/3.1 (BotBuilder Python/{__version__})"
 OAUTH_ENDPOINT = "https://api.botframework.com"
 US_GOV_OAUTH_ENDPOINT = "https://api.botframework.azure.us"
+BOT_IDENTITY_KEY = "BotIdentity"
 
 
 class TokenExchangeState(Model):
@@ -72,6 +77,8 @@ class BotFrameworkAdapterSettings:
         oauth_endpoint: str = None,
         open_id_metadata: str = None,
         channel_service: str = None,
+        channel_provider: ChannelProvider = None,
+        auth_configuration: AuthenticationConfiguration = None,
     ):
         self.app_id = app_id
         self.app_password = app_password
@@ -79,6 +86,8 @@ class BotFrameworkAdapterSettings:
         self.oauth_endpoint = oauth_endpoint
         self.open_id_metadata = open_id_metadata
         self.channel_service = channel_service
+        self.channel_provider = channel_provider
+        self.auth_configuration = auth_configuration or AuthenticationConfiguration()
 
 
 class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
@@ -90,6 +99,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         self.settings.channel_service = self.settings.channel_service or os.environ.get(
             AuthenticationConstants.CHANNEL_SERVICE
         )
+
         self.settings.open_id_metadata = (
             self.settings.open_id_metadata
             or os.environ.get(AuthenticationConstants.BOT_OPEN_ID_METADATA_KEY)
@@ -163,7 +173,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
 
             # Create conversation
             parameters = ConversationParameters(bot=reference.bot)
-            client = self.create_connector_client(reference.service_url)
+            client = await self.create_connector_client(reference.service_url)
 
             # Mix in the tenant ID if specified. This is required for MS Teams.
             if reference.conversation is not None and reference.conversation.tenant_id:
@@ -207,8 +217,9 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         activity = await self.parse_request(req)
         auth_header = auth_header or ""
 
-        await self.authenticate_request(activity, auth_header)
+        identity = await self.authenticate_request(activity, auth_header)
         context = self.create_context(activity)
+        context.turn_state[BOT_IDENTITY_KEY] = identity
 
         # Fix to assign tenant_id from channelData to Conversation.tenant_id.
         # MS Teams currently sends the tenant ID in channelData and the correct behavior is to expose
@@ -228,7 +239,9 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
 
         return await self.run_pipeline(context, logic)
 
-    async def authenticate_request(self, request: Activity, auth_header: str):
+    async def authenticate_request(
+        self, request: Activity, auth_header: str
+    ) -> ClaimsIdentity:
         """
         Allows for the overriding of authentication in unit tests.
         :param request:
@@ -240,10 +253,13 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             auth_header,
             self._credential_provider,
             self.settings.channel_service,
+            self.settings.auth_configuration,
         )
 
         if not claims.is_authenticated:
             raise Exception("Unauthorized Access. Request is not authorized")
+
+        return claims
 
     def create_context(self, activity):
         """
@@ -306,7 +322,8 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         :return:
         """
         try:
-            client = self.create_connector_client(activity.service_url)
+            identity: ClaimsIdentity = context.turn_state.get(BOT_IDENTITY_KEY)
+            client = await self.create_connector_client(activity.service_url, identity)
             return await client.conversations.update_activity(
                 activity.conversation.id, activity.id, activity
             )
@@ -324,7 +341,8 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         :return:
         """
         try:
-            client = self.create_connector_client(reference.service_url)
+            identity: ClaimsIdentity = context.turn_state.get(BOT_IDENTITY_KEY)
+            client = await self.create_connector_client(reference.service_url, identity)
             await client.conversations.delete_activity(
                 reference.conversation.id, reference.activity_id
             )
@@ -365,7 +383,10 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                             "BotFrameworkAdapter.send_activity(): conversation.id can not be None."
                         )
 
-                    client = self.create_connector_client(activity.service_url)
+                    identity: ClaimsIdentity = context.turn_state.get(BOT_IDENTITY_KEY)
+                    client = await self.create_connector_client(
+                        activity.service_url, identity
+                    )
                     if activity.type == "trace" and activity.channel_id != "emulator":
                         pass
                     elif activity.reply_to_id:
@@ -378,7 +399,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                         )
 
                 if not response:
-                    response = ResourceResponse(activity.id or "")
+                    response = ResourceResponse(id=activity.id or "")
 
                 responses.append(response)
             return responses
@@ -409,7 +430,8 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                 )
             service_url = context.activity.service_url
             conversation_id = context.activity.conversation.id
-            client = self.create_connector_client(service_url)
+            identity: ClaimsIdentity = context.turn_state.get(BOT_IDENTITY_KEY)
+            client = await self.create_connector_client(service_url, identity)
             return await client.conversations.delete_conversation_member(
                 conversation_id, member_id
             )
@@ -446,7 +468,8 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                 )
             service_url = context.activity.service_url
             conversation_id = context.activity.conversation.id
-            client = self.create_connector_client(service_url)
+            identity: ClaimsIdentity = context.turn_state.get(BOT_IDENTITY_KEY)
+            client = await self.create_connector_client(service_url, identity)
             return await client.conversations.get_activity_members(
                 conversation_id, activity_id
             )
@@ -474,7 +497,8 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                 )
             service_url = context.activity.service_url
             conversation_id = context.activity.conversation.id
-            client = self.create_connector_client(service_url)
+            identity: ClaimsIdentity = context.turn_state.get(BOT_IDENTITY_KEY)
+            client = await self.create_connector_client(service_url, identity)
             return await client.conversations.get_conversation_members(conversation_id)
         except Exception as error:
             raise error
@@ -488,7 +512,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         :param continuation_token:
         :return:
         """
-        client = self.create_connector_client(service_url)
+        client = await self.create_connector_client(service_url)
         return await client.conversations.get_conversations(continuation_token)
 
     async def get_user_token(
@@ -595,13 +619,44 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             user_id, connection_name, context.activity.channel_id, resource_urls
         )
 
-    def create_connector_client(self, service_url: str) -> ConnectorClient:
+    async def create_connector_client(
+        self, service_url: str, identity: ClaimsIdentity = None
+    ) -> ConnectorClient:
         """
         Allows for mocking of the connector client in unit tests.
         :param service_url:
+        :param identity:
         :return:
         """
-        client = ConnectorClient(self._credentials, base_url=service_url)
+        if identity:
+            bot_app_id_claim = identity.claims.get(
+                AuthenticationConstants.AUDIENCE_CLAIM
+            ) or identity.claims.get(AuthenticationConstants.APP_ID_CLAIM)
+
+            credentials = None
+            if bot_app_id_claim and SkillValidation.is_skill_claim(identity.claims):
+                scope = JwtTokenValidation.get_app_id_from_claims(identity.claims)
+
+                password = await self._credential_provider.get_app_password(
+                    bot_app_id_claim
+                )
+                credentials = MicrosoftAppCredentials(
+                    bot_app_id_claim, password, oauth_scope=scope
+                )
+                if (
+                    self.settings.channel_provider
+                    and self.settings.channel_provider.is_government()
+                ):
+                    credentials.oauth_endpoint = (
+                        GovernmentConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL
+                    )
+                    credentials.oauth_scope = (
+                        GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
+                    )
+        else:
+            credentials = self._credentials
+
+        client = ConnectorClient(credentials, base_url=service_url)
         client.config.add_user_agent(USER_AGENT)
         return client
 

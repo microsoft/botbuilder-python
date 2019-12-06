@@ -377,4 +377,5 @@ class TurnContext:
             for entity in activity.entities:
                 if entity.type.lower() == "mention":
                     result.append(entity)
+
         return result
