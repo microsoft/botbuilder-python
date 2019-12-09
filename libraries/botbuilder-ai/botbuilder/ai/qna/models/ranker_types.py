@@ -3,9 +3,9 @@
 
 
 class RankerTypes:
-    """ Enumeration of types of ranking. """
 
     """ Default Ranker Behaviour. i.e. Ranking based on Questions and Answer. """
+
     DEFAULT = "Default"
 
     """ Ranker based on question Only. """

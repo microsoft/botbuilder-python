@@ -49,7 +49,6 @@ class QnAMakerTraceInfo:
         is_test: (Optional) A value indicating whether to call test or prod environment of knowledgebase.
 
         ranker_types: (Optional) Ranker types.
-        
         """
         self.message = message
         self.query_results = query_results
