@@ -139,6 +139,8 @@ class GenerateAnswerUtils:
 
             hydrated_options.context = query_options.context
             hydrated_options.qna_id = query_options.qna_id
+            hydrated_options.is_test = query_options.is_test
+            hydrated_options.ranker_type = query_options.ranker_type
 
         return hydrated_options
 
@@ -154,6 +156,8 @@ class GenerateAnswerUtils:
             strict_filters=options.strict_filters,
             context=options.context,
             qna_id=options.qna_id,
+            is_test=options.is_test,
+            ranker_type=options.ranker_type,
         )
 
         http_request_helper = HttpRequestUtils(self._http_client)
@@ -178,6 +182,8 @@ class GenerateAnswerUtils:
             strict_filters=options.strict_filters,
             context=options.context,
             qna_id=options.qna_id,
+            is_test=options.is_test,
+            ranker_type=options.ranker_type,
         )
 
         trace_activity = Activity(
