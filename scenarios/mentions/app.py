@@ -29,7 +29,7 @@ ADAPTER = BotFrameworkAdapter(SETTINGS)
 
 # Catch-all for errors.
 async def on_error(  # pylint: disable=unused-argument
-    context: TurnContext, error: Exception
+    self, context: TurnContext, error: Exception
 ):
     # This check writes out errors to console log .vs. app insights.
     # NOTE: In production environment, you should consider logging this to Azure
