@@ -43,14 +43,14 @@ class RosterBot(TeamsActivityHandler):
     async def _show_channels(
         self, turn_context: TurnContext
     ):
-        channels = TeamsInfo.get_team_channels(turn_context)
+        channels = await TeamsInfo.get_team_channels(turn_context)
         reply = MessageFactory.text(f"Total of {len(channels)} channels are currently in team")
         await turn_context.send_activity(reply)
         messages = list(map(lambda c: (f'{c.id} --> {c.name}'), channels))
         await self._send_in_batches(turn_context, messages)
         
     async def _show_details(self, turn_context: TurnContext):
-        team_details = TeamsInfo.get_team_details(turn_context)
+        team_details = await TeamsInfo.get_team_details(turn_context)
         reply = MessageFactory.text(f"The team name is {team_details.name}. The team ID is {team_details.id}. The AADGroupID is {team_details.aad_group_id}.")
         await turn_context.send_activity(reply)    
         
