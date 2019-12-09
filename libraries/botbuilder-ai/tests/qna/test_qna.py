@@ -707,7 +707,9 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         qna = QnAMaker(QnaApplicationTest.tests_endpoint)
         question: str = "Q11"
         context = QnaApplicationTest._get_context(question, TestAdapter())
-        response_json = QnaApplicationTest._get_json_for_file("QnaMaker_IsTest_true.json")
+        response_json = QnaApplicationTest._get_json_for_file(
+            "QnaMaker_IsTest_true.json"
+        )
 
         with patch(
             "aiohttp.ClientSession.post",
@@ -721,7 +723,9 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         qna = QnAMaker(QnaApplicationTest.tests_endpoint)
         question: str = "Q11"
         context = QnaApplicationTest._get_context(question, TestAdapter())
-        response_json = QnaApplicationTest._get_json_for_file("QnaMaker_RankerType_QuestionOnly.json")
+        response_json = QnaApplicationTest._get_json_for_file(
+            "QnaMaker_RankerType_QuestionOnly.json"
+        )
 
         with patch(
             "aiohttp.ClientSession.post",

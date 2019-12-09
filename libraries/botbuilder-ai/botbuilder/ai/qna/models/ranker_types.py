@@ -1,7 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-class RankerTypes():
+
+class RankerTypes:
     """ Enumeration of types of ranking. """
 
     """ Default Ranker Behaviour. i.e. Ranking based on Questions and Answer. """
@@ -12,4 +13,3 @@ class RankerTypes():
 
     """ Ranker based on Autosuggest for question field only. """
     AUTO_SUGGEST_QUESTION = "AutoSuggestQuestion"
-    

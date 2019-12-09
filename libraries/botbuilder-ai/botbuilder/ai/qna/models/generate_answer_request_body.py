@@ -9,6 +9,7 @@ from .metadata import Metadata
 from .qna_request_context import QnARequestContext
 from .ranker_types import RankerTypes
 
+
 class GenerateAnswerRequestBody(Model):
     """ Question used as the payload body for QnA Maker's Generate Answer API. """
 

@@ -15,7 +15,7 @@ class QnAMakerOptions:
         context: [QnARequestContext] = None,
         qna_id: int = None,
         is_test: bool = False,
-        ranker_type: bool = RankerTypes.DEFAULT
+        ranker_type: bool = RankerTypes.DEFAULT,
     ):
         self.score_threshold = score_threshold
         self.timeout = timeout

@@ -9,6 +9,7 @@ from .query_result import QueryResult
 from .qna_request_context import QnARequestContext
 from .ranker_types import RankerTypes
 
+
 class QnAMakerTraceInfo:
     """ Represents all the trace info that we collect from the QnAMaker Middleware. """
 
@@ -23,7 +24,7 @@ class QnAMakerTraceInfo:
         context: QnARequestContext = None,
         qna_id: int = None,
         is_test: bool = False,
-        ranker_type: str = RankerTypes.DEFAULT
+        ranker_type: str = RankerTypes.DEFAULT,
     ):
         """
         Parameters:
