@@ -258,8 +258,8 @@ class CosmosDbPartitionedStorage(Storage):
                             self.compatability_mode_partition_key = True
                         elif "/id" not in paths:
                             raise Exception(
-                                f"Custom Partition Key Paths are not supported. {self.config.container_id} " \
-                                    "has a custom Partition Key Path of {paths[0]}."
+                                f"Custom Partition Key Paths are not supported. {self.config.container_id} "
+                                "has a custom Partition Key Path of {paths[0]}."
                             )
 
                 else:
