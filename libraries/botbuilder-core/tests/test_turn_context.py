@@ -309,12 +309,14 @@ class TestBotContext(aiounittest.AsyncTestCase):
             type="message",
             text="<at>TestOAuth619</at> test activity",
             recipient=ChannelAccount(id="TestOAuth619"),
-            entities=[Entity().deserialize(
-                Mention(
-                    type="mention",
-                    text="<at>TestOAuth619</at>",
-                    mentioned=ChannelAccount(name="Bot", id="TestOAuth619"),
-                ).serialize())
+            entities=[
+                Entity().deserialize(
+                    Mention(
+                        type="mention",
+                        text="<at>TestOAuth619</at>",
+                        mentioned=ChannelAccount(name="Bot", id="TestOAuth619"),
+                    ).serialize()
+                )
             ],
         )
 

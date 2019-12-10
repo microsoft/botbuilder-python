@@ -248,12 +248,14 @@ class TestConversationState(aiounittest.AsyncTestCase):
                 type=ActivityTypes.message,
                 text=attach_command,
                 recipient=ChannelAccount(id=recipient_id),
-                entities=[Entity().deserialize(
-                    Mention(
-                        type="mention",
-                        text=f"<at>{recipient_id}</at>",
-                        mentioned=ChannelAccount(name="Bot", id=recipient_id),
-                    ).serialize())
+                entities=[
+                    Entity().deserialize(
+                        Mention(
+                            type="mention",
+                            text=f"<at>{recipient_id}</at>",
+                            mentioned=ChannelAccount(name="Bot", id=recipient_id),
+                        ).serialize()
+                    )
                 ],
             )
             await application_adapter.receive_activity(attach_activity)
