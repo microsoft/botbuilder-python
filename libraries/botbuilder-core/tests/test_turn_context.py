@@ -9,6 +9,7 @@ from botbuilder.schema import (
     ActivityTypes,
     ChannelAccount,
     ConversationAccount,
+    Entity,
     Mention,
     ResourceResponse,
 )
@@ -308,12 +309,12 @@ class TestBotContext(aiounittest.AsyncTestCase):
             type="message",
             text="<at>TestOAuth619</at> test activity",
             recipient=ChannelAccount(id="TestOAuth619"),
-            entities=[
+            entities=[Entity().deserialize(
                 Mention(
                     type="mention",
                     text="<at>TestOAuth619</at>",
                     mentioned=ChannelAccount(name="Bot", id="TestOAuth619"),
-                )
+                ).serialize())
             ],
         )
 
