@@ -62,7 +62,7 @@ class MemoryStorage(Storage):
                     else new_value.get("e_tag", None)
                 )
                 if new_value_etag == "":
-                    raise Exception("blob_storage.write(): etag missing")
+                    raise Exception("memory_storage.write(): etag missing")
                 if (
                     old_state_etag is not None
                     and new_value_etag is not None
