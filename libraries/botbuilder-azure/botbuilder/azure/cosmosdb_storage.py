@@ -58,12 +58,18 @@ class CosmosDbConfig:
 
 class CosmosDbKeyEscape:
     @staticmethod
-    def sanitize_key(key) -> str:
+    def sanitize_key(
+        key: str, key_suffix: str = "", compatibility_mode: bool = True
+    ) -> str:
         """Return the sanitized key.
 
         Replace characters that are not allowed in keys in Cosmos.
 
-        :param key:
+        :param key: The provided key to be escaped.
+        :param key_suffix: The string to add a the end of all RowKeys.
+        :param compatibility_mode: True if keys should be truncated in order to support previous CosmosDb
+            max key length of 255.  This behavior can be overridden by setting
+            cosmosdb_partitioned_config.compatibility_mode to False.
         :return str:
         """
         # forbidden characters
@@ -72,11 +78,17 @@ class CosmosDbKeyEscape:
         # Unicode code point of the character and return the new string
         key = "".join(map(lambda x: "*" + str(ord(x)) if x in bad_chars else x, key))
 
-        return CosmosDbKeyEscape.truncate_key(key)
+        if key_suffix is None:
+            key_suffix = ""
+
+        return CosmosDbKeyEscape.truncate_key(f"{key}{key_suffix}", compatibility_mode)
 
     @staticmethod
-    def truncate_key(key: str) -> str:
+    def truncate_key(key: str, compatibility_mode: bool = True) -> str:
         max_key_len = 255
+
+        if not compatibility_mode:
+            return key
 
         if len(key) > max_key_len:
             aux_hash = sha256(key.encode("utf-8"))
