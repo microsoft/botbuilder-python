@@ -14,7 +14,7 @@ from botbuilder.core import (
 )
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.core.inspection import InspectionMiddleware, InspectionState
-from botbuilder.schema import Activity, ActivityTypes, ChannelAccount, Mention
+from botbuilder.schema import Activity, ActivityTypes, ChannelAccount, Entity, Mention
 
 
 class TestConversationState(aiounittest.AsyncTestCase):
@@ -249,10 +249,12 @@ class TestConversationState(aiounittest.AsyncTestCase):
                 text=attach_command,
                 recipient=ChannelAccount(id=recipient_id),
                 entities=[
-                    Mention(
-                        type="mention",
-                        text=f"<at>{recipient_id}</at>",
-                        mentioned=ChannelAccount(name="Bot", id=recipient_id),
+                    Entity().deserialize(
+                        Mention(
+                            type="mention",
+                            text=f"<at>{recipient_id}</at>",
+                            mentioned=ChannelAccount(name="Bot", id=recipient_id),
+                        ).serialize()
                     )
                 ],
             )

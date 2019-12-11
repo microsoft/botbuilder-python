@@ -48,21 +48,21 @@ class MemoryStorage(Storage):
                 # If it exists then we want to cache its original value from memory
                 if key in self.memory:
                     old_state = self.memory[key]
-                    if not isinstance(old_state, StoreItem):
+                    if isinstance(old_state, dict):
                         old_state_etag = old_state.get("e_tag", None)
-                    elif old_state.e_tag:
+                    elif hasattr(old_state, "e_tag"):
                         old_state_etag = old_state.e_tag
 
                 new_state = new_value
 
                 # Set ETag if applicable
-                new_value_etag = (
-                    new_value.e_tag
-                    if hasattr(new_value, "e_tag")
-                    else new_value.get("e_tag", None)
-                )
+                new_value_etag = None
+                if isinstance(new_value, dict):
+                    new_value_etag = new_value.get("e_tag", None)
+                elif hasattr(new_value, "e_tag"):
+                    new_value_etag = new_value.e_tag
                 if new_value_etag == "":
-                    raise Exception("blob_storage.write(): etag missing")
+                    raise Exception("memory_storage.write(): etag missing")
                 if (
                     old_state_etag is not None
                     and new_value_etag is not None

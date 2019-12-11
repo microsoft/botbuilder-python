@@ -150,7 +150,11 @@ class CosmosDbPartitionedStorage(Storage):
         await self.initialize()
 
         for (key, change) in changes.items():
-            e_tag = change.get("e_tag", None)
+            e_tag = None
+            if isinstance(change, dict):
+                e_tag = change.get("e_tag", None)
+            elif hasattr(change, "e_tag"):
+                e_tag = change.e_tag
             doc = {
                 "id": CosmosDbKeyEscape.sanitize_key(
                     key, self.config.key_suffix, self.config.compatibility_mode
