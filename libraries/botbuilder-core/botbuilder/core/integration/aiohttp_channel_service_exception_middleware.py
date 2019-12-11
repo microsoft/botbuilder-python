@@ -10,7 +10,7 @@ from .channel_service_handler import BotActionNotImplementedError
 
 
 @middleware
-async def error_middleware(request, handler):
+async def aiohttp_error_middleware(request, handler):
     try:
         response = await handler(request)
         return response
