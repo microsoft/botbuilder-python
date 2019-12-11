@@ -11,13 +11,11 @@ from botbuilder.schema import (
     ActivityTypes,
     AttachmentData,
     ChannelAccount,
-    ConversationAccount,
     ConversationParameters,
     ConversationResourceResponse,
     ConversationsResult,
     PagedMembersResult,
     ResourceResponse,
-    RoleTypes,
     Transcript,
 )
 from botframework.connector.auth import (
