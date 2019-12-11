@@ -4,6 +4,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Callable, Awaitable
 from botbuilder.schema import Activity, ConversationReference, ResourceResponse
+from botframework.connector.auth import ClaimsIdentity
 
 from . import conversation_reference_extension
 from .bot_assert import BotAssert
@@ -62,8 +63,12 @@ class BotAdapter(ABC):
         return self
 
     async def continue_conversation(
-        self, bot_id: str, reference: ConversationReference, callback: Callable
-    ):  # pylint: disable=unused-argument
+        self,
+        reference: ConversationReference,
+        callback: Callable,
+        bot_id: str = None,  # pylint: disable=unused-argument
+        claims_identity: ClaimsIdentity = None,  # pylint: disable=unused-argument
+    ):
         """
         Sends a proactive message to a conversation. Call this method to proactively send a message to a conversation.
         Most _channels require a user to initiate a conversation with a bot before the bot can send activities
@@ -73,6 +78,7 @@ class BotAdapter(ABC):
         which is multi-tenant aware. </param>
         :param reference: A reference to the conversation to continue.</param>
         :param callback: The method to call for the resulting bot turn.</param>
+        :param claims_identity:
         """
         context = TurnContext(
             self, conversation_reference_extension.get_continuation_activity(reference)

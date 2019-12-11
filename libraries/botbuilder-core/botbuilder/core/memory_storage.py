@@ -48,9 +48,9 @@ class MemoryStorage(Storage):
                 # If it exists then we want to cache its original value from memory
                 if key in self.memory:
                     old_state = self.memory[key]
-                    if not isinstance(old_state, StoreItem):
+                    if isinstance(old_state, dict):
                         old_state_etag = old_state.get("e_tag", None)
-                    elif old_state.e_tag:
+                    elif hasattr(old_state, "e_tag"):
                         old_state_etag = old_state.e_tag
 
                 new_state = new_value
@@ -59,7 +59,11 @@ class MemoryStorage(Storage):
                 new_value_etag = (
                     new_value.e_tag
                     if hasattr(new_value, "e_tag")
-                    else new_value.get("e_tag", None)
+                    else (
+                        new_value.get("e_tag", None)
+                        if isinstance(new_value, dict)
+                        else None
+                    )
                 )
                 if new_value_etag == "":
                     raise Exception("blob_storage.write(): etag missing")
@@ -73,10 +77,10 @@ class MemoryStorage(Storage):
                         "Etag conflict.\nOriginal: %s\r\nCurrent: %s"
                         % (new_value_etag, old_state_etag)
                     )
-                if hasattr(new_state, "e_tag"):
-                    new_state.e_tag = str(self._e_tag)
-                else:
+                if isinstance(new_state, dict):
                     new_state["e_tag"] = str(self._e_tag)
+                else:
+                    new_state.e_tag = str(self._e_tag)
                 self._e_tag += 1
                 self.memory[key] = deepcopy(new_state)
 
