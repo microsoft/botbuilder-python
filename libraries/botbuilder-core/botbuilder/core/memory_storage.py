@@ -56,17 +56,13 @@ class MemoryStorage(Storage):
                 new_state = new_value
 
                 # Set ETag if applicable
-                new_value_etag = (
-                    new_value.e_tag
-                    if hasattr(new_value, "e_tag")
-                    else (
-                        new_value.get("e_tag", None)
-                        if isinstance(new_value, dict)
-                        else None
-                    )
-                )
+                new_value_etag = None
+                if isinstance(new_value, dict):
+                    new_value_etag = new_value.get("e_tag", None)
+                elif hasattr(new_value, "e_tag"):
+                    new_value_etag = new_value.e_tag
                 if new_value_etag == "":
-                    raise Exception("blob_storage.write(): etag missing")
+                    raise Exception("memory_storage.write(): etag missing")
                 if (
                     old_state_etag is not None
                     and new_value_etag is not None

@@ -7,7 +7,7 @@ Part of the Azure Bot Framework in Python.
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 from typing import Dict, List
-from threading import Semaphore
+from threading import Lock
 import json
 
 from azure.cosmos import documents, http_constants
@@ -29,7 +29,9 @@ class CosmosDbPartitionedConfig:
         database_id: str = None,
         container_id: str = None,
         cosmos_client_options: dict = None,
-        container_throughput: int = None,
+        container_throughput: int = 400,
+        key_suffix: str = "",
+        compatibility_mode: bool = False,
         **kwargs,
     ):
         """Create the Config object.
@@ -41,6 +43,10 @@ class CosmosDbPartitionedConfig:
         :param cosmos_client_options: The options for the CosmosClient. Currently only supports connection_policy and
             consistency_level
         :param container_throughput: The throughput set when creating the Container. Defaults to 400.
+        :param key_suffix: The suffix to be added to every key. The keySuffix must contain only valid ComosDb
+            key characters. (e.g. not: '\\', '?', '/', '#', '*')
+        :param compatibility_mode: True if keys should be truncated in order to support previous CosmosDb
+            max key length of 255.
         :return CosmosDbPartitionedConfig:
         """
         self.__config_file = kwargs.get("filename")
@@ -56,6 +62,8 @@ class CosmosDbPartitionedConfig:
         self.container_throughput = container_throughput or kwargs.get(
             "container_throughput"
         )
+        self.key_suffix = key_suffix or kwargs.get("key_suffix")
+        self.compatibility_mode = compatibility_mode or kwargs.get("compatibility_mode")
 
 
 class CosmosDbPartitionedStorage(Storage):
@@ -71,7 +79,21 @@ class CosmosDbPartitionedStorage(Storage):
         self.client = None
         self.database = None
         self.container = None
-        self.__semaphore = Semaphore()
+        self.compatability_mode_partition_key = False
+        # Lock used for synchronizing container creation
+        self.__lock = Lock()
+        if config.key_suffix is None:
+            config.key_suffix = ""
+        if not config.key_suffix.__eq__(""):
+            if config.compatibility_mode:
+                raise Exception(
+                    "compatibilityMode cannot be true while using a keySuffix."
+                )
+            suffix_escaped = CosmosDbKeyEscape.sanitize_key(config.key_suffix)
+            if not suffix_escaped.__eq__(config.key_suffix):
+                raise Exception(
+                    f"Cannot use invalid Row Key characters: {config.key_suffix} in keySuffix."
+                )
 
     async def read(self, keys: List[str]) -> Dict[str, object]:
         """Read storeitems from storage.
@@ -88,10 +110,12 @@ class CosmosDbPartitionedStorage(Storage):
 
         for key in keys:
             try:
-                escaped_key = CosmosDbKeyEscape.sanitize_key(key)
+                escaped_key = CosmosDbKeyEscape.sanitize_key(
+                    key, self.config.key_suffix, self.config.compatibility_mode
+                )
 
                 read_item_response = self.client.ReadItem(
-                    self.__item_link(escaped_key), {"partitionKey": escaped_key}
+                    self.__item_link(escaped_key), self.__get_partition_key(escaped_key)
                 )
                 document_store_item = read_item_response
                 if document_store_item:
@@ -126,9 +150,15 @@ class CosmosDbPartitionedStorage(Storage):
         await self.initialize()
 
         for (key, change) in changes.items():
-            e_tag = change.get("e_tag", None)
+            e_tag = None
+            if isinstance(change, dict):
+                e_tag = change.get("e_tag", None)
+            elif hasattr(change, "e_tag"):
+                e_tag = change.e_tag
             doc = {
-                "id": CosmosDbKeyEscape.sanitize_key(key),
+                "id": CosmosDbKeyEscape.sanitize_key(
+                    key, self.config.key_suffix, self.config.compatibility_mode
+                ),
                 "realId": key,
                 "document": self.__create_dict(change),
             }
@@ -161,11 +191,13 @@ class CosmosDbPartitionedStorage(Storage):
         await self.initialize()
 
         for key in keys:
-            escaped_key = CosmosDbKeyEscape.sanitize_key(key)
+            escaped_key = CosmosDbKeyEscape.sanitize_key(
+                key, self.config.key_suffix, self.config.compatibility_mode
+            )
             try:
                 self.client.DeleteItem(
                     document_link=self.__item_link(escaped_key),
-                    options={"partitionKey": escaped_key},
+                    options=self.__get_partition_key(escaped_key),
                 )
             except cosmos_errors.HTTPFailure as err:
                 if (
@@ -188,41 +220,57 @@ class CosmosDbPartitionedStorage(Storage):
                 )
 
             if not self.database:
-                with self.__semaphore:
+                with self.__lock:
                     try:
-                        self.database = self.client.CreateDatabase(
-                            {"id": self.config.database_id}
-                        )
+                        if not self.database:
+                            self.database = self.client.CreateDatabase(
+                                {"id": self.config.database_id}
+                            )
                     except cosmos_errors.HTTPFailure:
                         self.database = self.client.ReadDatabase(
                             "dbs/" + self.config.database_id
                         )
 
-            if not self.container:
-                with self.__semaphore:
-                    container_def = {
-                        "id": self.config.container_id,
-                        "partitionKey": {
-                            "paths": ["/id"],
-                            "kind": documents.PartitionKind.Hash,
-                        },
-                    }
-                    try:
-                        self.container = self.client.CreateContainer(
-                            "dbs/" + self.database["id"],
-                            container_def,
-                            {"offerThroughput": 400},
-                        )
-                    except cosmos_errors.HTTPFailure as err:
-                        if err.status_code == http_constants.StatusCodes.CONFLICT:
-                            self.container = self.client.ReadContainer(
-                                "dbs/"
-                                + self.database["id"]
-                                + "/colls/"
-                                + container_def["id"]
+            self.__get_or_create_container()
+
+    def __get_or_create_container(self):
+        with self.__lock:
+            container_def = {
+                "id": self.config.container_id,
+                "partitionKey": {
+                    "paths": ["/id"],
+                    "kind": documents.PartitionKind.Hash,
+                },
+            }
+            try:
+                if not self.container:
+                    self.container = self.client.CreateContainer(
+                        "dbs/" + self.database["id"],
+                        container_def,
+                        {"offerThroughput": self.config.container_throughput},
+                    )
+            except cosmos_errors.HTTPFailure as err:
+                if err.status_code == http_constants.StatusCodes.CONFLICT:
+                    self.container = self.client.ReadContainer(
+                        "dbs/" + self.database["id"] + "/colls/" + container_def["id"]
+                    )
+                    if "partitionKey" not in self.container:
+                        self.compatability_mode_partition_key = True
+                    else:
+                        paths = self.container["partitionKey"]["paths"]
+                        if "/partitionKey" in paths:
+                            self.compatability_mode_partition_key = True
+                        elif "/id" not in paths:
+                            raise Exception(
+                                f"Custom Partition Key Paths are not supported. {self.config.container_id} "
+                                "has a custom Partition Key Path of {paths[0]}."
                             )
-                        else:
-                            raise err
+
+                else:
+                    raise err
+
+    def __get_partition_key(self, key: str) -> str:
+        return None if self.compatability_mode_partition_key else {"partitionKey": key}
 
     @staticmethod
     def __create_si(result) -> object:
