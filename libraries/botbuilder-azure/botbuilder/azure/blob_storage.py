@@ -73,7 +73,11 @@ class BlobStorage(Storage):
         )
 
         for (name, item) in changes.items():
-            e_tag = item.e_tag if hasattr(item, "e_tag") else item.get("e_tag", None)
+            e_tag = None
+            if isinstance(item, dict):
+                e_tag = item.get("e_tag", None)
+            elif hasattr(item, "e_tag"):
+                e_tag = item.e_tag
             e_tag = None if e_tag == "*" else e_tag
             if e_tag == "":
                 raise Exception("blob_storage.write(): etag missing")
