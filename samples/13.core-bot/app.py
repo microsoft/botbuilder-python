@@ -64,7 +64,7 @@ def messages():
 
     try:
         task = LOOP.create_task(
-            ADAPTER._process_activity(activity, auth_header, BOT.on_turn)
+            ADAPTER.process_activity(activity, auth_header, BOT.on_turn)
         )
         LOOP.run_until_complete(task)
         return Response(status=201)

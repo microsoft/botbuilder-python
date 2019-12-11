@@ -17,7 +17,7 @@ if __name__ == "__main__":
         # Greet user
         print("Hi... I'm an echobot. Whatever you say I'll echo back.")
 
-        LOOP.run_until_complete(ADAPTER._process_activity(BOT.on_turn))
+        LOOP.run_until_complete(ADAPTER.process_activity(BOT.on_turn))
     except KeyboardInterrupt:
         pass
     finally:
