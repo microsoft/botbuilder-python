@@ -20,6 +20,7 @@ from botbuilder.schema import (
     ResourceResponse,
     TokenResponse,
 )
+from botframework.connector.auth import ClaimsIdentity
 from ..bot_adapter import BotAdapter
 from ..turn_context import TurnContext
 from ..user_token_provider import UserTokenProvider
@@ -157,16 +158,23 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         self.updated_activities.append(activity)
 
     async def continue_conversation(
-        self, bot_id: str, reference: ConversationReference, callback: Callable
+        self,
+        reference: ConversationReference,
+        callback: Callable,
+        bot_id: str = None,
+        claims_identity: ClaimsIdentity = None,  # pylint: disable=unused-argument
     ):
         """
         The `TestAdapter` just calls parent implementation.
-        :param bot_id
         :param reference:
         :param callback:
+        :param bot_id:
+        :param claims_identity:
         :return:
         """
-        await super().continue_conversation(bot_id, reference, callback)
+        await super().continue_conversation(
+            reference, callback, bot_id, claims_identity
+        )
 
     async def receive_activity(self, activity):
         """

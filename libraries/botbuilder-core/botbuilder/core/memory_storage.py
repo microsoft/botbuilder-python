@@ -73,10 +73,10 @@ class MemoryStorage(Storage):
                         "Etag conflict.\nOriginal: %s\r\nCurrent: %s"
                         % (new_value_etag, old_state_etag)
                     )
-                if hasattr(new_state, "e_tag"):
-                    new_state.e_tag = str(self._e_tag)
-                else:
+                if isinstance(new_state, dict):
                     new_state["e_tag"] = str(self._e_tag)
+                else:
+                    new_state.e_tag = str(self._e_tag)
                 self._e_tag += 1
                 self.memory[key] = deepcopy(new_state)
 
