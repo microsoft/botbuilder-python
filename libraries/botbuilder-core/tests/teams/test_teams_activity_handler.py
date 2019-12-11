@@ -35,14 +35,6 @@ class TestingTeamsActivityHandler(TeamsActivityHandler):
         self.record.append("on_conversation_update_activity")
         return await super().on_conversation_update_activity(turn_context)
 
-    async def on_teams_members_added_activity(
-        self, teams_members_added: [TeamsChannelAccount], turn_context: TurnContext
-    ):
-        self.record.append("on_teams_members_added_activity")
-        return await super().on_teams_members_added_activity(
-            teams_members_added, turn_context
-        )
-
     async def on_teams_members_removed_activity(
         self, teams_members_removed: [TeamsChannelAccount], turn_context: TurnContext
     ):
@@ -342,33 +334,6 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         assert bot.record[0] == "on_conversation_update_activity"
         assert bot.record[1] == "on_teams_team_renamed_activity"
 
-    async def test_on_teams_members_added_activity(self):
-        # arrange
-        activity = Activity(
-            type=ActivityTypes.conversation_update,
-            channel_data={"eventType": "teamMemberAdded"},
-            members_added=[
-                ChannelAccount(
-                    id="123",
-                    name="test_user",
-                    aad_object_id="asdfqwerty",
-                    role="tester",
-                )
-            ],
-            channel_id=Channels.ms_teams,
-        )
-
-        turn_context = TurnContext(NotImplementedAdapter(), activity)
-
-        # Act
-        bot = TestingTeamsActivityHandler()
-        await bot.on_turn(turn_context)
-
-        # Assert
-        assert len(bot.record) == 2
-        assert bot.record[0] == "on_conversation_update_activity"
-        assert bot.record[1] == "on_teams_members_added_activity"
-
     async def test_on_teams_members_removed_activity(self):
         # arrange
         activity = Activity(
@@ -385,7 +350,7 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
             channel_id=Channels.ms_teams,
         )
 
-        turn_context = TurnContext(NotImplementedAdapter(), activity)
+        turn_context = TurnContext(SimpleAdapter(), activity)
 
         # Act
         bot = TestingTeamsActivityHandler()
