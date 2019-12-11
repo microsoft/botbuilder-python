@@ -75,7 +75,6 @@ class ActionTypes(str, Enum):
     download_file = "downloadFile"
     signin = "signin"
     call = "call"
-    payment = "payment"
     message_back = "messageBack"
 
 

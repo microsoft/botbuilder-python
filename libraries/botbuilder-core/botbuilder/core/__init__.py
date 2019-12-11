@@ -9,6 +9,7 @@ from . import conversation_reference_extension
 from .about import __version__
 from .activity_handler import ActivityHandler
 from .auto_save_state_middleware import AutoSaveStateMiddleware
+from .bot import Bot
 from .bot_assert import BotAssert
 from .bot_adapter import BotAdapter
 from .bot_framework_adapter import BotFrameworkAdapter, BotFrameworkAdapterSettings
@@ -42,6 +43,7 @@ __all__ = [
     "ActivityHandler",
     "AnonymousReceiveMiddleware",
     "AutoSaveStateMiddleware",
+    "Bot",
     "BotAdapter",
     "BotAssert",
     "BotFrameworkAdapter",
