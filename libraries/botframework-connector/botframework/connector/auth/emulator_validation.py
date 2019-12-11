@@ -121,8 +121,8 @@ class EmulatorValidation:
             AuthenticationConstants.ALLOWED_SIGNING_ALGORITHMS,
         )
 
-        identity = await asyncio.ensure_future(
-            token_extractor.get_identity_from_auth_header(auth_header, channel_id)
+        identity = await token_extractor.get_identity_from_auth_header(
+            auth_header, channel_id
         )
         if not identity:
             # No valid identity. Not Authorized.
