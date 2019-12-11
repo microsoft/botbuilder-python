@@ -17,6 +17,7 @@ from botbuilder.core import (
 from botbuilder.core.integration import (
     BotFrameworkHttpClient,
     aiohttp_channel_service_routes,
+    aiohttp_error_middleware,
 )
 from botbuilder.core.skills import SkillConversationIdFactory, SkillHandler
 from botbuilder.schema import Activity, ActivityTypes
@@ -101,7 +102,7 @@ async def messages(req: Request) -> Response:
         raise exception
 
 
-APP = web.Application()
+APP = web.Application(middlewares=[aiohttp_error_middleware])
 APP.router.add_post("/api/messages", messages)
 APP.router.add_routes(aiohttp_channel_service_routes(SKILL_HANDLER, "/api/skills"))
 

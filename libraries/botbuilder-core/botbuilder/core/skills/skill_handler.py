@@ -124,7 +124,7 @@ class SkillHandler(ChannelServiceHandler):
         )
 
         if not conversation_reference:
-            raise RuntimeError("ConversationReference not found")
+            raise KeyError("ConversationReference not found")
 
         skill_conversation_reference = ConversationReference(
             activity_id=activity.id,

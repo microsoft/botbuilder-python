@@ -53,7 +53,7 @@ class BotFrameworkHttpClient:
         app_credentials = await self._get_app_credentials(from_bot_id, to_bot_id)
 
         if not app_credentials:
-            raise RuntimeError("Unable to get appCredentials to connect to the skill")
+            raise KeyError("Unable to get appCredentials to connect to the skill")
 
         # Get token for the skill call
         token = (
