@@ -3,9 +3,10 @@
 
 from http import HTTPStatus
 from botbuilder.schema import Activity, ActivityTypes, ChannelAccount
-from botbuilder.core.turn_context import TurnContext
-from botbuilder.core.teams.teams_helper import deserializer_helper
 from botbuilder.core import ActivityHandler, InvokeResponse, BotFrameworkAdapter
+from botbuilder.core.turn_context import TurnContext
+from botbuilder.core.teams.teams_info import TeamsInfo
+from botbuilder.core.teams.teams_helper import deserializer_helper
 from botbuilder.schema.teams import (
     AppBasedLinkQuery,
     TeamInfo,
@@ -357,47 +358,43 @@ class TeamsActivityHandler(ActivityHandler):
         team_info: TeamInfo,
         turn_context: TurnContext,
     ):
-        """
+
         team_members = {}
         team_members_added = []
         for member in members_added:
             if member.additional_properties != {}:
-                team_members_added.append(TeamsChannelAccount(member))
+                team_members_added.append(
+                    deserializer_helper(TeamsChannelAccount, member)
+                )
             else:
                 if team_members == {}:
-                    result = await TeamsInfo.get_members_async(turn_context)
-                    team_members = { i.id : i for i in result }
+                    result = await TeamsInfo.get_members(turn_context)
+                    team_members = {i.id: i for i in result}
 
                 if member.id in team_members:
                     team_members_added.append(member)
                 else:
-                    newTeamsChannelAccount = TeamsChannelAccount(
+                    new_teams_channel_account = TeamsChannelAccount(
                         id=member.id,
-                        name = member.name,
-                        aad_object_id = member.aad_object_id,
-                        role = member.role
-                        )
-                    team_members_added.append(newTeamsChannelAccount)
+                        name=member.name,
+                        aad_object_id=member.aad_object_id,
+                        role=member.role,
+                    )
+                    team_members_added.append(new_teams_channel_account)
 
-        return await self.on_teams_members_added_activity(teams_members_added, team_info, turn_context)
-        """
-        team_accounts_added = []
-        for member in members_added:
-            # TODO: fix this
-            new_account_json = member.serialize()
-            if "additional_properties" in new_account_json:
-                del new_account_json["additional_properties"]
-            member = TeamsChannelAccount(**new_account_json)
-            team_accounts_added.append(member)
         return await self.on_teams_members_added_activity(
-            team_accounts_added, turn_context
+            team_members_added, team_info, turn_context
         )
 
-    async def on_teams_members_added_activity(
-        self, teams_members_added: [TeamsChannelAccount], turn_context: TurnContext
+    async def on_teams_members_added_activity(  # pylint: disable=unused-argument
+        self,
+        teams_members_added: [TeamsChannelAccount],
+        team_info: TeamInfo,
+        turn_context: TurnContext,
     ):
         teams_members_added = [
-            ChannelAccount(**member.serialize()) for member in teams_members_added
+            ChannelAccount().deserialize(member.serialize())
+            for member in teams_members_added
         ]
         return await super().on_members_added_activity(
             teams_members_added, turn_context
@@ -415,7 +412,9 @@ class TeamsActivityHandler(ActivityHandler):
             new_account_json = member.serialize()
             if "additional_properties" in new_account_json:
                 del new_account_json["additional_properties"]
-            teams_members_removed.append(TeamsChannelAccount(**new_account_json))
+            teams_members_removed.append(
+                TeamsChannelAccount().deserialize(new_account_json)
+            )
 
         return await self.on_teams_members_removed_activity(
             teams_members_removed, turn_context
@@ -425,7 +424,8 @@ class TeamsActivityHandler(ActivityHandler):
         self, teams_members_removed: [TeamsChannelAccount], turn_context: TurnContext
     ):
         members_removed = [
-            ChannelAccount(**member.serialize()) for member in teams_members_removed
+            ChannelAccount().deserialize(member.serialize())
+            for member in teams_members_removed
         ]
         return await super().on_members_removed_activity(members_removed, turn_context)
 
