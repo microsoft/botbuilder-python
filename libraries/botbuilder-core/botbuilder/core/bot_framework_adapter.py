@@ -157,6 +157,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         self,
         reference: ConversationReference,
         logic: Callable[[TurnContext], Awaitable] = None,
+        conversation_parameters: ConversationParameters = None,
     ):
         """
         Starts a new conversation with a user. This is typically used to Direct Message (DM) a member
@@ -172,8 +173,12 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                 )
 
             # Create conversation
-            parameters = ConversationParameters(
-                bot=reference.bot, members=[reference.user], is_group=False
+            parameters = (
+                conversation_parameters
+                if conversation_parameters
+                else ConversationParameters(
+                    bot=reference.bot, members=[reference.user], is_group=False
+                )
             )
             client = await self.create_connector_client(reference.service_url)
 
