@@ -66,10 +66,12 @@ class BotFrameworkHttpClient:
         # TODO: DO we need to set the activity ID? (events that are created manually don't have it).
         original_conversation_id = activity.conversation.id
         original_service_url = activity.service_url
+        original_caller_id = activity.caller_id
 
         try:
             activity.conversation.id = conversation_id
             activity.service_url = service_url
+            activity.caller_id = from_bot_id
 
             headers_dict = {
                 "Content-type": "application/json; charset=utf-8",
@@ -94,6 +96,7 @@ class BotFrameworkHttpClient:
             # Restore activity properties.
             activity.conversation.id = original_conversation_id
             activity.service_url = original_service_url
+            activity.caller_id = original_caller_id
 
     async def _get_app_credentials(
         self, app_id: str, oauth_scope: str

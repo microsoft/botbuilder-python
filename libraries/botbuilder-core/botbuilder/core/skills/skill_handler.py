@@ -2,21 +2,14 @@
 # Licensed under the MIT License.
 
 from uuid import uuid4
-from typing import List
 
 from botbuilder.core.integration import ChannelServiceHandler
 from botbuilder.core import Bot, BotAdapter, TurnContext
 from botbuilder.schema import (
     Activity,
     ActivityTypes,
-    AttachmentData,
-    ChannelAccount,
-    ConversationParameters,
-    ConversationResourceResponse,
-    ConversationsResult,
-    PagedMembersResult,
+    ConversationReference,
     ResourceResponse,
-    Transcript,
 )
 from botframework.connector.auth import (
     AuthenticationConfiguration,
@@ -29,6 +22,11 @@ from .skill_conversation_id_factory import SkillConversationIdFactory
 
 
 class SkillHandler(ChannelServiceHandler):
+
+    SKILL_CONVERSATION_REFERENCE_KEY = (
+        "botbuilder.core.skills.SkillConversationReference"
+    )
+
     def __init__(
         self,
         adapter: BotAdapter,
@@ -52,7 +50,6 @@ class SkillHandler(ChannelServiceHandler):
         self._bot = bot
         self._conversation_id_factory = conversation_id_factory
         self._logger = logger
-        self.skill_conversation_reference_key = "SkillConversationReference"
 
     async def on_send_to_conversation(
         self, claims_identity: ClaimsIdentity, conversation_id: str, activity: Activity,
@@ -115,240 +112,6 @@ class SkillHandler(ChannelServiceHandler):
             claims_identity, conversation_id, activity_id, activity,
         )
 
-    async def on_get_conversations(
-        self, claims_identity: ClaimsIdentity, continuation_token: str = "",
-    ) -> ConversationsResult:
-        """
-        get_conversations() API for Skill
-
-        List the Conversations in which this bot has participated.
-
-        GET from this method with a skip token
-
-        The return value is a ConversationsResult, which contains an array of
-        ConversationMembers and a skip token.  If the skip token is not empty, then
-        there are further values to be returned. Call this method again with the
-        returned token to get more values.
-
-        Each ConversationMembers object contains the ID of the conversation and an
-        array of ChannelAccounts that describe the members of the conversation.
-        :param claims_identity:
-        :param conversation_id:
-        :param continuation_token:
-        :return:
-        """
-        raise NotImplementedError()
-
-    async def on_create_conversation(
-        self, claims_identity: ClaimsIdentity, parameters: ConversationParameters,
-    ) -> ConversationResourceResponse:
-        """
-        create_conversation() API for Skill
-
-        Create a new Conversation.
-
-        POST to this method with a
-        * Bot being the bot creating the conversation
-        * IsGroup set to true if this is not a direct message (default is false)
-        * Array containing the members to include in the conversation
-
-        The return value is a ResourceResponse which contains a conversation id
-        which is suitable for use
-        in the message payload and REST API uris.
-
-        Most channels only support the semantics of bots initiating a direct
-        message conversation.  An example of how to do that would be:
-
-        var resource = await connector.conversations.CreateConversation(new
-        ConversationParameters(){ Bot = bot, members = new ChannelAccount[] { new
-        ChannelAccount("user1") } );
-        await connect.Conversations.SendToConversationAsync(resource.Id, new
-        Activity() ... ) ;
-
-        end.
-        :param claims_identity:
-        :param conversation_id:
-        :param parameters:
-        :return:
-        """
-        raise NotImplementedError()
-
-    async def on_send_conversation_history(
-        self,
-        claims_identity: ClaimsIdentity,
-        conversation_id: str,
-        transcript: Transcript,
-    ) -> ResourceResponse:
-        """
-        send_conversation_history() API for Skill.
-
-        This method allows you to upload the historic activities to the
-        conversation.
-
-        Sender must ensure that the historic activities have unique ids and
-        appropriate timestamps. The ids are used by the client to deal with
-        duplicate activities and the timestamps are used by the client to render
-        the activities in the right order.
-        :param claims_identity:
-        :param conversation_id:
-        :param transcript:
-        :return:
-        """
-        raise NotImplementedError()
-
-    async def on_update_activity(
-        self,
-        claims_identity: ClaimsIdentity,
-        conversation_id: str,
-        activity_id: str,
-        activity: Activity,
-    ) -> ResourceResponse:
-        """
-        update_activity() API for Skill.
-
-        Edit an existing activity.
-
-        Some channels allow you to edit an existing activity to reflect the new
-        state of a bot conversation.
-
-        For example, you can remove buttons after someone has clicked "Approve"
-        button.
-        :param claims_identity:
-        :param conversation_id:
-        :param activity_id:
-        :param activity:
-        :return:
-        """
-        raise NotImplementedError()
-
-    async def on_delete_activity(
-        self, claims_identity: ClaimsIdentity, conversation_id: str, activity_id: str,
-    ):
-        """
-        delete_activity() API for Skill.
-
-        Delete an existing activity.
-
-        Some channels allow you to delete an existing activity, and if successful
-        this method will remove the specified activity.
-        :param claims_identity:
-        :param conversation_id:
-        :param activity_id:
-        :return:
-        """
-        raise NotImplementedError()
-
-    async def on_get_conversation_members(
-        self, claims_identity: ClaimsIdentity, conversation_id: str,
-    ) -> List[ChannelAccount]:
-        """
-        get_conversation_members() API for Skill.
-
-        Enumerate the members of a conversation.
-
-        This REST API takes a ConversationId and returns a list of ChannelAccount
-        objects representing the members of the conversation.
-        :param claims_identity:
-        :param conversation_id:
-        :return:
-        """
-        raise NotImplementedError()
-
-    async def on_get_conversation_paged_members(
-        self,
-        claims_identity: ClaimsIdentity,
-        conversation_id: str,
-        page_size: int = None,
-        continuation_token: str = "",
-    ) -> PagedMembersResult:
-        """
-        get_conversation_paged_members() API for Skill.
-
-        Enumerate the members of a conversation one page at a time.
-
-        This REST API takes a ConversationId. Optionally a pageSize and/or
-        continuationToken can be provided. It returns a PagedMembersResult, which
-        contains an array
-        of ChannelAccounts representing the members of the conversation and a
-        continuation token that can be used to get more values.
-
-        One page of ChannelAccounts records are returned with each call. The number
-        of records in a page may vary between channels and calls. The pageSize
-        parameter can be used as
-        a suggestion. If there are no additional results the response will not
-        contain a continuation token. If there are no members in the conversation
-        the Members will be empty or not present in the response.
-
-        A response to a request that has a continuation token from a prior request
-        may rarely return members from a previous request.
-        :param claims_identity:
-        :param conversation_id:
-        :param page_size:
-        :param continuation_token:
-        :return:
-        """
-        raise NotImplementedError()
-
-    async def on_delete_conversation_member(
-        self, claims_identity: ClaimsIdentity, conversation_id: str, member_id: str,
-    ):
-        """
-        delete_conversation_member() API for Skill.
-
-        Deletes a member from a conversation.
-
-        This REST API takes a ConversationId and a memberId (of type string) and
-        removes that member from the conversation. If that member was the last
-        member
-        of the conversation, the conversation will also be deleted.
-        :param claims_identity:
-        :param conversation_id:
-        :param member_id:
-        :return:
-        """
-        raise NotImplementedError()
-
-    async def on_get_activity_members(
-        self, claims_identity: ClaimsIdentity, conversation_id: str, activity_id: str,
-    ) -> List[ChannelAccount]:
-        """
-        get_activity_members() API for Skill.
-
-        Enumerate the members of an activity.
-
-        This REST API takes a ConversationId and a ActivityId, returning an array
-        of ChannelAccount objects representing the members of the particular
-        activity in the conversation.
-        :param claims_identity:
-        :param conversation_id:
-        :param activity_id:
-        :return:
-        """
-        raise NotImplementedError()
-
-    async def on_upload_attachment(
-        self,
-        claims_identity: ClaimsIdentity,
-        conversation_id: str,
-        attachment_upload: AttachmentData,
-    ) -> ResourceResponse:
-        """
-        upload_attachment() API for Skill.
-
-        Upload an attachment directly into a channel's blob storage.
-
-        This is useful because it allows you to store data in a compliant store
-        when dealing with enterprises.
-
-        The response is a ResourceResponse which contains an AttachmentId which is
-        suitable for using with the attachments API.
-        :param claims_identity:
-        :param conversation_id:
-        :param attachment_upload:
-        :return:
-        """
-        raise NotImplementedError()
-
     async def _process_activity(
         self,
         claims_identity: ClaimsIdentity,
@@ -363,7 +126,19 @@ class SkillHandler(ChannelServiceHandler):
         if not conversation_reference:
             raise RuntimeError("ConversationReference not found")
 
+        skill_conversation_reference = ConversationReference(
+            activity_id=activity.id,
+            user=activity.from_property,
+            bot=activity.recipient,
+            conversation=activity.conversation,
+            channel_id=activity.channel_id,
+            service_url=activity.service_url,
+        )
+
         async def callback(context: TurnContext):
+            context.turn_state[
+                SkillHandler.SKILL_CONVERSATION_REFERENCE_KEY
+            ] = skill_conversation_reference
             TurnContext.apply_conversation_reference(activity, conversation_reference)
             context.activity.id = reply_to_activity_id
 
