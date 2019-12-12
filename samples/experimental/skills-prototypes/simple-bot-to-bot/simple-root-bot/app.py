@@ -9,13 +9,13 @@ from aiohttp import web
 from aiohttp.web import Request, Response
 from botbuilder.core import (
     BotFrameworkAdapterSettings,
+    BotFrameworkHttpClient,
     ConversationState,
     MemoryStorage,
     TurnContext,
     BotFrameworkAdapter,
 )
 from botbuilder.core.integration import (
-    BotFrameworkHttpClient,
     aiohttp_channel_service_routes,
     aiohttp_error_middleware,
 )

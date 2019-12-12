@@ -13,7 +13,7 @@ from botbuilder.schema import (
     Transcript,
 )
 
-from .channel_service_handler import ChannelServiceHandler
+from botbuilder.core import ChannelServiceHandler
 
 
 async def deserialize_from_body(
