@@ -110,7 +110,10 @@ class TeamsInfo:
         )
 
         for member in members:
-            new_account_json = member.serialize()
-            teams_members.append(TeamsChannelAccount(**new_account_json))
+            teams_members.append(
+                TeamsChannelAccount().deserialize(
+                    dict(member.serialize(), **member.additional_properties)
+                )
+            )
 
         return teams_members
