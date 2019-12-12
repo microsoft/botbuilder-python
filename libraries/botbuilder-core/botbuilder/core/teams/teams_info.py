@@ -3,6 +3,7 @@
 
 from typing import List
 from botbuilder.core.turn_context import TurnContext
+from botbuilder.core.teams.teams_helper import deserializer_helper
 from botbuilder.schema.teams import (
     ChannelInfo,
     TeamDetails,
@@ -110,7 +111,6 @@ class TeamsInfo:
         )
 
         for member in members:
-            new_account_json = member.serialize()
-            teams_members.append(TeamsChannelAccount(**new_account_json))
+            teams_members.append(TeamsChannelAccount().deserialize(dict(member.serialize(), **member.additional_properties)))
 
         return teams_members
