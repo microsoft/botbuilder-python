@@ -38,6 +38,7 @@ from . import __version__
 from .bot_adapter import BotAdapter
 from .turn_context import TurnContext
 from .user_token_provider import UserTokenProvider
+from .conversation_reference_extension import get_continuation_activity
 
 USER_AGENT = f"Microsoft-BotFramework/3.1 (BotBuilder Python/{__version__})"
 OAUTH_ENDPOINT = "https://api.botframework.com"
@@ -129,8 +130,14 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                 GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
             )
 
+        self._connector_client_cache: Dict[str, ConnectorClient] = {}
+
     async def continue_conversation(
-        self, bot_id: str, reference: ConversationReference, callback: Callable
+        self,
+        reference: ConversationReference,
+        callback: Callable,
+        bot_id: str = None,
+        claims_identity: ClaimsIdentity = None,  # pylint: disable=unused-argument
     ):
         """
         Continues a conversation with a user. This is often referred to as the bots "Proactive Messaging"
@@ -140,18 +147,26 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         :param bot_id:
         :param reference:
         :param callback:
+        :param claims_identity:
         :return:
         """
 
         # TODO: proactive messages
+        if not claims_identity:
+            if not bot_id:
+                raise TypeError("Expected bot_id: str but got None instead")
 
-        if not bot_id:
-            raise TypeError("Expected bot_id: str but got None instead")
+            claims_identity = ClaimsIdentity(
+                claims={
+                    AuthenticationConstants.AUDIENCE_CLAIM: bot_id,
+                    AuthenticationConstants.APP_ID_CLAIM: bot_id,
+                },
+                is_authenticated=True,
+            )
 
-        request = TurnContext.apply_conversation_reference(
-            Activity(), reference, is_incoming=True
-        )
-        context = self.create_context(request)
+        context = TurnContext(self, get_continuation_activity(reference))
+        context.turn_state[BOT_IDENTITY_KEY] = claims_identity
+        context.turn_state["BotCallbackHandler"] = callback
         return await self.run_pipeline(context, callback)
 
     async def create_conversation(
@@ -668,8 +683,16 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         else:
             credentials = self._credentials
 
-        client = ConnectorClient(credentials, base_url=service_url)
-        client.config.add_user_agent(USER_AGENT)
+        client_key = (
+            f"{service_url}{credentials.microsoft_app_id if credentials else ''}"
+        )
+        client = self._connector_client_cache.get(client_key)
+
+        if not client:
+            client = ConnectorClient(credentials, base_url=service_url)
+            client.config.add_user_agent(USER_AGENT)
+            self._connector_client_cache[client_key] = client
+
         return client
 
     def create_token_api_client(self, service_url: str) -> TokenApiClient:

@@ -67,7 +67,7 @@ class TestBotAdapter(aiounittest.AsyncTestCase):
             nonlocal callback_invoked
             callback_invoked = True
 
-        await adapter.continue_conversation("MyBot", reference, continue_callback)
+        await adapter.continue_conversation(reference, continue_callback, "MyBot")
         self.assertTrue(callback_invoked)
 
     async def test_turn_error(self):

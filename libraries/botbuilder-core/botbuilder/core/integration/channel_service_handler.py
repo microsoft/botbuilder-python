@@ -24,6 +24,10 @@ from botframework.connector.auth import (
 )
 
 
+class BotActionNotImplementedError(Exception):
+    """Raised when an action is not implemented"""
+
+
 class ChannelServiceHandler:
     """
     Initializes a new instance of the <see cref="ChannelServiceHandler"/> class,
@@ -159,7 +163,7 @@ class ChannelServiceHandler:
         :param continuation_token:
         :return:
         """
-        raise NotImplementedError()
+        raise BotActionNotImplementedError()
 
     async def on_create_conversation(
         self, claims_identity: ClaimsIdentity, parameters: ConversationParameters,
@@ -193,7 +197,7 @@ class ChannelServiceHandler:
         :param parameters:
         :return:
         """
-        raise NotImplementedError()
+        raise BotActionNotImplementedError()
 
     async def on_send_to_conversation(
         self, claims_identity: ClaimsIdentity, conversation_id: str, activity: Activity,
@@ -220,7 +224,7 @@ class ChannelServiceHandler:
         :param activity:
         :return:
         """
-        raise NotImplementedError()
+        raise BotActionNotImplementedError()
 
     async def on_send_conversation_history(
         self,
@@ -244,7 +248,7 @@ class ChannelServiceHandler:
         :param transcript:
         :return:
         """
-        raise NotImplementedError()
+        raise BotActionNotImplementedError()
 
     async def on_update_activity(
         self,
@@ -270,7 +274,7 @@ class ChannelServiceHandler:
         :param activity:
         :return:
         """
-        raise NotImplementedError()
+        raise BotActionNotImplementedError()
 
     async def on_reply_to_activity(
         self,
@@ -302,7 +306,7 @@ class ChannelServiceHandler:
         :param activity:
         :return:
         """
-        raise NotImplementedError()
+        raise BotActionNotImplementedError()
 
     async def on_delete_activity(
         self, claims_identity: ClaimsIdentity, conversation_id: str, activity_id: str,
@@ -320,7 +324,7 @@ class ChannelServiceHandler:
         :param activity_id:
         :return:
         """
-        raise NotImplementedError()
+        raise BotActionNotImplementedError()
 
     async def on_get_conversation_members(
         self, claims_identity: ClaimsIdentity, conversation_id: str,
@@ -337,7 +341,7 @@ class ChannelServiceHandler:
         :param conversation_id:
         :return:
         """
-        raise NotImplementedError()
+        raise BotActionNotImplementedError()
 
     async def on_get_conversation_paged_members(
         self,
@@ -373,7 +377,7 @@ class ChannelServiceHandler:
         :param continuation_token:
         :return:
         """
-        raise NotImplementedError()
+        raise BotActionNotImplementedError()
 
     async def on_delete_conversation_member(
         self, claims_identity: ClaimsIdentity, conversation_id: str, member_id: str,
@@ -393,7 +397,7 @@ class ChannelServiceHandler:
         :param member_id:
         :return:
         """
-        raise NotImplementedError()
+        raise BotActionNotImplementedError()
 
     async def on_get_activity_members(
         self, claims_identity: ClaimsIdentity, conversation_id: str, activity_id: str,
@@ -412,7 +416,7 @@ class ChannelServiceHandler:
         :param activity_id:
         :return:
         """
-        raise NotImplementedError()
+        raise BotActionNotImplementedError()
 
     async def on_upload_attachment(
         self,
@@ -436,7 +440,7 @@ class ChannelServiceHandler:
         :param attachment_upload:
         :return:
         """
-        raise NotImplementedError()
+        raise BotActionNotImplementedError()
 
     async def _authenticate(self, auth_header: str) -> ClaimsIdentity:
         if not auth_header:
