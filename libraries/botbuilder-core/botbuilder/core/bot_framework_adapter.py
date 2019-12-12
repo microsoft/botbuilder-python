@@ -9,6 +9,7 @@ from typing import List, Callable, Awaitable, Union, Dict
 from msrest.serialization import Model
 from botbuilder.schema import (
     Activity,
+    ActivityTypes,
     ConversationAccount,
     ConversationParameters,
     ConversationReference,
@@ -196,7 +197,9 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                 parameters
             )
             request = TurnContext.apply_conversation_reference(
-                Activity(), reference, is_incoming=True
+                Activity(type=ActivityTypes.event, name="CreateConversation"),
+                reference,
+                is_incoming=True,
             )
             request.conversation = ConversationAccount(
                 id=resource_response.id, tenant_id=parameters.tenant_id
