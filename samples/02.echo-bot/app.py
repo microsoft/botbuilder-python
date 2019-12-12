@@ -68,12 +68,23 @@ async def messages(req: Request) -> Response:
     except Exception as exception:
         raise exception
 
+def app():
+    APP = web.Application()
+    APP.router.add_post("/api/messages", messages)
+    return APP 
 
-APP = web.Application()
-APP.router.add_post("/api/messages", messages)
+#this is the code needed for the deployment template startup command
+def init_func(argv):
+    try:
+        APP = app()
+    except Exception as error:
+        raise error
+    
+    return APP
 
+#this part is needed if you start your bot with 'py app.py' instead of the deployed command.
 if __name__ == "__main__":
     try:
-        web.run_app(APP, host="localhost", port=CONFIG.PORT)
+        web.run_app(app(), host="localhost", port=CONFIG.PORT)
     except Exception as error:
         raise error
