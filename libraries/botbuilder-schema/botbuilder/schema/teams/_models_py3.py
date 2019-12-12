@@ -1798,7 +1798,7 @@ class TeamsChannelAccount(ChannelAccount):
         "surname": {"key": "surname", "type": "str"},
         "email": {"key": "email", "type": "str"},
         "user_principal_name": {"key": "userPrincipalName", "type": "str"},
-        "aad_object_id": {"key": "objectId", "type": "str"}
+        "aad_object_id": {"key": "objectId", "type": "str"},
     }
 
     def __init__(
