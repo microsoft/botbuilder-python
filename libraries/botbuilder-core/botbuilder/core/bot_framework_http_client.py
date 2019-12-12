@@ -6,7 +6,6 @@ from typing import Dict
 from logging import Logger
 import aiohttp
 
-from botbuilder.core import InvokeResponse
 from botbuilder.schema import Activity
 from botframework.connector.auth import (
     ChannelProvider,
@@ -14,6 +13,8 @@ from botframework.connector.auth import (
     GovernmentConstants,
     MicrosoftAppCredentials,
 )
+
+from . import InvokeResponse
 
 
 class BotFrameworkHttpClient:
