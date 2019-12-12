@@ -24,6 +24,7 @@ from botbuilder.schema import (
     TokenResponse,
 )
 from botframework.connector import Channels
+from botframework.connector.auth import ClaimsIdentity, SkillValidation
 from .prompt_options import PromptOptions
 from .oauth_prompt_settings import OAuthPromptSettings
 from .prompt_validator_context import PromptValidatorContext
@@ -115,7 +116,7 @@ class OAuthPrompt(Dialog):
         if output is not None:
             return await dialog_context.end_dialog(output)
 
-        await self.send_oauth_card(dialog_context.context, options.prompt)
+        await self._send_oauth_card(dialog_context.context, options.prompt)
         return Dialog.end_of_turn
 
     async def continue_dialog(self, dialog_context: DialogContext) -> DialogTurnResult:
@@ -132,6 +133,8 @@ class OAuthPrompt(Dialog):
 
         if state["state"].get("attemptCount") is None:
             state["state"]["attemptCount"] = 1
+        else:
+            state["state"]["attemptCount"] += 1
 
         # Validate the return value
         is_valid = False
@@ -142,7 +145,6 @@ class OAuthPrompt(Dialog):
                     recognized,
                     state["state"],
                     state["options"],
-                    state["state"]["attemptCount"],
                 )
             )
         elif recognized.succeeded:
@@ -188,7 +190,7 @@ class OAuthPrompt(Dialog):
 
         return await adapter.sign_out_user(context, self._settings.connection_name)
 
-    async def send_oauth_card(
+    async def _send_oauth_card(
         self, context: TurnContext, prompt: Union[Activity, str] = None
     ):
         if not isinstance(prompt, Activity):
@@ -198,11 +200,32 @@ class OAuthPrompt(Dialog):
 
         prompt.attachments = prompt.attachments or []
 
-        if self._channel_suppports_oauth_card(context.activity.channel_id):
+        if OAuthPrompt._channel_suppports_oauth_card(context.activity.channel_id):
             if not any(
                 att.content_type == CardFactory.content_types.oauth_card
                 for att in prompt.attachments
             ):
+                link = None
+                card_action_type = ActionTypes.signin
+                bot_identity: ClaimsIdentity = context.turn_state.get("BotIdentity")
+
+                # check if it's from streaming connection
+                if not context.activity.service_url.startswith("http"):
+                    if not hasattr(context.adapter, "get_oauth_sign_in_link"):
+                        raise Exception(
+                            "OAuthPrompt: get_oauth_sign_in_link() not supported by the current adapter"
+                        )
+                    link = await context.adapter.get_oauth_sign_in_link(
+                        context, self._settings.connection_name
+                    )
+                elif bot_identity and SkillValidation.is_skill_claim(
+                    bot_identity.claims
+                ):
+                    link = await context.adapter.get_oauth_sign_in_link(
+                        context, self._settings.connection_name
+                    )
+                    card_action_type = ActionTypes.open_url
+
                 prompt.attachments.append(
                     CardFactory.oauth_card(
                         OAuthCard(
@@ -212,7 +235,8 @@ class OAuthPrompt(Dialog):
                                 CardAction(
                                     title=self._settings.title,
                                     text=self._settings.text,
-                                    type=ActionTypes.signin,
+                                    type=card_action_type,
+                                    value=link,
                                 )
                             ],
                         )
@@ -251,9 +275,9 @@ class OAuthPrompt(Dialog):
 
     async def _recognize_token(self, context: TurnContext) -> PromptRecognizerResult:
         token = None
-        if self._is_token_response_event(context):
+        if OAuthPrompt._is_token_response_event(context):
             token = context.activity.value
-        elif self._is_teams_verification_invoke(context):
+        elif OAuthPrompt._is_teams_verification_invoke(context):
             code = context.activity.value.state
             try:
                 token = await self.get_user_token(context, code)
@@ -280,14 +304,16 @@ class OAuthPrompt(Dialog):
             else PromptRecognizerResult()
         )
 
-    def _is_token_response_event(self, context: TurnContext) -> bool:
+    @staticmethod
+    def _is_token_response_event(context: TurnContext) -> bool:
         activity = context.activity
 
         return (
             activity.type == ActivityTypes.event and activity.name == "tokens/response"
         )
 
-    def _is_teams_verification_invoke(self, context: TurnContext) -> bool:
+    @staticmethod
+    def _is_teams_verification_invoke(context: TurnContext) -> bool:
         activity = context.activity
 
         return (
@@ -295,7 +321,8 @@ class OAuthPrompt(Dialog):
             and activity.name == "signin/verifyState"
         )
 
-    def _channel_suppports_oauth_card(self, channel_id: str) -> bool:
+    @staticmethod
+    def _channel_suppports_oauth_card(channel_id: str) -> bool:
         if channel_id in [
             Channels.ms_teams,
             Channels.cortana,
