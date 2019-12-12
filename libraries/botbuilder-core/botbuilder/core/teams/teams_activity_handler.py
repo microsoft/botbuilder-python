@@ -252,7 +252,7 @@ class TeamsActivityHandler(ActivityHandler):
             )
 
         if action.bot_message_preview_action == "send":
-            return await self.on_teams_messaging_extension_bot_message_send_activity(
+            return await self.on_teams_messaging_extension_bot_message_preview_send_activity(
                 turn_context, action
             )
 
@@ -266,7 +266,7 @@ class TeamsActivityHandler(ActivityHandler):
     ) -> MessagingExtensionActionResponse:
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
-    async def on_teams_messaging_extension_bot_message_send_activity(  # pylint: disable=unused-argument
+    async def on_teams_messaging_extension_bot_message_preview_send_activity(  # pylint: disable=unused-argument
         self, turn_context: TurnContext, action
     ) -> MessagingExtensionActionResponse:
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
