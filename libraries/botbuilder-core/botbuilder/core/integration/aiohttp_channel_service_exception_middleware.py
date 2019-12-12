@@ -6,7 +6,7 @@ from aiohttp.web import (
     HTTPInternalServerError,
 )
 
-from .channel_service_handler import BotActionNotImplementedError
+from botbuilder.core import BotActionNotImplementedError
 
 
 @middleware
