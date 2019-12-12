@@ -255,6 +255,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             Channels.ms_teams == context.activity.channel_id
             and context.activity.conversation is not None
             and not context.activity.conversation.tenant_id
+            and context.activity.channel_data
         ):
             teams_channel_data = context.activity.channel_data
             if teams_channel_data.get("tenant", {}).get("id", None):
