@@ -1,0 +1,27 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
+FROM python:3.7-slim as pkg_holder
+
+ARG EXTRA_INDEX_URL
+RUN pip config set global.extra-index-url "${EXTRA_INDEX_URL}"
+
+COPY requirements.txt .
+RUN pip download -r requirements.txt -d packages
+
+FROM python:3.7-slim
+
+ENV VIRTUAL_ENV=/opt/venv
+RUN python3.7 -m venv $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+COPY . /app
+WORKDIR /app
+
+COPY --from=pkg_holder packages packages
+
+RUN pip install -r requirements.txt --no-index --find-links=packages && rm -rf packages
+
+ENTRYPOINT ["python"]
+EXPOSE 3978
+CMD ["runserver.py"]
