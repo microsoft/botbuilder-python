@@ -110,9 +110,9 @@ def notify():
 async def _send_proactive_message():
     for conversation_reference in CONVERSATION_REFERENCES.values():
         return await ADAPTER.continue_conversation(
-            APP_ID,
             conversation_reference,
             lambda turn_context: turn_context.send_activity("proactive hello"),
+            APP_ID,
         )
 
 

@@ -1,12 +1,13 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
-
 from datetime import datetime, timedelta
 from urllib.parse import urlparse
+
+from adal import AuthenticationContext
 import requests
 
 from msrest.authentication import Authentication
-from .constants import Constants
+from .authentication_constants import AuthenticationConstants
 
 # TODO: Decide to move this to Constants or viceversa (when porting OAuth)
 AUTH_SETTINGS = {
@@ -34,9 +35,9 @@ class _OAuthResponse:
     def from_json(json_values):
         result = _OAuthResponse()
         try:
-            result.token_type = json_values["token_type"]
-            result.access_token = json_values["access_token"]
-            result.expires_in = json_values["expires_in"]
+            result.token_type = json_values["tokenType"]
+            result.access_token = json_values["accessToken"]
+            result.expires_in = json_values["expiresIn"]
         except KeyError:
             pass
         return result
@@ -59,7 +60,13 @@ class MicrosoftAppCredentials(Authentication):
     }
     cache = {}
 
-    def __init__(self, app_id: str, password: str, channel_auth_tenant: str = None):
+    def __init__(
+        self,
+        app_id: str,
+        password: str,
+        channel_auth_tenant: str = None,
+        oauth_scope: str = None,
+    ):
         """
         Initializes a new instance of MicrosoftAppCredentials class
         :param app_id: The Microsoft app ID.
@@ -73,15 +80,16 @@ class MicrosoftAppCredentials(Authentication):
         tenant = (
             channel_auth_tenant
             if channel_auth_tenant
-            else Constants.DEFAULT_CHANNEL_AUTH_TENANT
+            else AuthenticationConstants.DEFAULT_CHANNEL_AUTH_TENANT
         )
         self.oauth_endpoint = (
-            Constants.TO_CHANNEL_FROM_BOT_LOGIN_URL_PREFIX
-            + tenant
-            + Constants.TO_CHANNEL_FROM_BOT_TOKEN_ENDPOINT_PATH
+            AuthenticationConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL_PREFIX + tenant
         )
-        self.oauth_scope = AUTH_SETTINGS["refreshScope"]
-        self.token_cache_key = app_id + "-cache"
+        self.oauth_scope = (
+            oauth_scope or AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER
+        )
+        self.token_cache_key = app_id + self.oauth_scope + "-cache" if app_id else None
+        self.authentication_context = AuthenticationContext(self.oauth_endpoint)
 
     # pylint: disable=arguments-differ
     def signed_session(self, session: requests.Session = None) -> requests.Session:
@@ -134,19 +142,14 @@ class MicrosoftAppCredentials(Authentication):
         """
         returns: _OAuthResponse
         """
-        options = {
-            "grant_type": "client_credentials",
-            "client_id": self.microsoft_app_id,
-            "client_secret": self.microsoft_app_password,
-            "scope": self.oauth_scope,
-        }
 
-        response = requests.post(self.oauth_endpoint, data=options)
-        response.raise_for_status()
+        token = self.authentication_context.acquire_token_with_client_credentials(
+            self.oauth_scope, self.microsoft_app_id, self.microsoft_app_password
+        )
 
-        oauth_response = _OAuthResponse.from_json(response.json())
+        oauth_response = _OAuthResponse.from_json(token)
         oauth_response.expiration_time = datetime.now() + timedelta(
-            seconds=(oauth_response.expires_in - 300)
+            seconds=(int(oauth_response.expires_in) - 300)
         )
 
         return oauth_response

@@ -35,6 +35,8 @@ setup(
         "botbuilder.core",
         "botbuilder.core.adapters",
         "botbuilder.core.inspection",
+        "botbuilder.core.integration",
+        "botbuilder.core.skills",
     ],
     install_requires=REQUIRES,
     classifiers=[

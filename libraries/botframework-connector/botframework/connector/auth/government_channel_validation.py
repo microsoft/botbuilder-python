@@ -3,6 +3,7 @@
 
 from abc import ABC
 
+from .authentication_configuration import AuthenticationConfiguration
 from .authentication_constants import AuthenticationConstants
 from .claims_identity import ClaimsIdentity
 from .credential_provider import CredentialProvider
@@ -24,8 +25,12 @@ class GovernmentChannelValidation(ABC):
 
     @staticmethod
     async def authenticate_channel_token(
-        auth_header: str, credentials: CredentialProvider, channel_id: str
+        auth_header: str,
+        credentials: CredentialProvider,
+        channel_id: str,
+        auth_configuration: AuthenticationConfiguration = None,
     ) -> ClaimsIdentity:
+        auth_configuration = auth_configuration or AuthenticationConfiguration()
         endpoint = (
             GovernmentChannelValidation.OPEN_ID_METADATA_ENDPOINT
             if GovernmentChannelValidation.OPEN_ID_METADATA_ENDPOINT
@@ -38,7 +43,7 @@ class GovernmentChannelValidation(ABC):
         )
 
         identity: ClaimsIdentity = await token_extractor.get_identity_from_auth_header(
-            auth_header, channel_id
+            auth_header, channel_id, auth_configuration.required_endorsements
         )
         return await GovernmentChannelValidation.validate_identity(
             identity, credentials
@@ -50,9 +55,10 @@ class GovernmentChannelValidation(ABC):
         credentials: CredentialProvider,
         service_url: str,
         channel_id: str,
+        auth_configuration: AuthenticationConfiguration = None,
     ) -> ClaimsIdentity:
         identity: ClaimsIdentity = await GovernmentChannelValidation.authenticate_channel_token(
-            auth_header, credentials, channel_id
+            auth_header, credentials, channel_id, auth_configuration
         )
 
         service_url_claim: str = identity.get_claim_value(

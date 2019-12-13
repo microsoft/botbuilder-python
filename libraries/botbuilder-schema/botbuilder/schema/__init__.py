@@ -39,23 +39,8 @@ try:
     from ._models_py3 import MediaUrl
     from ._models_py3 import Mention
     from ._models_py3 import MessageReaction
-    from ._models_py3 import MicrosoftPayMethodData
     from ._models_py3 import OAuthCard
     from ._models_py3 import PagedMembersResult
-    from ._models_py3 import PaymentAddress
-    from ._models_py3 import PaymentCurrencyAmount
-    from ._models_py3 import PaymentDetails
-    from ._models_py3 import PaymentDetailsModifier
-    from ._models_py3 import PaymentItem
-    from ._models_py3 import PaymentMethodData
-    from ._models_py3 import PaymentOptions
-    from ._models_py3 import PaymentRequest
-    from ._models_py3 import PaymentRequestComplete
-    from ._models_py3 import PaymentRequestCompleteResult
-    from ._models_py3 import PaymentRequestUpdate
-    from ._models_py3 import PaymentRequestUpdateResult
-    from ._models_py3 import PaymentResponse
-    from ._models_py3 import PaymentShippingOption
     from ._models_py3 import Place
     from ._models_py3 import ReceiptCard
     from ._models_py3 import ReceiptItem
@@ -101,23 +86,8 @@ except (SyntaxError, ImportError):
     from ._models import MediaUrl
     from ._models import Mention
     from ._models import MessageReaction
-    from ._models import MicrosoftPayMethodData
     from ._models import OAuthCard
     from ._models import PagedMembersResult
-    from ._models import PaymentAddress
-    from ._models import PaymentCurrencyAmount
-    from ._models import PaymentDetails
-    from ._models import PaymentDetailsModifier
-    from ._models import PaymentItem
-    from ._models import PaymentMethodData
-    from ._models import PaymentOptions
-    from ._models import PaymentRequest
-    from ._models import PaymentRequestComplete
-    from ._models import PaymentRequestCompleteResult
-    from ._models import PaymentRequestUpdate
-    from ._models import PaymentRequestUpdateResult
-    from ._models import PaymentResponse
-    from ._models import PaymentShippingOption
     from ._models import Place
     from ._models import ReceiptCard
     from ._models import ReceiptItem
@@ -179,23 +149,8 @@ __all__ = [
     "MediaUrl",
     "Mention",
     "MessageReaction",
-    "MicrosoftPayMethodData",
     "OAuthCard",
     "PagedMembersResult",
-    "PaymentAddress",
-    "PaymentCurrencyAmount",
-    "PaymentDetails",
-    "PaymentDetailsModifier",
-    "PaymentItem",
-    "PaymentMethodData",
-    "PaymentOptions",
-    "PaymentRequest",
-    "PaymentRequestComplete",
-    "PaymentRequestCompleteResult",
-    "PaymentRequestUpdate",
-    "PaymentRequestUpdateResult",
-    "PaymentResponse",
-    "PaymentShippingOption",
     "Place",
     "ReceiptCard",
     "ReceiptItem",

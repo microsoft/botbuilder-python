@@ -32,6 +32,8 @@ class ActivityHandler:
             await self.on_message_reaction_activity(turn_context)
         elif turn_context.activity.type == ActivityTypes.event:
             await self.on_event_activity(turn_context)
+        elif turn_context.activity.type == ActivityTypes.end_of_conversation:
+            await self.on_end_of_conversation(turn_context)
         else:
             await self.on_unrecognized_activity_type(turn_context)
 
@@ -58,12 +60,12 @@ class ActivityHandler:
         return
 
     async def on_members_added_activity(
-        self, members_added: ChannelAccount, turn_context: TurnContext
+        self, members_added: List[ChannelAccount], turn_context: TurnContext
     ):  # pylint: disable=unused-argument
         return
 
     async def on_members_removed_activity(
-        self, members_removed: ChannelAccount, turn_context: TurnContext
+        self, members_removed: List[ChannelAccount], turn_context: TurnContext
     ):  # pylint: disable=unused-argument
         return
 
@@ -100,6 +102,11 @@ class ActivityHandler:
         return
 
     async def on_event(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext
+    ):
+        return
+
+    async def on_end_of_conversation(  # pylint: disable=unused-argument
         self, turn_context: TurnContext
     ):
         return

@@ -4,6 +4,7 @@
 from abc import abstractmethod
 from copy import deepcopy
 from typing import Callable, Dict, Union
+from jsonpickle.pickler import Pickler
 from botbuilder.core.state_property_accessor import StatePropertyAccessor
 from .turn_context import TurnContext
 from .storage import Storage
@@ -24,8 +25,7 @@ class CachedBotState:
         return self.hash != self.compute_hash(self.state)
 
     def compute_hash(self, obj: object) -> str:
-        # TODO: Should this be compatible with C# JsonConvert.SerializeObject ?
-        return str(obj)
+        return str(Pickler().flatten(obj))
 
 
 class BotState(PropertyManager):
