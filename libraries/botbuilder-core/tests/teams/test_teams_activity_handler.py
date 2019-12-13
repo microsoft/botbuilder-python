@@ -164,9 +164,7 @@ class TestingTeamsActivityHandler(TeamsActivityHandler):
     async def on_teams_messaging_extension_bot_message_preview_edit(
         self, turn_context: TurnContext, action: MessagingExtensionAction
     ):
-        self.record.append(
-            "on_teams_messaging_extension_bot_message_preview_edit"
-        )
+        self.record.append("on_teams_messaging_extension_bot_message_preview_edit")
         return await super().on_teams_messaging_extension_bot_message_preview_edit(
             turn_context, action
         )
@@ -174,9 +172,7 @@ class TestingTeamsActivityHandler(TeamsActivityHandler):
     async def on_teams_messaging_extension_bot_message_preview_send(
         self, turn_context: TurnContext, action: MessagingExtensionAction
     ):
-        self.record.append(
-            "on_teams_messaging_extension_bot_message_preview_send"
-        )
+        self.record.append("on_teams_messaging_extension_bot_message_preview_send")
         return await super().on_teams_messaging_extension_bot_message_preview_send(
             turn_context, action
         )
@@ -502,10 +498,7 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         assert len(bot.record) == 3
         assert bot.record[0] == "on_invoke_activity"
         assert bot.record[1] == "on_teams_messaging_extension_submit_action_dispatch"
-        assert (
-            bot.record[2]
-            == "on_teams_messaging_extension_bot_message_preview_edit"
-        )
+        assert bot.record[2] == "on_teams_messaging_extension_bot_message_preview_edit"
 
     async def test_on_teams_messaging_extension_bot_message_send_activity(self):
         # Arrange
@@ -533,10 +526,7 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         assert len(bot.record) == 3
         assert bot.record[0] == "on_invoke_activity"
         assert bot.record[1] == "on_teams_messaging_extension_submit_action_dispatch"
-        assert (
-            bot.record[2]
-            == "on_teams_messaging_extension_bot_message_preview_send"
-        )
+        assert bot.record[2] == "on_teams_messaging_extension_bot_message_preview_send"
 
     async def test_on_teams_messaging_extension_bot_message_send_activity_with_none(
         self,
