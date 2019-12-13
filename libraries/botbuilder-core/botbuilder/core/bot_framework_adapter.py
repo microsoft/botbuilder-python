@@ -38,6 +38,7 @@ from . import __version__
 from .bot_adapter import BotAdapter
 from .turn_context import TurnContext
 from .user_token_provider import UserTokenProvider
+from .invoke_response import InvokeResponse
 from .conversation_reference_extension import get_continuation_activity
 
 USER_AGENT = f"Microsoft-BotFramework/3.1 (BotBuilder Python/{__version__})"
@@ -263,11 +264,17 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                     teams_channel_data["tenant"]["id"]
                 )
 
-        pipeline_result = await self.run_pipeline(context, logic)
+        await self.run_pipeline(context, logic)
 
-        return pipeline_result or context.turn_state.get(
-            BotFrameworkAdapter._INVOKE_RESPONSE_KEY  # pylint: disable=protected-access
-        )
+        if activity.type == ActivityTypes.invoke:
+            invoke_response = context.turn_state.get(
+                BotFrameworkAdapter._INVOKE_RESPONSE_KEY  # pylint: disable=protected-access
+            )
+            if invoke_response is None:
+                return InvokeResponse(status=501)
+            return invoke_response.value
+
+        return None
 
     async def authenticate_request(
         self, request: Activity, auth_header: str
@@ -287,7 +294,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         )
 
         if not claims.is_authenticated:
-            raise Exception("Unauthorized Access. Request is not authorized")
+            raise PermissionError("Unauthorized Access. Request is not authorized")
 
         return claims
 
