@@ -40,6 +40,7 @@ def serializer_helper(object_to_serialize: Model) -> dict:
     ]
     dependencies_dict = {dependency.__name__: dependency for dependency in dependencies}
     serializer = Serializer(dependencies_dict)
+    # pylint: disable=protected-access
     return serializer._serialize(
         object_to_serialize
-    )  # pylint: disable=protected-access
+    )
