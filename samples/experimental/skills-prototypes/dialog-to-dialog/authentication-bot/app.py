@@ -9,31 +9,19 @@ from aiohttp import web
 from aiohttp.web import Request, Response
 from botbuilder.core import (
     BotFrameworkAdapterSettings,
-    BotFrameworkHttpClient,
     ConversationState,
     MemoryStorage,
+    UserState,
     TurnContext,
     BotFrameworkAdapter,
 )
-from botbuilder.core.integration import (
-    aiohttp_channel_service_routes,
-    aiohttp_error_middleware,
-)
-from botbuilder.core.skills import SkillConversationIdFactory, SkillHandler
 from botbuilder.schema import Activity, ActivityTypes
-from botframework.connector.auth import (
-    AuthenticationConfiguration,
-    SimpleCredentialProvider,
-)
 
-from bots import RootBot
-from config import DefaultConfig, SkillConfiguration
+from bots import AuthBot
+from dialogs import MainDialog
+from config import DefaultConfig
 
 CONFIG = DefaultConfig()
-SKILL_CONFIG = SkillConfiguration()
-
-CREDENTIAL_PROVIDER = SimpleCredentialProvider(CONFIG.APP_ID, CONFIG.APP_PASSWORD)
-CLIENT = BotFrameworkHttpClient(CREDENTIAL_PROVIDER)
 
 # Create adapter.
 # See https://aka.ms/about-bot-adapter to learn more about how bots work.
@@ -43,7 +31,7 @@ ADAPTER = BotFrameworkAdapter(SETTINGS)
 STORAGE = MemoryStorage()
 
 CONVERSATION_STATE = ConversationState(STORAGE)
-ID_FACTORY = SkillConversationIdFactory(STORAGE)
+USER_STATE = UserState(STORAGE)
 
 
 # Catch-all for errors.
@@ -76,16 +64,14 @@ async def on_error(context: TurnContext, error: Exception):
 
 ADAPTER.on_turn_error = on_error
 
-# Create the Bot
-BOT = RootBot(CONVERSATION_STATE, SKILL_CONFIG, ID_FACTORY, CLIENT, CONFIG)
-
-SKILL_HANDLER = SkillHandler(
-    ADAPTER, BOT, ID_FACTORY, CREDENTIAL_PROVIDER, AuthenticationConfiguration()
-)
+DIALOG = MainDialog(CONFIG)
 
 
 # Listen for incoming requests on /api/messages
 async def messages(req: Request) -> Response:
+    # Create the Bot
+    bot = AuthBot(CONVERSATION_STATE, USER_STATE, DIALOG)
+
     # Main bot message handler.
     if "application/json" in req.headers["Content-Type"]:
         body = await req.json()
@@ -96,15 +82,14 @@ async def messages(req: Request) -> Response:
     auth_header = req.headers["Authorization"] if "Authorization" in req.headers else ""
 
     try:
-        await ADAPTER.process_activity(activity, auth_header, BOT.on_turn)
+        await ADAPTER.process_activity(activity, auth_header, bot.on_turn)
         return Response(status=201)
     except Exception as exception:
         raise exception
 
 
-APP = web.Application(middlewares=[aiohttp_error_middleware])
+APP = web.Application()
 APP.router.add_post("/api/messages", messages)
-APP.router.add_routes(aiohttp_channel_service_routes(SKILL_HANDLER, "/api/skills"))
 
 if __name__ == "__main__":
     try:

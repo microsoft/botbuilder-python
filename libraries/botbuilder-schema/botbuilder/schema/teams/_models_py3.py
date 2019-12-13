@@ -1816,7 +1816,6 @@ class TeamsChannelAccount(ChannelAccount):
         self.given_name = given_name
         self.surname = surname
         self.email = email
-        # changing to camel case due to how data comes in off the wire
         self.user_principal_name = user_principal_name
 
 
