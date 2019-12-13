@@ -28,6 +28,9 @@ def deserializer_helper(msrest_cls: Type[Model], dict_to_deserialize: dict) -> M
 
 
 def serializer_helper(object_to_serialize: Model) -> dict:
+    if object_to_serialize is None:
+        return None
+
     dependencies = [
         schema_cls
         for key, schema_cls in getmembers(schema)
