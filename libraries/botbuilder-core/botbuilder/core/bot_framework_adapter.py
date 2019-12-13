@@ -257,8 +257,8 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         pipeline_result = await self.run_pipeline(context, logic)
 
         return pipeline_result or context.turn_state.get(
-                BotFrameworkAdapter._INVOKE_RESPONSE_KEY  # pylint: disable=protected-access
-            )
+            BotFrameworkAdapter._INVOKE_RESPONSE_KEY  # pylint: disable=protected-access
+        )
 
     async def authenticate_request(
         self, request: Activity, auth_header: str
