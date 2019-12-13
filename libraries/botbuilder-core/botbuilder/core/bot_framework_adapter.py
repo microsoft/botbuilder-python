@@ -254,7 +254,11 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                     teams_channel_data["tenant"]["id"]
                 )
 
-        return await self.run_pipeline(context, logic)
+        pipeline_result = await self.run_pipeline(context, logic)
+
+        return pipeline_result or context.turn_state.get(
+                BotFrameworkAdapter._INVOKE_RESPONSE_KEY  # pylint: disable=protected-access
+            )
 
     async def authenticate_request(
         self, request: Activity, auth_header: str

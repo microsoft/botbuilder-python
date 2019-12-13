@@ -4,7 +4,7 @@
 from http import HTTPStatus
 from botbuilder.schema import Activity, ActivityTypes, ChannelAccount
 from botbuilder.core.turn_context import TurnContext
-from botbuilder.core.teams.teams_helper import deserializer_helper
+from botbuilder.core.teams.teams_helper import deserializer_helper, serializer_helper
 from botbuilder.core import ActivityHandler, InvokeResponse, BotFrameworkAdapter
 from botbuilder.schema.teams import (
     AppBasedLinkQuery,
@@ -441,7 +441,7 @@ class TeamsActivityHandler(ActivityHandler):
 
     @staticmethod
     def _create_invoke_response(body: object = None) -> InvokeResponse:
-        return InvokeResponse(status=int(HTTPStatus.OK), body=body)
+        return InvokeResponse(status=int(HTTPStatus.OK), body=serializer_helper(body))
 
 
 class _InvokeResponseException(Exception):
