@@ -4,4 +4,3 @@ omit =
     */tests/*
     setup.py
     */botbuilder-schema/*
-    */functional-tests/*
