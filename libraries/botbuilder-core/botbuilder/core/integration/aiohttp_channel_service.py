@@ -5,6 +5,7 @@ from typing import List, Union, Type
 
 from aiohttp.web import RouteTableDef, Request, Response
 from msrest.serialization import Model
+
 from botbuilder.schema import (
     Activity,
     AttachmentData,
@@ -12,7 +13,7 @@ from botbuilder.schema import (
     Transcript,
 )
 
-from .channel_service_handler import ChannelServiceHandler
+from botbuilder.core import ChannelServiceHandler
 
 
 async def deserialize_from_body(

@@ -7,7 +7,7 @@ extension-pkg-whitelist=
 
 # Add files or directories to the blacklist. They should be base names, not
 # paths.
-ignore=CVS,build,botbuilder-schema,samples,django_tests,Generator,operations,operations_async
+ignore=CVS,build,botbuilder-schema,samples,django_tests,Generator,operations,operations_async,schema
 
 # Add files or directories matching the regex patterns to the blacklist. The
 # regex matches against base names, not paths.

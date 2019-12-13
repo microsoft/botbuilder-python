@@ -88,7 +88,7 @@ class MicrosoftAppCredentials(Authentication):
         self.oauth_scope = (
             oauth_scope or AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER
         )
-        self.token_cache_key = app_id + "-cache" if app_id else None
+        self.token_cache_key = app_id + self.oauth_scope + "-cache" if app_id else None
         self.authentication_context = AuthenticationContext(self.oauth_endpoint)
 
     # pylint: disable=arguments-differ
