@@ -3,7 +3,6 @@
 
 from typing import List
 from botbuilder.core.turn_context import TurnContext
-from botbuilder.core.teams.teams_helper import deserializer_helper
 from botbuilder.schema.teams import (
     ChannelInfo,
     TeamDetails,
