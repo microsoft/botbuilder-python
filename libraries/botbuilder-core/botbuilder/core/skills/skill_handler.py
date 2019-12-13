@@ -3,8 +3,7 @@
 
 from uuid import uuid4
 
-from botbuilder.core.integration import ChannelServiceHandler
-from botbuilder.core import Bot, BotAdapter, TurnContext
+from botbuilder.core import Bot, BotAdapter, ChannelServiceHandler, TurnContext
 from botbuilder.schema import (
     Activity,
     ActivityTypes,

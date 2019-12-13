@@ -3,7 +3,7 @@
 
 from typing import List
 
-from botbuilder.core.integration import ChannelServiceHandler
+from botbuilder.core import ChannelServiceHandler
 from botbuilder.schema import (
     Activity,
     ChannelAccount,

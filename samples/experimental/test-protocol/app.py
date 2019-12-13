@@ -5,7 +5,8 @@ from aiohttp import web
 from aiohttp.web import Request, Response
 
 from botframework.connector.auth import AuthenticationConfiguration, SimpleCredentialProvider
-from botbuilder.core.integration import BotFrameworkHttpClient, aiohttp_channel_service_routes
+from botbuilder.core import BotFrameworkHttpClient
+from botbuilder.core.integration import aiohttp_channel_service_routes
 from botbuilder.schema import Activity
 
 from config import DefaultConfig
