@@ -57,8 +57,8 @@ class AdapterUnderTest(BotFrameworkAdapter):
     def aux_test_authenticate_request(self, request: Activity, auth_header: str):
         return super().authenticate_request(request, auth_header)
 
-    def aux_test_create_connector_client(self, service_url: str):
-        return super().create_connector_client(service_url)
+    async def aux_test_create_connector_client(self, service_url: str):
+        return await super().create_connector_client(service_url)
 
     async def authenticate_request(self, request: Activity, auth_header: str):
         self.tester.assertIsNotNone(
@@ -71,7 +71,11 @@ class AdapterUnderTest(BotFrameworkAdapter):
         )
         return not self.fail_auth
 
-    def create_connector_client(self, service_url: str) -> ConnectorClient:
+    async def create_connector_client(
+        self,
+        service_url: str,
+        identity: ClaimsIdentity = None,  # pylint: disable=unused-argument
+    ) -> ConnectorClient:
         self.tester.assertIsNotNone(
             service_url, "create_connector_client() not passed service_url."
         )
@@ -181,9 +185,9 @@ async def process_activity(
 
 
 class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
-    def test_should_create_connector_client(self):
+    async def test_should_create_connector_client(self):
         adapter = AdapterUnderTest()
-        client = adapter.aux_test_create_connector_client(REFERENCE.service_url)
+        client = await adapter.aux_test_create_connector_client(REFERENCE.service_url)
         self.assertIsNotNone(client, "client not returned.")
         self.assertIsNotNone(client.conversations, "invalid client returned.")
 

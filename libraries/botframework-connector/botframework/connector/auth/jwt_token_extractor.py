@@ -3,6 +3,7 @@
 
 import json
 from datetime import datetime, timedelta
+from typing import List
 import requests
 from jwt.algorithms import RSAAlgorithm
 import jwt
@@ -33,17 +34,23 @@ class JwtTokenExtractor:
         return metadata
 
     async def get_identity_from_auth_header(
-        self, auth_header: str, channel_id: str
+        self, auth_header: str, channel_id: str, required_endorsements: List[str] = None
     ) -> ClaimsIdentity:
         if not auth_header:
             return None
         parts = auth_header.split(" ")
         if len(parts) == 2:
-            return await self.get_identity(parts[0], parts[1], channel_id)
+            return await self.get_identity(
+                parts[0], parts[1], channel_id, required_endorsements
+            )
         return None
 
     async def get_identity(
-        self, schema: str, parameter: str, channel_id
+        self,
+        schema: str,
+        parameter: str,
+        channel_id: str,
+        required_endorsements: List[str] = None,
     ) -> ClaimsIdentity:
         # No header in correct scheme or no token
         if schema != "Bearer" or not parameter:
@@ -54,7 +61,9 @@ class JwtTokenExtractor:
             return None
 
         try:
-            return await self._validate_token(parameter, channel_id)
+            return await self._validate_token(
+                parameter, channel_id, required_endorsements
+            )
         except Exception as error:
             raise error
 
@@ -64,9 +73,12 @@ class JwtTokenExtractor:
         if issuer in self.validation_parameters.issuer:
             return True
 
-        return issuer is self.validation_parameters.issuer
+        return issuer == self.validation_parameters.issuer
 
-    async def _validate_token(self, jwt_token: str, channel_id: str) -> ClaimsIdentity:
+    async def _validate_token(
+        self, jwt_token: str, channel_id: str, required_endorsements: List[str] = None
+    ) -> ClaimsIdentity:
+        required_endorsements = required_endorsements or []
         headers = jwt.get_unverified_header(jwt_token)
 
         # Update the signing tokens from the last refresh
@@ -74,8 +86,17 @@ class JwtTokenExtractor:
         metadata = await self.open_id_metadata.get(key_id)
 
         if key_id and metadata.endorsements:
+            # Verify that channelId is included in endorsements
             if not EndorsementsValidator.validate(channel_id, metadata.endorsements):
                 raise Exception("Could not validate endorsement key")
+
+            # Verify that additional endorsements are satisfied.
+            # If no additional endorsements are expected, the requirement is satisfied as well
+            for endorsement in required_endorsements:
+                if not EndorsementsValidator.validate(
+                    endorsement, metadata.endorsements
+                ):
+                    raise Exception("Could not validate endorsement key")
 
         if headers.get("alg", None) not in self.validation_parameters.algorithms:
             raise Exception("Token signing algorithm not in allowed list")
@@ -84,7 +105,14 @@ class JwtTokenExtractor:
             "verify_aud": False,
             "verify_exp": not self.validation_parameters.ignore_expiration,
         }
-        decoded_payload = jwt.decode(jwt_token, metadata.public_key, options=options)
+
+        decoded_payload = jwt.decode(
+            jwt_token,
+            metadata.public_key,
+            leeway=self.validation_parameters.clock_tolerance,
+            options=options,
+        )
+
         claims = ClaimsIdentity(decoded_payload, True)
 
         return claims
@@ -114,7 +142,7 @@ class _OpenIdMetadata:
     def _find(self, key_id: str):
         if not self.keys:
             return None
-        key = next(x for x in self.keys if x["kid"] == key_id)
+        key = [x for x in self.keys if x["kid"] == key_id][0]
         public_key = RSAAlgorithm.from_jwk(json.dumps(key))
         endorsements = key.get("endorsements", [])
         return _OpenIdConfig(public_key, endorsements)

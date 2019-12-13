@@ -3,7 +3,6 @@ from typing import Dict, List
 
 from jsonpickle import encode
 from jsonpickle.unpickler import Unpickler
-
 from azure.storage.blob import BlockBlobService, Blob, PublicAccess
 from botbuilder.core import Storage
 
@@ -42,7 +41,7 @@ class BlobStorage(Storage):
 
     async def read(self, keys: List[str]) -> Dict[str, object]:
         if not keys:
-            raise Exception("Please provide at least one key to read from storage.")
+            raise Exception("Keys are required when reading")
 
         self.client.create_container(self.settings.container_name)
         self.client.set_container_acl(
@@ -63,24 +62,35 @@ class BlobStorage(Storage):
         return items
 
     async def write(self, changes: Dict[str, object]):
+        if changes is None:
+            raise Exception("Changes are required when writing")
+        if not changes:
+            return
+
         self.client.create_container(self.settings.container_name)
         self.client.set_container_acl(
             self.settings.container_name, public_access=PublicAccess.Container
         )
 
-        for name, item in changes.items():
-            e_tag = (
-                None if not hasattr(item, "e_tag") or item.e_tag == "*" else item.e_tag
-            )
-            if e_tag:
-                item.e_tag = e_tag.replace('"', '\\"')
+        for (name, item) in changes.items():
+            e_tag = None
+            if isinstance(item, dict):
+                e_tag = item.get("e_tag", None)
+            elif hasattr(item, "e_tag"):
+                e_tag = item.e_tag
+            e_tag = None if e_tag == "*" else e_tag
+            if e_tag == "":
+                raise Exception("blob_storage.write(): etag missing")
             item_str = self._store_item_to_str(item)
-            self.client.create_blob_from_text(
-                container_name=self.settings.container_name,
-                blob_name=name,
-                text=item_str,
-                if_match=e_tag,
-            )
+            try:
+                self.client.create_blob_from_text(
+                    container_name=self.settings.container_name,
+                    blob_name=name,
+                    text=item_str,
+                    if_match=e_tag,
+                )
+            except Exception as error:
+                raise error
 
     async def delete(self, keys: List[str]):
         if keys is None:
@@ -102,7 +112,6 @@ class BlobStorage(Storage):
     def _blob_to_store_item(self, blob: Blob) -> object:
         item = json.loads(blob.content)
         item["e_tag"] = blob.properties.etag
-        item["id"] = blob.name
         result = Unpickler().restore(item)
         return result
 

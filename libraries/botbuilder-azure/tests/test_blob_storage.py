@@ -4,16 +4,29 @@
 import pytest
 from botbuilder.core import StoreItem
 from botbuilder.azure import BlobStorage, BlobStorageSettings
+from botbuilder.testing import StorageBaseTests
 
 # local blob emulator instance blob
+
 BLOB_STORAGE_SETTINGS = BlobStorageSettings(
-    account_name="", account_key="", container_name="test"
+    account_name="",
+    account_key="",
+    container_name="test",
+    # Default Azure Storage Emulator Connection String
+    connection_string="AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq"
+    + "2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;DefaultEndpointsProtocol=http;BlobEndpoint="
+    + "http://127.0.0.1:10000/devstoreaccount1;QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;"
+    + "TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;",
 )
 EMULATOR_RUNNING = False
 
 
+def get_storage():
+    return BlobStorage(BLOB_STORAGE_SETTINGS)
+
+
 async def reset():
-    storage = BlobStorage(BLOB_STORAGE_SETTINGS)
+    storage = get_storage()
     try:
         await storage.client.delete_container(
             container_name=BLOB_STORAGE_SETTINGS.container_name
@@ -29,7 +42,7 @@ class SimpleStoreItem(StoreItem):
         self.e_tag = e_tag
 
 
-class TestBlobStorage:
+class TestBlobStorageConstructor:
     @pytest.mark.asyncio
     async def test_blob_storage_init_should_error_without_cosmos_db_config(self):
         try:
@@ -37,17 +50,104 @@ class TestBlobStorage:
         except Exception as error:
             assert error
 
+
+class TestBlobStorageBaseTests:
     @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
-    async def test_blob_storage_read_should_return_data_with_valid_key(self):
-        storage = BlobStorage(BLOB_STORAGE_SETTINGS)
-        await storage.write({"user": SimpleStoreItem()})
+    async def test_return_empty_object_when_reading_unknown_key(self):
+        await reset()
 
-        data = await storage.read(["user"])
-        assert "user" in data
-        assert data["user"].counter == 1
-        assert len(data.keys()) == 1
+        test_ran = await StorageBaseTests.return_empty_object_when_reading_unknown_key(
+            get_storage()
+        )
 
+        assert test_ran
+
+    @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
+    @pytest.mark.asyncio
+    async def test_handle_null_keys_when_reading(self):
+        await reset()
+
+        test_ran = await StorageBaseTests.handle_null_keys_when_reading(get_storage())
+
+        assert test_ran
+
+    @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
+    @pytest.mark.asyncio
+    async def test_handle_null_keys_when_writing(self):
+        await reset()
+
+        test_ran = await StorageBaseTests.handle_null_keys_when_writing(get_storage())
+
+        assert test_ran
+
+    @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
+    @pytest.mark.asyncio
+    async def test_does_not_raise_when_writing_no_items(self):
+        await reset()
+
+        test_ran = await StorageBaseTests.does_not_raise_when_writing_no_items(
+            get_storage()
+        )
+
+        assert test_ran
+
+    @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
+    @pytest.mark.asyncio
+    async def test_create_object(self):
+        await reset()
+
+        test_ran = await StorageBaseTests.create_object(get_storage())
+
+        assert test_ran
+
+    @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
+    @pytest.mark.asyncio
+    async def test_handle_crazy_keys(self):
+        await reset()
+
+        test_ran = await StorageBaseTests.handle_crazy_keys(get_storage())
+
+        assert test_ran
+
+    @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
+    @pytest.mark.asyncio
+    async def test_update_object(self):
+        await reset()
+
+        test_ran = await StorageBaseTests.update_object(get_storage())
+
+        assert test_ran
+
+    @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
+    @pytest.mark.asyncio
+    async def test_delete_object(self):
+        await reset()
+
+        test_ran = await StorageBaseTests.delete_object(get_storage())
+
+        assert test_ran
+
+    @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
+    @pytest.mark.asyncio
+    async def test_perform_batch_operations(self):
+        await reset()
+
+        test_ran = await StorageBaseTests.perform_batch_operations(get_storage())
+
+        assert test_ran
+
+    @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
+    @pytest.mark.asyncio
+    async def test_proceeds_through_waterfall(self):
+        await reset()
+
+        test_ran = await StorageBaseTests.proceeds_through_waterfall(get_storage())
+
+        assert test_ran
+
+
+class TestBlobStorage:
     @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
     async def test_blob_storage_read_update_should_return_new_etag(self):
@@ -62,25 +162,6 @@ class TestBlobStorage:
 
     @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio
-    async def test_blob_storage_read_no_key_should_throw(self):
-        try:
-            storage = BlobStorage(BLOB_STORAGE_SETTINGS)
-            await storage.read([])
-        except Exception as error:
-            assert error
-
-    @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
-    @pytest.mark.asyncio
-    async def test_blob_storage_write_should_add_new_value(self):
-        storage = BlobStorage(BLOB_STORAGE_SETTINGS)
-        await storage.write({"user": SimpleStoreItem(counter=1)})
-
-        data = await storage.read(["user"])
-        assert "user" in data
-        assert data["user"].counter == 1
-
-    @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
-    @pytest.mark.asyncio
     async def test_blob_storage_write_should_overwrite_when_new_e_tag_is_an_asterisk(
         self,
     ):
@@ -90,32 +171,6 @@ class TestBlobStorage:
         await storage.write({"user": SimpleStoreItem(counter=10, e_tag="*")})
         data = await storage.read(["user"])
         assert data["user"].counter == 10
-
-    @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
-    @pytest.mark.asyncio
-    async def test_blob_storage_write_batch_operation(self):
-        storage = BlobStorage(BLOB_STORAGE_SETTINGS)
-        await storage.write(
-            {
-                "batch1": SimpleStoreItem(counter=1),
-                "batch2": SimpleStoreItem(counter=1),
-                "batch3": SimpleStoreItem(counter=1),
-            }
-        )
-        data = await storage.read(["batch1", "batch2", "batch3"])
-        assert len(data.keys()) == 3
-        assert data["batch1"]
-        assert data["batch2"]
-        assert data["batch3"]
-        assert data["batch1"].counter == 1
-        assert data["batch2"].counter == 1
-        assert data["batch3"].counter == 1
-        assert data["batch1"].e_tag
-        assert data["batch2"].e_tag
-        assert data["batch3"].e_tag
-        await storage.delete(["batch1", "batch2", "batch3"])
-        data = await storage.read(["batch1", "batch2", "batch3"])
-        assert not data.keys()
 
     @pytest.mark.skipif(not EMULATOR_RUNNING, reason="Needs the emulator to run.")
     @pytest.mark.asyncio

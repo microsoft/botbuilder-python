@@ -359,9 +359,11 @@ class TurnContext:
     def remove_mention_text(activity: Activity, identifier: str) -> str:
         mentions = TurnContext.get_mentions(activity)
         for mention in mentions:
-            if mention.mentioned.id == identifier:
+            if mention.additional_properties["mentioned"]["id"] == identifier:
                 mention_name_match = re.match(
-                    r"<at(.*)>(.*?)<\/at>", mention.text, re.IGNORECASE
+                    r"<at(.*)>(.*?)<\/at>",
+                    mention.additional_properties["text"],
+                    re.IGNORECASE,
                 )
                 if mention_name_match:
                     activity.text = re.sub(
@@ -377,4 +379,5 @@ class TurnContext:
             for entity in activity.entities:
                 if entity.type.lower() == "mention":
                     result.append(entity)
+
         return result

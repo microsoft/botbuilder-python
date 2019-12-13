@@ -1,12 +1,18 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 import asyncio
+from typing import Union
+
 import jwt
 
 from .jwt_token_extractor import JwtTokenExtractor
 from .verify_options import VerifyOptions
-from .constants import Constants
+from .authentication_constants import AuthenticationConstants
 from .credential_provider import CredentialProvider
 from .claims_identity import ClaimsIdentity
 from .government_constants import GovernmentConstants
+from .channel_provider import ChannelProvider
 
 
 class EmulatorValidation:
@@ -44,27 +50,14 @@ class EmulatorValidation:
 
         :return: True, if the token was issued by the Emulator. Otherwise, false.
         """
-        # The Auth Header generally looks like this:
-        # "Bearer eyJ0e[...Big Long String...]XAiO"
-        if not auth_header:
-            # No token. Can't be an emulator token.
+        from .jwt_token_validation import (  # pylint: disable=import-outside-toplevel
+            JwtTokenValidation,
+        )
+
+        if not JwtTokenValidation.is_valid_token_format(auth_header):
             return False
 
-        parts = auth_header.split(" ")
-        if len(parts) != 2:
-            # Emulator tokens MUST have exactly 2 parts.
-            # If we don't have 2 parts, it's not an emulator token
-            return False
-
-        auth_scheme = parts[0]
-        bearer_token = parts[1]
-
-        # We now have an array that should be:
-        # [0] = "Bearer"
-        # [1] = "[Big Long String]"
-        if auth_scheme != "Bearer":
-            # The scheme from the emulator MUST be "Bearer"
-            return False
+        bearer_token = auth_header.split(" ")[1]
 
         # Parse the Big Long String into an actual token.
         token = jwt.decode(bearer_token, verify=False)
@@ -92,7 +85,7 @@ class EmulatorValidation:
     async def authenticate_emulator_token(
         auth_header: str,
         credentials: CredentialProvider,
-        channel_service: str,
+        channel_service_or_provider: Union[str, ChannelProvider],
         channel_id: str,
     ) -> ClaimsIdentity:
         """ Validate the incoming Auth Header
@@ -111,23 +104,25 @@ class EmulatorValidation:
         # pylint: disable=import-outside-toplevel
         from .jwt_token_validation import JwtTokenValidation
 
+        if isinstance(channel_service_or_provider, ChannelProvider):
+            is_gov = channel_service_or_provider.is_government()
+        else:
+            is_gov = JwtTokenValidation.is_government(channel_service_or_provider)
+
         open_id_metadata = (
             GovernmentConstants.TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL
-            if (
-                channel_service is not None
-                and JwtTokenValidation.is_government(channel_service)
-            )
-            else Constants.TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL
+            if is_gov
+            else AuthenticationConstants.TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL
         )
 
         token_extractor = JwtTokenExtractor(
             EmulatorValidation.TO_BOT_FROM_EMULATOR_TOKEN_VALIDATION_PARAMETERS,
             open_id_metadata,
-            Constants.ALLOWED_SIGNING_ALGORITHMS,
+            AuthenticationConstants.ALLOWED_SIGNING_ALGORITHMS,
         )
 
-        identity = await asyncio.ensure_future(
-            token_extractor.get_identity_from_auth_header(auth_header, channel_id)
+        identity = await token_extractor.get_identity_from_auth_header(
+            auth_header, channel_id
         )
         if not identity:
             # No valid identity. Not Authorized.
@@ -163,7 +158,9 @@ class EmulatorValidation:
             app_id = app_id_claim
         elif version_claim == "2.0":
             # Emulator, "2.0" puts the AppId in the "azp" claim.
-            app_authz_claim = identity.get_claim_value(Constants.AUTHORIZED_PARTY)
+            app_authz_claim = identity.get_claim_value(
+                AuthenticationConstants.AUTHORIZED_PARTY
+            )
             if not app_authz_claim:
                 # No claim around AppID. Not Authorized.
                 raise Exception(
