@@ -69,12 +69,15 @@ async def messages(req: Request) -> Response:
     auth_header = req.headers["Authorization"] if "Authorization" in req.headers else ""
 
     try:
-        response = await ADAPTER.process_activity(activity, auth_header, BOT.on_turn)
-        if response:
-            return json_response(data=response.value.body, status=response.value.status)
+        invoke_response = await ADAPTER.process_activity(activity, auth_header, BOT.on_turn)
+        if invoke_response:
+            return json_response(data=invoke_response.body, status=invoke_response.status)
         return Response(status=201)
-    except Exception as exception:
-        raise exception
+    except PermissionError:
+        return Response(status=401)
+    except Exception:
+        return Response(status=500)
+
 
 APP = web.Application()
 APP.router.add_post("/api/messages", messages)
