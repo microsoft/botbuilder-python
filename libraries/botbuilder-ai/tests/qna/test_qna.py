@@ -702,6 +702,38 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
                 "Should have 3 filtered answers after low score variation.",
             )
 
+    async def test_should_answer_with_is_test_true(self):
+        options = QnAMakerOptions(top=1, is_test=True)
+        qna = QnAMaker(QnaApplicationTest.tests_endpoint)
+        question: str = "Q11"
+        context = QnaApplicationTest._get_context(question, TestAdapter())
+        response_json = QnaApplicationTest._get_json_for_file(
+            "QnaMaker_IsTest_true.json"
+        )
+
+        with patch(
+            "aiohttp.ClientSession.post",
+            return_value=aiounittest.futurized(response_json),
+        ):
+            results = await qna.get_answers(context, options=options)
+            self.assertEqual(0, len(results), "Should have received zero answer.")
+
+    async def test_should_answer_with_ranker_type_question_only(self):
+        options = QnAMakerOptions(top=1, ranker_type="QuestionOnly")
+        qna = QnAMaker(QnaApplicationTest.tests_endpoint)
+        question: str = "Q11"
+        context = QnaApplicationTest._get_context(question, TestAdapter())
+        response_json = QnaApplicationTest._get_json_for_file(
+            "QnaMaker_RankerType_QuestionOnly.json"
+        )
+
+        with patch(
+            "aiohttp.ClientSession.post",
+            return_value=aiounittest.futurized(response_json),
+        ):
+            results = await qna.get_answers(context, options=options)
+            self.assertEqual(2, len(results), "Should have received two answers.")
+
     async def test_should_answer_with_prompts(self):
         options = QnAMakerOptions(top=2)
         qna = QnAMaker(QnaApplicationTest.tests_endpoint, options)

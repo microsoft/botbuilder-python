@@ -7,6 +7,7 @@ from botbuilder.schema import Activity
 from .metadata import Metadata
 from .query_result import QueryResult
 from .qna_request_context import QnARequestContext
+from .ranker_types import RankerTypes
 
 
 class QnAMakerTraceInfo:
@@ -22,6 +23,8 @@ class QnAMakerTraceInfo:
         strict_filters: List[Metadata],
         context: QnARequestContext = None,
         qna_id: int = None,
+        is_test: bool = False,
+        ranker_type: str = RankerTypes.DEFAULT,
     ):
         """
         Parameters:
@@ -42,6 +45,10 @@ class QnAMakerTraceInfo:
         context: (Optional) The context from which the QnA was extracted.
 
         qna_id: (Optional) Id of the current question asked.
+
+        is_test: (Optional) A value indicating whether to call test or prod environment of knowledgebase.
+
+        ranker_types: (Optional) Ranker types.
         """
         self.message = message
         self.query_results = query_results
@@ -51,3 +58,5 @@ class QnAMakerTraceInfo:
         self.strict_filters = strict_filters
         self.context = context
         self.qna_id = qna_id
+        self.is_test = is_test
+        self.ranker_type = ranker_type
