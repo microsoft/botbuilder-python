@@ -3,10 +3,10 @@
 
 from typing import Callable, Dict
 
-from botbuilder.schema import ActivityTypes, Attachment, InputHints
+from botbuilder.schema import ActivityTypes, InputHints
 from botbuilder.core import TurnContext
 
-from .prompt import Prompt
+from .prompt import Prompt, PromptValidatorContext
 from .prompt_options import PromptOptions
 from .prompt_recognizer_result import PromptRecognizerResult
 
@@ -18,7 +18,9 @@ class AttachmentPrompt(Prompt):
     By default the prompt will return to the calling dialog an `[Attachment]`
     """
 
-    def __init__(self, dialog_id: str, validator: Callable[[Attachment], bool] = None):
+    def __init__(
+        self, dialog_id: str, validator: Callable[[PromptValidatorContext], bool] = None
+    ):
         super().__init__(dialog_id, validator)
 
     async def on_prompt(
