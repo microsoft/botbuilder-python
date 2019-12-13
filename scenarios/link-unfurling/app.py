@@ -1,36 +1,29 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License.
-
-import asyncio
+import json
 import sys
 from datetime import datetime
-from types import MethodType
 
-from flask import Flask, request, Response
+from aiohttp import web
+from aiohttp.web import Request, Response, json_response
+
 from botbuilder.core import (
     BotFrameworkAdapterSettings,
     TurnContext,
     BotFrameworkAdapter,
 )
+
 from botbuilder.schema import Activity, ActivityTypes
-
 from bots import LinkUnfurlingBot
+from config import DefaultConfig
 
-# Create the loop and Flask app
-LOOP = asyncio.get_event_loop()
-APP = Flask(__name__, instance_relative_config=True)
-APP.config.from_object("config.DefaultConfig")
+CONFIG = DefaultConfig()
 
 # Create adapter.
 # See https://aka.ms/about-bot-adapter to learn more about how bots work.
-SETTINGS = BotFrameworkAdapterSettings(APP.config["APP_ID"], APP.config["APP_PASSWORD"])
+SETTINGS = BotFrameworkAdapterSettings(CONFIG.APP_ID, CONFIG.APP_PASSWORD)
 ADAPTER = BotFrameworkAdapter(SETTINGS)
 
-
 # Catch-all for errors.
-async def on_error(  # pylint: disable=unused-argument
-        self, context: TurnContext, error: Exception
-):
+async def on_error(context: TurnContext, error: Exception):
     # This check writes out errors to console log .vs. app insights.
     # NOTE: In production environment, you should consider logging this to Azure
     #       application insights.
@@ -52,41 +45,39 @@ async def on_error(  # pylint: disable=unused-argument
             value=f"{error}",
             value_type="https://www.botframework.com/schemas/error",
         )
+
         # Send a trace activity, which will be displayed in Bot Framework Emulator
         await context.send_activity(trace_activity)
 
-
-ADAPTER.on_turn_error = MethodType(on_error, ADAPTER)
+ADAPTER.on_turn_error = on_error
 
 # Create the Bot
 BOT = LinkUnfurlingBot()
 
-# Listen for incoming requests on /api/messages.s
-@APP.route("/api/messages", methods=["POST"])
-def messages():
+# Listen for incoming requests on /api/messages
+async def messages(req: Request) -> Response:
     # Main bot message handler.
-    if "application/json" in request.headers["Content-Type"]:
-        body = request.json
+    if "application/json" in req.headers["Content-Type"]:
+        body = await req.json()
     else:
         return Response(status=415)
 
     activity = Activity().deserialize(body)
-    auth_header = (
-        request.headers["Authorization"] if "Authorization" in request.headers else ""
-    )
+    auth_header = req.headers["Authorization"] if "Authorization" in req.headers else ""
 
     try:
-        task = LOOP.create_task(
-            ADAPTER.process_activity(activity, auth_header, BOT.on_turn)
-        )
-        LOOP.run_until_complete(task)
+        response = await ADAPTER.process_activity(activity, auth_header, BOT.on_turn)
+        if response:
+            return json_response(data=response.body, status=response.status)
         return Response(status=201)
     except Exception as exception:
         raise exception
 
+APP = web.Application()
+APP.router.add_post("/api/messages", messages)
 
 if __name__ == "__main__":
     try:
-        APP.run(debug=False, port=APP.config["PORT"])  # nosec debug
-    except Exception as exception:
-        raise exception
+        web.run_app(APP, host="localhost", port=CONFIG.PORT)
+    except Exception as error:
+        raise error
