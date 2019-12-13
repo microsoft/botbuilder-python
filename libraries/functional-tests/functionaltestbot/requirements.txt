@@ -1,5 +1,7 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License.
-
-botbuilder-core>=4.5.0.b4
-flask==1.1.1
+click==6.7
+Flask==1.0.2
+itsdangerous==0.24
+Jinja2==2.10
+MarkupSafe==1.0
+Werkzeug==0.14.1
+botbuilder-core>=4.4.0b1
