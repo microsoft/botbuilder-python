@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 """
 Base tests that all storage providers should implement in their own tests.
 They handle the storage-based assertions, internally.
