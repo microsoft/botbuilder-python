@@ -11,6 +11,7 @@ REQUIRES = [
     "cryptography==2.8.0",
     "PyJWT==1.5.3",
     "botbuilder-schema>=4.4.0b1",
+    "adal==1.2.1",
 ]
 
 root = os.path.abspath(os.path.dirname(__file__))
