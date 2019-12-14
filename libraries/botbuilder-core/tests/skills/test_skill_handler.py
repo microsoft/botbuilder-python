@@ -157,6 +157,10 @@ class SkillHandlerInstanceForTests(SkillHandler):
         )
 
 
+# pylint: disable=invalid-name
+# pylint: disable=attribute-defined-outside-init
+
+
 class TestSkillHandler(aiounittest.AsyncTestCase):
     @classmethod
     def setUpClass(cls):
