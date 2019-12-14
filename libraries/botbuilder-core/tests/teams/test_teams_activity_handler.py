@@ -507,7 +507,7 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
             name="composeExtension/submitAction",
             value={
                 "data": {"key": "value"},
-                "context": {"theme":"dark"},
+                "context": {"theme": "dark"},
                 "commandId": "test_command",
                 "commandContext": "command_context_test",
                 "botMessagePreviewAction": "send",
