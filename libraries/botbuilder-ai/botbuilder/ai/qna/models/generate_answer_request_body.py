@@ -7,6 +7,7 @@ from msrest.serialization import Model
 
 from .metadata import Metadata
 from .qna_request_context import QnARequestContext
+from .ranker_types import RankerTypes
 
 
 class GenerateAnswerRequestBody(Model):
@@ -19,6 +20,8 @@ class GenerateAnswerRequestBody(Model):
         "strict_filters": {"key": "strictFilters", "type": "[Metadata]"},
         "context": {"key": "context", "type": "QnARequestContext"},
         "qna_id": {"key": "qnaId", "type": "int"},
+        "is_test": {"key": "isTest", "type": "bool"},
+        "ranker_type": {"key": "rankerType", "type": "RankerTypes"},
     }
 
     def __init__(
@@ -29,6 +32,8 @@ class GenerateAnswerRequestBody(Model):
         strict_filters: List[Metadata],
         context: QnARequestContext = None,
         qna_id: int = None,
+        is_test: bool = False,
+        ranker_type: str = RankerTypes.DEFAULT,
         **kwargs
     ):
         """
@@ -47,6 +52,10 @@ class GenerateAnswerRequestBody(Model):
 
         qna_id: Id of the current question asked.
 
+        is_test: (Optional) A value indicating whether to call test or prod environment of knowledgebase.
+
+        ranker_types: (Optional) Ranker types.
+
         """
 
         super().__init__(**kwargs)
@@ -57,3 +66,5 @@ class GenerateAnswerRequestBody(Model):
         self.strict_filters = strict_filters
         self.context = context
         self.qna_id = qna_id
+        self.is_test = is_test
+        self.ranker_type = ranker_type

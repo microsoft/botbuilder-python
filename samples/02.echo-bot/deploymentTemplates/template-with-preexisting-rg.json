@@ -189,7 +189,7 @@
                 "use32BitWorkerProcess": true,
                 "webSocketsEnabled": false,
                 "alwaysOn": false,
-                "appCommandLine": "",
+                "appCommandLine": "python -m aiohttp.web -H 0.0.0.0 -P 8000 app:init_func",
                 "managedPipelineMode": "Integrated",
                 "virtualApplications": [
                     {

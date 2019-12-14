@@ -35,11 +35,11 @@ class TestingTeamsActivityHandler(TeamsActivityHandler):
         self.record.append("on_conversation_update_activity")
         return await super().on_conversation_update_activity(turn_context)
 
-    async def on_teams_members_removed_activity(
+    async def on_teams_members_removed(
         self, teams_members_removed: [TeamsChannelAccount], turn_context: TurnContext
     ):
-        self.record.append("on_teams_members_removed_activity")
-        return await super().on_teams_members_removed_activity(
+        self.record.append("on_teams_members_removed")
+        return await super().on_teams_members_removed(
             teams_members_removed, turn_context
         )
 
@@ -59,27 +59,27 @@ class TestingTeamsActivityHandler(TeamsActivityHandler):
         self.record.append("on_unrecognized_activity_type")
         return await super().on_unrecognized_activity_type(turn_context)
 
-    async def on_teams_channel_created_activity(
+    async def on_teams_channel_created(
         self, channel_info: ChannelInfo, team_info: TeamInfo, turn_context: TurnContext
     ):
-        self.record.append("on_teams_channel_created_activity")
-        return await super().on_teams_channel_created_activity(
+        self.record.append("on_teams_channel_created")
+        return await super().on_teams_channel_created(
             channel_info, team_info, turn_context
         )
 
-    async def on_teams_channel_renamed_activity(
+    async def on_teams_channel_renamed(
         self, channel_info: ChannelInfo, team_info: TeamInfo, turn_context: TurnContext
     ):
-        self.record.append("on_teams_channel_renamed_activity")
-        return await super().on_teams_channel_renamed_activity(
+        self.record.append("on_teams_channel_renamed")
+        return await super().on_teams_channel_renamed(
             channel_info, team_info, turn_context
         )
 
-    async def on_teams_channel_deleted_activity(
+    async def on_teams_channel_deleted(
         self, channel_info: ChannelInfo, team_info: TeamInfo, turn_context: TurnContext
     ):
-        self.record.append("on_teams_channel_deleted_activity")
-        return await super().on_teams_channel_renamed_activity(
+        self.record.append("on_teams_channel_deleted")
+        return await super().on_teams_channel_renamed(
             channel_info, team_info, turn_context
         )
 
@@ -107,23 +107,23 @@ class TestingTeamsActivityHandler(TeamsActivityHandler):
             turn_context, file_consent_card_response
         )
 
-    async def on_teams_file_consent_accept_activity(
+    async def on_teams_file_consent_accept(
         self,
         turn_context: TurnContext,
         file_consent_card_response: FileConsentCardResponse,
     ):
-        self.record.append("on_teams_file_consent_accept_activity")
-        return await super().on_teams_file_consent_accept_activity(
+        self.record.append("on_teams_file_consent_accept")
+        return await super().on_teams_file_consent_accept(
             turn_context, file_consent_card_response
         )
 
-    async def on_teams_file_consent_decline_activity(
+    async def on_teams_file_consent_decline(
         self,
         turn_context: TurnContext,
         file_consent_card_response: FileConsentCardResponse,
     ):
-        self.record.append("on_teams_file_consent_decline_activity")
-        return await super().on_teams_file_consent_decline_activity(
+        self.record.append("on_teams_file_consent_decline")
+        return await super().on_teams_file_consent_decline(
             turn_context, file_consent_card_response
         )
 
@@ -153,31 +153,27 @@ class TestingTeamsActivityHandler(TeamsActivityHandler):
             turn_context, action
         )
 
-    async def on_teams_messaging_extension_submit_action_activity(
+    async def on_teams_messaging_extension_submit_action(
         self, turn_context: TurnContext, action: MessagingExtensionAction
     ):
-        self.record.append("on_teams_messaging_extension_submit_action_activity")
-        return await super().on_teams_messaging_extension_submit_action_activity(
+        self.record.append("on_teams_messaging_extension_submit_action")
+        return await super().on_teams_messaging_extension_submit_action(
             turn_context, action
         )
 
-    async def on_teams_messaging_extension_bot_message_preview_edit_activity(
+    async def on_teams_messaging_extension_bot_message_preview_edit(
         self, turn_context: TurnContext, action: MessagingExtensionAction
     ):
-        self.record.append(
-            "on_teams_messaging_extension_bot_message_preview_edit_activity"
-        )
-        return await super().on_teams_messaging_extension_bot_message_preview_edit_activity(
+        self.record.append("on_teams_messaging_extension_bot_message_preview_edit")
+        return await super().on_teams_messaging_extension_bot_message_preview_edit(
             turn_context, action
         )
 
-    async def on_teams_messaging_extension_bot_message_preview_send_activity(
+    async def on_teams_messaging_extension_bot_message_preview_send(
         self, turn_context: TurnContext, action: MessagingExtensionAction
     ):
-        self.record.append(
-            "on_teams_messaging_extension_bot_message_preview_send_activity"
-        )
-        return await super().on_teams_messaging_extension_bot_message_preview_send_activity(
+        self.record.append("on_teams_messaging_extension_bot_message_preview_send")
+        return await super().on_teams_messaging_extension_bot_message_preview_send(
             turn_context, action
         )
 
@@ -268,7 +264,7 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         # Assert
         assert len(bot.record) == 2
         assert bot.record[0] == "on_conversation_update_activity"
-        assert bot.record[1] == "on_teams_channel_created_activity"
+        assert bot.record[1] == "on_teams_channel_created"
 
     async def test_on_teams_channel_renamed_activity(self):
         # arrange
@@ -290,7 +286,7 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         # Assert
         assert len(bot.record) == 2
         assert bot.record[0] == "on_conversation_update_activity"
-        assert bot.record[1] == "on_teams_channel_renamed_activity"
+        assert bot.record[1] == "on_teams_channel_renamed"
 
     async def test_on_teams_channel_deleted_activity(self):
         # arrange
@@ -312,7 +308,7 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         # Assert
         assert len(bot.record) == 2
         assert bot.record[0] == "on_conversation_update_activity"
-        assert bot.record[1] == "on_teams_channel_deleted_activity"
+        assert bot.record[1] == "on_teams_channel_deleted"
 
     async def test_on_teams_team_renamed_activity(self):
         # arrange
@@ -361,7 +357,7 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         # Assert
         assert len(bot.record) == 2
         assert bot.record[0] == "on_conversation_update_activity"
-        assert bot.record[1] == "on_teams_members_removed_activity"
+        assert bot.record[1] == "on_teams_members_removed"
 
     async def test_on_signin_verify_state(self):
         # arrange
@@ -396,7 +392,7 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         assert len(bot.record) == 3
         assert bot.record[0] == "on_invoke_activity"
         assert bot.record[1] == "on_teams_file_consent"
-        assert bot.record[2] == "on_teams_file_consent_accept_activity"
+        assert bot.record[2] == "on_teams_file_consent_accept"
 
     async def test_on_file_consent_decline_activity(self):
         # Arrange
@@ -416,7 +412,7 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         assert len(bot.record) == 3
         assert bot.record[0] == "on_invoke_activity"
         assert bot.record[1] == "on_teams_file_consent"
-        assert bot.record[2] == "on_teams_file_consent_decline_activity"
+        assert bot.record[2] == "on_teams_file_consent_decline"
 
     async def test_on_file_consent_bad_action_activity(self):
         # Arrange
@@ -502,10 +498,7 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         assert len(bot.record) == 3
         assert bot.record[0] == "on_invoke_activity"
         assert bot.record[1] == "on_teams_messaging_extension_submit_action_dispatch"
-        assert (
-            bot.record[2]
-            == "on_teams_messaging_extension_bot_message_preview_edit_activity"
-        )
+        assert bot.record[2] == "on_teams_messaging_extension_bot_message_preview_edit"
 
     async def test_on_teams_messaging_extension_bot_message_send_activity(self):
         # Arrange
@@ -533,10 +526,7 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         assert len(bot.record) == 3
         assert bot.record[0] == "on_invoke_activity"
         assert bot.record[1] == "on_teams_messaging_extension_submit_action_dispatch"
-        assert (
-            bot.record[2]
-            == "on_teams_messaging_extension_bot_message_preview_send_activity"
-        )
+        assert bot.record[2] == "on_teams_messaging_extension_bot_message_preview_send"
 
     async def test_on_teams_messaging_extension_bot_message_send_activity_with_none(
         self,
@@ -566,7 +556,7 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         assert len(bot.record) == 3
         assert bot.record[0] == "on_invoke_activity"
         assert bot.record[1] == "on_teams_messaging_extension_submit_action_dispatch"
-        assert bot.record[2] == "on_teams_messaging_extension_submit_action_activity"
+        assert bot.record[2] == "on_teams_messaging_extension_submit_action"
 
     async def test_on_teams_messaging_extension_bot_message_send_activity_with_empty_string(
         self,
@@ -596,7 +586,7 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         assert len(bot.record) == 3
         assert bot.record[0] == "on_invoke_activity"
         assert bot.record[1] == "on_teams_messaging_extension_submit_action_dispatch"
-        assert bot.record[2] == "on_teams_messaging_extension_submit_action_activity"
+        assert bot.record[2] == "on_teams_messaging_extension_submit_action"
 
     async def test_on_teams_messaging_extension_fetch_task(self):
         # Arrange
