@@ -248,12 +248,12 @@ class TeamsActivityHandler(ActivityHandler):
 
         if action.bot_message_preview_action == "edit":
             return await self.on_teams_messaging_extension_bot_message_preview_edit(
-                turn_context, deserializer_helper(MessagingExtensionAction, action)
+                turn_context, action
             )
 
         if action.bot_message_preview_action == "send":
             return await self.on_teams_messaging_extension_bot_message_preview_send(
-                turn_context, deserializer_helper(MessagingExtensionAction, action)
+                turn_context, action
             )
 
         raise _InvokeResponseException(
