@@ -58,7 +58,7 @@ class TeamsActivityHandler(ActivityHandler):
                 not turn_context.activity.name
                 and turn_context.activity.channel_id == Channels.ms_teams
             ):
-                return await self.on_teams_card_action_invoke_activity(turn_context)
+                return await self.on_teams_card_action_invoke(turn_context)
 
             if turn_context.activity.name == "signin/verifyState":
                 await self.on_teams_signin_verify_state(turn_context)
@@ -174,7 +174,7 @@ class TeamsActivityHandler(ActivityHandler):
         except _InvokeResponseException as err:
             return err.create_invoke_response()
 
-    async def on_teams_card_action_invoke_activity(
+    async def on_teams_card_action_invoke(
         self, turn_context: TurnContext
     ) -> InvokeResponse:
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
@@ -188,13 +188,13 @@ class TeamsActivityHandler(ActivityHandler):
         file_consent_card_response: FileConsentCardResponse,
     ) -> InvokeResponse:
         if file_consent_card_response.action == "accept":
-            await self.on_teams_file_consent_accept_activity(
+            await self.on_teams_file_consent_accept(
                 turn_context, file_consent_card_response
             )
             return self._create_invoke_response()
 
         if file_consent_card_response.action == "decline":
-            await self.on_teams_file_consent_decline_activity(
+            await self.on_teams_file_consent_decline(
                 turn_context, file_consent_card_response
             )
             return self._create_invoke_response()
@@ -204,14 +204,14 @@ class TeamsActivityHandler(ActivityHandler):
             f"{file_consent_card_response.action} is not a supported Action.",
         )
 
-    async def on_teams_file_consent_accept_activity(  # pylint: disable=unused-argument
+    async def on_teams_file_consent_accept(  # pylint: disable=unused-argument
         self,
         turn_context: TurnContext,
         file_consent_card_response: FileConsentCardResponse,
     ):
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
-    async def on_teams_file_consent_decline_activity(  # pylint: disable=unused-argument
+    async def on_teams_file_consent_decline(  # pylint: disable=unused-argument
         self,
         turn_context: TurnContext,
         file_consent_card_response: FileConsentCardResponse,
@@ -242,17 +242,17 @@ class TeamsActivityHandler(ActivityHandler):
         self, turn_context: TurnContext, action: MessagingExtensionAction
     ) -> MessagingExtensionActionResponse:
         if not action.bot_message_preview_action:
-            return await self.on_teams_messaging_extension_submit_action_activity(
+            return await self.on_teams_messaging_extension_submit_action(
                 turn_context, action
             )
 
         if action.bot_message_preview_action == "edit":
-            return await self.on_teams_messaging_extension_bot_message_preview_edit_activity(
+            return await self.on_teams_messaging_extension_bot_message_preview_edit(
                 turn_context, action
             )
 
         if action.bot_message_preview_action == "send":
-            return await self.on_teams_messaging_extension_bot_message_preview_send_activity(
+            return await self.on_teams_messaging_extension_bot_message_preview_send(
                 turn_context, action
             )
 
@@ -261,17 +261,17 @@ class TeamsActivityHandler(ActivityHandler):
             body=f"{action.bot_message_preview_action} is not a supported BotMessagePreviewAction",
         )
 
-    async def on_teams_messaging_extension_bot_message_preview_edit_activity(  # pylint: disable=unused-argument
-        self, turn_context: TurnContext, action
+    async def on_teams_messaging_extension_bot_message_preview_edit(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext, action: MessagingExtensionAction
     ) -> MessagingExtensionActionResponse:
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
-    async def on_teams_messaging_extension_bot_message_preview_send_activity(  # pylint: disable=unused-argument
-        self, turn_context: TurnContext, action
+    async def on_teams_messaging_extension_bot_message_preview_send(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext, action: MessagingExtensionAction
     ) -> MessagingExtensionActionResponse:
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
-    async def on_teams_messaging_extension_submit_action_activity(  # pylint: disable=unused-argument
+    async def on_teams_messaging_extension_submit_action(  # pylint: disable=unused-argument
         self, turn_context: TurnContext, action: MessagingExtensionAction
     ) -> MessagingExtensionActionResponse:
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
@@ -313,12 +313,12 @@ class TeamsActivityHandler(ActivityHandler):
                 turn_context.activity.channel_data
             )
             if turn_context.activity.members_added:
-                return await self.on_teams_members_added_dispatch_activity(
+                return await self.on_teams_members_added_dispatch(
                     turn_context.activity.members_added, channel_data.team, turn_context
                 )
 
             if turn_context.activity.members_removed:
-                return await self.on_teams_members_removed_dispatch_activity(
+                return await self.on_teams_members_removed_dispatch(
                     turn_context.activity.members_removed,
                     channel_data.team,
                     turn_context,
@@ -326,28 +326,27 @@ class TeamsActivityHandler(ActivityHandler):
 
             if channel_data:
                 if channel_data.event_type == "channelCreated":
-                    return await self.on_teams_channel_created_activity(
+                    return await self.on_teams_channel_created(
                         ChannelInfo().deserialize(channel_data.channel),
                         channel_data.team,
                         turn_context,
                     )
                 if channel_data.event_type == "channelDeleted":
-                    return await self.on_teams_channel_deleted_activity(
+                    return await self.on_teams_channel_deleted(
                         channel_data.channel, channel_data.team, turn_context
                     )
                 if channel_data.event_type == "channelRenamed":
-                    return await self.on_teams_channel_renamed_activity(
+                    return await self.on_teams_channel_renamed(
                         channel_data.channel, channel_data.team, turn_context
                     )
                 if channel_data.event_type == "teamRenamed":
                     return await self.on_teams_team_renamed_activity(
                         channel_data.team, turn_context
                     )
-                return await super().on_conversation_update_activity(turn_context)
 
         return await super().on_conversation_update_activity(turn_context)
 
-    async def on_teams_channel_created_activity(  # pylint: disable=unused-argument
+    async def on_teams_channel_created(  # pylint: disable=unused-argument
         self, channel_info: ChannelInfo, team_info: TeamInfo, turn_context: TurnContext
     ):
         return
@@ -357,7 +356,7 @@ class TeamsActivityHandler(ActivityHandler):
     ):
         return
 
-    async def on_teams_members_added_dispatch_activity(  # pylint: disable=unused-argument
+    async def on_teams_members_added_dispatch(  # pylint: disable=unused-argument
         self,
         members_added: [ChannelAccount],
         team_info: TeamInfo,
@@ -387,11 +386,11 @@ class TeamsActivityHandler(ActivityHandler):
                     )
                     team_members_added.append(new_teams_channel_account)
 
-        return await self.on_teams_members_added_activity(
+        return await self.on_teams_members_added(
             team_members_added, team_info, turn_context
         )
 
-    async def on_teams_members_added_activity(  # pylint: disable=unused-argument
+    async def on_teams_members_added(  # pylint: disable=unused-argument
         self,
         teams_members_added: [TeamsChannelAccount],
         team_info: TeamInfo,
@@ -405,7 +404,7 @@ class TeamsActivityHandler(ActivityHandler):
             teams_members_added, turn_context
         )
 
-    async def on_teams_members_removed_dispatch_activity(  # pylint: disable=unused-argument
+    async def on_teams_members_removed_dispatch(  # pylint: disable=unused-argument
         self,
         members_removed: [ChannelAccount],
         team_info: TeamInfo,
@@ -421,11 +420,9 @@ class TeamsActivityHandler(ActivityHandler):
                 TeamsChannelAccount().deserialize(new_account_json)
             )
 
-        return await self.on_teams_members_removed_activity(
-            teams_members_removed, turn_context
-        )
+        return await self.on_teams_members_removed(teams_members_removed, turn_context)
 
-    async def on_teams_members_removed_activity(
+    async def on_teams_members_removed(
         self, teams_members_removed: [TeamsChannelAccount], turn_context: TurnContext
     ):
         members_removed = [
@@ -434,12 +431,12 @@ class TeamsActivityHandler(ActivityHandler):
         ]
         return await super().on_members_removed_activity(members_removed, turn_context)
 
-    async def on_teams_channel_deleted_activity(  # pylint: disable=unused-argument
+    async def on_teams_channel_deleted(  # pylint: disable=unused-argument
         self, channel_info: ChannelInfo, team_info: TeamInfo, turn_context: TurnContext
     ):
         return  # Task.CompleteTask
 
-    async def on_teams_channel_renamed_activity(  # pylint: disable=unused-argument
+    async def on_teams_channel_renamed(  # pylint: disable=unused-argument
         self, channel_info: ChannelInfo, team_info: TeamInfo, turn_context: TurnContext
     ):
         return  # Task.CompleteTask
