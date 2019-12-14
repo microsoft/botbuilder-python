@@ -4,8 +4,9 @@ from uuid import uuid4
 from asyncio import Future
 from typing import Dict, List
 
-import aiounittest
 from unittest.mock import Mock, MagicMock
+import aiounittest
+
 from botbuilder.core import TurnContext, BotActionNotImplementedError
 from botbuilder.core.skills import ConversationIdFactoryBase, SkillHandler
 from botbuilder.schema import (
