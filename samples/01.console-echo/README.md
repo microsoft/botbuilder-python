@@ -15,6 +15,7 @@ git clone https://github.com/Microsoft/botbuilder-python.git
 ### Visual studio code
 - open `botbuilder-python\samples\01.console-echo` folder
 - Bring up a terminal, navigate to `botbuilder-python\samples\01.console-echo` folder
+- In the terminal, type `pip install -r requirements.txt`
 - type 'python main.py'
 
 
