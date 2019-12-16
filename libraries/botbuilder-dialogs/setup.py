@@ -5,7 +5,7 @@ import os
 from setuptools import setup
 
 REQUIRES = [
-    "regex==2019.8.19"
+    "regex<=2019.08.19"
     "recognizers-text-date-time>=1.0.2a1",
     "recognizers-text-number-with-unit>=1.0.2a1",
     "recognizers-text-number>=1.0.2a1",
