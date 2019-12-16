@@ -5,6 +5,7 @@ import os
 from setuptools import setup
 
 REQUIRES = [
+    "regex<=2019.08.19",
     "recognizers-text-date-time>=1.0.2a1",
     "recognizers-text-number-with-unit>=1.0.2a1",
     "recognizers-text-number>=1.0.2a1",
@@ -51,7 +52,7 @@ setup(
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 5 - Production/Stable",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
     ],
 )
