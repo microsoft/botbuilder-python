@@ -7,22 +7,20 @@ from botbuilder.core import (
     CardFactory,
     MessageFactory,
     TurnContext,
-    UserState,
-    ConversationState,
-    PrivateConversationState,
 )
-from botbuilder.schema import ChannelAccount, HeroCard, CardAction, CardImage, Attachment
+from botbuilder.schema import Attachment
 from botbuilder.schema.teams import (
     MessagingExtensionAction,
     MessagingExtensionActionResponse,
     TaskModuleContinueResponse,
-    MessagingExtensionAttachment,
     MessagingExtensionResult,
     TaskModuleTaskInfo
 )
-from botbuilder.core.teams import TeamsActivityHandler, TeamsInfo
-from botbuilder.azure import CosmosDbPartitionedStorage
+from botbuilder.core.teams import TeamsActivityHandler
 
+import sys
+sys.path.append("..") # Adds higher directory to python modules path.
+from example_data import ExampleData
 
 class ActionBasedMessagingExtensionFetchTaskBot(TeamsActivityHandler):
     async def on_message_activity(self, turn_context: TurnContext):
@@ -66,25 +64,23 @@ class ActionBasedMessagingExtensionFetchTaskBot(TeamsActivityHandler):
     ) -> MessagingExtensionActionResponse:
         activity_preview = action.bot_activity_preview[0]
         content = activity_preview.attachments[0].content
-        body = content["body"]
-        question = body[1]["text"]
-        choice_set = body[3]
-        multi_select = "isMultiSelect" in choice_set
-        option1 = choice_set["choices"][0]["value"]
-        option2 = choice_set["choices"][1]["value"]
-        option3 = choice_set["choices"][2]["value"]
-        card = self._create_adaptive_card_editor(question, multi_select, option1, option2, option3)
+        data = self._get_example_data(content)
+        card = self._create_adaptive_card_editor(data.question, data.is_multi_select, data.option1, data.option2, data.option3)
         task_info = TaskModuleTaskInfo(card=card, height=450, title="Task Module Fetch Example", width=500)
         continue_response = TaskModuleContinueResponse(type="continue", value=task_info)
         return MessagingExtensionActionResponse(task=continue_response)
-
-
 
     async def on_teams_messaging_extension_bot_message_preview_send(  # pylint: disable=unused-argument
         self, turn_context: TurnContext, action: MessagingExtensionAction
     ) -> MessagingExtensionActionResponse:
         activity_preview = action.bot_activity_preview[0]
         content = activity_preview.attachments[0].content
+        data = self._get_example_data(content)
+        card = self._create_adaptive_card_preview(data.question, data.is_multi_select, data.option1, data.option2, data.option3)
+        message = MessageFactory.attachment(card)
+        await turn_context.send_activity(message)
+
+    def _get_example_data(self, content: dict) -> ExampleData:
         body = content["body"]
         question = body[1]["text"]
         choice_set = body[3]
@@ -92,9 +88,7 @@ class ActionBasedMessagingExtensionFetchTaskBot(TeamsActivityHandler):
         option1 = choice_set["choices"][0]["value"]
         option2 = choice_set["choices"][1]["value"]
         option3 = choice_set["choices"][2]["value"]
-        card = self._create_adaptive_card_preview(question, multi_select, option1, option2, option3)
-        message = MessageFactory.attachment(card)
-        await turn_context.send_activity(message)
+        return ExampleData(question, multi_select,  option1, option2, option3)
 
     def _create_adaptive_card_editor(
         self, user_text: str = None, is_multi_select: bool = False, option1: str = None, option2: str = None, option3: str = None
