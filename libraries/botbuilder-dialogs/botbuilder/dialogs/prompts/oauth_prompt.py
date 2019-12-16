@@ -278,7 +278,7 @@ class OAuthPrompt(Dialog):
         if OAuthPrompt._is_token_response_event(context):
             token = context.activity.value
         elif OAuthPrompt._is_teams_verification_invoke(context):
-            code = context.activity.value.state
+            code = context.activity.value["state"]
             try:
                 token = await self.get_user_token(context, code)
                 if token is not None:
