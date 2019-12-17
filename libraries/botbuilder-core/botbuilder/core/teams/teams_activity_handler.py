@@ -412,7 +412,6 @@ class TeamsActivityHandler(ActivityHandler):
     ):
         teams_members_removed = []
         for member in members_removed:
-            # TODO: fix this
             new_account_json = member.serialize()
             if "additional_properties" in new_account_json:
                 del new_account_json["additional_properties"]
