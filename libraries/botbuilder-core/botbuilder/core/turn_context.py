@@ -195,7 +195,7 @@ class TurnContext:
                 self.responded = True
             return responses
 
-        return await self._emit(self._on_send_activities, output, logic())
+        return await self._emit(self._on_send_activities, output, logic)
 
     async def update_activity(self, activity: Activity):
         """
@@ -255,7 +255,7 @@ class TurnContext:
         self._on_delete_activity.append(handler)
         return self
 
-    async def _emit(self, plugins, arg, logic):
+    async def _emit(self, plugins, arg, logic: Callable):
         handlers = copy(plugins)
 
         async def emit_next(i: int):
@@ -272,8 +272,7 @@ class TurnContext:
                 raise error
 
         await emit_next(0)
-        # logic does not use parentheses because it's a coroutine
-        return await logic
+        return await logic()
 
     async def send_trace_activity(
         self, name: str, value: object, value_type: str, label: str
