@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 from .bot_state import BotState
 from .turn_context import TurnContext
 from .storage import Storage

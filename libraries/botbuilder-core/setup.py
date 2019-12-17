@@ -37,6 +37,7 @@ setup(
         "botbuilder.core.inspection",
         "botbuilder.core.integration",
         "botbuilder.core.skills",
+        "botbuilder.core.teams",
     ],
     install_requires=REQUIRES,
     classifiers=[
@@ -44,7 +45,7 @@ setup(
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 5 - Production/Stable",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
     ],
 )

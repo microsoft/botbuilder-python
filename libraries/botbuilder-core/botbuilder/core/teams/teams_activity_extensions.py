@@ -1,9 +1,8 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 from botbuilder.schema import Activity
 from botbuilder.schema.teams import NotificationInfo, TeamsChannelData, TeamInfo
-
-
-def dummy():
-    return 1
 
 
 def teams_get_channel_id(activity: Activity) -> str:

@@ -11,6 +11,7 @@ REQUIRES = [
     "cryptography==2.8.0",
     "PyJWT==1.5.3",
     "botbuilder-schema>=4.4.0b1",
+    "adal==1.2.1",
 ]
 
 root = os.path.abspath(os.path.dirname(__file__))
@@ -48,7 +49,7 @@ setup(
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 5 - Production/Stable",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
     ],
 )

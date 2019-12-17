@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 import aiounittest
 
 from botbuilder.core.teams.teams_helper import deserializer_helper
