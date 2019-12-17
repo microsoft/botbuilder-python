@@ -434,12 +434,12 @@ class TeamsActivityHandler(ActivityHandler):
     async def on_teams_channel_deleted(  # pylint: disable=unused-argument
         self, channel_info: ChannelInfo, team_info: TeamInfo, turn_context: TurnContext
     ):
-        return  # Task.CompleteTask
+        return
 
     async def on_teams_channel_renamed(  # pylint: disable=unused-argument
         self, channel_info: ChannelInfo, team_info: TeamInfo, turn_context: TurnContext
     ):
-        return  # Task.CompleteTask
+        return
 
     @staticmethod
     def _create_invoke_response(body: object = None) -> InvokeResponse:
