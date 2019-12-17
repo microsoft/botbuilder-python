@@ -5,7 +5,7 @@ from http import HTTPStatus
 from botbuilder.schema import Activity, ActivityTypes, ChannelAccount
 from botbuilder.core import ActivityHandler, InvokeResponse, BotFrameworkAdapter
 from botbuilder.core.turn_context import TurnContext
-from botbuilder.core.teams.teams_helper import deserializer_helper, serializer_helper
+from .teams_helper import deserializer_helper, serializer_helper
 from botbuilder.core.teams.teams_info import TeamsInfo
 from botbuilder.schema.teams import (
     AppBasedLinkQuery,
