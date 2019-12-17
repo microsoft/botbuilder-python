@@ -24,6 +24,7 @@ from botbuilder.schema.teams import (
 from botframework.connector import Channels
 from .teams_helper import deserializer_helper, serializer_helper
 
+
 class TeamsActivityHandler(ActivityHandler):
     async def on_turn(self, turn_context: TurnContext):
         if turn_context is None:
