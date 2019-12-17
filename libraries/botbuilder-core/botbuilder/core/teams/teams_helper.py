@@ -10,8 +10,9 @@ from msrest.serialization import Model, Deserializer, Serializer
 import botbuilder.schema as schema
 import botbuilder.schema.teams as teams_schema
 
-# Optimization: The dependencies dictionary could be cached here, 
+# Optimization: The dependencies dictionary could be cached here,
 # and shared between the two methods.
+
 
 def deserializer_helper(msrest_cls: Type[Model], dict_to_deserialize: dict) -> Model:
     dependencies = [
@@ -27,6 +28,7 @@ def deserializer_helper(msrest_cls: Type[Model], dict_to_deserialize: dict) -> M
     dependencies_dict = {dependency.__name__: dependency for dependency in dependencies}
     deserializer = Deserializer(dependencies_dict)
     return deserializer(msrest_cls.__name__, dict_to_deserialize)
+
 
 def serializer_helper(object_to_serialize: Model) -> dict:
     if object_to_serialize is None:
