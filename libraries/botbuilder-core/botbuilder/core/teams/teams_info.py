@@ -73,13 +73,10 @@ class TeamsInfo:
     async def get_teams_connector_client(
         turn_context: TurnContext,
     ) -> TeamsConnectorClient:
-        connector_client = await TeamsInfo._get_connector_client(turn_context)
         return TeamsConnectorClient(
-            connector_client.config.credentials, turn_context.activity.service_url
+            turn_context.adapter._credentials,  # pylint: disable=protected-access
+            turn_context.activity.service_url,
         )
-
-        # TODO: should have access to adapter's credentials
-        # return TeamsConnectorClient(turn_context.adapter._credentials, turn_context.activity.service_url)
 
     @staticmethod
     def get_team_id(turn_context: TurnContext):
