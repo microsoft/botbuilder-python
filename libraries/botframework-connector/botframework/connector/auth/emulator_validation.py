@@ -138,7 +138,9 @@ class EmulatorValidation:
         # Async validation.
         version_claim = identity.get_claim_value(EmulatorValidation.VERSION_CLAIM)
         if version_claim is None:
-            raise PermissionError('Unauthorized. "ver" claim is required on Emulator Tokens.')
+            raise PermissionError(
+                'Unauthorized. "ver" claim is required on Emulator Tokens.'
+            )
 
         app_id = ""
 
@@ -179,6 +181,8 @@ class EmulatorValidation:
             credentials.is_valid_appid(app_id)
         )
         if not is_valid_app_id:
-            raise PermissionError("Unauthorized. Invalid AppId passed on token: ", app_id)
+            raise PermissionError(
+                "Unauthorized. Invalid AppId passed on token: ", app_id
+            )
 
         return identity

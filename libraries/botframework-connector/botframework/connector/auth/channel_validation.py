@@ -133,6 +133,8 @@ class ChannelValidation:
         )
         if not is_valid_app_id:
             # The AppId is not valid or not present. Not Authorized.
-            raise PermissionError("Unauthorized. Invalid AppId passed on token: ", aud_claim)
+            raise PermissionError(
+                "Unauthorized. Invalid AppId passed on token: ", aud_claim
+            )
 
         return identity
