@@ -57,7 +57,7 @@ class ChannelValidation:
         )
         if service_url_claim != service_url:
             # Claim must match. Not Authorized.
-            raise Exception("Unauthorized. service_url claim do not match.")
+            raise PermissionError("Unauthorized. service_url claim do not match.")
 
         return identity
 
@@ -106,11 +106,11 @@ class ChannelValidation:
     ) -> ClaimsIdentity:
         if not identity:
             # No valid identity. Not Authorized.
-            raise Exception("Unauthorized. No valid identity.")
+            raise PermissionError("Unauthorized. No valid identity.")
 
         if not identity.is_authenticated:
             # The token is in some way invalid. Not Authorized.
-            raise Exception("Unauthorized. Is not authenticated")
+            raise PermissionError("Unauthorized. Is not authenticated")
 
         # Now check that the AppID in the claimset matches
         # what we're looking for. Note that in a multi-tenant bot, this value
@@ -123,7 +123,7 @@ class ChannelValidation:
             != AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER
         ):
             # The relevant Audience Claim MUST be present. Not Authorized.
-            raise Exception("Unauthorized. Audience Claim MUST be present.")
+            raise PermissionError("Unauthorized. Audience Claim MUST be present.")
 
         # The AppId from the claim in the token must match the AppId specified by the developer.
         # Note that the Bot Framework uses the Audience claim ("aud") to pass the AppID.
@@ -133,6 +133,6 @@ class ChannelValidation:
         )
         if not is_valid_app_id:
             # The AppId is not valid or not present. Not Authorized.
-            raise Exception("Unauthorized. Invalid AppId passed on token: ", aud_claim)
+            raise PermissionError("Unauthorized. Invalid AppId passed on token: ", aud_claim)
 
         return identity
