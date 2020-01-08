@@ -126,11 +126,11 @@ class EmulatorValidation:
         )
         if not identity:
             # No valid identity. Not Authorized.
-            raise Exception("Unauthorized. No valid identity.")
+            raise PermissionError("Unauthorized. No valid identity.")
 
         if not identity.is_authenticated:
             # The token is in some way invalid. Not Authorized.
-            raise Exception("Unauthorized. Is not authenticated")
+            raise PermissionError("Unauthorized. Is not authenticated")
 
         # Now check that the AppID in the claimset matches
         # what we're looking for. Note that in a multi-tenant bot, this value
@@ -138,7 +138,9 @@ class EmulatorValidation:
         # Async validation.
         version_claim = identity.get_claim_value(EmulatorValidation.VERSION_CLAIM)
         if version_claim is None:
-            raise Exception('Unauthorized. "ver" claim is required on Emulator Tokens.')
+            raise PermissionError(
+                'Unauthorized. "ver" claim is required on Emulator Tokens.'
+            )
 
         app_id = ""
 
@@ -150,7 +152,7 @@ class EmulatorValidation:
             app_id_claim = identity.get_claim_value(EmulatorValidation.APP_ID_CLAIM)
             if not app_id_claim:
                 # No claim around AppID. Not Authorized.
-                raise Exception(
+                raise PermissionError(
                     "Unauthorized. "
                     '"appid" claim is required on Emulator Token version "1.0".'
                 )
@@ -163,7 +165,7 @@ class EmulatorValidation:
             )
             if not app_authz_claim:
                 # No claim around AppID. Not Authorized.
-                raise Exception(
+                raise PermissionError(
                     "Unauthorized. "
                     '"azp" claim is required on Emulator Token version "2.0".'
                 )
@@ -171,7 +173,7 @@ class EmulatorValidation:
             app_id = app_authz_claim
         else:
             # Unknown Version. Not Authorized.
-            raise Exception(
+            raise PermissionError(
                 "Unauthorized. Unknown Emulator Token version ", version_claim, "."
             )
 
@@ -179,6 +181,8 @@ class EmulatorValidation:
             credentials.is_valid_appid(app_id)
         )
         if not is_valid_app_id:
-            raise Exception("Unauthorized. Invalid AppId passed on token: ", app_id)
+            raise PermissionError(
+                "Unauthorized. Invalid AppId passed on token: ", app_id
+            )
 
         return identity
