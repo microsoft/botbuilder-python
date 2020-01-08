@@ -49,7 +49,7 @@ class JwtTokenValidation:
                 return ClaimsIdentity({}, True)
 
             # No Auth Header. Auth is required. Request is not authorized.
-            raise Exception("Unauthorized Access. Request is not authorized")
+            raise PermissionError("Unauthorized Access. Request is not authorized")
 
         claims_identity = await JwtTokenValidation.validate_auth_header(
             auth_header,

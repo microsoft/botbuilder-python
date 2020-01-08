@@ -19,6 +19,8 @@ async def aiohttp_error_middleware(request, handler):
         return response
     except BotActionNotImplementedError:
         raise HTTPNotImplemented()
+    except NotImplementedError:
+        raise HTTPNotImplemented()
     except PermissionError:
         raise HTTPUnauthorized()
     except KeyError:

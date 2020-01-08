@@ -76,7 +76,7 @@ class EnterpriseChannelValidation(ABC):
             AuthenticationConstants.SERVICE_URL_CLAIM
         )
         if service_url_claim != service_url:
-            raise Exception("Unauthorized. service_url claim do not match.")
+            raise PermissionError("Unauthorized. service_url claim do not match.")
 
         return identity
 
@@ -86,11 +86,11 @@ class EnterpriseChannelValidation(ABC):
     ) -> ClaimsIdentity:
         if identity is None:
             # No valid identity. Not Authorized.
-            raise Exception("Unauthorized. No valid identity.")
+            raise PermissionError("Unauthorized. No valid identity.")
 
         if not identity.is_authenticated:
             # The token is in some way invalid. Not Authorized.
-            raise Exception("Unauthorized. Is not authenticated.")
+            raise PermissionError("Unauthorized. Is not authenticated.")
 
         # Now check that the AppID in the claim set matches
         # what we're looking for. Note that in a multi-tenant bot, this value
@@ -103,7 +103,7 @@ class EnterpriseChannelValidation(ABC):
             != AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER
         ):
             # The relevant Audience Claim MUST be present. Not Authorized.
-            raise Exception("Unauthorized. Issuer claim MUST be present.")
+            raise PermissionError("Unauthorized. Issuer claim MUST be present.")
 
         # The AppId from the claim in the token must match the AppId specified by the developer.
         # In this case, the token is destined for the app, so we find the app ID in the audience claim.
@@ -112,7 +112,7 @@ class EnterpriseChannelValidation(ABC):
         )
         if not await credentials.is_valid_appid(aud_claim or ""):
             # The AppId is not valid or not present. Not Authorized.
-            raise Exception(
+            raise PermissionError(
                 f"Unauthorized. Invalid AppId passed on token: { aud_claim }"
             )
 
