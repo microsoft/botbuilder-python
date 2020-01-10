@@ -23,22 +23,32 @@ from ..dialog_context import DialogContext
 
 
 class Prompt(Dialog):
-    """ Base class for all prompts."""
-
+     """ Prompts base class
+    Defines the core behavior of prompt dialogs. Extends `Dialog` base class.
+    
+    .. remarks:: 
+        When the prompt ends, it should return an object that represents the 
+        value that was prompted for.
+        Use `DialogSet.Add(Dialog)` or `ComponentDialog.AddDialog(Dialog)` to add a prompt 
+        to a dialog set or component dialog, respectively.
+        Use `DialogContext.PromptAsync(string, PromptOptions, CancellationToken)` or
+        `DialogContext.BeginDialogAsync(string, object, CancellationToken)` to start the prompt.
+        If you start a prompt from a `WaterfallStep` in a `WaterfallDialog`, then the prompt 
+        result will be available in the next step of the waterfall.
+    """
     ATTEMPT_COUNT_KEY = "AttemptCount"
     persisted_options = "options"
     persisted_state = "state"
 
     def __init__(self, dialog_id: str, validator: object = None):
-        """Creates a new Prompt instance.
-        Parameters
-        ----------
-        dialog_id
-            Unique ID of the prompt within its parent `DialogSet` or
-            `ComponentDialog`.
-        validator
-            (Optional) custom validator used to provide additional validation and
+        """Creates a new Prompt instance
+
+        :param dialog_id: Unique ID of the prompt within its parent :class:DialogSet or
+            :class:ComponentDialog.
+        :type dialog_id: str
+        :param validator: Optional custom validator used to provide additional validation and
             re-prompting logic for the prompt.
+        :type validator: object
         """
         super(Prompt, self).__init__(dialog_id)
 
@@ -47,6 +57,22 @@ class Prompt(Dialog):
     async def begin_dialog(
         self, dialog_context: DialogContext, options: object = None
     ) -> DialogTurnResult:
+        """ Starts a prompt dialog.
+        Called when a prompt dialog is pushed onto the dialog stack and is being activated.
+
+        :param dialog_context: The dialog context for the current turn of the conversation.
+        :type dialog_context:  :class:DialogContext
+    
+        :param options: Optional, additional information to pass to the prompt being started.
+        :type options: object
+
+        :return: A :class:Task representing the asynchronous operation.
+        :rtype: :class:Task
+
+        .. remarks:: 
+            If the task is successful, the result indicates whether the prompt is still active 
+            after the turn has been processed by the prompt.
+        """
         if not dialog_context:
             raise TypeError("Prompt(): dc cannot be None.")
         if not isinstance(options, PromptOptions):
@@ -74,6 +100,23 @@ class Prompt(Dialog):
         return Dialog.end_of_turn
 
     async def continue_dialog(self, dialog_context: DialogContext):
+        """ Continues a dialog.
+        Called when a prompt dialog is the active dialog and the user replied with a new activity.
+
+        :param dialog_context: The dialog context for the current turn of the conversation.
+        :type dialog_context:  :class:DialogContext    
+
+        :return: A :class:Task representing the asynchronous operation.
+        :rtype: :class:Task
+
+        .. remarks:: 
+        
+            If the task is successful, the result indicates whether the dialog is still
+            active after the turn has been processed by the dialog.
+            The prompt generally continues to receive the user's replies until it accepts the
+            user's reply as valid input for the prompt.
+
+        """
         if not dialog_context:
             raise TypeError("Prompt(): dc cannot be None.")
 
@@ -111,15 +154,50 @@ class Prompt(Dialog):
     async def resume_dialog(
         self, dialog_context: DialogContext, reason: DialogReason, result: object
     ) -> DialogTurnResult:
-        # Prompts are typically leaf nodes on the stack but the dev is free to push other dialogs
-        # on top of the stack which will result in the prompt receiving an unexpected call to
-        # dialog_resume() when the pushed on dialog ends.
-        # To avoid the prompt prematurely ending we need to implement this method and
-        # simply re-prompt the user.
+        """ Resumes a dialog. 
+        Called when a prompt dialog resumes being the active dialog on the dialog stack, such as
+        when the previous active dialog on the stack completes.
+
+        :param dialog_context: The dialog context for the current turn of the conversation.
+        :type dialog_context:  :class:DialogContext    
+
+        :param reason: An enum indicating why the dialog resumed.
+        :type reason:  :class:DialogReason    
+
+        :param result: Optional, value returned from the previous dialog on the stack.
+            The type of the value returned is dependent on the previous dialog.
+        :type result:  object   
+
+        :return: A :class:Task representing the asynchronous operation.
+        :rtype: :class:Task
+
+        .. remarks::
+            
+            If the task is successful, the result indicates whether the dialog is still
+            active after the turn has been processed by the dialog.</remarks>
+            
+            Prompts are typically leaf nodes on the stack but the dev is free to push other dialogs
+            on top of the stack which will result in the prompt receiving an unexpected call to
+            :meth:resume_dialog() when the pushed on dialog ends.
+            To avoid the prompt prematurely ending we need to simply re-prompt the user.
+        
+        """
         await self.reprompt_dialog(dialog_context.context, dialog_context.active_dialog)
         return Dialog.end_of_turn
 
     async def reprompt_dialog(self, context: TurnContext, instance: DialogInstance):
+        """ Reprompts user for input.
+        Called when a prompt dialog has been requested to reprompt the user for input.
+
+        :param context: Context for the current turn of conversation with the user.
+        :type context:  :class:TurnContext    
+
+        :param instance: The instance of the dialog on the stack.
+        :type instance:  :class:DialogInstance    
+
+        :return: A :class:Task representing the asynchronous operation.
+        :rtype: :class:Task
+        """
         state = instance.state[self.persisted_state]
         options = instance.state[self.persisted_options]
         await self.on_prompt(context, state, options, False)
@@ -132,6 +210,26 @@ class Prompt(Dialog):
         options: PromptOptions,
         is_retry: bool,
     ):
+        """ Prompts user for input.
+        When overridden in a derived class, prompts the user for input.
+
+        :param turn_context: Context for the current turn of conversation with the user.
+        :type turn_context:  :class:TurnContext    
+
+        :param state: Contains state for the current instance of the prompt on the dialog stack.
+        :type state:  :class:Dict
+
+        :param options: A prompt options object constructed from the options initially provided
+            in the call :meth:DialogContext.PromptAsync(string, PromptOptions, CancellationToken).
+        :type options:  :class:PromptOptions   
+
+        :param is_retry: true if this is the first time this prompt dialog instance on the stack is prompting 
+        the user for input; otherwise, false.
+        :type is_retry:  bool  
+
+        :return: A :class:Task representing the asynchronous operation.
+        :rtype: :class:Task
+        """
         pass
 
     @abstractmethod
@@ -141,6 +239,23 @@ class Prompt(Dialog):
         state: Dict[str, object],
         options: PromptOptions,
     ):
+      """ Recognizes the user's input.
+        When overridden in a derived class, attempts to recognize the user's input.
+
+        :param turn_context: Context for the current turn of conversation with the user.
+        :type turn_context:  :class:TurnContext    
+
+        :param state: Contains state for the current instance of the prompt on the dialog stack.
+        :type state:  :class:Dict
+
+        :param options: A prompt options object constructed from the options initially provided
+            in the call :meth:DialogContext.PromptAsync(string, PromptOptions, CancellationToken).
+        :type options:  :class:PromptOptions   
+
+        :return: A :class:Task representing the asynchronous operation.
+        :rtype: :class:Task
+
+        """
         pass
 
     def append_choices(
@@ -151,20 +266,30 @@ class Prompt(Dialog):
         style: ListStyle,
         options: ChoiceFactoryOptions = None,
     ) -> Activity:
-        """
+        """ Composes an output activity containing a set of choices.
+        When overridden in a derived class, appends choices to the activity when the user is prompted for input.
         Helper function to compose an output activity containing a set of choices.
 
-        Parameters:
-        -----------
-        prompt: The prompt to append the user's choice to.
+        :param prompt: The prompt to append the user's choice to.
+        :type prompt:  
 
-        channel_id: ID of the channel the prompt is being sent to.
+        :param channel_id: ID of the channel the prompt is being sent to.
+        :type channel_id: str
 
-        choices: List of choices to append.
+        :param: choices: List of choices to append.
+        :type choices:  :class:List
 
-        style: Configured style for the list of choices.
+        :param: style: Configured style for the list of choices.
+        :type style:  :class:ListStyle
 
-        options: (Optional) options to configure the underlying `ChoiceFactory` call.
+        :param: options: Optional formatting options to use when presenting the choices.
+        :type style: :class:ChoiceFactoryOptions
+
+        :return: A :class:Task representing the asynchronous operation.
+        :rtype: :class:Task
+
+        .. remarks::
+            If the task is successful, the result contains the updated activity.
         """
         # Get base prompt text (if any)
         text = prompt.text if prompt is not None and prompt.text else ""
