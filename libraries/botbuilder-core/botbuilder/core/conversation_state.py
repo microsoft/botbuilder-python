@@ -12,8 +12,7 @@ class ConversationState(BotState):
     Extends `BootState` base class.
 
     .. remarks:: 
-        Conversation state is available in any turn in a specific conversation, 
-        regardless of user, such as in a group conversation.
+        Conversation state is available in any turn in a specific conversation, regardless of user, such as in a group conversation.
     """
 
     no_key_error_message = "ConversationState: channelId and/or conversation missing from context.activity."
@@ -24,12 +23,11 @@ class ConversationState(BotState):
     
         :param storage: The storage containing the conversation state.
         :type storage: Storage 
-              
         """
         super(ConversationState, self).__init__(storage, "ConversationState")
 
     def get_storage_key(self, turn_context: TurnContext) -> object:
-          """ Get storage key
+        """ Get storage key
         Gets the key to use when reading and writing state to and from storage.
 
         :param turn_context: The context object for this turn.
@@ -60,7 +58,7 @@ class ConversationState(BotState):
         return storage_key
 
     def __raise_type_error(self, err: str = "NoneType found while expecting value"):
-                """ Raise type error
+        """ Raise type error
         :raises: :class:TypeError This function raises exception.
         """
         raise TypeError(err)
