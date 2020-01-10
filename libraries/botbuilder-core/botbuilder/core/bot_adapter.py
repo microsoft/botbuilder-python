@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+#test comment
+
 from abc import ABC, abstractmethod
 from typing import List, Callable, Awaitable
 from botbuilder.schema import Activity, ConversationReference, ResourceResponse
