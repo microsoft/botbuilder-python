@@ -45,8 +45,7 @@ class Prompt(Dialog):
         :param dialog_id: Unique ID of the prompt within its parent :class:DialogSet or
         :class:ComponentDialog.
         :type dialog_id: str
-        :param validator: Optional custom validator used to provide additional validation and
-        re-prompting logic for the prompt.
+        :param validator: Optional custom validator used to provide additional validation and re-prompting logic for the prompt.
         :type validator: object
         """
         super(Prompt, self).__init__(dialog_id)
@@ -107,10 +106,10 @@ class Prompt(Dialog):
         :rtype: :class:Task
 
         .. remarks:: 
-        If the task is successful, the result indicates whether the dialog is still
-        active after the turn has been processed by the dialog.
-        The prompt generally continues to receive the user's replies until it accepts the
-        user's reply as valid input for the prompt.
+            If the task is successful, the result indicates whether the dialog is still
+            active after the turn has been processed by the dialog.
+            The prompt generally continues to receive the user's replies until it accepts the
+            user's reply as valid input for the prompt.
         """
         if not dialog_context:
             raise TypeError("Prompt(): dc cannot be None.")
@@ -164,12 +163,12 @@ class Prompt(Dialog):
         :rtype: :class:Task
 
         .. remarks::
-        If the task is successful, the result indicates whether the dialog is still
-        active after the turn has been processed by the dialog.
-        Prompts are typically leaf nodes on the stack but the dev is free to push other dialogs
-        on top of the stack which will result in the prompt receiving an unexpected call to
-        :meth:resume_dialog() when the pushed on dialog ends.
-        To avoid the prompt prematurely ending we need to simply re-prompt the user.
+            If the task is successful, the result indicates whether the dialog is still
+            active after the turn has been processed by the dialog.
+            Prompts are typically leaf nodes on the stack but the dev is free to push other dialogs
+            on top of the stack which will result in the prompt receiving an unexpected call to
+            :meth:resume_dialog() when the pushed on dialog ends.
+            To avoid the prompt prematurely ending we need to simply re-prompt the user.
         """
         await self.reprompt_dialog(dialog_context.context, dialog_context.active_dialog)
         return Dialog.end_of_turn
@@ -265,7 +264,7 @@ class Prompt(Dialog):
         :rtype: :class:Task
 
         .. remarks::
-        If the task is successful, the result contains the updated activity.
+            If the task is successful, the result contains the updated activity.
         """
         # Get base prompt text (if any)
         text = prompt.text if prompt is not None and prompt.text else ""
