@@ -7,7 +7,7 @@ from .storage import Storage
 
 
 class ConversationState(BotState):
-     """Conversation state
+    """Conversation state
     Defines a state management object for conversation state.
     Extends `BootState` base class.
 
