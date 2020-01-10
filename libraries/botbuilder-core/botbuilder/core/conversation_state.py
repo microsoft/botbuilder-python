@@ -12,7 +12,8 @@ class ConversationState(BotState):
     Extends `BootState` base class.
 
     .. remarks:: 
-        Conversation state is available in any turn in a specific conversation, regardless of user, such as in a group conversation.
+        Conversation state is available in any turn in a specific conversation, 
+        regardless of user, such as in a group conversation.
     """
 
     no_key_error_message = "ConversationState: channelId and/or conversation missing from context.activity."
