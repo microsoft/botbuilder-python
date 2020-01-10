@@ -23,9 +23,9 @@ from ..dialog_context import DialogContext
 
 
 class Prompt(Dialog):
-     """ Prompts base class
+    """ Prompts base class
     Defines the core behavior of prompt dialogs. Extends `Dialog` base class.
-    
+
     .. remarks:: 
         When the prompt ends, it should return an object that represents the 
         value that was prompted for.
@@ -42,12 +42,11 @@ class Prompt(Dialog):
 
     def __init__(self, dialog_id: str, validator: object = None):
         """Creates a new Prompt instance
-
         :param dialog_id: Unique ID of the prompt within its parent :class:DialogSet or
-            :class:ComponentDialog.
+        :class:ComponentDialog.
         :type dialog_id: str
         :param validator: Optional custom validator used to provide additional validation and
-            re-prompting logic for the prompt.
+        re-prompting logic for the prompt.
         :type validator: object
         """
         super(Prompt, self).__init__(dialog_id)
@@ -62,10 +61,8 @@ class Prompt(Dialog):
 
         :param dialog_context: The dialog context for the current turn of the conversation.
         :type dialog_context:  :class:DialogContext
-    
         :param options: Optional, additional information to pass to the prompt being started.
         :type options: object
-
         :return: A :class:Task representing the asynchronous operation.
         :rtype: :class:Task
 
@@ -110,12 +107,10 @@ class Prompt(Dialog):
         :rtype: :class:Task
 
         .. remarks:: 
-        
-            If the task is successful, the result indicates whether the dialog is still
-            active after the turn has been processed by the dialog.
-            The prompt generally continues to receive the user's replies until it accepts the
-            user's reply as valid input for the prompt.
-
+        If the task is successful, the result indicates whether the dialog is still
+        active after the turn has been processed by the dialog.
+        The prompt generally continues to receive the user's replies until it accepts the
+        user's reply as valid input for the prompt.
         """
         if not dialog_context:
             raise TypeError("Prompt(): dc cannot be None.")
@@ -160,27 +155,21 @@ class Prompt(Dialog):
 
         :param dialog_context: The dialog context for the current turn of the conversation.
         :type dialog_context:  :class:DialogContext    
-
         :param reason: An enum indicating why the dialog resumed.
         :type reason:  :class:DialogReason    
-
         :param result: Optional, value returned from the previous dialog on the stack.
             The type of the value returned is dependent on the previous dialog.
         :type result:  object   
-
         :return: A :class:Task representing the asynchronous operation.
         :rtype: :class:Task
 
         .. remarks::
-            
-            If the task is successful, the result indicates whether the dialog is still
-            active after the turn has been processed by the dialog.</remarks>
-            
-            Prompts are typically leaf nodes on the stack but the dev is free to push other dialogs
-            on top of the stack which will result in the prompt receiving an unexpected call to
-            :meth:resume_dialog() when the pushed on dialog ends.
-            To avoid the prompt prematurely ending we need to simply re-prompt the user.
-        
+        If the task is successful, the result indicates whether the dialog is still
+        active after the turn has been processed by the dialog.
+        Prompts are typically leaf nodes on the stack but the dev is free to push other dialogs
+        on top of the stack which will result in the prompt receiving an unexpected call to
+        :meth:resume_dialog() when the pushed on dialog ends.
+        To avoid the prompt prematurely ending we need to simply re-prompt the user.
         """
         await self.reprompt_dialog(dialog_context.context, dialog_context.active_dialog)
         return Dialog.end_of_turn
@@ -191,10 +180,8 @@ class Prompt(Dialog):
 
         :param context: Context for the current turn of conversation with the user.
         :type context:  :class:TurnContext    
-
         :param instance: The instance of the dialog on the stack.
         :type instance:  :class:DialogInstance    
-
         :return: A :class:Task representing the asynchronous operation.
         :rtype: :class:Task
         """
@@ -215,14 +202,11 @@ class Prompt(Dialog):
 
         :param turn_context: Context for the current turn of conversation with the user.
         :type turn_context:  :class:TurnContext    
-
         :param state: Contains state for the current instance of the prompt on the dialog stack.
         :type state:  :class:Dict
-
         :param options: A prompt options object constructed from the options initially provided
-            in the call :meth:DialogContext.PromptAsync(string, PromptOptions, CancellationToken).
+        in the call :meth:DialogContext.PromptAsync(string, PromptOptions, CancellationToken).
         :type options:  :class:PromptOptions   
-
         :param is_retry: true if this is the first time this prompt dialog instance on the stack is prompting 
         the user for input; otherwise, false.
         :type is_retry:  bool  
@@ -244,17 +228,14 @@ class Prompt(Dialog):
 
         :param turn_context: Context for the current turn of conversation with the user.
         :type turn_context:  :class:TurnContext    
-
         :param state: Contains state for the current instance of the prompt on the dialog stack.
         :type state:  :class:Dict
-
         :param options: A prompt options object constructed from the options initially provided
-            in the call :meth:DialogContext.PromptAsync(string, PromptOptions, CancellationToken).
+        in the call :meth:DialogContext.PromptAsync(string, PromptOptions, CancellationToken).
         :type options:  :class:PromptOptions   
 
         :return: A :class:Task representing the asynchronous operation.
         :rtype: :class:Task
-
         """
         pass
 
@@ -272,24 +253,19 @@ class Prompt(Dialog):
 
         :param prompt: The prompt to append the user's choice to.
         :type prompt:  
-
         :param channel_id: ID of the channel the prompt is being sent to.
         :type channel_id: str
-
         :param: choices: List of choices to append.
         :type choices:  :class:List
-
         :param: style: Configured style for the list of choices.
         :type style:  :class:ListStyle
-
         :param: options: Optional formatting options to use when presenting the choices.
         :type style: :class:ChoiceFactoryOptions
-
         :return: A :class:Task representing the asynchronous operation.
         :rtype: :class:Task
 
         .. remarks::
-            If the task is successful, the result contains the updated activity.
+        If the task is successful, the result contains the updated activity.
         """
         # Get base prompt text (if any)
         text = prompt.text if prompt is not None and prompt.text else ""
