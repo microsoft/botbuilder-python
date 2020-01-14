@@ -32,39 +32,54 @@ from .prompt_recognizer_result import PromptRecognizerResult
 
 
 class OAuthPrompt(Dialog):
-    """
+    """Creates a new prompt for the user to sign in
     Creates a new prompt that asks the user to sign in using the Bot Framework Single Sign On (SSO) service.
-    The prompt will attempt to retrieve the users current token and if the user isn't signed in, it
-    will send them an `OAuthCard` containing a button they can press to sign in. Depending on the channel,
-    the user will be sent through one of two possible sign-in flows:
-    - The automatic sign-in flow where once the user signs in, the SSO service will forward
-    the bot the users access token using either an `event` or `invoke` activity.
-    - The "magic code" flow where once the user signs in, they will be prompted by the SSO service
-    to send the bot a six digit code confirming their identity. This code will be sent as a
-    standard `message` activity.
-    Both flows are automatically supported by the `OAuthPrompt` and they only thing you need to be careful of
-    is that you don't block the `event` and `invoke` activities that the prompt might be waiting on.
-    Note:
-    You should avaoid persisting the access token with your bots other state. The Bot Frameworks SSO service
-    will securely store the token on your behalf. If you store it in your bots state,
-    it could expire or be revoked in between turns.
-    When calling the prompt from within a waterfall step, you should use the token within the step
-    following the prompt and then let the token go out of scope at the end of your function
-    Prompt Usage
-    When used with your bots `DialogSet`, you can simply add a new instance of the prompt as a named dialog using
-     `DialogSet.add()`.
-    You can then start the prompt from a waterfall step using either
-     `DialogContext.begin()` or `DialogContext.prompt()`.
-    The user will be prompted to sign in as needed and their access token will be passed as an argument to the callers
-     next waterfall step.
-    """
 
+    .. remarks::
+        The prompt will attempt to retrieve the users current token and if the user isn't signed in, it
+        will send them an `OAuthCard` containing a button they can press to sign in. Depending on the channel,
+        the user will be sent through one of two possible sign-in flows:
+        - The automatic sign-in flow where once the user signs in, the SSO service will forward
+        the bot the users access token using either an `event` or `invoke` activity.
+        - The "magic code" flow where once the user signs in, they will be prompted by the SSO service
+        to send the bot a six digit code confirming their identity. This code will be sent as a
+        standard `message` activity.
+        Both flows are automatically supported by the `OAuthPrompt` and they only thing you need to be careful of
+        is that you don't block the `event` and `invoke` activities that the prompt might be waiting on.
+        
+    .. note:: 
+        You should avoid persisting the access token with your bots other state. The Bot Frameworks SSO service
+        will securely store the token on your behalf. If you store it in your bots state,
+        it could expire or be revoked in between turns.
+        When calling the prompt from within a waterfall step, you should use the token within the step
+        following the prompt and then let the token go out of scope at the end of your function.
+
+        **Prompt Usage**
+        When used with your bots :class:`DialogSet`, you can simply add a new instance of the prompt as a named dialog using
+        :meth`DialogSet.add()`.
+        You can then start the prompt from a waterfall step using either :meth:`DialogContext.begin()` or :meth:`DialogContext.prompt()`.
+        The user will be prompted to sign in as needed and their access token will be passed as an argument to the callers
+        next waterfall step.
+    """
     def __init__(
         self,
         dialog_id: str,
         settings: OAuthPromptSettings,
         validator: Callable[[PromptValidatorContext], Awaitable[bool]] = None,
     ):
+        """ Creates a :class:`OAuthPrompt` instance
+        Creates a new instance of the :class:`OAuthPrompt` class.
+
+        :param dialogId: The Id to assign to this prompt.
+        :type dialogId: str
+        :param settings: Additional authentication settings to use with this instance of the prompt.
+        :type settings: :class:`OAuthPromptSettings`
+        :param validator: Optional, a :class:`PromptValidator` that contains additional, custom validation for this prompt.
+        :type validator: :class:`PromptValidatorContext`
+
+        .. remarks::
+            The value of :param dialogId: must be unique within the :class:`DialogSet`or :class:`ComponentDialog` to which the prompt is added.
+        """
         super().__init__(dialog_id)
         self._validator = validator
 
@@ -79,6 +94,20 @@ class OAuthPrompt(Dialog):
     async def begin_dialog(
         self, dialog_context: DialogContext, options: PromptOptions = None
     ) -> DialogTurnResult:
+        """ Starts an authentication prompt dialog.
+        Called when an authentication prompt dialog is pushed onto the dialog stack and is being activated.
+
+        :param dialog_context: The dialog context for the current turn of the conversation.
+        :type dialog_context:  :class:`DialogContext`
+        :param options: Optional, additional information to pass to the prompt being started.
+        :type options: :class:PromptOptions
+        :return: Dialog turn result
+        :rtype: :class:DialogTurnResult
+
+        .. remarks:: 
+            If the task is successful, the result indicates whether the prompt is still active 
+            after the turn has been processed by the prompt.
+        """
         if dialog_context is None:
             raise TypeError(
                 f"OAuthPrompt.begin_dialog: Expected DialogContext but got NoneType instead"
@@ -120,6 +149,20 @@ class OAuthPrompt(Dialog):
         return Dialog.end_of_turn
 
     async def continue_dialog(self, dialog_context: DialogContext) -> DialogTurnResult:
+        """ Continues a dialog.
+        Called when a prompt dialog is the active dialog and the user replied with a new activity.
+
+        :param dialog_context: The dialog context for the current turn of the conversation.
+        :type dialog_context:  :class:`DialogContext`    
+        :return: Dialog turn result
+        :rtype: :class:DialogTurnResult
+
+        .. remarks:: 
+            If the task is successful, the result indicates whether the dialog is still
+            active after the turn has been processed by the dialog.
+            The prompt generally continues to receive the user's replies until it accepts the
+            user's reply as valid input for the prompt.
+        """
         # Recognize token
         recognized = await self._recognize_token(dialog_context.context)
 
@@ -167,6 +210,18 @@ class OAuthPrompt(Dialog):
     async def get_user_token(
         self, context: TurnContext, code: str = None
     ) -> TokenResponse:
+      """Gets the user's token
+        Attempts to get the user's token.
+
+        :param context: Context for the current turn of conversation with the user.
+        :type context:  :class:TurnContext    
+        :return: A response that includes the user's token
+        :rtype: :class:TokenResponse           
+
+       .. remarks::
+            If the task is successful and the user already has a token or the user successfully signs in,
+            the result contains the user's token.
+        """
         adapter = context.adapter
 
         # Validate adapter type
@@ -180,6 +235,17 @@ class OAuthPrompt(Dialog):
         )
 
     async def sign_out_user(self, context: TurnContext):
+        """Signs out the user
+
+        :param context: Context for the current turn of conversation with the user.
+        :type context:  :class:`TurnContext`    
+        :return: A :class:`Task` representing the work queued to execute.
+        :rtype: :class:`Task`            
+
+       .. remarks::
+            If the task is successful and the user already has a token or the user successfully signs in,
+            the result contains the user's token.
+        """
         adapter = context.adapter
 
         # Validate adapter type
