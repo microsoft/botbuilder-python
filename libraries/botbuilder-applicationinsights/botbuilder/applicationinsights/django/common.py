@@ -11,7 +11,6 @@ from applicationinsights.channel import (
     SynchronousQueue,
     TelemetryChannel,
 )
-from django.conf import settings
 
 from ..processor.telemetry_processor import TelemetryProcessor
 from .django_telemetry_processor import DjangoTelemetryProcessor
@@ -34,6 +33,7 @@ ApplicationInsightsChannelSettings = collections.namedtuple(
 
 
 def load_settings():
+    from django.conf import settings  # pylint: disable=import-outside-toplevel
     if hasattr(settings, "APPLICATION_INSIGHTS"):
         config = settings.APPLICATION_INSIGHTS
     elif hasattr(settings, "APPLICATIONINSIGHTS"):
