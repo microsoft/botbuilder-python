@@ -34,6 +34,7 @@ ApplicationInsightsChannelSettings = collections.namedtuple(
 
 def load_settings():
     from django.conf import settings  # pylint: disable=import-outside-toplevel
+
     if hasattr(settings, "APPLICATION_INSIGHTS"):
         config = settings.APPLICATION_INSIGHTS
     elif hasattr(settings, "APPLICATIONINSIGHTS"):
