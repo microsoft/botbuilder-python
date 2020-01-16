@@ -83,10 +83,26 @@ class BotFrameworkAdapterSettings:
         channel_provider: ChannelProvider = None,
         auth_configuration: AuthenticationConfiguration = None,
     ):
-    """
-    :param app_id: The application Id of the bot. This is the appId returned by the Azure portal registration, and is
-    generally found in the `MicrosoftAppId` parameter in the *config.py* file.
+    """Contains the settings used to initialize a :class:`BotFrameworkAdapter` instance.
+
+    :param app_id: The bot application ID. This is the appId returned by the Azure portal registration, and is
+    the value of the `MicrosoftAppId` parameter in the `config.py` file.
     :type app_id: str 
+    :param app_password: The bot application password. This is the password returned by the Azure portal registration, and is
+    the value os the `MicrosoftAppPassword` parameter in the `config.py` file.
+    :type app_password: str 
+    :param channel_auth_tenant: The channel tenant to use in conversation
+    :type channel_auth_tenant: str
+    :param oauth_endpoint:
+    :type oauth_endpoint: str
+    :param open_id_metadata:
+    :type open_id_metadata: str
+    :param channel_service:
+    :type channel_service: str 
+    :param channel_provider:
+    :type channel_provider: :class:`ChannelProvider`
+    :param auth_configuration:
+    :type auth_configuration: :class:`AuthenticationConfiguration`
 
     """
         self.app_id = app_id
