@@ -83,6 +83,12 @@ class BotFrameworkAdapterSettings:
         channel_provider: ChannelProvider = None,
         auth_configuration: AuthenticationConfiguration = None,
     ):
+    """
+    :param app_id: The application Id of the bot. This is the appId returned by the Azure portal registration, and is
+    generally found in the `MicrosoftAppId` parameter in the *config.py* file.
+    :type app_id: str 
+
+    """
         self.app_id = app_id
         self.app_password = app_password
         self.channel_auth_tenant = channel_auth_tenant
@@ -94,9 +100,27 @@ class BotFrameworkAdapterSettings:
 
 
 class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
+    """Defines an adapter to connect a bot to a service endpoint
+
+    .. remarks::
+        The bot adapter encapsulates authentication processes and sends activities to and 
+        receives activities from the Bot Connector Service. When your bot receives an activity, 
+        the adapter creates a context object, passes it to your bot's application logic, and 
+        sends responses back to the user's channel. 
+        The adapter processes and directs incoming activities in through the bot middleware 
+        pipeline to your bot’s logic and then back out again. 
+        As each activity flows in and out of the bot, each piece of middleware can inspect or act 
+        upon the activity, both before and after the bot logic runs.
+    """
+
     _INVOKE_RESPONSE_KEY = "BotFrameworkAdapter.InvokeResponse"
 
     def __init__(self, settings: BotFrameworkAdapterSettings):
+        """ Initializes a new instance of the :class:`BotFrameworkAdapter` class
+
+            :param settings: The settings to initialize the adapter
+            :type settings: :class:`BotFrameworkAdapterSettings`
+        """
         super(BotFrameworkAdapter, self).__init__()
         self.settings = settings or BotFrameworkAdapterSettings("", "")
         self.settings.channel_service = self.settings.channel_service or os.environ.get(
@@ -140,16 +164,23 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         bot_id: str = None,
         claims_identity: ClaimsIdentity = None,  # pylint: disable=unused-argument
     ):
-        """
-        Continues a conversation with a user. This is often referred to as the bots "Proactive Messaging"
-        flow as its lets the bot proactively send messages to a conversation or user that its already
-        communicated with. Scenarios like sending notifications or coupons to a user are enabled by this
-        method.
-        :param bot_id:
-        :param reference:
-        :param callback:
-        :param claims_identity:
-        :return:
+        """Continues a conversation with a user 
+
+        :param reference: A reference to the conversation to continue
+        :type reference: :class:`botbuilder.schema.ConversationReference   
+        :param callback: The method to call for the resulting bot turn
+        :type callback: :class:`typing.Callable`
+        :param bot_id: The application Id of the bot. This is the appId returned by the Azure portal registration, 
+        and is generally found in the `MicrosoftAppId` parameter in `config.py`.
+        :type bot_id: :class:`typing.str`
+        :param claims_identity: The bot claims identity
+        :type claims_identity: :class:`botframework.connector.auth.ClaimsIdentity`
+
+        .. remarks::
+            This is often referred to as the bots *proactive messaging* flow as it lets the bot proactively 
+            send messages to a conversation or user that are already in a communication. 
+            Scenarios such as sending notifications or coupons to a user are enabled by this function.
+
         """
 
         # TODO: proactive messages
@@ -176,12 +207,27 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         logic: Callable[[TurnContext], Awaitable] = None,
         conversation_parameters: ConversationParameters = None,
     ):
-        """
-        Starts a new conversation with a user. This is typically used to Direct Message (DM) a member
-        of a group.
-        :param reference:
-        :param logic:
-        :return:
+        """Starts a new conversation with a user
+        Used to direct message to a member of a group
+        :param reference: A conversation reference that contains the tenant.
+        :type reference: :class:`botbuilder.schema.ConversationReference` 
+        :param logic: The logic to use for the creation of the conversation
+        :type logic: :class:`typing.Callable`  
+        :param conversation_parameters: The information to use to create the conversation
+        :type conversation_parameters:
+
+        :return: A task representing the work queued to execute
+
+        .. remarks::
+            To start a conversation, your bot must know its account information and the user's 
+            account information on that channel.
+            Most channels only support initiating a direct message (non-group) conversation.
+            The adapter attempts to create a new conversation on the channel, and
+            then sends a conversation update activity through its middleware pipeline
+            to the the callback method.
+            If the conversation is established with the specified users, the ID of the activity
+            will contain the ID of the new conversation.</para>
+
         """
         try:
             if reference.service_url is None:
@@ -231,14 +277,26 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             raise error
 
     async def process_activity(self, req, auth_header: str, logic: Callable):
-        """
+        """Creates a turn context and runs the middleware pipeline for an incoming activity
         Processes an activity received by the bots web server. This includes any messages sent from a
-        user and is the method that drives what's often referred to as the bots "Reactive Messaging"
-        flow.
-        :param req:
-        :param auth_header:
-        :param logic:
-        :return:
+        user and is the method that drives what's often referred to as the bots *reactive messaging* flow.
+
+        :param req: The incoming activity
+        :type req: :class:`typing.str`
+        :param auth_header: The HTTP authentication header of the request
+        :type auth_header: :class:`typing.str`  
+        :param logic: The logic to execute at the end of the adapter's middleware pipeline.
+        :type logic: :class:`typing.Callable`  
+
+        :return: A task that represents the work queued to execute. If the activity type
+        was `Invoke` and the corresponding key (`channelId` + `activityId`) was found then 
+        an :class:`InvokeResponse` is returned; otherwise, `null` is returned.
+
+        .. remarks:: 
+            Call this method to reactively send a message to a conversation.
+            If the task completes successfully, then an :class:`InvokeResponse` is returned; 
+            otherwise. `null` is returned.
+
         """
         activity = await self.parse_request(req)
         auth_header = auth_header or ""
