@@ -4,6 +4,7 @@ from aiohttp.web import middleware
 # Map of thread id => POST body text
 _REQUEST_BODIES = {}
 
+
 def retrieve_aiohttp_body():
     """ retrieve_flask_body
     Retrieve the POST body text from temporary cache.
@@ -12,6 +13,7 @@ def retrieve_aiohttp_body():
     """
     result = _REQUEST_BODIES.pop(current_thread().ident, None)
     return result
+
 
 @middleware
 async def bot_telemetry_middleware(request, handler):
