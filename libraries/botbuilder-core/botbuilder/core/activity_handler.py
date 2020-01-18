@@ -8,6 +8,23 @@ from .turn_context import TurnContext
 
 class ActivityHandler:
     async def on_turn(self, turn_context: TurnContext):
+    """ Called by the adapter (for example, :class:`BotFrameworkAdapter`) at runtime 
+    in order to process an inbound :class:`botbuilder.schema.Activity`.
+        
+        :param turn_context: The context object for this turn
+        :type turn_context: :class:`TurnContext`
+        
+        :returns: A task that represents the work queued to execute
+        
+        .. remarks::
+            It calls other methods in this class based on the type of the activity to
+            process, which allows a derived class to provide type-specific logic in a controlled way.
+            In a derived class, override this method to add logic that applies to all activity types.
+            
+            .. note::
+                - Add logic to apply before the type-specific logic and before the call to the base class `OnTurnAsync` method.
+                - Add logic to apply after the type-specific logic after the call to the base class `OnTurnAsync` method.
+    """
         if turn_context is None:
             raise TypeError("ActivityHandler.on_turn(): turn_context cannot be None.")
 
@@ -40,6 +57,18 @@ class ActivityHandler:
     async def on_message_activity(  # pylint: disable=unused-argument
         self, turn_context: TurnContext
     ):
+        """Override this method in a derived class to provide logic specific to activities, 
+        such as the conversational logic.
+        
+        :param turn_context: The context object for this turn
+        :type turn_context: :class:`TurnContext`
+
+        :returns: A task that represents the work queued to execute
+
+        .. remarks::
+            The `OnTurnAsync` method calls this method when it receives a message activity.  
+    
+        """
         return
 
     async def on_conversation_update_activity(self, turn_context: TurnContext):
