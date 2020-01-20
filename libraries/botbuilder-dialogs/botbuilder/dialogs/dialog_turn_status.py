@@ -6,13 +6,13 @@ class DialogTurnStatus(Enum):
     """Codes indicating the state of the dialog stack after a call to `DialogContext.continueDialog()`
 
     :var Empty: Indicates that there is currently nothing on the dialog stack.
-    :vartype Empty: :class:`int`
+    :vartype Empty: int
     :var Waiting: Indicates that the dialog on top is waiting for a response from the user.
-    :vartype Waiting: :class:`int`
+    :vartype Waiting: int
     :var Complete: Indicates that the dialog completed successfully, the result is available, and the stack is empty.
-    :vartype Complete: :class:`int`
+    :vartype Complete: int
     :var Cancelled: Indicates that the dialog was cancelled and the stack is empty.
-    :vartype Cancelled: :class:`int`
+    :vartype Cancelled: int
     """
     
     Empty = 1
