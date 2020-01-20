@@ -4,9 +4,18 @@
 from typing import List
 from .dialog_instance import DialogInstance
 
-
 class DialogState:
+    """
+    Contains state information for the dialog stack.
+    """
     def __init__(self, stack: List[DialogInstance] = None):
+        """
+        Initializes a new instance of the `DialogState` class.
+            .. remarks::
+                The new instance is created with an empty dialog stack.
+        :param stack: The state information to initialize the stack with.
+        :type stack: List
+        """
         if stack is None:
             self._dialog_stack = []
         else:
@@ -14,9 +23,22 @@ class DialogState:
 
     @property
     def dialog_stack(self):
+        """
+         Initializes a new instance of the `DialogState` class.
+            .. remarks::
+            The new instance has a dialog stack that is populated using the information
+         :return: The state information to initialize the stack with.
+         :rtype: List
+        """
         return self._dialog_stack
 
     def __str__(self):
+        """
+        Gets or sets the state information for a dialog stack.
+
+        :return: State information for a dialog stack
+        :rtype: str
+        """
         if not self._dialog_stack:
             return "dialog stack empty!"
         return " ".join(map(str, self._dialog_stack))
