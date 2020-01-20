@@ -14,9 +14,9 @@ class DialogInstance:
         Gets or sets the ID of the dialog and gets or sets the instance's persisted state.
 
         :var self.id: The ID of the dialog
-        :vartype self.id: :class:`str`
+        :vartype self.id: str
         :var self.state: The instance's persisted state.
-        :vartype self.state: :class:`Dict`
+        :vartype self.state: Dict
         """
         self.id: str = None  # pylint: disable=invalid-name
 
@@ -30,7 +30,7 @@ class DialogInstance:
             Positive values are indexes within the current DC and negative values are indexes in the parent DC.
 
         :return: result
-        :rtype: :class:`str`
+        :rtype: str
         """
         result = "\ndialog_instance_id: %s\n" % self.id
         if self.state is not None:
