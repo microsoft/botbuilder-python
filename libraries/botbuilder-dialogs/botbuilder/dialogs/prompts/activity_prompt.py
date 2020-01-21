@@ -19,7 +19,6 @@ from .prompt_options import PromptOptions
 from .prompt_recognizer_result import PromptRecognizerResult
 from .prompt_validator_context import PromptValidatorContext
 
-
 class ActivityPrompt(Dialog, ABC):
     """
     Waits for an activity to be received.
