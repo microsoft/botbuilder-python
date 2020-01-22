@@ -3,7 +3,8 @@
 from enum import Enum
 
 class DialogTurnStatus(Enum):
-    """Codes indicating the state of the dialog stack after a call to `DialogContext.continueDialog()`
+    """
+    Codes indicating the state of the dialog stack after a call to `DialogContext.continueDialog()`
 
     :var Empty: Indicates that there is currently nothing on the dialog stack.
     :vartype Empty: int
