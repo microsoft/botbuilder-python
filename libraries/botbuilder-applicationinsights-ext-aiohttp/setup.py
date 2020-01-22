@@ -18,7 +18,9 @@ TESTS_REQUIRES = [
 
 root = os.path.abspath(os.path.dirname(__file__))
 
-with open(os.path.join(root, "botbuilder", "applicationinsights", "ext", "about.py")) as f:
+with open(
+    os.path.join(root, "botbuilder", "applicationinsights", "ext", "about.py")
+) as f:
     package_info = {}
     info = f.read()
     exec(info, package_info)
@@ -43,9 +45,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/x-rst",
     license=package_info["__license__"],
-    packages=[
-        "botbuilder.applicationinsights.ext.aiohttp",
-    ],
+    packages=["botbuilder.applicationinsights.ext.aiohttp",],
     install_requires=REQUIRES + TESTS_REQUIRES,
     tests_require=TESTS_REQUIRES,
     include_package_data=True,
