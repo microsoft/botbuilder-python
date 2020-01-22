@@ -1,6 +1,6 @@
 from aiounittest import AsyncTestCase
 
-from botbuilder.applicationinsights.aiohttp import bot_telemetry_middleware
+# from botbuilder.applicationinsights.aiohttp import bot_telemetry_middleware
 
 
 class TestAiohttpTelemetryMiddleware(AsyncTestCase):
