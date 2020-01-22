@@ -16,7 +16,7 @@ class DialogInstance:
         :var self.id: The ID of the dialog
         :vartype self.id: str
         :var self.state: The instance's persisted state.
-        :vartype self.state: Dict
+        :vartype self.state: Dict[str, object]
         """
         self.id: str = None  # pylint: disable=invalid-name
 
@@ -29,7 +29,7 @@ class DialogInstance:
         .. remarks::
             Positive values are indexes within the current DC and negative values are indexes in the parent DC.
 
-        :return: result
+        :return: Returns stack index. 
         :rtype: str
         """
         result = "\ndialog_instance_id: %s\n" % self.id
