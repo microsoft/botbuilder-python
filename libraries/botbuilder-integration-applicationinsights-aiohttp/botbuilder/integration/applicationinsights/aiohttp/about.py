@@ -4,7 +4,7 @@
 
 import os
 
-__title__ = "botbuilder-applicationinsights-aiohttp"
+__title__ = "botbuilder-integration-applicationinsights-aiohttp"
 __version__ = (
     os.environ["packageVersion"] if "packageVersion" in os.environ else "4.4.0b1"
 )

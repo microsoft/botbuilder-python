@@ -3,7 +3,9 @@
 """Telemetry processor for aiohttp."""
 import sys
 
-from botbuilder.applicationinsights import TelemetryProcessor
+from botbuilder.applicationinsights.processor.telemetry_processor import (
+    TelemetryProcessor,
+)
 from .aiohttp_telemetry_middleware import retrieve_aiohttp_body
 
 
