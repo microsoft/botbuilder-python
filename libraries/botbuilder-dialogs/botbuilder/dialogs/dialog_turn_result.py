@@ -7,7 +7,7 @@ class DialogTurnResult:
     """ 
     Result returned to the caller of one of the various stack manipulation methods.
     
-        ..remarks:
+        ..remarks::
             Use :class:`DialogContext.end_dialogAsync()` to end a :class:`Dialog` and
             return a result to the calling context.
     """
@@ -36,7 +36,7 @@ class DialogTurnResult:
         """
         Final result returned by a dialog that just completed.
         
-            ..remarks:
+            ..remarks::
                 This will only be populated in certain cases:
                 - The bot calls `DialogContext.begin_dialog()` to start a new dialog and the dialog ends immediately.
                 - The bot calls `DialogContext.continue_dialog()` and a dialog that was active ends.
