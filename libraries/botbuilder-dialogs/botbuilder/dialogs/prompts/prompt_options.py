@@ -8,7 +8,7 @@ from botbuilder.dialogs.choices import Choice, ListStyle
 
 
 class PromptOptions:
-    """ Contains prompt settings
+    """ 
     Contains settings to pass to a :class:`Prompt` object when the prompt is started.
     """
 
@@ -21,7 +21,8 @@ class PromptOptions:
         validations: object = None,
         number_of_attempts: int = 0,
     ):
-        """ Sets the initial prompt to send to the user as an :class:`botbuilder.schema.Activity`.
+        """ 
+        Sets the initial prompt to send to the user as an :class:`botbuilder.schema.Activity`.
 
         :param prompt: The initial prompt to send to the user
         :type prompt: :class:`botbuilder.schema.Activity`
