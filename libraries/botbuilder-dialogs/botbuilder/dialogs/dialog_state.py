@@ -10,10 +10,8 @@ class DialogState:
     """
     def __init__(self, stack: List[DialogInstance] = None):
         """
-        Initializes a new instance of the `DialogState` class.
-        
-            .. remarks::
-                The new instance is created with an empty dialog stack.
+        Initializes a new instance of the :class:`DialogState` class.
+        The new instance is created with an empty dialog stack.
                 
         :param stack: The state information to initialize the stack with.
         :type stack: List[:class:`DialogInstance`]
@@ -34,11 +32,6 @@ class DialogState:
         return self._dialog_stack
 
     def __str__(self):
-        """
-        ?
-        :return: 
-        :rtype: str
-        """
         if not self._dialog_stack:
             return "dialog stack empty!"
         return " ".join(map(str, self._dialog_stack))
