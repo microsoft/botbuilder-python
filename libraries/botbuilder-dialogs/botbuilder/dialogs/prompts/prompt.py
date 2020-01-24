@@ -66,7 +66,7 @@ class Prompt(Dialog):
         :return: The dialog turn result
         :rtype: :class:`DialogTurnResult`
 
-        .. remarks:: 
+        .. note:: 
             If the task is successful, the result indicates whether the prompt is still active 
             after the turn has been processed by the prompt.
         """
@@ -105,7 +105,7 @@ class Prompt(Dialog):
         :return: The dialog turn result
         :rtype: :class:`DialogTurnResult`
 
-        .. remarks:: 
+        .. note:: 
             If the task is successful, the result indicates whether the dialog is still
             active after the turn has been processed by the dialog.
             The prompt generally continues to receive the user's replies until it accepts the
@@ -162,7 +162,7 @@ class Prompt(Dialog):
         :return: The dialog turn result
         :rtype: :class:`DialogTurnResult`
 
-        .. remarks::
+        .. note::
             If the task is successful, the result indicates whether the dialog is still
             active after the turn has been processed by the dialog.
             Prompts are typically leaf nodes on the stack but the dev is free to push other dialogs
@@ -264,7 +264,7 @@ class Prompt(Dialog):
         :return: A :class:Task representing the asynchronous operation
         :rtype: :class:Task
 
-        .. remarks::
+        .. note::
             If the task is successful, the result contains the updated activity.
         """
         # Get base prompt text (if any)
