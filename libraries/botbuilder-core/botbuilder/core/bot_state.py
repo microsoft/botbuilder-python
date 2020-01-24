@@ -50,7 +50,7 @@ class BotState(PropertyManager):
         :param context_service_key: The key for the state cache for this :class:`BotState`
         :type context_service_key: str
 
-        .. remarks::
+        .. note::
             This constructor creates a state management object and associated scope. The object uses 
             the :param storage: to persist state property values and the :param context_service_key: to cache state 
             within the context for each turn.
@@ -131,7 +131,7 @@ class BotState(PropertyManager):
 
         :return: None
         
-        .. notes::
+        .. note::
         This function must be called in order for the cleared state to be persisted to the underlying store.
         """
         if turn_context is None:
