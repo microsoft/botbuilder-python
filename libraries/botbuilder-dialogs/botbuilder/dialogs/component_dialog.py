@@ -119,6 +119,12 @@ class ComponentDialog(Dialog):
         control to this dialog component.
 
         .. note::
+            Containers are typically leaf nodes on the stack but the dev is free to push other dialogs
+            on top of the stack which will result in the container receiving an unexpected call to
+            :meth:resume_dialog() when the pushed on dialog ends.
+            To avoid the container prematurely ending we need to implement this method and simply
+            ask our inner dialog stack to re-prompt.
+            
             If the task is successful, the result indicates whether this dialog is still
             active after this dialog turn has been processed.
 
@@ -139,13 +145,6 @@ class ComponentDialog(Dialog):
         :rtype: :class:`Dialog.end_of_turn`
         """
 
-        """ 
-        Containers are typically leaf nodes on the stack but the dev is free to push other dialogs
-        on top of the stack which will result in the container receiving an unexpected call to
-        resume_dialog() when the pushed on dialog ends.
-        To avoid the container prematurely ending we need to implement this method and simply
-        ask our inner dialog stack to re-prompt.
-        """
         await self.reprompt_dialog(dialog_context.context, dialog_context.active_dialog)
         return Dialog.end_of_turn
 
@@ -220,7 +219,6 @@ class ComponentDialog(Dialog):
         Called when the dialog is started and pushed onto the parent's dialog stack.
 
         .. note::
-
             If the task is successful, the result indicates whether the dialog is still
             active after the turn has been processed by the dialog.
 
@@ -272,6 +270,7 @@ class ComponentDialog(Dialog):
     ) -> DialogTurnResult:
         """
         Ends the component dialog in its parent's context.
+        
         .. note::
             If the task is successful, the result indicates that the dialog ended after the
             turn was processed by the dialog.
