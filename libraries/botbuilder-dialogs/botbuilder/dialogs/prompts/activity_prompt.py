@@ -152,7 +152,8 @@ class ActivityPrompt(Dialog, ABC):
         self, dialog_context: DialogContext, reason: DialogReason, result: object = None
     ):
         """
-        Called when a prompt dialog resumes being the active dialog on the dialog stack, such as when the previous active dialog on the stack completes.
+        Called when a prompt dialog resumes being the active dialog on the dialog stack, such 
+        as when the previous active dialog on the stack completes.
         
         .. note:
             Prompts are typically leaf nodes on the stack but the dev is free to push other dialogs
@@ -165,7 +166,7 @@ class ActivityPrompt(Dialog, ABC):
         :type dialog_context: :class:`DialogContext`
         :param reason: An enum indicating why the dialog resumed.
         :type reason: :class:`DialogReason`
-        :param result: Optional, value returned from the previous dialog on the stack. The type of the value returned is dependent on the previous dialog.
+        :param result: Optional, value returned from the previous dialog on the stack. 
         :type result: object
         """
         await self.reprompt_dialog(dialog_context.context, dialog_context.active_dialog)
