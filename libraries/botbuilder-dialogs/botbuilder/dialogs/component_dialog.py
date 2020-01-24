@@ -16,12 +16,11 @@ from .dialog_instance import DialogInstance
 class ComponentDialog(Dialog):
     """
     A :class:`Dialog` that is composed of other dialogs
-
-        ..remarks:
-
-            A component dialog has an inner :class:`DialogSet` :class:`DialogContext`,
-            which provides an inner dialog stack that is hidden from the parent dialog.
-    :var persisted_dialog state: ?
+    
+    A component dialog has an inner :class:`DialogSet` :class:`DialogContext`,
+    which provides an inner dialog stack that is hidden from the parent dialog.
+    
+    :var persisted_dialog state:
     :vartype persisted_dialog_state: str
     """
     persisted_dialog_state = "dialogs"
@@ -49,10 +48,8 @@ class ComponentDialog(Dialog):
         """
         Called when the dialog is started and pushed onto the parent's dialog stack.
         
-            ..remarks::
-
-                If the task is successful, the result indicates whether the dialog is still
-                active after the turn has been processed by the dialog.
+        If the task is successful, the result indicates whether the dialog is still
+        active after the turn has been processed by the dialog.
 
         :param dialog_context: The :class:`DialogContext` for the current turn of the conversation.
         :type dialog_context: :class:`DialogContext`
@@ -84,17 +81,16 @@ class ComponentDialog(Dialog):
         Called when the dialog is continued, where it is the active dialog and the
         user replies with a new activity.
 
-            ..remarks::
+        .. note::
+            If the task is successful, the result indicates whether the dialog is still
+            active after the turn has been processed by the dialog. The result may also
+            contain a return value.
 
-                If the task is successful, the result indicates whether the dialog is still
-                active after the turn has been processed by the dialog. The result may also
-                contain a return value.
-
-                If this method is *not* overriden the component dialog calls the 
-                :meth:`DialogContext.continue_dialog` method on it's inner dialog
-                context. If the inner dialog stack is empty, the component dialog ends,
-                and if a :class:`DialogTurnResult.result` is available, the component dialog
-                uses that as it's return value.
+            If this method is *not* overriden the component dialog calls the 
+            :meth:`DialogContext.continue_dialog` method on it's inner dialog
+            context. If the inner dialog stack is empty, the component dialog ends,
+            and if a :class:`DialogTurnResult.result` is available, the component dialog
+            uses that as it's return value.
 
 
         :param dialog_context: The parent :class:`DialogContext` for the current turn of the conversation.
@@ -122,17 +118,16 @@ class ComponentDialog(Dialog):
         Called when a child dialog on the parent's dialog stack completed this turn, returning
         control to this dialog component.
 
-            ..remarks::
+        .. note::
+            If the task is successful, the result indicates whether this dialog is still
+            active after this dialog turn has been processed.
 
-                If the task is successful, the result indicates whether this dialog is still
-                active after this dialog turn has been processed.
+            Generally, the child dialog was started with a call to :meth:`def async begin_dialog()`
+            in the parent's context. However, if the :meth:`DialogContext.replace_dialog()` method is
+            is called, the logical child dialog may be different than the original.
 
-                Generally, the child dialog was started with a call to :meth:`def async begin_dialog()`
-                in the parent's context. However, if the :meth:`DialogContext.replace_dialog()` method is
-                is called, the logical child dialog may be different than the original.
-
-                If this method is *not* overridden, the dialog automatically calls its
-                :meth:`asyn def reprompt_dialog()` when the user replies. 
+            If this method is *not* overridden, the dialog automatically calls its
+            :meth:`asyn def reprompt_dialog()` when the user replies. 
 
         :param dialog_context: The :class:`DialogContext` for the current turn of the conversation.
         :type dialog_context: :class:`DialogContext`
@@ -144,7 +139,7 @@ class ComponentDialog(Dialog):
         :rtype: :class:`Dialog.end_of_turn`
         """
 
-        """ (not sure where to put this information)
+        """ 
         Containers are typically leaf nodes on the stack but the dev is free to push other dialogs
         on top of the stack which will result in the container receiving an unexpected call to
         resume_dialog() when the pushed on dialog ends.
@@ -177,7 +172,7 @@ class ComponentDialog(Dialog):
         self, context: TurnContext, instance: DialogInstance, reason: DialogReason
     ) -> None:
         """
-    Called when the dialog is ending.
+        Called when the dialog is ending.
 
         :param context: The context object for this turn.
         :type context: :class:`TurnContext`
@@ -196,9 +191,8 @@ class ComponentDialog(Dialog):
     def add_dialog(self, dialog: Dialog) -> object:
         """
         Adds a :class:`Dialog` to the component dialog and returns the updated component.
-
-            ..remarks::
-                Adding a new dialog will inherit the :class:`BotTelemetryClient` of the :class:`ComponentDialog`.
+        Adding a new dialog will inherit the :class:`BotTelemetryClient` of the :class:`ComponentDialog`.
+        
         :param dialog: The dialog to add.
         :return: The updated :class:`ComponentDialog`
         :rtype: :class:`ComponentDialog`
@@ -211,9 +205,7 @@ class ComponentDialog(Dialog):
     def find_dialog(self, dialog_id: str) -> Dialog:
         """
         Finds a dialog by ID.
-
-            ..remarks::
-                Adding a new dialog will inherit the :class:`BotTelemetryClient` of the :class:`ComponentDialog`.
+        Adding a new dialog will inherit the :class:`BotTelemetryClient` of the :class:`ComponentDialog`.
         
         :param dialog_id: The dialog to add.
         :return: The dialog; or None if there is not a match for the ID.
@@ -227,15 +219,15 @@ class ComponentDialog(Dialog):
         """
         Called when the dialog is started and pushed onto the parent's dialog stack.
 
-            ..remarks::
+        .. note::
 
-                If the task is successful, the result indicates whether the dialog is still
-                active after the turn has been processed by the dialog.
+            If the task is successful, the result indicates whether the dialog is still
+            active after the turn has been processed by the dialog.
 
-                By default, this calls the :meth:`Dialog.begin_dialog()` method of the component
-                dialog's initial dialog, as defined by ?.
+            By default, this calls the :meth:`Dialog.begin_dialog()` method of the component
+            dialog's initial dialog.
 
-                Override this method in a derived class to implement interrupt logic.
+            Override this method in a derived class to implement interrupt logic.
 
         :param inner_dc: The inner :class:`DialogContext` for the current turn of conversation.
         :type inner_dc: :class:`DialogContext`
@@ -268,7 +260,7 @@ class ComponentDialog(Dialog):
         self, turn_context: TurnContext, instance: DialogInstance
     ) -> None:
         """
-        :param turn_context:
+        :param turn_context: The :class:`TurnContext` for the current turn of the conversation.
         :type turn_context: :class:`DialogInstance`
         :param instance: State information associated with the instance of this component dialog on its parent's dialog stack.
         :type instance: :class:`DialogInstance`
@@ -280,19 +272,18 @@ class ComponentDialog(Dialog):
     ) -> DialogTurnResult:
         """
         Ends the component dialog in its parent's context.
+        .. note::
+            If the task is successful, the result indicates that the dialog ended after the
+            turn was processed by the dialog.
 
-            ..remarks::
-                If the task is successful, the result indicates that the dialog ended after the
-                turn was processed by the dialog.
+            In general, the parent context is the dialog or bot turn handler that started the dialog.
+            If the parent is a dialog, the stack calls the parent's :meth:`Dialog.resume_dialog()` method
+            to return a result to the parent dialog. If the parent dialog does not implement
+            :meth:`Dialog.resume_dialog()`, then the parent will end, too, and the result is passed to the next
+            parent context, if one exists.
 
-                In general, the parent context is the dialog or bot turn handler that started the dialog.
-                If the parent is a dialog, the stack calls the parent's :meth:`Dialog.resume_dialog()` method
-                to return a result to the parent dialog. If the parent dialog does not implement
-                :meth:`Dialog.resume_dialog()`, then the parent will end, too, and the result is passed to the next
-                parent context, if one exists.
-
-                The returned :class:`DialogTurnResult`contains the return value in its
-                :class:`DialogTurnResult.result` property.
+            The returned :class:`DialogTurnResult`contains the return value in its
+            :class:`DialogTurnResult.result` property.
 
         :param outer_dc: The parent class:`DialogContext` for the current turn of conversation.
         :type outer_dc: class:`DialogContext`
