@@ -7,17 +7,19 @@ from .storage import Storage
 
 
 class ConversationState(BotState):
-    """Conversation state
+    """
     Defines a state management object for conversation state.
     Extends :class:`BootState` base class.
 
     .. remarks::
-        Conversation state is available in any turn in a specific conversation, regardless of user, such as in a group conversation.
+        Conversation state is available in any turn in a specific conversation, regardless of the user, such as in a group conversation.
     """
     no_key_error_message = "ConversationState: channelId and/or conversation missing from context.activity."
 
     def __init__(self, storage: Storage):
-        """ Creates a :class:`ConversationState` instance
+        """ 
+        Creates a :class:`ConversationState` instance.
+        
         Creates a new instance of the :class:`ConversationState` class.
         :param storage: The storage containing the conversation state.
         :type storage: :class:`Storage`
@@ -25,7 +27,7 @@ class ConversationState(BotState):
         super(ConversationState, self).__init__(storage, "ConversationState")
 
     def get_storage_key(self, turn_context: TurnContext) -> object:
-        """ Get storage key
+        """ 
         Gets the key to use when reading and writing state to and from storage.
 
         :param turn_context: The context object for this turn.
@@ -39,7 +41,7 @@ class ConversationState(BotState):
         :rtype: str
 
         .. remarks::
-            Conversation state includes the channel Id and conversation Id as part of its storage key.
+            Conversation state includes the channel ID and conversation ID as part of its storage key.
         """
         channel_id = turn_context.activity.channel_id or self.__raise_type_error(
             "invalid activity-missing channel_id"
