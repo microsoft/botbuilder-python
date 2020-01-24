@@ -13,7 +13,7 @@ from .property_manager import PropertyManager
 
 class CachedBotState:
     """ 
-        Internal cached bot state
+        Internal cached bot state.
     """
 
     def __init__(self, state: Dict[str, object] = None):
@@ -30,9 +30,9 @@ class CachedBotState:
 
 
 class BotState(PropertyManager):
-    """ Defines a state management object 
+    """
     Defines a state management object and automates the reading and writing of 
-    associated state properties to a storage layer
+    associated state properties to a storage layer.
 
     .. remarks::
         Each state management object defines a scope for a storage layer.
@@ -42,7 +42,8 @@ class BotState(PropertyManager):
     """
 
     def __init__(self, storage: Storage, context_service_key: str):
-        """ Initializes a new instance of the :class:`BotState` class.
+        """ 
+        Initializes a new instance of the :class:`BotState` class.
 
         :param storage: The storage layer this state management object will use to store and retrieve state
         :type storage:  :class:`bptbuilder.core.Storage`
@@ -54,7 +55,7 @@ class BotState(PropertyManager):
             the :param storage: to persist state property values and the :param context_service_key: to cache state 
             within the context for each turn.
 
-        :raises: It raises an argument null exception
+        :raises: It raises an argument null exception.
         """
         self.state_key = "state"
         self._storage = storage
@@ -63,9 +64,10 @@ class BotState(PropertyManager):
     def create_property(self, name: str) -> StatePropertyAccessor:
         """
         Create a property definition and register it with this :class:`BotState`.
+
         :param name: The name of the property
         :type name: str
-        :return: If successful, the state property accessor created.
+        :return: If successful, the state property accessor created
         :rtype: :class:`StatePropertyAccessor`
         """
         if not name:
@@ -79,7 +81,8 @@ class BotState(PropertyManager):
 
     async def load(self, turn_context: TurnContext, force: bool = False) -> None:
         """
-        Reads in  the current state object and caches it in the context object for this turn.
+        Reads the current state object and caches it in the context object for this turn.
+
         :param turn_context: The context object for this turn
         :type turn_context: :class:`TurnContext`
         :param force: Optional, true to bypass the cache
@@ -99,12 +102,13 @@ class BotState(PropertyManager):
     async def save_changes(
         self, turn_context: TurnContext, force: bool = False
     ) -> None:
-        """Save the state cached in the current context for this turn
-        If it has changed, save the state cached in the current context for this turn.
+        """
+        Saves the state cached in the current context for this turn.
+        If the state has changed, it saves the state cached in the current context for this turn.
         
         :param turn_context: The context object for this turn
         :type turn_context: :class:`TurnContext`
-        :param force: Optional, true to save state to storage whether or not there are changes.
+        :param force: Optional, true to save state to storage whether or not there are changes
         :type force: bool
         """
         if turn_context is None:
@@ -119,7 +123,8 @@ class BotState(PropertyManager):
             cached_state.hash = cached_state.compute_hash(cached_state.state)
 
     async def clear_state(self, turn_context: TurnContext):
-        """Clears any state currently stored in this state scope
+        """
+        Clears any state currently stored in this state scope.
         
         :param turn_context: The context object for this turn
         :type turn_context: :class:`TurnContext`
@@ -138,7 +143,8 @@ class BotState(PropertyManager):
         turn_context.turn_state[self._context_service_key] = cache_value
 
     async def delete(self, turn_context: TurnContext) -> None:
-        """Deletes any state currently stored in this state scope.
+        """
+        Deletes any state currently stored in this state scope.
 
         :param turn_context: The context object for this turn
         :type turn_context: :class:`TurnContext`
@@ -158,7 +164,8 @@ class BotState(PropertyManager):
         raise NotImplementedError()
 
     async def get_property_value(self, turn_context: TurnContext, property_name: str):
-        """Gets the value of the specified property in the turn context
+        """
+        Gets the value of the specified property in the turn context.
        
         :param turn_context: The context object for this turn
         :type turn_context: :class:`TurnContext`
@@ -184,7 +191,8 @@ class BotState(PropertyManager):
     async def delete_property_value(
         self, turn_context: TurnContext, property_name: str
     ) -> None:
-        """Deletes a property from the state cache in the turn context
+        """
+        Deletes a property from the state cache in the turn context.
         
         :param turn_context: The context object for this turn
         :type turn_context: :class:`TurnContext`
@@ -203,7 +211,8 @@ class BotState(PropertyManager):
     async def set_property_value(
         self, turn_context: TurnContext, property_name: str, value: object
     ) -> None:
-        """Sets a property to the specified value in the turn context
+        """
+        Sets a property to the specified value in the turn context.
        
         :param turn_context: The context object for this turn
         :type turn_context: :class:`TurnContext`
