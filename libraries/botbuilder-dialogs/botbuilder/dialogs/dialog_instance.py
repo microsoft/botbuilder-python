@@ -26,9 +26,6 @@ class DialogInstance:
         """
         Gets or sets a stack index. 
         
-        .. remarks::
-            Positive values are indexes within the current DC and negative values are indexes in the parent DC.
-
         :return: Returns stack index. 
         :rtype: str
         """
