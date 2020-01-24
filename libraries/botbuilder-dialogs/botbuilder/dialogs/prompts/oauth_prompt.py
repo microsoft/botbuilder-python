@@ -32,8 +32,8 @@ from .prompt_recognizer_result import PromptRecognizerResult
 
 
 class OAuthPrompt(Dialog):
-    """Creates a new prompt for the user to sign in
-    Creates a new prompt that asks the user to sign in using the Bot Framework Single Sign On (SSO) service.
+    """
+    Creates a new prompt that asks the user to sign in, using the Bot Framework Single Sign On (SSO) service.
 
     .. remarks::
         The prompt will attempt to retrieve the users current token and if the user isn't signed in, it
@@ -67,17 +67,17 @@ class OAuthPrompt(Dialog):
         settings: OAuthPromptSettings,
         validator: Callable[[PromptValidatorContext], Awaitable[bool]] = None,
     ):
-        """ Creates a :class:`OAuthPrompt` instance
+        """ 
         Creates a new instance of the :class:`OAuthPrompt` class.
 
         :param dialogId: The Id to assign to this prompt.
         :type dialogId: str
-        :param settings: Additional authentication settings to use with this instance of the prompt.
+        :param settings: Additional authentication settings to use with this instance of the prompt
         :type settings: :class:`OAuthPromptSettings`
-        :param validator: Optional, a :class:`PromptValidator` that contains additional, custom validation for this prompt.
+        :param validator: Optional, a :class:`PromptValidator` that contains additional, custom validation for this prompt
         :type validator: :class:`PromptValidatorContext`
 
-        .. remarks::
+        .. note:: 
             The value of :param dialogId: must be unique within the :class:`DialogSet`or :class:`ComponentDialog` to which the prompt is added.
         """
         super().__init__(dialog_id)
@@ -94,19 +94,18 @@ class OAuthPrompt(Dialog):
     async def begin_dialog(
         self, dialog_context: DialogContext, options: PromptOptions = None
     ) -> DialogTurnResult:
-        """ Starts an authentication prompt dialog.
-        Called when an authentication prompt dialog is pushed onto the dialog stack and is being activated.
+        """
+        Starts an authentication prompt dialog. Called when an authentication prompt dialog is pushed onto the dialog stack and is being activated.
 
-        :param dialog_context: The dialog context for the current turn of the conversation.
+        :param dialog_context: The dialog context for the current turn of the conversation
         :type dialog_context:  :class:`DialogContext`
-        :param options: Optional, additional information to pass to the prompt being started.
+        :param options: Optional, additional information to pass to the prompt being started
         :type options: :class:PromptOptions
         :return: Dialog turn result
         :rtype: :class:DialogTurnResult
 
-        .. remarks:: 
-            If the task is successful, the result indicates whether the prompt is still active 
-            after the turn has been processed by the prompt.
+        .. note::  
+            If the task is successful, the result indicates whether the prompt is still active after the turn has been processed by the prompt.
         """
         if dialog_context is None:
             raise TypeError(
@@ -149,15 +148,15 @@ class OAuthPrompt(Dialog):
         return Dialog.end_of_turn
 
     async def continue_dialog(self, dialog_context: DialogContext) -> DialogTurnResult:
-        """ Continues a dialog.
-        Called when a prompt dialog is the active dialog and the user replied with a new activity.
+        """ 
+        Continues a dialog. Called when a prompt dialog is the active dialog and the user replied with a new activity.
 
-        :param dialog_context: The dialog context for the current turn of the conversation.
+        :param dialog_context: The dialog context for the current turn of the conversation
         :type dialog_context:  :class:`DialogContext`    
         :return: Dialog turn result
         :rtype: :class:DialogTurnResult
 
-        .. remarks:: 
+        .. note:: 
             If the task is successful, the result indicates whether the dialog is still
             active after the turn has been processed by the dialog.
             The prompt generally continues to receive the user's replies until it accepts the
@@ -210,15 +209,15 @@ class OAuthPrompt(Dialog):
     async def get_user_token(
         self, context: TurnContext, code: str = None
     ) -> TokenResponse:
-      """Gets the user's token
-        Attempts to get the user's token.
+      """
+        Gets the user's tokeN.
 
-        :param context: Context for the current turn of conversation with the user.
+        :param context: Context for the current turn of conversation with the user
         :type context:  :class:TurnContext    
         :return: A response that includes the user's token
         :rtype: :class:TokenResponse           
 
-       .. remarks::
+       .. note:: 
             If the task is successful and the user already has a token or the user successfully signs in,
             the result contains the user's token.
         """
@@ -235,14 +234,15 @@ class OAuthPrompt(Dialog):
         )
 
     async def sign_out_user(self, context: TurnContext):
-        """Signs out the user
+        """
+        Signs out the user
 
-        :param context: Context for the current turn of conversation with the user.
+        :param context: Context for the current turn of conversation with the user
         :type context:  :class:`TurnContext`    
-        :return: A :class:`Task` representing the work queued to execute.
+        :return: A :class:`Task` representing the work queued to execute
         :rtype: :class:`Task`            
 
-       .. remarks::
+        .. note:: 
             If the task is successful and the user already has a token or the user successfully signs in,
             the result contains the user's token.
         """
