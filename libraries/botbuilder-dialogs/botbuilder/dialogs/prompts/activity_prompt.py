@@ -23,14 +23,14 @@ class ActivityPrompt(Dialog, ABC):
     """
     Waits for an activity to be received.
 
-        ..remarks:
+        .. remarks:
             This prompt requires a validator be passed in and is useful when waiting for non-message
             activities like an event to be received. The validator can ignore received events until the
             expected activity is received.
 
-    :var persisted_options: ?
+    :var persisted_options:
     :typevar persisted_options: str
-    :var persisted_state: ? 
+    :var persisted_state:
     :vartype persisted_state: str
     """
 
@@ -153,17 +153,19 @@ class ActivityPrompt(Dialog, ABC):
     ):
         """
         Called when a prompt dialog resumes being the active dialog on the dialog stack, such as when the previous active dialog on the stack completes.
-            ..remarks:
+        
+        .. note:
             Prompts are typically leaf nodes on the stack but the dev is free to push other dialogs
             on top of the stack which will result in the prompt receiving an unexpected call to
-            resume_dialog() when the pushed on dialog ends.
+            :meth:resume_dialog() when the pushed on dialog ends.
             To avoid the prompt prematurely ending, we need to implement this method and
-            simply re-prompt the user.                 
+            simply re-prompt the user.
+            
         :param dialog_context: The dialog context for the current turn of the conversation
         :type dialog_context: :class:`DialogContext`
         :param reason: An enum indicating why the dialog resumed.
         :type reason: :class:`DialogReason`
-        :param result: >Optional, value returned from the previous dialog on the stack. The type of the value returned is dependent on the previous dialog.
+        :param result: Optional, value returned from the previous dialog on the stack. The type of the value returned is dependent on the previous dialog.
         :type result: object
         """
         await self.reprompt_dialog(dialog_context.context, dialog_context.active_dialog)
