@@ -83,6 +83,29 @@ class BotFrameworkAdapterSettings:
         channel_provider: ChannelProvider = None,
         auth_configuration: AuthenticationConfiguration = None,
     ):
+    """
+    Contains the settings used to initialize a :class:`BotFrameworkAdapter` instance.
+
+    :param app_id: The bot application ID. This is the appId returned by the Azure portal registration, and is
+    the value of the `MicrosoftAppId` parameter in the `config.py` file.
+    :type app_id: str 
+    :param app_password: The bot application password. This is the password returned by the Azure portal registration, and is
+    the value os the `MicrosoftAppPassword` parameter in the `config.py` file.
+    :type app_password: str 
+    :param channel_auth_tenant: The channel tenant to use in conversation
+    :type channel_auth_tenant: str
+    :param oauth_endpoint:
+    :type oauth_endpoint: str
+    :param open_id_metadata:
+    :type open_id_metadata: str
+    :param channel_service:
+    :type channel_service: str 
+    :param channel_provider: The channel provider
+    :type channel_provider: :class:`botframework.connector.auth.ChannelProvider`
+    :param auth_configuration:
+    :type auth_configuration: :class:`botframework.connector.auth.AuthenticationConfiguration`
+
+    """
         self.app_id = app_id
         self.app_password = app_password
         self.channel_auth_tenant = channel_auth_tenant
@@ -94,9 +117,29 @@ class BotFrameworkAdapterSettings:
 
 
 class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
+    """
+    Defines an adapter to connect a bot to a service endpoint.
+
+    .. remarks::
+        The bot adapter encapsulates authentication processes and sends activities to and 
+        receives activities from the Bot Connector Service. When your bot receives an activity, 
+        the adapter creates a context object, passes it to your bot's application logic, and 
+        sends responses back to the user's channel. 
+        The adapter processes and directs incoming activities in through the bot middleware 
+        pipeline to your bot’s logic and then back out again. 
+        As each activity flows in and out of the bot, each piece of middleware can inspect or act 
+        upon the activity, both before and after the bot logic runs.
+    """
+
     _INVOKE_RESPONSE_KEY = "BotFrameworkAdapter.InvokeResponse"
 
     def __init__(self, settings: BotFrameworkAdapterSettings):
+        """ 
+        Initializes a new instance of the :class:`BotFrameworkAdapter` class.
+
+        :param settings: The settings to initialize the adapter
+        :type settings: :class:`BotFrameworkAdapterSettings`
+        """
         super(BotFrameworkAdapter, self).__init__()
         self.settings = settings or BotFrameworkAdapterSettings("", "")
         self.settings.channel_service = self.settings.channel_service or os.environ.get(
@@ -141,17 +184,27 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         claims_identity: ClaimsIdentity = None,  # pylint: disable=unused-argument
     ):
         """
-        Continues a conversation with a user. This is often referred to as the bots "Proactive Messaging"
-        flow as its lets the bot proactively send messages to a conversation or user that its already
-        communicated with. Scenarios like sending notifications or coupons to a user are enabled by this
-        method.
-        :param bot_id:
-        :param reference:
-        :param callback:
-        :param claims_identity:
-        :return:
-        """
+        Continues a conversation with a user. 
 
+        :param reference: A reference to the conversation to continue
+        :type reference: :class:`botbuilder.schema.ConversationReference   
+        :param callback: The method to call for the resulting bot turn
+        :type callback: :class:`typing.Callable`
+        :param bot_id: The application Id of the bot. This is the appId returned by the Azure portal registration, 
+        and is generally found in the `MicrosoftAppId` parameter in `config.py`.
+        :type bot_id: :class:`typing.str`
+        :param claims_identity: The bot claims identity
+        :type claims_identity: :class:`botframework.connector.auth.ClaimsIdentity`
+
+        :raises: It raises an argument null exception.
+        
+        :return: A task that represents the work queued to execute.
+        
+        .. note::
+            This is often referred to as the bots *proactive messaging* flow as it lets the bot proactively 
+            send messages to a conversation or user that are already in a communication. 
+            Scenarios such as sending notifications or coupons to a user are enabled by this function.
+        """
         # TODO: proactive messages
         if not claims_identity:
             if not bot_id:
@@ -177,11 +230,28 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         conversation_parameters: ConversationParameters = None,
     ):
         """
-        Starts a new conversation with a user. This is typically used to Direct Message (DM) a member
-        of a group.
-        :param reference:
-        :param logic:
-        :return:
+        Starts a new conversation with a user. Used to direct message to a member of a group.
+
+        :param reference: The conversation reference that contains the tenant
+        :type reference: :class:`botbuilder.schema.ConversationReference` 
+        :param logic: The logic to use for the creation of the conversation
+        :type logic: :class:`typing.Callable`  
+        :param conversation_parameters: The information to use to create the conversation
+        :type conversation_parameters:
+
+        :raises: It raises a generic exception error.
+
+        :return: A task representing the work queued to execute.
+
+        .. note::
+            To start a conversation, your bot must know its account information and the user's 
+            account information on that channel.
+            Most channels only support initiating a direct message (non-group) conversation.
+            The adapter attempts to create a new conversation on the channel, and
+            then sends a conversation update activity through its middleware pipeline
+            to the the callback method.
+            If the conversation is established with the specified users, the ID of the activity
+            will contain the ID of the new conversation.</para>
         """
         try:
             if reference.service_url is None:
@@ -232,13 +302,26 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
 
     async def process_activity(self, req, auth_header: str, logic: Callable):
         """
+        Creates a turn context and runs the middleware pipeline for an incoming activity,
         Processes an activity received by the bots web server. This includes any messages sent from a
-        user and is the method that drives what's often referred to as the bots "Reactive Messaging"
-        flow.
-        :param req:
-        :param auth_header:
-        :param logic:
-        :return:
+        user and is the method that drives what's often referred to as the bots *reactive messaging* flow.
+
+        :param req: The incoming activity
+        :type req: :class:`typing.str`
+        :param auth_header: The HTTP authentication header of the request
+        :type auth_header: :class:`typing.str`  
+        :param logic: The logic to execute at the end of the adapter's middleware pipeline.
+        :type logic: :class:`typing.Callable`  
+
+        :return: A task that represents the work queued to execute. If the activity type
+        was `Invoke` and the corresponding key (`channelId` + `activityId`) was found then 
+        an :class:`InvokeResponse` is returned; otherwise, `null` is returned.
+
+        .. note:: 
+            Call this method to reactively send a message to a conversation.
+            If the task completes successfully, then an :class:`InvokeResponse` is returned; 
+            otherwise. `null` is returned.
+
         """
         activity = await self.parse_request(req)
         auth_header = auth_header or ""
@@ -281,9 +364,15 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
     ) -> ClaimsIdentity:
         """
         Allows for the overriding of authentication in unit tests.
-        :param request:
-        :param auth_header:
-        :return:
+
+        :param request: The request to authenticate
+        :type request: :class:`botbuilder.schema.Activity`
+        :param auth_header: The authentication header
+       
+        :raises: A permission exception error.
+ 
+        :return: The request claims identity
+        :rtype: :class:`botframework.connector.auth.ClaimsIdentity`
         """
         claims = await JwtTokenValidation.authenticate_request(
             request,
@@ -302,7 +391,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         """
         Allows for the overriding of the context object in unit tests and derived adapters.
         :param activity:
-        :return:
+        :return: 
         """
         return TurnContext(self, activity)
 
@@ -354,9 +443,22 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         """
         Replaces an activity that was previously sent to a channel. It should be noted that not all
         channels support this feature.
-        :param context:
-        :param activity:
-        :return:
+
+        :param context: The context object for the turn
+        :type context: :class:`TurnContext'
+        :param activity: New replacement activity
+        :type activity: :class:`botbuilder.schema.Activity`
+
+        :raises: A generic exception error
+
+        :return: A task that represents the work queued to execute
+
+        .. note:: 
+            If the activity is successfully sent, the task result contains
+            a :class:`botbuilder.schema.ResourceResponse` object containing the ID that 
+            the receiving channel assigned to the activity.
+            Before calling this function, set the ID of the replacement activity to the ID
+            of the activity to replace.
         """
         try:
             identity: ClaimsIdentity = context.turn_state.get(BOT_IDENTITY_KEY)
@@ -373,9 +475,18 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         """
         Deletes an activity that was previously sent to a channel. It should be noted that not all
         channels support this feature.
-        :param context:
-        :param reference:
-        :return:
+
+        :param context: The context object for the turn
+        :type context: :class:`TurnContext'
+        :param reference: Conversation reference for the activity to delete
+        :type reference: :class:`botbuilder.schema.ConversationReference` 
+
+        :raises: A exception error
+
+        :return: A task that represents the work queued to execute
+
+        .. note:: 
+            The activity_id of the :class:`botbuilder.schema.ConversationReference` identifies the activity to delete.
         """
         try:
             identity: ClaimsIdentity = context.turn_state.get(BOT_IDENTITY_KEY)
@@ -448,9 +559,15 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
     ) -> None:
         """
         Deletes a member from the current conversation.
-        :param context:
-        :param member_id:
-        :return:
+
+        :param context: The context object for the turn
+        :type context: :class:`TurnContext`
+        :param member_id: The ID of the member to remove from the conversation
+        :type member_id: str
+
+        :raises: A exception error
+
+        :return: A task that represents the work queued to execute.</returns
         """
         try:
             if not context.activity.service_url:
@@ -480,9 +597,15 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
     async def get_activity_members(self, context: TurnContext, activity_id: str):
         """
         Lists the members of a given activity.
-        :param context:
-        :param activity_id:
-        :return:
+       
+        :param context: The context object for the turn
+        :type context: :class:`TurnContext`
+        :param activity_id: (Optional) Activity ID to enumerate. 
+        If not specified the current activities ID will be used.
+        
+        :raises: An exception error
+
+        :return: List of Members of the activity
         """
         try:
             if not activity_id:
@@ -516,8 +639,13 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
     async def get_conversation_members(self, context: TurnContext):
         """
         Lists the members of a current conversation.
-        :param context:
-        :return:
+        
+        :param context: The context object for the turn
+        :type context: :class:`TurnContext`
+
+        :raises: An exception error
+
+        :return: List of members of the current conversation
         """
         try:
             if not context.activity.service_url:
@@ -545,9 +673,19 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         Lists the Conversations in which this bot has participated for a given channel server. The channel server
         returns results in pages and each page will include a `continuationToken` that can be used to fetch the next
         page of results from the server.
-        :param service_url:
-        :param continuation_token:
-        :return:
+
+        :param service_url: The URL of the channel server to query. This can be retrieved from `context.activity.serviceUrl`
+        :type service_url: str
+        
+        :param continuation_token: The continuation token from the previous page of results
+        :type continuation_token: str
+
+        :raises: A generic exception error
+
+        :return: A task that represents the work queued to execute
+
+        .. note:: If the task completes successfully, the result contains a page of the members of the current conversation.
+        This overload may be called from outside the context of a conversation, as only the bot's service URL and credentials are required.
         """
         client = await self.create_connector_client(service_url)
         return await client.conversations.get_conversations(continuation_token)
@@ -555,6 +693,24 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
     async def get_user_token(
         self, context: TurnContext, connection_name: str, magic_code: str = None
     ) -> TokenResponse:
+
+        """
+        Attempts to retrieve the token for a user that's in a login flow.
+        
+        :param context: Context for the current turn of conversation with the user
+        :type context: :class:`TurnContext`
+        :param connection_name: Name of the auth connection to use
+        :type connection_name: str
+        :param magic_code" (Optional) user entered code to validate
+        :str magic_code" str
+       
+        :raises: An exception error
+
+        :returns: Token Response
+        :rtype: :class:'botbuilder.schema.TokenResponse`
+
+        """
+
         if (
             context.activity.from_property is None
             or not context.activity.from_property.id
@@ -585,6 +741,18 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
     async def sign_out_user(
         self, context: TurnContext, connection_name: str = None, user_id: str = None
     ) -> str:
+        """
+        Signs the user out with the token server.
+        
+        :param context: Context for the current turn of conversation with the user
+        :type context: :class:`TurnContext`
+        :param connection_name: Name of the auth connection to use
+        :type connection_name: str
+        :param user_id: User id of user to sign out
+        :type user_id: str
+       
+        :returns: A task that represents the work queued to execute
+        """
         if not context.activity.from_property or not context.activity.from_property.id:
             raise Exception(
                 "BotFrameworkAdapter.sign_out_user(): missing from_property or from_property.id"
@@ -602,6 +770,19 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
     async def get_oauth_sign_in_link(
         self, context: TurnContext, connection_name: str
     ) -> str:
+        """
+        Gets the raw sign-in link to be sent to the user for sign-in for a connection name.
+        
+        :param context: Context for the current turn of conversation with the user
+        :type context: :class:`TurnContext`
+        :param connection_name: Name of the auth connection to use
+        :type connection_name: str
+
+        :returns: A task that represents the work queued to execute
+        
+        .. note::
+            If the task completes successfully, the result contains the raw sign-in link
+        """
         self.check_emulating_oauth_cards(context)
         conversation = TurnContext.get_conversation_reference(context.activity)
         url = self.oauth_api_url(context)
@@ -621,6 +802,21 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
     async def get_token_status(
         self, context: TurnContext, user_id: str = None, include_filter: str = None
     ) -> List[TokenStatus]:
+
+        """
+        Retrieves the token status for each configured connection for the given user.
+        
+        :param context: Context for the current turn of conversation with the user
+        :type context: :class:`TurnContext`
+        :param user_id: The user Id for which token status is retrieved
+        :type user_id: str
+        :param include_filter: (Optional) Comma separated list of connection's to include. 
+        Blank will return token status for all configured connections.
+        :type include_filter: str
+
+        :returns: Array of :class:`botframework.connector.token_api.modelsTokenStatus`
+        """
+
         if not user_id and (
             not context.activity.from_property or not context.activity.from_property.id
         ):
@@ -641,6 +837,21 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
     async def get_aad_tokens(
         self, context: TurnContext, connection_name: str, resource_urls: List[str]
     ) -> Dict[str, TokenResponse]:
+        """
+        Retrieves Azure Active Directory tokens for particular resources on a configured connection.
+    
+        :param context: Context for the current turn of conversation with the user
+        :type context: :class:`TurnContext`
+
+        :param connection_name: The name of the Azure Active Directory connection configured with this bot
+        :type connection_name: str
+
+        :param resource_urls: The list of resource URLs to retrieve tokens for
+        :type resource_urls: :class:`typing.List`
+        
+        :returns: Dictionary of resource Urls to the corresponding :class:'botbuilder.schema.TokenResponse`
+        :rtype: :class:`typing.Dict`
+        """
         if not context.activity.from_property or not context.activity.from_property.id:
             raise Exception(
                 "BotFrameworkAdapter.get_aad_tokens(): missing from_property or from_property.id"
@@ -659,11 +870,11 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
     async def create_connector_client(
         self, service_url: str, identity: ClaimsIdentity = None
     ) -> ConnectorClient:
-        """
-        Allows for mocking of the connector client in unit tests.
-        :param service_url:
-        :param identity:
-        :return:
+        """Allows for mocking of the connector client in unit tests
+        :param service_url: The service URL
+        :param identity: The claims identity
+ 
+        :return: An instance of the :class:`ConnectorClient` class 
         """
         if identity:
             bot_app_id_claim = identity.claims.get(
