@@ -20,5 +20,5 @@ class CreateThreadInTeamsBot(TeamsActivityHandler):
 
         await turn_context.adapter.continue_conversation(result[0], self._continue_conversation_callback, self.id)
     
-    async def _continue_conversation_callback(self, t):
-        await t.send_activity(MessageFactory.text("second message"))
+    async def _continue_conversation_callback(self, turn_context):
+        await turn_context.send_activity(MessageFactory.text("second message"))
