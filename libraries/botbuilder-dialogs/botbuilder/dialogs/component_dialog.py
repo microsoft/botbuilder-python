@@ -16,13 +16,14 @@ from .dialog_instance import DialogInstance
 class ComponentDialog(Dialog):
     """
     A :class:`Dialog` that is composed of other dialogs
-    
+
     A component dialog has an inner :class:`DialogSet` :class:`DialogContext`,
     which provides an inner dialog stack that is hidden from the parent dialog.
-    
+
     :var persisted_dialog state:
     :vartype persisted_dialog_state: str
     """
+
     persisted_dialog_state = "dialogs"
 
     def __init__(self, dialog_id: str):
@@ -47,7 +48,7 @@ class ComponentDialog(Dialog):
     ) -> DialogTurnResult:
         """
         Called when the dialog is started and pushed onto the parent's dialog stack.
-        
+
         If the task is successful, the result indicates whether the dialog is still
         active after the turn has been processed by the dialog.
 
@@ -86,7 +87,7 @@ class ComponentDialog(Dialog):
             active after the turn has been processed by the dialog. The result may also
             contain a return value.
 
-            If this method is *not* overriden the component dialog calls the 
+            If this method is *not* overriden the component dialog calls the
             :meth:`DialogContext.continue_dialog` method on it's inner dialog
             context. If the inner dialog stack is empty, the component dialog ends,
             and if a :class:`DialogTurnResult.result` is available, the component dialog
@@ -124,7 +125,7 @@ class ComponentDialog(Dialog):
             :meth:resume_dialog() when the pushed on dialog ends.
             To avoid the container prematurely ending we need to implement this method and simply
             ask our inner dialog stack to re-prompt.
-            
+
             If the task is successful, the result indicates whether this dialog is still
             active after this dialog turn has been processed.
 
@@ -133,13 +134,14 @@ class ComponentDialog(Dialog):
             is called, the logical child dialog may be different than the original.
 
             If this method is *not* overridden, the dialog automatically calls its
-            :meth:`asyn def reprompt_dialog()` when the user replies. 
+            :meth:`asyn def reprompt_dialog()` when the user replies.
 
         :param dialog_context: The :class:`DialogContext` for the current turn of the conversation.
         :type dialog_context: :class:`DialogContext`
         :param reason: Reason why the dialog resumed.
         :type reason: :class:`DialogReason`
-        :param result: Optional, value returned from the dialog that was called. The type of the value returned is dependent on the child dialog.
+        :param result: Optional, value returned from the dialog that was called. The type of the
+        value returned is dependent on the child dialog.
         :type result: object
         :return: Signals the end of the turn
         :rtype: :class:`Dialog.end_of_turn`
@@ -175,7 +177,8 @@ class ComponentDialog(Dialog):
 
         :param context: The context object for this turn.
         :type context: :class:`TurnContext`
-        :param instance: State information associated with the instance of this component dialog on its parent's dialog stack.
+        :param instance: State information associated with the instance of this component dialog
+        on its parent's dialog stack.
         :type instance: :class:`DialogInstance`
         :param reason: Reason why the dialog ended.
         :type reason: :class:`DialogReason`
@@ -191,7 +194,7 @@ class ComponentDialog(Dialog):
         """
         Adds a :class:`Dialog` to the component dialog and returns the updated component.
         Adding a new dialog will inherit the :class:`BotTelemetryClient` of the :class:`ComponentDialog`.
-        
+
         :param dialog: The dialog to add.
         :return: The updated :class:`ComponentDialog`
         :rtype: :class:`ComponentDialog`
@@ -204,7 +207,7 @@ class ComponentDialog(Dialog):
     def find_dialog(self, dialog_id: str) -> Dialog:
         """
         Finds a dialog by ID.
-        
+
         :param dialog_id: The dialog to add.
         :return: The dialog; or None if there is not a match for the ID.
         :rtype: :class:Dialog
@@ -244,7 +247,8 @@ class ComponentDialog(Dialog):
 
         :param turn_context: The :class:`TurnContext` for the current turn of the conversation.
         :type turn_context: :class:`TurnContext`
-        :param instance: State information associated with the instance of this component dialog on its parent's dialog stack.
+        :param instance: State information associated with the instance of this component dialog on
+        its parent's dialog stack.
         :type instance: :class:`DialogInstance`
         :param reason: Reason why the dialog ended.
         :type reason: :class:`DialogReason`
@@ -257,7 +261,8 @@ class ComponentDialog(Dialog):
         """
         :param turn_context: The :class:`TurnContext` for the current turn of the conversation.
         :type turn_context: :class:`DialogInstance`
-        :param instance: State information associated with the instance of this component dialog on its parent's dialog stack.
+        :param instance: State information associated with the instance of this component dialog
+        on its parent's dialog stack.
         :type instance: :class:`DialogInstance`
         """
         return
@@ -267,7 +272,7 @@ class ComponentDialog(Dialog):
     ) -> DialogTurnResult:
         """
         Ends the component dialog in its parent's context.
-        
+
         .. note::
             If the task is successful, the result indicates that the dialog ended after the
             turn was processed by the dialog.
