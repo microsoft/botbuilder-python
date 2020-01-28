@@ -16,7 +16,7 @@ class DialogInstance:
         :var self.id: The ID of the dialog
         :vartype self.id: str
         :var self.state: The instance's persisted state.
-        :vartype self.state: Dict[str, object]
+        :vartype self.state: :class:`typing.Dict[str, object]`
         """
         self.id: str = None  # pylint: disable=invalid-name
 

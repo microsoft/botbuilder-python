@@ -204,7 +204,6 @@ class ComponentDialog(Dialog):
     def find_dialog(self, dialog_id: str) -> Dialog:
         """
         Finds a dialog by ID.
-        Adding a new dialog will inherit the :class:`BotTelemetryClient` of the :class:`ComponentDialog`.
         
         :param dialog_id: The dialog to add.
         :return: The dialog; or None if there is not a match for the ID.
@@ -231,8 +230,6 @@ class ComponentDialog(Dialog):
         :type inner_dc: :class:`DialogContext`
         :param options: Optional, initial information to pass to the dialog.
         :type options: object
-        :return: ?
-        :rtype: ?
         """
         return await inner_dc.begin_dialog(self.initial_dialog_id, options)
 

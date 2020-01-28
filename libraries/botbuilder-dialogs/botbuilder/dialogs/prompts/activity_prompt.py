@@ -46,7 +46,7 @@ class ActivityPrompt(Dialog, ABC):
         :param dialog_id: Unique ID of the dialog within its parent :class:`DialogSet` or :class:`ComponentDialog`.
         :type dialog_id: str
         :param validator: Validator that will be called each time a new activity is received.
-        :type validator: Callable[[PromptValidatorContext], bool]
+        :type validator: :class:`typing.Callable[[:class:`PromptValidatorContext`], bool]`
         """
         Dialog.__init__(self, dialog_id)
 
@@ -191,8 +191,8 @@ class ActivityPrompt(Dialog, ABC):
         :param dialog_context: The dialog context for the current turn of the conversation
         :type dialog_context: :class:`DialogContext`
         :param state: Additional state being persisted for the prompt.
-        :type state: Dict[str, dict]
-        :param options: Options that the prompt started with in the call to `DialogContext.prompt()`.
+        :type state: :class:`typing.Dict[str, dict]`
+        :param options: Options that the prompt started with in the call to :meth:`DialogContext.prompt()`.
         :type options: :class:`PromptOptions`
         :param isRetry: If `true` the users response wasn't recognized and the re-prompt should be sent.
         :type isRetry: bool
@@ -213,10 +213,10 @@ class ActivityPrompt(Dialog, ABC):
         :param context: Context for the current turn of conversation with the user.
         :type context: :class:`TurnContext`
         :param state: Contains state for the current instance of the prompt on the dialog stack.
-        :type state: Dict[str, object]
+        :type state: :class:`typing.Dict[str, dict]`
         :param options: A prompt options object
         :type options: :class:`PromptOptions`
-        :return result: constructed from the options initially provided in the call to `async def on_prompt()`
+        :return result: constructed from the options initially provided in the call to :meth:`async def on_prompt()`
         :rtype result: :class:`PromptRecognizerResult`
         """
         result = PromptRecognizerResult()
