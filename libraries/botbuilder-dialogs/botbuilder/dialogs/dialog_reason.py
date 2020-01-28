@@ -2,10 +2,11 @@
 # Licensed under the MIT License.
 from enum import Enum
 
+
 class DialogReason(Enum):
-    """ 
+    """
     Indicates in which a dialog-related method is being called.
-    
+
     :var BeginCalled: A dialog is being started through a call to `DialogContext.begin()`.
     :vartype BeginCalled: int
     :var ContinuCalled: A dialog is being continued through a call to `DialogContext.continue_dialog()`.

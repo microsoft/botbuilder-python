@@ -19,6 +19,7 @@ from .prompt_options import PromptOptions
 from .prompt_recognizer_result import PromptRecognizerResult
 from .prompt_validator_context import PromptValidatorContext
 
+
 class ActivityPrompt(Dialog, ABC):
     """
     Waits for an activity to be received.
@@ -64,7 +65,7 @@ class ActivityPrompt(Dialog, ABC):
         :type dialog_context: :class:`DialogContext`
         :param options: Optional, additional information to pass to the prompt being started.
         :type options: :class:`PromptOptions`
-        :return Dialog.end_of_turn: 
+        :return Dialog.end_of_turn:
         :rtype Dialog.end_of_turn: :class:`Dialog.DialogTurnResult`
         """
         if not dialog_context:
@@ -97,15 +98,15 @@ class ActivityPrompt(Dialog, ABC):
         return Dialog.end_of_turn
 
     async def continue_dialog(self, dialog_context: DialogContext) -> DialogTurnResult:
-        if not dialog_context:
-            """
-            Called when a prompt dialog is the active dialog and the user replied with a new activity.
+        """
+        Called when a prompt dialog is the active dialog and the user replied with a new activity.
 
-            :param dialog_context: The dialog context for the current turn of the conversation.
-            :type dialog_context: :class:`DialogContext`
-            :return Dialog.end_of_turn: 
-            :rtype Dialog.end_of_turn: :class:`Dialog.DialogTurnResult`
-            """
+        :param dialog_context: The dialog context for the current turn of the conversation.
+        :type dialog_context: :class:`DialogContext`
+        :return Dialog.end_of_turn:
+        :rtype Dialog.end_of_turn: :class:`Dialog.DialogTurnResult`
+        """
+        if not dialog_context:
             raise TypeError(
                 "ActivityPrompt.continue_dialog(): DialogContext cannot be None."
             )
@@ -152,21 +153,21 @@ class ActivityPrompt(Dialog, ABC):
         self, dialog_context: DialogContext, reason: DialogReason, result: object = None
     ):
         """
-        Called when a prompt dialog resumes being the active dialog on the dialog stack, such 
+        Called when a prompt dialog resumes being the active dialog on the dialog stack, such
         as when the previous active dialog on the stack completes.
-        
+
         .. note:
             Prompts are typically leaf nodes on the stack but the dev is free to push other dialogs
             on top of the stack which will result in the prompt receiving an unexpected call to
             :meth:resume_dialog() when the pushed on dialog ends.
             To avoid the prompt prematurely ending, we need to implement this method and
             simply re-prompt the user.
-            
+
         :param dialog_context: The dialog context for the current turn of the conversation
         :type dialog_context: :class:`DialogContext`
         :param reason: An enum indicating why the dialog resumed.
         :type reason: :class:`DialogReason`
-        :param result: Optional, value returned from the previous dialog on the stack. 
+        :param result: Optional, value returned from the previous dialog on the stack.
         :type result: object
         """
         await self.reprompt_dialog(dialog_context.context, dialog_context.active_dialog)

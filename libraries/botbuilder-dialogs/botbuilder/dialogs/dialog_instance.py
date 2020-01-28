@@ -10,7 +10,7 @@ class DialogInstance:
     """
 
     def __init__(self):
-        """    
+        """
         Gets or sets the ID of the dialog and gets or sets the instance's persisted state.
 
         :var self.id: The ID of the dialog
@@ -24,9 +24,9 @@ class DialogInstance:
 
     def __str__(self):
         """
-        Gets or sets a stack index. 
-        
-        :return: Returns stack index. 
+        Gets or sets a stack index.
+
+        :return: Returns stack index.
         :rtype: str
         """
         result = "\ndialog_instance_id: %s\n" % self.id

@@ -5,6 +5,8 @@ import re
 from datetime import datetime, timedelta
 from typing import Union, Awaitable, Callable
 
+from botframework.connector import Channels
+from botframework.connector.auth import ClaimsIdentity, SkillValidation
 from botbuilder.core import (
     CardFactory,
     MessageFactory,
@@ -23,8 +25,6 @@ from botbuilder.schema import (
     OAuthCard,
     TokenResponse,
 )
-from botframework.connector import Channels
-from botframework.connector.auth import ClaimsIdentity, SkillValidation
 from .prompt_options import PromptOptions
 from .oauth_prompt_settings import OAuthPromptSettings
 from .prompt_validator_context import PromptValidatorContext
@@ -46,8 +46,8 @@ class OAuthPrompt(Dialog):
         standard `message` activity.
         Both flows are automatically supported by the `OAuthPrompt` and they only thing you need to be careful of
         is that you don't block the `event` and `invoke` activities that the prompt might be waiting on.
-        
-    .. note:: 
+
+    .. note::
         You should avoid persisting the access token with your bots other state. The Bot Frameworks SSO service
         will securely store the token on your behalf. If you store it in your bots state,
         it could expire or be revoked in between turns.
@@ -55,30 +55,35 @@ class OAuthPrompt(Dialog):
         following the prompt and then let the token go out of scope at the end of your function.
 
         **Prompt Usage**
-        When used with your bots :class:`DialogSet`, you can simply add a new instance of the prompt as a named dialog using
+        When used with your bots :class:`DialogSet`, you can simply add a new instance of the prompt as a named
+        dialog using
         :meth`DialogSet.add()`.
-        You can then start the prompt from a waterfall step using either :meth:`DialogContext.begin()` or :meth:`DialogContext.prompt()`.
-        The user will be prompted to sign in as needed and their access token will be passed as an argument to the callers
-        next waterfall step.
+        You can then start the prompt from a waterfall step using either :meth:`DialogContext.begin()` or
+        :meth:`DialogContext.prompt()`.
+        The user will be prompted to sign in as needed and their access token will be passed as an argument to
+        the callers next waterfall step.
     """
+
     def __init__(
         self,
         dialog_id: str,
         settings: OAuthPromptSettings,
         validator: Callable[[PromptValidatorContext], Awaitable[bool]] = None,
     ):
-        """ 
+        """
         Creates a new instance of the :class:`OAuthPrompt` class.
 
         :param dialogId: The Id to assign to this prompt.
         :type dialogId: str
         :param settings: Additional authentication settings to use with this instance of the prompt
         :type settings: :class:`OAuthPromptSettings`
-        :param validator: Optional, a :class:`PromptValidator` that contains additional, custom validation for this prompt
+        :param validator: Optional, a :class:`PromptValidator` that contains additional, custom validation
+        for this prompt
         :type validator: :class:`PromptValidatorContext`
 
-        .. note:: 
-            The value of :param dialogId: must be unique within the :class:`DialogSet`or :class:`ComponentDialog` to which the prompt is added.
+        .. note::
+            The value of :param dialogId: must be unique within the :class:`DialogSet`or :class:`ComponentDialog`
+            to which the prompt is added.
         """
         super().__init__(dialog_id)
         self._validator = validator
@@ -95,7 +100,8 @@ class OAuthPrompt(Dialog):
         self, dialog_context: DialogContext, options: PromptOptions = None
     ) -> DialogTurnResult:
         """
-        Starts an authentication prompt dialog. Called when an authentication prompt dialog is pushed onto the dialog stack and is being activated.
+        Starts an authentication prompt dialog. Called when an authentication prompt dialog is pushed onto the
+        dialog stack and is being activated.
 
         :param dialog_context: The dialog context for the current turn of the conversation
         :type dialog_context:  :class:`DialogContext`
@@ -104,8 +110,9 @@ class OAuthPrompt(Dialog):
         :return: Dialog turn result
         :rtype: :class:DialogTurnResult
 
-        .. note::  
-            If the task is successful, the result indicates whether the prompt is still active after the turn has been processed by the prompt.
+        .. note::
+            If the task is successful, the result indicates whether the prompt is still active after the turn
+            has been processed by the prompt.
         """
         if dialog_context is None:
             raise TypeError(
@@ -148,15 +155,15 @@ class OAuthPrompt(Dialog):
         return Dialog.end_of_turn
 
     async def continue_dialog(self, dialog_context: DialogContext) -> DialogTurnResult:
-        """ 
+        """
         Continues a dialog. Called when a prompt dialog is the active dialog and the user replied with a new activity.
 
         :param dialog_context: The dialog context for the current turn of the conversation
-        :type dialog_context:  :class:`DialogContext`    
+        :type dialog_context:  :class:`DialogContext`
         :return: Dialog turn result
         :rtype: :class:DialogTurnResult
 
-        .. note:: 
+        .. note::
             If the task is successful, the result indicates whether the dialog is still
             active after the turn has been processed by the dialog.
             The prompt generally continues to receive the user's replies until it accepts the
@@ -209,15 +216,15 @@ class OAuthPrompt(Dialog):
     async def get_user_token(
         self, context: TurnContext, code: str = None
     ) -> TokenResponse:
-      """
+        """
         Gets the user's tokeN.
 
         :param context: Context for the current turn of conversation with the user
-        :type context:  :class:TurnContext    
+        :type context:  :class:TurnContext
         :return: A response that includes the user's token
-        :rtype: :class:TokenResponse           
+        :rtype: :class:TokenResponse
 
-       .. note:: 
+        .. note::
             If the task is successful and the user already has a token or the user successfully signs in,
             the result contains the user's token.
         """
@@ -238,11 +245,11 @@ class OAuthPrompt(Dialog):
         Signs out the user
 
         :param context: Context for the current turn of conversation with the user
-        :type context:  :class:`TurnContext`    
+        :type context:  :class:`TurnContext`
         :return: A :class:`Task` representing the work queued to execute
-        :rtype: :class:`Task`            
+        :rtype: :class:`Task`
 
-        .. note:: 
+        .. note::
             If the task is successful and the user already has a token or the user successfully signs in,
             the result contains the user's token.
         """
