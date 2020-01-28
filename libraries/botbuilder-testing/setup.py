@@ -5,9 +5,9 @@ import os
 from setuptools import setup
 
 REQUIRES = [
-    "botbuilder-schema>=4.4.0b1",
-    "botbuilder-core>=4.4.0b1",
-    "botbuilder-dialogs>=4.4.0b1",
+    "botbuilder-schema>=4.7.1",
+    "botbuilder-core>=4.7.1",
+    "botbuilder-dialogs>=4.7.1",
 ]
 
 TESTS_REQUIRES = ["aiounittest==1.3.0"]

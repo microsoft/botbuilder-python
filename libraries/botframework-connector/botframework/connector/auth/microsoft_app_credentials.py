@@ -105,7 +105,7 @@ class MicrosoftAppCredentials(Authentication):
         if not self.microsoft_app_id and not self.microsoft_app_password:
             session.headers.pop("Authorization", None)
 
-        elif not session.headers.get("Authorization"):
+        else:
             auth_token = self.get_access_token()
             header = "{} {}".format("Bearer", auth_token)
             session.headers["Authorization"] = header
