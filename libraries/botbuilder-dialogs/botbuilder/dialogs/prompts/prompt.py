@@ -215,7 +215,6 @@ class Prompt(Dialog):
         :return: A :class:Task representing the asynchronous operation.
         :rtype: :class:Task
         """
-        pass
 
     @abstractmethod
     async def on_recognize(
@@ -238,7 +237,6 @@ class Prompt(Dialog):
         :return: A :class:Task representing the asynchronous operation.
         :rtype: :class:Task
         """
-        pass
 
     def append_choices(
         self,

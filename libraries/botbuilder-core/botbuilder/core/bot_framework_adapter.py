@@ -90,7 +90,8 @@ class BotFrameworkAdapterSettings:
         :param app_id: The bot application ID. This is the appId returned by the Azure portal registration, and is
         the value of the `MicrosoftAppId` parameter in the `config.py` file.
         :type app_id: str
-        :param app_password: The bot application password. This is the password returned by the Azure portal registration, and is
+        :param app_password: The bot application password. This is the password returned by the Azure portal
+        registration, and is
         the value os the `MicrosoftAppPassword` parameter in the `config.py` file.
         :type app_password: str
         :param channel_auth_tenant: The channel tenant to use in conversation
@@ -674,7 +675,8 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         returns results in pages and each page will include a `continuationToken` that can be used to fetch the next
         page of results from the server.
 
-        :param service_url: The URL of the channel server to query. This can be retrieved from `context.activity.serviceUrl`
+        :param service_url: The URL of the channel server to query. This can be retrieved from
+        `context.activity.serviceUrl`
         :type service_url: str
 
         :param continuation_token: The continuation token from the previous page of results
@@ -684,8 +686,10 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
 
         :return: A task that represents the work queued to execute
 
-        .. note:: If the task completes successfully, the result contains a page of the members of the current conversation.
-        This overload may be called from outside the context of a conversation, as only the bot's service URL and credentials are required.
+        .. note:: If the task completes successfully, the result contains a page of the members of the current
+        conversation.
+        This overload may be called from outside the context of a conversation, as only the bot's service URL and
+        credentials are required.
         """
         client = await self.create_connector_client(service_url)
         return await client.conversations.get_conversations(continuation_token)
