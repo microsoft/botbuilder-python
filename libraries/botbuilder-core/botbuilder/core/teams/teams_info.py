@@ -2,7 +2,8 @@
 # Licensed under the MIT License.
 
 from typing import List
-from botbuilder.core.turn_context import TurnContext
+from botbuilder.schema import ConversationParameters
+from botbuilder.core.turn_context import Activity, TurnContext
 from botbuilder.schema.teams import (
     ChannelInfo,
     TeamDetails,
@@ -12,8 +13,36 @@ from botbuilder.schema.teams import (
 from botframework.connector.aio import ConnectorClient
 from botframework.connector.teams.teams_connector_client import TeamsConnectorClient
 
-
 class TeamsInfo:
+    @staticmethod
+    async def send_message_to_teams_channel(
+        turn_context: TurnContext, activity: Activity, teams_channel_id: str
+    ) -> tuple:
+        if not turn_context:
+            raise ValueError("The turn_context cannot be None")
+        if not turn_context.activity:
+            raise ValueError("The turn_context.activity cannot be None")
+        if not teams_channel_id:
+            raise ValueError("The teams_channel_id cannot be None or empty")
+
+        old_ref = TurnContext.get_conversation_reference(turn_context.activity)
+        conversation_parameters = ConversationParameters(
+            is_group=True,
+            channel_data={"channel": {"id": teams_channel_id}},
+            activity=activity,
+        )
+
+        result = await turn_context.adapter.create_conversation(
+            old_ref, TeamsInfo._create_conversation_callback, conversation_parameters
+        )
+        return (result[0], result[1])
+
+    @staticmethod
+    async def _create_conversation_callback(new_turn_context) -> tuple:
+        new_activity_id = new_turn_context.activity.id
+        conversation_reference = TurnContext.get_conversation_reference(new_turn_context.activity)
+        return (conversation_reference, new_activity_id)
+
     @staticmethod
     async def get_team_details(
         turn_context: TurnContext, team_id: str = ""
