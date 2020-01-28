@@ -106,7 +106,7 @@ class ActivityHandler:
 
     async def on_members_added_activity(
         self, members_added: List[ChannelAccount], turn_context: TurnContext
-    ): # pylint: disable=unused-argument
+    ):  # pylint: disable=unused-argument
         """
         Override this method in a derived class to provide logic for when members other than the bot join the conversation.
         You can add your bot's welcome logic.

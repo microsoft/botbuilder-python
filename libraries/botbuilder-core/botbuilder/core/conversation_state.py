@@ -14,6 +14,7 @@ class ConversationState(BotState):
     .. remarks::
         Conversation state is available in any turn in a specific conversation, regardless of the user, such as in a group conversation.
     """
+
     no_key_error_message = "ConversationState: channelId and/or conversation missing from context.activity."
 
     def __init__(self, storage: Storage):

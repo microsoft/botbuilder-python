@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 from enum import Enum
 
+
 class DialogTurnStatus(Enum):
     """
     Codes indicating the state of the dialog stack after a call to `DialogContext.continueDialog()`
@@ -15,7 +16,7 @@ class DialogTurnStatus(Enum):
     :var Cancelled: Indicates that the dialog was cancelled and the stack is empty.
     :vartype Cancelled: int
     """
-    
+
     Empty = 1
 
     Waiting = 2
