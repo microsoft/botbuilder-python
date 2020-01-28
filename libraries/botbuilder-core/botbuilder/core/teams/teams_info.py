@@ -13,6 +13,7 @@ from botbuilder.schema.teams import (
 from botframework.connector.aio import ConnectorClient
 from botframework.connector.teams.teams_connector_client import TeamsConnectorClient
 
+
 class TeamsInfo:
     @staticmethod
     async def send_message_to_teams_channel(
@@ -40,7 +41,9 @@ class TeamsInfo:
     @staticmethod
     async def _create_conversation_callback(new_turn_context) -> tuple:
         new_activity_id = new_turn_context.activity.id
-        conversation_reference = TurnContext.get_conversation_reference(new_turn_context.activity)
+        conversation_reference = TurnContext.get_conversation_reference(
+            new_turn_context.activity
+        )
         return (conversation_reference, new_activity_id)
 
     @staticmethod
