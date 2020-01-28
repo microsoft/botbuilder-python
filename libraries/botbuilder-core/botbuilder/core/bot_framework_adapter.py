@@ -198,7 +198,9 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                 )
             )
             client = await self.create_connector_client(reference.service_url)
-
+            resource_response = await client.conversations.create_conversation(
+                parameters
+            )
             # Mix in the tenant ID if specified. This is required for MS Teams.
             if reference.conversation is not None and reference.conversation.tenant_id:
                 # Putting tenant_id in channel_data is a temporary while we wait for the Teams API to be updated
@@ -209,9 +211,6 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                 # Permanent solution is to put tenant_id in parameters.tenant_id
                 parameters.tenant_id = reference.conversation.tenant_id
 
-            resource_response = await client.conversations.create_conversation(
-                parameters
-            )
             request = TurnContext.apply_conversation_reference(
                 Activity(type=ActivityTypes.event, name="CreateConversation"),
                 reference,
