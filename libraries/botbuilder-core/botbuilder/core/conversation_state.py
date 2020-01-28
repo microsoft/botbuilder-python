@@ -17,9 +17,9 @@ class ConversationState(BotState):
     no_key_error_message = "ConversationState: channelId and/or conversation missing from context.activity."
 
     def __init__(self, storage: Storage):
-        """ 
+        """
         Creates a :class:`ConversationState` instance.
-        
+
         Creates a new instance of the :class:`ConversationState` class.
         :param storage: The storage containing the conversation state.
         :type storage: :class:`Storage`
@@ -27,14 +27,14 @@ class ConversationState(BotState):
         super(ConversationState, self).__init__(storage, "ConversationState")
 
     def get_storage_key(self, turn_context: TurnContext) -> object:
-        """ 
+        """
         Gets the key to use when reading and writing state to and from storage.
 
         :param turn_context: The context object for this turn.
-        :type turn_context: :class:`TurnContext` 
+        :type turn_context: :class:`TurnContext`
 
         :raise: :class:`TypeError` if the :meth:`TurnContext.activity` for the current turn is missing
-        :class:`botbuilder.schema.Activity` channelId or conversation information or the conversation's 
+        :class:`botbuilder.schema.Activity` channelId or conversation information or the conversation's
         account id is missing.
 
         :return: The storage key.
@@ -58,6 +58,6 @@ class ConversationState(BotState):
 
     def __raise_type_error(self, err: str = "NoneType found while expecting value"):
         """ Raise type error exception
-        :raises: :class:`TypeError` 
+        :raises: :class:`TypeError`
         """
         raise TypeError(err)
