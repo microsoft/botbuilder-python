@@ -28,9 +28,9 @@ class Prompt(Dialog):
 
     .. remarks::
         When the prompt ends, it returns an object that represents the value it was prompted for.
-        Use :method:`DialogSet.add()` or :method:`ComponentDialog.add_dialog()` to add a prompt to a dialog set or
+        Use :meth:`DialogSet.add()` or :meth:`ComponentDialog.add_dialog()` to add a prompt to a dialog set or
         component dialog, respectively.
-        Use :method:`DialogContext.prompt()` or :meth:`DialogContext.begin_dialog()` to start the prompt.
+        Use :meth:`DialogContext.prompt()` or :meth:`DialogContext.begin_dialog()` to start the prompt.
         .. note::
             If you start a prompt from a :class:`WaterfallStep` in a :class:`WaterfallDialog`, then the prompt result
             will be available in the next step of the waterfall.
