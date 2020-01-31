@@ -132,7 +132,7 @@ class BotState(PropertyManager):
         :return: None
 
         .. note::
-        This function must be called in order for the cleared state to be persisted to the underlying store.
+            This function must be called in order for the cleared state to be persisted to the underlying store.
         """
         if turn_context is None:
             raise TypeError("BotState.clear_state(): turn_context cannot be None.")
