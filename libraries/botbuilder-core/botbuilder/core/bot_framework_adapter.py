@@ -222,6 +222,9 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         context = TurnContext(self, get_continuation_activity(reference))
         context.turn_state[BOT_IDENTITY_KEY] = claims_identity
         context.turn_state["BotCallbackHandler"] = callback
+        await self._ensure_channel_connector_client_is_created(
+            reference.service_url, claims_identity
+        )
         return await self.run_pipeline(context, callback)
 
     async def create_conversation(
@@ -965,3 +968,31 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             )
         ):
             self._is_emulating_oauth_cards = True
+
+    async def _ensure_channel_connector_client_is_created(
+        self, service_url: str, claims_identity: ClaimsIdentity
+    ):
+        # Ensure we have a default ConnectorClient and MSAppCredentials instance for the audience.
+        audience = claims_identity.claims.get(AuthenticationConstants.AUDIENCE_CLAIM)
+
+        if (
+            not audience
+            or AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER != audience
+        ):
+            # We create a default connector for audiences that are not coming from
+            # the default https://api.botframework.com audience.
+            # We create a default claim that contains only the desired audience.
+            default_connector_claims = {
+                AuthenticationConstants.AUDIENCE_CLAIM: audience
+            }
+            connector_claims_identity = ClaimsIdentity(
+                claims=default_connector_claims, is_authenticated=True
+            )
+
+            await self.create_connector_client(service_url, connector_claims_identity)
+
+        if SkillValidation.is_skill_claim(claims_identity.claims):
+            # Add the channel service URL to the trusted services list so we can send messages back.
+            # the service URL for skills is trusted because it is applied by the
+            # SkillHandler based on the original request received by the root bot
+            MicrosoftAppCredentials.trust_service_url(service_url)
