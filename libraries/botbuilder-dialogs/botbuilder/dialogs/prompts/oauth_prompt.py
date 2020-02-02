@@ -47,20 +47,17 @@ class OAuthPrompt(Dialog):
         Both flows are automatically supported by the `OAuthPrompt` and they only thing you need to be careful of
         is that you don't block the `event` and `invoke` activities that the prompt might be waiting on.
 
-    .. note::
-        You should avoid persisting the access token with your bots other state. The Bot Frameworks SSO service
-        will securely store the token on your behalf. If you store it in your bots state,
-        it could expire or be revoked in between turns.
-        When calling the prompt from within a waterfall step, you should use the token within the step
+        Notice the following:
+        - You should avoid persisting the access token with your bots other state. The Bot Frameworks SSO service
+        will securely store the token on your behalf. If you store it in your bots state, it could expire or
+        be revoked in between turns.
+        - When calling the prompt from within a waterfall step, you should use the token within the step
         following the prompt and then let the token go out of scope at the end of your function.
-
-        **Prompt Usage**
-        When used with your bots :class:`DialogSet`, you can simply add a new instance of the prompt as a named
-        dialog using
-        :meth`DialogSet.add()`.
-        You can then start the prompt from a waterfall step using either :meth:`DialogContext.begin()` or
+        - When used with your bots :class:`DialogSet`, you can simply add a new instance of the prompt as a named
+        dialog using :meth:`DialogSet.add()`.
+        - You can then start the prompt from a waterfall step using either :meth:`DialogContext.begin()` or
         :meth:`DialogContext.prompt()`.
-        The user will be prompted to sign in as needed and their access token will be passed as an argument to
+        - The user will be prompted to sign in as needed and their access token will be passed as an argument to
         the callers next waterfall step.
     """
 
@@ -81,7 +78,7 @@ class OAuthPrompt(Dialog):
         for this prompt
         :type validator: :class:`PromptValidatorContext`
 
-        .. note::
+        .. remarks::
             The value of :param dialogId: must be unique within the :class:`DialogSet`or :class:`ComponentDialog`
             to which the prompt is added.
         """
@@ -110,7 +107,7 @@ class OAuthPrompt(Dialog):
         :return: Dialog turn result
         :rtype: :class:DialogTurnResult
 
-        .. note::
+        .. remarks::
             If the task is successful, the result indicates whether the prompt is still active after the turn
             has been processed by the prompt.
         """
@@ -163,11 +160,11 @@ class OAuthPrompt(Dialog):
         :return: Dialog turn result
         :rtype: :class:DialogTurnResult
 
-        .. note::
-            If the task is successful, the result indicates whether the dialog is still
-            active after the turn has been processed by the dialog.
-            The prompt generally continues to receive the user's replies until it accepts the
-            user's reply as valid input for the prompt.
+        .. remarks::
+            If the task is successful, the result indicates whether the dialog is still active after
+            the turn has been processed by the dialog.
+            The prompt generally continues to receive the user's replies until it accepts the user's reply
+            as valid input for the prompt.
         """
         # Recognize token
         recognized = await self._recognize_token(dialog_context.context)
@@ -224,7 +221,7 @@ class OAuthPrompt(Dialog):
         :return: A response that includes the user's token
         :rtype: :class:TokenResponse
 
-        .. note::
+        .. remarks::
             If the task is successful and the user already has a token or the user successfully signs in,
             the result contains the user's token.
         """
@@ -249,7 +246,7 @@ class OAuthPrompt(Dialog):
         :return: A :class:`Task` representing the work queued to execute
         :rtype: :class:`Task`
 
-        .. note::
+        .. remarks::
             If the task is successful and the user already has a token or the user successfully signs in,
             the result contains the user's token.
         """
