@@ -69,8 +69,7 @@ class Prompt(Dialog):
         :rtype: :class:`DialogTurnResult`
 
         .. note::
-            If the task is successful, the result indicates whether the prompt is still active
-            after the turn has been processed by the prompt.
+            If the task is successful, the result indicates whether the prompt is still active after the turn has been processed by the prompt.
         """
         if not dialog_context:
             raise TypeError("Prompt(): dc cannot be None.")
@@ -108,10 +107,8 @@ class Prompt(Dialog):
         :rtype: :class:`DialogTurnResult`
 
         .. note::
-            If the task is successful, the result indicates whether the dialog is still
-            active after the turn has been processed by the dialog.
-            The prompt generally continues to receive the user's replies until it accepts the
-            user's reply as valid input for the prompt.
+            If the task is successful, the result indicates whether the dialog is still active after the turn has been processed by the dialog.
+            The prompt generally continues to receive the user's replies until it accepts the user's reply as valid input for the prompt.
         """
         if not dialog_context:
             raise TypeError("Prompt(): dc cannot be None.")
@@ -167,8 +164,8 @@ class Prompt(Dialog):
         .. note::
             If the task is successful, the result indicates whether the dialog is still active after the turn has been processed by the dialog.
             Prompts are typically leaf nodes on the stack but the dev is free to push other dialogs on top of the stack which will result in
-            the prompt receiving an unexpected call to :meth:resume_dialog() when the pushed on dialog ends.
-            To avoid the prompt prematurely ending we need to simply re-prompt the user.
+            the prompt receiving an unexpected call to :meth:resume_dialog() when the pushed on dialog ends. To avoid the prompt ending prematurely
+            you need to simply re-prompt the user.
         """
         await self.reprompt_dialog(dialog_context.context, dialog_context.active_dialog)
         return Dialog.end_of_turn
