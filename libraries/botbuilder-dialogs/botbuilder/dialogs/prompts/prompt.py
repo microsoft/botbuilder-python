@@ -24,16 +24,16 @@ from ..dialog_context import DialogContext
 
 class Prompt(Dialog):
     """
-    Defines the core behavior of prompt dialogs. Extends the :class:`Dialog` base class.
+    Defines the core behavior of prompt dialogs.
 
     .. remarks::
         When the prompt ends, it returns an object that represents the value it was prompted for.
         Use :meth:`DialogSet.add()` or :meth:`ComponentDialog.add_dialog()` to add a prompt to a dialog set or
         component dialog, respectively.
         Use :meth:`DialogContext.prompt()` or :meth:`DialogContext.begin_dialog()` to start the prompt.
-        .. note::
-            If you start a prompt from a :class:`WaterfallStep` in a :class:`WaterfallDialog`, then the prompt result
-            will be available in the next step of the waterfall.
+
+        If you start a prompt from a :class:`WaterfallStep` in a :class:`WaterfallDialog`, then the prompt result
+         will be available in the next step of the waterfall.
     """
 
     ATTEMPT_COUNT_KEY = "AttemptCount"
@@ -165,11 +165,9 @@ class Prompt(Dialog):
         :rtype: :class:`DialogTurnResult`
 
         .. note::
-            If the task is successful, the result indicates whether the dialog is still
-            active after the turn has been processed by the dialog.
-            Prompts are typically leaf nodes on the stack but the dev is free to push other dialogs
-            on top of the stack which will result in the prompt receiving an unexpected call to
-            :meth:resume_dialog() when the pushed on dialog ends.
+            If the task is successful, the result indicates whether the dialog is still active after the turn has been processed by the dialog.
+            Prompts are typically leaf nodes on the stack but the dev is free to push other dialogs on top of the stack which will result in
+            the prompt receiving an unexpected call to :meth:resume_dialog() when the pushed on dialog ends.
             To avoid the prompt prematurely ending we need to simply re-prompt the user.
         """
         await self.reprompt_dialog(dialog_context.context, dialog_context.active_dialog)
@@ -249,7 +247,7 @@ class Prompt(Dialog):
         """
         Composes an output activity containing a set of choices.
         When overridden in a derived class, appends choices to the activity when the user is prompted for input.
-        Helper function to compose an output activity containing a set of choices.
+        This is an helper function to compose an output activity containing a set of choices.
 
         :param prompt: The prompt to append the user's choice to
         :type prompt:
