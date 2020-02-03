@@ -47,7 +47,7 @@ class OAuthPrompt(Dialog):
         Both flows are automatically supported by the `OAuthPrompt` and they only thing you need to be careful of
         is that you don't block the `event` and `invoke` activities that the prompt might be waiting on.
 
-    .. note::
+    .. remarks::
         You should avoid persisting the access token with your bots other state. The Bot Frameworks SSO service
         will securely store the token on your behalf. If you store it in your bots state,
         it could expire or be revoked in between turns.
@@ -81,7 +81,7 @@ class OAuthPrompt(Dialog):
         for this prompt
         :type validator: :class:`PromptValidatorContext`
 
-        .. note::
+        .. remarks::
             The value of :param dialogId: must be unique within the :class:`DialogSet`or :class:`ComponentDialog`
             to which the prompt is added.
         """
@@ -110,7 +110,7 @@ class OAuthPrompt(Dialog):
         :return: Dialog turn result
         :rtype: :class:DialogTurnResult
 
-        .. note::
+        .. remarks::
             If the task is successful, the result indicates whether the prompt is still active after the turn
             has been processed by the prompt.
         """
@@ -163,7 +163,7 @@ class OAuthPrompt(Dialog):
         :return: Dialog turn result
         :rtype: :class:DialogTurnResult
 
-        .. note::
+        .. remarks::
             If the task is successful, the result indicates whether the dialog is still
             active after the turn has been processed by the dialog.
             The prompt generally continues to receive the user's replies until it accepts the
@@ -224,7 +224,7 @@ class OAuthPrompt(Dialog):
         :return: A response that includes the user's token
         :rtype: :class:TokenResponse
 
-        .. note::
+        .. remarks::
             If the task is successful and the user already has a token or the user successfully signs in,
             the result contains the user's token.
         """
@@ -245,11 +245,11 @@ class OAuthPrompt(Dialog):
         Signs out the user
 
         :param context: Context for the current turn of conversation with the user
-        :type context:  :class:`TurnContext`
+        :type context:  :class:`botbuilder.core.TurnContext`
         :return: A :class:`Task` representing the work queued to execute
         :rtype: :class:`Task`
 
-        .. note::
+        .. remarks::
             If the task is successful and the user already has a token or the user successfully signs in,
             the result contains the user's token.
         """
