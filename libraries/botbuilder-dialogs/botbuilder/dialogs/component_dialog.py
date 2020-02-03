@@ -297,3 +297,5 @@ class ComponentDialog(Dialog):
         :rtype: :class:`DialogTurnResult.result`
         """
         return await outer_dc.end_dialog(result)
+
+    
