@@ -184,7 +184,7 @@ class SlackClient(WebClient):
         target_user: str,
         parse: str = None,
         link_names: bool = False,
-        attachments: [str] = None,
+        attachments: [str] = None,  # pylint: disable=unused-argument
         as_user: bool = False,
     ) -> SlackResponse:
         args = {
@@ -209,8 +209,8 @@ class SlackClient(WebClient):
         bot_name: str = None,
         parse: str = None,
         link_names: bool = False,
-        blocks: [str] = None,
-        attachments: [str] = None,
+        blocks: [str] = None,  # pylint: disable=unused-argument
+        attachments: [str] = None,  # pylint: disable=unused-argument
         unfurl_links: bool = False,
         icon_url: str = None,
         icon_emoji: str = None,
@@ -327,7 +327,7 @@ class SlackClient(WebClient):
         bot_name: str = None,
         parse: str = None,
         link_names: bool = False,
-        attachments: [str] = None,
+        attachments: [str] = None,  # pylint: disable=unused-argument
         as_user: bool = False,
     ):
         args = {
