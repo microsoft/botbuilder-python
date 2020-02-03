@@ -222,7 +222,7 @@ class ComponentDialog(Dialog):
         Called when the dialog is started and pushed onto the parent's dialog stack.
 
         .. remarks::
-        
+
             If the task is successful, the result indicates whether the dialog is still
             active after the turn has been processed by the dialog.
 
@@ -297,5 +297,3 @@ class ComponentDialog(Dialog):
         :rtype: :class:`DialogTurnResult.result`
         """
         return await outer_dc.end_dialog(result)
-
-    
