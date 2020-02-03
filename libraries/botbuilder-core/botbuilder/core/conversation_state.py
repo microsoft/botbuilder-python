@@ -9,7 +9,6 @@ from .storage import Storage
 class ConversationState(BotState):
     """
     Defines a state management object for conversation state.
-    Extends :class:`BootState` base class.
 
     .. remarks::
         Conversation state is available in any turn in a specific conversation, regardless of the user, such as
@@ -33,7 +32,7 @@ class ConversationState(BotState):
         Gets the key to use when reading and writing state to and from storage.
 
         :param turn_context: The context object for this turn.
-        :type turn_context: :class:`TurnContext`
+        :type turn_context: :class:`botbuilder.core.TurnContext`
 
         :raise: :class:`TypeError` if the :meth:`TurnContext.activity` for the current turn is missing
         :class:`botbuilder.schema.Activity` channelId or conversation information or the conversation's
