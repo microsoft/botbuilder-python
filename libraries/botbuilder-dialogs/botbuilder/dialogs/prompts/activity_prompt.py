@@ -23,7 +23,7 @@ from .prompt_validator_context import PromptValidatorContext
 class ActivityPrompt(Dialog, ABC):
     """
     Waits for an activity to be received.
-    
+
         .. remarks::
 
             This prompt requires a validator be passed in and is useful when waiting for non-message
@@ -227,7 +227,8 @@ class ActivityPrompt(Dialog, ABC):
         :type state: :class:`typing.Dict[str, dict]`
         :param options: A prompt options object
         :type options: :class:`PromptOptions`
-        :return result: constructed from the options initially provided in the call to :meth:`AcitivityPrompt.on_prompt()`
+        :return result: constructed from the options initially provided in the call to
+        :meth:`AcitivityPrompt.on_prompt()`
         :rtype result: :class:`PromptRecognizerResult`
         """
         result = PromptRecognizerResult()
