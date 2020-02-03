@@ -26,5 +26,5 @@ __all__ = [
     "SlackEvent",
     "ActivityResourceResponse",
     "SlackRequestBody",
-    "SlackHelper"
+    "SlackHelper",
 ]

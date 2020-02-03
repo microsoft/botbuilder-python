@@ -78,7 +78,7 @@ class SlackHelper:
         return message
 
     @staticmethod
-    def response( # pylint: disable=unused-argument
+    def response(  # pylint: disable=unused-argument
         req: Request, code: int, text: str = None, encoding: str = None
     ) -> Response:
         """
