@@ -50,7 +50,7 @@ class BotState(PropertyManager):
         :param context_service_key: The key for the state cache for this :class:`BotState`
         :type context_service_key: str
 
-        .. note::
+        .. remarks::
             This constructor creates a state management object and associated scope. The object uses
             the :param storage: to persist state property values and the :param context_service_key: to cache state
             within the context for each turn.
@@ -84,7 +84,7 @@ class BotState(PropertyManager):
         Reads the current state object and caches it in the context object for this turn.
 
         :param turn_context: The context object for this turn
-        :type turn_context: :class:`TurnContext`
+        :type turn_context: :class:`botbuilder.core.TurnContext`
         :param force: Optional, true to bypass the cache
         :type force: bool
         """
@@ -107,7 +107,7 @@ class BotState(PropertyManager):
         If the state has changed, it saves the state cached in the current context for this turn.
 
         :param turn_context: The context object for this turn
-        :type turn_context: :class:`TurnContext`
+        :type turn_context: :class:`botbuilder.core.TurnContext`
         :param force: Optional, true to save state to storage whether or not there are changes
         :type force: bool
         """
@@ -127,11 +127,11 @@ class BotState(PropertyManager):
         Clears any state currently stored in this state scope.
 
         :param turn_context: The context object for this turn
-        :type turn_context: :class:`TurnContext`
+        :type turn_context: :class:`botbuilder.core.TurnContext`
 
         :return: None
 
-        .. note::
+        .. remarks::
             This function must be called in order for the cleared state to be persisted to the underlying store.
         """
         if turn_context is None:
@@ -147,7 +147,7 @@ class BotState(PropertyManager):
         Deletes any state currently stored in this state scope.
 
         :param turn_context: The context object for this turn
-        :type turn_context: :class:`TurnContext`
+        :type turn_context: :class:`botbuilder.core.TurnContext`
 
         :return: None
         """
@@ -168,7 +168,7 @@ class BotState(PropertyManager):
         Gets the value of the specified property in the turn context.
 
         :param turn_context: The context object for this turn
-        :type turn_context: :class:`TurnContext`
+        :type turn_context: :class:`botbuilder.core.TurnContext`
         :param property_name: The property name
         :type property_name: str
 
@@ -195,7 +195,7 @@ class BotState(PropertyManager):
         Deletes a property from the state cache in the turn context.
 
         :param turn_context: The context object for this turn
-        :type turn_context: :class:`TurnContext`
+        :type turn_context: :class:`botbuilder.core.TurnContext`
         :param property_name: The name of the property to delete
         :type property_name: str
 
@@ -215,7 +215,7 @@ class BotState(PropertyManager):
         Sets a property to the specified value in the turn context.
 
         :param turn_context: The context object for this turn
-        :type turn_context: :class:`TurnContext`
+        :type turn_context: :class:`botbuilder.core.TurnContext`
         :param property_name: The property name
         :type property_name: str
         :param value: The value to assign to the property
