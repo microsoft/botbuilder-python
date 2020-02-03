@@ -13,10 +13,10 @@ class DialogInstance:
         """
         Gets or sets the ID of the dialog and gets or sets the instance's persisted state.
 
-        :var self.id: The ID of the dialog
-        :vartype self.id: str
-        :var self.state: The instance's persisted state.
-        :vartype self.state: :class:`typing.Dict[str, object]`
+        :var id: The ID of the dialog
+        :vartype id: str
+        :var state: The instance's persisted state.
+        :vartype state: :class:`typing.Dict[str, object]`
         """
         self.id: str = None  # pylint: disable=invalid-name
 
@@ -26,8 +26,8 @@ class DialogInstance:
         """
         Gets or sets a stack index.
 
-        :return: Returns stack index.
-        :rtype: str
+        :return result: Returns stack index.
+        :rtype result: str
         """
         result = "\ndialog_instance_id: %s\n" % self.id
         if self.state is not None:

@@ -23,8 +23,9 @@ from .prompt_validator_context import PromptValidatorContext
 class ActivityPrompt(Dialog, ABC):
     """
     Waits for an activity to be received.
+    
+        .. remarks::
 
-        .. remarks:
             This prompt requires a validator be passed in and is useful when waiting for non-message
             activities like an event to be received. The validator can ignore received events until the
             expected activity is received.
@@ -104,7 +105,7 @@ class ActivityPrompt(Dialog, ABC):
         :param dialog_context: The dialog context for the current turn of the conversation.
         :type dialog_context: :class:`DialogContext`
         :return Dialog.end_of_turn:
-        :rtype Dialog.end_of_turn: :class:`Dialog.DialogTurnResult`
+        :rtype Dialog.end_of_turn: :class:`DialogTurnResult`
         """
         if not dialog_context:
             raise TypeError(
@@ -156,7 +157,8 @@ class ActivityPrompt(Dialog, ABC):
         Called when a prompt dialog resumes being the active dialog on the dialog stack, such
         as when the previous active dialog on the stack completes.
 
-        .. note:
+        .. remarks::
+
             Prompts are typically leaf nodes on the stack but the dev is free to push other dialogs
             on top of the stack which will result in the prompt receiving an unexpected call to
             :meth:resume_dialog() when the pushed on dialog ends.
@@ -175,6 +177,14 @@ class ActivityPrompt(Dialog, ABC):
         return Dialog.end_of_turn
 
     async def reprompt_dialog(self, context: TurnContext, instance: DialogInstance):
+        """
+        Called when a prompt dialog has been requested to re-prompt the user for input.
+
+        :param context: The dialog context for the current turn of the conversation.
+        :type context: :class:`TurnContext`
+        :param instance: The instance of the dialog on the stack.
+        :type instance: :class:`DialogInstance`
+        """
         state: Dict[str, object] = instance.state[self.persisted_state]
         options: PromptOptions = instance.state[self.persisted_options]
         await self.on_prompt(context, state, options, False)
@@ -189,8 +199,8 @@ class ActivityPrompt(Dialog, ABC):
         """
         Called anytime the derived class should send the user a prompt.
 
-        :param dialog_context: The dialog context for the current turn of the conversation
-        :type dialog_context: :class:`DialogContext`
+        :param dialog_context: The dialog context for the current turn of the conversation.
+        :type dialog_context: :class:`TurnContext`
         :param state: Additional state being persisted for the prompt.
         :type state: :class:`typing.Dict[str, dict]`
         :param options: Options that the prompt started with in the call to :meth:`DialogContext.prompt()`.
@@ -217,7 +227,7 @@ class ActivityPrompt(Dialog, ABC):
         :type state: :class:`typing.Dict[str, dict]`
         :param options: A prompt options object
         :type options: :class:`PromptOptions`
-        :return result: constructed from the options initially provided in the call to :meth:`async def on_prompt()`
+        :return result: constructed from the options initially provided in the call to :meth:`AcitivityPrompt.on_prompt()`
         :rtype result: :class:`PromptRecognizerResult`
         """
         result = PromptRecognizerResult()
