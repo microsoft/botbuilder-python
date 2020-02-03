@@ -48,16 +48,19 @@ class OAuthPrompt(Dialog):
         is that you don't block the `event` and `invoke` activities that the prompt might be waiting on.
 
         Notice the following:
-        - You should avoid persisting the access token with your bots other state. The Bot Frameworks SSO service
-        will securely store the token on your behalf. If you store it in your bots state, it could expire or
-        be revoked in between turns.
-        - When calling the prompt from within a waterfall step, you should use the token within the step
+
+        You should avoid persisting the access token with your bots other state. The Bot Frameworks SSO service
+        will securely store the token on your behalf. If you store it in your bots state,
+        it could expire or be revoked in between turns.
+        When calling the prompt from within a waterfall step, you should use the token within the step
         following the prompt and then let the token go out of scope at the end of your function.
-        - When used with your bots :class:`DialogSet`, you can simply add a new instance of the prompt as a named
-        dialog using :meth:`DialogSet.add()`.
-        - You can then start the prompt from a waterfall step using either :meth:`DialogContext.begin()` or
+
+        When used with your bots :class:`DialogSet`, you can simply add a new instance of the prompt as a named
+        dialog using
+        :meth`DialogSet.add()`.
+        You can then start the prompt from a waterfall step using either :meth:`DialogContext.begin()` or
         :meth:`DialogContext.prompt()`.
-        - The user will be prompted to sign in as needed and their access token will be passed as an argument to
+        The user will be prompted to sign in as needed and their access token will be passed as an argument to
         the callers next waterfall step.
     """
 
@@ -161,10 +164,10 @@ class OAuthPrompt(Dialog):
         :rtype: :class:DialogTurnResult
 
         .. remarks::
-            If the task is successful, the result indicates whether the dialog is still active after
-            the turn has been processed by the dialog.
-            The prompt generally continues to receive the user's replies until it accepts the user's reply
-            as valid input for the prompt.
+            If the task is successful, the result indicates whether the dialog is still
+            active after the turn has been processed by the dialog.
+            The prompt generally continues to receive the user's replies until it accepts the
+            user's reply as valid input for the prompt.
         """
         # Recognize token
         recognized = await self._recognize_token(dialog_context.context)
@@ -242,7 +245,7 @@ class OAuthPrompt(Dialog):
         Signs out the user
 
         :param context: Context for the current turn of conversation with the user
-        :type context:  :class:`TurnContext`
+        :type context:  :class:`botbuilder.core.TurnContext`
         :return: A :class:`Task` representing the work queued to execute
         :rtype: :class:`Task`
 
