@@ -181,7 +181,7 @@ class ActivityPrompt(Dialog, ABC):
         Called when a prompt dialog has been requested to re-prompt the user for input.
 
         :param context: The dialog context for the current turn of the conversation.
-        :type context: :class:`TurnContext`
+        :type context: :class:`botbuilder.core.TurnContext`
         :param instance: The instance of the dialog on the stack.
         :type instance: :class:`DialogInstance`
         """
@@ -200,7 +200,7 @@ class ActivityPrompt(Dialog, ABC):
         Called anytime the derived class should send the user a prompt.
 
         :param dialog_context: The dialog context for the current turn of the conversation.
-        :type dialog_context: :class:`TurnContext`
+        :type dialog_context: :class:`botbuilder.core.TurnContext`
         :param state: Additional state being persisted for the prompt.
         :type state: :class:`typing.Dict[str, dict]`
         :param options: Options that the prompt started with in the call to :meth:`DialogContext.prompt()`.
