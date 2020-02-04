@@ -6,7 +6,7 @@ from .dialog_turn_status import DialogTurnStatus
 
 class DialogTurnResult:
     """
-    Result returned to the caller of one of the various stack manipulation methods.
+    Result returned to the caller of one of the stack manipulation methods.
 
     Use :meth:`DialogContext.end_dialog()` to end a :class:`Dialog` and
     return a result to the calling context.
@@ -37,13 +37,15 @@ class DialogTurnResult:
         """
         Final result returned by a dialog that just completed.
 
-       .. remarks::
+        .. remarks::
 
-           This will only be populated in certain cases:
-           * The bot calls :meth:`DialogContext.begin_dialog()` to start a new dialog and the dialog ends immediately.
-           * The bot calls :meth:`DialogContext.continue_dialog()` and a dialog that was active ends.
+            This will only be populated in certain cases:
+                * The bot calls :meth:`DialogContext.begin_dialog()` to start a
+                new dialog and the dialog ends immediately.
+                * The bot calls :meth:`DialogContext.continue_dialog()` and a
+                dialog that was active ends.
 
-    :return self._result: Final result returned by a dialog that just completed.
-    :rtype self._result: object
-    """
+        :return self._result: Result returned by a dialog that just completed.
+        :rtype self._result: object
+        """
         return self._result

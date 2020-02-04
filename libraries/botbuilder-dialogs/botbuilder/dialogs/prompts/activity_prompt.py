@@ -26,9 +26,10 @@ class ActivityPrompt(Dialog, ABC):
 
         .. remarks::
 
-            This prompt requires a validator be passed in and is useful when waiting for non-message
-            activities like an event to be received. The validator can ignore received events until the
-            expected activity is received.
+            This prompt requires a validator be passed in and is useful when
+            waiting for non-message activities like an event to be received. The
+            validator can ignore received events until the expected activity is
+             received.
 
     :var persisted_options:
     :typevar persisted_options: str
@@ -45,9 +46,11 @@ class ActivityPrompt(Dialog, ABC):
         """
         Initializes a new instance of the :class:`ActivityPrompt` class.
 
-        :param dialog_id: Unique ID of the dialog within its parent :class:`DialogSet` or :class:`ComponentDialog`.
+        :param dialog_id: Unique ID of the dialog within its parent
+        :class:`DialogSet` or :class:`ComponentDialog`.
         :type dialog_id: str
-        :param validator: Validator that will be called each time a new activity is received.
+        :param validator: Validator that will be called each time a new activity
+        is received.
         :type validator: :class:`typing.Callable[[:class:`PromptValidatorContext`], bool]`
         """
         Dialog.__init__(self, dialog_id)
@@ -64,7 +67,8 @@ class ActivityPrompt(Dialog, ABC):
 
         :param dialog_context: The dialog context for the current turn of the conversation.
         :type dialog_context: :class:`DialogContext`
-        :param options: Optional, additional information to pass to the prompt being started.
+        :param options: Optional, additional information to pass to the prompt
+        being started.
         :type options: :class:`PromptOptions`
         :return Dialog.end_of_turn:
         :rtype Dialog.end_of_turn: :class:`Dialog.DialogTurnResult`
@@ -154,16 +158,16 @@ class ActivityPrompt(Dialog, ABC):
         self, dialog_context: DialogContext, reason: DialogReason, result: object = None
     ):
         """
-        Called when a prompt dialog resumes being the active dialog on the dialog stack, such
-        as when the previous active dialog on the stack completes.
+        Called when a prompt dialog resumes being the active dialog on the dialog
+        stack, such as when the previous active dialog on the stack completes.
 
         .. remarks::
 
-            Prompts are typically leaf nodes on the stack but the dev is free to push other dialogs
-            on top of the stack which will result in the prompt receiving an unexpected call to
-            :meth:resume_dialog() when the pushed on dialog ends.
-            To avoid the prompt prematurely ending, we need to implement this method and
-            simply re-prompt the user.
+            Prompts are typically leaf nodes on the stack but the dev is free to
+            push other dialogs on top of the stack which will result in the prompt
+            receiving an unexpected call to :meth:`resume_dialog()` when the pushed
+             on dialog ends.To avoid the prompt prematurely ending, we need to
+             implement this method and simply re-prompt the user.
 
         :param dialog_context: The dialog context for the current turn of the conversation
         :type dialog_context: :class:`DialogContext`
@@ -203,9 +207,11 @@ class ActivityPrompt(Dialog, ABC):
         :type dialog_context: :class:`botbuilder.core.TurnContext`
         :param state: Additional state being persisted for the prompt.
         :type state: :class:`typing.Dict[str, dict]`
-        :param options: Options that the prompt started with in the call to :meth:`DialogContext.prompt()`.
+        :param options: Options that the prompt started with in the call to
+        :meth:`DialogContext.prompt()`.
         :type options: :class:`PromptOptions`
-        :param isRetry: If `true` the users response wasn't recognized and the re-prompt should be sent.
+        :param isRetry: If `true` the users response wasn't recognized and the
+        re-prompt should be sent.
         :type isRetry: bool
         """
         if is_retry and options.retry_prompt:
@@ -223,12 +229,13 @@ class ActivityPrompt(Dialog, ABC):
 
         :param context: Context for the current turn of conversation with the user.
         :type context: :class:`botbuilder.core.TurnContext`
-        :param state: Contains state for the current instance of the prompt on the dialog stack.
+        :param state: Contains state for the current instance of the prompt on
+        the dialog stack.
         :type state: :class:`typing.Dict[str, dict]`
         :param options: A prompt options object
         :type options: :class:`PromptOptions`
-        :return result: constructed from the options initially provided in the call to
-        :meth:`AcitivityPrompt.on_prompt()`
+        :return result: constructed from the options initially provided in the
+        call to :meth:`AcitivityPrompt.on_prompt()`
         :rtype result: :class:`PromptRecognizerResult`
         """
         result = PromptRecognizerResult()

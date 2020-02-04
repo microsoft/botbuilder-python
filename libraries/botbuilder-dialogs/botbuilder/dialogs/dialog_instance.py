@@ -11,7 +11,8 @@ class DialogInstance:
 
     def __init__(self):
         """
-        Gets or sets the ID of the dialog and gets or sets the instance's persisted state.
+        Gets or sets the ID of the dialog and gets or sets the instance's
+        persisted state.
 
         :var id: The ID of the dialog
         :vartype id: str
