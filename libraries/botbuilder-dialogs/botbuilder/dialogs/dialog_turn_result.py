@@ -8,7 +8,7 @@ class DialogTurnResult:
     """
     Result returned to the caller of one of the various stack manipulation methods.
 
-    Use :meth:`DialogContext.end_dialogAsync()` to end a :class:`Dialog` and
+    Use :meth:`DialogContext.end_dialog()` to end a :class:`Dialog` and
     return a result to the calling context.
     """
 
@@ -27,7 +27,7 @@ class DialogTurnResult:
         """
         Gets or sets the current status of the stack.
 
-        :return self._status:
+        :return self._status: The status of the stack.
         :rtype self._status: :class:`DialogTurnStatus`
          """
         return self._status
