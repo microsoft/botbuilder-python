@@ -26,10 +26,10 @@ class DialogState:
     @property
     def dialog_stack(self):
         """
-         Initializes a new instance of the :class:`DialogState` class.
+        Initializes a new instance of the :class:`DialogState` class.
 
-         :return: The state information to initialize the stack with.
-         :rtype: list
+        :return: The state information to initialize the stack with.
+        :rtype: list
         """
         return self._dialog_stack
 
