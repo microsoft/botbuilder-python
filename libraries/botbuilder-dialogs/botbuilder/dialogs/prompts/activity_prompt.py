@@ -24,7 +24,7 @@ class ActivityPrompt(Dialog, ABC):
     """
     Waits for an activity to be received.
 
-        .. remarks:
+        .. remarks::
             This prompt requires a validator be passed in and is useful when waiting for non-message
             activities like an event to be received. The validator can ignore received events until the
             expected activity is received.
@@ -156,10 +156,10 @@ class ActivityPrompt(Dialog, ABC):
         Called when a prompt dialog resumes being the active dialog on the dialog stack, such
         as when the previous active dialog on the stack completes.
 
-        .. note:
+        .. remarks::
             Prompts are typically leaf nodes on the stack but the dev is free to push other dialogs
             on top of the stack which will result in the prompt receiving an unexpected call to
-            :meth:resume_dialog() when the pushed on dialog ends.
+            :meth:`ActivityPrompt.resume_dialog()` when the pushed on dialog ends.
             To avoid the prompt prematurely ending, we need to implement this method and
             simply re-prompt the user.
 
@@ -212,7 +212,7 @@ class ActivityPrompt(Dialog, ABC):
         When overridden in a derived class, attempts to recognize the incoming activity.
 
         :param context: Context for the current turn of conversation with the user.
-        :type context: :class:`TurnContext`
+        :type context: :class:`botbuilder.core.TurnContext`
         :param state: Contains state for the current instance of the prompt on the dialog stack.
         :type state: :class:`typing.Dict[str, dict]`
         :param options: A prompt options object
