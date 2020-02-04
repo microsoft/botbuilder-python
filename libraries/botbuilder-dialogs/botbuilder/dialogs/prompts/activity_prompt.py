@@ -156,7 +156,8 @@ class ActivityPrompt(Dialog, ABC):
         Called when a prompt dialog resumes being the active dialog on the dialog stack, such
         as when the previous active dialog on the stack completes.
 
-        .. note:
+        .. remarks::
+        
             Prompts are typically leaf nodes on the stack but the dev is free to push other dialogs
             on top of the stack which will result in the prompt receiving an unexpected call to
             :meth:resume_dialog() when the pushed on dialog ends.
