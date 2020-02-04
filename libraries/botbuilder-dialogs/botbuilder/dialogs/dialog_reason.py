@@ -9,7 +9,7 @@ class DialogReason(Enum):
 
     :var BeginCalled: A dialog is being started through a call to `DialogContext.begin()`.
     :vartype BeginCalled: int
-    :var ContinuCalled: A dialog is being continued through a call to `DialogContext.continue_dialog()`.
+    :var ContinueCalled: A dialog is being continued through a call to `DialogContext.continue_dialog()`.
     :vartype ContinueCalled: int
     :var EndCalled: A dialog ended normally through a call to `DialogContext.end_dialog()
     :vartype EndCalled: int
