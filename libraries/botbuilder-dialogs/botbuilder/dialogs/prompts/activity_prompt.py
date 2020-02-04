@@ -212,12 +212,12 @@ class ActivityPrompt(Dialog, ABC):
         When overridden in a derived class, attempts to recognize the incoming activity.
 
         :param context: Context for the current turn of conversation with the user.
-        :type context: :class:`botbuilder.core.TurnContext`
+        :type context:
         :param state: Contains state for the current instance of the prompt on the dialog stack.
         :type state: :class:`typing.Dict[str, dict]`
         :param options: A prompt options object
         :type options: :class:`PromptOptions`
-        :return result: constructed from the options initially provided in the call to :meth:`async def on_prompt()`
+        :return result: constructed from the options initially provided in the call to :meth:`ActivityPrompt.on_prompt()`
         :rtype result: :class:`PromptRecognizerResult`
         """
         result = PromptRecognizerResult()
