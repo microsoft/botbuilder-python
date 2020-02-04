@@ -83,7 +83,6 @@ class ComponentDialog(Dialog):
         user replies with a new activity.
 
         .. remarks::
-
             If the task is successful, the result indicates whether the dialog is still
             active after the turn has been processed by the dialog. The result may also
             contain a return value.
@@ -121,7 +120,6 @@ class ComponentDialog(Dialog):
         control to this dialog component.
 
         .. remarks::
-
             Containers are typically leaf nodes on the stack but the dev is free to push other dialogs
             on top of the stack which will result in the container receiving an unexpected call to
             :meth:resume_dialog() when the pushed on dialog ends.
@@ -223,7 +221,6 @@ class ComponentDialog(Dialog):
         Called when the dialog is started and pushed onto the parent's dialog stack.
 
         .. remarks::
-        
             If the task is successful, the result indicates whether the dialog is still
             active after the turn has been processed by the dialog.
 
@@ -277,7 +274,6 @@ class ComponentDialog(Dialog):
         Ends the component dialog in its parent's context.
 
         .. remarks::
-
             If the task is successful, the result indicates that the dialog ended after the
             turn was processed by the dialog.
 
