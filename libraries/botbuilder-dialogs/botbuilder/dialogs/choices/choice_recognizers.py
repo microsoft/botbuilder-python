@@ -73,7 +73,7 @@ class ChoiceRecognizers:
                         choices_list, matched, match
                     )
 
-            if not matches and (not options or options.recognize_ordinals):
+            if not matches and (not options or options.recognize_numbers):
                 # Then try by numerical index
                 matches = ChoiceRecognizers._recognize_number(utterance, locale)
                 for match in matches:
