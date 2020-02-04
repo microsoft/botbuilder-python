@@ -24,7 +24,8 @@ class ActivityPrompt(Dialog, ABC):
     """
     Waits for an activity to be received.
 
-        .. remarks:
+        .. remarks::
+        
             This prompt requires a validator be passed in and is useful when waiting for non-message
             activities like an event to be received. The validator can ignore received events until the
             expected activity is received.
