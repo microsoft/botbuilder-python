@@ -38,7 +38,6 @@ class DialogTurnResult:
         Final result returned by a dialog that just completed.
 
         .. remarks::
-
             This will only be populated in certain cases:
                 * The bot calls :meth:`DialogContext.begin_dialog()` to start a
                 new dialog and the dialog ends immediately.
