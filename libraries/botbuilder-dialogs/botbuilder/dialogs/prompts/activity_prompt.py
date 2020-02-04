@@ -25,7 +25,6 @@ class ActivityPrompt(Dialog, ABC):
     Waits for an activity to be received.
 
         .. remarks::
-
             This prompt requires a validator be passed in and is useful when
             waiting for non-message activities like an event to be received. The
             validator can ignore received events until the expected activity is
@@ -162,7 +161,6 @@ class ActivityPrompt(Dialog, ABC):
         stack, such as when the previous active dialog on the stack completes.
 
         .. remarks::
-
             Prompts are typically leaf nodes on the stack but the dev is free to
             push other dialogs on top of the stack which will result in the prompt
             receiving an unexpected call to :meth:`resume_dialog()` when the pushed
