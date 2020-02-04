@@ -685,11 +685,11 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         :return: A task that represents the work queued to execute
 
         .. remarks::
-        The channel server returns results in pages and each page will include a `continuationToken` that
-        can be used to fetch the next page of results from the server.
-        If the task completes successfully, the result contains a page of the members of the current conversation.
-        This overload may be called from outside the context of a conversation, as only the bot's service URL and
-        credentials are required.
+            The channel server returns results in pages and each page will include a `continuationToken` that
+            can be used to fetch the next page of results from the server.
+            If the task completes successfully, the result contains a page of the members of the current conversation.
+            This overload may be called from outside the context of a conversation, as only the bot's service URL and
+            credentials are required.
         """
         client = await self.create_connector_client(service_url)
         return await client.conversations.get_conversations(continuation_token)
