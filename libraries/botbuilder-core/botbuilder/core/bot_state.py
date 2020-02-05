@@ -279,8 +279,7 @@ class BotStatePropertyAccessor(StatePropertyAccessor):
 
         :param turn_context: The context object for this turn
         :type turn_context: :class:`botbuilder.core.TurnContext`
-        :param default_value_or_factory: Defines the default value when no value is set for the property
-        :type default_value_or_factory: :typing:Union
+        :param default_value_or_factory: Defines the default value for the property
         """
         await self._bot_state.load(turn_context, False)
         try:
@@ -307,7 +306,6 @@ class BotStatePropertyAccessor(StatePropertyAccessor):
         :type turn_context: :class:`botbuilder.core.TurnContext`
 
         :param value: The value to assign to the property
-        :type value: :typing:`Object`
         """
         await self._bot_state.load(turn_context, False)
         await self._bot_state.set_property_value(turn_context, self._name, value)
