@@ -29,7 +29,7 @@ class DialogState:
         Initializes a new instance of the :class:`DialogState` class.
 
         :return: The state information to initialize the stack with.
-        :rtype: list
+        :rtype: :class:`typing.List[:class:`DialogInstance`]`
         """
         return self._dialog_stack
 
