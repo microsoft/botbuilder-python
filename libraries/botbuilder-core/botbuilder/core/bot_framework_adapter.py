@@ -73,7 +73,6 @@ class TokenExchangeState(Model):
 
 
 class BotFrameworkAdapterSettings:
-
     def __init__(
         self,
         app_id: str,
