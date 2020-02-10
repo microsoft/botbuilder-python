@@ -253,9 +253,9 @@ class ComponentDialog(Dialog):
     ) -> None:
         """
         :param turn_context: The :class:`botbuilder.core.TurnContext` for the current turn of the conversation.
-        :type turn_context: :class:`DialogInstance`
+        :type turn_context: :class:`botbuilder.core.TurnContext`
         :param instance: State information associated with the instance of this component dialog.
-        :type instance: :class:`DialogInstance`
+        :type instance: :class:`botbuilder.core.DialogInstance`
         """
         return
 
