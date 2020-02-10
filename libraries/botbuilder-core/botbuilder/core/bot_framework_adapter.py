@@ -73,9 +73,7 @@ class TokenExchangeState(Model):
 
 
 class BotFrameworkAdapterSettings:
-    """
-    Contains the settings used to initialize a :class:`BotFrameworkAdapter` instance.
-    """
+
     def __init__(
         self,
         app_id: str,
