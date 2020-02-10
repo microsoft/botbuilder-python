@@ -9,13 +9,7 @@ from .turn_context import TurnContext
 class ActivityHandler:
 
     """
-    Handles actviities and intended for subclassing.
-
-    .. remarks::
-
-        Derive from this class to handle particular activity types.
-        Pre- and post-processing of activities can be added by calling the base class implementation
-        from the derived class.
+        Handles actviities and intended for subclassing.
     """
     async def on_turn(self, turn_context: TurnContext):
 
