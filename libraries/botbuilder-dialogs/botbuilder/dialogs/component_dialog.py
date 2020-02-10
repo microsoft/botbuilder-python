@@ -283,6 +283,6 @@ class ComponentDialog(Dialog):
         :param result: Optional, value to return from the dialog component to the parent context.
         :type result: object
         :return : Value to return.
-        :rtype: :var:`DialogTurnResult.result`
+        :rtype: :var:`botbuilder.dialogs.DialogTurnResult.result`
         """
         return await outer_dc.end_dialog(result)
