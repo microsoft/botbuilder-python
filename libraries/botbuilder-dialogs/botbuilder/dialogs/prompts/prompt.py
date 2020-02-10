@@ -28,14 +28,13 @@ class Prompt(Dialog):
     Defines the core behavior of prompt dialogs. Extends the :class:`Dialog` base class.
 
     .. remarks::
-
         When the prompt ends, it returns an object that represents the value it was prompted for.
         Use :meth:`DialogSet.add()` or :meth:`ComponentDialog.add_dialog()` to add a prompt to
         a dialog set or component dialog, respectively.
+
         Use :meth:`DialogContext.prompt()` or :meth:`DialogContext.begin_dialog()` to start the prompt.
         If you start a prompt from a :class:`WaterfallStep` in a :class:`WaterfallDialog`, then the
         prompt result will be available in the next step of the waterfall.
-
     """
 
     ATTEMPT_COUNT_KEY = "AttemptCount"
@@ -46,11 +45,10 @@ class Prompt(Dialog):
         """
         Creates a new :class:`Prompt` instance.
 
-        :param dialog_id: Unique Id of the prompt within its parent :class:`DialogSet` or
-        :class:`ComponentDialog`.
+        :param dialog_id: Unique Id of the prompt within its parent :class:`DialogSet`
+        :class:`ComponentDialog`
         :type dialog_id: str
-        :param validator: Optional custom validator used to provide additional validation and re-prompting
-        logic for the prompt.
+        :param validator: Optionally provide additional validation and re-prompting logic
         :type validator: Object
         """
         super(Prompt, self).__init__(dialog_id)
@@ -66,13 +64,12 @@ class Prompt(Dialog):
         :param dialog_context: The dialog context for the current turn of the conversation
         :type dialog_context:  :class:`DialogContext`
         :param options: Optional, additional information to pass to the prompt being started
-        :type options: object
+        :type options: Object
         :return: The dialog turn result
         :rtype: :class:`DialogTurnResult`
 
         .. note::
-
-            If the task is successful, the result indicates whether the prompt is still active after the turn has been processed.
+            The result indicates whether the prompt is still active after the turn has been processed.
         """
         if not dialog_context:
             raise TypeError("Prompt(): dc cannot be None.")
@@ -102,7 +99,7 @@ class Prompt(Dialog):
 
     async def continue_dialog(self, dialog_context: DialogContext):
         """
-        Continues a dialog. Called when a prompt dialog is the active dialog and the user replied with a new activity.
+        Continues a dialog.
 
         :param dialog_context: The dialog context for the current turn of the conversation
         :type dialog_context:  :class:`DialogContext`
@@ -110,11 +107,13 @@ class Prompt(Dialog):
         :rtype: :class:`DialogTurnResult`
 
         .. remarks::
-            If the task is successful, the result indicates whether the dialog is still
-            active after the turn has been processed by the dialog.
+            Called when a prompt dialog is the active dialog and the user replied with a new activity.
+
+            If the task is successful, the result indicates whether the dialog is still active after
+            the turn has been processed by the dialog.
+
             The prompt generally continues to receive the user's replies until it accepts the
             user's reply as valid input for the prompt.
-
         """
         if not dialog_context:
             raise TypeError("Prompt(): dc cannot be None.")
@@ -161,20 +160,21 @@ class Prompt(Dialog):
         :param reason: An enum indicating why the dialog resumed.
         :type reason:  :class:`DialogReason`
         :param result: Optional, value returned from the previous dialog on the stack.
-        The type of the value returned is dependent on the previous dialog.
         :type result:  object
         :return: The dialog turn result
         :rtype: :class:`DialogTurnResult`
 
         .. remarks::
-
             Called when a prompt dialog resumes being the active dialog on the dialog stack,
             such as when the previous active dialog on the stack completes.
+
             If the task is successful, the result indicates whether the dialog is still
             active after the turn has been processed by the dialog.
+
             Prompts are typically leaf nodes on the stack but the dev is free to push other dialogs
             on top of the stack which will result in the prompt receiving an unexpected call to
             :meth:resume_dialog() when the pushed on dialog ends.
+
             Simply re-prompt the user to avoid that the prompt ends prematurely.
 
         """
@@ -183,7 +183,7 @@ class Prompt(Dialog):
 
     async def reprompt_dialog(self, context: TurnContext, instance: DialogInstance):
         """
-        Reprompts user for input. Called when a prompt dialog has been requested to re-prompt the user for input.
+        Reprompts user for input.
 
         :param context: Context for the current turn of conversation with the user
         :type context:  :class:`botbuilder.core.TurnContext`
@@ -214,8 +214,7 @@ class Prompt(Dialog):
         :param options: A prompt options object constructed from the options initially provided
         in the call :meth:`DialogContext.prompt()`
         :type options:  :class:`PromptOptions`
-        :param is_retry: true if this is the first time this prompt dialog instance on the stack is prompting
-        the user for input; otherwise, false
+        :param is_retry: true if is the first time the user for input; otherwise, false
         :type is_retry:  bool
 
         :return: A task representing the asynchronous operation.
@@ -230,7 +229,7 @@ class Prompt(Dialog):
         options: PromptOptions,
     ):
         """
-        Recognizes the user's input. When overridden in a derived class, attempts to recognize the user's input.
+        Recognizes the user's input.
 
         :param turn_context: Context for the current turn of conversation with the user
         :type turn_context:  :class:`botbuilder.core.TurnContext`
@@ -242,6 +241,8 @@ class Prompt(Dialog):
 
         :return: A task representing the asynchronous operation.
 
+        .. note::
+            When overridden in a derived class, attempts to recognize the user's input.
         """
 
     def append_choices(
