@@ -15,7 +15,7 @@ from .dialog_instance import DialogInstance
 
 class ComponentDialog(Dialog):
     """
-    A :class:`Dialog` that is composed of other dialogs
+    A :class:`botbuilder.dialogs.Dialog` that is composed of other dialogs
 
     A component dialog has an inner :class:`DialogSet` :class:`DialogContext`,
     which provides an inner dialog stack that is hidden from the parent dialog.
@@ -97,7 +97,7 @@ class ComponentDialog(Dialog):
         :param dialog_context: The parent :class:`DialogContext` for the current turn of the conversation.
         :type dialog_context: :class:`DialogContext`
         :return: Signals the end of the turn
-        :rtype: :class:`Dialog.end_of_turn`
+        :rtype: :var:`Dialog.end_of_turn`
         """
         if dialog_context is None:
             raise TypeError("ComponentDialog.begin_dialog(): outer_dc cannot be None.")
@@ -198,8 +198,7 @@ class ComponentDialog(Dialog):
 
         :param dialog_id: The dialog to add.
         :type dialog_id: str
-        :return: The dialog; or None if there is not a match for the ID.
-        :rtype: :class:`Dialog`
+        :return: The :class:`Dialog`; or None if there is not a match for the ID.
         """
         return self._dialogs.find(dialog_id)
 
@@ -283,7 +282,7 @@ class ComponentDialog(Dialog):
         :type outer_dc: :class:`DialogContext`
         :param result: Optional, value to return from the dialog component to the parent context.
         :type result: object
-        :return: Value to return.
-        :rtype: :class:`DialogTurnResult.result`
+        :return : Value to return.
+        :rtype: :var:`DialogTurnResult.result`
         """
         return await outer_dc.end_dialog(result)
