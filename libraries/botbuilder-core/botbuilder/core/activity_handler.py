@@ -19,15 +19,8 @@ class ActivityHandler:
         :param turn_context: The context object for this turn
         :type turn_context: :class:`botbuilder.core.TurnContext`
 
-        :returns: A task that represents the work queued to execute
+        :return: A task that represents the work queued to execute
 
-        .. remarks::
-            It calls other methods in this class based on the type of the activity to
-            process, which allows a derived class to provide type-specific logic in a controlled way.
-            In a derived class, override this method to add logic that applies to all activity types.
-            Also
-            - Add logic to apply before the type-specific logic and before calling :meth:`on_turn()`.
-            - Add logic to apply after the type-specific logic after calling :meth:`on_turn()`.
         """
 
         if turn_context is None:
@@ -69,7 +62,7 @@ class ActivityHandler:
         :param turn_context: The context object for this turn
         :type turn_context: :class:`botbuilder.core.TurnContext`
 
-        :returns: A task that represents the work queued to execute
+        :return: A task that represents the work queued to execute
         """
         return
 
@@ -81,7 +74,7 @@ class ActivityHandler:
         :param turn_context: The context object for this turn
         :type turn_context: :class:`botbuilder.core.TurnContext`
 
-        :returns: A task that represents the work queued to execute
+        :return: A task that represents the work queued to execute
 
         .. remarks::
             When the :meth:`on_turn()` method receives a conversation update activity, it calls this method.
@@ -139,7 +132,7 @@ class ActivityHandler:
         :param turn_context: The context object for this turn
         :type turn_context: :class:`botbuilder.core.TurnContext`
 
-        :returns: A task that represents the work queued to execute
+        :return: A task that represents the work queued to execute
 
         .. remarks::
             When the :meth:`ActivityHandler.on_conversation_update_activity()` method receives a conversation
@@ -157,7 +150,7 @@ class ActivityHandler:
         :param turn_context: The context object for this turn
         :type turn_context: :class:`botbuilder.core.TurnContext`
 
-        :returns: A task that represents the work queued to execute
+        :return: A task that represents the work queued to execute
 
         .. remarks::
             Message reactions correspond to the user adding a 'like' or 'sad' etc. (often an emoji) to a previously
@@ -198,7 +191,7 @@ class ActivityHandler:
         :param turn_context: The context object for this turn
         :type turn_context: :class:`botbuilder.core.TurnContext`
 
-        :returns: A task that represents the work queued to execute
+        :return: A task that represents the work queued to execute
 
         .. remarks::
             Message reactions correspond to the user adding a 'like' or 'sad' etc. (often an emoji)
@@ -221,7 +214,7 @@ class ActivityHandler:
         :param turn_context: The context object for this turn
         :type turn_context: :class:`botbuilder.core.TurnContext`
 
-        :returns: A task that represents the work queued to execute
+        :return: A task that represents the work queued to execute
 
         .. remarks::
             Message reactions correspond to the user adding a 'like' or 'sad' etc. (often an emoji)
@@ -240,7 +233,7 @@ class ActivityHandler:
         :param turn_context: The context object for this turn
         :type turn_context: :class:`botbuilder.core.TurnContext`
 
-        :returns: A task that represents the work queued to execute
+        :return: A task that represents the work queued to execute
 
         .. remarks::
             When the :meth:`ActivityHandler.on_turn()` method receives an event activity, it calls this method.
@@ -271,7 +264,7 @@ class ActivityHandler:
         :param turn_context: The context object for this turn
         :type turn_context: :class:`botbuilder.core.TurnContext`
 
-        :returns: A task that represents the work queued to execute
+        :return: A task that represents the work queued to execute
 
         .. remarks::
             When the :meth:`ActivityHandler.on_event()` method receives an event with an activity name of
@@ -308,7 +301,7 @@ class ActivityHandler:
 
         :param turn_context: The context object for this turn
         :type turn_context: :class:`botbuilder.core.TurnContext`
-        :returns: A task that represents the work queued to execute
+        :return: A task that represents the work queued to execute
         """
         return
 
@@ -323,7 +316,7 @@ class ActivityHandler:
         :param turn_context: The context object for this turn
         :type turn_context: :class:`botbuilder.core.TurnContext`
 
-        :returns: A task that represents the work queued to execute
+        :return: A task that represents the work queued to execute
 
         .. remarks::
             When the :meth:`ActivityHandler.on_turn()` method receives an activity that is not a message,
