@@ -74,11 +74,10 @@ class OAuthPrompt(Dialog):
         :type dialogId: str
         :param settings: Additional authentication settings to use with this instance of the prompt
         :type settings: :class:`OAuthPromptSettings`
-        :param validator: Optional, a :class:`PromptValidator` that contains additional, custom validation
-        for this prompt
+        :param validator: Optional, contains additional, custom validation for this prompt
         :type validator: :class:`PromptValidatorContext`
 
-        .. note::
+        .. remarks::
             The value of :param dialogId: must be unique within the :class:`DialogSet`or :class:`ComponentDialog`
             to which the prompt is added.
         """
@@ -103,11 +102,13 @@ class OAuthPrompt(Dialog):
         :param dialog_context: The dialog context for the current turn of the conversation
         :type dialog_context:  :class:`DialogContext`
         :param options: Optional, additional information to pass to the prompt being started
-        :type options: :class:PromptOptions
-        :return: Dialog turn result
-        :rtype: :class:DialogTurnResult
+        :type options: :class:`PromptOptions`
 
-        .. note::
+        :return: Dialog turn result
+        :rtype: :class`:`DialogTurnResult`
+
+        .. remarks::
+
             If the task is successful, the result indicates whether the prompt is still active after the turn
             has been processed.
         """
@@ -157,8 +158,9 @@ class OAuthPrompt(Dialog):
 
         :param dialog_context: The dialog context for the current turn of the conversation
         :type dialog_context:  :class:`DialogContext`
+
         :return: Dialog turn result
-        :rtype: :class:DialogTurnResult
+        :rtype: :class:`DialogTurnResult`
 
         .. remarks::
             If the task is successful, the result indicates whether the dialog is still
@@ -217,11 +219,12 @@ class OAuthPrompt(Dialog):
         Gets the user's tokeN.
 
         :param context: Context for the current turn of conversation with the user
-        :type context:  :class:TurnContext
-        :return: A response that includes the user's token
-        :rtype: :class:TokenResponse
+        :type context:  :class:`TurnContext`
 
-        .. note::
+        :return: A response that includes the user's token
+        :rtype: :class:`TokenResponse`
+
+        .. remarks::
             If the task is successful and the user already has a token or the user successfully signs in,
             the result contains the user's token.
         """
@@ -242,11 +245,10 @@ class OAuthPrompt(Dialog):
         Signs out the user
 
         :param context: Context for the current turn of conversation with the user
-        :type context:  :class:`botbuilder.core.TurnContext`
-        :return: A :class:`Task` representing the work queued to execute
-        :rtype: :class:`Task`
+        :type context:  :class:`TurnContext`
+        :return: A task representing the work queued to execute
 
-        .. note::
+        .. reamarks::
             If the task is successful and the user already has a token or the user successfully signs in,
             the result contains the user's token.
         """
