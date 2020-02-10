@@ -73,10 +73,6 @@ class TokenExchangeState(Model):
 
 
 class BotFrameworkAdapterSettings:
-    """
-    Contains the settings used to initialize a :class:`BotFrameworkAdapter` instance.
-    """
-
     def __init__(
         self,
         app_id: str,
@@ -89,7 +85,7 @@ class BotFrameworkAdapterSettings:
         auth_configuration: AuthenticationConfiguration = None,
     ):
         """
-        Initializes a :class:`BotFrameworkAdapter` instance.
+        Contains the settings used to initialize a :class:`BotFrameworkAdapter` instance.
 
         :param app_id: The bot application ID.
         :type app_id: str
@@ -128,7 +124,6 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         receives activities from the Bot Connector Service. When your bot receives an activity,
         the adapter creates a context object, passes it to your bot's application logic, and
         sends responses back to the user's channel.
-
         The adapter processes and directs incoming activities in through the bot middleware
         pipeline to your bot’s logic and then back out again.
         As each activity flows in and out of the bot, each piece of middleware can inspect or act
@@ -191,11 +186,12 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         Continues a conversation with a user.
 
         :param reference: A reference to the conversation to continue
-        :type reference: :class:`botbuilder.schema.ConversationReference`
+        :type reference: :class:`botbuilder.schema.ConversationReference
         :param callback: The method to call for the resulting bot turn
         :type callback: :class:`typing.Callable`
-        :param bot_id: The application Id of the bot.
-        :type bot_id: str
+        :param bot_id: The application Id of the bot. This is the appId returned by the Azure portal registration,
+        and is generally found in the `MicrosoftAppId` parameter in `config.py`.
+        :type bot_id: :class:`typing.str`
         :param claims_identity: The bot claims identity
         :type claims_identity: :class:`botframework.connector.auth.ClaimsIdentity`
 
@@ -252,12 +248,10 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         .. remarks::
             To start a conversation, your bot must know its account information and the user's
             account information on that channel.
-
             Most channels only support initiating a direct message (non-group) conversation.
             The adapter attempts to create a new conversation on the channel, and
             then sends a conversation update activity through its middleware pipeline
             to the the callback method.
-
             If the conversation is established with the specified users, the ID of the activity
             will contain the ID of the new conversation.</para>
         """
@@ -313,9 +307,9 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         Creates a turn context and runs the middleware pipeline for an incoming activity.
 
         :param req: The incoming activity
-        :type req:  str
+        :type req: :class:`typing.str`
         :param auth_header: The HTTP authentication header of the request
-        :type auth_header: str
+        :type auth_header: :class:`typing.str`
         :param logic: The logic to execute at the end of the adapter's middleware pipeline.
         :type logic: :class:`typing.Callable`
 
@@ -325,7 +319,6 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             This class processes an activity received by the bots web server. This includes any messages
             sent from a user and is the method that drives what's often referred to as the
             bots *reactive messaging* flow.
-
             Call this method to reactively send a message to a conversation.
             If the task completes successfully, then an :class:`InvokeResponse` is returned;
             otherwise. `null` is returned.
@@ -607,12 +600,13 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         Lists the members of a given activity.
 
         :param context: The context object for the turn
-        :type context: :class:`TurnContext`
-        :param activity_id: (Optional) Activity ID to enumerate. If not specified the current activities ID will be used.
+        :type context: :class:`botbuilder.core.TurnContext`
+        :param activity_id: (Optional) Activity ID to enumerate.
+        If not specified the current activities ID will be used.
 
         :raises: An exception error
 
-        :return: List of members of the activity
+        :return: List of Members of the activity
         """
         try:
             if not activity_id:
@@ -679,7 +673,8 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         """
         Lists the Conversations in which this bot has participated for a given channel server.
 
-        :param service_url: The URL of the channel server to query
+        :param service_url: The URL of the channel server to query. This can be retrieved from
+        `context.activity.serviceUrl`
         :type service_url: str
 
         :param continuation_token: The continuation token from the previous page of results
@@ -692,7 +687,6 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         .. remarks::
             The channel server returns results in pages and each page will include a `continuationToken` that
             can be used to fetch the next page of results from the server.
-
             If the task completes successfully, the result contains a page of the members of the current conversation.
             This overload may be called from outside the context of a conversation, as only the bot's service URL and
             credentials are required.
@@ -711,13 +705,13 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         :type context: :class:`botbuilder.core.TurnContext`
         :param connection_name: Name of the auth connection to use
         :type connection_name: str
-        :param magic_code: (Optional) user entered code to validate
-        :str magic_code: str
+        :param magic_code" (Optional) user entered code to validate
+        :str magic_code" str
 
         :raises: An exception error
 
         :returns: Token Response
-        :rtype: :class:'TokenResponse`
+        :rtype: :class:'botbuilder.schema.TokenResponse`
 
         """
 
@@ -791,6 +785,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         :returns: A task that represents the work queued to execute
 
         .. note::
+
             If the task completes successfully, the result contains the raw sign-in link
         """
         self.check_emulating_oauth_cards(context)
@@ -821,6 +816,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         :param user_id: The user Id for which token status is retrieved
         :type user_id: str
         :param include_filter: (Optional) Comma separated list of connection's to include.
+        Blank will return token status for all configured connections.
         :type include_filter: str
 
         :returns: Array of :class:`botframework.connector.token_api.modelsTokenStatus`
@@ -855,7 +851,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         :type connection_name: str
         :param resource_urls: The list of resource URLs to retrieve tokens for
         :type resource_urls: :class:`typing.List`
-        :returns: Dictionary of resource Urls to the corresponding :class:`botbuilder.schema.TokenResponse`
+        :returns: Dictionary of resource Urls to the corresponding :class:'botbuilder.schema.TokenResponse`
         :rtype: :class:`typing.Dict`
         """
         if not context.activity.from_property or not context.activity.from_property.id:
@@ -876,9 +872,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
     async def create_connector_client(
         self, service_url: str, identity: ClaimsIdentity = None
     ) -> ConnectorClient:
-        """
-        Allows for mocking of the connector client in unit tests
-
+        """Allows for mocking of the connector client in unit tests
         :param service_url: The service URL
         :param identity: The claims identity
 
