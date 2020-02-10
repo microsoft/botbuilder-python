@@ -76,25 +76,7 @@ class ActivityHandler:
         return
 
     async def on_conversation_update_activity(self, turn_context: TurnContext):
-        """
-        Called when a conversation update activity is received from the channel when the base behavior of
-        :meth:`on_turn()` is used.
 
-        :param turn_context: The context object for this turn
-        :type turn_context: :class:`botbuilder.core.TurnContext`
-
-        :returns: A task that represents the work queued to execute
-
-        .. remarks::
-            When the :meth:`on_turn()` method receives a conversation update activity,
-            it calls this method.
-            If the conversation update activity indicates that members other than the bot joined the conversation,
-            it calls the  :meth:`on_members_added_activity()` method.
-            If the conversation update activity indicates that members other than the bot left the conversation,
-            it calls the  :meth:`on_members_removed_activity()`  method.
-            In a derived class, override this method to add logic that applies to all conversation update activities.
-            Add logic to apply before the member added or removed logic before the call to this base class method.
-        """
         if (
             turn_context.activity.members_added is not None
             and turn_context.activity.members_added
