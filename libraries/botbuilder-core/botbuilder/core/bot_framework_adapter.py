@@ -73,6 +73,10 @@ class TokenExchangeState(Model):
 
 
 class BotFrameworkAdapterSettings:
+    """
+    Contains the settings used to initialize a :class:`BotFrameworkAdapter` instance.
+    """
+
     def __init__(
         self,
         app_id: str,
@@ -121,11 +125,14 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
 
     .. remarks::
         The bot adapter encapsulates authentication processes and sends activities to and
-        receives activities from the Bot Connector Service. When your bot receives an activity,
-        the adapter creates a context object, passes it to your bot's application logic, and
-        sends responses back to the user's channel.
+        receives activities from the Bot Connector Service.
+
+        When your bot receives an activity, the adapter creates a context object, passes it to
+        your bot's application logic, and sends responses back to the user's channel.
+
         The adapter processes and directs incoming activities in through the bot middleware
         pipeline to your bot’s logic and then back out again.
+
         As each activity flows in and out of the bot, each piece of middleware can inspect or act
         upon the activity, both before and after the bot logic runs.
     """
@@ -249,6 +256,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             To start a conversation, your bot must know its account information and the user's
             account information on that channel.
             Most channels only support initiating a direct message (non-group) conversation.
+
             The adapter attempts to create a new conversation on the channel, and
             then sends a conversation update activity through its middleware pipeline
             to the the callback method.
@@ -390,7 +398,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
     def create_context(self, activity):
         """
         Allows for the overriding of the context object in unit tests and derived adapters.
-        :param activity:
+        :param activity: the activity to create
         :return:
         """
         return TurnContext(self, activity)
@@ -399,7 +407,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
     async def parse_request(req):
         """
         Parses and validates request
-        :param req:
+        :param req: The request to parse
         :return:
         """
 
@@ -688,6 +696,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             The channel server returns results in pages and each page will include a `continuationToken` that
             can be used to fetch the next page of results from the server.
             If the task completes successfully, the result contains a page of the members of the current conversation.
+
             This overload may be called from outside the context of a conversation, as only the bot's service URL and
             credentials are required.
         """
