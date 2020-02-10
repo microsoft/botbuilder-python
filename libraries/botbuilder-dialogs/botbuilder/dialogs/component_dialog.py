@@ -132,8 +132,8 @@ class ComponentDialog(Dialog):
         :type reason: :class:`DialogReason`
         :param result: Optional, value returned from the dialog that was called.
         :type result: object
-        :return: Signals the end of the turn
-        :rtype: :class:`Dialog.end_of_turn`
+        :return Dialog.end_of_turn: Signals the end of the turn
+        :rtype Dialog.end_of_turn: :class:`Dialog.end_of_turn`
         """
 
         await self.reprompt_dialog(dialog_context.context, dialog_context.active_dialog)
@@ -183,8 +183,9 @@ class ComponentDialog(Dialog):
         Adds a :class:`Dialog` to the component dialog and returns the updated component.
 
         :param dialog: The dialog to add.
-        :return: The updated :class:`ComponentDialog`
-        :rtype: :class:`ComponentDialog`
+        :type dialog: :class:`Dialog`
+        :return self: The updated :class:`ComponentDialog`
+        :rtype self: :class:`ComponentDialog`
         """
         self._dialogs.add(dialog)
         if not self.initial_dialog_id:
@@ -196,8 +197,9 @@ class ComponentDialog(Dialog):
         Finds a dialog by ID.
 
         :param dialog_id: The dialog to add.
+        :type dialog_id: str
         :return: The dialog; or None if there is not a match for the ID.
-        :rtype: :class:Dialog
+        :rtype: :class:`Dialog`
         """
         return self._dialogs.find(dialog_id)
 
@@ -253,8 +255,7 @@ class ComponentDialog(Dialog):
         """
         :param turn_context: The :class:`botbuilder.core.TurnContext` for the current turn of the conversation.
         :type turn_context: :class:`DialogInstance`
-        :param instance: State information associated with the instance of this component dialog
-        on its parent's dialog stack.
+        :param instance: State information associated with the instance of this component dialog.
         :type instance: :class:`DialogInstance`
         """
         return
@@ -278,8 +279,8 @@ class ComponentDialog(Dialog):
             The returned :class:`DialogTurnResult`contains the return value in its
             :class:`DialogTurnResult.result` property.
 
-        :param outer_dc: The parent class:`DialogContext` for the current turn of conversation.
-        :type outer_dc: class:`DialogContext`
+        :param outer_dc: The parent :class:`DialogContext` for the current turn of conversation.
+        :type outer_dc: :class:`DialogContext`
         :param result: Optional, value to return from the dialog component to the parent context.
         :type result: object
         :return: Value to return.
