@@ -15,7 +15,7 @@ from .dialog_instance import DialogInstance
 
 class ComponentDialog(Dialog):
     """
-    A :class:`Dialog` that is composed of other dialogs
+    A :class:`botbuilder.dialogs.Dialog` that is composed of other dialogs
 
     A component dialog has an inner :class:`DialogSet` :class:`DialogContext`,
     which provides an inner dialog stack that is hidden from the parent dialog.
