@@ -172,15 +172,18 @@ class ActivityHandler:
         .. remarks::
             Message reactions correspond to the user adding a 'like' or 'sad' etc. (often an emoji) to a previously
             sent activity.
+
             Message reactions are only supported by a few channels. The activity that the message reaction corresponds
             to is indicated in the reply to Id property. The value of this property is the activity id of a previously
             sent activity given back to the bot as the response from a send call.
             When the :meth:`on_turn()` method receives a message reaction activity, it calls this
             method.
-            If the message reaction indicates that reactions were added to a message, it calls
+
+            - If the message reaction indicates that reactions were added to a message, it calls
             :meth:`on_reaction_added()`.
-            If the message reaction indicates that reactions were removed from a message, it calls
+            - If the message reaction indicates that reactions were removed from a message, it calls
             :meth:`on_reaction_removed()`.
+
             In a derived class, override this method to add logic that applies to all message reaction activities.
             Add logic to apply before the reactions added or removed logic before the call to the this base class
             method.
@@ -212,8 +215,9 @@ class ActivityHandler:
 
         .. remarks::
             Message reactions correspond to the user adding a 'like' or 'sad' etc. (often an emoji)
-            to a previously sent message on the conversation. Message reactions are supported by only a few channels.
-            The activity that the message is in reaction to is identified by the activity's reply to Id property.
+            to a previously sent message on the conversation.
+            Message reactions are supported by only a few channels.
+            The activity that the message is in reaction to is identified by the activity's reply to ID property.
             The value of this property is the activity ID of a previously sent activity. When the bot sends an activity,
             the channel assigns an ID to it, which is available in the resource response Id of the result.
         """
