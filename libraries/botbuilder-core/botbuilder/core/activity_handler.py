@@ -7,6 +7,14 @@ from .turn_context import TurnContext
 
 
 class ActivityHandler:
+    """
+    Class to handle actviities and intended for subclassing.
+
+    .. remarks::
+        Derive from this class to plug in code to handle particular activity types.
+        Pre- and post-processing of activities can be added by calling the base class implementation
+        from the derived class.
+    """
     async def on_turn(self, turn_context: TurnContext):
         """
         Called by the adapter (for example, :class:`BotFrameworkAdapter`) at runtime
@@ -81,10 +89,15 @@ class ActivityHandler:
         .. remarks::
             When the :meth:'ActivityHandler.on_turn()` method receives a conversation update activity, it calls this
             method.
+
             If the conversation update activity indicates that members other than the bot joined the conversation,
-            it calls the  :meth:`ActivityHandler.on_members_added_activity()` method.
+
+            it calls the  :meth:`on_members_added_activity()` method.
+
             If the conversation update activity indicates that members other than the bot left the conversation,
-            it calls the  :meth:`ActivityHandler.on_members_removed_activity()`  method.
+
+            it calls the  :meth:`on_members_removed_activity()`  method.
+
             In a derived class, override this method to add logic that applies to all conversation update activities.
             Add logic to apply before the member added or removed logic before the call to this base class method.
         """
@@ -111,8 +124,7 @@ class ActivityHandler:
         Override this method in a derived class to provide logic for when members other than the bot join
         the conversation. You can add your bot's welcome logic.
 
-        :param members_added: A list of all the members added to the conversation, as described by the
-        conversation update activity
+        :param members_added: A list of all the members added to the conversation
         :type members_added: :class:`typing.List`
         :param turn_context: The context object for this turn
         :type turn_context: :class:`botbuilder.core.TurnContext`
@@ -133,8 +145,7 @@ class ActivityHandler:
         Override this method in a derived class to provide logic for when members other than the bot leave
         the conversation.  You can add your bot's good-bye logic.
 
-        :param members_added: A list of all the members removed from the conversation, as described by the
-        conversation update activity
+        :param members_added: A list of all the members removed from the conversation
         :type members_added: :class:`typing.List`
         :param turn_context: The context object for this turn
         :type turn_context: :class:`botbuilder.core.TurnContext`
@@ -162,15 +173,18 @@ class ActivityHandler:
         .. remarks::
             Message reactions correspond to the user adding a 'like' or 'sad' etc. (often an emoji) to a previously
             sent activity.
+
             Message reactions are only supported by a few channels. The activity that the message reaction corresponds
             to is indicated in the reply to Id property. The value of this property is the activity id of a previously
             sent activity given back to the bot as the response from a send call.
             When the :meth:'ActivityHandler.on_turn()` method receives a message reaction activity, it calls this
             method.
+
             If the message reaction indicates that reactions were added to a message, it calls
             :meth:'ActivityHandler.on_reaction_added().
             If the message reaction indicates that reactions were removed from a message, it calls
             :meth:'ActivityHandler.on_reaction_removed().
+
             In a derived class, override this method to add logic that applies to all message reaction activities.
             Add logic to apply before the reactions added or removed logic before the call to the this base class
             method.
@@ -203,6 +217,7 @@ class ActivityHandler:
         .. remarks::
             Message reactions correspond to the user adding a 'like' or 'sad' etc. (often an emoji)
             to a previously sent message on the conversation. Message reactions are supported by only a few channels.
+
             The activity that the message is in reaction to is identified by the activity's reply to Id property.
             The value of this property is the activity ID of a previously sent activity. When the bot sends an activity,
             the channel assigns an ID to it, which is available in the resource response Id of the result.
@@ -226,6 +241,7 @@ class ActivityHandler:
         .. remarks::
             Message reactions correspond to the user adding a 'like' or 'sad' etc. (often an emoji)
             to a previously sent message on the conversation. Message reactions are supported by only a few channels.
+
             The activity that the message is in reaction to is identified by the activity's reply to Id property.
             The value of this property is the activity ID of a previously sent activity. When the bot sends an activity,
             the channel assigns an ID to it, which is available in the resource response Id of the result.
@@ -234,7 +250,7 @@ class ActivityHandler:
 
     async def on_event_activity(self, turn_context: TurnContext):
         """
-        Invoked when an event activity is received from the connector when the base behavior of
+        Called when an event activity is received from the connector when the base behavior of
         :meth:'ActivityHandler.on_turn()` is used.
 
         :param turn_context: The context object for this turn
@@ -264,7 +280,7 @@ class ActivityHandler:
         self, turn_context: TurnContext
     ):
         """
-        Invoked when a `tokens/response` event is received when the base behavior of
+        Called when a `tokens/response` event is received when the base behavior of
         :meth:'ActivityHandler.on_event_activity()` is used.
         If using an `oauth_prompt`, override this method to forward this activity to the current dialog.
 
@@ -316,7 +332,7 @@ class ActivityHandler:
         self, turn_context: TurnContext
     ):
         """
-        Invoked when an activity other than a message, conversation update, or event is received when the base
+        Called  when an activity other than a message, conversation update, or event is received when the base
         behavior of :meth:`ActivityHandler.on_turn()` is used.
         If overridden, this method could potentially respond to any of the other activity types.
 
