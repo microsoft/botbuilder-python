@@ -7,10 +7,18 @@ from .turn_context import TurnContext
 
 
 class ActivityHandler:
+    """
+    Class to handle actviities and intended for subclassing.
+
+    .. remarks::
+        Derive from this class to handle particular activity types.
+        Pre- and post-processing of activities can be added by calling the base class implementation
+        from the derived class.
+    """
     async def on_turn(self, turn_context: TurnContext):
+
         """
-        Called by the adapter (for example, :class:`BotFrameworkAdapter`) at runtime
-        in order to process an inbound :class:`botbuilder.schema.Activity`.
+        Called by the adapter at runtime to process an inbound :class:`botbuilder.schema.Activity`.
 
         :param turn_context: The context object for this turn
         :type turn_context: :class:`botbuilder.core.TurnContext`
@@ -22,9 +30,10 @@ class ActivityHandler:
             process, which allows a derived class to provide type-specific logic in a controlled way.
             In a derived class, override this method to add logic that applies to all activity types.
             Also
-            - Add logic to apply before the type-specific logic and before calling :meth:`ActivityHandler.on_turn()`.
-            - Add logic to apply after the type-specific logic after calling :meth:`ActivityHandler.on_turn()`.
+            - Add logic to apply before the type-specific logic and before calling :meth:`on_turn()`.
+            - Add logic to apply after the type-specific logic after calling :meth:`on_turn()`.
         """
+
         if turn_context is None:
             raise TypeError("ActivityHandler.on_turn(): turn_context cannot be None.")
 
@@ -71,7 +80,7 @@ class ActivityHandler:
     async def on_conversation_update_activity(self, turn_context: TurnContext):
         """
         Invoked when a conversation update activity is received from the channel when the base behavior of
-        :meth:`ActivityHandler.on_turn()` is used.
+        :meth:`on_turn()` is used.
 
         :param turn_context: The context object for this turn
         :type turn_context: :class:`botbuilder.core.TurnContext`
@@ -79,13 +88,14 @@ class ActivityHandler:
         :returns: A task that represents the work queued to execute
 
         .. remarks::
-            When the :meth:`ActivityHandler.on_turn()` method receives a conversation update activity, it calls this
-            method.
-            If the conversation update activity indicates that members other than the bot joined the conversation,
-            it calls the  :meth:`ActivityHandler.on_members_added_activity()` method.
-            If the conversation update activity indicates that members other than the bot left the conversation,
-            it calls the  :meth:`ActivityHandler.on_members_removed_activity()`  method.
-            In a derived class, override this method to add logic that applies to all conversation update activities.
+            When the :meth:`on_turn()` method receives a conversation update activity, it calls this
+            method. Note the following:
+
+            - If the conversation update activity indicates that members other than the bot joined the conversation,
+            it calls the  :meth:`on_members_added_activity()` method.
+            - If the conversation update activity indicates that members other than the bot left the conversation,
+            it calls the  :meth:`on_members_removed_activity()`  method.
+            - In a derived class, override this method to add logic that applies to all conversation update activities.
             Add logic to apply before the member added or removed logic before the call to this base class method.
         """
         if (
