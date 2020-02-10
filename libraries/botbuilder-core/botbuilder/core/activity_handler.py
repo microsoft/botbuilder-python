@@ -90,11 +90,12 @@ class ActivityHandler:
         .. remarks::
             When the :meth:`on_turn()` method receives a conversation update activity, it calls this
             method.
-            If the conversation update activity indicates that members other than the bot joined the conversation,
+            Also
+            - If the conversation update activity indicates that members other than the bot joined the conversation,
             it calls the  :meth:`on_members_added_activity()` method.
-            If the conversation update activity indicates that members other than the bot left the conversation,
+            - If the conversation update activity indicates that members other than the bot left the conversation,
             it calls the  :meth:`on_members_removed_activity()`  method.
-            In a derived class, override this method to add logic that applies to all conversation update activities.
+            - In a derived class, override this method to add logic that applies to all conversation update activities.
             Add logic to apply before the member added or removed logic before the call to this base class method.
         """
         if (
