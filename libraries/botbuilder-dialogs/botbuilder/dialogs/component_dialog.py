@@ -90,7 +90,7 @@ class ComponentDialog(Dialog):
             If this method is *not* overriden the component dialog calls the
             :meth:`DialogContext.continue_dialog` method on it's inner dialog
             context. If the inner dialog stack is empty, the component dialog ends,
-            and if a :class:`DialogTurnResult.result` is available, the component dialog
+            and if a :var:`botbuilder.dialogs.DialogTurnResult.result` is available, the component dialog
             uses that as it's return value.
 
 
@@ -270,16 +270,16 @@ class ComponentDialog(Dialog):
             turn was processed by the dialog.
 
             In general, the parent context is the dialog or bot turn handler that started the dialog.
-            If the parent is a dialog, the stack calls the parent's :meth:`Dialog.resume_dialog()` method
+            If the parent is a dialog, the stack calls the parent's :meth:`botbuilder.dialogs.Dialog.resume_dialog()` method
             to return a result to the parent dialog. If the parent dialog does not implement
-            :meth:`Dialog.resume_dialog()`, then the parent will end, too, and the result is passed to the next
+            :meth:`botbuilder.dialogs.Dialog.resume_dialog()`, then the parent will end, too, and the result is passed to the next
             parent context, if one exists.
 
-            The returned :class:`DialogTurnResult`contains the return value in its
-            :class:`DialogTurnResult.result` property.
+            The returned :class:`botbuilder.dialogs.DialogTurnResult` contains the return value in its
+            :var:`botbuilder.dialogs.DialogTurnResult.result` property.
 
-        :param outer_dc: The parent :class:`DialogContext` for the current turn of conversation.
-        :type outer_dc: :class:`DialogContext`
+        :param outer_dc: The parent :class:`botbuilder.dialogs.DialogContext` for the current turn of conversation.
+        :type outer_dc: :class:`botbuilder.dialogs.DialogContext`
         :param result: Optional, value to return from the dialog component to the parent context.
         :type result: object
         :return : Value to return.
