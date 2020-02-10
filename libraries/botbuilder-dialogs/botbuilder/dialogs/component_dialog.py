@@ -180,10 +180,10 @@ class ComponentDialog(Dialog):
 
     def add_dialog(self, dialog: Dialog) -> object:
         """
-        Adds a :class:`Dialog` to the component dialog and returns the updated component.
+        Adds a :class:`botbuilder.dialogs.Dialog` to the component dialog and returns the updated component.
 
         :param dialog: The dialog to add.
-        :type dialog: :class:`Dialog`
+        :type dialog: :class:`botbuilder.dialogs.Dialog`
         :return self: The updated :class:`ComponentDialog`
         :rtype self: :class:`ComponentDialog`
         """
@@ -198,7 +198,7 @@ class ComponentDialog(Dialog):
 
         :param dialog_id: The dialog to add.
         :type dialog_id: str
-        :return: The :class:`Dialog`; or None if there is not a match for the ID.
+        :return: The :class:`botbuilder.dialogs.Dialog`; or None if there is not a match for the ID.
         """
         return self._dialogs.find(dialog_id)
 
