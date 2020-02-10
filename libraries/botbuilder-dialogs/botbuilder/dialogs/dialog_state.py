@@ -13,7 +13,6 @@ class DialogState:
     def __init__(self, stack: List[DialogInstance] = None):
         """
         Initializes a new instance of the :class:`DialogState` class.
-        The new instance is created with an empty dialog stack.
 
         :param stack: The state information to initialize the stack with.
         :type stack: :class:`typing.List[:class:`DialogInstance`]`
