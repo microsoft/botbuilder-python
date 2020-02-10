@@ -74,8 +74,7 @@ class OAuthPrompt(Dialog):
         :type dialogId: str
         :param settings: Additional authentication settings to use with this instance of the prompt
         :type settings: :class:`OAuthPromptSettings`
-        :param validator: Optional, a :class:`PromptValidator` that contains additional, custom validation
-        for this prompt
+        :param validator: Optional, contains additional custom validation for this prompt
         :type validator: :class:`PromptValidatorContext`
 
         .. remarks::
