@@ -11,6 +11,9 @@ from .certificate_authenticator import CertificateAuthenticator
 class CertificateAppCredentials(AppCredentials, ABC):
     """
     CertificateAppCredentials auth implementation.
+
+    See:
+    https://github.com/AzureAD/microsoft-authentication-library-for-python/wiki/Client-Credentials#client-credentials-with-certificate
     """
 
     def __init__(

@@ -106,6 +106,15 @@ class BotFrameworkAdapterSettings:
         :type channel_provider: :class:`botframework.connector.auth.ChannelProvider`
         :param auth_configuration:
         :type auth_configuration: :class:`botframework.connector.auth.AuthenticationConfiguration`
+        :param certificate_thumbprint: X509 thumbprint
+        :type certificate_thumbprint: str
+        :param certificate_private_key: X509 private key
+        :type certificate_private_key: str
+
+        .. remarks::
+            For credentials authorization, both app_id and app_password are required.
+            For certificate authorization, app_id, certificate_thumbprint, and certificate_private_key are required.
+
         """
         self.app_id = app_id
         self.app_password = app_password
