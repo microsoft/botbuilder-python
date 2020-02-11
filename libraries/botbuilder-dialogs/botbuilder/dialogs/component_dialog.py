@@ -94,7 +94,7 @@ class ComponentDialog(Dialog):
         :param dialog_context: The parent dialog context for the current turn of the conversation.
         :type dialog_context: :class:`botbuilder.dialogs.DialogContext`
         :return: Signals the end of the turn
-        :rtype: :class:`botbuilder.dialogs.Dialog.end_of_turn`
+        :rtype: :var:`botbuilder.dialogs.Dialog.end_of_turn`
         """
         if dialog_context is None:
             raise TypeError("ComponentDialog.begin_dialog(): outer_dc cannot be None.")
@@ -123,8 +123,8 @@ class ComponentDialog(Dialog):
             To avoid the container prematurely ending we need to implement this method and simply
             ask our inner dialog stack to re-prompt.
 
-        :param dialog_context: The :class:`DialogContext` for the current turn of the conversation.
-        :type dialog_context: :class:`DialogContext`
+        :param dialog_context: The dialog context for the current turn of the conversation.
+        :type dialog_context: :class:`botbuilder.dialogs.DialogContext`
         :param reason: Reason why the dialog resumed.
         :type reason: :class:`botbuilder.dialogs.DialogReason`
         :param result: Optional, value returned from the dialog that was called.
@@ -181,7 +181,7 @@ class ComponentDialog(Dialog):
         Adds a :class:`Dialog` to the component dialog and returns the updated component.
 
         :param dialog: The dialog to add.
-        :return: The updated :class:`ComponentDialog`
+        :return: The updated :class:`ComponentDialog`.
         :rtype: :class:`ComponentDialog`
         """
         self._dialogs.add(dialog)
@@ -209,13 +209,13 @@ class ComponentDialog(Dialog):
             If the task is successful, the result indicates whether the dialog is still
             active after the turn has been processed by the dialog.
 
-            By default, this calls the :meth:`Dialog.begin_dialog()` method of the component
-            dialog's initial dialog.
+            By default, this calls the :meth:`botbuilder.dialogs.Dialog.begin_dialog()`
+            method of the component dialog's initial dialog.
 
             Override this method in a derived class to implement interrupt logic.
 
-        :param inner_dc: The inner :class:`DialogContext` for the current turn of conversation.
-        :type inner_dc: :class:`DialogContext`
+        :param inner_dc: The inner dialog context for the current turn of conversation.
+        :type inner_dc: :class:`botbuilder.dialogs.DialogContext`
         :param options: Optional, initial information to pass to the dialog.
         :type options: object
         """
@@ -225,8 +225,8 @@ class ComponentDialog(Dialog):
         """
         Called when the dialog is continued, where it is the active dialog and the user replies with a new activity.
 
-        :param inner_dc: The inner :class:`DialogContext` for the current turn of conversation.
-        :type inner_dc: :class:`DialogContext`
+        :param inner_dc: The inner dialog context for the current turn of conversation.
+        :type inner_dc: :class:`botbuilder.dialogs.DialogContext`
         """
         return await inner_dc.continue_dialog()
 
