@@ -49,12 +49,12 @@ class ComponentDialog(Dialog):
         If the task is successful, the result indicates whether the dialog is still
         active after the turn has been processed by the dialog.
 
-        :param dialog_context: The :class:`DialogContext` for the current turn of the conversation.
-        :type dialog_context: :class:`DialogContext`
+        :param dialog_context: The :class:`botbuilder.dialogs.DialogContext` for the current turn of the conversation.
+        :type dialog_context: :class:`botbuilder.dialogs.DialogContext`
         :param options: Optional, initial information to pass to the dialog.
         :type options: object
         :return: Signals the end of the turn
-        :rtype: :class:`Dialog.end_of_turn`
+        :rtype: :class:`botbuilder.dialogs.Dialog.end_of_turn`
         """
         if dialog_context is None:
             raise TypeError("ComponentDialog.begin_dialog(): outer_dc cannot be None.")
