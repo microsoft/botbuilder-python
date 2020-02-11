@@ -94,7 +94,7 @@ class ComponentDialog(Dialog):
         :param dialog_context: The parent dialog context for the current turn of the conversation.
         :type dialog_context: :class:`botbuilder.dialogs.DialogContext`
         :return: Signals the end of the turn
-        :rtype: :class:`Dialog.end_of_turn`
+        :rtype: :class:`botbuilder.dialogs.Dialog.end_of_turn`
         """
         if dialog_context is None:
             raise TypeError("ComponentDialog.begin_dialog(): outer_dc cannot be None.")
@@ -131,7 +131,7 @@ class ComponentDialog(Dialog):
         value returned is dependent on the child dialog.
         :type result: object
         :return: Signals the end of the turn
-        :rtype: :class:`Dialog.end_of_turn`
+        :rtype: :class:`botbuilder.dialogs.Dialog.end_of_turn`
         """
 
         await self.reprompt_dialog(dialog_context.context, dialog_context.active_dialog)
@@ -196,7 +196,7 @@ class ComponentDialog(Dialog):
 
         :param dialog_id: The dialog to add.
         :return: The dialog; or None if there is not a match for the ID.
-        :rtype: :class:Dialog
+        :rtype: :class:`botbuilder.dialogs.Dialog`
         """
         return self._dialogs.find(dialog_id)
 
