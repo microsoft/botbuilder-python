@@ -127,8 +127,7 @@ class ComponentDialog(Dialog):
         :type dialog_context: :class:`DialogContext`
         :param reason: Reason why the dialog resumed.
         :type reason: :class:`DialogReason`
-        :param result: Optional, value returned from the dialog that was called. The type of the
-        value returned is dependent on the child dialog.
+        :param result: Optional, value returned from the dialog that was called.
         :type result: object
         :return: Signals the end of the turn
         :rtype: :class:`botbuilder.dialogs.Dialog.end_of_turn`
@@ -252,10 +251,10 @@ class ComponentDialog(Dialog):
     ) -> None:
         """
         :param turn_context: The :class:`botbuilder.core.TurnContext` for the current turn of the conversation.
-        :type turn_context: :class:`DialogInstance`
+        :type turn_context: :class:`botbuilder.dialogs.DialogInstance`
         :param instance: State information associated with the instance of this component dialog
         on its parent's dialog stack.
-        :type instance: :class:`DialogInstance`
+        :type instance: :class:`botbuilder.dialogs.DialogInstance`
         """
         return
 
