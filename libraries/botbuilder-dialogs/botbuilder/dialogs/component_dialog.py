@@ -85,14 +85,14 @@ class ComponentDialog(Dialog):
             contain a return value.
 
             If this method is *not* overriden the component dialog calls the
-            :meth:`DialogContext.continue_dialog` method on it's inner dialog
+            :meth:`botbuilder.dialogs.DialogContext.continue_dialog` method on it's inner dialog
             context. If the inner dialog stack is empty, the component dialog ends,
-            and if a :class:`DialogTurnResult.result` is available, the component dialog
+            and if a :var:`botbuilder.dialogs.DialogTurnResult.result` is available, the component dialog
             uses that as it's return value.
 
 
-        :param dialog_context: The parent :class:`DialogContext` for the current turn of the conversation.
-        :type dialog_context: :class:`DialogContext`
+        :param dialog_context: The parent :class:`botbuilder.dialogs.DialogContext` for the current turn of the conversation.
+        :type dialog_context: :class:`botbuilder.dialogs.DialogContext`
         :return: Signals the end of the turn
         :rtype: :class:`Dialog.end_of_turn`
         """
