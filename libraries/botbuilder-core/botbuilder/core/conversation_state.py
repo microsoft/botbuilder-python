@@ -9,7 +9,6 @@ from .storage import Storage
 class ConversationState(BotState):
     """
     Defines a state management object for conversation state.
-    Extends :class:`BootState` base class.
 
     .. remarks::
         Conversation state is available in any turn in a specific conversation, regardless of the user, such as
