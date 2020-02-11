@@ -163,7 +163,7 @@ class ComponentDialog(Dialog):
 
         :param context: The context object for this turn.
         :type context: :class:`botbuilder.core.TurnContext`
-        :param instance: State information associated with the instance of this component dialog
+        :param instance: State information associated with the instance of this component dialog.
         on its parent's dialog stack.
         :type instance: :class:`DialogInstance`
         :param reason: Reason why the dialog ended.
@@ -238,8 +238,7 @@ class ComponentDialog(Dialog):
 
         :param turn_context: The :class:`botbuilder.core.TurnContext` for the current turn of the conversation.
         :type turn_context: :class:`botbuilder.core.TurnContext`
-        :param instance: State information associated with the instance of this component dialog on
-        its parent's dialog stack.
+        :param instance: State information associated with the inner dialog stack of this component dialog.
         :type instance: :class:`DialogInstance`
         :param reason: Reason why the dialog ended.
         :type reason: :class:`DialogReason`
@@ -252,8 +251,7 @@ class ComponentDialog(Dialog):
         """
         :param turn_context: The :class:`botbuilder.core.TurnContext` for the current turn of the conversation.
         :type turn_context: :class:`botbuilder.dialogs.DialogInstance`
-        :param instance: State information associated with the instance of this component dialog
-        on its parent's dialog stack.
+        :param instance: State information associated with the inner dialog stack of this component dialog.
         :type instance: :class:`botbuilder.dialogs.DialogInstance`
         """
         return
