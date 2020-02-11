@@ -278,8 +278,8 @@ class ComponentDialog(Dialog):
             The returned :class:`botbuilder.dialogs.DialogTurnResult`contains the return value in its
             :var:`botbuilder.dialogs.DialogTurnResult.result` property.
 
-        :param outer_dc: The parent class:`DialogContext` for the current turn of conversation.
-        :type outer_dc: class:`DialogContext`
+        :param outer_dc: The parent dialog context for the current turn of conversation.
+        :type outer_dc: class:`botbuilder.dialogs.DialogContext`
         :param result: Optional, value to return from the dialog component to the parent context.
         :type result: object
         :return: Value to return.
