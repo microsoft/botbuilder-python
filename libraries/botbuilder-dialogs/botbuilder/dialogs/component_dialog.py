@@ -275,8 +275,8 @@ class ComponentDialog(Dialog):
             :meth:`Dialog.resume_dialog()`, then the parent will end, too, and the result is passed to the next
             parent context, if one exists.
 
-            The returned :class:`DialogTurnResult`contains the return value in its
-            :class:`DialogTurnResult.result` property.
+            The returned :class:`botbuilder.dialogs.DialogTurnResult`contains the return value in its
+            :var:`botbuilder.dialogs.DialogTurnResult.result` property.
 
         :param outer_dc: The parent class:`DialogContext` for the current turn of conversation.
         :type outer_dc: class:`DialogContext`
