@@ -3,8 +3,7 @@
 
 import os
 
-
-__title__ = "botbuilder-testing"
+__title__ = "botbuilder-adapters-slack"
 __version__ = (
     os.environ["packageVersion"] if "packageVersion" in os.environ else "4.7.1"
 )

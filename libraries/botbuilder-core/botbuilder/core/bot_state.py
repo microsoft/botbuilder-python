@@ -13,10 +13,11 @@ from .property_manager import PropertyManager
 
 class CachedBotState:
     """
-    Internal cached bot state.
+        Internal cached bot state.
     """
 
     def __init__(self, state: Dict[str, object] = None):
+
         self.state = state if state is not None else {}
         self.hash = self.compute_hash(state)
 
@@ -29,17 +30,45 @@ class CachedBotState:
 
 
 class BotState(PropertyManager):
+    """
+    Defines a state management object and automates the reading and writing of
+    associated state properties to a storage layer.
+
+    .. remarks::
+        Each state management object defines a scope for a storage layer.
+        State properties are created within a state management scope, and the Bot Framework
+        defines these scopes: :class:`ConversationState`, :class:`UserState`, and :class:`PrivateConversationState`.
+        You can define additional scopes for your bot.
+    """
+
     def __init__(self, storage: Storage, context_service_key: str):
+        """
+        Initializes a new instance of the :class:`BotState` class.
+
+        :param storage: The storage layer this state management object will use to store and retrieve state
+        :type storage:  :class:`bptbuilder.core.Storage`
+        :param context_service_key: The key for the state cache for this :class:`BotState`
+        :type context_service_key: str
+
+        .. remarks::
+            This constructor creates a state management object and associated scope. The object uses
+            the :param storage: to persist state property values and the :param context_service_key: to cache state
+            within the context for each turn.
+
+        :raises: It raises an argument null exception.
+        """
         self.state_key = "state"
         self._storage = storage
         self._context_service_key = context_service_key
 
     def create_property(self, name: str) -> StatePropertyAccessor:
         """
-        Create a property definition and register it with this BotState.
-        :param name: The name of the property.
-        :param force:
-        :return: If successful, the state property accessor created.
+        Creates a property definition and registers it with this :class:`BotState`.
+
+        :param name: The name of the property
+        :type name: str
+        :return: If successful, the state property accessor created
+        :rtype: :class:`StatePropertyAccessor`
         """
         if not name:
             raise TypeError("BotState.create_property(): name cannot be None or empty.")
@@ -52,9 +81,12 @@ class BotState(PropertyManager):
 
     async def load(self, turn_context: TurnContext, force: bool = False) -> None:
         """
-        Reads in  the current state object and caches it in the context object for this turm.
-        :param turn_context: The context object for this turn.
-        :param force: Optional. True to bypass the cache.
+        Reads the current state object and caches it in the context object for this turn.
+
+        :param turn_context: The context object for this turn
+        :type turn_context: :class:`TurnContext`
+        :param force: Optional, true to bypass the cache
+        :type force: bool
         """
         if turn_context is None:
             raise TypeError("BotState.load(): turn_context cannot be None.")
@@ -71,10 +103,13 @@ class BotState(PropertyManager):
         self, turn_context: TurnContext, force: bool = False
     ) -> None:
         """
-        If it has changed, writes to storage the state object that is cached in the current context object
-        for this turn.
-        :param turn_context: The context object for this turn.
-        :param force: Optional. True to save state to storage whether or not there are changes.
+        Saves the state cached in the current context for this turn.
+        If the state has changed, it saves the state cached in the current context for this turn.
+
+        :param turn_context: The context object for this turn
+        :type turn_context: :class:`TurnContext`
+        :param force: Optional, true to save state to storage whether or not there are changes
+        :type force: bool
         """
         if turn_context is None:
             raise TypeError("BotState.save_changes(): turn_context cannot be None.")
@@ -90,9 +125,14 @@ class BotState(PropertyManager):
     async def clear_state(self, turn_context: TurnContext):
         """
         Clears any state currently stored in this state scope.
-        NOTE: that save_changes must be called in order for the cleared state to be persisted to the underlying store.
-        :param turn_context: The context object for this turn.
+
+        :param turn_context: The context object for this turn
+        :type turn_context: :class:`TurnContext`
+
         :return: None
+
+        .. remarks::
+            This function must be called in order for the cleared state to be persisted to the underlying store.
         """
         if turn_context is None:
             raise TypeError("BotState.clear_state(): turn_context cannot be None.")
@@ -104,8 +144,11 @@ class BotState(PropertyManager):
 
     async def delete(self, turn_context: TurnContext) -> None:
         """
-        Delete any state currently stored in this state scope.
-        :param turn_context: The context object for this turn.
+        Deletes any state currently stored in this state scope.
+
+        :param turn_context: The context object for this turn
+        :type turn_context: :class:`TurnContext`
+
         :return: None
         """
         if turn_context is None:
@@ -121,6 +164,16 @@ class BotState(PropertyManager):
         raise NotImplementedError()
 
     async def get_property_value(self, turn_context: TurnContext, property_name: str):
+        """
+        Gets the value of the specified property in the turn context.
+
+        :param turn_context: The context object for this turn
+        :type turn_context: :class:`TurnContext`
+        :param property_name: The property name
+        :type property_name: str
+
+        :return: The value of the property
+        """
         if turn_context is None:
             raise TypeError(
                 "BotState.get_property_value(): turn_context cannot be None."
@@ -140,11 +193,14 @@ class BotState(PropertyManager):
     ) -> None:
         """
         Deletes a property from the state cache in the turn context.
-        :param turn_context: The context object for this turn.
-        :param property_name: The name of the property to delete.
+
+        :param turn_context: The context object for this turn
+        :type turn_context: :TurnContext`
+        :param property_name: The name of the property to delete
+        :type property_name: str
+
         :return: None
         """
-
         if turn_context is None:
             raise TypeError("BotState.delete_property(): turn_context cannot be None.")
         if not property_name:
@@ -156,12 +212,17 @@ class BotState(PropertyManager):
         self, turn_context: TurnContext, property_name: str, value: object
     ) -> None:
         """
-        Deletes a property from the state cache in the turn context.
-        :param turn_context: The context object for this turn.
-        :param property_name: The value to set on the property.
+        Sets a property to the specified value in the turn context.
+
+        :param turn_context: The context object for this turn
+        :type turn_context: :class:`TurnContext`
+        :param property_name: The property name
+        :type property_name: str
+        :param value: The value to assign to the property
+        :type value: Object
+
         :return: None
         """
-
         if turn_context is None:
             raise TypeError("BotState.delete_property(): turn_context cannot be None.")
         if not property_name:
@@ -170,17 +231,38 @@ class BotState(PropertyManager):
         cached_state.state[property_name] = value
 
 
-##
 class BotStatePropertyAccessor(StatePropertyAccessor):
+    """
+    Defines methods for accessing a state property created in a :class:`BotState` object.
+    """
+
     def __init__(self, bot_state: BotState, name: str):
+        """
+        Initializes a new instance of the :class:`BotStatePropertyAccessor` class.
+
+        :param bot_state: The state object to access
+        :type bot_state:  :class:`BotState`
+        :param name: The name of the state property to access
+        :type name: str
+
+        """
         self._bot_state = bot_state
         self._name = name
 
     @property
     def name(self) -> str:
+        """
+        The name of the property.
+        """
         return self._name
 
     async def delete(self, turn_context: TurnContext) -> None:
+        """
+        Deletes the property.
+
+        :param turn_context: The context object for this turn
+        :type turn_context: :class:`TurnContext`
+        """
         await self._bot_state.load(turn_context, False)
         await self._bot_state.delete_property_value(turn_context, self._name)
 
@@ -189,6 +271,13 @@ class BotStatePropertyAccessor(StatePropertyAccessor):
         turn_context: TurnContext,
         default_value_or_factory: Union[Callable, object] = None,
     ) -> object:
+        """
+        Gets the property value.
+
+        :param turn_context: The context object for this turn
+        :type turn_context: :class:`TurnContext`
+        :param default_value_or_factory: Defines the default value for the property
+        """
         await self._bot_state.load(turn_context, False)
         try:
             result = await self._bot_state.get_property_value(turn_context, self._name)
@@ -207,5 +296,13 @@ class BotStatePropertyAccessor(StatePropertyAccessor):
             return result
 
     async def set(self, turn_context: TurnContext, value: object) -> None:
+        """
+        Sets the property value.
+
+        :param turn_context: The context object for this turn
+        :type turn_context: :class:`TurnContext`
+
+        :param value: The value to assign to the property
+        """
         await self._bot_state.load(turn_context, False)
         await self._bot_state.set_property_value(turn_context, self._name, value)
