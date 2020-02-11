@@ -22,7 +22,7 @@ from botframework.connector.auth import (
     JwtTokenValidation,
     SimpleCredentialProvider,
     SkillValidation,
-)
+    CertificateAppCredentials)
 from botframework.connector.token_api import TokenApiClient
 from botframework.connector.token_api.models import TokenStatus
 from botbuilder.schema import (
@@ -76,13 +76,15 @@ class BotFrameworkAdapterSettings:
     def __init__(
         self,
         app_id: str,
-        app_password: str,
+        app_password: str = None,
         channel_auth_tenant: str = None,
         oauth_endpoint: str = None,
         open_id_metadata: str = None,
         channel_service: str = None,
         channel_provider: ChannelProvider = None,
         auth_configuration: AuthenticationConfiguration = None,
+        certificate_thumbprint: str = None,
+        certificate_private_key: str = None,
     ):
         """
         Contains the settings used to initialize a :class:`BotFrameworkAdapter` instance.
@@ -113,6 +115,8 @@ class BotFrameworkAdapterSettings:
         self.channel_service = channel_service
         self.channel_provider = channel_provider
         self.auth_configuration = auth_configuration or AuthenticationConfiguration()
+        self.certificate_thumbprint = certificate_thumbprint
+        self.certificate_private_key = certificate_private_key
 
 
 class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
@@ -141,23 +145,42 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         """
         super(BotFrameworkAdapter, self).__init__()
         self.settings = settings or BotFrameworkAdapterSettings("", "")
+
+        # If settings.certificateThumbprint & settings.certificatePrivateKey are provided,
+        # use CertificateAppCredentials.
+        if settings.certificate_thumbprint and settings.certificate_private_key:
+            self._credentials = CertificateAppCredentials(
+                self.settings.app_id,
+                self.settings.certificate_thumbprint,
+                self.settings.certificate_private_key,
+                self.settings.channel_auth_tenant,
+            )
+            self._credential_provider = SimpleCredentialProvider(
+                self.settings.app_id, ""
+            )
+        else:
+            self._credentials = MicrosoftAppCredentials(
+                self.settings.app_id,
+                self.settings.app_password,
+                self.settings.channel_auth_tenant,
+            )
+            self._credential_provider = SimpleCredentialProvider(
+                self.settings.app_id, self.settings.app_password
+            )
+
+        self._is_emulating_oauth_cards = False
+
+        # If no channelService or openIdMetadata values were passed in the settings, check the
+        # process' Environment Variables for values.
+        # These values may be set when a bot is provisioned on Azure and if so are required for
+        # the bot to properly work in Public Azure or a National Cloud.
         self.settings.channel_service = self.settings.channel_service or os.environ.get(
             AuthenticationConstants.CHANNEL_SERVICE
         )
-
         self.settings.open_id_metadata = (
             self.settings.open_id_metadata
             or os.environ.get(AuthenticationConstants.BOT_OPEN_ID_METADATA_KEY)
         )
-        self._credentials = MicrosoftAppCredentials(
-            self.settings.app_id,
-            self.settings.app_password,
-            self.settings.channel_auth_tenant,
-        )
-        self._credential_provider = SimpleCredentialProvider(
-            self.settings.app_id, self.settings.app_password
-        )
-        self._is_emulating_oauth_cards = False
 
         if self.settings.open_id_metadata:
             ChannelValidation.open_id_metadata_endpoint = self.settings.open_id_metadata
@@ -878,35 +901,39 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
 
         :return: An instance of the :class:`ConnectorClient` class
         """
+
+        # Anonymous claims and non-skill claims should fall through without modifying the scope.
+        credentials = self._credentials
+
         if identity:
             bot_app_id_claim = identity.claims.get(
                 AuthenticationConstants.AUDIENCE_CLAIM
             ) or identity.claims.get(AuthenticationConstants.APP_ID_CLAIM)
 
-            credentials = None
             if bot_app_id_claim and SkillValidation.is_skill_claim(identity.claims):
                 scope = JwtTokenValidation.get_app_id_from_claims(identity.claims)
 
-                password = await self._credential_provider.get_app_password(
-                    bot_app_id_claim
-                )
-                credentials = MicrosoftAppCredentials(
-                    bot_app_id_claim, password, oauth_scope=scope
-                )
-                if (
-                    self.settings.channel_provider
-                    and self.settings.channel_provider.is_government()
-                ):
-                    credentials.oauth_endpoint = (
-                        GovernmentConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL
+                # Do nothing, if the current credentials and its scope are valid for the skill.
+                # i.e. the adapter instance is pre-configured to talk with one skill.
+                # Otherwise we will create a new instance of the AppCredentials
+                # so self._credentials.oauth_scope isn't overridden.
+                if self._credentials.oauth_scope != scope:
+                    password = await self._credential_provider.get_app_password(
+                        bot_app_id_claim
                     )
-                    credentials.oauth_scope = (
-                        GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
+                    credentials = MicrosoftAppCredentials(
+                        bot_app_id_claim, password, oauth_scope=scope
                     )
-            else:
-                credentials = self._credentials
-        else:
-            credentials = self._credentials
+                    if (
+                        self.settings.channel_provider
+                        and self.settings.channel_provider.is_government()
+                    ):
+                        credentials.oauth_endpoint = (
+                            GovernmentConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL
+                        )
+                        credentials.oauth_scope = (
+                            GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
+                        )
 
         client_key = (
             f"{service_url}{credentials.microsoft_app_id if credentials else ''}"
