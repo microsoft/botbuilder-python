@@ -126,7 +126,7 @@ class ComponentDialog(Dialog):
         :param dialog_context: The :class:`DialogContext` for the current turn of the conversation.
         :type dialog_context: :class:`DialogContext`
         :param reason: Reason why the dialog resumed.
-        :type reason: :class:`DialogReason`
+        :type reason: :class:`botbuilder.dialogs.DialogReason`
         :param result: Optional, value returned from the dialog that was called.
         :type result: object
         :return: Signals the end of the turn
@@ -167,7 +167,7 @@ class ComponentDialog(Dialog):
         on its parent's dialog stack.
         :type instance: :class:`botbuilder.dialogs.DialogInstance`
         :param reason: Reason why the dialog ended.
-        :type reason: :class:`DialogReason`
+        :type reason: :class:`botbuilder.dialogs.DialogReason`
         """
         # Forward cancel to inner dialog
         if reason == DialogReason.CancelCalled:
@@ -241,7 +241,7 @@ class ComponentDialog(Dialog):
         :param instance: State information associated with the inner dialog stack of this component dialog.
         :type instance: :class:`botbuilder.dialogs.DialogInstance`
         :param reason: Reason why the dialog ended.
-        :type reason: :class:`DialogReason`
+        :type reason: :class:`botbuilder.dialogs.DialogReason`
         """
         return
 
