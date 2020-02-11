@@ -362,7 +362,7 @@ class TurnContext:
             if mention.additional_properties["mentioned"]["id"] == identifier:
                 mention_name_match = re.match(
                     r"<at(.*)>(.*?)<\/at>",
-                    mention.additional_properties["text"],
+                    re.escape(mention.additional_properties["text"]),
                     re.IGNORECASE,
                 )
                 if mention_name_match:
