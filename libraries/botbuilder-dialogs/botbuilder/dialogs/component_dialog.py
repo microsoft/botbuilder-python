@@ -91,7 +91,7 @@ class ComponentDialog(Dialog):
             uses that as it's return value.
 
 
-        :param dialog_context: The parent :class:`botbuilder.dialogs.DialogContext` for the current turn of the conversation.
+        :param dialog_context: The parent dialog context for the current turn of the conversation.
         :type dialog_context: :class:`botbuilder.dialogs.DialogContext`
         :return: Signals the end of the turn
         :rtype: :class:`botbuilder.dialogs.Dialog.end_of_turn`
