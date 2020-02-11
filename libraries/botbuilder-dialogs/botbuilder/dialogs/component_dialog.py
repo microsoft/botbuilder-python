@@ -94,7 +94,7 @@ class ComponentDialog(Dialog):
         :param dialog_context: The parent dialog context for the current turn of the conversation.
         :type dialog_context: :class:`botbuilder.dialogs.DialogContext`
         :return: Signals the end of the turn
-        :rtype: :class:`botbuilder.dialogs.Dialog.end_of_turn`
+        :rtype: :class:`Dialog.end_of_turn`
         """
         if dialog_context is None:
             raise TypeError("ComponentDialog.begin_dialog(): outer_dc cannot be None.")
@@ -123,8 +123,8 @@ class ComponentDialog(Dialog):
             To avoid the container prematurely ending we need to implement this method and simply
             ask our inner dialog stack to re-prompt.
 
-        :param dialog_context: The dialog context for the current turn of the conversation.
-        :type dialog_context: :class:`botbuilder.dialogs.DialogContext`
+        :param dialog_context: The :class:`DialogContext` for the current turn of the conversation.
+        :type dialog_context: :class:`DialogContext`
         :param reason: Reason why the dialog resumed.
         :type reason: :class:`DialogReason`
         :param result: Optional, value returned from the dialog that was called. The type of the
