@@ -12,7 +12,7 @@ class DialogTurnResult:
     def __init__(self, status: DialogTurnStatus, result: object = None):
         """
         :param status: The current status of the stack.
-        :type status: :class:`DialogTurnStatus`
+        :type status: :class:`botbuilder.dialogs.DialogTurnStatus`
         :param result: The result returned by a dialog that was just ended.
         :type result: object
         """
