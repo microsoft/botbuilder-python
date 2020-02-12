@@ -41,7 +41,7 @@ class CertificateAppCredentials(AppCredentials, ABC):
             },
         )
 
-    def get_access_token(self) -> str:
+    def get_access_token(self, force_refresh: bool = False) -> str:
         """
         Implementation of AppCredentials.get_token.
         :return: The access token for the given certificate.

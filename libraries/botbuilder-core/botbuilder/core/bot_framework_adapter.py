@@ -157,9 +157,9 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         super(BotFrameworkAdapter, self).__init__()
         self.settings = settings or BotFrameworkAdapterSettings("", "")
 
-        # If settings.certificateThumbprint & settings.certificatePrivateKey are provided,
+        # If settings.certificate_thumbprint & settings.certificate_private_key are provided,
         # use CertificateAppCredentials.
-        if settings.certificate_thumbprint and settings.certificate_private_key:
+        if self.settings.certificate_thumbprint and settings.certificate_private_key:
             self._credentials = CertificateAppCredentials(
                 self.settings.app_id,
                 self.settings.certificate_thumbprint,
@@ -181,7 +181,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
 
         self._is_emulating_oauth_cards = False
 
-        # If no channelService or openIdMetadata values were passed in the settings, check the
+        # If no channel_service or open_id_metadata values were passed in the settings, check the
         # process' Environment Variables for values.
         # These values may be set when a bot is provisioned on Azure and if so are required for
         # the bot to properly work in Public Azure or a National Cloud.

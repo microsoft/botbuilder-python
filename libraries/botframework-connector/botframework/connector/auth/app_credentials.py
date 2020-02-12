@@ -12,7 +12,7 @@ from botframework.connector.auth import AuthenticationConstants
 
 class AppCredentials(Authentication):
     """
-    Base class for token retrieval.  Subclasses MUST override get_token in
+    Base class for token retrieval.  Subclasses MUST override get_access_token in
     order to supply a valid token for the specific credentials.
     """
 
@@ -103,7 +103,7 @@ class AppCredentials(Authentication):
 
         return session
 
-    def get_access_token(self) -> str:
+    def get_access_token(self, force_refresh: bool = False) -> str:
         """
         Returns a token for the current AppCredentials.
         :return: The token
