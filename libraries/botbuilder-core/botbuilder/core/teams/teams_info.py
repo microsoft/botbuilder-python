@@ -23,11 +23,7 @@ class TeamsInfo:
     @staticmethod
     async def send_message_to_teams_channel(
         turn_context: TurnContext, activity: Activity, teams_channel_id: str
-<<<<<<< HEAD
     ) -> Tuple[ConversationReference, str]:
-=======
-    ) -> tuple:
->>>>>>> 9f1901c313c763fb6ab6dbc884625d6fceac83f0
         if not turn_context:
             raise ValueError("The turn_context cannot be None")
         if not turn_context.activity:
@@ -48,13 +44,9 @@ class TeamsInfo:
         return (result[0], result[1])
 
     @staticmethod
-<<<<<<< HEAD
     async def _create_conversation_callback(
         new_turn_context,
     ) -> Tuple[ConversationReference, str]:
-=======
-    async def _create_conversation_callback(new_turn_context) -> tuple:
->>>>>>> 9f1901c313c763fb6ab6dbc884625d6fceac83f0
         new_activity_id = new_turn_context.activity.id
         conversation_reference = TurnContext.get_conversation_reference(
             new_turn_context.activity
