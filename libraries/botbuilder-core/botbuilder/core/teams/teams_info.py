@@ -1,8 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from typing import List
-from botbuilder.schema import ConversationParameters
+from typing import List, Tuple
+from botbuilder.schema import ConversationParameters, ConversationReference
 from botbuilder.core.turn_context import Activity, TurnContext
 from botbuilder.schema.teams import (
     ChannelInfo,
@@ -18,7 +18,7 @@ class TeamsInfo:
     @staticmethod
     async def send_message_to_teams_channel(
         turn_context: TurnContext, activity: Activity, teams_channel_id: str
-    ) -> tuple:
+    ) -> Tuple[ConversationReference, str]:
         if not turn_context:
             raise ValueError("The turn_context cannot be None")
         if not turn_context.activity:
@@ -39,7 +39,9 @@ class TeamsInfo:
         return (result[0], result[1])
 
     @staticmethod
-    async def _create_conversation_callback(new_turn_context) -> tuple:
+    async def _create_conversation_callback(
+        new_turn_context,
+    ) -> Tuple[ConversationReference, str]:
         new_activity_id = new_turn_context.activity.id
         conversation_reference = TurnContext.get_conversation_reference(
             new_turn_context.activity
