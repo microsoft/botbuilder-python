@@ -97,13 +97,13 @@ class AppCredentials(Authentication):
         if not self.microsoft_app_id:
             session.headers.pop("Authorization", None)
         else:
-            auth_token = self.get_token()
+            auth_token = self.get_access_token()
             header = "{} {}".format("Bearer", auth_token)
             session.headers["Authorization"] = header
 
         return session
 
-    def get_token(self) -> str:
+    def get_access_token(self) -> str:
         """
         Returns a token for the current AppCredentials.
         :return: The token

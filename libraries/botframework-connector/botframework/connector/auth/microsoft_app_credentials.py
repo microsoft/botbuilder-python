@@ -36,7 +36,7 @@ class MicrosoftAppCredentials(AppCredentials, ABC):
         )
         self.scopes = [self.oauth_scope]
 
-    def get_token(self) -> str:
+    def get_access_token(self) -> str:
         """
         Implementation of AppCredentials.get_token.
         :return: The access token for the given app id and password.
