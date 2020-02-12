@@ -15,10 +15,7 @@ from .dialog_instance import DialogInstance
 
 class ComponentDialog(Dialog):
     """
-    A :class:`Dialog` that is composed of other dialogs
-
-    A component dialog has an inner :class:`DialogSet` :class:`DialogContext`,
-    which provides an inner dialog stack that is hidden from the parent dialog.
+    A :class:`botbuilder.dialogs.Dialog` that is composed of other dialogs
 
     :var persisted_dialog state:
     :vartype persisted_dialog_state: str
@@ -52,12 +49,12 @@ class ComponentDialog(Dialog):
         If the task is successful, the result indicates whether the dialog is still
         active after the turn has been processed by the dialog.
 
-        :param dialog_context: The :class:`DialogContext` for the current turn of the conversation.
-        :type dialog_context: :class:`DialogContext`
+        :param dialog_context: The :class:`botbuilder.dialogs.DialogContext` for the current turn of the conversation.
+        :type dialog_context: :class:`botbuilder.dialogs.DialogContext`
         :param options: Optional, initial information to pass to the dialog.
         :type options: object
         :return: Signals the end of the turn
-        :rtype: :class:`Dialog.end_of_turn`
+        :rtype: :class:`botbuilder.dialogs.Dialog.end_of_turn`
         """
         if dialog_context is None:
             raise TypeError("ComponentDialog.begin_dialog(): outer_dc cannot be None.")
@@ -88,16 +85,16 @@ class ComponentDialog(Dialog):
             contain a return value.
 
             If this method is *not* overriden the component dialog calls the
-            :meth:`DialogContext.continue_dialog` method on it's inner dialog
+            :meth:`botbuilder.dialogs.DialogContext.continue_dialog` method on it's inner dialog
             context. If the inner dialog stack is empty, the component dialog ends,
-            and if a :class:`DialogTurnResult.result` is available, the component dialog
+            and if a :var:`botbuilder.dialogs.DialogTurnResult.result` is available, the component dialog
             uses that as it's return value.
 
 
-        :param dialog_context: The parent :class:`DialogContext` for the current turn of the conversation.
-        :type dialog_context: :class:`DialogContext`
+        :param dialog_context: The parent dialog context for the current turn of the conversation.
+        :type dialog_context: :class:`botbuilder.dialogs.DialogContext`
         :return: Signals the end of the turn
-        :rtype: :class:`Dialog.end_of_turn`
+        :rtype: :var:`botbuilder.dialogs.Dialog.end_of_turn`
         """
         if dialog_context is None:
             raise TypeError("ComponentDialog.begin_dialog(): outer_dc cannot be None.")
@@ -126,15 +123,14 @@ class ComponentDialog(Dialog):
             To avoid the container prematurely ending we need to implement this method and simply
             ask our inner dialog stack to re-prompt.
 
-        :param dialog_context: The :class:`DialogContext` for the current turn of the conversation.
-        :type dialog_context: :class:`DialogContext`
+        :param dialog_context: The dialog context for the current turn of the conversation.
+        :type dialog_context: :class:`botbuilder.dialogs.DialogContext`
         :param reason: Reason why the dialog resumed.
-        :type reason: :class:`DialogReason`
-        :param result: Optional, value returned from the dialog that was called. The type of the
-        value returned is dependent on the child dialog.
+        :type reason: :class:`botbuilder.dialogs.DialogReason`
+        :param result: Optional, value returned from the dialog that was called.
         :type result: object
         :return: Signals the end of the turn
-        :rtype: :class:`Dialog.end_of_turn`
+        :rtype: :class:`botbuilder.dialogs.Dialog.end_of_turn`
         """
 
         await self.reprompt_dialog(dialog_context.context, dialog_context.active_dialog)
@@ -149,7 +145,7 @@ class ComponentDialog(Dialog):
         :param context: The context object for this turn.
         :type context: :class:`botbuilder.core.TurnContext`
         :param instance: State information for this dialog.
-        :type instance: :class:`DialogInstance`
+        :type instance: :class:`botbuilder.dialogs.DialogInstance`
         """
         # Delegate to inner dialog.
         dialog_state = instance.state[self.persisted_dialog_state]
@@ -167,11 +163,11 @@ class ComponentDialog(Dialog):
 
         :param context: The context object for this turn.
         :type context: :class:`botbuilder.core.TurnContext`
-        :param instance: State information associated with the instance of this component dialog
+        :param instance: State information associated with the instance of this component dialog.
         on its parent's dialog stack.
-        :type instance: :class:`DialogInstance`
+        :type instance: :class:`botbuilder.dialogs.DialogInstance`
         :param reason: Reason why the dialog ended.
-        :type reason: :class:`DialogReason`
+        :type reason: :class:`botbuilder.dialogs.DialogReason`
         """
         # Forward cancel to inner dialog
         if reason == DialogReason.CancelCalled:
@@ -185,7 +181,7 @@ class ComponentDialog(Dialog):
         Adds a :class:`Dialog` to the component dialog and returns the updated component.
 
         :param dialog: The dialog to add.
-        :return: The updated :class:`ComponentDialog`
+        :return: The updated :class:`ComponentDialog`.
         :rtype: :class:`ComponentDialog`
         """
         self._dialogs.add(dialog)
@@ -199,7 +195,7 @@ class ComponentDialog(Dialog):
 
         :param dialog_id: The dialog to add.
         :return: The dialog; or None if there is not a match for the ID.
-        :rtype: :class:Dialog
+        :rtype: :class:`botbuilder.dialogs.Dialog`
         """
         return self._dialogs.find(dialog_id)
 
@@ -213,13 +209,13 @@ class ComponentDialog(Dialog):
             If the task is successful, the result indicates whether the dialog is still
             active after the turn has been processed by the dialog.
 
-            By default, this calls the :meth:`Dialog.begin_dialog()` method of the component
-            dialog's initial dialog.
+            By default, this calls the :meth:`botbuilder.dialogs.Dialog.begin_dialog()`
+            method of the component dialog's initial dialog.
 
             Override this method in a derived class to implement interrupt logic.
 
-        :param inner_dc: The inner :class:`DialogContext` for the current turn of conversation.
-        :type inner_dc: :class:`DialogContext`
+        :param inner_dc: The inner dialog context for the current turn of conversation.
+        :type inner_dc: :class:`botbuilder.dialogs.DialogContext`
         :param options: Optional, initial information to pass to the dialog.
         :type options: object
         """
@@ -229,8 +225,8 @@ class ComponentDialog(Dialog):
         """
         Called when the dialog is continued, where it is the active dialog and the user replies with a new activity.
 
-        :param inner_dc: The inner :class:`DialogContext` for the current turn of conversation.
-        :type inner_dc: :class:`DialogContext`
+        :param inner_dc: The inner dialog context for the current turn of conversation.
+        :type inner_dc: :class:`botbuilder.dialogs.DialogContext`
         """
         return await inner_dc.continue_dialog()
 
@@ -242,11 +238,10 @@ class ComponentDialog(Dialog):
 
         :param turn_context: The :class:`botbuilder.core.TurnContext` for the current turn of the conversation.
         :type turn_context: :class:`botbuilder.core.TurnContext`
-        :param instance: State information associated with the instance of this component dialog on
-        its parent's dialog stack.
-        :type instance: :class:`DialogInstance`
+        :param instance: State information associated with the inner dialog stack of this component dialog.
+        :type instance: :class:`botbuilder.dialogs.DialogInstance`
         :param reason: Reason why the dialog ended.
-        :type reason: :class:`DialogReason`
+        :type reason: :class:`botbuilder.dialogs.DialogReason`
         """
         return
 
@@ -255,10 +250,9 @@ class ComponentDialog(Dialog):
     ) -> None:
         """
         :param turn_context: The :class:`botbuilder.core.TurnContext` for the current turn of the conversation.
-        :type turn_context: :class:`DialogInstance`
-        :param instance: State information associated with the instance of this component dialog
-        on its parent's dialog stack.
-        :type instance: :class:`DialogInstance`
+        :type turn_context: :class:`botbuilder.dialogs.DialogInstance`
+        :param instance: State information associated with the inner dialog stack of this component dialog.
+        :type instance: :class:`botbuilder.dialogs.DialogInstance`
         """
         return
 
@@ -272,20 +266,11 @@ class ComponentDialog(Dialog):
             If the task is successful, the result indicates that the dialog ended after the
             turn was processed by the dialog.
 
-            In general, the parent context is the dialog or bot turn handler that started the dialog.
-            If the parent is a dialog, the stack calls the parent's :meth:`Dialog.resume_dialog()` method
-            to return a result to the parent dialog. If the parent dialog does not implement
-            :meth:`Dialog.resume_dialog()`, then the parent will end, too, and the result is passed to the next
-            parent context, if one exists.
-
-            The returned :class:`DialogTurnResult`contains the return value in its
-            :class:`DialogTurnResult.result` property.
-
-        :param outer_dc: The parent class:`DialogContext` for the current turn of conversation.
-        :type outer_dc: class:`DialogContext`
+        :param outer_dc: The parent dialog context for the current turn of conversation.
+        :type outer_dc: class:`botbuilder.dialogs.DialogContext`
         :param result: Optional, value to return from the dialog component to the parent context.
         :type result: object
         :return: Value to return.
-        :rtype: :class:`DialogTurnResult.result`
+        :rtype: :var:`botbuilder.dialogs.DialogTurnResult.result`
         """
         return await outer_dc.end_dialog(result)

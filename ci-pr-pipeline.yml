@@ -41,16 +41,13 @@ jobs:
       pip install -e ./libraries/botbuilder-dialogs
       pip install -e ./libraries/botbuilder-azure
       pip install -e ./libraries/botbuilder-testing
+      pip install -e ./libraries/botbuilder-integration-applicationinsights-aiohttp
       pip install -r ./libraries/botframework-connector/tests/requirements.txt
       pip install -r ./libraries/botbuilder-core/tests/requirements.txt
       pip install coveralls
       pip install pylint
       pip install black
     displayName: 'Install dependencies'
-
-  - script: 'pip install requests_mock'
-    displayName: 'Install requests mock (REMOVE AFTER MERGING INSPECTION)'
-    enabled: false
 
   - script: |
       pip install pytest
