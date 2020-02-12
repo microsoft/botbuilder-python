@@ -3,14 +3,14 @@
 
 from abc import ABC
 
+from msal import ConfidentialClientApplication
+
 from .app_credentials import AppCredentials
-from .authenticator import Authenticator
-from .certificate_authenticator import CertificateAuthenticator
 
 
 class CertificateAppCredentials(AppCredentials, ABC):
     """
-    CertificateAppCredentials auth implementation.
+    AppCredentials implementation using a certificate.
 
     See:
     https://github.com/AzureAD/microsoft-authentication-library-for-python/wiki/Client-Credentials#client-credentials-with-certificate
@@ -24,22 +24,34 @@ class CertificateAppCredentials(AppCredentials, ABC):
         channel_auth_tenant: str = None,
         oauth_scope: str = None,
     ):
+        # super will set proper scope and endpoint.
         super().__init__(
-            channel_auth_tenant=channel_auth_tenant, oauth_scope=oauth_scope
+            app_id=app_id,
+            channel_auth_tenant=channel_auth_tenant,
+            oauth_scope=oauth_scope,
         )
-        self.microsoft_app_id = app_id
-        self.certificate_thumbprint = certificate_thumbprint
-        self.certificate_private_key = certificate_private_key
 
-    def _build_authenticator(self) -> Authenticator:
-        """
-        Returns an Authenticator suitable for certificate auth.
-        :return: An Authenticator object
-        """
-        return CertificateAuthenticator(
-            app_id=self.microsoft_app_id,
-            certificate_thumbprint=self.certificate_thumbprint,
-            certificate_private_key=self.certificate_private_key,
+        self.scopes = [self.oauth_scope]
+        self.app = ConfidentialClientApplication(
+            client_id=self.microsoft_app_id,
             authority=self.oauth_endpoint,
-            scope=self.oauth_scope,
+            client_credential={
+                "thumbprint": certificate_thumbprint,
+                "private_key": certificate_private_key,
+            },
         )
+
+    def get_token(self) -> str:
+        """
+        Implementation of AppCredentials.get_token.
+        :return: The access token for the given certificate.
+        """
+
+        # Firstly, looks up a token from cache
+        # Since we are looking for token for the current app, NOT for an end user,
+        # notice we give account parameter as None.
+        auth_token = self.app.acquire_token_silent(self.scopes, account=None)
+        if not auth_token:
+            # No suitable token exists in cache. Let's get a new one from AAD.
+            auth_token = self.app.acquire_token_for_client(scopes=self.scopes)
+        return auth_token["access_token"]

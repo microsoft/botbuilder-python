@@ -8,12 +8,12 @@ import requests
 from msrest.authentication import Authentication
 
 from botframework.connector.auth import AuthenticationConstants
-from botframework.connector.auth.authenticator import Authenticator
 
 
 class AppCredentials(Authentication):
     """
-    MicrosoftAppCredentials auth implementation and cache.
+    Base class for token retrieval.  Subclasses MUST override get_token in
+    order to supply a valid token for the specific credentials.
     """
 
     schema = "Bearer"
@@ -29,7 +29,10 @@ class AppCredentials(Authentication):
     cache = {}
 
     def __init__(
-        self, channel_auth_tenant: str = None, oauth_scope: str = None,
+        self,
+        app_id: str = None,
+        channel_auth_tenant: str = None,
+        oauth_scope: str = None,
     ):
         """
         Initializes a new instance of MicrosoftAppCredentials class
@@ -47,8 +50,7 @@ class AppCredentials(Authentication):
             oauth_scope or AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
         )
 
-        self.microsoft_app_id = None
-        self.authenticator: Authenticator = None
+        self.microsoft_app_id = app_id
 
     @staticmethod
     def trust_service_url(service_url: str, expiration=None):
@@ -84,7 +86,7 @@ class AppCredentials(Authentication):
     # pylint: disable=arguments-differ
     def signed_session(self, session: requests.Session = None) -> requests.Session:
         """
-        Gets the signed session.
+        Gets the signed session.  This is called by the msrest package
         :returns: Signed requests.Session object
         """
         if not session:
@@ -102,16 +104,8 @@ class AppCredentials(Authentication):
         return session
 
     def get_token(self) -> str:
-        return self._get_authenticator().acquire_token()["access_token"]
-
-    def _get_authenticator(self) -> Authenticator:
-        if not self.authenticator:
-            self.authenticator = self._build_authenticator()
-        return self.authenticator
-
-    def _build_authenticator(self) -> Authenticator:
         """
-        Returns an appropriate Authenticator that is provided by a subclass.
-        :return: An Authenticator object
+        Returns a token for the current AppCredentials.
+        :return: The token
         """
         raise NotImplementedError()
