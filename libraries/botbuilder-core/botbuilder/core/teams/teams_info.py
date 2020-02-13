@@ -1,13 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-<<<<<<< HEAD
 from typing import List, Tuple
 from botbuilder.schema import ConversationParameters, ConversationReference
-=======
-from typing import List
-from botbuilder.schema import ConversationParameters
->>>>>>> 9f1901c313c763fb6ab6dbc884625d6fceac83f0
 from botbuilder.core.turn_context import Activity, TurnContext
 from botbuilder.schema.teams import (
     ChannelInfo,
