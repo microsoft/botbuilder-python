@@ -7,6 +7,7 @@ from botbuilder.adapters.slack.slack_message import SlackMessage
 
 from slack.web.classes.actions import Action
 
+
 class SlackPayload:
     def __init__(self, **kwargs):
         self.type: [str] = kwargs.get("type")
