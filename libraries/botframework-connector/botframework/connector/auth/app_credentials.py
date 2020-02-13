@@ -92,9 +92,7 @@ class AppCredentials(Authentication):
         if not session:
             session = requests.Session()
 
-        # If there is no microsoft_app_id then there shouldn't be an
-        # "Authorization" header on the outgoing activity.
-        if not self.microsoft_app_id:
+        if not self._should_authorize(session):
             session.headers.pop("Authorization", None)
         else:
             auth_token = self.get_access_token()
@@ -102,6 +100,11 @@ class AppCredentials(Authentication):
             session.headers["Authorization"] = header
 
         return session
+
+    def _should_authorize(
+        self, session: requests.Session  # pylint: disable=unused-argument
+    ) -> bool:
+        return True
 
     def get_access_token(self, force_refresh: bool = False) -> str:
         """
