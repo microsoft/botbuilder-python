@@ -43,16 +43,22 @@ class MicrosoftAppCredentials(AppCredentials, ABC):
         # Firstly, looks up a token from cache
         # Since we are looking for token for the current app, NOT for an end user,
         # notice we give account parameter as None.
-        auth_token = self.__get_msal_app().acquire_token_silent(self.scopes, account=None)
+        auth_token = self.__get_msal_app().acquire_token_silent(
+            self.scopes, account=None
+        )
         if not auth_token:
             # No suitable token exists in cache. Let's get a new one from AAD.
-            auth_token = self.__get_msal_app().acquire_token_for_client(scopes=self.scopes)
+            auth_token = self.__get_msal_app().acquire_token_for_client(
+                scopes=self.scopes
+            )
         return auth_token["access_token"]
 
     def __get_msal_app(self):
         if not self.app:
             self.app = ConfidentialClientApplication(
-                client_id=self.microsoft_app_id, client_credential=self.microsoft_app_password, authority=self.oauth_endpoint
+                client_id=self.microsoft_app_id,
+                client_credential=self.microsoft_app_password,
+                authority=self.oauth_endpoint,
             )
 
         return self.app
