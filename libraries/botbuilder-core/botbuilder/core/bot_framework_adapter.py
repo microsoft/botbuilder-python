@@ -24,7 +24,8 @@ from botframework.connector.auth import (
     JwtTokenValidation,
     SimpleCredentialProvider,
     SkillValidation,
-    CertificateAppCredentials)
+    CertificateAppCredentials,
+)
 from botframework.connector.token_api import TokenApiClient
 from botframework.connector.token_api.models import TokenStatus
 from botbuilder.schema import (
