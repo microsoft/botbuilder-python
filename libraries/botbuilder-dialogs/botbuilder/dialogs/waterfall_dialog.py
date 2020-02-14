@@ -59,7 +59,7 @@ class WaterfallDialog(Dialog):
         properties = {}
         properties["DialogId"] = self.id
         properties["InstanceId"] = instance_id
-        self.telemetry_client.track_event("WaterfallStart", properties=properties)
+        self.telemetry_client.track_event("WaterfallStart", properties)
 
         # Run first stepkinds
         return await self.run_step(dialog_context, 0, DialogReason.BeginCalled, None)

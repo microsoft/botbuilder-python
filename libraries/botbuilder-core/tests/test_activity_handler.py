@@ -13,6 +13,8 @@ from botbuilder.schema import (
 
 
 class TestingActivityHandler(ActivityHandler):
+    __test__ = False
+
     def __init__(self):
         self.record: List[str] = []
 
