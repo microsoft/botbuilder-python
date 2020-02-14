@@ -7,7 +7,7 @@ class TestMicrosoftAppCredentials(aiounittest.AsyncTestCase):
     async def test_app_credentials(self):
         default_scope_case_1 = MicrosoftAppCredentials("some_app", "some_password")
         assert (
-            AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER
+            AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
             == default_scope_case_1.oauth_scope
         )
 
@@ -16,7 +16,7 @@ class TestMicrosoftAppCredentials(aiounittest.AsyncTestCase):
             "some_app", "some_password", "some_tenant"
         )
         assert (
-            AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER
+            AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
             == default_scope_case_2.oauth_scope
         )
 
