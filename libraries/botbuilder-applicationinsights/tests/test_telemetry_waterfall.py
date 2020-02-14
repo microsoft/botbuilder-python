@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock
 from typing import Dict
 import aiounittest
 from botbuilder.core.adapters import TestAdapter, TestFlow
@@ -150,7 +150,9 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
     def assert_telemetry_call(
         self, telemetry_mock, index: int, event_name: str, props: Dict[str, str]
     ) -> None:
-        args, kwargs = telemetry_mock.track_event.call_args_list[index]
+        args, kwargs = telemetry_mock.track_event.call_args_list[
+            index
+        ]  # pylint: disable=unused-variable
         self.assertEqual(args[0], event_name)
 
         for key, val in props.items():
