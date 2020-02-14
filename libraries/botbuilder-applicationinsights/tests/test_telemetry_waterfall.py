@@ -150,9 +150,8 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
     def assert_telemetry_call(
         self, telemetry_mock, index: int, event_name: str, props: Dict[str, str]
     ) -> None:
-        args, kwargs = telemetry_mock.track_event.call_args_list[  # pylint: disable=unused-variable
-            index
-        ]
+        # pylint: disable=unused-variable
+        args, kwargs = telemetry_mock.track_event.call_args_list[index]
         self.assertEqual(args[0], event_name)
 
         for key, val in props.items():
