@@ -10,8 +10,6 @@ from msrest.serialization import Model, Deserializer, Serializer
 import botbuilder.schema as schema
 import botbuilder.schema.teams as teams_schema
 
-# Optimization: The dependencies dictionary could be cached here,
-# and shared between the two methods.
 DEPENDICIES = [
     schema_cls
     for key, schema_cls in getmembers(schema)
