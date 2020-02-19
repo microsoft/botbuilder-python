@@ -3,7 +3,8 @@
 
 from abc import ABC
 
-from botbuilder.schema import Activity, InvokeResponse
+from botbuilder.schema import Activity
+from botbuilder.core import InvokeResponse
 
 
 class BotFrameworkClient(ABC):

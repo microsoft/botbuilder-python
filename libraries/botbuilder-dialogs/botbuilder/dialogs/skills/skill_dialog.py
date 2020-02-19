@@ -49,13 +49,11 @@ class SkillDialog(Dialog):
         # Apply conversation reference and common properties from incoming activity before sending.
         TurnContext.apply_conversation_reference(
             TurnContext.get_conversation_reference(dialog_context.context.activity),
-            True
+            True,
         )
 
         # Send the activity to the skill.
-        await self._send_to_skill(
-            dialog_context, skill_activity, dialog_args.Skill
-        )
+        await self._send_to_skill(dialog_context, skill_activity, dialog_args.Skill)
         return Dialog.end_of_turn
 
     @staticmethod

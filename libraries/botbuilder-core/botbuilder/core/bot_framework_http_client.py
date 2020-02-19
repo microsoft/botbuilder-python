@@ -15,9 +15,10 @@ from botframework.connector.auth import (
 )
 
 from . import InvokeResponse
+from .skills.bot_framework_client import BotFrameworkClient
 
 
-class BotFrameworkHttpClient:
+class BotFrameworkHttpClient(BotFrameworkClient):
 
     """
     A skill host adapter implements API to forward activity to a skill and
