@@ -113,7 +113,7 @@ class SkillDialog(Dialog):
         )
 
         # Inspect the skill response status
-        if not (200 <= response.status <= 299):
+        if not 200 <= response.status <= 299:
             raise Exception(
                 f'Error invoking the skill id: "{skill_info.id}" at "{skill_info.skill_endpoint}"'
                 f" (status is {response.status}). \r\n {response.body}"
