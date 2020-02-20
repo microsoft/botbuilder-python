@@ -14,6 +14,7 @@ from .government_constants import *
 from .channel_provider import *
 from .simple_channel_provider import *
 from .microsoft_app_credentials import *
+from .certificate_app_credentials import *
 from .claims_identity import *
 from .jwt_token_validation import *
 from .credential_provider import *
