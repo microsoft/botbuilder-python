@@ -46,6 +46,8 @@ class CustomState(StoreItem):
 
 
 class TestPocoState:
+    __test__ = False
+
     def __init__(self, value=None):
         self.value = value
 

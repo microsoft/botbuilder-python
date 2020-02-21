@@ -30,6 +30,8 @@ from botbuilder.schema import (
 
 
 class TestContext(TurnContext):
+    __test__ = False
+
     def __init__(self, request):
         super().__init__(TestAdapter(), request)
         self.sent: List[Activity] = list()

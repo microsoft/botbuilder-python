@@ -55,6 +55,8 @@ class TokenMagicCode:
 
 
 class TestAdapter(BotAdapter, UserTokenProvider):
+    __test__ = False
+
     def __init__(
         self,
         logic: Coroutine = None,
@@ -335,6 +337,8 @@ class TestAdapter(BotAdapter, UserTokenProvider):
 
 
 class TestFlow:
+    __test__ = False
+
     def __init__(self, previous: Callable, adapter: TestAdapter):
         """
         INTERNAL: creates a new TestFlow instance.
