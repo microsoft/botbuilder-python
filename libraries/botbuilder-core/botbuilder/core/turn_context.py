@@ -13,6 +13,7 @@ from botbuilder.schema import (
     Mention,
     ResourceResponse,
 )
+from .re_escape import escape
 
 
 class TurnContext:
@@ -362,7 +363,7 @@ class TurnContext:
             if mention.additional_properties["mentioned"]["id"] == identifier:
                 mention_name_match = re.match(
                     r"<at(.*)>(.*?)<\/at>",
-                    mention.additional_properties["text"],
+                    escape(mention.additional_properties["text"]),
                     re.IGNORECASE,
                 )
                 if mention_name_match:

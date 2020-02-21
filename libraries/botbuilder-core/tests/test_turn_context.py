@@ -322,8 +322,29 @@ class TestBotContext(aiounittest.AsyncTestCase):
 
         text = TurnContext.remove_recipient_mention(activity)
 
-        assert text, " test activity"
-        assert activity.text, " test activity"
+        assert text == " test activity"
+        assert activity.text == " test activity"
+
+    def test_should_remove_at_mention_with_regex_characters(self):
+        activity = Activity(
+            type="message",
+            text="<at>Test (*.[]$%#^&?)</at> test activity",
+            recipient=ChannelAccount(id="Test (*.[]$%#^&?)"),
+            entities=[
+                Entity().deserialize(
+                    Mention(
+                        type="mention",
+                        text="<at>Test (*.[]$%#^&?)</at>",
+                        mentioned=ChannelAccount(name="Bot", id="Test (*.[]$%#^&?)"),
+                    ).serialize()
+                )
+            ],
+        )
+
+        text = TurnContext.remove_recipient_mention(activity)
+
+        assert text == " test activity"
+        assert activity.text == " test activity"
 
     async def test_should_send_a_trace_activity(self):
         context = TurnContext(SimpleAdapter(), ACTIVITY)

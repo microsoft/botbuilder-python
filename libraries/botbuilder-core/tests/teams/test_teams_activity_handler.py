@@ -28,6 +28,8 @@ from simple_adapter import SimpleAdapter
 
 
 class TestingTeamsActivityHandler(TeamsActivityHandler):
+    __test__ = False
+
     def __init__(self):
         self.record: List[str] = []
 
