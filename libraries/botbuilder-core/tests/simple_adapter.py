@@ -57,4 +57,4 @@ class SimpleAdapter(BotAdapter):
 
     async def process_request(self, activity, handler):
         context = TurnContext(self, activity)
-        return self.run_pipeline(context, handler)
+        return await self.run_pipeline(context, handler)
