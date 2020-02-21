@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from unittest.mock import patch
+from unittest.mock import MagicMock
 from typing import Dict
 import aiounittest
 from botbuilder.core.adapters import TestAdapter, TestFlow
@@ -24,6 +24,8 @@ BEGIN_MESSAGE = Activity()
 BEGIN_MESSAGE.text = "begin"
 BEGIN_MESSAGE.type = "message"
 
+MOCK_TELEMETRY = "botbuilder.applicationinsights.ApplicationInsightsTelemetryClient"
+
 
 class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
     def test_none_telemetry_client(self):
@@ -34,15 +36,12 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
         # assert
         self.assertEqual(type(dialog.telemetry_client), NullTelemetryClient)
 
-    @patch("botbuilder.applicationinsights.ApplicationInsightsTelemetryClient")
-    async def test_execute_sequence_waterfall_steps(  # pylint: disable=invalid-name
-        self, MockTelemetry
-    ):
+    async def test_execute_sequence_waterfall_steps(self):
         # arrange
 
         # Create new ConversationState with MemoryStorage and register the state as middleware.
         convo_state = ConversationState(MemoryStorage())
-        telemetry = MockTelemetry()
+        telemetry = MagicMock(name=MOCK_TELEMETRY)
 
         # Create a DialogState property, DialogSet and register the WaterfallDialog.
         dialog_state = convo_state.create_property("dialogState")
@@ -92,15 +91,12 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
         ]
         self.assert_telemetry_calls(telemetry, telemetry_calls)
 
-    @patch("botbuilder.applicationinsights.ApplicationInsightsTelemetryClient")
-    async def test_ensure_end_dialog_called(
-        self, MockTelemetry
-    ):  # pylint: disable=invalid-name
+    async def test_ensure_end_dialog_called(self):
         # arrange
 
         # Create new ConversationState with MemoryStorage and register the state as middleware.
         convo_state = ConversationState(MemoryStorage())
-        telemetry = MockTelemetry()
+        telemetry = MagicMock(name=MOCK_TELEMETRY)
 
         # Create a DialogState property, DialogSet and register the WaterfallDialog.
         dialog_state = convo_state.create_property("dialogState")
