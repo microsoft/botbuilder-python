@@ -6,14 +6,14 @@ from setuptools import setup
 
 REQUIRES = [
     "applicationinsights>=0.11.9",
-    "botbuilder-schema>=4.4.0b1",
-    "botframework-connector>=4.4.0b1",
-    "botbuilder-core>=4.4.0b1",
-    "botbuilder-applicationinsights>=4.4.0b1",
+    "aiohttp==3.6.2",
+    "botbuilder-schema>=4.7.1",
+    "botframework-connector>=4.7.1",
+    "botbuilder-core>=4.7.1",
+    "botbuilder-applicationinsights>=4.7.1",
 ]
 TESTS_REQUIRES = [
     "aiounittest==1.3.0",
-    "aiohttp==3.5.4",
 ]
 
 root = os.path.abspath(os.path.dirname(__file__))
