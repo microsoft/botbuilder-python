@@ -1,18 +1,16 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import sys
-import traceback
-from datetime import datetime
-
 from aiohttp import web
 from aiohttp.web import Request, Response, json_response
 from botbuilder.core import (
     BotFrameworkAdapterSettings,
-    TurnContext
+    ConversationState,
+    MemoryStorage,
+    UserState
 )
 from botbuilder.core.integration import aiohttp_error_middleware
-from botbuilder.schema import Activity, ActivityTypes
+from botbuilder.schema import Activity
 from botframework.connector.auth import AuthenticationConfiguration
 
 from authentication import AllowedCallersClaimsValidator
@@ -22,6 +20,11 @@ from skill_adapter_with_error_handler import SkillAdapterWithErrorHandler
 
 CONFIG = DefaultConfig()
 
+# Create MemoryStorage, UserState and ConversationState
+MEMORY = MemoryStorage()
+USER_STATE = UserState(MEMORY)
+CONVERSATION_STATE = ConversationState(MEMORY)
+
 # Create adapter.
 # See https://aka.ms/about-bot-adapter to learn more about how bots work.
 VALIDATOR = AllowedCallersClaimsValidator(CONFIG).claims_validator
@@ -30,7 +33,7 @@ SETTINGS = BotFrameworkAdapterSettings(
     CONFIG.APP_PASSWORD,
     auth_configuration=AuthenticationConfiguration(claims_validator=VALIDATOR)
 )
-ADAPTER = SkillAdapterWithErrorHandler(SETTINGS)
+ADAPTER = SkillAdapterWithErrorHandler(SETTINGS, CONVERSATION_STATE)
 
 # Create the Bot
 BOT = EchoBot()

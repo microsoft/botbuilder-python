@@ -14,8 +14,8 @@ from botframework.connector.auth import (
     MicrosoftAppCredentials,
 )
 
-from . import InvokeResponse
-from .skills.bot_framework_client import BotFrameworkClient
+from botbuilder.core import InvokeResponse
+from botbuilder.core.skills import BotFrameworkClient
 
 
 class BotFrameworkHttpClient(BotFrameworkClient):
