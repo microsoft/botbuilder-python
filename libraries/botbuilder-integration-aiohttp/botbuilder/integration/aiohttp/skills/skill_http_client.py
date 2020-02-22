@@ -1,6 +1,5 @@
 from logging import Logger
 
-from botbuilder.schema import Activity
 from botframework.connector.auth import (
     ChannelProvider,
     CredentialProvider,
@@ -8,6 +7,7 @@ from botframework.connector.auth import (
 from botbuilder.core import InvokeResponse, TurnContext
 from botbuilder.core.skills import BotFrameworkSkill, SkillConversationIdFactory
 from botbuilder.integration.aiohttp import BotFrameworkHttpClient
+from botbuilder.schema import Activity
 
 
 class SkillHttpClient(BotFrameworkHttpClient):
