@@ -18,11 +18,6 @@ jobs:
   pool:
     name: Hosted Ubuntu 1604
 
-  steps:
-  - powershell: |
-      Get-ChildItem env:* | sort-object name | Format-Table -Autosize -Wrap | Out-String -Width 120
-    displayName: 'Get environment vars'
-
   strategy:
       matrix:
         Python35:
@@ -32,6 +27,11 @@ jobs:
         Python37:
           PYTHON_VERSION: '$(python.38)'
       maxParallel: 2
+
+  steps:
+  - powershell: |
+      Get-ChildItem env:* | sort-object name | Format-Table -Autosize -Wrap | Out-String -Width 120
+    displayName: 'Get environment vars'
 
   - task: UsePythonVersion@0
     displayName: 'Use Python $(PYTHON_VERSION)'
