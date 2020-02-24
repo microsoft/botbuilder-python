@@ -56,7 +56,7 @@ jobs:
       pip install pytest
       pip install pytest-cov
       pip install coveralls
-    displayName: PyTest
+    displayName: PyTestSetup
 
   - task: UsePythonVersion@0
     displayName: 'Use Python $(python.36)'
@@ -67,6 +67,12 @@ jobs:
       pytest --junitxml=junit/test-results.36.xml --cov-config=.coveragerc --cov --cov-report=xml --cov-report=html
     displayName: Pytest.36
 
+  - task: PublishTestResults@2
+    displayName: 'Publish Test Results **/test-results.36.xml'
+    inputs:
+      testResultsFiles: '**/test-results.36.xml'
+      testRunTitle: 'Python $(python.36)'
+
   - task: UsePythonVersion@0
     displayName: 'Use Python $(python.37)'
     inputs:
@@ -76,6 +82,12 @@ jobs:
       pytest --junitxml=junit/test-results.37.xml --cov-config=.coveragerc --cov --cov-report=xml --cov-report=html
     displayName: Pytest.37
 
+  - task: PublishTestResults@2
+    displayName: 'Publish Test Results **/test-results.37.xml'
+    inputs:
+      testResultsFiles: '**/test-results.37.xml'
+      testRunTitle: 'Python $(python.37)'
+
   - task: UsePythonVersion@0
     displayName: 'Use Python $(python.38)'
     inputs:
@@ -84,6 +96,12 @@ jobs:
   - script:
       pytest --junitxml=junit/test-results.38.xml --cov-config=.coveragerc --cov --cov-report=xml --cov-report=html
     displayName: Pytest.38
+
+  - task: PublishTestResults@2
+    displayName: 'Publish Test Results **/test-results.38.xml'
+    inputs:
+      testResultsFiles: '**/test-results.38.xml'
+      testRunTitle: 'Python $(python.38)'
 
   - task: UsePythonVersion@0
     displayName: 'Use Python $(python.version)'
@@ -95,12 +113,6 @@ jobs:
 
   - script: 'pylint --rcfile=.pylintrc libraries'
     displayName: Pylint
-
-  - task: PublishTestResults@2
-    displayName: 'Publish Test Results **/test-results.xml'
-    inputs:
-      testResultsFiles: '**/test-results*.xml'
-      testRunTitle: 'Python $(python.version)'
 
   - script: 'COVERALLS_REPO_TOKEN=$(COVERALLS_TOKEN) coveralls'
     displayName: 'Push test results to coveralls https://coveralls.io/github/microsoft/botbuilder-python'
