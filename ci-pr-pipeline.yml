@@ -26,7 +26,7 @@ jobs:
           PYTHON_VERSION: '$(python.37)'
         Python38:
           PYTHON_VERSION: '$(python.38)'
-      maxParallel: 2
+      maxParallel: 3
 
   steps:
   - powershell: |
@@ -59,7 +59,7 @@ jobs:
       pip install black
     displayName: 'Install dependencies'
 
-  - script:
+  - script: |
       pip install pytest
       pip install pytest-cov
       pip install coveralls
