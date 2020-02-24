@@ -9,12 +9,13 @@ from typing import Union
 
 import aiohttp
 from aiohttp.web_request import Request
-from slack.web.client import WebClient
-from slack.web.slack_response import SlackResponse
 
 from botbuilder.schema import Activity
 from botbuilder.adapters.slack import SlackAdapterOptions
 from botbuilder.adapters.slack.slack_message import SlackMessage
+
+from slack.web.client import WebClient
+from slack.web.slack_response import SlackResponse
 
 POST_MESSAGE_URL = "https://slack.com/api/chat.postMessage"
 POST_EPHEMERAL_MESSAGE_URL = "https://slack.com/api/chat.postEphemeral"
