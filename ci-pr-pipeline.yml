@@ -8,7 +8,7 @@ variables:
   COVERALLS_SERVICE_NAME: python-ci
   python.36: 3.6.10
   python.37: 3.7.6
-  pythin.38: 3.8.1
+  python.38: 3.8.1
   python.version: $(python.37)
 
 
@@ -64,7 +64,7 @@ jobs:
       versionSpec: '$(python.36)'
 
   - script:
-      pytest --junitxml=junit/test-results.36.xml --cov-config=.coveragerc --cov --cov-report=xml --cov-report=html
+      python -m pytest --junitxml=junit/test-results.36.xml --cov-config=.coveragerc --cov --cov-report=xml --cov-report=html
     displayName: Pytest.36
 
   - task: PublishTestResults@2
@@ -79,7 +79,7 @@ jobs:
       versionSpec: '$(python.37)'
 
   - script:
-      pytest --junitxml=junit/test-results.37.xml --cov-config=.coveragerc --cov --cov-report=xml --cov-report=html
+      python -m pytest --junitxml=junit/test-results.37.xml --cov-config=.coveragerc --cov --cov-report=xml --cov-report=html
     displayName: Pytest.37
 
   - task: PublishTestResults@2
@@ -91,10 +91,10 @@ jobs:
   - task: UsePythonVersion@0
     displayName: 'Use Python $(python.38)'
     inputs:
-      versionSpec: '3.8.1'
+      versionSpec: '$(python.38)'
 
   - script:
-      pytest --junitxml=junit/test-results.38.xml --cov-config=.coveragerc --cov --cov-report=xml --cov-report=html
+      python -m pytest --junitxml=junit/test-results.38.xml --cov-config=.coveragerc --cov --cov-report=xml --cov-report=html
     displayName: Pytest.38
 
   - task: PublishTestResults@2
