@@ -1,6 +1,6 @@
 # ![Bot Framework SDK v4 Python](./doc/media/FrameWorkPython.png)
 
-### [Click here to find out what's new with Bot Framework](https://github.com/Microsoft/botframework/blob/master/whats-new.md#whats-new)
+### [Click here to find out what's new with Bot Framework](https://docs.microsoft.com/en-us/azure/bot-service/what-is-new?view=azure-bot-service-4.0)
 
 # Bot Framework SDK v4 for Python
 [![Build status](https://fuselabs.visualstudio.com/SDK_v4/_apis/build/status/Python/SDK_v4-Python-CI)](https://fuselabs.visualstudio.com/SDK_v4/_build/latest?definitionId=431)
