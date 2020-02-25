@@ -9,7 +9,7 @@ from botbuilder.core.teams import TeamsInfo, TeamsActivityHandler
 from botbuilder.schema import Activity
 from botbuilder.schema.teams import TeamsChannelData, TeamInfo
 from botframework.connector import Channels
-from simple_adapter import SimpleAdapter
+from simple_adapter_with_create_conversation import SimpleAdapterWithCreateConversation
 
 
 class TestTeamsInfo(aiounittest.AsyncTestCase):
@@ -17,7 +17,7 @@ class TestTeamsInfo(aiounittest.AsyncTestCase):
         def create_conversation():
             pass
 
-        adapter = SimpleAdapter(call_create_conversation=create_conversation)
+        adapter = SimpleAdapterWithCreateConversation(call_create_conversation=create_conversation)
 
         activity = Activity(
             type="message",
