@@ -6,7 +6,9 @@ variables:
   COVERALLS_GIT_COMMIT: $(Build.SourceVersion)
   COVERALLS_SERVICE_JOB_ID: $(Build.BuildId)
   COVERALLS_SERVICE_NAME: python-ci
-  python.version: 3.7.6
+  python.36: 3.6.10
+  python.37: 3.7.6
+  python.38: 3.8.1
 
 
 jobs:
@@ -15,8 +17,16 @@ jobs:
 #Multi-configuration and multi-agent job options are not exported to YAML. Configure these options using documentation guidance: https://docs.microsoft.com/vsts/pipelines/process/phases
   pool:
     name: Hosted Ubuntu 1604
-  #Your build pipeline references the ‘python.version’ variable, which you’ve selected to be settable at queue time. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab, and then select the option to make it settable at queue time. See https://go.microsoft.com/fwlink/?linkid=865971
-  #Your build pipeline references the ‘python.version’ variable, which you’ve selected to be settable at queue time. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab, and then select the option to make it settable at queue time. See https://go.microsoft.com/fwlink/?linkid=865971
+
+  strategy:
+      matrix:
+        Python36:
+          PYTHON_VERSION: '$(python.36)'
+        Python37:
+          PYTHON_VERSION: '$(python.37)'
+        Python38:
+          PYTHON_VERSION: '$(python.38)'
+      maxParallel: 3
 
   steps:
   - powershell: |
@@ -24,9 +34,9 @@ jobs:
     displayName: 'Get environment vars'
 
   - task: UsePythonVersion@0
-    displayName: 'Use Python $(python.version)'
+    displayName: 'Use Python $(PYTHON_VERSION)'
     inputs:
-      versionSpec: '$(python.version)'
+      versionSpec: '$(PYTHON_VERSION)'
 
   - script: 'sudo ln -s /opt/hostedtoolcache/Python/3.6.9/x64/lib/libpython3.6m.so.1.0 /usr/lib/libpython3.6m.so'
     displayName: libpython3.6m
@@ -53,20 +63,20 @@ jobs:
       pip install pytest
       pip install pytest-cov
       pip install coveralls
-      pytest --junitxml=junit/test-results.xml --cov-config=.coveragerc --cov --cov-report=xml --cov-report=html
+      pytest --junitxml=junit/test-results.$(PYTHON_VERSION).xml --cov-config=.coveragerc --cov --cov-report=xml --cov-report=html
     displayName: Pytest
+
+  - task: PublishTestResults@2
+    displayName: 'Publish Test Results **/test-results.$(PYTHON_VERSION).xml'
+    inputs:
+      testResultsFiles: '**/test-results.$(PYTHON_VERSION).xml'
+      testRunTitle: 'Python $(PYTHON_VERSION)'
 
   - script: 'black --check libraries'
     displayName: 'Check Black compliant'
 
   - script: 'pylint --rcfile=.pylintrc libraries'
     displayName: Pylint
-
-  - task: PublishTestResults@2
-    displayName: 'Publish Test Results **/test-results.xml'
-    inputs:
-      testResultsFiles: '**/test-results.xml'
-      testRunTitle: 'Python $(python.version)'
 
   - script: 'COVERALLS_REPO_TOKEN=$(COVERALLS_TOKEN) coveralls'
     displayName: 'Push test results to coveralls https://coveralls.io/github/microsoft/botbuilder-python'
