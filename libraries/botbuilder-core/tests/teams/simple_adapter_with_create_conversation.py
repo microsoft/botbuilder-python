@@ -4,7 +4,12 @@
 import unittest
 from typing import List, Tuple, Awaitable, Callable
 from botbuilder.core import BotAdapter, TurnContext
-from botbuilder.schema import Activity, ConversationReference, ResourceResponse, ConversationParameters
+from botbuilder.schema import (
+    Activity,
+    ConversationReference,
+    ResourceResponse,
+    ConversationParameters,
+)
 
 
 class SimpleAdapterWithCreateConversation(BotAdapter):

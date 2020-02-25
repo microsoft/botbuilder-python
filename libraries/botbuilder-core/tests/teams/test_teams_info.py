@@ -17,7 +17,9 @@ class TestTeamsInfo(aiounittest.AsyncTestCase):
         def create_conversation():
             pass
 
-        adapter = SimpleAdapterWithCreateConversation(call_create_conversation=create_conversation)
+        adapter = SimpleAdapterWithCreateConversation(
+            call_create_conversation=create_conversation
+        )
 
         activity = Activity(
             type="message",
