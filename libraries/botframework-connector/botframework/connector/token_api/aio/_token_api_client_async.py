@@ -13,6 +13,7 @@ from msrest.async_client import SDKClientAsync
 from msrest import Serializer, Deserializer
 
 from .._configuration import TokenApiClientConfiguration
+from msrest.exceptions import HttpOperationError
 from .operations_async import BotSignInOperations
 from .operations_async import UserTokenOperations
 from .. import models

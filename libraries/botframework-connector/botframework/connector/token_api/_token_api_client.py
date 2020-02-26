@@ -13,6 +13,7 @@ from msrest.service_client import SDKClient
 from msrest import Serializer, Deserializer
 
 from ._configuration import TokenApiClientConfiguration
+from msrest.exceptions import HttpOperationError
 from .operations import BotSignInOperations
 from .operations import UserTokenOperations
 from . import models

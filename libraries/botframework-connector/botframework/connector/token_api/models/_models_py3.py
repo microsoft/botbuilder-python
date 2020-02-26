@@ -101,6 +101,78 @@ class InnerHttpError(Model):
         self.body = body
 
 
+class SignInUrlResponse(Model):
+    """SignInUrlResponse.
+
+    :param sign_in_link:
+    :type sign_in_link: str
+    :param token_exchange_resource:
+    :type token_exchange_resource:
+     ~botframework.tokenapi.models.TokenExchangeResource
+    """
+
+    _attribute_map = {
+        "sign_in_link": {"key": "signInLink", "type": "str"},
+        "token_exchange_resource": {
+            "key": "tokenExchangeResource",
+            "type": "TokenExchangeResource",
+        },
+    }
+
+    def __init__(
+        self, *, sign_in_link: str = None, token_exchange_resource=None, **kwargs
+    ) -> None:
+        super(SignInUrlResponse, self).__init__(**kwargs)
+        self.sign_in_link = sign_in_link
+        self.token_exchange_resource = token_exchange_resource
+
+
+class TokenExchangeRequest(Model):
+    """TokenExchangeRequest.
+
+    :param uri:
+    :type uri: str
+    :param token:
+    :type token: str
+    """
+
+    _attribute_map = {
+        "uri": {"key": "uri", "type": "str"},
+        "token": {"key": "token", "type": "str"},
+    }
+
+    def __init__(self, *, uri: str = None, token: str = None, **kwargs) -> None:
+        super(TokenExchangeRequest, self).__init__(**kwargs)
+        self.uri = uri
+        self.token = token
+
+
+class TokenExchangeResource(Model):
+    """TokenExchangeResource.
+
+    :param id:
+    :type id: str
+    :param uri:
+    :type uri: str
+    :param provider_id:
+    :type provider_id: str
+    """
+
+    _attribute_map = {
+        "id": {"key": "id", "type": "str"},
+        "uri": {"key": "uri", "type": "str"},
+        "provider_id": {"key": "providerId", "type": "str"},
+    }
+
+    def __init__(
+        self, *, id: str = None, uri: str = None, provider_id: str = None, **kwargs
+    ) -> None:
+        super(TokenExchangeResource, self).__init__(**kwargs)
+        self.id = id
+        self.uri = uri
+        self.provider_id = provider_id
+
+
 class TokenResponse(Model):
     """TokenResponse.
 
