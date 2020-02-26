@@ -9,6 +9,8 @@
 # regenerated.
 # --------------------------------------------------------------------------
 
+from typing import Callable
+
 from msrest.serialization import Model
 from msrest.exceptions import HttpOperationError
 
@@ -1363,6 +1365,7 @@ class OAuthCard(Model):
         self.text = text
         self.connection_name = connection_name
         self.buttons = buttons
+        self.token_exchange_resource = None
 
 
 class PagedMembersResult(Model):
@@ -1599,6 +1602,37 @@ class SigninCard(Model):
         self.buttons = buttons
 
 
+class SigninResource(Model):
+    """A card representing a request to sign in.
+
+    :param sign_in_link: The sign-in link
+    :type sign_in_link: str
+    :param token_exchange_resource: Action to use to perform signin
+    :type token_exchange_resource: ~botframework.connector.models.TokenExchangeResource
+    """
+
+    _attribute_map = {
+        "sign_in_link": {"key": "signInLink", "type": "str"},
+        "token_exchange_resource": {"key": "tokenExchangeResource", "type": "TokenExchangeResource"},
+    }
+
+    def __init__(
+        self,
+        *,
+        sign_in_link: str = None,
+        token_exchange_resource: TokenExchangeResource = None,
+        **kwargs
+    ) -> None:
+        super(SigninResource, self).__init__(**kwargs)
+        self.sign_in_link = sign_in_link or ""
+        self.token_exchange_resource = token_exchange_resource or TokenExchangeResource()
+        self.custom_init(self, **kwargs)
+
+    @staticmethod
+    def custom_init(obj: SigninResource, **kwargs):
+        pass
+
+
 class SuggestedActions(Model):
     """SuggestedActions that can be performed.
 
@@ -1727,6 +1761,162 @@ class ThumbnailUrl(Model):
         super(ThumbnailUrl, self).__init__(**kwargs)
         self.url = url
         self.alt = alt
+
+
+class TokenExchangeInvokeRequest(Model):
+    """Thumbnail URL.
+
+    :param id: The id from the OAuthCard.
+    :type id: str
+    :param connection_name: The connection name.
+    :type connection_name: str
+    :param token: The user token that can be exchanged.
+    :type token: str
+    :param properties: Extension data for overflow of properties.
+    :type properties: dict[str, object]
+    """
+
+    _attribute_map = {
+        "id": {"key": "id", "type": "str"},
+        "connection_name": {"key": "connectionName", "type": "str"},
+        "token": {"key": "token", "type": "str"},
+        "properties": {"key": "properties", "type": "{object}"},
+    }
+
+    def __init__(
+        self, *, id: str = None, connection_name: str = None, token: str = None, properties=None, **kwargs
+    ) -> None:
+        super(TokenExchangeInvokeRequest, self).__init__(**kwargs)
+        self.id = id
+        self.connection_name = connection_name
+        self.token = token
+        self.properties = properties
+
+
+class TokenExchangeInvokeResponse(Model):
+    """Thumbnail URL.
+
+    :param id: The id from the OAuthCard.
+    :type id: str
+    :param connection_name: The connection name.
+    :type connection_name: str
+    :param failure_detail: The details of why the token exchange failed.
+    :type failure_detail: str
+    :param properties: Extension data for overflow of properties.
+    :type properties: dict[str, object]
+    """
+
+    _attribute_map = {
+        "id": {"key": "id", "type": "str"},
+        "connection_name": {"key": "connectionName", "type": "str"},
+        "failure_detail": {"key": "failureDetail", "type": "str"},
+        "properties": {"key": "properties", "type": "{object}"},
+    }
+
+    def __init__(
+        self, *, id: str = None, connection_name: str = None, failure_detail: str = None, properties=None, **kwargs
+    ) -> None:
+        super(TokenExchangeInvokeResponse, self).__init__(**kwargs)
+        self.id = id
+        self.connection_name = connection_name
+        self.failure_detail = failure_detail
+        self.properties = properties
+
+
+class TokenExchangeRequest(Model):
+    """Thumbnail URL.
+
+    :param url: The url.
+    :type url: str
+    :param token: The user token that can be exchanged.
+    :type alt: str
+    """
+
+    _attribute_map = {
+        "url": {"key": "url", "type": "str"},
+        "token": {"key": "token", "type": "str"},
+    }
+
+    def __init__(self, *, url: str = None, token: str = None, **kwargs) -> None:
+        super(TokenExchangeRequest, self).__init__(**kwargs)
+        self.url = url
+        self.token = token
+        self.custom_init(self, **kwargs)
+
+    @staticmethod
+    def custom_init(obj: TokenExchangeRequest, **kwargs):
+        pass
+
+
+class TokenExchangeResource(Model):
+    """Thumbnail URL.
+
+    :param id: A unique identifier for this token exchange instance.
+    :type id: str
+    :param url: The application ID / resource identifier with which to exchange a token on behalf of.
+    :type url: str
+    :param provider_id: The identifier of the provider with which to attempt a token exchange.
+    A value of null or empty will default to Azure Active Directory
+    :type provider_id: str
+    """
+
+    _attribute_map = {
+        "id": {"key": "id", "type": "str"},
+        "url": {"key": "url", "type": "str"},
+        "provider_id": {"key": "providerId", "type": "str"},
+    }
+
+    def __init__(self, *, id: str = None, url: str = None, provider_id: str = None, **kwargs) -> None:
+        super(TokenExchangeResource, self).__init__(**kwargs)
+        self.id = id
+        self.url = url
+        self.provider_id = provider_id
+        self.custom_init(self, **kwargs)
+
+    @staticmethod
+    def custom_init(obj: TokenExchangeResource, **kwargs):
+        pass
+
+
+class TokenExchangeState(Model):
+    """Thumbnail URL.
+
+    :param connection_name: The connection name that was used.
+    :type connection_name: str
+    :param conversation: Gets or sets a reference to the conversation.
+    :type conversation: ~botframework.connector.models.ConversationReference
+    :param relates_to: Gets or sets a reference to a related parent conversation for this token exchange.
+    :type relates_to: ~botframework.connector.models.ConversationReference
+    :param bot_ur: The URL of the bot messaging endpoint.
+    :type bot_ur: str
+    :param ms_app_id: The bot's registered application ID.
+    :type ms_app_id: str
+    """
+
+    _attribute_map = {
+        "connection_name": {"key": "connectionName", "type": "str"},
+        "conversation": {"key": "conversation", "type": "ConversationReference"},
+        "relates_to": {"key": "relatesTo", "type": "ConversationReference"},
+        "bot_url": {"key": "connectionName", "type": "str"},
+        "ms_app_id": {"key": "msAppId", "type": "str"},
+    }
+
+    def __init__(
+        self,
+        *,
+        connection_name: str = None,
+        conversation=None,
+        relates_to=None,
+        bot_url: str = None,
+        ms_app_id: str = None,
+        **kwargs
+    ) -> None:
+        super(TokenExchangeState, self).__init__(**kwargs)
+        self.connection_name = connection_name
+        self.conversation = conversation
+        self.relates_to = relates_to
+        self.bot_url = bot_url
+        self.ms_app_id = ms_app_id
 
 
 class TokenRequest(Model):

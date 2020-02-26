@@ -13,6 +13,7 @@ from .authentication_constants import *
 from .government_constants import *
 from .channel_provider import *
 from .simple_channel_provider import *
+from .app_credentials import *
 from .microsoft_app_credentials import *
 from .certificate_app_credentials import *
 from .claims_identity import *
