@@ -25,9 +25,9 @@ from botframework.connector.auth import (
     SimpleCredentialProvider,
     SkillValidation,
     CertificateAppCredentials,
+    AppCredentials,
 )
 from botframework.connector.token_api import TokenApiClient
-from botframework.connector.token_api.models import TokenStatus
 from botbuilder.schema import (
     Activity,
     ActivityTypes,
@@ -729,7 +729,11 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         return await client.conversations.get_conversations(continuation_token)
 
     async def get_user_token(
-        self, context: TurnContext, connection_name: str, magic_code: str = None
+        self,
+        context: TurnContext,
+        connection_name: str,
+        magic_code: str = None,
+        oauth_app_credentials: AppCredentials = None,
     ) -> TokenResponse:
 
         """
@@ -741,6 +745,8 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         :type connection_name: str
         :param magic_code" (Optional) user entered code to validate
         :str magic_code" str
+        :param oauth_app_credentials: (Optional) AppCredentials for OAuth.
+        :type oauth_app_credentials: :class:`botframework.connector.auth.AppCredential`
 
         :raises: An exception error
 
@@ -761,24 +767,27 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                 "get_user_token() requires a connection_name but none was provided."
             )
 
-        self.check_emulating_oauth_cards(context)
-        user_id = context.activity.from_property.id
-        url = self.oauth_api_url(context)
-        client = self.create_token_api_client(url)
+        client = self._create_token_api_client(context, oauth_app_credentials)
 
         result = client.user_token.get_token(
-            user_id, connection_name, context.activity.channel_id, magic_code
+            context.activity.from_property.id,
+            connection_name,
+            context.activity.channel_id,
+            magic_code,
         )
 
-        # TODO check form of response
         if result is None or result.token is None:
             return None
 
         return result
 
     async def sign_out_user(
-        self, context: TurnContext, connection_name: str = None, user_id: str = None
-    ) -> str:
+        self,
+        context: TurnContext,
+        connection_name: str = None,
+        user_id: str = None,
+        oauth_app_credentials: AppCredentials = None,
+    ):
         """
         Signs the user out with the token server.
 
@@ -788,8 +797,8 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         :type connection_name: str
         :param user_id: User id of user to sign out
         :type user_id: str
-
-        :returns: A task that represents the work queued to execute
+        :param oauth_app_credentials: (Optional) AppCredentials for OAuth.
+        :type oauth_app_credentials: :class:`botframework.connector.auth.AppCredential`
         """
         if not context.activity.from_property or not context.activity.from_property.id:
             raise Exception(
@@ -798,15 +807,17 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         if not user_id:
             user_id = context.activity.from_property.id
 
-        self.check_emulating_oauth_cards(context)
-        url = self.oauth_api_url(context)
-        client = self.create_token_api_client(url)
+        client = self._create_token_api_client(context, oauth_app_credentials)
         client.user_token.sign_out(
             user_id, connection_name, context.activity.channel_id
         )
 
     async def get_oauth_sign_in_link(
-        self, context: TurnContext, connection_name: str
+        self,
+        context: TurnContext,
+        connection_name: str,
+        final_redirect: str = None,
+        oauth_app_credentials: AppCredentials = None,
     ) -> str:
         """
         Gets the raw sign-in link to be sent to the user for sign-in for a connection name.
@@ -815,17 +826,16 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         :type context: :class:`botbuilder.core.TurnContext`
         :param connection_name: Name of the auth connection to use
         :type connection_name: str
+        :param final_redirect: The final URL that the OAuth flow will redirect to.
+        :param oauth_app_credentials: (Optional) AppCredentials for OAuth.
+        :type oauth_app_credentials: :class:`botframework.connector.auth.AppCredential`
 
-        :returns: A task that represents the work queued to execute
-
-        .. note::
-
-            If the task completes successfully, the result contains the raw sign-in link
+        :return: If the task completes successfully, the result contains the raw sign-in link
         """
-        self.check_emulating_oauth_cards(context)
+
+        client = self._create_token_api_client(context, oauth_app_credentials)
+
         conversation = TurnContext.get_conversation_reference(context.activity)
-        url = self.oauth_api_url(context)
-        client = self.create_token_api_client(url)
         state = TokenExchangeState(
             connection_name=connection_name,
             conversation=conversation,
@@ -839,19 +849,27 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         return client.bot_sign_in.get_sign_in_url(final_state)
 
     async def get_token_status(
-        self, context: TurnContext, user_id: str = None, include_filter: str = None
-    ) -> List[TokenStatus]:
-
+        self,
+        context: TurnContext,
+        connection_name: str = None,
+        user_id: str = None,
+        include_filter: str = None,
+        oauth_app_credentials: AppCredentials = None,
+    ) -> Dict[str, TokenResponse]:
         """
         Retrieves the token status for each configured connection for the given user.
 
         :param context: Context for the current turn of conversation with the user
         :type context: :class:`botbuilder.core.TurnContext`
-        :param user_id: The user Id for which token status is retrieved
+        :param connection_name: Name of the auth connection to use
+        :type connection_name: str
+        :param user_id: The user Id for which tokens are retrieved. If passing in None the userId is taken
         :type user_id: str
         :param include_filter: (Optional) Comma separated list of connection's to include.
         Blank will return token status for all configured connections.
         :type include_filter: str
+        :param oauth_app_credentials: (Optional) AppCredentials for OAuth.
+        :type oauth_app_credentials: :class:`botframework.connector.auth.AppCredential`
 
         :returns: Array of :class:`botframework.connector.token_api.modelsTokenStatus`
         """
@@ -863,18 +881,20 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                 "BotFrameworkAdapter.get_token_status(): missing from_property or from_property.id"
             )
 
-        self.check_emulating_oauth_cards(context)
-        user_id = user_id or context.activity.from_property.id
-        url = self.oauth_api_url(context)
-        client = self.create_token_api_client(url)
+        client = self._create_token_api_client(context, oauth_app_credentials)
 
-        # TODO check form of response
+        user_id = user_id or context.activity.from_property.id
         return client.user_token.get_token_status(
             user_id, context.activity.channel_id, include_filter
         )
 
     async def get_aad_tokens(
-        self, context: TurnContext, connection_name: str, resource_urls: List[str]
+        self,
+        context: TurnContext,
+        connection_name: str,
+        resource_urls: List[str],
+        user_id: str = None,
+        oauth_app_credentials: AppCredentials = None,
     ) -> Dict[str, TokenResponse]:
         """
         Retrieves Azure Active Directory tokens for particular resources on a configured connection.
@@ -885,6 +905,12 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         :type connection_name: str
         :param resource_urls: The list of resource URLs to retrieve tokens for
         :type resource_urls: :class:`typing.List`
+        :param user_id: The user Id for which tokens are retrieved. If passing in null the userId is taken
+        from the Activity in the TurnContext.
+        :type user_id: str
+        :param oauth_app_credentials: (Optional) AppCredentials for OAuth.
+        :type oauth_app_credentials: :class:`botframework.connector.auth.AppCredential`
+
         :returns: Dictionary of resource Urls to the corresponding :class:'botbuilder.schema.TokenResponse`
         :rtype: :class:`typing.Dict`
         """
@@ -893,14 +919,12 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                 "BotFrameworkAdapter.get_aad_tokens(): missing from_property or from_property.id"
             )
 
-        self.check_emulating_oauth_cards(context)
-        user_id = context.activity.from_property.id
-        url = self.oauth_api_url(context)
-        client = self.create_token_api_client(url)
-
-        # TODO check form of response
+        client = self._create_token_api_client(context, oauth_app_credentials)
         return client.user_token.get_aad_tokens(
-            user_id, connection_name, context.activity.channel_id, resource_urls
+            context.activity.from_property.id,
+            connection_name,
+            context.activity.channel_id,
+            resource_urls,
         )
 
     async def create_connector_client(
@@ -958,20 +982,31 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
 
         return client
 
-    def create_token_api_client(self, service_url: str) -> TokenApiClient:
-        client = TokenApiClient(self._credentials, service_url)
-        client.config.add_user_agent(USER_AGENT)
+    def _create_token_api_client(
+        self,
+        url_or_context: Union[TurnContext, str],
+        oauth_app_credentials: AppCredentials = None,
+    ) -> TokenApiClient:
+        if isinstance(url_or_context, str):
+            app_credentials = (
+                oauth_app_credentials if oauth_app_credentials else self._credentials
+            )
+            client = TokenApiClient(app_credentials, url_or_context)
+            client.config.add_user_agent(USER_AGENT)
+            return client
 
-        return client
+        self.__check_emulating_oauth_cards(url_or_context)
+        url = self.__oauth_api_url(url_or_context)
+        return self._create_token_api_client(url)
 
-    async def emulate_oauth_cards(
+    async def __emulate_oauth_cards(
         self, context_or_service_url: Union[TurnContext, str], emulate: bool
     ):
         self._is_emulating_oauth_cards = emulate
-        url = self.oauth_api_url(context_or_service_url)
+        url = self.__oauth_api_url(context_or_service_url)
         await EmulatorApiClient.emulate_oauth_cards(self._credentials, url, emulate)
 
-    def oauth_api_url(self, context_or_service_url: Union[TurnContext, str]) -> str:
+    def __oauth_api_url(self, context_or_service_url: Union[TurnContext, str]) -> str:
         url = None
         if self._is_emulating_oauth_cards:
             url = (
@@ -991,7 +1026,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
 
         return url
 
-    def check_emulating_oauth_cards(self, context: TurnContext):
+    def __check_emulating_oauth_cards(self, context: TurnContext):
         if (
             not self._is_emulating_oauth_cards
             and context.activity.channel_id == "emulator"
