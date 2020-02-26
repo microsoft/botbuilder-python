@@ -142,8 +142,7 @@ class ExtendedUserTokenProvider(UserTokenProvider):
         raise NotImplementedError()
 
     async def get_sign_in_resource(
-        self,
-        turn_context: TurnContext, connection_name: str
+        self, turn_context: TurnContext, connection_name: str
     ) -> SignInResource:
         """
         Get the raw signin link to be sent to the user for signin for a connection name.

@@ -1611,19 +1611,20 @@ class SignInResource(Model):
 
     _attribute_map = {
         "sign_in_link": {"key": "signInLink", "type": "str"},
-        "token_exchange_resource": {"key": "tokenExchangeResource", "type": "TokenExchangeResource"},
+        "token_exchange_resource": {
+            "key": "tokenExchangeResource",
+            "type": "TokenExchangeResource",
+        },
     }
 
     def __init__(
-        self,
-        *,
-        sign_in_link: str = None,
-        token_exchange_resource=None,
-        **kwargs
+        self, *, sign_in_link: str = None, token_exchange_resource=None, **kwargs
     ) -> None:
         super(SignInResource, self).__init__(**kwargs)
         self.sign_in_link = sign_in_link or ""
-        self.token_exchange_resource = token_exchange_resource or TokenExchangeResource()
+        self.token_exchange_resource = (
+            token_exchange_resource or TokenExchangeResource()
+        )
         self.custom_init(self, **kwargs)
 
     @staticmethod
@@ -1782,7 +1783,13 @@ class TokenExchangeInvokeRequest(Model):
     }
 
     def __init__(
-        self, *, id: str = None, connection_name: str = None, token: str = None, properties=None, **kwargs
+        self,
+        *,
+        id: str = None,
+        connection_name: str = None,
+        token: str = None,
+        properties=None,
+        **kwargs
     ) -> None:
         super(TokenExchangeInvokeRequest, self).__init__(**kwargs)
         self.id = id
@@ -1812,7 +1819,13 @@ class TokenExchangeInvokeResponse(Model):
     }
 
     def __init__(
-        self, *, id: str = None, connection_name: str = None, failure_detail: str = None, properties=None, **kwargs
+        self,
+        *,
+        id: str = None,
+        connection_name: str = None,
+        failure_detail: str = None,
+        properties=None,
+        **kwargs
     ) -> None:
         super(TokenExchangeInvokeResponse, self).__init__(**kwargs)
         self.id = id
@@ -1864,7 +1877,9 @@ class TokenExchangeResource(Model):
         "provider_id": {"key": "providerId", "type": "str"},
     }
 
-    def __init__(self, *, id: str = None, url: str = None, provider_id: str = None, **kwargs) -> None:
+    def __init__(
+        self, *, id: str = None, url: str = None, provider_id: str = None, **kwargs
+    ) -> None:
         super(TokenExchangeResource, self).__init__(**kwargs)
         self.id = id
         self.url = url
