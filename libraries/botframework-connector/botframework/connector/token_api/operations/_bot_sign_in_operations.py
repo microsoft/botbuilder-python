@@ -15,10 +15,11 @@ from msrest.exceptions import HttpOperationError
 from .. import models
 
 
-class BotSignInOperations(object):
+class BotSignInOperations:
     """BotSignInOperations operations.
 
-    You should not instantiate directly this class, but create a Client instance that will create it for you and attach it as attribute.
+    You should not instantiate directly this class, but create a Client instance that will create it for you and
+    attach it as attribute.
 
     :param client: Client for service requests.
     :param config: Configuration of service client.
@@ -86,6 +87,9 @@ class BotSignInOperations(object):
             query_parameters["finalRedirect"] = self._serialize.query(
                 "final_redirect", final_redirect, "str"
             )
+        query_parameters["api-version"] = self._serialize.query(	
+            "self.api_version", self.api_version, "str"	
+        )
 
         # Construct headers
         header_parameters = {}
@@ -102,7 +106,7 @@ class BotSignInOperations(object):
 
         deserialized = None
         if response.status_code == 200:
-            deserialized = self._deserialize("str", response)
+            deserialized = response.content.decode("utf-8")
 
         if raw:
             client_raw_response = ClientRawResponse(deserialized, response)

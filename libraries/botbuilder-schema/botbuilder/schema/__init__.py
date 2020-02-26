@@ -47,7 +47,6 @@ try:
     from ._models_py3 import ResourceResponse
     from ._models_py3 import SemanticAction
     from ._models_py3 import SigninCard
-    from ._models_py3 import SignInResource
     from ._models_py3 import SuggestedActions
     from ._models_py3 import TextHighlight
     from ._models_py3 import Thing
@@ -55,8 +54,6 @@ try:
     from ._models_py3 import ThumbnailUrl
     from ._models_py3 import TokenExchangeInvokeRequest
     from ._models_py3 import TokenExchangeInvokeResponse
-    from ._models_py3 import TokenExchangeRequest
-    from ._models_py3 import TokenExchangeResource
     from ._models_py3 import TokenExchangeState
     from ._models_py3 import TokenRequest
     from ._models_py3 import TokenResponse
@@ -166,7 +163,6 @@ __all__ = [
     "SemanticAction",
     "SigninCard",
     "SignInConstants",
-    "SignInResource",
     "SuggestedActions",
     "TextHighlight",
     "Thing",
@@ -174,8 +170,6 @@ __all__ = [
     "ThumbnailUrl",
     "TokenExchangeInvokeRequest",
     "TokenExchangeInvokeResponse",
-    "TokenExchangeRequest",
-    "TokenExchangeResource",
     "TokenExchangeState",
     "TokenRequest",
     "TokenResponse",

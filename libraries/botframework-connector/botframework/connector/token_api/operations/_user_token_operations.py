@@ -14,15 +14,17 @@ from msrest.pipeline import ClientRawResponse
 from .. import models
 
 
-class UserTokenOperations(object):
+class UserTokenOperations:
     """UserTokenOperations operations.
 
-    You should not instantiate directly this class, but create a Client instance that will create it for you and attach it as attribute.
+    You should not instantiate directly this class, but create a Client instance that will create it for you and attach
+    it as attribute.
 
     :param client: Client for service requests.
     :param config: Configuration of service client.
     :param serializer: An object model serializer.
     :param deserializer: An object model deserializer.
+    :ivar api_version: The API version to use for the request. Constant value: "token".
     """
 
     models = models

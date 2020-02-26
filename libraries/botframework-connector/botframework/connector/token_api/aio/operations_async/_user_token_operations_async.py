@@ -17,7 +17,8 @@ from ... import models
 class UserTokenOperations:
     """UserTokenOperations async operations.
 
-    You should not instantiate directly this class, but create a Client instance that will create it for you and attach it as attribute.
+    You should not instantiate directly this class, but create a Client instance that will create it for you and
+    attach it as attribute.
 
     :param client: Client for service requests.
     :param config: Configuration of service client.
@@ -317,6 +318,9 @@ class UserTokenOperations:
             query_parameters["include"] = self._serialize.query(
                 "include", include, "str"
             )
+        query_parameters["api-version"] = self._serialize.query(	
+            "self.api_version", self.api_version, "str"	
+        )
 
         # Construct headers
         header_parameters = {}

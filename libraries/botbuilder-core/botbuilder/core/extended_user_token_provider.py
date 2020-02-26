@@ -4,8 +4,7 @@
 # from abc import ABC
 from typing import Dict, List
 
-from botbuilder.schema import SignInResource, TokenResponse, TokenExchangeRequest
-from botframework.connector.token_api.models import TokenStatus
+from botframework.connector.token_api.models import SignInUrlResponse, TokenStatus, TokenExchangeRequest, TokenResponse
 from botframework.connector.auth import AppCredentials
 
 from .turn_context import TurnContext
@@ -143,7 +142,7 @@ class ExtendedUserTokenProvider(UserTokenProvider):
 
     async def get_sign_in_resource(
         self, turn_context: TurnContext, connection_name: str
-    ) -> SignInResource:
+    ) -> SignInUrlResponse:
         """
         Get the raw signin link to be sent to the user for signin for a connection name.
 
@@ -162,7 +161,7 @@ class ExtendedUserTokenProvider(UserTokenProvider):
         connection_name: str,
         user_id: str,
         final_redirect: str = None,
-    ) -> SignInResource:
+    ) -> SignInUrlResponse:
         """
         Get the raw signin link to be sent to the user for signin for a connection name.
 
@@ -184,7 +183,7 @@ class ExtendedUserTokenProvider(UserTokenProvider):
         connection_name: str,
         user_id: str,
         final_redirect: str = None,
-    ) -> SignInResource:
+    ) -> SignInUrlResponse:
         """
         Get the raw signin link to be sent to the user for signin for a connection name.
 

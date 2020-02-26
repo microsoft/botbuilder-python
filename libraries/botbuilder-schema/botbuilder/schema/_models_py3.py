@@ -1600,38 +1600,6 @@ class SigninCard(Model):
         self.buttons = buttons
 
 
-class SignInResource(Model):
-    """A card representing a request to sign in.
-
-    :param sign_in_link: The sign-in link
-    :type sign_in_link: str
-    :param token_exchange_resource: Action to use to perform signin
-    :type token_exchange_resource: ~botframework.connector.models.TokenExchangeResource
-    """
-
-    _attribute_map = {
-        "sign_in_link": {"key": "signInLink", "type": "str"},
-        "token_exchange_resource": {
-            "key": "tokenExchangeResource",
-            "type": "TokenExchangeResource",
-        },
-    }
-
-    def __init__(
-        self, *, sign_in_link: str = None, token_exchange_resource=None, **kwargs
-    ) -> None:
-        super(SignInResource, self).__init__(**kwargs)
-        self.sign_in_link = sign_in_link or ""
-        self.token_exchange_resource = (
-            token_exchange_resource or TokenExchangeResource()
-        )
-        self.custom_init(self, **kwargs)
-
-    @staticmethod
-    def custom_init(obj: "TokenExchangeResource", **kwargs):
-        pass
-
-
 class SuggestedActions(Model):
     """SuggestedActions that can be performed.
 
@@ -1832,63 +1800,6 @@ class TokenExchangeInvokeResponse(Model):
         self.connection_name = connection_name
         self.failure_detail = failure_detail
         self.properties = properties
-
-
-class TokenExchangeRequest(Model):
-    """TokenExchangeRequest.
-
-    :param url: The url.
-    :type url: str
-    :param token: The user token that can be exchanged.
-    :type alt: str
-    """
-
-    _attribute_map = {
-        "url": {"key": "url", "type": "str"},
-        "token": {"key": "token", "type": "str"},
-    }
-
-    def __init__(self, *, url: str = None, token: str = None, **kwargs) -> None:
-        super(TokenExchangeRequest, self).__init__(**kwargs)
-        self.url = url
-        self.token = token
-        self.custom_init(self, **kwargs)
-
-    @staticmethod
-    def custom_init(obj: "TokenExchangeRequest", **kwargs):
-        pass
-
-
-class TokenExchangeResource(Model):
-    """Thumbnail URL.
-
-    :param id: A unique identifier for this token exchange instance.
-    :type id: str
-    :param url: The application ID / resource identifier with which to exchange a token on behalf of.
-    :type url: str
-    :param provider_id: The identifier of the provider with which to attempt a token exchange.
-    A value of null or empty will default to Azure Active Directory
-    :type provider_id: str
-    """
-
-    _attribute_map = {
-        "id": {"key": "id", "type": "str"},
-        "url": {"key": "url", "type": "str"},
-        "provider_id": {"key": "providerId", "type": "str"},
-    }
-
-    def __init__(
-        self, *, id: str = None, url: str = None, provider_id: str = None, **kwargs
-    ) -> None:
-        super(TokenExchangeResource, self).__init__(**kwargs)
-        self.id = id
-        self.url = url
-        self.provider_id = provider_id
-        self.custom_init(self, **kwargs)
-
-    @staticmethod
-    def custom_init(obj: "TokenExchangeResource", **kwargs):
-        pass
 
 
 class TokenExchangeState(Model):
