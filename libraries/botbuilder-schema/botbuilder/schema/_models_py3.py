@@ -9,8 +9,6 @@
 # regenerated.
 # --------------------------------------------------------------------------
 
-from typing import Callable
-
 from msrest.serialization import Model
 from msrest.exceptions import HttpOperationError
 
@@ -1602,7 +1600,7 @@ class SigninCard(Model):
         self.buttons = buttons
 
 
-class SigninResource(Model):
+class SignInResource(Model):
     """A card representing a request to sign in.
 
     :param sign_in_link: The sign-in link
@@ -1620,16 +1618,16 @@ class SigninResource(Model):
         self,
         *,
         sign_in_link: str = None,
-        token_exchange_resource: TokenExchangeResource = None,
+        token_exchange_resource=None,
         **kwargs
     ) -> None:
-        super(SigninResource, self).__init__(**kwargs)
+        super(SignInResource, self).__init__(**kwargs)
         self.sign_in_link = sign_in_link or ""
         self.token_exchange_resource = token_exchange_resource or TokenExchangeResource()
         self.custom_init(self, **kwargs)
 
     @staticmethod
-    def custom_init(obj: SigninResource, **kwargs):
+    def custom_init(obj: "TokenExchangeResource", **kwargs):
         pass
 
 
@@ -1764,7 +1762,7 @@ class ThumbnailUrl(Model):
 
 
 class TokenExchangeInvokeRequest(Model):
-    """Thumbnail URL.
+    """TokenExchangeInvokeRequest.
 
     :param id: The id from the OAuthCard.
     :type id: str
@@ -1794,7 +1792,7 @@ class TokenExchangeInvokeRequest(Model):
 
 
 class TokenExchangeInvokeResponse(Model):
-    """Thumbnail URL.
+    """TokenExchangeInvokeResponse.
 
     :param id: The id from the OAuthCard.
     :type id: str
@@ -1824,7 +1822,7 @@ class TokenExchangeInvokeResponse(Model):
 
 
 class TokenExchangeRequest(Model):
-    """Thumbnail URL.
+    """TokenExchangeRequest.
 
     :param url: The url.
     :type url: str
@@ -1844,7 +1842,7 @@ class TokenExchangeRequest(Model):
         self.custom_init(self, **kwargs)
 
     @staticmethod
-    def custom_init(obj: TokenExchangeRequest, **kwargs):
+    def custom_init(obj: "TokenExchangeRequest", **kwargs):
         pass
 
 
@@ -1874,7 +1872,7 @@ class TokenExchangeResource(Model):
         self.custom_init(self, **kwargs)
 
     @staticmethod
-    def custom_init(obj: TokenExchangeResource, **kwargs):
+    def custom_init(obj: "TokenExchangeResource", **kwargs):
         pass
 
 

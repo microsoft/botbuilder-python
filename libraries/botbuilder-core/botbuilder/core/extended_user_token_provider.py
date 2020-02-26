@@ -1,16 +1,18 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from abc import ABC
+# from abc import ABC
+from typing import Dict, List
 
-from botbuilder.schema import TokenResponse
+from botbuilder.schema import SignInResource, TokenResponse, TokenExchangeRequest
+from botframework.connector.token_api.models import TokenStatus
 from botframework.connector.auth import AppCredentials
 
 from .turn_context import TurnContext
 from .user_token_provider import UserTokenProvider
 
 
-class ExtendedUserTokenProvider(ABC, UserTokenProvider):
+class ExtendedUserTokenProvider(UserTokenProvider):
     async def get_user_token(
         self,
         turn_context: TurnContext,
