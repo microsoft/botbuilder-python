@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 from abc import ABC
+from typing import Dict, List
 
 from botframework.connector.token_api.models import (
     SignInUrlResponse,
@@ -15,6 +16,8 @@ from .user_token_provider import UserTokenProvider
 
 
 class ExtendedUserTokenProvider(UserTokenProvider, ABC):
+    # pylint: disable=unused-argument
+
     async def get_sign_in_resource(
         self, turn_context: TurnContext, connection_name: str
     ) -> SignInUrlResponse:
@@ -28,7 +31,7 @@ class ExtendedUserTokenProvider(UserTokenProvider, ABC):
         :return: A task that represents the work queued to execute.
         .. remarks:: If the task completes successfully, the result contains the raw signin link.
         """
-        raise NotImplementedError()
+        return
 
     async def get_sign_in_resource_from_user(
         self,
@@ -49,7 +52,7 @@ class ExtendedUserTokenProvider(UserTokenProvider, ABC):
         :return: A task that represents the work queued to execute.
         .. remarks:: If the task completes successfully, the result contains the raw signin link.
         """
-        raise NotImplementedError()
+        return
 
     async def get_sign_in_resource_from_user_and_credentials(
         self,
@@ -72,7 +75,7 @@ class ExtendedUserTokenProvider(UserTokenProvider, ABC):
         :return: A task that represents the work queued to execute.
         .. remarks:: If the task completes successfully, the result contains the raw signin link.
         """
-        raise NotImplementedError()
+        return
 
     async def exchange_token(
         self,
@@ -92,7 +95,7 @@ class ExtendedUserTokenProvider(UserTokenProvider, ABC):
 
         :return: If the task completes, the exchanged token is returned.
         """
-        raise NotImplementedError()
+        return
 
     async def exchange_token_from_credentials(
         self,
@@ -113,5 +116,52 @@ class ExtendedUserTokenProvider(UserTokenProvider, ABC):
 
 
         :return: If the task completes, the exchanged token is returned.
+        """
+        return
+
+    async def get_user_token(
+        self, context: TurnContext, connection_name: str, magic_code: str = None
+    ) -> TokenResponse:
+        """
+        Retrieves the OAuth token for a user that is in a sign-in flow.
+        :param context:
+        :param connection_name:
+        :param magic_code:
+        :return:
+        """
+        raise NotImplementedError()
+
+    async def sign_out_user(
+        self, context: TurnContext, connection_name: str, user_id: str = None
+    ):
+        """
+        Signs the user out with the token server.
+        :param context:
+        :param connection_name:
+        :param user_id:
+        :return:
+        """
+        raise NotImplementedError()
+
+    async def get_oauth_sign_in_link(
+        self, context: TurnContext, connection_name: str
+    ) -> str:
+        """
+        Get the raw signin link to be sent to the user for signin for a connection name.
+        :param context:
+        :param connection_name:
+        :return:
+        """
+        raise NotImplementedError()
+
+    async def get_aad_tokens(
+        self, context: TurnContext, connection_name: str, resource_urls: List[str]
+    ) -> Dict[str, TokenResponse]:
+        """
+        Retrieves Azure Active Directory tokens for particular resources on a configured connection.
+        :param context:
+        :param connection_name:
+        :param resource_urls:
+        :return:
         """
         raise NotImplementedError()

@@ -1357,13 +1357,19 @@ class OAuthCard(Model):
     }
 
     def __init__(
-        self, *, text: str = None, connection_name: str = None, buttons=None, **kwargs
+        self,
+        *,
+        text: str = None,
+        connection_name: str = None,
+        buttons=None,
+        token_exchange_resource=None,
+        **kwargs
     ) -> None:
         super(OAuthCard, self).__init__(**kwargs)
         self.text = text
         self.connection_name = connection_name
         self.buttons = buttons
-        self.token_exchange_resource = None
+        self.token_exchange_resource = token_exchange_resource
 
 
 class PagedMembersResult(Model):

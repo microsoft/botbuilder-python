@@ -25,10 +25,11 @@ from botframework.connector.auth import ClaimsIdentity
 from botframework.connector.token_api.models import (
     SignInUrlResponse,
     TokenExchangeResource,
+    TokenExchangeRequest,
 )
 from ..bot_adapter import BotAdapter
 from ..turn_context import TurnContext
-from ..user_token_provider import UserTokenProvider
+from ..extended_user_token_provider import ExtendedUserTokenProvider
 
 
 class UserToken:
@@ -88,7 +89,7 @@ class TokenMagicCode:
         self.magic_code = magic_code
 
 
-class TestAdapter(BotAdapter, UserTokenProvider):
+class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
     __test__ = False
 
     def __init__(
@@ -387,21 +388,48 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         )
         self._exchangeable_tokens[key.to_key()] = key
 
-    async def get_sign_in_resource(
+    async def get_sign_in_resource_from_user(
         self,
-        context: TurnContext,
+        turn_context: TurnContext,
         connection_name: str,
-        user_id: str = None,
-        final_redirect: str = None,  # pylint: disable=unused-argument
+        user_id: str,
+        final_redirect: str = None,
     ) -> SignInUrlResponse:
         return SignInUrlResponse(
-            sign_in_link=f"https://fake.com/oauthsignin/{connection_name}/{context.activity.channelId}/{user_id}",
+            sign_in_link=f"https://fake.com/oauthsignin/{connection_name}/{turn_context.activity.channelId}/{user_id}",
             token_exchange_resource=TokenExchangeResource(
                 id=str(uuid4()),
                 provider_id=None,
                 uri=f"api://{connection_name}/resource",
-            )
+            ),
         )
+
+    async def exchange_token(
+        self,
+        turn_context: TurnContext,
+        connection_name: str,
+        user_id: str,
+        exchange_request: TokenExchangeRequest,
+    ) -> TokenResponse:
+        exchangeable_value = exchange_request.token or exchange_request.uri
+
+        key = ExchangeableToken(
+            channel_id=turn_context.activity.channel_id,
+            connection_name=connection_name,
+            exchangeable_item=exchangeable_value,
+            user_id=user_id,
+        )
+
+        token_exchange_response = self._exchangeable_tokens.get(key.to_key())
+        if token_exchange_response:
+            return TokenResponse(
+                channel_id=key.channel_id,
+                connection_name=key.connection_name,
+                token=token_exchange_response.token,
+                expiration=None,
+            )
+
+        return None
 
 
 class TestFlow:
@@ -409,7 +437,7 @@ class TestFlow:
 
     def __init__(self, previous: Callable, adapter: TestAdapter):
         """
-        INTERNAL: creates a new TestFlow instance.
+        INTERNAL: creates a TestFlow instance.
         :param previous:
         :param adapter:
         """

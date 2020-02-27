@@ -5,17 +5,17 @@ import re
 from datetime import datetime, timedelta
 from typing import Union, Awaitable, Callable
 
-from botbuilder.core import ExtendedUserTokenProvider
-from botbuilder.core.bot_framework_adapter import TokenExchangeRequest
 from botframework.connector import Channels
 from botframework.connector.auth import ClaimsIdentity, SkillValidation
 from botbuilder.core import (
     CardFactory,
+    ExtendedUserTokenProvider,
     MessageFactory,
     InvokeResponse,
     TurnContext,
     UserTokenProvider,
 )
+from botbuilder.core.bot_framework_adapter import TokenExchangeRequest
 from botbuilder.dialogs import Dialog, DialogContext, DialogTurnResult
 from botbuilder.schema import (
     Activity,
@@ -449,14 +449,14 @@ class OAuthPrompt(Dialog):
         )
 
     def _get_token_exchange_invoke_response(
-        self, status: int, failure_detail: str, id: str = None
+        self, status: int, failure_detail: str, identifier: str = None
     ) -> Activity:
         return Activity(
             type=ActivityTypes.invoke_response,
             value=InvokeResponse(
                 status=status,
                 body=TokenExchangeInvokeResponse(
-                    id=id,
+                    id=identifier,
                     connection_name=self._settings.connection_name,
                     failure_detail=failure_detail,
                 ),

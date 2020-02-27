@@ -12,6 +12,8 @@
 from msrest.serialization import Model
 from msrest.exceptions import HttpOperationError
 
+# pylint: disable=invalid-name
+
 
 class AadResourceUrls(Model):
     """AadResourceUrls.

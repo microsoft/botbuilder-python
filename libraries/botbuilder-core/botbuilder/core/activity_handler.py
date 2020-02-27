@@ -2,7 +2,12 @@
 # Licensed under the MIT License.
 from typing import List
 
-from botbuilder.schema import ActivityTypes, ChannelAccount, MessageReaction
+from botbuilder.schema import (
+    ActivityTypes,
+    ChannelAccount,
+    MessageReaction,
+    SignInConstants,
+)
 from .turn_context import TurnContext
 
 
@@ -269,7 +274,7 @@ class ActivityHandler:
             The meaning of an event activity is defined by the event activity name property, which is meaningful within
             the scope of a channel.
         """
-        if turn_context.activity.name == "tokens/response":
+        if turn_context.activity.name == SignInConstants.token_response_event_name:
             return await self.on_token_response_event(turn_context)
 
         return await self.on_event(turn_context)
@@ -342,5 +347,58 @@ class ActivityHandler:
         .. remarks::
             When the :meth:`on_turn()` method receives an activity that is not a message,
             conversation update, message reaction, or event activity, it calls this method.
+        """
+        return
+
+    async def on_invoke_activity(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext
+    ):
+        """
+        Registers an activity event handler for the _invoke_ event, emitted for every incoming event activity.
+
+        :param turn_context: The context object for this turn
+        :type turn_context: :class:`botbuilder.core.TurnContext`
+
+        :returns: A task that represents the work queued to execute
+        """
+
+        if (
+            turn_context.activity.name == SignInConstants.verify_state_operation_name
+            or turn_context.activity.name
+            == SignInConstants.token_exchange_operation_name
+        ):
+            return self.on_sign_in_invoke(turn_context)
+
+        return self.on_invoke(turn_context)
+
+    async def on_sign_in_invoke(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext
+    ):
+        """
+        Invoked when a signin/verifyState or signin/tokenExchange event is received when the base behavior of
+        on_invoke_activity(TurnContext{InvokeActivity}) is used.
+        If using an OAuthPrompt, override this method to forward this Activity"/ to the current dialog.
+        By default, this method does nothing.
+
+        :param turn_context: The context object for this turn
+        :type turn_context: :class:`botbuilder.core.TurnContext`
+
+        :returns: A task that represents the work queued to execute
+        """
+        return
+
+    async def on_invoke(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext
+    ):
+        """
+        Invoked when a signin/verifyState or signin/tokenExchange event is received when the base behavior of
+        on_invoke_activity(TurnContext{InvokeActivity}) is used.
+        This method could optionally be overridden if the bot is meant to handle miscellaneous Invokes.
+        By default, this method does nothing.
+
+        :param turn_context: The context object for this turn
+        :type turn_context: :class:`botbuilder.core.TurnContext`
+
+        :returns: A task that represents the work queued to execute
         """
         return

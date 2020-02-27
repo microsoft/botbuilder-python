@@ -1029,6 +1029,8 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
         user_id: str,
         exchange_request: TokenExchangeRequest,
     ) -> TokenResponse:
+        # pylint: disable=no-member
+
         if not connection_name:
             raise TypeError(
                 "BotFrameworkAdapter.exchange_token(): missing connection_name"
