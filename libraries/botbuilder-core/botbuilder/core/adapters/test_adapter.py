@@ -21,7 +21,7 @@ from botbuilder.schema import (
     ResourceResponse,
     TokenResponse,
 )
-from botframework.connector.auth import ClaimsIdentity
+from botframework.connector.auth import AppCredentials, ClaimsIdentity
 from botframework.connector.token_api.models import (
     SignInUrlResponse,
     TokenExchangeResource,
@@ -307,7 +307,11 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
             self._magic_codes.append(code)
 
     async def get_user_token(
-        self, context: TurnContext, connection_name: str, magic_code: str = None
+        self,
+        context: TurnContext,
+        connection_name: str,
+        magic_code: str = None,
+        oauth_app_credentials: AppCredentials = None,   # pylint: disable=unused-argument
     ) -> TokenResponse:
         key = UserToken()
         key.channel_id = context.activity.channel_id
@@ -343,7 +347,11 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
         return None
 
     async def sign_out_user(
-        self, context: TurnContext, connection_name: str, user_id: str = None
+        self,
+        context: TurnContext,
+        connection_name: str = None,
+        user_id: str = None,
+        oauth_app_credentials: AppCredentials = None,  # pylint: disable=unused-argument
     ):
         channel_id = context.activity.channel_id
         user_id = context.activity.from_property.id
@@ -359,15 +367,34 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
         self._user_tokens = new_records
 
     async def get_oauth_sign_in_link(
-        self, context: TurnContext, connection_name: str
+        self,
+        context: TurnContext,
+        connection_name: str,
+        final_redirect: str = None,  # pylint: disable=unused-argument
+        oauth_app_credentials: AppCredentials = None,  # pylint: disable=unused-argument
     ) -> str:
         return (
             f"https://fake.com/oauthsignin"
             f"/{connection_name}/{context.activity.channel_id}/{context.activity.from_property.id}"
         )
 
+    async def get_token_status(
+        self,
+        context: TurnContext,
+        connection_name: str = None,
+        user_id: str = None,
+        include_filter: str = None,
+        oauth_app_credentials: AppCredentials = None,
+    ) -> Dict[str, TokenResponse]:
+        return None
+
     async def get_aad_tokens(
-        self, context: TurnContext, connection_name: str, resource_urls: List[str]
+        self,
+        context: TurnContext,
+        connection_name: str,
+        resource_urls: List[str],
+        user_id: str = None,  # pylint: disable=unused-argument
+        oauth_app_credentials: AppCredentials = None,  # pylint: disable=unused-argument
     ) -> Dict[str, TokenResponse]:
         return None
 

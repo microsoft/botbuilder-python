@@ -120,48 +120,71 @@ class ExtendedUserTokenProvider(UserTokenProvider, ABC):
         return
 
     async def get_user_token(
-        self, context: TurnContext, connection_name: str, magic_code: str = None
+        self,
+        context: TurnContext,
+        connection_name: str,
+        magic_code: str = None,
+        oauth_app_credentials: AppCredentials = None,
     ) -> TokenResponse:
         """
         Retrieves the OAuth token for a user that is in a sign-in flow.
         :param context:
         :param connection_name:
         :param magic_code:
+        :param oauth_app_credentials:
         :return:
         """
         raise NotImplementedError()
 
     async def sign_out_user(
-        self, context: TurnContext, connection_name: str, user_id: str = None
+        self,
+        context: TurnContext,
+        connection_name: str = None,
+        user_id: str = None,
+        oauth_app_credentials: AppCredentials = None,
     ):
         """
         Signs the user out with the token server.
         :param context:
         :param connection_name:
         :param user_id:
+        :param oauth_app_credentials:
         :return:
         """
         raise NotImplementedError()
 
     async def get_oauth_sign_in_link(
-        self, context: TurnContext, connection_name: str
+        self,
+        context: TurnContext,
+        connection_name: str,
+        final_redirect: str = None,
+        oauth_app_credentials: AppCredentials = None,
     ) -> str:
         """
         Get the raw signin link to be sent to the user for signin for a connection name.
         :param context:
         :param connection_name:
+        :param final_redirect:
+        :param oauth_app_credentials:
         :return:
         """
         raise NotImplementedError()
 
     async def get_aad_tokens(
-        self, context: TurnContext, connection_name: str, resource_urls: List[str]
+        self,
+        context: TurnContext,
+        connection_name: str,
+        resource_urls: List[str],
+        user_id: str = None,
+        oauth_app_credentials: AppCredentials = None,
     ) -> Dict[str, TokenResponse]:
         """
         Retrieves Azure Active Directory tokens for particular resources on a configured connection.
         :param context:
         :param connection_name:
         :param resource_urls:
+        :param user_id:
+        :param oauth_app_credentials:
         :return:
         """
         raise NotImplementedError()
