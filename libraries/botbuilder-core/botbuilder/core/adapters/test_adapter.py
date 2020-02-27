@@ -311,7 +311,7 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
         context: TurnContext,
         connection_name: str,
         magic_code: str = None,
-        oauth_app_credentials: AppCredentials = None,   # pylint: disable=unused-argument
+        oauth_app_credentials: AppCredentials = None,  # pylint: disable=unused-argument
     ) -> TokenResponse:
         key = UserToken()
         key.channel_id = context.activity.channel_id
