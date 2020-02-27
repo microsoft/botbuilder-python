@@ -27,7 +27,11 @@ from botframework.connector.auth import (
     CertificateAppCredentials,
 )
 from botframework.connector.token_api import TokenApiClient
-from botframework.connector.token_api.models import TokenStatus
+from botframework.connector.token_api.models import (
+    TokenStatus,
+    TokenExchangeRequest,
+    SignInUrlResponse,
+)
 from botbuilder.schema import (
     Activity,
     ActivityTypes,
@@ -41,7 +45,7 @@ from botbuilder.schema import (
 from . import __version__
 from .bot_adapter import BotAdapter
 from .turn_context import TurnContext
-from .user_token_provider import UserTokenProvider
+from .extended_user_token_provider import ExtendedUserTokenProvider
 from .invoke_response import InvokeResponse
 from .conversation_reference_extension import get_continuation_activity
 
@@ -52,10 +56,25 @@ BOT_IDENTITY_KEY = "BotIdentity"
 
 
 class TokenExchangeState(Model):
+    """TokenExchangeState
+
+    :param connection_name: The connection name that was used.
+    :type connection_name: str
+    :param conversation: Gets or sets a reference to the conversation.
+    :type conversation: ~botframework.connector.models.ConversationReference
+    :param relates_to: Gets or sets a reference to a related parent conversation for this token exchange.
+    :type relates_to: ~botframework.connector.models.ConversationReference
+    :param bot_ur: The URL of the bot messaging endpoint.
+    :type bot_ur: str
+    :param ms_app_id: The bot's registered application ID.
+    :type ms_app_id: str
+    """
+
     _attribute_map = {
         "connection_name": {"key": "connectionName", "type": "str"},
         "conversation": {"key": "conversation", "type": "ConversationReference"},
-        "bot_url": {"key": "botUrl", "type": "str"},
+        "relates_to": {"key": "relatesTo", "type": "ConversationReference"},
+        "bot_url": {"key": "connectionName", "type": "str"},
         "ms_app_id": {"key": "msAppId", "type": "str"},
     }
 
@@ -63,7 +82,8 @@ class TokenExchangeState(Model):
         self,
         *,
         connection_name: str = None,
-        conversation: ConversationReference = None,
+        conversation=None,
+        relates_to=None,
         bot_url: str = None,
         ms_app_id: str = None,
         **kwargs,
@@ -71,6 +91,7 @@ class TokenExchangeState(Model):
         super(TokenExchangeState, self).__init__(**kwargs)
         self.connection_name = connection_name
         self.conversation = conversation
+        self.relates_to = relates_to
         self.bot_url = bot_url
         self.ms_app_id = ms_app_id
 
@@ -131,7 +152,7 @@ class BotFrameworkAdapterSettings:
         self.certificate_private_key = certificate_private_key
 
 
-class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
+class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
     """
     Defines an adapter to connect a bot to a service endpoint.
 
@@ -957,6 +978,79 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             self._connector_client_cache[client_key] = client
 
         return client
+
+    async def get_sign_in_resource_from_user(
+        self,
+        turn_context: TurnContext,
+        connection_name: str,
+        user_id: str,
+        final_redirect: str = None,
+    ) -> SignInUrlResponse:
+        if not connection_name:
+            raise TypeError(
+                "BotFrameworkAdapter.get_sign_in_resource_from_user(): missing connection_name"
+            )
+        if (
+            not turn_context.activity.from_property
+            or not turn_context.activity.from_property.id
+        ):
+            raise TypeError(
+                "BotFrameworkAdapter.get_sign_in_resource_from_user(): missing activity id"
+            )
+        if user_id and turn_context.activity.from_property.id != user_id:
+            raise TypeError(
+                "BotFrameworkAdapter.get_sign_in_resource_from_user(): cannot get signin resource"
+                " for a user that is different from the conversation"
+            )
+
+        url = self.oauth_api_url(turn_context)
+        client = self.create_token_api_client(url)
+        conversation = TurnContext.get_conversation_reference(turn_context.activity)
+
+        state = TokenExchangeState(
+            connection_name=connection_name,
+            conversation=conversation,
+            relates_to=turn_context.activity.relates_to,
+            ms_app_id=client.config.credentials.microsoft_app_id,
+        )
+
+        final_state = base64.b64encode(
+            json.dumps(state.serialize()).encode(encoding="UTF-8", errors="strict")
+        ).decode()
+
+        return client.bot_sign_in.get_sign_in_url(
+            final_state, final_redirect=final_redirect
+        )
+
+    async def exchange_token(
+        self,
+        turn_context: TurnContext,
+        connection_name: str,
+        user_id: str,
+        exchange_request: TokenExchangeRequest,
+    ) -> TokenResponse:
+        if not connection_name:
+            raise TypeError(
+                "BotFrameworkAdapter.exchange_token(): missing connection_name"
+            )
+        if not user_id:
+            raise TypeError("BotFrameworkAdapter.exchange_token(): missing user_id")
+        if exchange_request and not exchange_request.token and not exchange_request.uri:
+            raise TypeError(
+                "BotFrameworkAdapter.exchange_token(): Either a Token or Uri property is required"
+                " on the TokenExchangeRequest"
+            )
+
+        url = self.oauth_api_url(turn_context)
+        client = self.create_token_api_client(url)
+
+        return await client.user_token.exchange_async(
+            user_id,
+            connection_name,
+            turn_context.activity.channel_id,
+            exchange_request.uri,
+            exchange_request.token,
+        )
 
     def create_token_api_client(self, service_url: str) -> TokenApiClient:
         client = TokenApiClient(self._credentials, service_url)

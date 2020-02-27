@@ -87,8 +87,8 @@ class BotSignInOperations:
             query_parameters["finalRedirect"] = self._serialize.query(
                 "final_redirect", final_redirect, "str"
             )
-        query_parameters["api-version"] = self._serialize.query(	
-            "self.api_version", self.api_version, "str"	
+        query_parameters["api-version"] = self._serialize.query(
+            "self.api_version", self.api_version, "str"
         )
 
         # Construct headers

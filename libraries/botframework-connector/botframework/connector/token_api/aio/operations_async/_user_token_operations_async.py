@@ -318,8 +318,8 @@ class UserTokenOperations:
             query_parameters["include"] = self._serialize.query(
                 "include", include, "str"
             )
-        query_parameters["api-version"] = self._serialize.query(	
-            "self.api_version", self.api_version, "str"	
+        query_parameters["api-version"] = self._serialize.query(
+            "self.api_version", self.api_version, "str"
         )
 
         # Construct headers

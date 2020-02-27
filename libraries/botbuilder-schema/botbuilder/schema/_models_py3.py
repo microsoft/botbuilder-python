@@ -1803,7 +1803,7 @@ class TokenExchangeInvokeResponse(Model):
 
 
 class TokenExchangeState(Model):
-    """Thumbnail URL.
+    """TokenExchangeState
 
     :param connection_name: The connection name that was used.
     :type connection_name: str

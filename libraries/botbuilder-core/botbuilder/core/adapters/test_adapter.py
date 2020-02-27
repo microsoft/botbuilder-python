@@ -8,6 +8,7 @@
 import asyncio
 import inspect
 from datetime import datetime
+from uuid import uuid4
 from typing import Awaitable, Coroutine, Dict, List, Callable, Union
 from copy import copy
 from threading import Lock
@@ -21,6 +22,10 @@ from botbuilder.schema import (
     TokenResponse,
 )
 from botframework.connector.auth import ClaimsIdentity
+from botframework.connector.token_api.models import (
+    SignInUrlResponse,
+    TokenExchangeResource,
+)
 from ..bot_adapter import BotAdapter
 from ..turn_context import TurnContext
 from ..user_token_provider import UserTokenProvider
@@ -46,6 +51,35 @@ class UserToken:
             and self.user_id == rhs.user_id
             and self.channel_id == rhs.channel_id
         )
+
+
+class ExchangeableToken(UserToken):
+    def __init__(
+        self,
+        connection_name: str = None,
+        user_id: str = None,
+        channel_id: str = None,
+        token: str = None,
+        exchangeable_item: str = None,
+    ):
+        super(ExchangeableToken, self).__init__(
+            connection_name=connection_name,
+            user_id=user_id,
+            channel_id=channel_id,
+            token=token,
+        )
+
+        self.exchangeable_item = exchangeable_item
+
+    def equals_key(self, rhs: "ExchangeableToken") -> bool:
+        return (
+            rhs is not None
+            and self.exchangeable_item == rhs.exchangeable_item
+            and super().equals_key(rhs)
+        )
+
+    def to_key(self) -> str:
+        return self.exchangeable_item
 
 
 class TokenMagicCode:
@@ -74,6 +108,7 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         self._user_tokens: List[UserToken] = []
         self._magic_codes: List[TokenMagicCode] = []
         self._conversation_lock = Lock()
+        self._exchangeable_tokens: Dict[str, ExchangeableToken] = {}
         self.activity_buffer: List[Activity] = []
         self.updated_activities: List[Activity] = []
         self.deleted_activities: List[ConversationReference] = []
@@ -334,6 +369,39 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         self, context: TurnContext, connection_name: str, resource_urls: List[str]
     ) -> Dict[str, TokenResponse]:
         return None
+
+    def add_exchangeable_token(
+        self,
+        connection_name: str,
+        channel_id: str,
+        user_id: str,
+        exchangeable_item: str,
+        token: str,
+    ):
+        key = ExchangeableToken(
+            connection_name=connection_name,
+            channel_id=channel_id,
+            user_id=user_id,
+            exchangeable_item=exchangeable_item,
+            token=token,
+        )
+        self._exchangeable_tokens[key.to_key()] = key
+
+    async def get_sign_in_resource(
+        self,
+        context: TurnContext,
+        connection_name: str,
+        user_id: str = None,
+        final_redirect: str = None,  # pylint: disable=unused-argument
+    ) -> SignInUrlResponse:
+        return SignInUrlResponse(
+            sign_in_link=f"https://fake.com/oauthsignin/{connection_name}/{context.activity.channelId}/{user_id}",
+            token_exchange_resource=TokenExchangeResource(
+                id=str(uuid4()),
+                provider_id=None,
+                uri=f"api://{connection_name}/resource",
+            )
+        )
 
 
 class TestFlow:

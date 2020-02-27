@@ -5,6 +5,8 @@ import re
 from datetime import datetime, timedelta
 from typing import Union, Awaitable, Callable
 
+from botbuilder.core import ExtendedUserTokenProvider
+from botbuilder.core.bot_framework_adapter import TokenExchangeRequest
 from botframework.connector import Channels
 from botframework.connector.auth import ClaimsIdentity, SkillValidation
 from botbuilder.core import (
@@ -22,13 +24,19 @@ from botbuilder.schema import (
     CardAction,
     InputHints,
     SigninCard,
+    SignInConstants,
     OAuthCard,
     TokenResponse,
+    TokenExchangeInvokeRequest,
+    TokenExchangeInvokeResponse,
 )
+
 from .prompt_options import PromptOptions
 from .oauth_prompt_settings import OAuthPromptSettings
 from .prompt_validator_context import PromptValidatorContext
 from .prompt_recognizer_result import PromptRecognizerResult
+
+# TODO: Consider moving TokenExchangeInvokeRequest and TokenExchangeInvokeResponse to here
 
 
 class OAuthPrompt(Dialog):
@@ -70,8 +78,8 @@ class OAuthPrompt(Dialog):
         """
         Creates a new instance of the :class:`OAuthPrompt` class.
 
-        :param dialogId: The Id to assign to this prompt.
-        :type dialogId: str
+        :param dialog_id: The Id to assign to this prompt.
+        :type dialog_id: str
         :param settings: Additional authentication settings to use with this instance of the prompt
         :type settings: :class:`OAuthPromptSettings`
         :param validator: Optional, contains additional, custom validation for this prompt
@@ -362,9 +370,73 @@ class OAuthPrompt(Dialog):
                         Activity(type="invokeResponse", value=InvokeResponse(404))
                     )
             except Exception:
-                context.send_activity(
+                await context.send_activity(
                     Activity(type="invokeResponse", value=InvokeResponse(500))
                 )
+        elif self._is_token_exchange_request_invoke(context):
+            if not (
+                context.activity.value
+                and self._is_token_exchange_request(context.activity.value)
+            ):
+                await context.send_activity(
+                    self._get_token_exchange_invoke_response(
+                        400,
+                        "The bot received an InvokeActivity that is missing a TokenExchangeInvokeRequest value."
+                        " This is required to be sent with the InvokeActivity.",
+                    )
+                )
+            elif (
+                context.activity.value.connection_name != self._settings.connection_name
+            ):
+                await context.send_activity(
+                    self._get_token_exchange_invoke_response(
+                        400,
+                        "The bot received an InvokeActivity with a TokenExchangeInvokeRequest containing a"
+                        " ConnectionName that does not match the ConnectionName expected by the bots active"
+                        " OAuthPrompt. Ensure these names match when sending the InvokeActivityInvalid"
+                        " ConnectionName in the TokenExchangeInvokeRequest",
+                    )
+                )
+            elif not getattr(context.adapter, "exchange_token"):
+                await context.send_activity(
+                    self._get_token_exchange_invoke_response(
+                        502,
+                        "The bot's BotAdapter does not support token exchange operations."
+                        " Ensure the bot's Adapter supports the ITokenExchangeProvider interface.",
+                    )
+                )
+
+                raise AttributeError(
+                    "OAuthPrompt.recognize(): not supported by the current adapter."
+                )
+            else:
+                extended_user_token_provider: ExtendedUserTokenProvider = context.adapter
+                token_exchange_response = await extended_user_token_provider.exchange_token(
+                    context,
+                    self._settings.connection_name,
+                    context.activity.id,
+                    TokenExchangeRequest(token=context.activity.value.token),
+                )
+
+                if not token_exchange_response or not token_exchange_response.token:
+                    await context.send_activity(
+                        self._get_token_exchange_invoke_response(
+                            409,
+                            "The bot is unable to exchange token. Proceed with regular login.",
+                        )
+                    )
+                else:
+                    await context.send_activity(
+                        self._get_token_exchange_invoke_response(
+                            200, None, context.activity.value.id
+                        )
+                    )
+                    token = TokenResponse(
+                        channel_id=token_exchange_response.channel_id,
+                        connection_name=token_exchange_response.connection_name,
+                        token=token_exchange_response.token,
+                        expiration=None,
+                    )
         elif context.activity.type == ActivityTypes.message and context.activity.text:
             match = re.match(r"(?<!\d)\d{6}(?!\d)", context.activity.text)
             if match:
@@ -374,6 +446,21 @@ class OAuthPrompt(Dialog):
             PromptRecognizerResult(True, token)
             if token is not None
             else PromptRecognizerResult()
+        )
+
+    def _get_token_exchange_invoke_response(
+        self, status: int, failure_detail: str, id: str = None
+    ) -> Activity:
+        return Activity(
+            type=ActivityTypes.invoke_response,
+            value=InvokeResponse(
+                status=status,
+                body=TokenExchangeInvokeResponse(
+                    id=id,
+                    connection_name=self._settings.connection_name,
+                    failure_detail=failure_detail,
+                ),
+            ),
         )
 
     @staticmethod
@@ -404,3 +491,16 @@ class OAuthPrompt(Dialog):
             return False
 
         return True
+
+    @staticmethod
+    def _is_token_exchange_request_invoke(context: TurnContext) -> bool:
+        activity = context.activity
+
+        return (
+            activity.type == ActivityTypes.invoke
+            and activity.name == SignInConstants.token_exchange_operation_name
+        )
+
+    @staticmethod
+    def _is_token_exchange_request(obj: TokenExchangeInvokeRequest) -> bool:
+        return bool(obj.connection_name) and bool(obj.token)
