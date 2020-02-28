@@ -68,6 +68,7 @@ class BotAdapter(ABC):
         callback: Callable,
         bot_id: str = None,  # pylint: disable=unused-argument
         claims_identity: ClaimsIdentity = None,  # pylint: disable=unused-argument
+        audience: str = None,  # pylint: disable=unused-argument
     ):
         """
         Sends a proactive message to a conversation. Call this method to proactively send a message to a conversation.
@@ -79,6 +80,7 @@ class BotAdapter(ABC):
         :param reference: A reference to the conversation to continue.</param>
         :param callback: The method to call for the resulting bot turn.</param>
         :param claims_identity:
+        :param audience:
         """
         context = TurnContext(
             self, conversation_reference_extension.get_continuation_activity(reference)

@@ -2,13 +2,13 @@
 # Licensed under the MIT License.
 
 import requests
-from .auth import MicrosoftAppCredentials
+from .auth import AppCredentials
 
 
 class EmulatorApiClient:
     @staticmethod
     async def emulate_oauth_cards(
-        credentials: MicrosoftAppCredentials, emulator_url: str, emulate: bool
+        credentials: AppCredentials, emulator_url: str, emulate: bool
     ) -> bool:
         token = await credentials.get_token()
         request_url = (

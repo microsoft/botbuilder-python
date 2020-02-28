@@ -35,6 +35,10 @@ class MicrosoftAppCredentials(AppCredentials, ABC):
         self.app = None
         self.scopes = [self.oauth_scope]
 
+    @staticmethod
+    def empty():
+        return MicrosoftAppCredentials("", "")
+
     def get_access_token(self, force_refresh: bool = False) -> str:
         """
         Implementation of AppCredentials.get_token.

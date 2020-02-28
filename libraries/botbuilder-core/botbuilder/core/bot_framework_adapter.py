@@ -7,6 +7,7 @@ import asyncio
 import base64
 import json
 import os
+import uuid
 from typing import List, Callable, Awaitable, Union, Dict
 from msrest.serialization import Model
 
@@ -22,10 +23,12 @@ from botframework.connector.auth import (
     GovernmentConstants,
     MicrosoftAppCredentials,
     JwtTokenValidation,
+    CredentialProvider,
     SimpleCredentialProvider,
     SkillValidation,
-    CertificateAppCredentials,
     AppCredentials,
+    SimpleChannelProvider,
+    MicrosoftGovernmentAppCredentials,
 )
 from botframework.connector.token_api import TokenApiClient
 from botbuilder.schema import (
@@ -48,7 +51,6 @@ from .conversation_reference_extension import get_continuation_activity
 USER_AGENT = f"Microsoft-BotFramework/3.1 (BotBuilder Python/{__version__})"
 OAUTH_ENDPOINT = "https://api.botframework.com"
 US_GOV_OAUTH_ENDPOINT = "https://api.botframework.azure.us"
-BOT_IDENTITY_KEY = "BotIdentity"
 
 
 class TokenExchangeState(Model):
@@ -83,11 +85,12 @@ class BotFrameworkAdapterSettings:
         channel_auth_tenant: str = None,
         oauth_endpoint: str = None,
         open_id_metadata: str = None,
-        channel_service: str = None,
         channel_provider: ChannelProvider = None,
         auth_configuration: AuthenticationConfiguration = None,
         certificate_thumbprint: str = None,
         certificate_private_key: str = None,
+        app_credentials: AppCredentials = None,
+        credential_provider: CredentialProvider = None,
     ):
         """
         Contains the settings used to initialize a :class:`BotFrameworkAdapter` instance.
@@ -103,8 +106,6 @@ class BotFrameworkAdapterSettings:
         :type oauth_endpoint: str
         :param open_id_metadata:
         :type open_id_metadata: str
-        :param channel_service:
-        :type channel_service: str
         :param channel_provider: The channel provider
         :type channel_provider: :class:`botframework.connector.auth.ChannelProvider`
         :param auth_configuration:
@@ -121,14 +122,28 @@ class BotFrameworkAdapterSettings:
         """
         self.app_id = app_id
         self.app_password = app_password
+        self.app_credentials = app_credentials
         self.channel_auth_tenant = channel_auth_tenant
         self.oauth_endpoint = oauth_endpoint
-        self.open_id_metadata = open_id_metadata
-        self.channel_service = channel_service
-        self.channel_provider = channel_provider
+        self.channel_provider = (
+            channel_provider if channel_provider else SimpleChannelProvider()
+        )
+        self.credential_provider = (
+            credential_provider
+            if credential_provider
+            else SimpleCredentialProvider(self.app_id, self.app_password)
+        )
         self.auth_configuration = auth_configuration or AuthenticationConfiguration()
         self.certificate_thumbprint = certificate_thumbprint
         self.certificate_private_key = certificate_private_key
+
+        # If no open_id_metadata values were passed in the settings, check the
+        # process' Environment Variable.
+        self.open_id_metadata = (
+            open_id_metadata
+            if open_id_metadata
+            else os.environ.get(AuthenticationConstants.BOT_OPEN_ID_METADATA_KEY)
+        )
 
 
 class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
@@ -147,6 +162,10 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
     """
 
     _INVOKE_RESPONSE_KEY = "BotFrameworkAdapter.InvokeResponse"
+    BOT_IDENTITY_KEY = "BotIdentity"
+    BOT_OAUTH_SCOPE_KEY = "OAuthScope"
+    BOT_CALLBACK_HANDLER_KEY = "BotCallbackHandler"
+    BOT_CONNECTOR_CLIENT_KEY = "ConnectorClient"
 
     def __init__(self, settings: BotFrameworkAdapterSettings):
         """
@@ -158,41 +177,14 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         super(BotFrameworkAdapter, self).__init__()
         self.settings = settings or BotFrameworkAdapterSettings("", "")
 
-        # If settings.certificate_thumbprint & settings.certificate_private_key are provided,
-        # use CertificateAppCredentials.
-        if self.settings.certificate_thumbprint and settings.certificate_private_key:
-            self._credentials = CertificateAppCredentials(
-                self.settings.app_id,
-                self.settings.certificate_thumbprint,
-                self.settings.certificate_private_key,
-                self.settings.channel_auth_tenant,
-            )
-            self._credential_provider = SimpleCredentialProvider(
-                self.settings.app_id, ""
-            )
-        else:
-            self._credentials = MicrosoftAppCredentials(
-                self.settings.app_id,
-                self.settings.app_password,
-                self.settings.channel_auth_tenant,
-            )
-            self._credential_provider = SimpleCredentialProvider(
-                self.settings.app_id, self.settings.app_password
-            )
+        self._credentials = self.settings.app_credentials
+        self._credential_provider = SimpleCredentialProvider(
+            self.settings.app_id, self.settings.app_password
+        )
+
+        self._channel_provider = self.settings.channel_provider
 
         self._is_emulating_oauth_cards = False
-
-        # If no channel_service or open_id_metadata values were passed in the settings, check the
-        # process' Environment Variables for values.
-        # These values may be set when a bot is provisioned on Azure and if so are required for
-        # the bot to properly work in Public Azure or a National Cloud.
-        self.settings.channel_service = self.settings.channel_service or os.environ.get(
-            AuthenticationConstants.CHANNEL_SERVICE
-        )
-        self.settings.open_id_metadata = (
-            self.settings.open_id_metadata
-            or os.environ.get(AuthenticationConstants.BOT_OPEN_ID_METADATA_KEY)
-        )
 
         if self.settings.open_id_metadata:
             ChannelValidation.open_id_metadata_endpoint = self.settings.open_id_metadata
@@ -200,22 +192,19 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                 self.settings.open_id_metadata
             )
 
-        if JwtTokenValidation.is_government(self.settings.channel_service):
-            self._credentials.oauth_endpoint = (
-                GovernmentConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL
-            )
-            self._credentials.oauth_scope = (
-                GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
-            )
-
+        # There is a significant boost in throughput if we reuse a ConnectorClient
         self._connector_client_cache: Dict[str, ConnectorClient] = {}
+
+        # Cache for appCredentials to speed up token acquisition (a token is not requested unless is expired)
+        self._app_credential_map: Dict[str, AppCredentials] = {}
 
     async def continue_conversation(
         self,
         reference: ConversationReference,
         callback: Callable,
         bot_id: str = None,
-        claims_identity: ClaimsIdentity = None,  # pylint: disable=unused-argument
+        claims_identity: ClaimsIdentity = None,
+        audience: str = None,
     ):
         """
         Continues a conversation with a user.
@@ -229,6 +218,8 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         :type bot_id: :class:`typing.str`
         :param claims_identity: The bot claims identity
         :type claims_identity: :class:`botframework.connector.auth.ClaimsIdentity`
+        :param audience:
+        :type audience: :class:`typing.str`
 
         :raises: It raises an argument null exception.
 
@@ -239,11 +230,20 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             send messages to a conversation or user that are already in a communication.
             Scenarios such as sending notifications or coupons to a user are enabled by this function.
         """
-        # TODO: proactive messages
-        if not claims_identity:
-            if not bot_id:
-                raise TypeError("Expected bot_id: str but got None instead")
 
+        if not reference:
+            raise TypeError(
+                "Expected reference: ConversationReference but got None instead"
+            )
+        if not callback:
+            raise TypeError("Expected callback: Callable but got None instead")
+
+        # This has to have either a bot_id, in which case a ClaimsIdentity will be created, or
+        # a ClaimsIdentity.  In either case, if an audience isn't supplied one will be created.
+        if not (bot_id or claims_identity):
+            raise TypeError("Expected bot_id or claims_identity")
+
+        if bot_id and not claims_identity:
             claims_identity = ClaimsIdentity(
                 claims={
                     AuthenticationConstants.AUDIENCE_CLAIM: bot_id,
@@ -252,12 +252,24 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                 is_authenticated=True,
             )
 
+        if not audience:
+            audience = self.__get_botframework_oauth_scope()
+
         context = TurnContext(self, get_continuation_activity(reference))
-        context.turn_state[BOT_IDENTITY_KEY] = claims_identity
-        context.turn_state["BotCallbackHandler"] = callback
-        await self._ensure_channel_connector_client_is_created(
-            reference.service_url, claims_identity
+        context.turn_state[BotFrameworkAdapter.BOT_IDENTITY_KEY] = claims_identity
+        context.turn_state[BotFrameworkAdapter.BOT_CALLBACK_HANDLER_KEY] = callback
+        context.turn_state[BotFrameworkAdapter.BOT_OAUTH_SCOPE_KEY] = audience
+
+        # Add the channel service URL to the trusted services list so we can send messages back.
+        # the service URL for skills is trusted because it is applied by the SkillHandler based
+        # on the original request received by the root bot
+        AppCredentials.trust_service_url(reference.service_url)
+
+        client = await self.create_connector_client(
+            reference.service_url, claims_identity, audience
         )
+        context.turn_state[BotFrameworkAdapter.BOT_CONNECTOR_CLIENT_KEY] = client
+
         return await self.run_pipeline(context, callback)
 
     async def create_conversation(
@@ -265,6 +277,9 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         reference: ConversationReference,
         logic: Callable[[TurnContext], Awaitable] = None,
         conversation_parameters: ConversationParameters = None,
+        channel_id: str = None,
+        service_url: str = None,
+        credentials: AppCredentials = None,
     ):
         """
         Starts a new conversation with a user. Used to direct message to a member of a group.
@@ -275,6 +290,12 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         :type logic: :class:`typing.Callable`
         :param conversation_parameters: The information to use to create the conversation
         :type conversation_parameters:
+        :param channel_id: The ID for the channel.
+        :type channel_id: :class:`typing.str`
+        :param service_url: The channel's service URL endpoint.
+        :type service_url: :class:`typing.str`
+        :param credentials: The application credentials for the bot.
+        :type credentials: :class:`botframework.connector.auth.AppCredentials`
 
         :raises: It raises a generic exception error.
 
@@ -288,15 +309,23 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             then sends a conversation update activity through its middleware pipeline
             to the the callback method.
             If the conversation is established with the specified users, the ID of the activity
-            will contain the ID of the new conversation.</para>
+            will contain the ID of the new conversation.
         """
         try:
-            if reference.service_url is None:
-                raise TypeError(
-                    "BotFrameworkAdapter.create_conversation(): reference.service_url cannot be None."
-                )
+            if not service_url:
+                service_url = reference.service_url
+                if not service_url:
+                    raise TypeError(
+                        "BotFrameworkAdapter.create_conversation(): service_url or reference.service_url is required."
+                    )
 
-            # Create conversation
+            if not channel_id:
+                channel_id = reference.channel_id
+                if not channel_id:
+                    raise TypeError(
+                        "BotFrameworkAdapter.create_conversation(): channel_id or reference.channel_id is required."
+                    )
+
             parameters = (
                 conversation_parameters
                 if conversation_parameters
@@ -304,12 +333,9 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                     bot=reference.bot, members=[reference.user], is_group=False
                 )
             )
-            client = await self.create_connector_client(reference.service_url)
-            resource_response = await client.conversations.create_conversation(
-                parameters
-            )
+
             # Mix in the tenant ID if specified. This is required for MS Teams.
-            if reference.conversation is not None and reference.conversation.tenant_id:
+            if reference.conversation and reference.conversation.tenant_id:
                 # Putting tenant_id in channel_data is a temporary while we wait for the Teams API to be updated
                 parameters.channel_data = {
                     "tenant": {"id": reference.conversation.tenant_id}
@@ -318,19 +344,51 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                 # Permanent solution is to put tenant_id in parameters.tenant_id
                 parameters.tenant_id = reference.conversation.tenant_id
 
-            request = TurnContext.apply_conversation_reference(
-                Activity(type=ActivityTypes.event, name="CreateConversation"),
-                reference,
-                is_incoming=True,
+            # This is different from C# where credentials are required in the method call.
+            # Doing this for compatibility.
+            app_credentials = (
+                credentials
+                if credentials
+                else await self.__get_app_credentials(
+                    self.settings.app_id, self.__get_botframework_oauth_scope()
+                )
             )
-            request.conversation = ConversationAccount(
-                id=resource_response.id, tenant_id=parameters.tenant_id
-            )
-            request.channel_data = parameters.channel_data
-            if resource_response.service_url:
-                request.service_url = resource_response.service_url
 
-            context = self.create_context(request)
+            # Create conversation
+            client = self._get_or_create_connector_client(service_url, app_credentials)
+
+            resource_response = await client.conversations.create_conversation(
+                parameters
+            )
+
+            event_activity = Activity(
+                type=ActivityTypes.event,
+                name="CreateConversation",
+                channel_id=channel_id,
+                service_url=service_url,
+                id=resource_response.activity_id
+                if resource_response.activity_id
+                else str(uuid.uuid4()),
+                conversation=ConversationAccount(
+                    id=resource_response.id, tenant_id=parameters.tenant_id,
+                ),
+                channel_data=parameters.channel_data,
+                recipient=parameters.bot,
+            )
+
+            context = self._create_context(event_activity)
+            context.turn_state[BotFrameworkAdapter.BOT_CONNECTOR_CLIENT_KEY] = client
+
+            claims_identity = ClaimsIdentity(
+                claims={
+                    AuthenticationConstants.AUDIENCE_CLAIM: app_credentials.microsoft_app_id,
+                    AuthenticationConstants.APP_ID_CLAIM: app_credentials.microsoft_app_id,
+                    AuthenticationConstants.SERVICE_URL_CLAIM: service_url,
+                },
+                is_authenticated=True,
+            )
+            context.turn_state[BotFrameworkAdapter.BOT_IDENTITY_KEY] = claims_identity
+
             return await self.run_pipeline(context, logic)
 
         except Exception as error:
@@ -359,10 +417,30 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         """
         activity = await self.parse_request(req)
         auth_header = auth_header or ""
+        identity = await self._authenticate_request(activity, auth_header)
+        return await self.process_activity_with_identity(activity, identity, logic)
 
-        identity = await self.authenticate_request(activity, auth_header)
-        context = self.create_context(activity)
-        context.turn_state[BOT_IDENTITY_KEY] = identity
+    async def process_activity_with_identity(
+        self, activity: Activity, identity: ClaimsIdentity, logic: Callable
+    ):
+        context = self._create_context(activity)
+        context.turn_state[BotFrameworkAdapter.BOT_IDENTITY_KEY] = identity
+        context.turn_state[BotFrameworkAdapter.BOT_CALLBACK_HANDLER_KEY] = logic
+
+        # To create the correct cache key, provide the OAuthScope when calling CreateConnectorClientAsync.
+        # The OAuthScope is also stored on the TurnState to get the correct AppCredentials if fetching a token
+        # is required.
+        scope = (
+            self.__get_botframework_oauth_scope()
+            if not SkillValidation.is_skill_claim(identity.claims)
+            else JwtTokenValidation.get_app_id_from_claims(identity.claims)
+        )
+        context.turn_state[BotFrameworkAdapter.BOT_OAUTH_SCOPE_KEY] = scope
+
+        client = await self.create_connector_client(
+            activity.service_url, identity, scope
+        )
+        context.turn_state[BotFrameworkAdapter.BOT_CONNECTOR_CLIENT_KEY] = client
 
         # Fix to assign tenant_id from channelData to Conversation.tenant_id.
         # MS Teams currently sends the tenant ID in channelData and the correct behavior is to expose
@@ -393,7 +471,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
 
         return None
 
-    async def authenticate_request(
+    async def _authenticate_request(
         self, request: Activity, auth_header: str
     ) -> ClaimsIdentity:
         """
@@ -412,7 +490,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             request,
             auth_header,
             self._credential_provider,
-            self.settings.channel_service,
+            await self.settings.channel_provider.get_channel_service(),
             self.settings.auth_configuration,
         )
 
@@ -421,7 +499,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
 
         return claims
 
-    def create_context(self, activity):
+    def _create_context(self, activity):
         """
         Allows for the overriding of the context object in unit tests and derived adapters.
         :param activity:
@@ -495,8 +573,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             of the activity to replace.
         """
         try:
-            identity: ClaimsIdentity = context.turn_state.get(BOT_IDENTITY_KEY)
-            client = await self.create_connector_client(activity.service_url, identity)
+            client = context.turn_state[BotFrameworkAdapter.BOT_CONNECTOR_CLIENT_KEY]
             return await client.conversations.update_activity(
                 activity.conversation.id, activity.id, activity
             )
@@ -524,8 +601,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             The activity_id of the :class:`botbuilder.schema.ConversationReference` identifies the activity to delete.
         """
         try:
-            identity: ClaimsIdentity = context.turn_state.get(BOT_IDENTITY_KEY)
-            client = await self.create_connector_client(reference.service_url, identity)
+            client = context.turn_state[BotFrameworkAdapter.BOT_CONNECTOR_CLIENT_KEY]
             await client.conversations.delete_activity(
                 reference.conversation.id, reference.activity_id
             )
@@ -566,17 +642,19 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                             "BotFrameworkAdapter.send_activity(): conversation.id can not be None."
                         )
 
-                    identity: ClaimsIdentity = context.turn_state.get(BOT_IDENTITY_KEY)
-                    client = await self.create_connector_client(
-                        activity.service_url, identity
-                    )
                     if activity.type == "trace" and activity.channel_id != "emulator":
                         pass
                     elif activity.reply_to_id:
+                        client = context.turn_state[
+                            BotFrameworkAdapter.BOT_CONNECTOR_CLIENT_KEY
+                        ]
                         response = await client.conversations.reply_to_activity(
                             activity.conversation.id, activity.reply_to_id, activity
                         )
                     else:
+                        client = context.turn_state[
+                            BotFrameworkAdapter.BOT_CONNECTOR_CLIENT_KEY
+                        ]
                         response = await client.conversations.send_to_conversation(
                             activity.conversation.id, activity
                         )
@@ -617,12 +695,10 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                     "BotFrameworkAdapter.delete_conversation_member(): missing conversation or "
                     "conversation.id"
                 )
-            service_url = context.activity.service_url
-            conversation_id = context.activity.conversation.id
-            identity: ClaimsIdentity = context.turn_state.get(BOT_IDENTITY_KEY)
-            client = await self.create_connector_client(service_url, identity)
+
+            client = context.turn_state[BotFrameworkAdapter.BOT_CONNECTOR_CLIENT_KEY]
             return await client.conversations.delete_conversation_member(
-                conversation_id, member_id
+                context.activity.conversation.id, member_id
             )
         except AttributeError as attr_e:
             raise attr_e
@@ -661,12 +737,10 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                     "BotFrameworkAdapter.get_activity_member(): missing both activity_id and "
                     "context.activity.id"
                 )
-            service_url = context.activity.service_url
-            conversation_id = context.activity.conversation.id
-            identity: ClaimsIdentity = context.turn_state.get(BOT_IDENTITY_KEY)
-            client = await self.create_connector_client(service_url, identity)
+
+            client = context.turn_state[BotFrameworkAdapter.BOT_CONNECTOR_CLIENT_KEY]
             return await client.conversations.get_activity_members(
-                conversation_id, activity_id
+                context.activity.conversation.id, activity_id
             )
         except Exception as error:
             raise error
@@ -695,15 +769,20 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                     "BotFrameworkAdapter.get_conversation_members(): missing conversation or "
                     "conversation.id"
                 )
-            service_url = context.activity.service_url
-            conversation_id = context.activity.conversation.id
-            identity: ClaimsIdentity = context.turn_state.get(BOT_IDENTITY_KEY)
-            client = await self.create_connector_client(service_url, identity)
-            return await client.conversations.get_conversation_members(conversation_id)
+
+            client = context.turn_state[BotFrameworkAdapter.BOT_CONNECTOR_CLIENT_KEY]
+            return await client.conversations.get_conversation_members(
+                context.activity.conversation.id
+            )
         except Exception as error:
             raise error
 
-    async def get_conversations(self, service_url: str, continuation_token: str = None):
+    async def get_conversations(
+        self,
+        service_url: str,
+        credentials: AppCredentials,
+        continuation_token: str = None,
+    ):
         """
         Lists the Conversations in which this bot has participated for a given channel server.
 
@@ -725,7 +804,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             This overload may be called from outside the context of a conversation, as only the bot's service URL and
             credentials are required.
         """
-        client = await self.create_connector_client(service_url)
+        client = self._get_or_create_connector_client(service_url, credentials)
         return await client.conversations.get_conversations(continuation_token)
 
     async def get_user_token(
@@ -928,83 +1007,107 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         )
 
     async def create_connector_client(
-        self, service_url: str, identity: ClaimsIdentity = None
+        self, service_url: str, identity: ClaimsIdentity = None, audience: str = None
     ) -> ConnectorClient:
-        """Allows for mocking of the connector client in unit tests
+        """
+        Creates the connector client
         :param service_url: The service URL
         :param identity: The claims identity
+        :param audience:
 
         :return: An instance of the :class:`ConnectorClient` class
         """
 
+        if not identity:
+            # This is different from C# where an exception is raised.  In this case
+            # we are creating a ClaimsIdentity to retain compatibility with this
+            # method.
+            identity = ClaimsIdentity(
+                claims={
+                    AuthenticationConstants.AUDIENCE_CLAIM: self.settings.app_id,
+                    AuthenticationConstants.APP_ID_CLAIM: self.settings.app_id,
+                },
+                is_authenticated=True,
+            )
+
+        # For requests from channel App Id is in Audience claim of JWT token. For emulator it is in AppId claim.
+        # For unauthenticated requests we have anonymous claimsIdentity provided auth is disabled.
+        # For Activities coming from Emulator AppId claim contains the Bot's AAD AppId.
+        bot_app_id = identity.claims.get(
+            AuthenticationConstants.AUDIENCE_CLAIM
+        ) or identity.claims.get(AuthenticationConstants.APP_ID_CLAIM)
+
         # Anonymous claims and non-skill claims should fall through without modifying the scope.
-        credentials = self._credentials
+        credentials = None
+        if bot_app_id:
+            scope = audience
+            if not scope:
+                scope = (
+                    JwtTokenValidation.get_app_id_from_claims(identity.claims)
+                    if SkillValidation.is_skill_claim(identity.claims)
+                    else self.__get_botframework_oauth_scope()
+                )
 
-        if identity:
-            bot_app_id_claim = identity.claims.get(
-                AuthenticationConstants.AUDIENCE_CLAIM
-            ) or identity.claims.get(AuthenticationConstants.APP_ID_CLAIM)
+            credentials = await self.__get_app_credentials(bot_app_id, scope)
 
-            if bot_app_id_claim and SkillValidation.is_skill_claim(identity.claims):
-                scope = JwtTokenValidation.get_app_id_from_claims(identity.claims)
+        return self._get_or_create_connector_client(service_url, credentials)
 
-                # Do nothing, if the current credentials and its scope are valid for the skill.
-                # i.e. the adapter instance is pre-configured to talk with one skill.
-                # Otherwise we will create a new instance of the AppCredentials
-                # so self._credentials.oauth_scope isn't overridden.
-                if self._credentials.oauth_scope != scope:
-                    password = await self._credential_provider.get_app_password(
-                        bot_app_id_claim
-                    )
-                    credentials = MicrosoftAppCredentials(
-                        bot_app_id_claim, password, oauth_scope=scope
-                    )
-                    if (
-                        self.settings.channel_provider
-                        and self.settings.channel_provider.is_government()
-                    ):
-                        credentials.oauth_endpoint = (
-                            GovernmentConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL
-                        )
-                        credentials.oauth_scope = (
-                            GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
-                        )
-
-        client_key = (
-            f"{service_url}{credentials.microsoft_app_id if credentials else ''}"
+    def _get_or_create_connector_client(
+        self, service_url: str, credentials: AppCredentials
+    ) -> ConnectorClient:
+        # Get ConnectorClient from cache or create.
+        client_key = BotFrameworkAdapter.key_for_connector_client(
+            service_url, credentials.microsoft_app_id, credentials.oauth_scope
         )
         client = self._connector_client_cache.get(client_key)
-
         if not client:
+            if not credentials:
+                credentials = MicrosoftAppCredentials.empty()
+
             client = ConnectorClient(credentials, base_url=service_url)
             client.config.add_user_agent(USER_AGENT)
             self._connector_client_cache[client_key] = client
 
         return client
 
-    def _create_token_api_client(
-        self,
-        url_or_context: Union[TurnContext, str],
-        oauth_app_credentials: AppCredentials = None,
+    @staticmethod
+    def key_for_connector_client(service_url: str, app_id: str, scope: str):
+        return f"{service_url}:{app_id}:{scope}"
+
+    async def _create_token_api_client(
+        self, context: TurnContext, oauth_app_credentials: AppCredentials = None,
     ) -> TokenApiClient:
-        if isinstance(url_or_context, str):
-            app_credentials = (
-                oauth_app_credentials if oauth_app_credentials else self._credentials
-            )
-            client = TokenApiClient(app_credentials, url_or_context)
-            client.config.add_user_agent(USER_AGENT)
-            return client
+        if (
+            not self._is_emulating_oauth_cards
+            and context.activity.channel_id == "emulator"
+            and await self._credential_provider.is_authentication_disabled()
+        ):
+            self._is_emulating_oauth_cards = True
 
-        self.__check_emulating_oauth_cards(url_or_context)
-        url = self.__oauth_api_url(url_or_context)
-        return self._create_token_api_client(url)
+        app_id = self.__get_app_id(context)
+        scope = context.turn_state[BotFrameworkAdapter.BOT_OAUTH_SCOPE_KEY]
+        app_credentials = oauth_app_credentials or await self.__get_app_credentials(
+            app_id, scope
+        )
 
-    async def __emulate_oauth_cards(
-        self, context_or_service_url: Union[TurnContext, str], emulate: bool
-    ):
-        self._is_emulating_oauth_cards = emulate
-        url = self.__oauth_api_url(context_or_service_url)
-        await EmulatorApiClient.emulate_oauth_cards(self._credentials, url, emulate)
+        if (
+            not self._is_emulating_oauth_cards
+            and context.activity.channel_id == "emulator"
+            and await self._credential_provider.is_authentication_disabled()
+        ):
+            self._is_emulating_oauth_cards = True
+
+        # TODO: token_api_client cache
+
+        url = self.__oauth_api_url(context)
+        client = TokenApiClient(app_credentials, url)
+        client.config.add_user_agent(USER_AGENT)
+
+        if self._is_emulating_oauth_cards:
+            # intentionally not awaiting this call
+            EmulatorApiClient.emulate_oauth_cards(app_credentials, url, True)
+
+        return client
 
     def __oauth_api_url(self, context_or_service_url: Union[TurnContext, str]) -> str:
         url = None
@@ -1020,47 +1123,76 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             else:
                 url = (
                     US_GOV_OAUTH_ENDPOINT
-                    if JwtTokenValidation.is_government(self.settings.channel_service)
+                    if self.settings.channel_provider.is_government()
                     else OAUTH_ENDPOINT
                 )
 
         return url
 
-    def __check_emulating_oauth_cards(self, context: TurnContext):
-        if (
-            not self._is_emulating_oauth_cards
-            and context.activity.channel_id == "emulator"
-            and (
-                not self._credentials.microsoft_app_id
-                or not self._credentials.microsoft_app_password
+    @staticmethod
+    def key_for_app_credentials(app_id: str, scope: str):
+        return f"{app_id}:{scope}"
+
+    async def __get_app_credentials(
+        self, app_id: str, oauth_scope: str
+    ) -> AppCredentials:
+        if not app_id:
+            return MicrosoftAppCredentials.empty()
+
+        # get from the cache if it's there
+        cache_key = BotFrameworkAdapter.key_for_app_credentials(app_id, oauth_scope)
+        app_credentials = self._app_credential_map.get(cache_key)
+        if app_credentials:
+            return app_credentials
+
+        # If app credentials were provided, use them as they are the preferred choice moving forward
+        if self._credentials:
+            self._app_credential_map[cache_key] = self._credentials
+            return self._credentials
+
+        # Credentials not found in cache, build them
+        app_credentials = await self.__build_credentials(app_id, oauth_scope)
+
+        # Cache the credentials for later use
+        self._app_credential_map[cache_key] = app_credentials
+
+        return app_credentials
+
+    async def __build_credentials(
+        self, app_id: str, oauth_scope: str = None
+    ) -> AppCredentials:
+        app_password = await self._credential_provider.get_app_password(app_id)
+
+        if self._channel_provider.is_government():
+            return MicrosoftGovernmentAppCredentials(
+                app_id,
+                app_password,
+                self.settings.channel_auth_tenant,
+                scope=oauth_scope,
             )
-        ):
-            self._is_emulating_oauth_cards = True
 
-    async def _ensure_channel_connector_client_is_created(
-        self, service_url: str, claims_identity: ClaimsIdentity
-    ):
-        # Ensure we have a default ConnectorClient and MSAppCredentials instance for the audience.
-        audience = claims_identity.claims.get(AuthenticationConstants.AUDIENCE_CLAIM)
+        return MicrosoftAppCredentials(
+            app_id,
+            app_password,
+            self.settings.channel_auth_tenant,
+            oauth_scope=oauth_scope,
+        )
 
+    def __get_botframework_oauth_scope(self) -> str:
         if (
-            not audience
-            or AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER != audience
+            self.settings.channel_provider
+            and self.settings.channel_provider.is_government()
         ):
-            # We create a default connector for audiences that are not coming from
-            # the default https://api.botframework.com audience.
-            # We create a default claim that contains only the desired audience.
-            default_connector_claims = {
-                AuthenticationConstants.AUDIENCE_CLAIM: audience
-            }
-            connector_claims_identity = ClaimsIdentity(
-                claims=default_connector_claims, is_authenticated=True
-            )
+            return GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
+        return AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
 
-            await self.create_connector_client(service_url, connector_claims_identity)
+    def __get_app_id(self, context: TurnContext) -> str:
+        identity = context.turn_state[BotFrameworkAdapter.BOT_IDENTITY_KEY]
+        if not identity:
+            raise Exception("An IIdentity is required in TurnState for this operation.")
 
-        if SkillValidation.is_skill_claim(claims_identity.claims):
-            # Add the channel service URL to the trusted services list so we can send messages back.
-            # the service URL for skills is trusted because it is applied by the
-            # SkillHandler based on the original request received by the root bot
-            MicrosoftAppCredentials.trust_service_url(service_url)
+        app_id = identity.claims.get(AuthenticationConstants.AUDIENCE_CLAIM)
+        if not app_id:
+            raise Exception("Unable to get the bot AppId from the audience claim.")
+
+        return app_id
