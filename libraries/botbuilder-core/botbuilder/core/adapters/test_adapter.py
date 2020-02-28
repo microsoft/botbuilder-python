@@ -164,7 +164,8 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         reference: ConversationReference,
         callback: Callable,
         bot_id: str = None,
-        claims_identity: ClaimsIdentity = None,  # pylint: disable=unused-argument
+        claims_identity: ClaimsIdentity = None,
+        audience: str = None,
     ):
         """
         The `TestAdapter` just calls parent implementation.
@@ -175,7 +176,7 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         :return:
         """
         await super().continue_conversation(
-            reference, callback, bot_id, claims_identity
+            reference, callback, bot_id, claims_identity, audience
         )
 
     async def receive_activity(self, activity):

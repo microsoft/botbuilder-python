@@ -130,8 +130,9 @@ class SlackAdapter(BotAdapter, ABC):
         self,
         reference: ConversationReference,
         callback: Callable,
-        bot_id: str = None,  # pylint: disable=unused-argument
-        claims_identity: ClaimsIdentity = None,  # pylint: disable=unused-argument
+        bot_id: str = None,
+        claims_identity: ClaimsIdentity = None,
+        audience: str = None,
     ):
         """
         Sends a proactive message to a conversation. Call this method to proactively send a message to a conversation.
