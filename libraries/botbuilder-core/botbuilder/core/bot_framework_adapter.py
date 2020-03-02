@@ -87,8 +87,6 @@ class BotFrameworkAdapterSettings:
         open_id_metadata: str = None,
         channel_provider: ChannelProvider = None,
         auth_configuration: AuthenticationConfiguration = None,
-        certificate_thumbprint: str = None,
-        certificate_private_key: str = None,
         app_credentials: AppCredentials = None,
         credential_provider: CredentialProvider = None,
     ):
@@ -107,19 +105,14 @@ class BotFrameworkAdapterSettings:
         :param open_id_metadata:
         :type open_id_metadata: str
         :param channel_provider: The channel provider
-        :type channel_provider: :class:`botframework.connector.auth.ChannelProvider`
+        :type channel_provider: :class:`botframework.connector.auth.ChannelProvider`.  Defaults to SimpleChannelProvider
+        if one isn't specified.
         :param auth_configuration:
         :type auth_configuration: :class:`botframework.connector.auth.AuthenticationConfiguration`
-        :param certificate_thumbprint: X509 thumbprint
-        :type certificate_thumbprint: str
-        :param certificate_private_key: X509 private key
-        :type certificate_private_key: str
-
-        .. remarks::
-            For credentials authorization, both app_id and app_password are required.
-            For certificate authorization, app_id, certificate_thumbprint, and certificate_private_key are required.
-
+        :param credential_provider: Defaults to SimpleCredentialProvider if one isn't specified.
+        :param app_credentials: Allows for a custom AppCredentials.  Used, for example, for CertificateAppCredentials.
         """
+
         self.app_id = app_id
         self.app_password = app_password
         self.app_credentials = app_credentials
@@ -134,8 +127,6 @@ class BotFrameworkAdapterSettings:
             else SimpleCredentialProvider(self.app_id, self.app_password)
         )
         self.auth_configuration = auth_configuration or AuthenticationConfiguration()
-        self.certificate_thumbprint = certificate_thumbprint
-        self.certificate_private_key = certificate_private_key
 
         # If no open_id_metadata values were passed in the settings, check the
         # process' Environment Variable.
