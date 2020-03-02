@@ -88,8 +88,6 @@ class BotFrameworkAdapterSettings:
         open_id_metadata: str = None,
         channel_provider: ChannelProvider = None,
         auth_configuration: AuthenticationConfiguration = None,
-        certificate_thumbprint: str = None,
-        certificate_private_key: str = None,
         app_credentials: AppCredentials = None,
         credential_provider: CredentialProvider = None,
     ):
@@ -108,19 +106,14 @@ class BotFrameworkAdapterSettings:
         :param open_id_metadata:
         :type open_id_metadata: str
         :param channel_provider: The channel provider
-        :type channel_provider: :class:`botframework.connector.auth.ChannelProvider`
+        :type channel_provider: :class:`botframework.connector.auth.ChannelProvider`.  Defaults to SimpleChannelProvider
+        if one isn't specified.
         :param auth_configuration:
         :type auth_configuration: :class:`botframework.connector.auth.AuthenticationConfiguration`
-        :param certificate_thumbprint: X509 thumbprint
-        :type certificate_thumbprint: str
-        :param certificate_private_key: X509 private key
-        :type certificate_private_key: str
-
-        .. remarks::
-            For credentials authorization, both app_id and app_password are required.
-            For certificate authorization, app_id, certificate_thumbprint, and certificate_private_key are required.
-
+        :param credential_provider: Defaults to SimpleCredentialProvider if one isn't specified.
+        :param app_credentials: Allows for a custom AppCredentials.  Used, for example, for CertificateAppCredentials.
         """
+
         self.app_id = app_id
         self.app_password = app_password
         self.app_credentials = app_credentials
@@ -135,8 +128,6 @@ class BotFrameworkAdapterSettings:
             else SimpleCredentialProvider(self.app_id, self.app_password)
         )
         self.auth_configuration = auth_configuration or AuthenticationConfiguration()
-        self.certificate_thumbprint = certificate_thumbprint
-        self.certificate_private_key = certificate_private_key
 
         # If no open_id_metadata values were passed in the settings, check the
         # process' Environment Variable.
@@ -163,10 +154,6 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
     """
 
     _INVOKE_RESPONSE_KEY = "BotFrameworkAdapter.InvokeResponse"
-    BOT_IDENTITY_KEY = "BotIdentity"
-    BOT_OAUTH_SCOPE_KEY = "OAuthScope"
-    BOT_CALLBACK_HANDLER_KEY = "BotCallbackHandler"
-    BOT_CONNECTOR_CLIENT_KEY = "ConnectorClient"
 
     def __init__(self, settings: BotFrameworkAdapterSettings):
         """
@@ -257,9 +244,9 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             audience = self.__get_botframework_oauth_scope()
 
         context = TurnContext(self, get_continuation_activity(reference))
-        context.turn_state[BotFrameworkAdapter.BOT_IDENTITY_KEY] = claims_identity
-        context.turn_state[BotFrameworkAdapter.BOT_CALLBACK_HANDLER_KEY] = callback
-        context.turn_state[BotFrameworkAdapter.BOT_OAUTH_SCOPE_KEY] = audience
+        context.turn_state[BotAdapter.BOT_IDENTITY_KEY] = claims_identity
+        context.turn_state[BotAdapter.BOT_CALLBACK_HANDLER_KEY] = callback
+        context.turn_state[BotAdapter.BOT_OAUTH_SCOPE_KEY] = audience
 
         # Add the channel service URL to the trusted services list so we can send messages back.
         # the service URL for skills is trusted because it is applied by the SkillHandler based
@@ -269,7 +256,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         client = await self.create_connector_client(
             reference.service_url, claims_identity, audience
         )
-        context.turn_state[BotFrameworkAdapter.BOT_CONNECTOR_CLIENT_KEY] = client
+        context.turn_state[BotAdapter.BOT_CONNECTOR_CLIENT_KEY] = client
 
         return await self.run_pipeline(context, callback)
 
@@ -378,7 +365,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             )
 
             context = self._create_context(event_activity)
-            context.turn_state[BotFrameworkAdapter.BOT_CONNECTOR_CLIENT_KEY] = client
+            context.turn_state[BotAdapter.BOT_CONNECTOR_CLIENT_KEY] = client
 
             claims_identity = ClaimsIdentity(
                 claims={
@@ -388,7 +375,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                 },
                 is_authenticated=True,
             )
-            context.turn_state[BotFrameworkAdapter.BOT_IDENTITY_KEY] = claims_identity
+            context.turn_state[BotAdapter.BOT_IDENTITY_KEY] = claims_identity
 
             return await self.run_pipeline(context, logic)
 
@@ -425,8 +412,8 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         self, activity: Activity, identity: ClaimsIdentity, logic: Callable
     ):
         context = self._create_context(activity)
-        context.turn_state[BotFrameworkAdapter.BOT_IDENTITY_KEY] = identity
-        context.turn_state[BotFrameworkAdapter.BOT_CALLBACK_HANDLER_KEY] = logic
+        context.turn_state[BotAdapter.BOT_IDENTITY_KEY] = identity
+        context.turn_state[BotAdapter.BOT_CALLBACK_HANDLER_KEY] = logic
 
         # To create the correct cache key, provide the OAuthScope when calling CreateConnectorClientAsync.
         # The OAuthScope is also stored on the TurnState to get the correct AppCredentials if fetching a token
@@ -436,12 +423,12 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             if not SkillValidation.is_skill_claim(identity.claims)
             else JwtTokenValidation.get_app_id_from_claims(identity.claims)
         )
-        context.turn_state[BotFrameworkAdapter.BOT_OAUTH_SCOPE_KEY] = scope
+        context.turn_state[BotAdapter.BOT_OAUTH_SCOPE_KEY] = scope
 
         client = await self.create_connector_client(
             activity.service_url, identity, scope
         )
-        context.turn_state[BotFrameworkAdapter.BOT_CONNECTOR_CLIENT_KEY] = client
+        context.turn_state[BotAdapter.BOT_CONNECTOR_CLIENT_KEY] = client
 
         # Fix to assign tenant_id from channelData to Conversation.tenant_id.
         # MS Teams currently sends the tenant ID in channelData and the correct behavior is to expose
@@ -576,7 +563,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             of the activity to replace.
         """
         try:
-            client = context.turn_state[BotFrameworkAdapter.BOT_CONNECTOR_CLIENT_KEY]
+            client = context.turn_state[BotAdapter.BOT_CONNECTOR_CLIENT_KEY]
             return await client.conversations.update_activity(
                 activity.conversation.id, activity.id, activity
             )
@@ -604,7 +591,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             The activity_id of the :class:`botbuilder.schema.ConversationReference` identifies the activity to delete.
         """
         try:
-            client = context.turn_state[BotFrameworkAdapter.BOT_CONNECTOR_CLIENT_KEY]
+            client = context.turn_state[BotAdapter.BOT_CONNECTOR_CLIENT_KEY]
             await client.conversations.delete_activity(
                 reference.conversation.id, reference.activity_id
             )
@@ -648,16 +635,12 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                     if activity.type == "trace" and activity.channel_id != "emulator":
                         pass
                     elif activity.reply_to_id:
-                        client = context.turn_state[
-                            BotFrameworkAdapter.BOT_CONNECTOR_CLIENT_KEY
-                        ]
+                        client = context.turn_state[BotAdapter.BOT_CONNECTOR_CLIENT_KEY]
                         response = await client.conversations.reply_to_activity(
                             activity.conversation.id, activity.reply_to_id, activity
                         )
                     else:
-                        client = context.turn_state[
-                            BotFrameworkAdapter.BOT_CONNECTOR_CLIENT_KEY
-                        ]
+                        client = context.turn_state[BotAdapter.BOT_CONNECTOR_CLIENT_KEY]
                         response = await client.conversations.send_to_conversation(
                             activity.conversation.id, activity
                         )
@@ -699,7 +682,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                     "conversation.id"
                 )
 
-            client = context.turn_state[BotFrameworkAdapter.BOT_CONNECTOR_CLIENT_KEY]
+            client = context.turn_state[BotAdapter.BOT_CONNECTOR_CLIENT_KEY]
             return await client.conversations.delete_conversation_member(
                 context.activity.conversation.id, member_id
             )
@@ -741,7 +724,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                     "context.activity.id"
                 )
 
-            client = context.turn_state[BotFrameworkAdapter.BOT_CONNECTOR_CLIENT_KEY]
+            client = context.turn_state[BotAdapter.BOT_CONNECTOR_CLIENT_KEY]
             return await client.conversations.get_activity_members(
                 context.activity.conversation.id, activity_id
             )
@@ -773,7 +756,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                     "conversation.id"
                 )
 
-            client = context.turn_state[BotFrameworkAdapter.BOT_CONNECTOR_CLIENT_KEY]
+            client = context.turn_state[BotAdapter.BOT_CONNECTOR_CLIENT_KEY]
             return await client.conversations.get_conversation_members(
                 context.activity.conversation.id
             )
@@ -849,7 +832,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                 "get_user_token() requires a connection_name but none was provided."
             )
 
-        client = self._create_token_api_client(context, oauth_app_credentials)
+        client = await self._create_token_api_client(context, oauth_app_credentials)
 
         result = client.user_token.get_token(
             context.activity.from_property.id,
@@ -889,7 +872,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         if not user_id:
             user_id = context.activity.from_property.id
 
-        client = self._create_token_api_client(context, oauth_app_credentials)
+        client = await self._create_token_api_client(context, oauth_app_credentials)
         client.user_token.sign_out(
             user_id, connection_name, context.activity.channel_id
         )
@@ -915,7 +898,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         :return: If the task completes successfully, the result contains the raw sign-in link
         """
 
-        client = self._create_token_api_client(context, oauth_app_credentials)
+        client = await self._create_token_api_client(context, oauth_app_credentials)
 
         conversation = TurnContext.get_conversation_reference(context.activity)
         state = TokenExchangeState(
@@ -963,7 +946,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                 "BotFrameworkAdapter.get_token_status(): missing from_property or from_property.id"
             )
 
-        client = self._create_token_api_client(context, oauth_app_credentials)
+        client = await self._create_token_api_client(context, oauth_app_credentials)
 
         user_id = user_id or context.activity.from_property.id
         return client.user_token.get_token_status(
@@ -1001,7 +984,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                 "BotFrameworkAdapter.get_aad_tokens(): missing from_property or from_property.id"
             )
 
-        client = self._create_token_api_client(context, oauth_app_credentials)
+        client = await self._create_token_api_client(context, oauth_app_credentials)
         return client.user_token.get_aad_tokens(
             context.activity.from_property.id,
             connection_name,
@@ -1088,7 +1071,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             self._is_emulating_oauth_cards = True
 
         app_id = self.__get_app_id(context)
-        scope = context.turn_state[BotFrameworkAdapter.BOT_OAUTH_SCOPE_KEY]
+        scope = context.turn_state[BotAdapter.BOT_OAUTH_SCOPE_KEY]
         app_credentials = oauth_app_credentials or await self.__get_app_credentials(
             app_id, scope
         )
@@ -1190,7 +1173,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         return AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
 
     def __get_app_id(self, context: TurnContext) -> str:
-        identity = context.turn_state[BotFrameworkAdapter.BOT_IDENTITY_KEY]
+        identity = context.turn_state[BotAdapter.BOT_IDENTITY_KEY]
         if not identity:
             raise Exception("An IIdentity is required in TurnState for this operation.")
 
