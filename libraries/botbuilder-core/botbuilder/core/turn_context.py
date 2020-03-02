@@ -202,11 +202,15 @@ class TurnContext:
                 for activity in output:
                     self.buffered_replies.append(activity)
                     responses.append(ResourceResponse())
-                    sent_non_trace_activity = sent_non_trace_activity | (activity.type != ActivityTypes.trace)
+
+                if sent_non_trace_activity:
+                    self.responded = True
 
                 return responses
 
             responses = await self.adapter.send_activities(self, output)
+            if sent_non_trace_activity:
+                self.responded = True
             return responses
 
         return await self._emit(self._on_send_activities, output, logic())
