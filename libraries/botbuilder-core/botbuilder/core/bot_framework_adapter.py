@@ -1055,15 +1055,15 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
     def _get_or_create_connector_client(
         self, service_url: str, credentials: AppCredentials
     ) -> ConnectorClient:
+        if not credentials:
+            credentials = MicrosoftAppCredentials.empty()
+
         # Get ConnectorClient from cache or create.
         client_key = BotFrameworkAdapter.key_for_connector_client(
             service_url, credentials.microsoft_app_id, credentials.oauth_scope
         )
         client = self._connector_client_cache.get(client_key)
         if not client:
-            if not credentials:
-                credentials = MicrosoftAppCredentials.empty()
-
             client = ConnectorClient(credentials, base_url=service_url)
             client.config.add_user_agent(USER_AGENT)
             self._connector_client_cache[client_key] = client
