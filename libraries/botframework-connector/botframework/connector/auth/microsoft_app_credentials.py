@@ -33,6 +33,9 @@ class MicrosoftAppCredentials(AppCredentials, ABC):
 
         self.microsoft_app_password = password
         self.app = None
+
+        if self.oauth_scope and not self.oauth_scope.endswith("/.default"):
+            self.oauth_scope += "/.default"
         self.scopes = [self.oauth_scope]
 
     @staticmethod
