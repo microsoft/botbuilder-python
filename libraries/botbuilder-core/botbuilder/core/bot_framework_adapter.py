@@ -829,7 +829,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                 "get_user_token() requires a connection_name but none was provided."
             )
 
-        client = self._create_token_api_client(context, oauth_app_credentials)
+        client = await self._create_token_api_client(context, oauth_app_credentials)
 
         result = client.user_token.get_token(
             context.activity.from_property.id,
@@ -869,7 +869,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         if not user_id:
             user_id = context.activity.from_property.id
 
-        client = self._create_token_api_client(context, oauth_app_credentials)
+        client = await self._create_token_api_client(context, oauth_app_credentials)
         client.user_token.sign_out(
             user_id, connection_name, context.activity.channel_id
         )
@@ -895,7 +895,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         :return: If the task completes successfully, the result contains the raw sign-in link
         """
 
-        client = self._create_token_api_client(context, oauth_app_credentials)
+        client = await self._create_token_api_client(context, oauth_app_credentials)
 
         conversation = TurnContext.get_conversation_reference(context.activity)
         state = TokenExchangeState(
@@ -943,7 +943,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                 "BotFrameworkAdapter.get_token_status(): missing from_property or from_property.id"
             )
 
-        client = self._create_token_api_client(context, oauth_app_credentials)
+        client = await self._create_token_api_client(context, oauth_app_credentials)
 
         user_id = user_id or context.activity.from_property.id
         return client.user_token.get_token_status(
@@ -981,7 +981,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                 "BotFrameworkAdapter.get_aad_tokens(): missing from_property or from_property.id"
             )
 
-        client = self._create_token_api_client(context, oauth_app_credentials)
+        client = await self._create_token_api_client(context, oauth_app_credentials)
         return client.user_token.get_aad_tokens(
             context.activity.from_property.id,
             connection_name,
