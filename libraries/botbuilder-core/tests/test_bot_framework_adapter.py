@@ -19,6 +19,7 @@ from botbuilder.schema import (
     ConversationReference,
     ConversationResourceResponse,
     ChannelAccount,
+    DeliveryModes,
 )
 from botframework.connector.aio import ConnectorClient
 from botframework.connector.auth import (
@@ -58,6 +59,7 @@ class AdapterUnderTest(BotFrameworkAdapter):
         self.fail_operation = False
         self.expect_auth_header = ""
         self.new_service_url = None
+        self.connector_client_mock = None
 
     def aux_test_authenticate_request(self, request: Activity, auth_header: str):
         return super()._authenticate_request(request, auth_header)
@@ -102,7 +104,10 @@ class AdapterUnderTest(BotFrameworkAdapter):
         self.tester.assertIsNotNone(
             service_url, "create_connector_client() not passed service_url."
         )
-        connector_client_mock = Mock()
+
+        if self.connector_client_mock:
+            return self.connector_client_mock
+        self.connector_client_mock = Mock()
 
         async def mock_reply_to_activity(conversation_id, activity_id, activity):
             nonlocal self
@@ -160,23 +165,23 @@ class AdapterUnderTest(BotFrameworkAdapter):
             )
             return response
 
-        connector_client_mock.conversations.reply_to_activity.side_effect = (
+        self.connector_client_mock.conversations.reply_to_activity.side_effect = (
             mock_reply_to_activity
         )
-        connector_client_mock.conversations.send_to_conversation.side_effect = (
+        self.connector_client_mock.conversations.send_to_conversation.side_effect = (
             mock_send_to_conversation
         )
-        connector_client_mock.conversations.update_activity.side_effect = (
+        self.connector_client_mock.conversations.update_activity.side_effect = (
             mock_update_activity
         )
-        connector_client_mock.conversations.delete_activity.side_effect = (
+        self.connector_client_mock.conversations.delete_activity.side_effect = (
             mock_delete_activity
         )
-        connector_client_mock.conversations.create_conversation.side_effect = (
+        self.connector_client_mock.conversations.create_conversation.side_effect = (
             mock_create_conversation
         )
 
-        return connector_client_mock
+        return self.connector_client_mock
 
 
 async def process_activity(
@@ -571,4 +576,89 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
 
         await adapter.continue_conversation(
             refs, callback, claims_identity=skills_identity, audience=skill_2_app_id
+        )
+
+    async def test_delivery_mode_buffered_replies(self):
+        mock_credential_provider = unittest.mock.create_autospec(CredentialProvider)
+
+        settings = BotFrameworkAdapterSettings(
+            app_id="bot_id", credential_provider=mock_credential_provider
+        )
+        adapter = AdapterUnderTest(settings)
+
+        async def callback(context: TurnContext):
+            await context.send_activity("activity 1")
+            await context.send_activity("activity 2")
+            await context.send_activity("activity 3")
+
+        inbound_activity = Activity(
+            type=ActivityTypes.message,
+            channel_id="emulator",
+            service_url="http://tempuri.org/whatever",
+            delivery_mode=DeliveryModes.buffered_replies,
+            text="hello world",
+        )
+
+        identity = ClaimsIdentity(
+            claims={
+                AuthenticationConstants.AUDIENCE_CLAIM: "bot_id",
+                AuthenticationConstants.APP_ID_CLAIM: "bot_id",
+                AuthenticationConstants.VERSION_CLAIM: "1.0",
+            },
+            is_authenticated=True,
+        )
+
+        invoke_response = await adapter.process_activity_with_identity(
+            inbound_activity, identity, callback
+        )
+        assert invoke_response
+        assert invoke_response.status == 200
+        activities = invoke_response.body
+        assert len(activities) == 3
+        assert activities[0].text == "activity 1"
+        assert activities[1].text == "activity 2"
+        assert activities[2].text == "activity 3"
+        assert (
+            adapter.connector_client_mock.conversations.send_to_conversation.call_count
+            == 0
+        )
+
+    async def test_delivery_mode_normal(self):
+        mock_credential_provider = unittest.mock.create_autospec(CredentialProvider)
+
+        settings = BotFrameworkAdapterSettings(
+            app_id="bot_id", credential_provider=mock_credential_provider
+        )
+        adapter = AdapterUnderTest(settings)
+
+        async def callback(context: TurnContext):
+            await context.send_activity("activity 1")
+            await context.send_activity("activity 2")
+            await context.send_activity("activity 3")
+
+        inbound_activity = Activity(
+            type=ActivityTypes.message,
+            channel_id="emulator",
+            service_url="http://tempuri.org/whatever",
+            delivery_mode=DeliveryModes.normal,
+            text="hello world",
+            conversation=ConversationAccount(id="conversationId"),
+        )
+
+        identity = ClaimsIdentity(
+            claims={
+                AuthenticationConstants.AUDIENCE_CLAIM: "bot_id",
+                AuthenticationConstants.APP_ID_CLAIM: "bot_id",
+                AuthenticationConstants.VERSION_CLAIM: "1.0",
+            },
+            is_authenticated=True,
+        )
+
+        invoke_response = await adapter.process_activity_with_identity(
+            inbound_activity, identity, callback
+        )
+        assert not invoke_response
+        assert (
+            adapter.connector_client_mock.conversations.send_to_conversation.call_count
+            == 3
         )

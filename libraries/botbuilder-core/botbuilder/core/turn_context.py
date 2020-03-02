@@ -12,7 +12,7 @@ from botbuilder.schema import (
     InputHints,
     Mention,
     ResourceResponse,
-)
+    DeliveryModes)
 from .re_escape import escape
 
 
@@ -49,6 +49,9 @@ class TurnContext:
             )
 
         self._turn_state = {}
+
+        # A list of activities to send when `context.Activity.DeliveryMode == 'bufferedReplies'`
+        self.buffered_replies = []
 
     @property
     def turn_state(self) -> Dict[str, object]:
@@ -190,10 +193,20 @@ class TurnContext:
             for act in activities
         ]
 
+        # send activities through adapter
         async def logic():
+            nonlocal sent_non_trace_activity
+
+            if self.activity.delivery_mode == DeliveryModes.buffered_replies:
+                responses = []
+                for activity in output:
+                    self.buffered_replies.append(activity)
+                    responses.append(ResourceResponse())
+                    sent_non_trace_activity = sent_non_trace_activity | (activity.type != ActivityTypes.trace)
+
+                return responses
+
             responses = await self.adapter.send_activities(self, output)
-            if sent_non_trace_activity:
-                self.responded = True
             return responses
 
         return await self._emit(self._on_send_activities, output, logic())

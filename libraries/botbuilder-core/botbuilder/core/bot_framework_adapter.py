@@ -39,7 +39,7 @@ from botbuilder.schema import (
     ConversationReference,
     TokenResponse,
     ResourceResponse,
-)
+    DeliveryModes)
 
 from . import __version__
 from .bot_adapter import BotAdapter
@@ -468,6 +468,8 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             if invoke_response is None:
                 return InvokeResponse(status=501)
             return invoke_response.value
+        if context.activity.delivery_mode == DeliveryModes.buffered_replies:
+            return InvokeResponse(status=200, body=context.buffered_replies)
 
         return None
 
