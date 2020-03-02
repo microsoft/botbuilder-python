@@ -39,7 +39,8 @@ from botbuilder.schema import (
     ConversationReference,
     TokenResponse,
     ResourceResponse,
-    DeliveryModes)
+    DeliveryModes,
+)
 
 from . import __version__
 from .bot_adapter import BotAdapter

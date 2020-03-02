@@ -12,7 +12,8 @@ from botbuilder.schema import (
     InputHints,
     Mention,
     ResourceResponse,
-    DeliveryModes)
+    DeliveryModes,
+)
 from .re_escape import escape
 
 
