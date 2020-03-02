@@ -632,16 +632,12 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                     if activity.type == "trace" and activity.channel_id != "emulator":
                         pass
                     elif activity.reply_to_id:
-                        client = context.turn_state[
-                            BotAdapter.BOT_CONNECTOR_CLIENT_KEY
-                        ]
+                        client = context.turn_state[BotAdapter.BOT_CONNECTOR_CLIENT_KEY]
                         response = await client.conversations.reply_to_activity(
                             activity.conversation.id, activity.reply_to_id, activity
                         )
                     else:
-                        client = context.turn_state[
-                            BotAdapter.BOT_CONNECTOR_CLIENT_KEY
-                        ]
+                        client = context.turn_state[BotAdapter.BOT_CONNECTOR_CLIENT_KEY]
                         response = await client.conversations.send_to_conversation(
                             activity.conversation.id, activity
                         )
