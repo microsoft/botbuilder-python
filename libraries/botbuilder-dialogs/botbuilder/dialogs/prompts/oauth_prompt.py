@@ -7,6 +7,7 @@ from typing import Union, Awaitable, Callable
 
 from botframework.connector import Channels
 from botframework.connector.auth import ClaimsIdentity, SkillValidation
+from botframework.connector.token_api.models import SignInUrlResponse
 from botbuilder.core import (
     CardFactory,
     ExtendedUserTokenProvider,
@@ -298,8 +299,14 @@ class OAuthPrompt(Dialog):
                 att.content_type == CardFactory.content_types.oauth_card
                 for att in prompt.attachments
             ):
+                adapter: ExtendedUserTokenProvider = context.adapter
                 link = None
                 card_action_type = ActionTypes.signin
+                sign_in_resource: SignInUrlResponse = await adapter.get_sign_in_resource_from_user(
+                    context,
+                    self._settings.connection_name,
+                    context.activity.from_property.id,
+                )
                 bot_identity: ClaimsIdentity = context.turn_state.get("BotIdentity")
 
                 # check if it's from streaming connection
@@ -338,6 +345,7 @@ class OAuthPrompt(Dialog):
                                     value=link,
                                 )
                             ],
+                            token_exchange_resource=sign_in_resource.token_exchange_resource,
                         )
                     )
                 )
