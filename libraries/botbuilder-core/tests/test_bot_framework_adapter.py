@@ -21,7 +21,12 @@ from botbuilder.schema import (
     ChannelAccount,
 )
 from botframework.connector.aio import ConnectorClient
-from botframework.connector.auth import ClaimsIdentity
+from botframework.connector.auth import (
+    ClaimsIdentity,
+    AuthenticationConstants,
+    AppCredentials,
+    CredentialProvider,
+)
 
 REFERENCE = ConversationReference(
     activity_id="1234",
@@ -55,12 +60,14 @@ class AdapterUnderTest(BotFrameworkAdapter):
         self.new_service_url = None
 
     def aux_test_authenticate_request(self, request: Activity, auth_header: str):
-        return super().authenticate_request(request, auth_header)
+        return super()._authenticate_request(request, auth_header)
 
     async def aux_test_create_connector_client(self, service_url: str):
         return await super().create_connector_client(service_url)
 
-    async def authenticate_request(self, request: Activity, auth_header: str):
+    async def _authenticate_request(
+        self, request: Activity, auth_header: str
+    ) -> ClaimsIdentity:
         self.tester.assertIsNotNone(
             request, "authenticate_request() not passed request."
         )
@@ -69,12 +76,28 @@ class AdapterUnderTest(BotFrameworkAdapter):
             self.expect_auth_header,
             "authenticateRequest() not passed expected authHeader.",
         )
-        return not self.fail_auth
+
+        if self.fail_auth:
+            raise PermissionError("Unauthorized Access. Request is not authorized")
+
+        return ClaimsIdentity(
+            claims={
+                AuthenticationConstants.AUDIENCE_CLAIM: self.settings.app_id,
+                AuthenticationConstants.APP_ID_CLAIM: self.settings.app_id,
+            },
+            is_authenticated=True,
+        )
 
     async def create_connector_client(
         self,
         service_url: str,
         identity: ClaimsIdentity = None,  # pylint: disable=unused-argument
+        audience: str = None,  # pylint: disable=unused-argument
+    ) -> ConnectorClient:
+        return self._get_or_create_connector_client(service_url, None)
+
+    def _get_or_create_connector_client(
+        self, service_url: str, credentials: AppCredentials
     ) -> ConnectorClient:
         self.tester.assertIsNotNone(
             service_url, "create_connector_client() not passed service_url."
@@ -203,14 +226,6 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
         await adapter.process_activity(INCOMING_MESSAGE, "", aux_func_assert_context)
         self.assertTrue(called, "bot logic not called.")
 
-    async def test_should_update_activity(self):
-        adapter = AdapterUnderTest()
-        context = TurnContext(adapter, INCOMING_MESSAGE)
-        self.assertTrue(
-            await adapter.update_activity(context, INCOMING_MESSAGE),
-            "Activity not updated.",
-        )
-
     async def test_should_fail_to_update_activity_if_service_url_missing(self):
         adapter = AdapterUnderTest()
         context = TurnContext(adapter, INCOMING_MESSAGE)
@@ -291,3 +306,269 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
 
         await adapter.create_conversation(reference, aux_func_assert_valid_conversation)
         self.assertTrue(called, "bot logic not called.")
+
+    @staticmethod
+    def get_creds_and_assert_values(
+        turn_context: TurnContext,
+        expected_app_id: str,
+        expected_scope: str,
+        creds_count: int = None,
+    ):
+        # pylint: disable=protected-access
+        credential_cache = turn_context.adapter._app_credential_map
+        cache_key = BotFrameworkAdapter.key_for_app_credentials(
+            expected_app_id, expected_scope
+        )
+        credentials = credential_cache.get(cache_key)
+        assert credentials
+
+        TestBotFrameworkAdapter.assert_credentials_values(
+            credentials, expected_app_id, expected_scope
+        )
+
+        if creds_count:
+            assert creds_count == len(credential_cache)
+
+    @staticmethod
+    def get_client_and_assert_values(
+        turn_context: TurnContext,
+        expected_app_id: str,
+        expected_scope: str,
+        expected_url: str,
+        client_count: int = None,
+    ):
+        # pylint: disable=protected-access
+        client_cache = turn_context.adapter._connector_client_cache
+        cache_key = BotFrameworkAdapter.key_for_connector_client(
+            expected_url, expected_app_id, expected_scope
+        )
+        client = client_cache[cache_key]
+        assert client
+
+        TestBotFrameworkAdapter.assert_connectorclient_vaules(
+            client, expected_app_id, expected_url, expected_scope
+        )
+
+        if client_count:
+            assert client_count == len(client_cache)
+
+    @staticmethod
+    def assert_connectorclient_vaules(
+        client: ConnectorClient,
+        expected_app_id,
+        expected_service_url: str,
+        expected_scope=AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE,
+    ):
+        creds = client.config.credentials
+        assert expected_app_id == creds.microsoft_app_id
+        assert expected_scope == creds.oauth_scope
+        assert expected_service_url == client.config.base_url
+
+    @staticmethod
+    def assert_credentials_values(
+        credentials: AppCredentials,
+        expected_app_id: str,
+        expected_scope: str = AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE,
+    ):
+        assert expected_app_id == credentials.microsoft_app_id
+        assert expected_scope == credentials.oauth_scope
+
+    async def test_process_activity_creates_correct_creds_and_client(self):
+        bot_app_id = "00000000-0000-0000-0000-000000000001"
+        identity = ClaimsIdentity(
+            claims={
+                AuthenticationConstants.AUDIENCE_CLAIM: bot_app_id,
+                AuthenticationConstants.APP_ID_CLAIM: bot_app_id,
+                AuthenticationConstants.VERSION_CLAIM: "1.0",
+            },
+            is_authenticated=True,
+        )
+
+        service_url = "https://smba.trafficmanager.net/amer/"
+
+        async def callback(context: TurnContext):
+            TestBotFrameworkAdapter.get_creds_and_assert_values(
+                context,
+                bot_app_id,
+                AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE,
+                1,
+            )
+            TestBotFrameworkAdapter.get_client_and_assert_values(
+                context,
+                bot_app_id,
+                AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE,
+                service_url,
+                1,
+            )
+
+            scope = context.turn_state[BotFrameworkAdapter.BOT_OAUTH_SCOPE_KEY]
+            assert AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE == scope
+
+        settings = BotFrameworkAdapterSettings(bot_app_id)
+        sut = BotFrameworkAdapter(settings)
+        await sut.process_activity_with_identity(
+            Activity(channel_id="emulator", service_url=service_url, text="test",),
+            identity,
+            callback,
+        )
+
+    async def test_process_activity_for_forwarded_activity(self):
+        bot_app_id = "00000000-0000-0000-0000-000000000001"
+        skill_1_app_id = "00000000-0000-0000-0000-000000skill1"
+        identity = ClaimsIdentity(
+            claims={
+                AuthenticationConstants.AUDIENCE_CLAIM: skill_1_app_id,
+                AuthenticationConstants.APP_ID_CLAIM: bot_app_id,
+                AuthenticationConstants.VERSION_CLAIM: "1.0",
+            },
+            is_authenticated=True,
+        )
+
+        service_url = "https://root-bot.test.azurewebsites.net/"
+
+        async def callback(context: TurnContext):
+            TestBotFrameworkAdapter.get_creds_and_assert_values(
+                context, skill_1_app_id, bot_app_id, 1,
+            )
+            TestBotFrameworkAdapter.get_client_and_assert_values(
+                context, skill_1_app_id, bot_app_id, service_url, 1,
+            )
+
+            scope = context.turn_state[BotFrameworkAdapter.BOT_OAUTH_SCOPE_KEY]
+            assert bot_app_id == scope
+
+        settings = BotFrameworkAdapterSettings(bot_app_id)
+        sut = BotFrameworkAdapter(settings)
+        await sut.process_activity_with_identity(
+            Activity(channel_id="emulator", service_url=service_url, text="test",),
+            identity,
+            callback,
+        )
+
+    async def test_continue_conversation_without_audience(self):
+        mock_credential_provider = unittest.mock.create_autospec(CredentialProvider)
+
+        settings = BotFrameworkAdapterSettings(
+            app_id="bot_id", credential_provider=mock_credential_provider
+        )
+        adapter = BotFrameworkAdapter(settings)
+
+        skill_1_app_id = "00000000-0000-0000-0000-000000skill1"
+        skill_2_app_id = "00000000-0000-0000-0000-000000skill2"
+
+        skills_identity = ClaimsIdentity(
+            claims={
+                AuthenticationConstants.AUDIENCE_CLAIM: skill_1_app_id,
+                AuthenticationConstants.APP_ID_CLAIM: skill_2_app_id,
+                AuthenticationConstants.VERSION_CLAIM: "1.0",
+            },
+            is_authenticated=True,
+        )
+
+        channel_service_url = "https://smba.trafficmanager.net/amer/"
+
+        async def callback(context: TurnContext):
+            TestBotFrameworkAdapter.get_creds_and_assert_values(
+                context,
+                skill_1_app_id,
+                AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE,
+                1,
+            )
+            TestBotFrameworkAdapter.get_client_and_assert_values(
+                context,
+                skill_1_app_id,
+                AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE,
+                channel_service_url,
+                1,
+            )
+
+            # pylint: disable=protected-access
+            client_cache = context.adapter._connector_client_cache
+            client = client_cache.get(
+                BotFrameworkAdapter.key_for_connector_client(
+                    channel_service_url,
+                    skill_1_app_id,
+                    AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE,
+                )
+            )
+            assert client
+
+            turn_state_client = context.turn_state.get(
+                BotFrameworkAdapter.BOT_CONNECTOR_CLIENT_KEY
+            )
+            assert turn_state_client
+            client_creds = turn_state_client.config.credentials
+
+            assert skill_1_app_id == client_creds.microsoft_app_id
+            assert (
+                AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
+                == client_creds.oauth_scope
+            )
+            assert client.config.base_url == turn_state_client.config.base_url
+
+            scope = context.turn_state[BotFrameworkAdapter.BOT_OAUTH_SCOPE_KEY]
+            assert AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE == scope
+
+        refs = ConversationReference(service_url=channel_service_url)
+
+        await adapter.continue_conversation(
+            refs, callback, claims_identity=skills_identity
+        )
+
+    async def test_continue_conversation_with_audience(self):
+        mock_credential_provider = unittest.mock.create_autospec(CredentialProvider)
+
+        settings = BotFrameworkAdapterSettings(
+            app_id="bot_id", credential_provider=mock_credential_provider
+        )
+        adapter = BotFrameworkAdapter(settings)
+
+        skill_1_app_id = "00000000-0000-0000-0000-000000skill1"
+        skill_2_app_id = "00000000-0000-0000-0000-000000skill2"
+
+        skills_identity = ClaimsIdentity(
+            claims={
+                AuthenticationConstants.AUDIENCE_CLAIM: skill_1_app_id,
+                AuthenticationConstants.APP_ID_CLAIM: skill_2_app_id,
+                AuthenticationConstants.VERSION_CLAIM: "1.0",
+            },
+            is_authenticated=True,
+        )
+
+        skill_2_service_url = "https://skill2.com/api/skills/"
+
+        async def callback(context: TurnContext):
+            TestBotFrameworkAdapter.get_creds_and_assert_values(
+                context, skill_1_app_id, skill_2_app_id, 1,
+            )
+            TestBotFrameworkAdapter.get_client_and_assert_values(
+                context, skill_1_app_id, skill_2_app_id, skill_2_service_url, 1,
+            )
+
+            # pylint: disable=protected-access
+            client_cache = context.adapter._connector_client_cache
+            client = client_cache.get(
+                BotFrameworkAdapter.key_for_connector_client(
+                    skill_2_service_url, skill_1_app_id, skill_2_app_id,
+                )
+            )
+            assert client
+
+            turn_state_client = context.turn_state.get(
+                BotFrameworkAdapter.BOT_CONNECTOR_CLIENT_KEY
+            )
+            assert turn_state_client
+            client_creds = turn_state_client.config.credentials
+
+            assert skill_1_app_id == client_creds.microsoft_app_id
+            assert skill_2_app_id == client_creds.oauth_scope
+            assert client.config.base_url == turn_state_client.config.base_url
+
+            scope = context.turn_state[BotFrameworkAdapter.BOT_OAUTH_SCOPE_KEY]
+            assert skill_2_app_id == scope
+
+        refs = ConversationReference(service_url=skill_2_service_url)
+
+        await adapter.continue_conversation(
+            refs, callback, claims_identity=skills_identity, audience=skill_2_app_id
+        )

@@ -15,6 +15,7 @@ from .channel_provider import *
 from .simple_channel_provider import *
 from .app_credentials import *
 from .microsoft_app_credentials import *
+from .microsoft_government_app_credentials import *
 from .certificate_app_credentials import *
 from .claims_identity import *
 from .jwt_token_validation import *

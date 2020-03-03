@@ -97,7 +97,7 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
         logic: Coroutine = None,
         template_or_conversation: Union[Activity, ConversationReference] = None,
         send_trace_activities: bool = False,
-    ):  # pylint: disable=unused-argument
+    ):
         """
         Creates a new TestAdapter instance.
         :param logic:
@@ -201,6 +201,7 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
         callback: Callable,
         bot_id: str = None,
         claims_identity: ClaimsIdentity = None,  # pylint: disable=unused-argument
+        audience: str = None,
     ):
         """
         The `TestAdapter` just calls parent implementation.
@@ -211,7 +212,7 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
         :return:
         """
         await super().continue_conversation(
-            reference, callback, bot_id, claims_identity
+            reference, callback, bot_id, claims_identity, audience
         )
 
     async def receive_activity(self, activity):
