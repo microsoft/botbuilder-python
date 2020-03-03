@@ -52,6 +52,7 @@ jobs:
       pip install -e ./libraries/botbuilder-azure
       pip install -e ./libraries/botbuilder-testing
       pip install -e ./libraries/botbuilder-integration-applicationinsights-aiohttp
+      pip install -e ./libraries/botbuilder-adapters-slack
       pip install -r ./libraries/botframework-connector/tests/requirements.txt
       pip install -r ./libraries/botbuilder-core/tests/requirements.txt
       pip install coveralls
@@ -85,16 +86,16 @@ jobs:
   - powershell: |
       Set-Location ..
       Get-ChildItem -Recurse -Force
-    
+
     displayName: 'Dir workspace'
     condition: succeededOrFailed()
 
   - powershell: |
       # This task copies the code coverage file created by dotnet test into a well known location. In all
-      # checks I've done, dotnet test ALWAYS outputs the coverage file to the temp directory. 
+      # checks I've done, dotnet test ALWAYS outputs the coverage file to the temp directory.
       # My attempts to override this and have it go directly to the CodeCoverage directory have
       # all failed, so I'm just doing the copy here.  (cmullins)
-      
+
       Get-ChildItem -Path "$(Build.SourcesDirectory)" -Include "*coverage*" | Copy-Item -Destination "$(Build.ArtifactStagingDirectory)/CodeCoverage"
     displayName: 'Copy .coverage Files to CodeCoverage folder'
     continueOnError: true
