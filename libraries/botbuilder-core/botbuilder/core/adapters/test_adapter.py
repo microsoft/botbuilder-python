@@ -20,7 +20,7 @@ from botbuilder.schema import (
     ResourceResponse,
     TokenResponse,
 )
-from botframework.connector.auth import ClaimsIdentity
+from botframework.connector.auth import ClaimsIdentity, AppCredentials
 from ..bot_adapter import BotAdapter
 from ..turn_context import TurnContext
 from ..user_token_provider import UserTokenProvider
@@ -55,6 +55,8 @@ class TokenMagicCode:
 
 
 class TestAdapter(BotAdapter, UserTokenProvider):
+    __test__ = False
+
     def __init__(
         self,
         logic: Coroutine = None,
@@ -162,7 +164,8 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         reference: ConversationReference,
         callback: Callable,
         bot_id: str = None,
-        claims_identity: ClaimsIdentity = None,  # pylint: disable=unused-argument
+        claims_identity: ClaimsIdentity = None,
+        audience: str = None,
     ):
         """
         The `TestAdapter` just calls parent implementation.
@@ -173,7 +176,7 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         :return:
         """
         await super().continue_conversation(
-            reference, callback, bot_id, claims_identity
+            reference, callback, bot_id, claims_identity, audience
         )
 
     async def receive_activity(self, activity):
@@ -269,7 +272,11 @@ class TestAdapter(BotAdapter, UserTokenProvider):
             self._magic_codes.append(code)
 
     async def get_user_token(
-        self, context: TurnContext, connection_name: str, magic_code: str = None
+        self,
+        context: TurnContext,
+        connection_name: str,
+        magic_code: str = None,
+        oauth_app_credentials: AppCredentials = None,
     ) -> TokenResponse:
         key = UserToken()
         key.channel_id = context.activity.channel_id
@@ -305,7 +312,11 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         return None
 
     async def sign_out_user(
-        self, context: TurnContext, connection_name: str, user_id: str = None
+        self,
+        context: TurnContext,
+        connection_name: str = None,
+        user_id: str = None,
+        oauth_app_credentials: AppCredentials = None,
     ):
         channel_id = context.activity.channel_id
         user_id = context.activity.from_property.id
@@ -321,20 +332,41 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         self._user_tokens = new_records
 
     async def get_oauth_sign_in_link(
-        self, context: TurnContext, connection_name: str
+        self,
+        context: TurnContext,
+        connection_name: str,
+        final_redirect: str = None,
+        oauth_app_credentials: AppCredentials = None,
     ) -> str:
         return (
             f"https://fake.com/oauthsignin"
             f"/{connection_name}/{context.activity.channel_id}/{context.activity.from_property.id}"
         )
 
+    async def get_token_status(
+        self,
+        context: TurnContext,
+        connection_name: str = None,
+        user_id: str = None,
+        include_filter: str = None,
+        oauth_app_credentials: AppCredentials = None,
+    ) -> Dict[str, TokenResponse]:
+        return None
+
     async def get_aad_tokens(
-        self, context: TurnContext, connection_name: str, resource_urls: List[str]
+        self,
+        context: TurnContext,
+        connection_name: str,
+        resource_urls: List[str],
+        user_id: str = None,
+        oauth_app_credentials: AppCredentials = None,
     ) -> Dict[str, TokenResponse]:
         return None
 
 
 class TestFlow:
+    __test__ = False
+
     def __init__(self, previous: Callable, adapter: TestAdapter):
         """
         INTERNAL: creates a new TestFlow instance.

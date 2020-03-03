@@ -1,0 +1,13 @@
+
+on: [issues]
+
+jobs:
+  on-issue-update:
+    runs-on: ubuntu-latest
+    name: Tag issues
+    steps:
+    - name: Issue tagging
+      id: issue-autotagger
+      uses: christopheranderson/issue-autotagger@v1
+      with:
+        repo-token: "${{ secrets.GITHUB_TOKEN }}"

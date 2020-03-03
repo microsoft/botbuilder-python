@@ -143,7 +143,10 @@ class OAuthPrompt(Dialog):
             )
 
         output = await dialog_context.context.adapter.get_user_token(
-            dialog_context.context, self._settings.connection_name, None
+            dialog_context.context,
+            self._settings.connection_name,
+            None,
+            self._settings.oath_app_credentials,
         )
 
         if output is not None:
@@ -220,6 +223,8 @@ class OAuthPrompt(Dialog):
 
         :param context: Context for the current turn of conversation with the user
         :type context:  :class:`TurnContext`
+        :param code: (Optional) Optional user entered code to validate.
+        :type code: str
 
         :return: A response that includes the user's token
         :rtype: :class:`TokenResponse`
@@ -237,7 +242,10 @@ class OAuthPrompt(Dialog):
             )
 
         return await adapter.get_user_token(
-            context, self._settings.connection_name, code
+            context,
+            self._settings.connection_name,
+            code,
+            self._settings.oath_app_credentials,
         )
 
     async def sign_out_user(self, context: TurnContext):
@@ -260,7 +268,12 @@ class OAuthPrompt(Dialog):
                 "OAuthPrompt.sign_out_user(): not supported for the current adapter."
             )
 
-        return await adapter.sign_out_user(context, self._settings.connection_name)
+        return await adapter.sign_out_user(
+            context,
+            self._settings.connection_name,
+            None,
+            self._settings.oath_app_credentials,
+        )
 
     async def _send_oauth_card(
         self, context: TurnContext, prompt: Union[Activity, str] = None
@@ -288,13 +301,19 @@ class OAuthPrompt(Dialog):
                             "OAuthPrompt: get_oauth_sign_in_link() not supported by the current adapter"
                         )
                     link = await context.adapter.get_oauth_sign_in_link(
-                        context, self._settings.connection_name
+                        context,
+                        self._settings.connection_name,
+                        None,
+                        self._settings.oath_app_credentials,
                     )
                 elif bot_identity and SkillValidation.is_skill_claim(
                     bot_identity.claims
                 ):
                     link = await context.adapter.get_oauth_sign_in_link(
-                        context, self._settings.connection_name
+                        context,
+                        self._settings.connection_name,
+                        None,
+                        self._settings.oath_app_credentials,
                     )
                     card_action_type = ActionTypes.open_url
 
@@ -325,7 +344,10 @@ class OAuthPrompt(Dialog):
                     )
 
                 link = await context.adapter.get_oauth_sign_in_link(
-                    context, self._settings.connection_name
+                    context,
+                    self._settings.connection_name,
+                    None,
+                    self._settings.oath_app_credentials,
                 )
                 prompt.attachments.append(
                     CardFactory.signin_card(
