@@ -174,7 +174,7 @@ class JwtTokenValidation:
         )
 
     @staticmethod
-    def get_app_id_from_claims(claims: Dict[str, object]) -> bool:
+    def get_app_id_from_claims(claims: Dict[str, object]) -> str:
         app_id = None
 
         # Depending on Version, the is either in the

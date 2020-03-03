@@ -13,6 +13,11 @@ from .middleware_set import MiddlewareSet
 
 
 class BotAdapter(ABC):
+    BOT_IDENTITY_KEY = "BotIdentity"
+    BOT_OAUTH_SCOPE_KEY = "OAuthScope"
+    BOT_CONNECTOR_CLIENT_KEY = "ConnectorClient"
+    BOT_CALLBACK_HANDLER_KEY = "BotCallbackHandler"
+
     def __init__(
         self, on_turn_error: Callable[[TurnContext, Exception], Awaitable] = None
     ):
@@ -68,6 +73,7 @@ class BotAdapter(ABC):
         callback: Callable,
         bot_id: str = None,  # pylint: disable=unused-argument
         claims_identity: ClaimsIdentity = None,  # pylint: disable=unused-argument
+        audience: str = None,  # pylint: disable=unused-argument
     ):
         """
         Sends a proactive message to a conversation. Call this method to proactively send a message to a conversation.
@@ -79,6 +85,7 @@ class BotAdapter(ABC):
         :param reference: A reference to the conversation to continue.</param>
         :param callback: The method to call for the resulting bot turn.</param>
         :param claims_identity:
+        :param audience:
         """
         context = TurnContext(
             self, conversation_reference_extension.get_continuation_activity(reference)

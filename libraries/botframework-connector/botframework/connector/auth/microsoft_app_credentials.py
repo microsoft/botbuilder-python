@@ -33,7 +33,17 @@ class MicrosoftAppCredentials(AppCredentials, ABC):
 
         self.microsoft_app_password = password
         self.app = None
-        self.scopes = [self.oauth_scope]
+
+        # This check likely needs to be more nuanced than this.  Assuming
+        # "/.default" precludes other valid suffixes
+        scope = self.oauth_scope
+        if oauth_scope and not scope.endswith("/.default"):
+            scope += "/.default"
+        self.scopes = [scope]
+
+    @staticmethod
+    def empty():
+        return MicrosoftAppCredentials("", "")
 
     def get_access_token(self, force_refresh: bool = False) -> str:
         """

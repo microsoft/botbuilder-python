@@ -35,7 +35,7 @@ class TestTeamsInfo(aiounittest.AsyncTestCase):
 
 class TestTeamsActivityHandler(TeamsActivityHandler):
     async def on_turn(self, turn_context: TurnContext):
-        super().on_turn(turn_context)
+        await super().on_turn(turn_context)
 
         if turn_context.activity.text == "test_send_message_to_teams_channel":
             await self.call_send_message_to_teams(turn_context)
