@@ -1099,8 +1099,7 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
                 " for a user that is different from the conversation"
             )
 
-        url = self.__oauth_api_url(turn_context)
-        client = self._create_token_api_client(url)
+        client = await self._create_token_api_client(turn_context)
         conversation = TurnContext.get_conversation_reference(turn_context.activity)
 
         state = TokenExchangeState(
@@ -1114,7 +1113,7 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
             json.dumps(state.serialize()).encode(encoding="UTF-8", errors="strict")
         ).decode()
 
-        return client.bot_sign_in.get_sign_in_url(
+        return client.bot_sign_in.get_sign_in_resource(
             final_state, final_redirect=final_redirect
         )
 
