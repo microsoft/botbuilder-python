@@ -33,23 +33,7 @@ class SkillConversationIdFactoryOptions:
                 "SkillConversationIdFactoryOptions(): bot_framework_skill cannot be None."
             )
 
-        self._from_bot_oauth_scope = from_bot_oauth_scope
-        self._from_bot_id = from_bot_id
-        self._activity = activity
-        self._bot_framework_skill = bot_framework_skill
-
-    @property
-    def from_bot_oauth_scope(self) -> str:
-        return self._from_bot_oauth_scope
-
-    @property
-    def from_bot_id(self) -> str:
-        return self._from_bot_id
-
-    @property
-    def activity(self) -> Activity:
-        return self._activity
-
-    @property
-    def bot_framework_skill(self) -> BotFrameworkSkill:
-        return self._bot_framework_skill
+        self.from_bot_oauth_scope = from_bot_oauth_scope
+        self.from_bot_id = from_bot_id
+        self.activity = activity
+        self.bot_framework_skill = bot_framework_skill

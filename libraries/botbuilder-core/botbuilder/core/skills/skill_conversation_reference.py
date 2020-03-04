@@ -17,13 +17,5 @@ class SkillConversationReference:
         if oauth_scope is None:
             raise TypeError("SkillConversationReference(): oauth_scope cannot be None.")
 
-        self._conversation_reference = conversation_reference
-        self._oauth_scope = oauth_scope
-
-    @property
-    def conversation_reference(self) -> ConversationReference:
-        return self._conversation_reference
-
-    @property
-    def oauth_scope(self) -> str:
-        return self._oauth_scope
+        self.conversation_reference = conversation_reference
+        self.oauth_scope = oauth_scope
