@@ -19,7 +19,7 @@ from botframework.connector.auth import (
     GovernmentConstants,
 )
 from .skill_conversation_reference import SkillConversationReference
-from .skill_conversation_id_factory import ConversationIdFactoryBase
+from .conversation_id_factory import ConversationIdFactoryBase
 
 
 class SkillHandler(ChannelServiceHandler):
