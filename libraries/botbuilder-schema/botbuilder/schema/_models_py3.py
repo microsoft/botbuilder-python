@@ -1354,7 +1354,7 @@ class OAuthCard(Model):
         "text": {"key": "text", "type": "str"},
         "connection_name": {"key": "connectionName", "type": "str"},
         "buttons": {"key": "buttons", "type": "[CardAction]"},
-        "token_exchange_resource": {"key": "tokenExchangeResource", "type": "TokenExchangeResource"}
+        "token_exchange_resource": {"key": "tokenExchangeResource", "type": "object"},
     }
 
     def __init__(
@@ -1906,33 +1906,6 @@ class TokenResponse(Model):
         self.token = token
         self.expiration = expiration
         self.channel_id = channel_id
-
-
-# TODO: Consider removing, duplicating due to temporal fix
-class TokenExchangeResource(Model):
-    """TokenExchangeResource.
-
-    :param id:
-    :type id: str
-    :param uri:
-    :type uri: str
-    :param provider_id:
-    :type provider_id: str
-    """
-
-    _attribute_map = {
-        "id": {"key": "id", "type": "str"},
-        "uri": {"key": "uri", "type": "str"},
-        "provider_id": {"key": "providerId", "type": "str"},
-    }
-
-    def __init__(
-        self, *, id: str = None, uri: str = None, provider_id: str = None, **kwargs
-    ) -> None:
-        super(TokenExchangeResource, self).__init__(**kwargs)
-        self.id = id
-        self.uri = uri
-        self.provider_id = provider_id
 
 
 class Transcript(Model):

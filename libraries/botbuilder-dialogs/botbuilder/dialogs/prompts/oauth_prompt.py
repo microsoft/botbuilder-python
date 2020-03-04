@@ -346,7 +346,7 @@ class OAuthPrompt(Dialog):
                                     value=link,
                                 )
                             ],
-                            token_exchange_resource=sign_in_resource.token_exchange_resource,
+                            token_exchange_resource=sign_in_resource.token_exchange_resource.as_dict(),
                         )
                     )
                 )
