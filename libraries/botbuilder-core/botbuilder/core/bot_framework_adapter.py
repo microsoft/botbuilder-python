@@ -1075,9 +1075,10 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
 
         return client
 
-    async def get_sign_in_resource_from_user(
+    async def get_sign_in_resource_from_user_and_credentials(
         self,
         turn_context: TurnContext,
+        oauth_app_credentials: AppCredentials,
         connection_name: str,
         user_id: str,
         final_redirect: str = None,
@@ -1099,7 +1100,9 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
                 " for a user that is different from the conversation"
             )
 
-        client = await self._create_token_api_client(turn_context)
+        client = await self._create_token_api_client(
+            turn_context, oauth_app_credentials
+        )
         conversation = TurnContext.get_conversation_reference(turn_context.activity)
 
         state = TokenExchangeState(

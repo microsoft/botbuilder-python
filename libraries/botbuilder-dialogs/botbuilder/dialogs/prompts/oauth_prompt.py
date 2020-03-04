@@ -302,8 +302,9 @@ class OAuthPrompt(Dialog):
                 adapter: ExtendedUserTokenProvider = context.adapter
                 link = None
                 card_action_type = ActionTypes.signin
-                sign_in_resource: SignInUrlResponse = await adapter.get_sign_in_resource_from_user(
+                sign_in_resource: SignInUrlResponse = await adapter.get_sign_in_resource_from_user_and_credentials(
                     context,
+                    self._settings.oath_app_credentials,
                     self._settings.connection_name,
                     context.activity.from_property.id,
                 )
