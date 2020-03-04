@@ -18,7 +18,7 @@ class SkillConversationIdFactory(ConversationIdFactoryBase):
         self._forward_x_ref: Dict[str, str] = {}
         self._backward_x_ref: Dict[str, Tuple[str, str]] = {}
 
-    async def create_skill_conversation_id( # pylint: disable=W0221
+    async def create_skill_conversation_id(  # pylint: disable=W0221
         self, conversation_reference: ConversationReference
     ) -> str:
         if not conversation_reference:

@@ -34,7 +34,7 @@ class ConversationIdFactoryForTest(ConversationIdFactoryBase):
     def __init__(self):
         self._conversation_refs: Dict[str, str] = {}
 
-    async def create_skill_conversation_id( # pylint: disable=W0221
+    async def create_skill_conversation_id(  # pylint: disable=W0221
         self, conversation_reference: ConversationReference
     ) -> str:
         cr_json = json.dumps(conversation_reference.serialize())
