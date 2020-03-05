@@ -367,9 +367,9 @@ class ActivityHandler:
             or turn_context.activity.name
             == SignInConstants.token_exchange_operation_name
         ):
-            return self.on_sign_in_invoke(turn_context)
+            return await self.on_sign_in_invoke(turn_context)
 
-        return self.on_invoke(turn_context)
+        return await self.on_invoke(turn_context)
 
     async def on_sign_in_invoke(  # pylint: disable=unused-argument
         self, turn_context: TurnContext
