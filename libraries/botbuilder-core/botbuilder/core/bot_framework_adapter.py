@@ -1141,10 +1141,9 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
                 " on the TokenExchangeRequest"
             )
 
-        url = self.__oauth_api_url(turn_context)
-        client = self.create_token_api_client(url)
+        client = await self._create_token_api_client(turn_context)
 
-        return await client.user_token.exchange_async(
+        return client.user_token.exchange_async(
             user_id,
             connection_name,
             turn_context.activity.channel_id,
@@ -1167,7 +1166,7 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
             self._is_emulating_oauth_cards = True
 
         app_id = self.__get_app_id(context)
-        scope = context.turn_state[BotAdapter.BOT_OAUTH_SCOPE_KEY]
+        scope = context.turn_state.get(BotAdapter.BOT_OAUTH_SCOPE_KEY)
         app_credentials = oauth_app_credentials or await self.__get_app_credentials(
             app_id, scope
         )
