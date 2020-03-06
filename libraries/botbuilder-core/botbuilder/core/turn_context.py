@@ -295,7 +295,7 @@ class TurnContext:
         return await logic
 
     async def send_trace_activity(
-        self, name: str, value: object, value_type: str, label: str
+        self, name: str, value: object = None, value_type: str = None, label: str = None
     ) -> ResourceResponse:
         trace_activity = Activity(
             type=ActivityTypes.trace,
