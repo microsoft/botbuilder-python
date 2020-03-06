@@ -99,6 +99,7 @@ class DeliveryModes(str, Enum):
 
     normal = "normal"
     notification = "notification"
+    buffered_replies = "bufferedReplies"
 
 
 class ContactRelationUpdateActionTypes(str, Enum):

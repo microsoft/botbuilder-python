@@ -92,13 +92,33 @@ class BotFrameworkHttpClient(BotFrameworkClient):
             content = json.loads(data) if data else None
 
             if content:
-                return InvokeResponse(status=resp.status_code, body=content)
+                return InvokeResponse(status=resp.status, body=content)
 
         finally:
             # Restore activity properties.
             activity.conversation.id = original_conversation_id
             activity.service_url = original_service_url
             activity.caller_id = original_caller_id
+
+    async def post_buffered_activity(
+        self,
+        from_bot_id: str,
+        to_bot_id: str,
+        to_url: str,
+        service_url: str,
+        conversation_id: str,
+        activity: Activity,
+    ) -> [Activity]:
+        """
+        Helper method to return a list of activities when an Activity is being
+        sent with DeliveryMode == bufferedReplies.
+        """
+        response = await self.post_activity(
+            from_bot_id, to_bot_id, to_url, service_url, conversation_id, activity
+        )
+        if not response or (response.status / 100) != 2:
+            return []
+        return [Activity().deserialize(activity) for activity in response.body]
 
     async def _get_app_credentials(
         self, app_id: str, oauth_scope: str

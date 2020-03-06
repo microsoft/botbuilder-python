@@ -39,6 +39,7 @@ from botbuilder.schema import (
     ConversationReference,
     TokenResponse,
     ResourceResponse,
+    DeliveryModes,
 )
 
 from . import __version__
@@ -455,6 +456,15 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             if invoke_response is None:
                 return InvokeResponse(status=501)
             return invoke_response.value
+
+        # Return the buffered activities in the response.  In this case, the invoker
+        # should deserialize accordingly:
+        #    activities = [Activity().deserialize(activity) for activity in response.body]
+        if context.activity.delivery_mode == DeliveryModes.buffered_replies:
+            serialized_activities = [
+                activity.serialize() for activity in context.buffered_replies
+            ]
+            return InvokeResponse(status=200, body=serialized_activities)
 
         return None
 
