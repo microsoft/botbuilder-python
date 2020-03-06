@@ -1085,6 +1085,17 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
 
         return client
 
+    async def get_sign_in_resource_from_user(
+        self,
+        turn_context: TurnContext,
+        connection_name: str,
+        user_id: str,
+        final_redirect: str = None,
+    ) -> SignInUrlResponse:
+        return await self.get_sign_in_resource_from_user_and_credentials(
+            turn_context, None, connection_name, user_id, final_redirect
+        )
+
     async def get_sign_in_resource_from_user_and_credentials(
         self,
         turn_context: TurnContext,
@@ -1128,6 +1139,17 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
 
         return client.bot_sign_in.get_sign_in_resource(
             final_state, final_redirect=final_redirect
+        )
+
+    async def exchange_token(
+        self,
+        turn_context: TurnContext,
+        connection_name: str,
+        user_id: str,
+        exchange_request: TokenExchangeRequest,
+    ) -> TokenResponse:
+        return await self.exchange_token_from_credentials(
+            turn_context, None, connection_name, user_id, exchange_request
         )
 
     async def exchange_token_from_credentials(

@@ -423,8 +423,20 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
         user_id: str,
         final_redirect: str = None,
     ) -> SignInUrlResponse:
+        return await self.get_sign_in_resource_from_user_and_credentials(
+            turn_context, None, connection_name, user_id, final_redirect
+        )
+
+    async def get_sign_in_resource_from_user_and_credentials(
+        self,
+        turn_context: TurnContext,
+        oauth_app_credentials: AppCredentials,
+        connection_name: str,
+        user_id: str,
+        final_redirect: str = None,
+    ) -> SignInUrlResponse:
         return SignInUrlResponse(
-            sign_in_link=f"https://fake.com/oauthsignin/{connection_name}/{turn_context.activity.channelId}/{user_id}",
+            sign_in_link=f"https://fake.com/oauthsignin/{connection_name}/{turn_context.activity.channel_id}/{user_id}",
             token_exchange_resource=TokenExchangeResource(
                 id=str(uuid4()),
                 provider_id=None,
@@ -435,6 +447,18 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
     async def exchange_token(
         self,
         turn_context: TurnContext,
+        connection_name: str,
+        user_id: str,
+        exchange_request: TokenExchangeRequest,
+    ) -> TokenResponse:
+        return await self.exchange_token_from_credentials(
+            turn_context, None, connection_name, user_id, exchange_request
+        )
+
+    async def exchange_token_from_credentials(
+        self,
+        turn_context: TurnContext,
+        oauth_app_credentials: AppCredentials,
         connection_name: str,
         user_id: str,
         exchange_request: TokenExchangeRequest,
