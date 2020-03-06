@@ -69,6 +69,7 @@ class BotFrameworkHttpClient(BotFrameworkClient):
         original_conversation_id = activity.conversation.id
         original_service_url = activity.service_url
         original_caller_id = activity.caller_id
+        original_relates_to = activity.relates_to
 
         try:
             activity.conversation.id = conversation_id
@@ -99,6 +100,7 @@ class BotFrameworkHttpClient(BotFrameworkClient):
             activity.conversation.id = original_conversation_id
             activity.service_url = original_service_url
             activity.caller_id = original_caller_id
+            activity.relates_to = original_relates_to
 
     async def post_buffered_activity(
         self,
