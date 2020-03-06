@@ -1120,9 +1120,10 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
             final_state, final_redirect=final_redirect
         )
 
-    async def exchange_token(
+    async def exchange_token_from_credentials(
         self,
         turn_context: TurnContext,
+        oauth_app_credentials: AppCredentials,
         connection_name: str,
         user_id: str,
         exchange_request: TokenExchangeRequest,
@@ -1141,7 +1142,7 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
                 " on the TokenExchangeRequest"
             )
 
-        client = await self._create_token_api_client(turn_context)
+        client = await self._create_token_api_client(turn_context, oauth_app_credentials)
 
         return client.user_token.exchange_async(
             user_id,

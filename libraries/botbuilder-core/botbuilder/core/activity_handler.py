@@ -63,6 +63,8 @@ class ActivityHandler:
             await self.on_message_reaction_activity(turn_context)
         elif turn_context.activity.type == ActivityTypes.event:
             await self.on_event_activity(turn_context)
+        elif turn_context.activity.type == ActivityTypes.invoke:
+            await self.on_invoke_activity(turn_context)
         elif turn_context.activity.type == ActivityTypes.end_of_conversation:
             await self.on_end_of_conversation_activity(turn_context)
         else:

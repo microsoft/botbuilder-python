@@ -405,6 +405,8 @@ class OAuthPrompt(Dialog):
                     Activity(type="invokeResponse", value=InvokeResponse(500))
                 )
         elif self._is_token_exchange_request_invoke(context):
+            if isinstance(context.activity.value, dict):
+                context.activity.value = TokenExchangeInvokeRequest().from_dict(context.activity.value)
             if not (
                 context.activity.value
                 and self._is_token_exchange_request(context.activity.value)
@@ -442,10 +444,11 @@ class OAuthPrompt(Dialog):
                 )
             else:
                 extended_user_token_provider: ExtendedUserTokenProvider = context.adapter
-                token_exchange_response = await extended_user_token_provider.exchange_token(
+                token_exchange_response = await extended_user_token_provider.exchange_token_from_credentials(
                     context,
+                    self._settings.oath_app_credentials,
                     self._settings.connection_name,
-                    context.activity.id,
+                    context.activity.from_property.id,
                     TokenExchangeRequest(token=context.activity.value.token),
                 )
 
