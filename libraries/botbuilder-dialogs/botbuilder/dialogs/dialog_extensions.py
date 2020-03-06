@@ -4,7 +4,6 @@
 from botbuilder.core import BotAdapter, StatePropertyAccessor, TurnContext
 from botbuilder.dialogs import (
     Dialog,
-    DialogContext,
     DialogEvents,
     DialogSet,
     DialogTurnStatus,
