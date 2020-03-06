@@ -13,26 +13,6 @@ class SkillConversationIdFactoryOptions:
         activity: Activity,
         bot_framework_skill: BotFrameworkSkill,
     ):
-        if from_bot_oauth_scope is None:
-            raise TypeError(
-                "SkillConversationIdFactoryOptions(): from_bot_oauth_scope cannot be None."
-            )
-
-        if from_bot_id is None:
-            raise TypeError(
-                "SkillConversationIdFactoryOptions(): from_bot_id cannot be None."
-            )
-
-        if activity is None:
-            raise TypeError(
-                "SkillConversationIdFactoryOptions(): activity cannot be None."
-            )
-
-        if bot_framework_skill is None:
-            raise TypeError(
-                "SkillConversationIdFactoryOptions(): bot_framework_skill cannot be None."
-            )
-
         self.from_bot_oauth_scope = from_bot_oauth_scope
         self.from_bot_id = from_bot_id
         self.activity = activity
