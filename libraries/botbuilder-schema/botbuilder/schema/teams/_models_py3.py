@@ -1737,7 +1737,7 @@ class TeamDetails(Model):
     :param aad_group_id: Azure Active Directory (AAD) Group Id for the team.
     :type aad_group_id: str
     :param channel_count: The count of channels in the team.
-    :type chanel_count: int
+    :type channel_count: int
     :param member_count: The count of members in the team.
     :type member_count: int
     """
