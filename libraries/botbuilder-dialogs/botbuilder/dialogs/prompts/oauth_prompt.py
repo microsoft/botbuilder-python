@@ -406,7 +406,9 @@ class OAuthPrompt(Dialog):
                 )
         elif self._is_token_exchange_request_invoke(context):
             if isinstance(context.activity.value, dict):
-                context.activity.value = TokenExchangeInvokeRequest().from_dict(context.activity.value)
+                context.activity.value = TokenExchangeInvokeRequest().from_dict(
+                    context.activity.value
+                )
             if not (
                 context.activity.value
                 and self._is_token_exchange_request(context.activity.value)

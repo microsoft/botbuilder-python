@@ -1142,7 +1142,9 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
                 " on the TokenExchangeRequest"
             )
 
-        client = await self._create_token_api_client(turn_context, oauth_app_credentials)
+        client = await self._create_token_api_client(
+            turn_context, oauth_app_credentials
+        )
 
         return client.user_token.exchange_async(
             user_id,
