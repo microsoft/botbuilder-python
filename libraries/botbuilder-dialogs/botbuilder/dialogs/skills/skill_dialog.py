@@ -19,8 +19,8 @@ from botbuilder.dialogs import (
     DialogInstance,
 )
 
-from .begin_skilldialog_options import BeginSkillDialogOptions
-from .skilldialog_options import SkillDialogOptions
+from .begin_skill_dialog_options import BeginSkillDialogOptions
+from .skill_dialog_options import SkillDialogOptions
 
 
 class SkillDialog(Dialog):
