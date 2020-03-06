@@ -1751,7 +1751,14 @@ class TeamDetails(Model):
     }
 
     def __init__(
-        self, *, id: str = None, name: str = None, aad_group_id: str = None, member_count: int = None, chanel_count: int = None, **kwargs
+        self,
+        *,
+        id: str = None,
+        name: str = None,
+        aad_group_id: str = None,
+        member_count: int = None,
+        chanel_count: int = None,
+        **kwargs
     ) -> None:
         super(TeamDetails, self).__init__(**kwargs)
         self.id = id
