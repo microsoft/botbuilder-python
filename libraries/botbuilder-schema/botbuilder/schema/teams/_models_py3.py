@@ -1757,14 +1757,14 @@ class TeamDetails(Model):
         name: str = None,
         aad_group_id: str = None,
         member_count: int = None,
-        chanel_count: int = None,
+        channel_count: int = None,
         **kwargs
     ) -> None:
         super(TeamDetails, self).__init__(**kwargs)
         self.id = id
         self.name = name
         self.aad_group_id = aad_group_id
-        self.channel_count = chanel_count
+        self.channel_count = channel_count
         self.member_count = member_count
 
 
