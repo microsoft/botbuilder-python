@@ -5,8 +5,8 @@ from botbuilder.schema import Activity
 
 
 class BeginSkillDialogOptions:
-    def __init__(self, activity=Activity):
-        self.activity = Activity
+    def __init__(self, activity: Activity):  # pylint: disable=unused-argument
+        self.activity = activity
 
     @staticmethod
     def from_object(obj: object) -> "BeginSkillDialogOptions":
