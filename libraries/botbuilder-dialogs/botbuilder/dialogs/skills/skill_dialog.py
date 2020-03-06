@@ -63,7 +63,7 @@ class SkillDialog(Dialog):
         eoc_activity = await self._send_to_skill(dialog_context.context, skill_activity)
         if not eoc_activity:
             return await dialog_context.end_dialog(eoc_activity.value)
-        
+
         return self.end_of_turn
 
     async def continue_dialog(self, dialog_context: DialogContext):
