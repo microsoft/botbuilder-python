@@ -578,7 +578,7 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
             refs, callback, claims_identity=skills_identity, audience=skill_2_app_id
         )
 
-    async def test_delivery_mode_buffered_replies(self):
+    async def test_delivery_mode_expects_reply(self):
         mock_credential_provider = unittest.mock.create_autospec(CredentialProvider)
 
         settings = BotFrameworkAdapterSettings(
@@ -595,7 +595,7 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
             type=ActivityTypes.message,
             channel_id="emulator",
             service_url="http://tempuri.org/whatever",
-            delivery_mode=DeliveryModes.buffered_replies,
+            delivery_mode=DeliveryModes.expects_reply,
             text="hello world",
         )
 

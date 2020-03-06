@@ -51,7 +51,7 @@ class TurnContext:
 
         self._turn_state = {}
 
-        # A list of activities to send when `context.Activity.DeliveryMode == 'bufferedReplies'`
+        # A list of activities to send when `context.Activity.DeliveryMode == 'expectsReply'`
         self.buffered_replies = []
 
     @property
@@ -198,7 +198,7 @@ class TurnContext:
         async def logic():
             nonlocal sent_non_trace_activity
 
-            if self.activity.delivery_mode == DeliveryModes.buffered_replies:
+            if self.activity.delivery_mode == DeliveryModes.expects_reply:
                 responses = []
                 for activity in output:
                     self.buffered_replies.append(activity)
