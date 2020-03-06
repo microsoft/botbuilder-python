@@ -5,13 +5,13 @@
 # license information.
 # --------------------------------------------------------------------------
 
-from .skill_dialog_args import SkillDialogArgs
+from .begin_skill_dialog_options import BeginSkillDialogOptions
 from .skill_dialog_options import SkillDialogOptions
 from .skill_dialog import SkillDialog
 
 
 __all__ = [
-    "SkillDialogArgs",
+    "BeginSkillDialogOptions",
     "SkillDialogOptions",
     "SkillDialog",
 ]

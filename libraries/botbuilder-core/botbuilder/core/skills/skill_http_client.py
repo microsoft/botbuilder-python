@@ -1,10 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from botbuilder.core import (
-    BotFrameworkHttpClient,
-    InvokeResponse,
-)
+from botbuilder.core import InvokeResponse
+from botbuilder.integration.aiohttp import BotFrameworkHttpClient
 from botbuilder.core.skills import (
     ConversationIdFactoryBase,
     SkillConversationIdFactoryOptions,

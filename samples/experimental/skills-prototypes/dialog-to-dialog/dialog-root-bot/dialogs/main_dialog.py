@@ -23,6 +23,9 @@ from ..config import DefaultConfig, SkillConfiguration
 
 
 class MainDialog(ComponentDialog):
+
+    ACTIVE_SKILL_PROPERTY_NAME = f"MainDialog.ActiveSkillProperty"
+
     def __init__(
         self,
         conversation_state: ConversationState,
@@ -54,15 +57,19 @@ class MainDialog(ComponentDialog):
         # ChoicePrompt to render available skills and skill actions
         self.add_dialog(ChoicePrompt(ChoicePrompt.__name__))
 
-        # SkillDialog used to wrap interaction with the selected skill
-        skill_dialog_options = SkillDialogOptions(
-            bot_id=bot_id,
-            conversation_id_factory=conversation_id_factory,
-            skill_client=skill_client,
-            skill_host_endpoint=skills_config.SKILL_HOST_ENDPOINT,
-        )
+        # Create SkillDialog instances for the configured skills
+        for _, skill_info in skills_config.SKILLS.items():
+            # SkillDialog used to wrap interaction with the selected skill
+            skill_dialog_options = SkillDialogOptions(
+                bot_id=bot_id,
+                conversation_id_factory=conversation_id_factory,
+                skill_client=skill_client,
+                skill=skill_info,
+                skill_host_endpoint=skills_config.SKILL_HOST_ENDPOINT,
+                conversation_state=conversation_state
+            )
 
-        self.add_dialog(SkillDialog(skill_dialog_options, conversation_state))
+            self.add_dialog(SkillDialog(skill_dialog_options, skill_info.id))
 
         # Main waterfall dialog for this bot
         self.add_dialog(
@@ -71,6 +78,8 @@ class MainDialog(ComponentDialog):
                 [self.intro_step, self.act_step, self.final_step],
             )
         )
+
+        self._active_skill_property = conversation_state.create_property()
 
         self.initial_dialog_id = WaterfallDialog.__name__
 

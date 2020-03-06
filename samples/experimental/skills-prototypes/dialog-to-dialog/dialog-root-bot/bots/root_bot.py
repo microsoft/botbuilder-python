@@ -5,12 +5,12 @@ from typing import List
 
 from botbuilder.core import (
     ActivityHandler,
-    BotFrameworkHttpClient,
     ConversationState,
     MessageFactory,
     TurnContext,
 )
 from botbuilder.core.skills import SkillConversationIdFactory
+from botbuilder.integration.aiohttp import BotFrameworkHttpClient
 from botbuilder.dialogs import Dialog
 
 from botbuilder.schema import ActivityTypes, Attachment, ChannelAccount

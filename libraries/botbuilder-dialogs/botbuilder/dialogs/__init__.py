@@ -8,6 +8,7 @@
 from .about import __version__
 from .component_dialog import ComponentDialog
 from .dialog_context import DialogContext
+from .dialog_events import DialogEvents
 from .dialog_instance import DialogInstance
 from .dialog_reason import DialogReason
 from .dialog_set import DialogSet
@@ -24,6 +25,7 @@ from .skills import *
 __all__ = [
     "ComponentDialog",
     "DialogContext",
+    "DialogEvents",
     "DialogInstance",
     "DialogReason",
     "DialogSet",

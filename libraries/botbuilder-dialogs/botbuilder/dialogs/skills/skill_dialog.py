@@ -2,33 +2,35 @@
 # Licensed under the MIT License.
 
 from copy import deepcopy
+from typing import List
 
-from botbuilder.schema import Activity, ActivityTypes
-from botbuilder.core import ConversationState, StatePropertyAccessor, TurnContext
-from botbuilder.core.skills import BotFrameworkSkill
+from botbuilder.schema import Activity, ActivityTypes, DeliveryModes
+from botbuilder.core import (
+    BotAdapter,
+    TurnContext,
+)
+from botbuilder.core.skills import SkillConversationIdFactoryOptions
 
-from botbuilder.dialogs import Dialog, DialogContext
+from botbuilder.dialogs import (
+    Dialog,
+    DialogContext,
+    DialogEvents,
+    DialogReason,
+    DialogInstance,
+)
 
-from .skill_dialog_args import SkillDialogArgs
+from .begin_skill_dialog_options import BeginSkillDialogOptions
 from .skill_dialog_options import SkillDialogOptions
 
 
 class SkillDialog(Dialog):
-    def __init__(
-        self, dialog_options: SkillDialogOptions, conversation_state: ConversationState
-    ):
-        super().__init__(SkillDialog.__name__)
+    def __init__(self, dialog_options: SkillDialogOptions, dialog_id: str):
+        super().__init__(dialog_id)
         if not dialog_options:
             raise TypeError("SkillDialog.__init__(): dialog_options cannot be None.")
-        if not conversation_state:
-            raise TypeError(
-                "SkillDialog.__init__(): conversation_state cannot be None."
-            )
-        self._dialog_options = dialog_options
-        self._conversation_state = conversation_state
-        self._active_skill_property: StatePropertyAccessor = conversation_state.create_property(
-            f"{SkillDialog.__module__}.{SkillDialog.__name__}.ActiveSkillProperty"
-        )
+
+        self.dialog_options = dialog_options
+        self._DELIVER_MODE_STATE_KEY = "deliverymode"
 
     async def begin_dialog(self, dialog_context: DialogContext, options: object = None):
         """
@@ -36,7 +38,7 @@ class SkillDialog(Dialog):
         :param dialog_context: The dialog context for the current turn of conversation.
         :param options: (Optional) additional argument(s) to pass to the dialog being started.
         """
-        dialog_args = SkillDialog._validate_begin_dialog_options(options)
+        dialog_args = SkillDialog._validate_begin_dialog_args(options)
 
         await dialog_context.context.trace_activity(
             f"{SkillDialog.__name__}.BeginDialogAsync()",
@@ -48,61 +50,153 @@ class SkillDialog(Dialog):
 
         # Apply conversation reference and common properties from incoming activity before sending.
         TurnContext.apply_conversation_reference(
+            skill_activity,
             TurnContext.get_conversation_reference(dialog_context.context.activity),
-            True,
+            is_incoming=True,
         )
+
+        dialog_context.active_dialog.state[
+            self._DELIVER_MODE_STATE_KEY
+        ] = dialog_args.activity.delivery_mode
 
         # Send the activity to the skill.
         await self._send_to_skill(dialog_context, skill_activity, dialog_args.Skill)
         return Dialog.end_of_turn
 
+    async def continue_dialog(self, dialog_context: DialogContext):
+        await dialog_context.context.send_trace_activity(
+            f"{SkillDialog.__name__}.continue_dialog()",
+            label=f"ActivityType: {dialog_context.context.activity.type}",
+        )
+
+        # Handle EndOfConversation from the skill (this will be sent to the this dialog by the SkillHandler if
+        # received from the Skill)
+        if dialog_context.context.activity.type == ActivityTypes.end_of_conversation:
+            await dialog_context.context.send_trace_activity(
+                f"{SkillDialog.__name__}.continue_dialog()",
+                label=f"Got {ActivityTypes.end_of_conversation}",
+            )
+
+            return await dialog_context.end_dialog(
+                dialog_context.context.activity.value
+            )
+
+        # Forward only Message and Event activities to the skill
+        if (
+            dialog_context.context.activity.type == ActivityTypes.message
+            or dialog_context.context.activity.type == ActivityTypes.event
+        ):
+            # Create deep clone of the original activity to avoid altering it before forwarding it.
+            skill_activity = deepcopy(dialog_context.context.activity)
+            skill_activity.delivery_mode = dialog_context.active_dialog.state[
+                self._DELIVER_MODE_STATE_KEY
+            ]
+
+            # Just forward to the remote skill
+            eoc_activity = await self._send_to_skill(
+                dialog_context.context, skill_activity
+            )
+            if eoc_activity:
+                return await dialog_context.end_dialog(eoc_activity.value)
+
+        return self.end_of_turn
+
+    async def reprompt_dialog(  # pylint: disable=unused-argument
+        self, context: TurnContext, instance: DialogInstance
+    ):
+        # Create and send an event to the skill so it can resume the dialog.
+        reprompt_event = Activity(
+            type=ActivityTypes.event, name=DialogEvents.reprompt_dialog
+        )
+
+        # Apply conversation reference and common properties from incoming activity before sending.
+        TurnContext.apply_conversation_reference(
+            reprompt_event,
+            TurnContext.get_conversation_reference(context.activity),
+            is_incoming=True,
+        )
+
+        await self._send_to_skill(context, reprompt_event)
+
+    async def resume_dialog(  # pylint: disable=unused-argument
+        self, dialog_context: "DialogContext", reason: DialogReason, result: object
+    ):
+        await self.reprompt_dialog(dialog_context.context, dialog_context.active_dialog)
+        return self.end_of_turn
+
+    async def end_dialog(
+        self, context: TurnContext, instance: DialogInstance, reason: DialogReason
+    ):
+        # Send of of conversation to the skill if the dialog has been cancelled.
+        if reason == DialogReason.CancelCalled or reason == DialogReason.ReplaceCalled:
+            await context.send_trace_activity(
+                f"{SkillDialog.__name__}.end_dialog()",
+                label=f"ActivityType: {context.activity.type}",
+            )
+            activity = Activity(type=ActivityTypes.end_of_conversation)
+
+            # Apply conversation reference and common properties from incoming activity before sending.
+            TurnContext.apply_conversation_reference(
+                activity,
+                TurnContext.get_conversation_reference(context.activity),
+                is_incoming=True,
+            )
+            activity.channel_data = context.activity.channel_data
+            activity.additional_properties = context.activity.additional_properties
+
+            await self._send_to_skill(context, activity)
+
+        await super().end_dialog(context, instance, reason)
+
     @staticmethod
-    def _validate_begin_dialog_options(options: object) -> SkillDialogArgs:
+    def _validate_begin_dialog_args(options: object) -> BeginSkillDialogOptions:
         if not options:
             raise TypeError("options cannot be None.")
 
-        if isinstance(options, dict) and "skill" in options and "activity" in options:
-            skill_args = SkillDialogArgs(
-                skill=options["skill"], activity=options["skill"]
-            )
-        elif hasattr(options, "skill") and hasattr(options, "activity"):
-            skill_args = SkillDialogArgs(
-                skill=options["skill"], activity=options["skill"]
-            )
-        else:
-            raise TypeError("SkillDialog: options object not valid as SkillDialogArgs.")
+        dialog_args = BeginSkillDialogOptions.from_object(options)
 
-        if not skill_args.activity:
+        if not dialog_args:
             raise TypeError(
-                "SkillDialog: activity object in options as SkillDialogArgs cannot be None."
+                "SkillDialog: options object not valid as BeginSkillDialogOptions."
+            )
+
+        if not dialog_args.activity:
+            raise TypeError(
+                "SkillDialog: activity object in options as BeginSkillDialogOptions cannot be None."
             )
 
         # Only accept Message or Event activities
         if (
-            skill_args.activity.type != ActivityTypes.message
-            and skill_args.activity.type != ActivityTypes.event
+            dialog_args.activity.type != ActivityTypes.message
+            and dialog_args.activity.type != ActivityTypes.event
         ):
             raise TypeError(
                 f"Only {ActivityTypes.message} and {ActivityTypes.event} activities are supported."
-                f" Received activity of type {skill_args.activity.type}."
+                f" Received activity of type {dialog_args.activity.type}."
             )
 
-        return skill_args
+        return dialog_args
 
     async def _send_to_skill(
-        self,
-        dialog_context: DialogContext,
-        activity: Activity,
-        skill_info: BotFrameworkSkill,
-    ):
+        self, context: TurnContext, activity: Activity,
+    ) -> Activity:
+        # Create a conversationId to interact with the skill and send the activity
+        conversation_id_factory_options = SkillConversationIdFactoryOptions(
+            from_bot_oauth_scope=context.turn_state.get(BotAdapter.BOT_OAUTH_SCOPE_KEY),
+            from_bot_id=self.dialog_options.bot_id,
+            activity=activity,
+            bot_framework_skill=self.dialog_options.skill,
+        )
+
+        skill_conversation_id = await self.dialog_options.conversation_id_factory.create_skill_conversation_id(
+            conversation_id_factory_options
+        )
+
         # Always save state before forwarding
         # (the dialog stack won't get updated with the skillDialog and things won't work if you don't)
-        await self._conversation_state.save_changes(dialog_context.context, True)
+        skill_info = self.dialog_options.skill
+        await self.dialog_options.conversation_state.save_changes(context, True)
 
-        # Create a conversation_id to interact with the skill and send the activity
-        skill_conversation_id = await self._dialog_options.conversation_id_factory.create_skill_conversation_id(
-            TurnContext.get_conversation_reference(activity)
-        )
         response = await self._dialog_options.skill_client.post_activity(
             self._dialog_options.bot_id,
             skill_info.app_id,
@@ -118,3 +212,17 @@ class SkillDialog(Dialog):
                 f'Error invoking the skill id: "{skill_info.id}" at "{skill_info.skill_endpoint}"'
                 f" (status is {response.status}). \r\n {response.body}"
             )
+
+        eoc_activity: Activity = None
+        if activity.delivery_mode == DeliveryModes.buffered_replies and response.body:
+            # Process replies in the response.Body.
+            response.body: List[Activity]
+            for from_skill_activity in response.body:
+                if from_skill_activity.type == ActivityTypes.end_of_conversation:
+                    # Capture the EndOfConversation activity if it was sent from skill
+                    eoc_activity = from_skill_activity
+                else:
+                    # Send the response back to the channel.
+                    await context.send_activity(from_skill_activity)
+
+        return eoc_activity

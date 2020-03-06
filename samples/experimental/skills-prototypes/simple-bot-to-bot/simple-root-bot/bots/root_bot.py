@@ -2,12 +2,12 @@ from typing import List
 
 from botbuilder.core import (
     ActivityHandler,
-    BotFrameworkHttpClient,
     ConversationState,
     MessageFactory,
     TurnContext,
 )
 from botbuilder.core.skills import SkillConversationIdFactory
+from botbuilder.integration.aiohttp import BotFrameworkHttpClient
 
 from botbuilder.schema import ActivityTypes, ChannelAccount
 
