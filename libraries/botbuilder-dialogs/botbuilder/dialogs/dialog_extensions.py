@@ -76,7 +76,3 @@ class DialogExtensions:
             results = await dialog_context.continue_dialog()
             if results.status == DialogTurnStatus.Empty:
                 await dialog_context.begin_dialog(dialog.id)
-
-    @staticmethod
-    async def _get_active_dialog_context(dialog_context: DialogContext):
-        child = dialog_context.child

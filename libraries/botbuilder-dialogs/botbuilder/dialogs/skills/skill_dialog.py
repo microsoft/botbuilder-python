@@ -19,8 +19,8 @@ from botbuilder.dialogs import (
     DialogInstance,
 )
 
-from .begin_skill_dialog_options import BeginSkillDialogOptions
-from .skill_dialog_options import SkillDialogOptions
+from .begin_skilldialog_options import BeginSkillDialogOptions
+from .skilldialog_options import SkillDialogOptions
 
 
 class SkillDialog(Dialog):
@@ -30,7 +30,7 @@ class SkillDialog(Dialog):
             raise TypeError("SkillDialog.__init__(): dialog_options cannot be None.")
 
         self.dialog_options = dialog_options
-        self._DELIVER_MODE_STATE_KEY = "deliverymode"
+        self._deliver_mode_state_key = "deliverymode"
 
     async def begin_dialog(self, dialog_context: DialogContext, options: object = None):
         """
@@ -56,12 +56,15 @@ class SkillDialog(Dialog):
         )
 
         dialog_context.active_dialog.state[
-            self._DELIVER_MODE_STATE_KEY
+            self._deliver_mode_state_key
         ] = dialog_args.activity.delivery_mode
 
         # Send the activity to the skill.
-        await self._send_to_skill(dialog_context, skill_activity, dialog_args.Skill)
-        return Dialog.end_of_turn
+        eoc_activity = await self._send_to_skill(dialog_context.context, skill_activity)
+        if not eoc_activity:
+            return await dialog_context.end_dialog(eoc_activity.value)
+        
+        return self.end_of_turn
 
     async def continue_dialog(self, dialog_context: DialogContext):
         await dialog_context.context.send_trace_activity(
@@ -89,7 +92,7 @@ class SkillDialog(Dialog):
             # Create deep clone of the original activity to avoid altering it before forwarding it.
             skill_activity = deepcopy(dialog_context.context.activity)
             skill_activity.delivery_mode = dialog_context.active_dialog.state[
-                self._DELIVER_MODE_STATE_KEY
+                self._deliver_mode_state_key
             ]
 
             # Just forward to the remote skill
@@ -128,7 +131,7 @@ class SkillDialog(Dialog):
         self, context: TurnContext, instance: DialogInstance, reason: DialogReason
     ):
         # Send of of conversation to the skill if the dialog has been cancelled.
-        if reason == DialogReason.CancelCalled or reason == DialogReason.ReplaceCalled:
+        if reason in (DialogReason.CancelCalled, DialogReason.ReplaceCalled):
             await context.send_trace_activity(
                 f"{SkillDialog.__name__}.end_dialog()",
                 label=f"ActivityType: {context.activity.type}",
@@ -197,11 +200,11 @@ class SkillDialog(Dialog):
         skill_info = self.dialog_options.skill
         await self.dialog_options.conversation_state.save_changes(context, True)
 
-        response = await self._dialog_options.skill_client.post_activity(
-            self._dialog_options.bot_id,
+        response = await self.dialog_options.skill_client.post_activity(
+            self.dialog_options.bot_id,
             skill_info.app_id,
             skill_info.skill_endpoint,
-            self._dialog_options.skill_host_endpoint,
+            self.dialog_options.skill_host_endpoint,
             skill_conversation_id,
             activity,
         )
