@@ -655,6 +655,75 @@ class ConversationsOperations:
         "url": "/v3/conversations/{conversationId}/members"
     }
 
+    def get_conversation_member(
+        self,
+        conversation_id,
+        member_id,
+        custom_headers=None,
+        raw=False,
+        **operation_config
+    ):
+        """GetConversationMember.
+
+        Get a member of a conversation.
+        This REST API takes a ConversationId and memberId and returns a
+        ChannelAccount object representing the member of the conversation.
+
+        :param conversation_id: Conversation Id
+        :type conversation_id: str
+        :param member_id: Member Id
+        :type member_id: str
+        :param dict custom_headers: headers that will be added to the request
+        :param bool raw: returns the direct response alongside the
+         deserialized response
+        :param operation_config: :ref:`Operation configuration
+         overrides<msrest:optionsforoperations>`.
+        :return: list or ClientRawResponse if raw=true
+        :rtype: list[~botframework.connector.models.ChannelAccount] or
+         ~msrest.pipeline.ClientRawResponse
+        :raises:
+         :class:`ErrorResponseException<botframework.connector.models.ErrorResponseException>`
+        """
+        # Construct URL
+        url = self.get_conversation_member.metadata["url"]
+        path_format_arguments = {
+            "conversationId": self._serialize.url(
+                "conversation_id", conversation_id, "str"
+            ),
+            "memberId": self._serialize.url("member_id", member_id, "str"),
+        }
+        url = self._client.format_url(url, **path_format_arguments)
+
+        # Construct parameters
+        query_parameters = {}
+
+        # Construct headers
+        header_parameters = {}
+        header_parameters["Accept"] = "application/json"
+        if custom_headers:
+            header_parameters.update(custom_headers)
+
+        # Construct and send request
+        request = self._client.get(url, query_parameters, header_parameters)
+        response = self._client.send(request, stream=False, **operation_config)
+
+        if response.status_code not in [200]:
+            raise models.ErrorResponseException(self._deserialize, response)
+
+        deserialized = None
+        if response.status_code == 200:
+            deserialized = self._deserialize("ChannelAccount", response)
+
+        if raw:
+            client_raw_response = ClientRawResponse(deserialized, response)
+            return client_raw_response
+
+        return deserialized
+
+    get_conversation_member.metadata = {
+        "url": "/v3/conversations/{conversationId}/members/{memberId}"
+    }
+
     def get_conversation_paged_members(
         self,
         conversation_id,
