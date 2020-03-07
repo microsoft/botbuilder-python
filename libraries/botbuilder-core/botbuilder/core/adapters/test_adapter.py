@@ -205,7 +205,9 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         return await self.run_pipeline(context, self.logic)
 
     def get_next_activity(self) -> Activity:
-        return self.activity_buffer.pop(0)
+        if len(self.activity_buffer) > 0:
+            return self.activity_buffer.pop(0)
+        return None
 
     async def send(self, user_says) -> object:
         """
