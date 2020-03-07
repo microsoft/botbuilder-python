@@ -108,9 +108,11 @@ class TeamsInfo:
 
     @staticmethod
     async def get_paged_team_members(
-        turn_context: TurnContext, team_id: str = "", continuation_token: str = None
+        turn_context: TurnContext,
+        team_id: str = "",
+        continuation_token: str = None,
+        page_size: int = None,
     ) -> List[TeamsPagedMembersResult]:
-
         if not team_id:
             team_id = TeamsInfo.get_team_id(turn_context)
 
@@ -121,12 +123,15 @@ class TeamsInfo:
 
         connector_client = await TeamsInfo._get_connector_client(turn_context)
         return await TeamsInfo._get_paged_members(
-            connector_client, turn_context.activity.conversation.id, continuation_token
+            connector_client,
+            turn_context.activity.conversation.id,
+            continuation_token,
+            page_size,
         )
 
     @staticmethod
     async def get_paged_members(
-        turn_context: TurnContext, continuation_token: str = None
+        turn_context: TurnContext, continuation_token: str = None, page_size: int = None
     ) -> List[TeamsPagedMembersResult]:
 
         team_id = TeamsInfo.get_team_id(turn_context)
@@ -134,10 +139,10 @@ class TeamsInfo:
             conversation_id = turn_context.activity.conversation.id
             connector_client = await TeamsInfo._get_connector_client(turn_context)
             return await TeamsInfo._get_paged_members(
-                connector_client, conversation_id, continuation_token
+                connector_client, conversation_id, continuation_token, page_size
             )
 
-        return await TeamsInfo.get_paged_team_members(turn_context, team_id)
+        return await TeamsInfo.get_paged_team_members(turn_context, team_id, page_size)
 
     @staticmethod
     async def get_team_member(
@@ -224,27 +229,21 @@ class TeamsInfo:
         connector_client: ConnectorClient,
         conversation_id: str,
         continuation_token: str = None,
+        page_size: int = None,
     ) -> List[TeamsPagedMembersResult]:
         if connector_client is None:
-            raise TypeError("TeamsInfo._get_members.connector_client: cannot be None.")
-
-        if not conversation_id:
-            raise TypeError("TeamsInfo._get_members.conversation_id: cannot be empty.")
-
-        teams_paged_members_result = [TeamsPagedMembersResult]
-        paged_result = await connector_client.conversations.get_paged_conversation_members(
-            conversation_id, continuation_token
-        )
-
-        teams_members = None
-        for member in paged_result.members:
-            teams_members.append(
-                TeamsChannelAccount().deserialize(
-                    dict(member.serialize(), **member.additional_properties)
-                )
+            raise TypeError(
+                "TeamsInfo._get_paged_members.connector_client: cannot be None."
             )
 
-        return teams_paged_members_result
+        if not conversation_id:
+            raise TypeError(
+                "TeamsInfo._get_paged_members.conversation_id: cannot be empty."
+            )
+
+        return await connector_client.conversations.get_teams_conversation_paged_members(
+            conversation_id, continuation_token, page_size
+        )
 
     @staticmethod
     async def _get_member(

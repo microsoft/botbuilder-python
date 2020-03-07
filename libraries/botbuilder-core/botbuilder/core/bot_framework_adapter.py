@@ -797,7 +797,9 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                     "conversation.id"
                 )
             if not member_id:
-                "BotFrameworkAdapter.get_conversation_member(): missing memberId"
+                raise TypeError(
+                    "BotFrameworkAdapter.get_conversation_member(): missing memberId"
+                )
 
             client = context.turn_state[BotAdapter.BOT_CONNECTOR_CLIENT_KEY]
             return await client.conversations.get_conversation_member(
