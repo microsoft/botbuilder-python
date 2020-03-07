@@ -154,6 +154,69 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
 
         assert DialogTurnStatus.Complete == client.dialog_turn_result.status
 
+    async def test_cancel_dialog_sends_eoc(self):
+        activity_sent = None
+
+        async def capture(
+            from_bot_id: str,  # pylint: disable=unused-argument
+            to_bot_id: str,  # pylint: disable=unused-argument
+            to_url: str,  # pylint: disable=unused-argument
+            service_url: str,  # pylint: disable=unused-argument
+            conversation_id: str,  # pylint: disable=unused-argument
+            activity: Activity,
+        ):
+            nonlocal activity_sent
+            activity_sent = activity
+
+        mock_skill_client = self._create_mock_skill_client(capture)
+
+        conversation_state = ConversationState(MemoryStorage())
+        dialog_options = self._create_skill_dialog_options(
+            conversation_state, mock_skill_client
+        )
+
+        sut = SkillDialog(dialog_options, "dialog_id")
+        activity_to_send = MessageFactory.text(str(uuid.uuid4()))
+
+        client = DialogTestClient(
+            "test",
+            sut,
+            BeginSkillDialogOptions(activity=activity_to_send),
+            conversation_state=conversation_state,
+        )
+
+        # Send something to the dialog to start it
+        await client.send_activity(MessageFactory.text("irrelevant"))
+
+        # Cancel the dialog so it sends an EoC to the skill
+        await client.dialog_context.cancel_all_dialogs()
+
+        assert activity_sent
+        assert activity_sent.type == ActivityTypes.end_of_conversation
+
+    async def test_should_throw_on_post_failure(self):
+        # This mock client will fail
+        mock_skill_client = self._create_mock_skill_client(None, 500)
+
+        conversation_state = ConversationState(MemoryStorage())
+        dialog_options = self._create_skill_dialog_options(
+            conversation_state, mock_skill_client
+        )
+
+        sut = SkillDialog(dialog_options, "dialog_id")
+        activity_to_send = MessageFactory.text(str(uuid.uuid4()))
+
+        client = DialogTestClient(
+            "test",
+            sut,
+            BeginSkillDialogOptions(activity=activity_to_send),
+            conversation_state=conversation_state,
+        )
+
+        # A send should raise an exception
+        with self.assertRaises(Exception):
+            await client.send_activity("irrelevant")
+
     def _create_skill_dialog_options(
         self, conversation_state: ConversationState, skill_client: BotFrameworkClient
     ):
