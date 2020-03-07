@@ -26,7 +26,7 @@ class ParentBot(ActivityHandler):
         TurnContext.apply_conversation_reference(
             activity, TurnContext.get_conversation_reference(turn_context.activity)
         )
-        activity.delivery_mode = DeliveryModes.expects_reply
+        activity.delivery_mode = DeliveryModes.expect_replies
 
         activities = await self.client.post_buffered_activity(
             None,

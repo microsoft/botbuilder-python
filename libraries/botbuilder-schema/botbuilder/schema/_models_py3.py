@@ -133,7 +133,7 @@ class Activity(Model):
     :param delivery_mode: A delivery hint to signal to the recipient alternate
      delivery paths for the activity.
      The default delivery mode is "default". Possible values include: 'normal',
-     'notification'
+     'notification', 'expectReplies'
     :type delivery_mode: str or ~botframework.connector.models.DeliveryModes
     :param listen_for: List of phrases and references that speech and language
      priming systems should listen for

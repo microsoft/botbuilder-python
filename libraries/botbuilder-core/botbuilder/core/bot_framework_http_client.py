@@ -110,7 +110,7 @@ class BotFrameworkHttpClient:
     ) -> [Activity]:
         """
         Helper method to return a list of activities when an Activity is being
-        sent with DeliveryMode == expectsReply.
+        sent with DeliveryMode == expectReplies.
         """
         response = await self.post_activity(
             from_bot_id, to_bot_id, to_url, service_url, conversation_id, activity
