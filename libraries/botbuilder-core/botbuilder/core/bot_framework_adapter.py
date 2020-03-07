@@ -462,7 +462,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         #    activities = [Activity().deserialize(activity) for activity in response.body]
         if context.activity.delivery_mode == DeliveryModes.expect_replies:
             serialized_activities = [
-                activity.serialize() for activity in context.buffered_reply_activties
+                activity.serialize() for activity in context.buffered_reply_activities
             ]
             return InvokeResponse(status=200, body=serialized_activities)
 
