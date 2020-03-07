@@ -182,6 +182,6 @@ __all__ = [
     "TeamInfo",
     "TeamsChannelAccount",
     "TeamsChannelData",
-    "TeamsPagedMembersResults",
+    "TeamsPagedMembersResult",
     "TenantInfo",
 ]
