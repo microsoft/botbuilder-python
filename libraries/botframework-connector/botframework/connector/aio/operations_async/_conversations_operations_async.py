@@ -712,7 +712,9 @@ class ConversationsOperations:
             "conversationId": self._serialize.url(
                 "conversation_id", conversation_id, "str"
             ),
-            "memberId": self._serialize.url("member_id", member_id, "str"),
+            "memberId": self._serialize.url(
+                "member_id", member_id, "str"
+            ),
         }
         url = self._client.format_url(url, **path_format_arguments)
 
@@ -727,7 +729,9 @@ class ConversationsOperations:
 
         # Construct and send request
         request = self._client.get(url, query_parameters, header_parameters)
-        response = await self._client.send(request, stream=False, **operation_config)
+        response = await self._client.async_send(
+            request, stream=False, **operation_config
+        )
 
         if response.status_code not in [200]:
             raise models.ErrorResponseException(self._deserialize, response)

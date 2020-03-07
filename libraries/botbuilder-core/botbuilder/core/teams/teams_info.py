@@ -259,8 +259,7 @@ class TeamsInfo:
         if not member_id:
             raise TypeError("TeamsInfo._get_member.member_id: cannot be empty.")
 
-        member = None
-        member = await connector_client.conversations.get_conversation_member(
+        member: TeamsChannelAccount = await connector_client.conversations.get_conversation_member(
             conversation_id, member_id
         )
 
