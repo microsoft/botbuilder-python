@@ -673,6 +673,10 @@ class ConversationsOperations:
 
         return deserialized
 
+    get_conversation_members.metadata = {
+        "url": "/v3/conversations/{conversationId}/members"
+    }
+
     async def get_conversation_member(
         self,
         conversation_id,
