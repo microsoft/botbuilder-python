@@ -52,7 +52,7 @@ class TurnContext:
         self._turn_state = {}
 
         # A list of activities to send when `context.Activity.DeliveryMode == 'expectReplies'`
-        self.buffered_reply_activties = []
+        self.buffered_reply_activities = []
 
     @property
     def turn_state(self) -> Dict[str, object]:
@@ -201,7 +201,7 @@ class TurnContext:
             if self.activity.delivery_mode == DeliveryModes.expect_replies:
                 responses = []
                 for activity in output:
-                    self.buffered_reply_activties.append(activity)
+                    self.buffered_reply_activities.append(activity)
                     responses.append(ResourceResponse())
 
                 if sent_non_trace_activity:
