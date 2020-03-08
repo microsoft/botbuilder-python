@@ -1478,12 +1478,18 @@ class TeamDetails(Model):
     :type name: str
     :param aad_group_id: Azure Active Directory (AAD) Group Id for the team.
     :type aad_group_id: str
+    :param channel_count: The count of channels in the team.
+    :type chanel_count: int
+    :param member_count: The count of members in the team.
+    :type member_count: int
     """
 
     _attribute_map = {
         "id": {"key": "id", "type": "str"},
         "name": {"key": "name", "type": "str"},
         "aad_group_id": {"key": "aadGroupId", "type": "str"},
+        "channel_count": {"key": "channelCount", "type": "int"},
+        "member_count": {"key": "memberCount", "type": "int"},
     }
 
     def __init__(self, **kwargs):
@@ -1491,6 +1497,8 @@ class TeamDetails(Model):
         self.id = kwargs.get("id", None)
         self.name = kwargs.get("name", None)
         self.aad_group_id = kwargs.get("aad_group_id", None)
+        self.channel_count = kwargs.get("channel_count", None)
+        self.member_count = kwargs.get("member_count", None)
 
 
 class TeamInfo(Model):
