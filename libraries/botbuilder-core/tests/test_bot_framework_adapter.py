@@ -20,6 +20,7 @@ from botbuilder.schema import (
     ConversationResourceResponse,
     ChannelAccount,
     DeliveryModes,
+    ExpectedReplies,
 )
 from botframework.connector.aio import ConnectorClient
 from botframework.connector.auth import (
@@ -613,7 +614,7 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
         )
         assert invoke_response
         assert invoke_response.status == 200
-        activities = invoke_response.body
+        activities = ExpectedReplies().deserialize(invoke_response.body).activities
         assert len(activities) == 3
         assert activities[0]["text"] == "activity 1"
         assert activities[1]["text"] == "activity 2"
