@@ -616,9 +616,9 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
         assert invoke_response.status == 200
         activities = ExpectedReplies().deserialize(invoke_response.body).activities
         assert len(activities) == 3
-        assert activities[0]["text"] == "activity 1"
-        assert activities[1]["text"] == "activity 2"
-        assert activities[2]["text"] == "activity 3"
+        assert activities[0].text == "activity 1"
+        assert activities[1].text == "activity 2"
+        assert activities[2].text == "activity 3"
         assert (
             adapter.connector_client_mock.conversations.send_to_conversation.call_count
             == 0
