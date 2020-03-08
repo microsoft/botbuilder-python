@@ -37,6 +37,7 @@ from botbuilder.schema import (
     ConversationAccount,
     ConversationParameters,
     ConversationReference,
+    ExpectedReplies,
     TokenResponse,
     ResourceResponse,
     DeliveryModes,
@@ -459,12 +460,12 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
 
         # Return the buffered activities in the response.  In this case, the invoker
         # should deserialize accordingly:
-        #    activities = [Activity().deserialize(activity) for activity in response.body]
+        #    activities = ExpectedReplies().deserialize(response.body).activities
         if context.activity.delivery_mode == DeliveryModes.expect_replies:
-            serialized_activities = [
-                activity.serialize() for activity in context.buffered_reply_activities
-            ]
-            return InvokeResponse(status=200, body=serialized_activities)
+            expected_replies = ExpectedReplies(
+                activities=context.buffered_reply_activities
+            ).serialize()
+            return InvokeResponse(status=200, body=expected_replies)
 
         return None
 

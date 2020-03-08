@@ -6,7 +6,7 @@ from typing import Dict
 from logging import Logger
 import aiohttp
 
-from botbuilder.schema import Activity
+from botbuilder.schema import Activity, ExpectedReplies
 from botframework.connector.auth import (
     ChannelProvider,
     CredentialProvider,
@@ -117,7 +117,7 @@ class BotFrameworkHttpClient:
         )
         if not response or (response.status / 100) != 2:
             return []
-        return [Activity().deserialize(activity) for activity in response.body]
+        return ExpectedReplies().deserialize(response.body).activities
 
     async def _get_app_credentials(
         self, app_id: str, oauth_scope: str

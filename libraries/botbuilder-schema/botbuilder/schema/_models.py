@@ -806,6 +806,21 @@ class ConversationsResult(Model):
         self.conversations = kwargs.get("conversations", None)
 
 
+class ExpectedReplies(Model):
+    """ExpectedReplies.
+
+    :param activities: A collection of Activities that conforms to the
+     ExpectedReplies schema.
+    :type activities: list[~botframework.connector.models.Activity]
+    """
+
+    _attribute_map = {"activities": {"key": "activities", "type": "[Activity]"}}
+
+    def __init__(self, **kwargs):
+        super(ExpectedReplies, self).__init__(**kwargs)
+        self.activities = kwargs.get("activities", None)
+
+
 class Entity(Model):
     """Metadata object pertaining to an activity.
 
