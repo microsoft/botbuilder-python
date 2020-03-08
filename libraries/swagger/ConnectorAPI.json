@@ -2293,7 +2293,8 @@
         "description": "Values for deliveryMode field",
         "enum": [
           "normal",
-          "notification"
+          "notification",
+          "expectReplies"
         ],
         "type": "string",
         "properties": {},
