@@ -20,6 +20,7 @@ from botbuilder.schema import (
     ConversationResourceResponse,
     ChannelAccount,
     DeliveryModes,
+    ExpectedReplies,
 )
 from botframework.connector.aio import ConnectorClient
 from botframework.connector.auth import (
@@ -578,7 +579,7 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
             refs, callback, claims_identity=skills_identity, audience=skill_2_app_id
         )
 
-    async def test_delivery_mode_buffered_replies(self):
+    async def test_delivery_mode_expect_replies(self):
         mock_credential_provider = unittest.mock.create_autospec(CredentialProvider)
 
         settings = BotFrameworkAdapterSettings(
@@ -595,7 +596,7 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
             type=ActivityTypes.message,
             channel_id="emulator",
             service_url="http://tempuri.org/whatever",
-            delivery_mode=DeliveryModes.buffered_replies,
+            delivery_mode=DeliveryModes.expect_replies,
             text="hello world",
         )
 
@@ -613,11 +614,11 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
         )
         assert invoke_response
         assert invoke_response.status == 200
-        activities = invoke_response.body
+        activities = ExpectedReplies().deserialize(invoke_response.body).activities
         assert len(activities) == 3
-        assert activities[0]["text"] == "activity 1"
-        assert activities[1]["text"] == "activity 2"
-        assert activities[2]["text"] == "activity 3"
+        assert activities[0].text == "activity 1"
+        assert activities[1].text == "activity 2"
+        assert activities[2].text == "activity 3"
         assert (
             adapter.connector_client_mock.conversations.send_to_conversation.call_count
             == 0

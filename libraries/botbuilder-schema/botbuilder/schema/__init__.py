@@ -27,6 +27,7 @@ try:
     from ._models_py3 import ConversationReference
     from ._models_py3 import ConversationResourceResponse
     from ._models_py3 import ConversationsResult
+    from ._models_py3 import ExpectedReplies
     from ._models_py3 import Entity
     from ._models_py3 import Error
     from ._models_py3 import ErrorResponse, ErrorResponseException
@@ -74,6 +75,7 @@ except (SyntaxError, ImportError):
     from ._models import ConversationReference
     from ._models import ConversationResourceResponse
     from ._models import ConversationsResult
+    from ._models import ExpectedReplies
     from ._models import Entity
     from ._models import Error
     from ._models import ErrorResponse, ErrorResponseException
@@ -136,6 +138,7 @@ __all__ = [
     "ConversationReference",
     "ConversationResourceResponse",
     "ConversationsResult",
+    "ExpectedReplies",
     "Entity",
     "Error",
     "ErrorResponse",
