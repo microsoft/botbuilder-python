@@ -6,7 +6,7 @@ from typing import Dict
 from logging import Logger
 import aiohttp
 
-from botbuilder.schema import Activity
+from botbuilder.schema import Activity, ExpectedReplies
 from botframework.connector.auth import (
     ChannelProvider,
     CredentialProvider,
@@ -110,14 +110,14 @@ class BotFrameworkHttpClient:
     ) -> [Activity]:
         """
         Helper method to return a list of activities when an Activity is being
-        sent with DeliveryMode == bufferedReplies.
+        sent with DeliveryMode == expectReplies.
         """
         response = await self.post_activity(
             from_bot_id, to_bot_id, to_url, service_url, conversation_id, activity
         )
         if not response or (response.status / 100) != 2:
             return []
-        return [Activity().deserialize(activity) for activity in response.body]
+        return ExpectedReplies().deserialize(response.body).activities
 
     async def _get_app_credentials(
         self, app_id: str, oauth_scope: str
