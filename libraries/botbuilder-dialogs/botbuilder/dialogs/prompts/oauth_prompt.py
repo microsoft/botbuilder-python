@@ -14,7 +14,8 @@ from botbuilder.core import (
     InvokeResponse,
     TurnContext,
     UserTokenProvider,
-    BotAdapter)
+    BotAdapter,
+)
 from botbuilder.dialogs import Dialog, DialogContext, DialogTurnResult
 from botbuilder.schema import (
     Activity,
@@ -293,7 +294,9 @@ class OAuthPrompt(Dialog):
             ):
                 link = None
                 card_action_type = ActionTypes.signin
-                bot_identity: ClaimsIdentity = context.turn_state.get(BotAdapter.BOT_IDENTITY_KEY)
+                bot_identity: ClaimsIdentity = context.turn_state.get(
+                    BotAdapter.BOT_IDENTITY_KEY
+                )
 
                 # check if it's from streaming connection
                 if not context.activity.service_url.startswith("http"):
