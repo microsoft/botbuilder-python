@@ -9,6 +9,7 @@ from botbuilder.schema.teams import (
     TeamDetails,
     TeamsChannelData,
     TeamsChannelAccount,
+    TeamsPagedMembersResult,
 )
 from botframework.connector.aio import ConnectorClient
 from botframework.connector.teams.teams_connector_client import TeamsConnectorClient
@@ -79,7 +80,9 @@ class TeamsInfo:
         return teams_connector.teams.get_teams_channels(team_id).conversations
 
     @staticmethod
-    async def get_team_members(turn_context: TurnContext, team_id: str = ""):
+    async def get_team_members(
+        turn_context: TurnContext, team_id: str = ""
+    ) -> List[TeamsChannelAccount]:
         if not team_id:
             team_id = TeamsInfo.get_team_id(turn_context)
 
@@ -102,6 +105,78 @@ class TeamsInfo:
             return await TeamsInfo._get_members(connector_client, conversation_id)
 
         return await TeamsInfo.get_team_members(turn_context, team_id)
+
+    @staticmethod
+    async def get_paged_team_members(
+        turn_context: TurnContext,
+        team_id: str = "",
+        continuation_token: str = None,
+        page_size: int = None,
+    ) -> List[TeamsPagedMembersResult]:
+        if not team_id:
+            team_id = TeamsInfo.get_team_id(turn_context)
+
+        if not team_id:
+            raise TypeError(
+                "TeamsInfo.get_team_members: method is only valid within the scope of MS Teams Team."
+            )
+
+        connector_client = await TeamsInfo._get_connector_client(turn_context)
+        return await TeamsInfo._get_paged_members(
+            connector_client,
+            turn_context.activity.conversation.id,
+            continuation_token,
+            page_size,
+        )
+
+    @staticmethod
+    async def get_paged_members(
+        turn_context: TurnContext, continuation_token: str = None, page_size: int = None
+    ) -> List[TeamsPagedMembersResult]:
+
+        team_id = TeamsInfo.get_team_id(turn_context)
+        if not team_id:
+            conversation_id = turn_context.activity.conversation.id
+            connector_client = await TeamsInfo._get_connector_client(turn_context)
+            return await TeamsInfo._get_paged_members(
+                connector_client, conversation_id, continuation_token, page_size
+            )
+
+        return await TeamsInfo.get_paged_team_members(turn_context, team_id, page_size)
+
+    @staticmethod
+    async def get_team_member(
+        turn_context: TurnContext, team_id: str = "", member_id: str = None
+    ) -> TeamsChannelAccount:
+        if not team_id:
+            team_id = TeamsInfo.get_team_id(turn_context)
+
+        if not team_id:
+            raise TypeError(
+                "TeamsInfo.get_team_member: method is only valid within the scope of MS Teams Team."
+            )
+
+        if not member_id:
+            raise TypeError("TeamsInfo.get_team_member: method requires a member_id")
+
+        connector_client = await TeamsInfo._get_connector_client(turn_context)
+        return await TeamsInfo._get_member(
+            connector_client, turn_context.activity.conversation.id, member_id
+        )
+
+    @staticmethod
+    async def get_member(
+        turn_context: TurnContext, member_id: str
+    ) -> TeamsChannelAccount:
+        team_id = TeamsInfo.get_team_id(turn_context)
+        if not team_id:
+            conversation_id = turn_context.activity.conversation.id
+            connector_client = await TeamsInfo._get_connector_client(turn_context)
+            return await TeamsInfo._get_member(
+                connector_client, conversation_id, member_id
+            )
+
+        return await TeamsInfo.get_team_member(turn_context, team_id, member_id)
 
     @staticmethod
     async def get_teams_connector_client(
@@ -151,3 +226,45 @@ class TeamsInfo:
             )
 
         return teams_members
+
+    @staticmethod
+    async def _get_paged_members(
+        connector_client: ConnectorClient,
+        conversation_id: str,
+        continuation_token: str = None,
+        page_size: int = None,
+    ) -> List[TeamsPagedMembersResult]:
+        if connector_client is None:
+            raise TypeError(
+                "TeamsInfo._get_paged_members.connector_client: cannot be None."
+            )
+
+        if not conversation_id:
+            raise TypeError(
+                "TeamsInfo._get_paged_members.conversation_id: cannot be empty."
+            )
+
+        return await connector_client.conversations.get_teams_conversation_paged_members(
+            conversation_id, continuation_token, page_size
+        )
+
+    @staticmethod
+    async def _get_member(
+        connector_client: ConnectorClient, conversation_id: str, member_id: str
+    ) -> TeamsChannelAccount:
+        if connector_client is None:
+            raise TypeError("TeamsInfo._get_member.connector_client: cannot be None.")
+
+        if not conversation_id:
+            raise TypeError("TeamsInfo._get_member.conversation_id: cannot be empty.")
+
+        if not member_id:
+            raise TypeError("TeamsInfo._get_member.member_id: cannot be empty.")
+
+        member: TeamsChannelAccount = await connector_client.conversations.get_conversation_member(
+            conversation_id, member_id
+        )
+
+        return TeamsChannelAccount().deserialize(
+            dict(member.serialize(), **member.additional_properties)
+        )
