@@ -40,7 +40,7 @@ class SkillDialog(Dialog):
         """
         dialog_args = SkillDialog._validate_begin_dialog_args(options)
 
-        await dialog_context.context.trace_activity(
+        await dialog_context.context.send_trace_activity(
             f"{SkillDialog.__name__}.BeginDialogAsync()",
             label=f"Using activity of type: {dialog_args.activity.type}",
         )
@@ -61,7 +61,7 @@ class SkillDialog(Dialog):
 
         # Send the activity to the skill.
         eoc_activity = await self._send_to_skill(dialog_context.context, skill_activity)
-        if not eoc_activity:
+        if eoc_activity:
             return await dialog_context.end_dialog(eoc_activity.value)
 
         return self.end_of_turn
