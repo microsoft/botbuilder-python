@@ -14,6 +14,7 @@ from botbuilder.core import (
     InvokeResponse,
     TurnContext,
     UserTokenProvider,
+    BotAdapter,
 )
 from botbuilder.dialogs import Dialog, DialogContext, DialogTurnResult
 from botbuilder.schema import (
@@ -293,7 +294,9 @@ class OAuthPrompt(Dialog):
             ):
                 link = None
                 card_action_type = ActionTypes.signin
-                bot_identity: ClaimsIdentity = context.turn_state.get("BotIdentity")
+                bot_identity: ClaimsIdentity = context.turn_state.get(
+                    BotAdapter.BOT_IDENTITY_KEY
+                )
 
                 # check if it's from streaming connection
                 if not context.activity.service_url.startswith("http"):
@@ -316,7 +319,9 @@ class OAuthPrompt(Dialog):
                         None,
                         self._settings.oath_app_credentials,
                     )
-                    card_action_type = ActionTypes.open_url
+
+                    if context.activity.channel_id == "emulator":
+                        card_action_type = ActionTypes.open_url
 
                 prompt.attachments.append(
                     CardFactory.oauth_card(
