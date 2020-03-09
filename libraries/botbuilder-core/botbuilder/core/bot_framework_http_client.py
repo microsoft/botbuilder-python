@@ -6,7 +6,7 @@ from typing import Dict
 from logging import Logger
 import aiohttp
 
-from botbuilder.schema import Activity
+from botbuilder.schema import Activity, ConversationAccount, ConversationReference
 from botframework.connector.auth import (
     ChannelProvider,
     CredentialProvider,
@@ -70,6 +70,24 @@ class BotFrameworkHttpClient:
         original_caller_id = activity.caller_id
 
         try:
+            # TODO: The relato has to be ported to the adapter in the new integration library when
+            #  resolving conflicts in merge
+            activity.relates_to = ConversationReference(
+                service_url=activity.service_url,
+                activity_id=activity.id,
+                channel_id=activity.channel_id,
+                conversation=ConversationAccount(
+                    id=activity.conversation.id,
+                    name=activity.conversation.name,
+                    conversation_type=activity.conversation.conversation_type,
+                    aad_object_id=activity.conversation.aad_object_id,
+                    is_group=activity.conversation.is_group,
+                    role=activity.conversation.role,
+                    tenant_id=activity.conversation.tenant_id,
+                    properties=activity.conversation.properties,
+                ),
+                bot=None,
+            )
             activity.conversation.id = conversation_id
             activity.service_url = service_url
             activity.caller_id = from_bot_id

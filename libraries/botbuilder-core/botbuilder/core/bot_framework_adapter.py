@@ -53,6 +53,7 @@ from .turn_context import TurnContext
 from .extended_user_token_provider import ExtendedUserTokenProvider
 from .invoke_response import InvokeResponse
 from .conversation_reference_extension import get_continuation_activity
+from .status_codes import StatusCodes
 
 USER_AGENT = f"Microsoft-BotFramework/3.1 (BotBuilder Python/{__version__})"
 OAUTH_ENDPOINT = "https://api.botframework.com"
@@ -476,7 +477,7 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
                 BotFrameworkAdapter._INVOKE_RESPONSE_KEY  # pylint: disable=protected-access
             )
             if invoke_response is None:
-                return InvokeResponse(status=501)
+                return InvokeResponse(status=StatusCodes.NOT_IMPLEMENTED)
             return invoke_response.value
 
         # Return the buffered activities in the response.  In this case, the invoker
@@ -486,7 +487,7 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
             serialized_activities = [
                 activity.serialize() for activity in context.buffered_replies
             ]
-            return InvokeResponse(status=200, body=serialized_activities)
+            return InvokeResponse(status=StatusCodes.OK, body=serialized_activities)
 
         return None
 
@@ -934,6 +935,7 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
             connection_name=connection_name,
             conversation=conversation,
             ms_app_id=client.config.credentials.microsoft_app_id,
+            relates_to=context.activity.relates_to,
         )
 
         final_state = base64.b64encode(

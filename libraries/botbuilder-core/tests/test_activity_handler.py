@@ -62,6 +62,10 @@ class TestingActivityHandler(ActivityHandler):
         self.record.append("on_unrecognized_activity_type")
         return await super().on_unrecognized_activity_type(turn_context)
 
+    async def on_invoke(self, turn_context: TurnContext):
+        self.record.append("on_invoke")
+        return await super().on_invoke(turn_context)
+
 
 class NotImplementedAdapter(BotAdapter):
     async def delete_activity(
@@ -101,3 +105,14 @@ class TestActivityHandler(aiounittest.AsyncTestCase):
         assert bot.record[0] == "on_message_reaction_activity"
         assert bot.record[1] == "on_reactions_added"
         assert bot.record[2] == "on_reactions_removed"
+
+    async def test_on_invoke(self):
+        activity = Activity(type=ActivityTypes.invoke,)
+        turn_context = TurnContext(NotImplementedAdapter(), activity)
+
+        # Act
+        bot = TestingActivityHandler()
+        await bot.on_turn(turn_context)
+
+        assert len(bot.record) == 1
+        assert bot.record[0] == "on_invoke"

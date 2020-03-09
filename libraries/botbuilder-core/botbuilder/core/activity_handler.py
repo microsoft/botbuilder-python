@@ -1,6 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
-from typing import List
+from typing import List, Union
 
 from botbuilder.schema import (
     ActivityTypes,
@@ -8,6 +8,7 @@ from botbuilder.schema import (
     MessageReaction,
     SignInConstants,
 )
+from .invoke_response import InvokeResponse
 from .turn_context import TurnContext
 
 
@@ -354,7 +355,7 @@ class ActivityHandler:
 
     async def on_invoke_activity(  # pylint: disable=unused-argument
         self, turn_context: TurnContext
-    ):
+    ) -> Union[InvokeResponse, None]:
         """
         Registers an activity event handler for the _invoke_ event, emitted for every incoming event activity.
 

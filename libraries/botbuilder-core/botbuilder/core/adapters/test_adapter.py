@@ -109,7 +109,7 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
         self._user_tokens: List[UserToken] = []
         self._magic_codes: List[TokenMagicCode] = []
         self._conversation_lock = Lock()
-        self._exchangeable_tokens: Dict[str, ExchangeableToken] = {}
+        self.exchangeable_tokens: Dict[str, ExchangeableToken] = {}
         self.activity_buffer: List[Activity] = []
         self.updated_activities: List[Activity] = []
         self.deleted_activities: List[ConversationReference] = []
@@ -414,7 +414,7 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
             exchangeable_item=exchangeable_item,
             token=token,
         )
-        self._exchangeable_tokens[key.to_key()] = key
+        self.exchangeable_tokens[key.to_key()] = key
 
     async def get_sign_in_resource_from_user(
         self,
@@ -472,7 +472,7 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
             user_id=user_id,
         )
 
-        token_exchange_response = self._exchangeable_tokens.get(key.to_key())
+        token_exchange_response = self.exchangeable_tokens.get(key.to_key())
         if token_exchange_response:
             return TokenResponse(
                 channel_id=key.channel_id,

@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 from http import HTTPStatus
-from botbuilder.schema import Activity, ActivityTypes, ChannelAccount
+from botbuilder.schema import Activity, ActivityTypes, ChannelAccount, SignInConstants
 from botbuilder.core import ActivityHandler, InvokeResponse, BotFrameworkAdapter
 from botbuilder.core.turn_context import TurnContext
 from botbuilder.core.teams.teams_info import TeamsInfo
@@ -60,8 +60,18 @@ class TeamsActivityHandler(ActivityHandler):
             ):
                 return await self.on_teams_card_action_invoke(turn_context)
 
-            if turn_context.activity.name == "signin/verifyState":
+            if (
+                turn_context.activity.name
+                == SignInConstants.verify_state_operation_name
+            ):
                 await self.on_teams_signin_verify_state(turn_context)
+                return self._create_invoke_response()
+
+            if (
+                turn_context.activity.name
+                == SignInConstants.token_exchange_operation_name
+            ):
+                await self.on_teams_signin_token_exchange(turn_context)
                 return self._create_invoke_response()
 
             if turn_context.activity.name == "fileConsent/invoke":
@@ -180,6 +190,9 @@ class TeamsActivityHandler(ActivityHandler):
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
     async def on_teams_signin_verify_state(self, turn_context: TurnContext):
+        raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
+
+    async def on_teams_signin_token_exchange(self, turn_context: TurnContext):
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
     async def on_teams_file_consent(
