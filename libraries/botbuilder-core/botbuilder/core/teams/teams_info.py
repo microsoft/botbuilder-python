@@ -107,9 +107,12 @@ class TeamsInfo:
     async def get_teams_connector_client(
         turn_context: TurnContext,
     ) -> TeamsConnectorClient:
+        # A normal connector client is retrieved in order to use the credentials
+        # while creating a TeamsConnectorClient below
+        connector_client = await TeamsInfo._get_connector_client(turn_context)
+
         return TeamsConnectorClient(
-            turn_context.adapter._credentials,  # pylint: disable=protected-access
-            turn_context.activity.service_url,
+            connector_client.config.credentials, turn_context.activity.service_url,
         )
 
     @staticmethod
