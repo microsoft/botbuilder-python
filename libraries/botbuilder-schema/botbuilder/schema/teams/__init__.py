@@ -65,6 +65,7 @@ try:
     from ._models_py3 import TeamInfo
     from ._models_py3 import TeamsChannelAccount
     from ._models_py3 import TeamsChannelData
+    from ._models_py3 import TeamsPagedMembersResult
     from ._models_py3 import TenantInfo
 except (SyntaxError, ImportError):
     from ._models import AppBasedLinkQuery
@@ -122,6 +123,7 @@ except (SyntaxError, ImportError):
     from ._models import TeamInfo
     from ._models import TeamsChannelAccount
     from ._models import TeamsChannelData
+    from ._models import TeamsPagedMembersResult
     from ._models import TenantInfo
 
 __all__ = [
@@ -180,5 +182,6 @@ __all__ = [
     "TeamInfo",
     "TeamsChannelAccount",
     "TeamsChannelData",
+    "TeamsPagedMembersResult",
     "TenantInfo",
 ]

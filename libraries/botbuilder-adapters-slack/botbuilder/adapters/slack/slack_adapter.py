@@ -138,12 +138,11 @@ class SlackAdapter(BotAdapter, ABC):
         Sends a proactive message to a conversation. Call this method to proactively send a message to a conversation.
         Most _channels require a user to initiate a conversation with a bot before the bot can send activities
         to the user.
-        :param bot_id: The application ID of the bot. This parameter is ignored in
-        single tenant the Adpters (Console, Test, etc) but is critical to the BotFrameworkAdapter
-        which is multi-tenant aware. </param>
-        :param reference: A reference to the conversation to continue.</param>
-        :param callback: The method to call for the resulting bot turn.</param>
-        :param claims_identity:
+        :param bot_id: Unused for this override.
+        :param reference: A reference to the conversation to continue.
+        :param callback: The method to call for the resulting bot turn.
+        :param claims_identity: A ClaimsIdentity for the conversation.
+        :param audience: Unused for this override.
         """
 
         if not reference:
@@ -151,11 +150,19 @@ class SlackAdapter(BotAdapter, ABC):
         if not callback:
             raise Exception("callback is required")
 
-        request = TurnContext.apply_conversation_reference(
-            conversation_reference_extension.get_continuation_activity(reference),
-            reference,
-        )
-        context = TurnContext(self, request)
+        if claims_identity:
+            request = conversation_reference_extension.get_continuation_activity(
+                reference
+            )
+            context = TurnContext(self, request)
+            context.turn_state[BotAdapter.BOT_IDENTITY_KEY] = claims_identity
+            context.turn_state[BotAdapter.BOT_CALLBACK_HANDLER_KEY] = callback
+        else:
+            request = TurnContext.apply_conversation_reference(
+                conversation_reference_extension.get_continuation_activity(reference),
+                reference,
+            )
+            context = TurnContext(self, request)
 
         return await self.run_pipeline(context, callback)
 

@@ -104,6 +104,14 @@ class ChannelServiceHandler:
         claims_identity = await self._authenticate(auth_header)
         return await self.on_get_conversation_members(claims_identity, conversation_id)
 
+    async def handle_get_conversation_member(
+        self, auth_header, conversation_id, member_id
+    ) -> ChannelAccount:
+        claims_identity = await self._authenticate(auth_header)
+        return await self.on_get_conversation_member(
+            claims_identity, conversation_id, member_id
+        )
+
     async def handle_get_conversation_paged_members(
         self,
         auth_header,
@@ -339,6 +347,24 @@ class ChannelServiceHandler:
 
         :param claims_identity:
         :param conversation_id:
+        :return:
+        """
+        raise BotActionNotImplementedError()
+
+    async def on_get_conversation_member(
+        self, claims_identity: ClaimsIdentity, conversation_id: str, member_id: str,
+    ) -> ChannelAccount:
+        """
+        get_conversation_member() API for Skill.
+
+        Enumerate the members of a conversation.
+
+        This REST API takes a ConversationId and returns a list of ChannelAccount
+        objects representing the members of the conversation.
+
+        :param claims_identity:
+        :param conversation_id:
+        :param member_id:
         :return:
         """
         raise BotActionNotImplementedError()

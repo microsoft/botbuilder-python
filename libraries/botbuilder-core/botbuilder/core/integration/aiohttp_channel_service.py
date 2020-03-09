@@ -132,6 +132,15 @@ def aiohttp_channel_service_routes(
 
         return get_serialized_response(result)
 
+    @routes.get(base_url + "/v3/conversations/{conversation_id}/members/{member_id}")
+    async def get_conversation_member(request: Request):
+        result = await handler.handle_get_conversation_member(
+            request.headers.get("Authorization"),
+            request.match_info["conversation_id", "member_id"],
+        )
+
+        return get_serialized_response(result)
+
     @routes.get(base_url + "/v3/conversations/{conversation_id}/pagedmembers")
     async def get_conversation_paged_members(request: Request):
         # TODO: continuation token? page size?
