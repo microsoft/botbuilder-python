@@ -10,7 +10,7 @@
 # --------------------------------------------------------------------------
 
 from msrest.serialization import Model
-from botbuilder.schema import Activity, Attachment, ChannelAccount
+from botbuilder.schema import Activity, Attachment, ChannelAccount, PagedMembersResult
 
 
 class TaskModuleRequest(Model):
@@ -1832,6 +1832,34 @@ class TeamsChannelAccount(ChannelAccount):
         self.surname = surname
         self.email = email
         self.user_principal_name = user_principal_name
+
+
+class TeamsPagedMembersResult(PagedMembersResult):
+    """Page of members for Teams.
+
+    :param continuation_token: Paging token
+    :type continuation_token: str
+    :param members: The Teams Channel Accounts.
+    :type members: list[~botframework.connector.models.TeamsChannelAccount]
+    """
+
+    _attribute_map = {
+        "continuation_token": {"key": "continuationToken", "type": "str"},
+        "members": {"key": "members", "type": "[TeamsChannelAccount]"},
+    }
+
+    def __init__(
+        self,
+        *,
+        continuation_token: str = None,
+        members: [TeamsChannelAccount] = None,
+        **kwargs
+    ) -> None:
+        super(TeamsPagedMembersResult, self).__init__(
+            continuation_token=continuation_token, members=members, **kwargs
+        )
+        self.continuation_token = continuation_token
+        self.members = members
 
 
 class TeamsChannelData(Model):
