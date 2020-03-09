@@ -6,7 +6,12 @@ from typing import Dict
 from logging import Logger
 import aiohttp
 
-from botbuilder.schema import Activity, ExpectedReplies, ConversationAccount, ConversationReference
+from botbuilder.schema import (
+    Activity,
+    ExpectedReplies,
+    ConversationAccount,
+    ConversationReference,
+)
 from botframework.connector.auth import (
     ChannelProvider,
     CredentialProvider,

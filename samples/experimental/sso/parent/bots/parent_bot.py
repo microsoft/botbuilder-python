@@ -79,7 +79,7 @@ class ParentBot(ActivityHandler):
                     True
                 )
 
-                clone_activity.delivery_mode = DeliveryModes.buffered_replies
+                clone_activity.delivery_mode = DeliveryModes.expect_replies
 
                 response_1 = await self._client.post_activity(
                     self._from_bot_id,
@@ -104,7 +104,7 @@ class ParentBot(ActivityHandler):
             TurnContext.get_conversation_reference(turn_context.activity),
             True
         )
-        activity.delivery_mode = DeliveryModes.buffered_replies
+        activity.delivery_mode = DeliveryModes.expect_replies
 
         response = await self._client.post_activity(
             self._from_bot_id,
