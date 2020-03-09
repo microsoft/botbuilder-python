@@ -3,6 +3,7 @@
 
 import re
 from datetime import datetime, timedelta
+from http import HTTPStatus
 from typing import Union, Awaitable, Callable
 
 from botframework.connector import Channels
@@ -377,15 +378,23 @@ class OAuthPrompt(Dialog):
                 token = await self.get_user_token(context, code)
                 if token is not None:
                     await context.send_activity(
-                        Activity(type="invokeResponse", value=InvokeResponse(200))
+                        Activity(
+                            type="invokeResponse", value=InvokeResponse(HTTPStatus.OK)
+                        )
                     )
                 else:
                     await context.send_activity(
-                        Activity(type="invokeResponse", value=InvokeResponse(404))
+                        Activity(
+                            type="invokeResponse",
+                            value=InvokeResponse(HTTPStatus.NOT_FOUND),
+                        )
                     )
             except Exception:
-                context.send_activity(
-                    Activity(type="invokeResponse", value=InvokeResponse(500))
+                await context.send_activity(
+                    Activity(
+                        type="invokeResponse",
+                        value=InvokeResponse(HTTPStatus.INTERNAL_SERVER_ERROR),
+                    )
                 )
         elif context.activity.type == ActivityTypes.message and context.activity.text:
             match = re.match(r"(?<!\d)\d{6}(?!\d)", context.activity.text)
