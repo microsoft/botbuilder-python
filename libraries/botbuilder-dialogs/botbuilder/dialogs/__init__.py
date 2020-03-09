@@ -18,6 +18,7 @@ from .dialog_turn_status import DialogTurnStatus
 from .dialog import Dialog
 from .waterfall_dialog import WaterfallDialog
 from .waterfall_step_context import WaterfallStepContext
+from .dialog_extensions import DialogExtensions
 from .prompts import *
 from .choices import *
 from .skills import *
@@ -46,5 +47,6 @@ __all__ = [
     "Prompt",
     "PromptOptions",
     "TextPrompt",
+    "DialogExtensions",
     "__version__",
 ]

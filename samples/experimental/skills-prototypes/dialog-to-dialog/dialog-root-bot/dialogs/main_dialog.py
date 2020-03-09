@@ -6,19 +6,21 @@ from typing import List
 from jsonpickle import encode
 from botbuilder.dialogs import (
     ComponentDialog,
+    DialogContext,
     WaterfallDialog,
     WaterfallStepContext,
     DialogTurnResult,
 )
 from botbuilder.dialogs.choices import Choice, ListStyle
 from botbuilder.dialogs.prompts import PromptOptions, ChoicePrompt
-from botbuilder.dialogs.skills import SkillDialogOptions, SkillDialog, SkillDialogArgs
+from botbuilder.dialogs.skills import SkillDialogOptions, SkillDialog, BeginSkillDialogOptions
 from botbuilder.core import ConversationState, MessageFactory
 from botbuilder.core.skills import BotFrameworkSkill, ConversationIdFactoryBase
-from botbuilder.schema import Activity, ActivityTypes, InputHints
+from botbuilder.schema import Activity, ActivityTypes, InputHints, DeliveryModes
 from botbuilder.integration.aiohttp.skills import SkillHttpClient
 
 from .booking_details import BookingDetails
+from .tangent_dialog import TangentDialog
 from ..config import DefaultConfig, SkillConfiguration
 
 
@@ -75,13 +77,37 @@ class MainDialog(ComponentDialog):
         self.add_dialog(
             WaterfallDialog(
                 WaterfallDialog.__name__,
-                [self.intro_step, self.act_step, self.final_step],
+                [
+                    self.select_skill_step,
+                    self.select_skill_action_step,
+                    self.call_skill_action_step,
+                    self.final_step
+                ],
             )
         )
 
-        self._active_skill_property = conversation_state.create_property()
+        self._active_skill_property = conversation_state.create_property(MainDialog.ACTIVE_SKILL_PROPERTY_NAME)
 
         self.initial_dialog_id = WaterfallDialog.__name__
+
+    async def on_continue_dialog(self, inner_dc: DialogContext) -> DialogTurnResult:
+        # This is an example on how to cancel a SkillDialog that is currently in progress from the parent bot
+        active_skill = await self._active_skill_property.get(inner_dc.context)
+        activity = inner_dc.context.activity
+        if active_skill and activity.type == ActivityTypes.message and "abort" in activity.text:
+            # Cancel all dialog when the user says abort.
+            await inner_dc.cancel_all_dialogs()
+            return await inner_dc.replace_dialog(
+                self.initial_dialog_id
+            )
+
+        elif active_skill and activity.type == ActivityTypes.message and "tangent" in activity.text:
+            # Begin Tangent
+            return await inner_dc.replace_dialog(
+                TangentDialog.__name__
+            )
+
+        return super().on_continue_dialog(inner_dc)
 
     async def select_skill_step(
         self, step_context: WaterfallStepContext
@@ -106,7 +132,7 @@ class MainDialog(ComponentDialog):
         selected_skill = next(
             (
                 skill
-                for skill in self._skills_config.SKILLS
+                for skill_id, skill in self._skills_config.SKILLS
                 if skill.id == selected_skill_id
             ),
             None,
@@ -147,11 +173,11 @@ class MainDialog(ComponentDialog):
                 text="Start echo skill",
             )
         elif selected_skill.id == "DialogSkillBot":
-            skill_activity = self._get_dialog_skill_bot_activity(step_context.result)
+            skill_activity = self._create_dialog_skill_bot_activity(step_context.result.value)
         else:
             raise Exception(f"Unknown target skill id: {selected_skill.id}.")
 
-        skill_dialog_args = SkillDialogArgs(selected_skill, skill_activity)
+        skill_dialog_args = BeginSkillDialogOptions(skill_activity)
 
         # We are manually creating the activity to send to the skill, ensure we add the ChannelData and Properties
         # from the original activity so the skill gets them.
@@ -163,9 +189,15 @@ class MainDialog(ComponentDialog):
             step_context.context.activity.additional_properties
         )
 
-        return await step_context.begin_dialog(SkillDialog.__name__, skill_dialog_args)
+        skill_dialog_args.activity.delivery_mode = DeliveryModes.expect_replies
+
+        await self._active_skill_property.set(step_context.context, selected_skill)
+
+        return await step_context.begin_dialog(selected_skill.id, skill_dialog_args)
 
     async def final_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
+        active_skill = await self._active_skill_property.get(step_context.context)
+
         if step_context.result:
             message = "Skill invocation complete."
             message += f" Result: {encode(step_context.result)}"
@@ -173,9 +205,15 @@ class MainDialog(ComponentDialog):
                 MessageFactory.text(message, input_hint=InputHints.ignoring_input)
             )
 
+        # Clear the skill selected by the user.
+        step_context.values[self._selected_skill_key] = None
+
+        # Clear active skill in state
+        await self._active_skill_property.delete(step_context.context)
+
         # Restart the main dialog with a different message the second time around
         return await step_context.replace_dialog(
-            self.initial_dialog_id, "What else can I do for you?"
+            self.initial_dialog_id
         )
 
     # Helper method to create Choice elements for the actions supported by the skill
@@ -197,7 +235,7 @@ class MainDialog(ComponentDialog):
         return choices
 
     # Helper method to create the activity to be sent to the DialogSkillBot
-    def _get_dialog_skill_bot_activity(self, selected_option: str) -> Activity:
+    def _create_dialog_skill_bot_activity(self, selected_option: str) -> Activity:
         # Note: in a real bot, the dialogArgs will be created dynamically based on the conversation
         # and what each action requires, this code hardcodes the values to make things simpler.
 

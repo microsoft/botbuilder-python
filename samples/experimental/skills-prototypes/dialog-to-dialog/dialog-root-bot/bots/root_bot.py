@@ -9,14 +9,8 @@ from botbuilder.core import (
     MessageFactory,
     TurnContext,
 )
-from botbuilder.core.skills import SkillConversationIdFactory
-from botbuilder.integration.aiohttp import BotFrameworkHttpClient
-from botbuilder.dialogs import Dialog
-
+from botbuilder.dialogs import Dialog, DialogExtensions
 from botbuilder.schema import ActivityTypes, Attachment, ChannelAccount
-
-from config import DefaultConfig, SkillConfiguration
-from helpers.dialog_helper import DialogHelper
 
 
 class RootBot(ActivityHandler):
@@ -30,7 +24,7 @@ class RootBot(ActivityHandler):
         if turn_context.activity.type == ActivityTypes.conversation_update:
             # Handle end of conversation back from the skill
             # forget skill invocation
-            await DialogHelper.run_dialog(
+            await DialogExtensions.run_dialog(
                 self._main_dialog,
                 turn_context,
                 self._conversation_state.create_property("DialogState"),
@@ -46,7 +40,7 @@ class RootBot(ActivityHandler):
                 welcome_card = self._create_adaptive_card_attachment()
                 activity = MessageFactory.attachment(welcome_card)
                 await turn_context.send_activity(activity)
-                await DialogHelper.run_dialog(
+                await DialogExtensions.run_dialog(
                     self._main_dialog,
                     turn_context,
                     self._conversation_state.create_property("DialogState"),
