@@ -16,22 +16,23 @@ from botbuilder.core.integration import (
     aiohttp_error_middleware,
     BotFrameworkHttpClient
 )
-from botbuilder.core.skills import SkillConversationIdFactory, SkillHandler
+from botbuilder.core.skills import SkillHandler
 from botbuilder.schema import Activity, ActivityTypes
+from botbuilder.integration.aiohttp.skills import SkillHttpClient
 from botframework.connector.auth import (
     AuthenticationConfiguration,
     SimpleCredentialProvider,
 )
 
 from bots import RootBot
+from dialogs import MainDialog
 from config import DefaultConfig, SkillConfiguration
 from adapter_with_error_handler import AdapterWithErrorHandler
+from authentication.allow_callers_claims_validation import AllowedCallersClaimsValidator
+from skill_conversation_id_factory import SkillConversationIdFactory
 
 CONFIG = DefaultConfig()
 SKILL_CONFIG = SkillConfiguration()
-
-CREDENTIAL_PROVIDER = SimpleCredentialProvider(CONFIG.APP_ID, CONFIG.APP_PASSWORD)
-CLIENT = BotFrameworkHttpClient(CREDENTIAL_PROVIDER)
 
 # Create MemoryStorage, UserState and ConversationState
 MEMORY = MemoryStorage()
@@ -39,16 +40,24 @@ USER_STATE = UserState(MEMORY)
 CONVERSATION_STATE = ConversationState(MEMORY)
 ID_FACTORY = SkillConversationIdFactory(MEMORY)
 
+CREDENTIAL_PROVIDER = SimpleCredentialProvider(CONFIG.APP_ID, CONFIG.APP_PASSWORD)
+CLIENT = SkillHttpClient(CREDENTIAL_PROVIDER, ID_FACTORY)
+
+
 # Create adapter.
 # See https://aka.ms/about-bot-adapter to learn more about how bots work.
 SETTINGS = BotFrameworkAdapterSettings(CONFIG.APP_ID, CONFIG.APP_PASSWORD)
 ADAPTER = AdapterWithErrorHandler(SETTINGS, CONVERSATION_STATE)
 
+DIALOG = MainDialog(CONVERSATION_STATE, ID_FACTORY, CLIENT, SKILL_CONFIG, CONFIG)
+
 # Create the Bot
 BOT = RootBot(CONVERSATION_STATE, SKILL_CONFIG, ID_FACTORY, CLIENT, CONFIG)
 
+AUTH_CONFIG = AuthenticationConfiguration(claims_validator=AllowedCallersClaimsValidator(CONFIG).claims_validator)
+
 SKILL_HANDLER = SkillHandler(
-    ADAPTER, BOT, ID_FACTORY, CREDENTIAL_PROVIDER, AuthenticationConfiguration()
+    ADAPTER, BOT, ID_FACTORY, CREDENTIAL_PROVIDER, AUTH_CONFIG
 )
 
 

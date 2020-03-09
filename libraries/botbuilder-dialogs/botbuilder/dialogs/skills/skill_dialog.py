@@ -4,7 +4,7 @@
 from copy import deepcopy
 from typing import List
 
-from botbuilder.schema import Activity, ActivityTypes, DeliveryModes
+from botbuilder.schema import Activity, ActivityTypes, ExpectedReplies, DeliveryModes
 from botbuilder.core import (
     BotAdapter,
     TurnContext,
@@ -220,6 +220,8 @@ class SkillDialog(Dialog):
         if activity.delivery_mode == DeliveryModes.expect_replies and response.body:
             # Process replies in the response.Body.
             response.body: List[Activity]
+            response.body = ExpectedReplies().deserialize(response.body).activities
+
             for from_skill_activity in response.body:
                 if from_skill_activity.type == ActivityTypes.end_of_conversation:
                     # Capture the EndOfConversation activity if it was sent from skill
