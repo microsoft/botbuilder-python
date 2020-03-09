@@ -1,7 +1,7 @@
 from typing import List
 
 import aiounittest
-from botbuilder.core import ActivityHandler, BotAdapter, TurnContext
+from botbuilder.core import ActivityHandler, BotAdapter, TurnContext, StatusCodes
 from botbuilder.schema import (
     Activity,
     ActivityTypes,
@@ -62,9 +62,18 @@ class TestingActivityHandler(ActivityHandler):
         self.record.append("on_unrecognized_activity_type")
         return await super().on_unrecognized_activity_type(turn_context)
 
-    async def on_invoke(self, turn_context: TurnContext):
-        self.record.append("on_invoke")
-        return await super().on_invoke(turn_context)
+    async def on_invoke_activity(self, turn_context: TurnContext):
+        self.record.append("on_invoke_activity")
+        if turn_context.activity.name == "some.random.invoke":
+            return self._create_invoke_response()
+
+        return await super().on_invoke_activity(turn_context)
+
+    async def on_sign_in_invoke(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext
+    ):
+        self.record.append("on_sign_in_invoke")
+        return
 
 
 class NotImplementedAdapter(BotAdapter):
@@ -77,6 +86,35 @@ class NotImplementedAdapter(BotAdapter):
         self, context: TurnContext, activities: List[Activity]
     ) -> List[ResourceResponse]:
         raise NotImplementedError()
+
+    async def update_activity(self, context: TurnContext, activity: Activity):
+        raise NotImplementedError()
+
+
+class TestInvokeAdapter(NotImplementedAdapter):
+    def __init__(self, on_turn_error=None, activity: Activity = None):
+        super().__init__(on_turn_error)
+
+        self.activity = activity
+
+    async def delete_activity(
+        self, context: TurnContext, reference: ConversationReference
+    ):
+        raise NotImplementedError()
+
+    async def send_activities(
+        self, context: TurnContext, activities: List[Activity]
+    ) -> List[ResourceResponse]:
+        self.activity = next(
+            (
+                activity
+                for activity in activities
+                if activity.type == ActivityTypes.invoke_response
+            ),
+            None,
+        )
+
+        return []
 
     async def update_activity(self, context: TurnContext, activity: Activity):
         raise NotImplementedError()
@@ -106,13 +144,30 @@ class TestActivityHandler(aiounittest.AsyncTestCase):
         assert bot.record[1] == "on_reactions_added"
         assert bot.record[2] == "on_reactions_removed"
 
-    async def test_on_invoke(self):
-        activity = Activity(type=ActivityTypes.invoke,)
-        turn_context = TurnContext(NotImplementedAdapter(), activity)
+    async def test_invoke(self):
+        activity = Activity(type=ActivityTypes.invoke, name="some.random.invoke")
+
+        adapter = TestInvokeAdapter()
+        turn_context = TurnContext(adapter, activity)
 
         # Act
         bot = TestingActivityHandler()
         await bot.on_turn(turn_context)
 
         assert len(bot.record) == 1
-        assert bot.record[0] == "on_invoke"
+        assert bot.record[0] == "on_invoke_activity"
+        assert adapter.activity.value.status == StatusCodes.OK
+
+    async def test_invoke_should_not_match(self):
+        activity = Activity(type=ActivityTypes.invoke, name="should.not.match")
+
+        adapter = TestInvokeAdapter()
+        turn_context = TurnContext(adapter, activity)
+
+        # Act
+        bot = TestingActivityHandler()
+        await bot.on_turn(turn_context)
+
+        assert len(bot.record) == 1
+        assert bot.record[0] == "on_invoke_activity"
+        assert adapter.activity.value.status == StatusCodes.NOT_IMPLEMENTED

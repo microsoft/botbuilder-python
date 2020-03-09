@@ -1,15 +1,19 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+from http import HTTPStatus
 from typing import List, Union
 
 from botbuilder.schema import (
+    Activity,
     ActivityTypes,
     ChannelAccount,
     MessageReaction,
     SignInConstants,
 )
+from .bot_framework_adapter import BotFrameworkAdapter
 from .invoke_response import InvokeResponse
 from .turn_context import TurnContext
+from .status_codes import StatusCodes
 
 
 class ActivityHandler:
@@ -65,7 +69,15 @@ class ActivityHandler:
         elif turn_context.activity.type == ActivityTypes.event:
             await self.on_event_activity(turn_context)
         elif turn_context.activity.type == ActivityTypes.invoke:
-            await self.on_invoke_activity(turn_context)
+            invoke_response = await self.on_invoke_activity(turn_context)
+
+            # If OnInvokeActivityAsync has already sent an InvokeResponse, do not send another one.
+            if invoke_response and not turn_context.turn_state.get(
+                BotFrameworkAdapter._INVOKE_RESPONSE_KEY  # pylint: disable=protected-access
+            ):
+                await turn_context.send_activity(
+                    Activity(value=invoke_response, type=ActivityTypes.invoke_response)
+                )
         elif turn_context.activity.type == ActivityTypes.end_of_conversation:
             await self.on_end_of_conversation_activity(turn_context)
         else:
@@ -364,15 +376,19 @@ class ActivityHandler:
 
         :returns: A task that represents the work queued to execute
         """
+        try:
+            if (
+                turn_context.activity.name
+                == SignInConstants.verify_state_operation_name
+                or turn_context.activity.name
+                == SignInConstants.token_exchange_operation_name
+            ):
+                await self.on_sign_in_invoke(turn_context)
+                return self._create_invoke_response()
 
-        if (
-            turn_context.activity.name == SignInConstants.verify_state_operation_name
-            or turn_context.activity.name
-            == SignInConstants.token_exchange_operation_name
-        ):
-            return await self.on_sign_in_invoke(turn_context)
-
-        return await self.on_invoke(turn_context)
+            raise _InvokeResponseException(HTTPStatus.NOT_IMPLEMENTED)
+        except _InvokeResponseException as invoke_exception:
+            return invoke_exception.create_invoke_response()
 
     async def on_sign_in_invoke(  # pylint: disable=unused-argument
         self, turn_context: TurnContext
@@ -388,20 +404,18 @@ class ActivityHandler:
 
         :returns: A task that represents the work queued to execute
         """
-        return
+        raise _InvokeResponseException(HTTPStatus.NOT_IMPLEMENTED)
 
-    async def on_invoke(  # pylint: disable=unused-argument
-        self, turn_context: TurnContext
-    ):
-        """
-        Invoked when a signin/verifyState or signin/tokenExchange event is received when the base behavior of
-        on_invoke_activity(TurnContext{InvokeActivity}) is used.
-        This method could optionally be overridden if the bot is meant to handle miscellaneous Invokes.
-        By default, this method does nothing.
+    @staticmethod
+    def _create_invoke_response(body: object = None) -> InvokeResponse:
+        return InvokeResponse(status=StatusCodes.OK, body=body)
 
-        :param turn_context: The context object for this turn
-        :type turn_context: :class:`botbuilder.core.TurnContext`
 
-        :returns: A task that represents the work queued to execute
-        """
-        return
+class _InvokeResponseException(Exception):
+    def __init__(self, status_code: HTTPStatus, body: object = None):
+        super(_InvokeResponseException, self).__init__()
+        self._status_code = status_code
+        self._body = body
+
+    def create_invoke_response(self) -> InvokeResponse:
+        return InvokeResponse(status=int(self._status_code), body=self._body)

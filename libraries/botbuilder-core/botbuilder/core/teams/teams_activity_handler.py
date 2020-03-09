@@ -4,6 +4,7 @@
 from http import HTTPStatus
 from botbuilder.schema import Activity, ActivityTypes, ChannelAccount, SignInConstants
 from botbuilder.core import ActivityHandler, InvokeResponse, BotFrameworkAdapter
+from botbuilder.core.activity_handler import _InvokeResponseException
 from botbuilder.core.turn_context import TurnContext
 from botbuilder.core.teams.teams_info import TeamsInfo
 from botbuilder.schema.teams import (
@@ -26,32 +27,6 @@ from .teams_helper import deserializer_helper, serializer_helper
 
 
 class TeamsActivityHandler(ActivityHandler):
-    async def on_turn(self, turn_context: TurnContext):
-        if turn_context is None:
-            raise TypeError("ActivityHandler.on_turn(): turn_context cannot be None.")
-
-        if not getattr(turn_context, "activity", None):
-            raise TypeError(
-                "ActivityHandler.on_turn(): turn_context must have a non-None activity."
-            )
-
-        if not getattr(turn_context.activity, "type", None):
-            raise TypeError(
-                "ActivityHandler.on_turn(): turn_context activity must have a non-None type."
-            )
-
-        if turn_context.activity.type == ActivityTypes.invoke:
-            invoke_response = await self.on_invoke_activity(turn_context)
-            if invoke_response and not turn_context.turn_state.get(
-                BotFrameworkAdapter._INVOKE_RESPONSE_KEY  # pylint: disable=protected-access
-            ):
-                await turn_context.send_activity(
-                    Activity(value=invoke_response, type=ActivityTypes.invoke_response)
-                )
-            return
-
-        await super().on_turn(turn_context)
-
     async def on_invoke_activity(self, turn_context: TurnContext) -> InvokeResponse:
         try:
             if (
@@ -59,13 +34,6 @@ class TeamsActivityHandler(ActivityHandler):
                 and turn_context.activity.channel_id == Channels.ms_teams
             ):
                 return await self.on_teams_card_action_invoke(turn_context)
-
-            if (
-                turn_context.activity.name
-                == SignInConstants.verify_state_operation_name
-            ):
-                await self.on_teams_signin_verify_state(turn_context)
-                return self._create_invoke_response()
 
             if (
                 turn_context.activity.name
@@ -180,9 +148,13 @@ class TeamsActivityHandler(ActivityHandler):
                     )
                 )
 
-            raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
-        except _InvokeResponseException as err:
-            return err.create_invoke_response()
+            return await super().on_invoke_activity(turn_context)
+
+        except _InvokeResponseException as invoke_exception:
+            return invoke_exception.create_invoke_response()
+
+    async def on_sign_in_invoke(self, turn_context: TurnContext):
+        return await self.on_teams_signin_verify_state(turn_context)
 
     async def on_teams_card_action_invoke(
         self, turn_context: TurnContext
@@ -452,17 +424,3 @@ class TeamsActivityHandler(ActivityHandler):
         self, channel_info: ChannelInfo, team_info: TeamInfo, turn_context: TurnContext
     ):
         return
-
-    @staticmethod
-    def _create_invoke_response(body: object = None) -> InvokeResponse:
-        return InvokeResponse(status=int(HTTPStatus.OK), body=serializer_helper(body))
-
-
-class _InvokeResponseException(Exception):
-    def __init__(self, status_code: HTTPStatus, body: object = None):
-        super(_InvokeResponseException, self).__init__()
-        self._status_code = status_code
-        self._body = body
-
-    def create_invoke_response(self) -> InvokeResponse:
-        return InvokeResponse(status=int(self._status_code), body=self._body)
