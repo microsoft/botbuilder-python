@@ -36,7 +36,9 @@ class ActivityRouterDialog(ComponentDialog):
 
         self.add_dialog(BookingDialog())
         self.add_dialog(OAuthTestDialog(configuration))
-        self.add_dialog(WaterfallDialog(WaterfallDialog.__name__, [None]))
+        self.add_dialog(
+            WaterfallDialog(WaterfallDialog.__name__, [self.process_activity])
+        )
 
         self.initial_dialog_id = WaterfallDialog.__name__
 
