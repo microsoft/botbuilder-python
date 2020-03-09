@@ -1,29 +1,32 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+from http import HTTPStatus
 
-from typing import List
-
-from jsonpickle import encode
 from botbuilder.dialogs import (
     ComponentDialog,
     WaterfallDialog,
     WaterfallStepContext,
     DialogTurnResult,
-    DialogTurnStatus
+    DialogTurnStatus,
 )
-from botbuilder.dialogs.choices import Choice, ListStyle
-from botbuilder.dialogs.prompts import PromptOptions, ChoicePrompt
-from botbuilder.dialogs.skills import SkillDialogOptions, SkillDialog, SkillDialogArgs
-from botbuilder.core import ConversationState, MessageFactory, InvokeResponse
-from botbuilder.core.skills import BotFrameworkSkill, ConversationIdFactoryBase
+from botbuilder.core import MessageFactory, InvokeResponse
 from botbuilder.schema import Activity, ActivityTypes, InputHints
-from botbuilder.integration.aiohttp.skills import SkillHttpClient
 
-from ..config import DefaultConfig, SkillConfiguration
-from ..dialogs import BookingDetails, BookingDialog, DialogSkillBotRecognizer, Location, OAuthTestDialog
+from config import DefaultConfig
+from dialogs import (
+    DialogSkillBotRecognizer,
+    BookingDialog,
+    OAuthTestDialog,
+    BookingDetails,
+    Location,
+)
 
 
 class ActivityRouterDialog(ComponentDialog):
+    """
+    A root dialog that can route activities sent to the skill to different dialogs.
+    """
+
     def __init__(
         self, luis_recognizer: DialogSkillBotRecognizer, configuration: DefaultConfig
     ):
@@ -50,9 +53,9 @@ class ActivityRouterDialog(ComponentDialog):
 
         if current_activity_type == ActivityTypes.message:
             return await self._on_message_activity(step_context)
-        elif current_activity_type == ActivityTypes.invoke:
+        if current_activity_type == ActivityTypes.invoke:
             return await self._on_invoke_activity(step_context)
-        elif current_activity_type == ActivityTypes.event:
+        if current_activity_type == ActivityTypes.event:
             return await self._on_event_activity(step_context)
 
         # We didn't get an activity type we can handle.
@@ -65,7 +68,7 @@ class ActivityRouterDialog(ComponentDialog):
         return DialogTurnResult(DialogTurnStatus.Complete)
 
     async def _on_event_activity(
-            self, step_context: WaterfallStepContext
+        self, step_context: WaterfallStepContext
     ) -> DialogTurnResult:
         activity = step_context.context.activity
 
@@ -78,22 +81,22 @@ class ActivityRouterDialog(ComponentDialog):
             # Start the booking dialog
             booking_dialog = self.find_dialog(BookingDialog.__name__)
             return await step_context.begin_dialog(booking_dialog.id, booking_details)
-        elif activity.name == "OAuthTest":
+
+        if activity.name == "OAuthTest":
             # Start the oauth dialog
             oauth_dialog = self.find_dialog(OAuthTestDialog.__name__)
             return await step_context.begin_dialog(oauth_dialog.id, None)
 
-        else:
-            await step_context.context.send_activity(
-                MessageFactory.text(
-                    f'Unrecognized EventName: "{activity.name}".',
-                    input_hint=InputHints.ignoring_input,
-                )
+        await step_context.context.send_activity(
+            MessageFactory.text(
+                f'Unrecognized EventName: "{activity.name}".',
+                input_hint=InputHints.ignoring_input,
             )
-            return DialogTurnResult(DialogTurnStatus.Complete)
+        )
+        return DialogTurnResult(DialogTurnStatus.Complete)
 
     async def _on_invoke_activity(
-            self, step_context: WaterfallStepContext
+        self, step_context: WaterfallStepContext
     ) -> DialogTurnResult:
         activity = step_context.context.activity
 
@@ -104,7 +107,13 @@ class ActivityRouterDialog(ComponentDialog):
                 location.from_json(activity.value)
 
             looking_into_it_message = "Getting your weather forecast..."
-            step_context.context.send_activity(MessageFactory.text(looking_into_it_message, looking_into_it_message, InputHints.ignoring_input))
+            await step_context.context.send_activity(
+                MessageFactory.text(
+                    looking_into_it_message,
+                    looking_into_it_message,
+                    InputHints.ignoring_input,
+                )
+            )
 
             # Create and return an invoke activity with the weather results.
             invoke_response_activity = Activity(
@@ -112,14 +121,15 @@ class ActivityRouterDialog(ComponentDialog):
                 value=InvokeResponse(
                     body=[
                         "New York, NY, Clear, 56 F",
-                        "Bellevue, WA, Mostly Cloudy, 48 F"
+                        "Bellevue, WA, Mostly Cloudy, 48 F",
                     ],
-                    status=200
-                )
+                    status=HTTPStatus.OK,
+                ),
             )
 
             await step_context.context.send_activity(invoke_response_activity)
         else:
+            # We didn't get an invoke name we can handle.
             await step_context.context.send_activity(
                 MessageFactory.text(
                     f'Unrecognized InvokeName: "{activity.name}".',
@@ -130,7 +140,7 @@ class ActivityRouterDialog(ComponentDialog):
         return DialogTurnResult(DialogTurnStatus.Complete)
 
     async def _on_message_activity(
-            self, step_context: WaterfallStepContext
+        self, step_context: WaterfallStepContext
     ) -> DialogTurnResult:
         activity = step_context.context.activity
 
@@ -146,24 +156,22 @@ class ActivityRouterDialog(ComponentDialog):
             # Call LUIS with the utterance.
             luis_result = await self._luis_recognizer.recognize(step_context.context)
 
-            message = f"LUIS results for \"{activity.Text}\":\n"
+            message = f'LUIS results for "{activity.Text}":\n'
             intent, intent_score = None, None
             if luis_result.intents:
-                max_value_key = max(luis_result.intents, key=lambda key: luis_result.intents[key])
+                max_value_key = max(
+                    luis_result.intents, key=lambda key: luis_result.intents[key]
+                )
                 intent, intent_score = max_value_key, luis_result.intents[max_value_key]
 
-            message += f"Intent: \"{intent}\" Score: {intent_score}\n"
+            message += f'Intent: "{intent}" Score: {intent_score}\n'
             message += f"Entities found: {len(luis_result.entities) - 1}\n"
             for entity_key, entity_val in luis_result.entities:
                 if not entity_key == "$instance":
                     message += f"* {entity_val}\n"
 
             await step_context.context.send_activity(
-                MessageFactory.text(
-                    message,
-                    input_hint=InputHints.ignoring_input,
-                )
+                MessageFactory.text(message, input_hint=InputHints.ignoring_input,)
             )
 
         return DialogTurnResult(DialogTurnStatus.Complete)
-

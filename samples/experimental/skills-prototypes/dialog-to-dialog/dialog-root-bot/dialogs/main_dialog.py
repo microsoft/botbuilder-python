@@ -13,15 +13,19 @@ from botbuilder.dialogs import (
 )
 from botbuilder.dialogs.choices import Choice, ListStyle
 from botbuilder.dialogs.prompts import PromptOptions, ChoicePrompt
-from botbuilder.dialogs.skills import SkillDialogOptions, SkillDialog, BeginSkillDialogOptions
+from botbuilder.dialogs.skills import (
+    SkillDialogOptions,
+    SkillDialog,
+    BeginSkillDialogOptions,
+)
 from botbuilder.core import ConversationState, MessageFactory
 from botbuilder.core.skills import BotFrameworkSkill, ConversationIdFactoryBase
 from botbuilder.schema import Activity, ActivityTypes, InputHints, DeliveryModes
 from botbuilder.integration.aiohttp.skills import SkillHttpClient
 
+from config import SkillConfiguration, DefaultConfig
 from .booking_details import BookingDetails
 from .tangent_dialog import TangentDialog
-from ..config import DefaultConfig, SkillConfiguration
 
 
 class MainDialog(ComponentDialog):
@@ -59,6 +63,9 @@ class MainDialog(ComponentDialog):
         # ChoicePrompt to render available skills and skill actions
         self.add_dialog(ChoicePrompt(ChoicePrompt.__name__))
 
+        # Register the tangent
+        self.add_dialog(TangentDialog())
+
         # Create SkillDialog instances for the configured skills
         for _, skill_info in skills_config.SKILLS.items():
             # SkillDialog used to wrap interaction with the selected skill
@@ -68,7 +75,7 @@ class MainDialog(ComponentDialog):
                 skill_client=skill_client,
                 skill=skill_info,
                 skill_host_endpoint=skills_config.SKILL_HOST_ENDPOINT,
-                conversation_state=conversation_state
+                conversation_state=conversation_state,
             )
 
             self.add_dialog(SkillDialog(skill_dialog_options, skill_info.id))
@@ -81,12 +88,14 @@ class MainDialog(ComponentDialog):
                     self.select_skill_step,
                     self.select_skill_action_step,
                     self.call_skill_action_step,
-                    self.final_step
+                    self.final_step,
                 ],
             )
         )
 
-        self._active_skill_property = conversation_state.create_property(MainDialog.ACTIVE_SKILL_PROPERTY_NAME)
+        self._active_skill_property = conversation_state.create_property(
+            MainDialog.ACTIVE_SKILL_PROPERTY_NAME
+        )
 
         self.initial_dialog_id = WaterfallDialog.__name__
 
@@ -94,20 +103,25 @@ class MainDialog(ComponentDialog):
         # This is an example on how to cancel a SkillDialog that is currently in progress from the parent bot
         active_skill = await self._active_skill_property.get(inner_dc.context)
         activity = inner_dc.context.activity
-        if active_skill and activity.type == ActivityTypes.message and "abort" in activity.text:
+
+        if (
+            active_skill
+            and activity.type == ActivityTypes.message
+            and "abort" in activity.text
+        ):
             # Cancel all dialog when the user says abort.
             await inner_dc.cancel_all_dialogs()
-            return await inner_dc.replace_dialog(
-                self.initial_dialog_id
-            )
+            return await inner_dc.replace_dialog(self.initial_dialog_id)
 
-        elif active_skill and activity.type == ActivityTypes.message and "tangent" in activity.text:
+        if (
+            active_skill
+            and activity.type == ActivityTypes.message
+            and "tangent" in activity.text
+        ):
             # Begin Tangent
-            return await inner_dc.replace_dialog(
-                TangentDialog.__name__
-            )
+            return await inner_dc.replace_dialog(TangentDialog.__name__)
 
-        return super().on_continue_dialog(inner_dc)
+        return await super().on_continue_dialog(inner_dc)
 
     async def select_skill_step(
         self, step_context: WaterfallStepContext
@@ -118,7 +132,10 @@ class MainDialog(ComponentDialog):
             retry_prompt=MessageFactory.text(
                 "That was not a valid choice, please select a valid skill."
             ),
-            choices=[Choice(value=skill.id) for skill in self._skills_config.SKILLS],
+            choices=[
+                Choice(value=skill.id)
+                for _, skill in self._skills_config.SKILLS.items()
+            ],
         )
 
         # Prompt the user to select a skill.
@@ -129,14 +146,7 @@ class MainDialog(ComponentDialog):
     ) -> DialogTurnResult:
         # Get the skill info based on the selected skill.
         selected_skill_id = step_context.result
-        selected_skill = next(
-            (
-                skill
-                for skill_id, skill in self._skills_config.SKILLS
-                if skill.id == selected_skill_id
-            ),
-            None,
-        )
+        selected_skill = self._skills_config.SKILLS.get(selected_skill_id.value)
 
         # Remember the skill selected by the user.
         step_context.values[self._selected_skill_key] = selected_skill
@@ -173,7 +183,9 @@ class MainDialog(ComponentDialog):
                 text="Start echo skill",
             )
         elif selected_skill.id == "DialogSkillBot":
-            skill_activity = self._create_dialog_skill_bot_activity(step_context.result.value)
+            skill_activity = self._create_dialog_skill_bot_activity(
+                step_context.result.value
+            )
         else:
             raise Exception(f"Unknown target skill id: {selected_skill.id}.")
 
@@ -212,9 +224,7 @@ class MainDialog(ComponentDialog):
         await self._active_skill_property.delete(step_context.context)
 
         # Restart the main dialog with a different message the second time around
-        return await step_context.replace_dialog(
-            self.initial_dialog_id
-        )
+        return await step_context.replace_dialog(self.initial_dialog_id)
 
     # Helper method to create Choice elements for the actions supported by the skill
     def _get_skill_actions(self, skill: BotFrameworkSkill) -> List[Choice]:

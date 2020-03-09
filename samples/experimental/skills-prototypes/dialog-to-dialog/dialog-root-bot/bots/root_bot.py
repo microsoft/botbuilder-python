@@ -21,7 +21,7 @@ class RootBot(ActivityHandler):
         self._main_dialog = main_dialog
 
     async def on_turn(self, turn_context: TurnContext):
-        if turn_context.activity.type == ActivityTypes.conversation_update:
+        if turn_context.activity.type != ActivityTypes.conversation_update:
             # Handle end of conversation back from the skill
             # forget skill invocation
             await DialogExtensions.run_dialog(
@@ -31,6 +31,9 @@ class RootBot(ActivityHandler):
             )
         else:
             await super().on_turn(turn_context)
+
+        # Save any state changes that might have occurred during the turn.
+        await self._conversation_state.save_changes(turn_context)
 
     async def on_members_added_activity(
         self, members_added: List[ChannelAccount], turn_context: TurnContext

@@ -1,3 +1,3 @@
-from .allow_callers_claims_validation import AllowedCallersClaimsValidator
+from .allowed_skills_claims_validator import AllowedSkillsClaimsValidator
 
-__all__ = ["AllowedCallersClaimsValidator"]
+__all__ = ["AllowedSkillsClaimsValidator"]

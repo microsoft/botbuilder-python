@@ -21,11 +21,11 @@ from botframework.connector.auth import (
     SimpleCredentialProvider,
 )
 
+from authentication import AllowedSkillsClaimsValidator
 from bots import RootBot
 from dialogs import MainDialog
 from config import DefaultConfig, SkillConfiguration
 from adapter_with_error_handler import AdapterWithErrorHandler
-from authentication.allow_callers_claims_validation import AllowedCallersClaimsValidator
 from skill_conversation_id_factory import SkillConversationIdFactory
 
 CONFIG = DefaultConfig()
@@ -49,13 +49,13 @@ ADAPTER = AdapterWithErrorHandler(SETTINGS, CONVERSATION_STATE)
 DIALOG = MainDialog(CONVERSATION_STATE, ID_FACTORY, CLIENT, SKILL_CONFIG, CONFIG)
 
 # Create the Bot
-BOT = RootBot(CONVERSATION_STATE, SKILL_CONFIG, ID_FACTORY, CLIENT, CONFIG)
+BOT = RootBot(CONVERSATION_STATE, DIALOG)  # , SKILL_CONFIG, ID_FACTORY, CLIENT, CONFIG)
 
-AUTH_CONFIG = AuthenticationConfiguration(claims_validator=AllowedCallersClaimsValidator(CONFIG).claims_validator)
-
-SKILL_HANDLER = SkillHandler(
-    ADAPTER, BOT, ID_FACTORY, CREDENTIAL_PROVIDER, AUTH_CONFIG
+AUTH_CONFIG = AuthenticationConfiguration(
+    claims_validator=AllowedSkillsClaimsValidator(CONFIG).validate_claims
 )
+
+SKILL_HANDLER = SkillHandler(ADAPTER, BOT, ID_FACTORY, CREDENTIAL_PROVIDER, AUTH_CONFIG)
 
 
 # Listen for incoming requests on /api/messages

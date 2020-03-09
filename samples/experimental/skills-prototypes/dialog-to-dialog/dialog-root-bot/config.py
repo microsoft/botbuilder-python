@@ -6,21 +6,24 @@ import os
 from typing import Dict
 from botbuilder.core.skills import BotFrameworkSkill
 
-""" Bot Configuration """
-
 
 class DefaultConfig:
     """ Bot Configuration """
 
-    PORT = 3428
-    APP_ID = os.environ.get("MicrosoftAppId", "")
-    APP_PASSWORD = os.environ.get("MicrosoftAppPassword", "")
-    SKILL_HOST_ENDPOINT = "http://localhost:3428/api/skills"
+    PORT = 3978
+    APP_ID = os.environ.get("MicrosoftAppId", "b56a1b59-7081-4546-b3fa-177401fd0657")
+    APP_PASSWORD = os.environ.get("MicrosoftAppPassword", "b0tframew0rks3cr3t!")
+    SKILL_HOST_ENDPOINT = "http://localhost:3978/api/skills"
     SKILLS = [
         {
-            "id": "SkillBot",
-            "app_id": "",
-            "skill_endpoint": "http://localhost:3978/api/messages",
+            "id": "EchoSkillBot",
+            "app_id": "fb7a9f3c-2b30-4ac8-86a0-c44bdeaa380e",
+            "skill_endpoint": "http://localhost:39793/api/messages",
+        },
+        {
+            "id": "DialogSkillBot",
+            "app_id": "67ec4e96-f4f6-424b-911f-de362a2a81d4",
+            "skill_endpoint": "http://localhost:39783/api/messages",
         },
     ]
 

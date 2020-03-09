@@ -2,7 +2,7 @@ from typing import Awaitable, Callable, Dict, List
 
 from botframework.connector.auth import JwtTokenValidation, SkillValidation
 
-from ..config import DefaultConfig
+from config import DefaultConfig
 
 
 class AllowedCallersClaimsValidator:
@@ -19,7 +19,7 @@ class AllowedCallersClaimsValidator:
         # that consists of the list of parent bot ids that are allowed to access the skill
         # to add a new parent bot simply go to the AllowedCallers and add
         # the parent bot's microsoft app id to the list
-        self._allowed_callers = getattr(config)
+        self._allowed_callers = config.ALLOWED_CALLERS
 
     @property
     def claims_validator(self) -> Callable[[List[Dict]], Awaitable]:

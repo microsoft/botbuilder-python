@@ -14,8 +14,9 @@ from botbuilder.schema import Activity
 from botframework.connector.auth import AuthenticationConfiguration
 
 from authentication import AllowedCallersClaimsValidator
-from bots import EchoBot
+from bots import SkillBot, ActivityRouterDialog
 from config import DefaultConfig
+from dialogs import DialogSkillBotRecognizer
 from skill_adapter_with_error_handler import SkillAdapterWithErrorHandler
 
 CONFIG = DefaultConfig()
@@ -36,7 +37,9 @@ SETTINGS = BotFrameworkAdapterSettings(
 ADAPTER = SkillAdapterWithErrorHandler(SETTINGS, CONVERSATION_STATE)
 
 # Create the Bot
-BOT = EchoBot()
+RECOGNIZER = DialogSkillBotRecognizer(CONFIG)
+ROUTER = ActivityRouterDialog(RECOGNIZER, CONFIG)
+BOT = SkillBot(CONVERSATION_STATE, ROUTER)
 
 
 # Listen for incoming requests on /api/messages

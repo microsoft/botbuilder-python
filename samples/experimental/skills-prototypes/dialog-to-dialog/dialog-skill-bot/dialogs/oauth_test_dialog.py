@@ -15,8 +15,8 @@ from botbuilder.dialogs.prompts import (
 from botbuilder.core import BotFrameworkAdapter, MessageFactory
 from botbuilder.schema import InputHints
 
+from config import DefaultConfig
 from .cancel_and_help_dialog import CancelAndHelpDialog
-from ..config import DefaultConfig
 
 
 class OAuthTestDialog(CancelAndHelpDialog):
