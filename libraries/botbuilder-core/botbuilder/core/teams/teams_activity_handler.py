@@ -2,8 +2,8 @@
 # Licensed under the MIT License.
 
 from http import HTTPStatus
-from botbuilder.schema import Activity, ActivityTypes, ChannelAccount, SignInConstants
-from botbuilder.core import ActivityHandler, InvokeResponse, BotFrameworkAdapter
+from botbuilder.schema import ChannelAccount, SignInConstants
+from botbuilder.core import ActivityHandler, InvokeResponse
 from botbuilder.core.activity_handler import _InvokeResponseException
 from botbuilder.core.turn_context import TurnContext
 from botbuilder.core.teams.teams_info import TeamsInfo
@@ -23,7 +23,7 @@ from botbuilder.schema.teams import (
     TaskModuleResponse,
 )
 from botframework.connector import Channels
-from .teams_helper import deserializer_helper, serializer_helper
+from ..serializer_helper import deserializer_helper
 
 
 class TeamsActivityHandler(ActivityHandler):

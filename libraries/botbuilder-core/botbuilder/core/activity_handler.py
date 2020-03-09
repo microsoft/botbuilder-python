@@ -10,6 +10,7 @@ from botbuilder.schema import (
     MessageReaction,
     SignInConstants,
 )
+from .serializer_helper import serializer_helper
 from .bot_framework_adapter import BotFrameworkAdapter
 from .invoke_response import InvokeResponse
 from .turn_context import TurnContext
@@ -408,7 +409,7 @@ class ActivityHandler:
 
     @staticmethod
     def _create_invoke_response(body: object = None) -> InvokeResponse:
-        return InvokeResponse(status=StatusCodes.OK, body=body)
+        return InvokeResponse(status=StatusCodes.OK, body=serializer_helper(body))
 
 
 class _InvokeResponseException(Exception):
