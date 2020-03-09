@@ -34,6 +34,7 @@ from botframework.connector.token_api import TokenApiClient
 from botbuilder.schema import (
     Activity,
     ActivityTypes,
+    ChannelAccount,
     ConversationAccount,
     ConversationParameters,
     ConversationReference,
@@ -746,32 +747,29 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         :param context: The context object for the turn
         :type context: :class:`botbuilder.core.TurnContext`
 
-        :raises: An exception error
+        :raises: TypeError if missing service_url or conversation.id
 
         :return: List of members of the current conversation
         """
-        try:
-            if not context.activity.service_url:
-                raise TypeError(
-                    "BotFrameworkAdapter.get_conversation_members(): missing service_url"
-                )
-            if (
-                not context.activity.conversation
-                or not context.activity.conversation.id
-            ):
-                raise TypeError(
-                    "BotFrameworkAdapter.get_conversation_members(): missing conversation or "
-                    "conversation.id"
-                )
 
-            client = context.turn_state[BotAdapter.BOT_CONNECTOR_CLIENT_KEY]
-            return await client.conversations.get_conversation_members(
-                context.activity.conversation.id
+        if not context.activity.service_url:
+            raise TypeError(
+                "BotFrameworkAdapter.get_conversation_members(): missing service_url"
             )
-        except Exception as error:
-            raise error
+        if not context.activity.conversation or not context.activity.conversation.id:
+            raise TypeError(
+                "BotFrameworkAdapter.get_conversation_members(): missing conversation or "
+                "conversation.id"
+            )
 
-    async def get_conversation_member(self, context: TurnContext, member_id: str):
+        client = context.turn_state[BotAdapter.BOT_CONNECTOR_CLIENT_KEY]
+        return await client.conversations.get_conversation_members(
+            context.activity.conversation.id
+        )
+
+    async def get_conversation_member(
+        self, context: TurnContext, member_id: str
+    ) -> ChannelAccount:
         """
         Retrieve a member of a current conversation.
 
@@ -780,34 +778,28 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         :param member_id: The member Id
         :type member_id: str
 
-        :raises: An exception error
+        :raises: A TypeError if missing member_id, service_url, or conversation.id
 
-        :return: List of members of the current conversation
+        :return: A member of the current conversation
         """
-        try:
-            if not context.activity.service_url:
-                raise TypeError(
-                    "BotFrameworkAdapter.get_conversation_member(): missing service_url"
-                )
-            if (
-                not context.activity.conversation
-                or not context.activity.conversation.id
-            ):
-                raise TypeError(
-                    "BotFrameworkAdapter.get_conversation_member(): missing conversation or "
-                    "conversation.id"
-                )
-            if not member_id:
-                raise TypeError(
-                    "BotFrameworkAdapter.get_conversation_member(): missing memberId"
-                )
-
-            client = context.turn_state[BotAdapter.BOT_CONNECTOR_CLIENT_KEY]
-            return await client.conversations.get_conversation_member(
-                context.activity.conversation.id, member_id
+        if not context.activity.service_url:
+            raise TypeError(
+                "BotFrameworkAdapter.get_conversation_member(): missing service_url"
             )
-        except Exception as error:
-            raise error
+        if not context.activity.conversation or not context.activity.conversation.id:
+            raise TypeError(
+                "BotFrameworkAdapter.get_conversation_member(): missing conversation or "
+                "conversation.id"
+            )
+        if not member_id:
+            raise TypeError(
+                "BotFrameworkAdapter.get_conversation_member(): missing memberId"
+            )
+
+        client = context.turn_state[BotAdapter.BOT_CONNECTOR_CLIENT_KEY]
+        return await client.conversations.get_conversation_member(
+            context.activity.conversation.id, member_id
+        )
 
     async def get_conversations(
         self,
