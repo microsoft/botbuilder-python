@@ -217,7 +217,7 @@ class SkillDialog(Dialog):
             )
 
         eoc_activity: Activity = None
-        if activity.delivery_mode == DeliveryModes.buffered_replies and response.body:
+        if activity.delivery_mode == DeliveryModes.expect_replies and response.body:
             # Process replies in the response.Body.
             response.body: List[Activity]
             for from_skill_activity in response.body:
