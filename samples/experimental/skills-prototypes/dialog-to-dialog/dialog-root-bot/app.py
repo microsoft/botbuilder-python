@@ -7,9 +7,7 @@ from botbuilder.core import (
     BotFrameworkAdapterSettings,
     ConversationState,
     MemoryStorage,
-    TurnContext,
     UserState,
-    BotFrameworkAdapter,
 )
 from botbuilder.core.integration import (
     aiohttp_channel_service_routes,
@@ -17,7 +15,7 @@ from botbuilder.core.integration import (
     BotFrameworkHttpClient
 )
 from botbuilder.core.skills import SkillHandler
-from botbuilder.schema import Activity, ActivityTypes
+from botbuilder.schema import Activity
 from botbuilder.integration.aiohttp.skills import SkillHttpClient
 from botframework.connector.auth import (
     AuthenticationConfiguration,
