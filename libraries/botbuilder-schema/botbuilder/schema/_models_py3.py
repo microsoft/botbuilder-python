@@ -133,7 +133,7 @@ class Activity(Model):
     :param delivery_mode: A delivery hint to signal to the recipient alternate
      delivery paths for the activity.
      The default delivery mode is "default". Possible values include: 'normal',
-     'notification'
+     'notification', 'expectReplies'
     :type delivery_mode: str or ~botframework.connector.models.DeliveryModes
     :param listen_for: List of phrases and references that speech and language
      priming systems should listen for
@@ -976,6 +976,21 @@ class ConversationsResult(Model):
         super(ConversationsResult, self).__init__(**kwargs)
         self.continuation_token = continuation_token
         self.conversations = conversations
+
+
+class ExpectedReplies(Model):
+    """ExpectedReplies.
+
+    :param activities: A collection of Activities that conforms to the
+     ExpectedReplies schema.
+    :type activities: list[~botframework.connector.models.Activity]
+    """
+
+    _attribute_map = {"activities": {"key": "activities", "type": "[Activity]"}}
+
+    def __init__(self, *, activities=None, **kwargs) -> None:
+        super(ExpectedReplies, self).__init__(**kwargs)
+        self.activities = activities
 
 
 class Entity(Model):
