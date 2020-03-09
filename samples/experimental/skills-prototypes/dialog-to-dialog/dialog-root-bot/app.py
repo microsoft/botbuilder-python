@@ -12,7 +12,6 @@ from botbuilder.core import (
 from botbuilder.core.integration import (
     aiohttp_channel_service_routes,
     aiohttp_error_middleware,
-    BotFrameworkHttpClient
 )
 from botbuilder.core.skills import SkillHandler
 from botbuilder.schema import Activity
