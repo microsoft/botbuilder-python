@@ -34,7 +34,6 @@ from .recognizer_result import RecognizerResult, TopIntent
 from .show_typing_middleware import ShowTypingMiddleware
 from .state_property_accessor import StatePropertyAccessor
 from .state_property_info import StatePropertyInfo
-from .status_codes import StatusCodes
 from .storage import Storage, StoreItem, calculate_change_hash
 from .telemetry_constants import TelemetryConstants
 from .telemetry_logger_constants import TelemetryLoggerConstants
@@ -78,7 +77,6 @@ __all__ = [
     "ShowTypingMiddleware",
     "StatePropertyAccessor",
     "StatePropertyInfo",
-    "StatusCodes",
     "Storage",
     "StoreItem",
     "TelemetryConstants",

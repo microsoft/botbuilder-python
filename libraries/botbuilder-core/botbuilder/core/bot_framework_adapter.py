@@ -8,6 +8,7 @@ import base64
 import json
 import os
 import uuid
+from http import HTTPStatus
 from typing import List, Callable, Awaitable, Union, Dict
 from msrest.serialization import Model
 
@@ -55,7 +56,6 @@ from .turn_context import TurnContext
 from .extended_user_token_provider import ExtendedUserTokenProvider
 from .invoke_response import InvokeResponse
 from .conversation_reference_extension import get_continuation_activity
-from .status_codes import StatusCodes
 
 USER_AGENT = f"Microsoft-BotFramework/3.1 (BotBuilder Python/{__version__})"
 OAUTH_ENDPOINT = "https://api.botframework.com"
@@ -479,7 +479,7 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
                 BotFrameworkAdapter._INVOKE_RESPONSE_KEY  # pylint: disable=protected-access
             )
             if invoke_response is None:
-                return InvokeResponse(status=StatusCodes.NOT_IMPLEMENTED)
+                return InvokeResponse(status=int(HTTPStatus.NOT_IMPLEMENTED))
             return invoke_response.value
 
         # Return the buffered activities in the response.  In this case, the invoker
@@ -489,7 +489,7 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
             expected_replies = ExpectedReplies(
                 activities=context.buffered_reply_activities
             ).serialize()
-            return InvokeResponse(status=StatusCodes.OK, body=expected_replies)
+            return InvokeResponse(status=int(HTTPStatus.OK), body=expected_replies)
 
         return None
 

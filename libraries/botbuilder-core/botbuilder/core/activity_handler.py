@@ -14,7 +14,6 @@ from .serializer_helper import serializer_helper
 from .bot_framework_adapter import BotFrameworkAdapter
 from .invoke_response import InvokeResponse
 from .turn_context import TurnContext
-from .status_codes import StatusCodes
 
 
 class ActivityHandler:
@@ -409,7 +408,7 @@ class ActivityHandler:
 
     @staticmethod
     def _create_invoke_response(body: object = None) -> InvokeResponse:
-        return InvokeResponse(status=StatusCodes.OK, body=serializer_helper(body))
+        return InvokeResponse(status=int(HTTPStatus.OK), body=serializer_helper(body))
 
 
 class _InvokeResponseException(Exception):

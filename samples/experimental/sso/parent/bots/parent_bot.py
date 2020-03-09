@@ -1,6 +1,7 @@
 from uuid import uuid4
 
 from datetime import datetime
+from http import HTTPStatus
 from typing import List
 
 from botbuilder.core import (
@@ -11,8 +12,7 @@ from botbuilder.core import (
     ConversationState,
     UserState,
     MessageFactory,
-    TurnContext,
-    StatusCodes
+    TurnContext
 )
 from botbuilder.schema import (
     Activity,
@@ -90,7 +90,7 @@ class ParentBot(ActivityHandler):
                     clone_activity,
                 )
 
-                if response_1.status == StatusCodes.OK:
+                if response_1.status == int(HTTPStatus.OK):
                     if not await self._intercept_oauth_cards(response_1.body, turn_context):
                         await turn_context.send_activities(response_1.body)
 
@@ -115,7 +115,7 @@ class ParentBot(ActivityHandler):
             activity
         )
 
-        if response.status == StatusCodes.OK:
+        if response.status == int(HTTPStatus.OK):
             await turn_context.send_activities(response.body)
 
         await turn_context.send_activity(MessageFactory.text("parent: after child"))
@@ -189,7 +189,7 @@ class ParentBot(ActivityHandler):
         )
 
         # Check response status: true if success, false if failure
-        is_success = StatusCodes.OK <= response.status <= StatusCodes.SUCCESSFUL_LIMIT
+        is_success = int(HTTPStatus.OK) <= response.status <= 299
         message = "Skill token exchange successful" if is_success else "Skill token exchange failed"
 
         await turn_context.send_activity(MessageFactory.text(

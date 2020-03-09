@@ -3,6 +3,7 @@
 
 import re
 from datetime import datetime, timedelta
+from http import HTTPStatus
 from typing import Union, Awaitable, Callable
 
 from botframework.connector import Channels
@@ -13,7 +14,6 @@ from botbuilder.core import (
     ExtendedUserTokenProvider,
     MessageFactory,
     InvokeResponse,
-    StatusCodes,
     TurnContext,
     UserTokenProvider,
 )
@@ -386,21 +386,22 @@ class OAuthPrompt(Dialog):
                 if token is not None:
                     await context.send_activity(
                         Activity(
-                            type="invokeResponse", value=InvokeResponse(StatusCodes.OK)
+                            type="invokeResponse",
+                            value=InvokeResponse(int(HTTPStatus.OK)),
                         )
                     )
                 else:
                     await context.send_activity(
                         Activity(
                             type="invokeResponse",
-                            value=InvokeResponse(StatusCodes.NOT_FOUND),
+                            value=InvokeResponse(int(HTTPStatus.NOT_FOUND)),
                         )
                     )
             except Exception:
                 await context.send_activity(
                     Activity(
                         type="invokeResponse",
-                        value=InvokeResponse(StatusCodes.INTERNAL_SERVER_ERROR),
+                        value=InvokeResponse(int(HTTPStatus.INTERNAL_SERVER_ERROR)),
                     )
                 )
         elif self._is_token_exchange_request_invoke(context):
@@ -416,7 +417,7 @@ class OAuthPrompt(Dialog):
                 # Received activity is not a token exchange request.
                 await context.send_activity(
                     self._get_token_exchange_invoke_response(
-                        StatusCodes.BAD_REQUEST,
+                        int(HTTPStatus.BAD_REQUEST),
                         "The bot received an InvokeActivity that is missing a TokenExchangeInvokeRequest value."
                         " This is required to be sent with the InvokeActivity.",
                     )
@@ -427,7 +428,7 @@ class OAuthPrompt(Dialog):
                 # Connection name on activity does not match that of setting.
                 await context.send_activity(
                     self._get_token_exchange_invoke_response(
-                        StatusCodes.BAD_REQUEST,
+                        int(HTTPStatus.BAD_REQUEST),
                         "The bot received an InvokeActivity with a TokenExchangeInvokeRequest containing a"
                         " ConnectionName that does not match the ConnectionName expected by the bots active"
                         " OAuthPrompt. Ensure these names match when sending the InvokeActivityInvalid"
@@ -438,7 +439,7 @@ class OAuthPrompt(Dialog):
                 # Token Exchange not supported in the adapter.
                 await context.send_activity(
                     self._get_token_exchange_invoke_response(
-                        StatusCodes.BAD_GATEWAY,
+                        int(HTTPStatus.BAD_GATEWAY),
                         "The bot's BotAdapter does not support token exchange operations."
                         " Ensure the bot's Adapter supports the ITokenExchangeProvider interface.",
                     )
@@ -461,14 +462,14 @@ class OAuthPrompt(Dialog):
                 if not token_exchange_response or not token_exchange_response.token:
                     await context.send_activity(
                         self._get_token_exchange_invoke_response(
-                            StatusCodes.CONFLICT,
+                            int(HTTPStatus.CONFLICT),
                             "The bot is unable to exchange token. Proceed with regular login.",
                         )
                     )
                 else:
                     await context.send_activity(
                         self._get_token_exchange_invoke_response(
-                            StatusCodes.OK, None, context.activity.value.id
+                            int(HTTPStatus.OK), None, context.activity.value.id
                         )
                     )
                     token = TokenResponse(

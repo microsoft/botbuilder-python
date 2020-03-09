@@ -1,7 +1,8 @@
+from http import HTTPStatus
 from typing import List
 
 import aiounittest
-from botbuilder.core import ActivityHandler, BotAdapter, TurnContext, StatusCodes
+from botbuilder.core import ActivityHandler, BotAdapter, TurnContext
 from botbuilder.schema import (
     Activity,
     ActivityTypes,
@@ -156,7 +157,7 @@ class TestActivityHandler(aiounittest.AsyncTestCase):
 
         assert len(bot.record) == 1
         assert bot.record[0] == "on_invoke_activity"
-        assert adapter.activity.value.status == StatusCodes.OK
+        assert adapter.activity.value.status == int(HTTPStatus.OK)
 
     async def test_invoke_should_not_match(self):
         activity = Activity(type=ActivityTypes.invoke, name="should.not.match")
@@ -170,4 +171,4 @@ class TestActivityHandler(aiounittest.AsyncTestCase):
 
         assert len(bot.record) == 1
         assert bot.record[0] == "on_invoke_activity"
-        assert adapter.activity.value.status == StatusCodes.NOT_IMPLEMENTED
+        assert adapter.activity.value.status == int(HTTPStatus.NOT_IMPLEMENTED)
