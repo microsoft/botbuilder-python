@@ -38,7 +38,10 @@ class SkillConversationIdFactory(ConversationIdFactoryBase):
         conversation_reference = TurnContext.get_conversation_reference(
             options.activity
         )
-        storage_key = f"{conversation_reference.channel_id}:{conversation_reference.conversation.id}"
+        storage_key = f"{conversation_reference.conversation.id}" \
+                      f"-{options.bot_framework_skill.id}" \
+                      f"-{conversation_reference.channel_id}" \
+                      f"-skillconvo"
 
         skill_conversation_reference = SkillConversationReference(
             conversation_reference=conversation_reference,

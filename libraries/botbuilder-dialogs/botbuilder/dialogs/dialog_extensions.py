@@ -36,10 +36,10 @@ class DialogExtensions:
                 # Process a reprompt event sent from the parent.
                 if (
                     turn_context.activity.type == ActivityTypes.event
-                    or turn_context.activity.name == DialogEvents.reprompt_dialog
+                    and turn_context.activity.name == DialogEvents.reprompt_dialog
                     and dialog_context.stack
                 ):
-                    await dialog.reprompt_dialog()
+                    await dialog_context.reprompt_dialog()
                     return
 
                 # Run the Dialog with the new message Activity and capture the results

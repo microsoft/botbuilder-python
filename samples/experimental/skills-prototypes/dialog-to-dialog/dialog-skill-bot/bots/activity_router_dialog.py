@@ -81,12 +81,12 @@ class ActivityRouterDialog(ComponentDialog):
                 booking_details.from_json(activity.value)
 
             # Start the booking dialog
-            booking_dialog = self.find_dialog(BookingDialog.__name__)
+            booking_dialog = await self.find_dialog(BookingDialog.__name__)
             return await step_context.begin_dialog(booking_dialog.id, booking_details)
 
         if activity.name == "OAuthTest":
             # Start the oauth dialog
-            oauth_dialog = self.find_dialog(OAuthTestDialog.__name__)
+            oauth_dialog = await self.find_dialog(OAuthTestDialog.__name__)
             return await step_context.begin_dialog(oauth_dialog.id, None)
 
         await step_context.context.send_activity(
@@ -150,7 +150,7 @@ class ActivityRouterDialog(ComponentDialog):
             await step_context.context.send_activity(
                 MessageFactory.text(
                     "NOTE: LUIS is not configured. To enable all capabilities, add 'LuisAppId', 'LuisAPIKey' and"
-                    " 'LuisAPIHostName' to the appsettings.json file.",
+                    " 'LuisAPIHostName' to the config.py file.",
                     input_hint=InputHints.ignoring_input,
                 )
             )

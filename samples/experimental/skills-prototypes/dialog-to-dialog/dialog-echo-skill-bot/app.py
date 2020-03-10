@@ -7,7 +7,7 @@ from botbuilder.core import (
     BotFrameworkAdapterSettings,
     ConversationState,
     MemoryStorage,
-    UserState
+    UserState,
 )
 from botbuilder.core.integration import aiohttp_error_middleware
 from botbuilder.schema import Activity
@@ -31,7 +31,7 @@ VALIDATOR = AllowedCallersClaimsValidator(CONFIG).claims_validator
 SETTINGS = BotFrameworkAdapterSettings(
     CONFIG.APP_ID,
     CONFIG.APP_PASSWORD,
-    auth_configuration=AuthenticationConfiguration(claims_validator=VALIDATOR)
+    auth_configuration=AuthenticationConfiguration(claims_validator=VALIDATOR),
 )
 ADAPTER = SkillAdapterWithErrorHandler(SETTINGS, CONVERSATION_STATE)
 
