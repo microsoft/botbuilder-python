@@ -1,5 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+import json
 from http import HTTPStatus
 
 from botbuilder.dialogs import (
@@ -78,7 +79,7 @@ class ActivityRouterDialog(ComponentDialog):
         if activity.name == "BookFlight":
             booking_details = BookingDetails()
             if activity.value:
-                booking_details.from_json(activity.value)
+                booking_details.from_json(json.loads(activity.value))
 
             # Start the booking dialog
             booking_dialog = await self.find_dialog(BookingDialog.__name__)
@@ -106,7 +107,7 @@ class ActivityRouterDialog(ComponentDialog):
         if activity.name == "GetWeather":
             location = Location()
             if activity.value:
-                location.from_json(activity.value)
+                location.from_json(json.loads(activity.value))
 
             looking_into_it_message = "Getting your weather forecast..."
             await step_context.context.send_activity(

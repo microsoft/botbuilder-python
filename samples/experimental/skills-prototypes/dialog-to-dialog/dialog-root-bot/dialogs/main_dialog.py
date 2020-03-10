@@ -1,6 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
-
+import json
 from typing import List
 
 from jsonpickle import encode
@@ -267,7 +267,7 @@ class MainDialog(ComponentDialog):
                 attachments=[],
                 entities=[],
                 text=selected_option[:3].strip(),
-                value=BookingDetails(destination="New York"),
+                value=json.dumps(BookingDetails(destination="New York").__dict__),
             )
 
         # Send an event activity to the skill with "OAuthTest" in the name.
@@ -283,7 +283,7 @@ class MainDialog(ComponentDialog):
             return Activity(
                 type=ActivityTypes.event,
                 name="BookFlight",
-                value=BookingDetails(destination="New York", origin="Seattle"),
+                value=json.dumps(BookingDetails(destination="New York", origin="Seattle").__dict__),
             )
 
         raise Exception(f'Unable to create dialogArgs for "{selected_option}".')
