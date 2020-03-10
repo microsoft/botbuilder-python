@@ -8,6 +8,7 @@ from datetime import datetime
 
 from aiohttp import web
 from aiohttp.web import Request, Response
+from aiohttp.web_response import json_response
 from botbuilder.core import (
     BotFrameworkAdapterSettings,
     ConversationState,
@@ -83,7 +84,9 @@ async def messages(req: Request) -> Response:
     auth_header = req.headers["Authorization"] if "Authorization" in req.headers else ""
 
     try:
-        await ADAPTER.process_activity(activity, auth_header, BOT.on_turn)
+        response = await ADAPTER.process_activity(activity, auth_header, BOT.on_turn)
+        if response:
+            return json_response(data=response.body, status=response.status)
         return Response(status=201)
     except Exception as exception:
         raise exception
