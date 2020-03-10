@@ -8,6 +8,7 @@ import base64
 import json
 import os
 import uuid
+from http import HTTPStatus
 from typing import List, Callable, Awaitable, Union, Dict
 from msrest.serialization import Model
 
@@ -31,6 +32,11 @@ from botframework.connector.auth import (
     MicrosoftGovernmentAppCredentials,
 )
 from botframework.connector.token_api import TokenApiClient
+from botframework.connector.token_api.models import (
+    TokenStatus,
+    TokenExchangeRequest,
+    SignInUrlResponse,
+)
 from botbuilder.schema import (
     Activity,
     ActivityTypes,
@@ -47,7 +53,7 @@ from botbuilder.schema import (
 from . import __version__
 from .bot_adapter import BotAdapter
 from .turn_context import TurnContext
-from .user_token_provider import UserTokenProvider
+from .extended_user_token_provider import ExtendedUserTokenProvider
 from .invoke_response import InvokeResponse
 from .conversation_reference_extension import get_continuation_activity
 
@@ -57,10 +63,25 @@ US_GOV_OAUTH_ENDPOINT = "https://api.botframework.azure.us"
 
 
 class TokenExchangeState(Model):
+    """TokenExchangeState
+
+    :param connection_name: The connection name that was used.
+    :type connection_name: str
+    :param conversation: Gets or sets a reference to the conversation.
+    :type conversation: ~botframework.connector.models.ConversationReference
+    :param relates_to: Gets or sets a reference to a related parent conversation for this token exchange.
+    :type relates_to: ~botframework.connector.models.ConversationReference
+    :param bot_ur: The URL of the bot messaging endpoint.
+    :type bot_ur: str
+    :param ms_app_id: The bot's registered application ID.
+    :type ms_app_id: str
+    """
+
     _attribute_map = {
         "connection_name": {"key": "connectionName", "type": "str"},
         "conversation": {"key": "conversation", "type": "ConversationReference"},
-        "bot_url": {"key": "botUrl", "type": "str"},
+        "relates_to": {"key": "relatesTo", "type": "ConversationReference"},
+        "bot_url": {"key": "connectionName", "type": "str"},
         "ms_app_id": {"key": "msAppId", "type": "str"},
     }
 
@@ -68,7 +89,8 @@ class TokenExchangeState(Model):
         self,
         *,
         connection_name: str = None,
-        conversation: ConversationReference = None,
+        conversation=None,
+        relates_to=None,
         bot_url: str = None,
         ms_app_id: str = None,
         **kwargs,
@@ -76,6 +98,7 @@ class TokenExchangeState(Model):
         super(TokenExchangeState, self).__init__(**kwargs)
         self.connection_name = connection_name
         self.conversation = conversation
+        self.relates_to = relates_to
         self.bot_url = bot_url
         self.ms_app_id = ms_app_id
 
@@ -140,7 +163,7 @@ class BotFrameworkAdapterSettings:
         )
 
 
-class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
+class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
     """
     Defines an adapter to connect a bot to a service endpoint.
 
@@ -456,7 +479,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
                 BotFrameworkAdapter._INVOKE_RESPONSE_KEY  # pylint: disable=protected-access
             )
             if invoke_response is None:
-                return InvokeResponse(status=501)
+                return InvokeResponse(status=int(HTTPStatus.NOT_IMPLEMENTED))
             return invoke_response.value
 
         # Return the buffered activities in the response.  In this case, the invoker
@@ -466,7 +489,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             expected_replies = ExpectedReplies(
                 activities=context.buffered_reply_activities
             ).serialize()
-            return InvokeResponse(status=200, body=expected_replies)
+            return InvokeResponse(status=int(HTTPStatus.OK), body=expected_replies)
 
         return None
 
@@ -836,7 +859,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         context: TurnContext,
         connection_name: str,
         magic_code: str = None,
-        oauth_app_credentials: AppCredentials = None,
+        oauth_app_credentials: AppCredentials = None,  # pylint: disable=unused-argument
     ) -> TokenResponse:
 
         """
@@ -887,7 +910,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
     async def sign_out_user(
         self,
         context: TurnContext,
-        connection_name: str = None,
+        connection_name: str = None,  # pylint: disable=unused-argument
         user_id: str = None,
         oauth_app_credentials: AppCredentials = None,
     ):
@@ -919,7 +942,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         self,
         context: TurnContext,
         connection_name: str,
-        final_redirect: str = None,
+        final_redirect: str = None,  # pylint: disable=unused-argument
         oauth_app_credentials: AppCredentials = None,
     ) -> str:
         """
@@ -943,6 +966,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             connection_name=connection_name,
             conversation=conversation,
             ms_app_id=client.config.credentials.microsoft_app_id,
+            relates_to=context.activity.relates_to,
         )
 
         final_state = base64.b64encode(
@@ -958,7 +982,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         user_id: str = None,
         include_filter: str = None,
         oauth_app_credentials: AppCredentials = None,
-    ) -> Dict[str, TokenResponse]:
+    ) -> List[TokenStatus]:
         """
         Retrieves the token status for each configured connection for the given user.
 
@@ -996,7 +1020,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
         context: TurnContext,
         connection_name: str,
         resource_urls: List[str],
-        user_id: str = None,
+        user_id: str = None,  # pylint: disable=unused-argument
         oauth_app_credentials: AppCredentials = None,
     ) -> Dict[str, TokenResponse]:
         """
@@ -1094,6 +1118,107 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
 
         return client
 
+    async def get_sign_in_resource_from_user(
+        self,
+        turn_context: TurnContext,
+        connection_name: str,
+        user_id: str,
+        final_redirect: str = None,
+    ) -> SignInUrlResponse:
+        return await self.get_sign_in_resource_from_user_and_credentials(
+            turn_context, None, connection_name, user_id, final_redirect
+        )
+
+    async def get_sign_in_resource_from_user_and_credentials(
+        self,
+        turn_context: TurnContext,
+        oauth_app_credentials: AppCredentials,
+        connection_name: str,
+        user_id: str,
+        final_redirect: str = None,
+    ) -> SignInUrlResponse:
+        if not connection_name:
+            raise TypeError(
+                "BotFrameworkAdapter.get_sign_in_resource_from_user(): missing connection_name"
+            )
+        if (
+            not turn_context.activity.from_property
+            or not turn_context.activity.from_property.id
+        ):
+            raise TypeError(
+                "BotFrameworkAdapter.get_sign_in_resource_from_user(): missing activity id"
+            )
+        if user_id and turn_context.activity.from_property.id != user_id:
+            raise TypeError(
+                "BotFrameworkAdapter.get_sign_in_resource_from_user(): cannot get signin resource"
+                " for a user that is different from the conversation"
+            )
+
+        client = await self._create_token_api_client(
+            turn_context, oauth_app_credentials
+        )
+        conversation = TurnContext.get_conversation_reference(turn_context.activity)
+
+        state = TokenExchangeState(
+            connection_name=connection_name,
+            conversation=conversation,
+            relates_to=turn_context.activity.relates_to,
+            ms_app_id=client.config.credentials.microsoft_app_id,
+        )
+
+        final_state = base64.b64encode(
+            json.dumps(state.serialize()).encode(encoding="UTF-8", errors="strict")
+        ).decode()
+
+        return client.bot_sign_in.get_sign_in_resource(
+            final_state, final_redirect=final_redirect
+        )
+
+    async def exchange_token(
+        self,
+        turn_context: TurnContext,
+        connection_name: str,
+        user_id: str,
+        exchange_request: TokenExchangeRequest,
+    ) -> TokenResponse:
+        return await self.exchange_token_from_credentials(
+            turn_context, None, connection_name, user_id, exchange_request
+        )
+
+    async def exchange_token_from_credentials(
+        self,
+        turn_context: TurnContext,
+        oauth_app_credentials: AppCredentials,
+        connection_name: str,
+        user_id: str,
+        exchange_request: TokenExchangeRequest,
+    ) -> TokenResponse:
+        # pylint: disable=no-member
+
+        if not connection_name:
+            raise TypeError(
+                "BotFrameworkAdapter.exchange_token(): missing connection_name"
+            )
+        if not user_id:
+            raise TypeError("BotFrameworkAdapter.exchange_token(): missing user_id")
+        if exchange_request and not exchange_request.token and not exchange_request.uri:
+            raise TypeError(
+                "BotFrameworkAdapter.exchange_token(): Either a Token or Uri property is required"
+                " on the TokenExchangeRequest"
+            )
+
+        client = await self._create_token_api_client(
+            turn_context, oauth_app_credentials
+        )
+
+        return client.user_token.exchange_async(
+            user_id,
+            connection_name,
+            turn_context.activity.channel_id,
+            exchange_request.uri,
+            exchange_request.token,
+        )
+
     @staticmethod
     def key_for_connector_client(service_url: str, app_id: str, scope: str):
         return f"{service_url}:{app_id}:{scope}"
@@ -1109,7 +1234,7 @@ class BotFrameworkAdapter(BotAdapter, UserTokenProvider):
             self._is_emulating_oauth_cards = True
 
         app_id = self.__get_app_id(context)
-        scope = context.turn_state[BotAdapter.BOT_OAUTH_SCOPE_KEY]
+        scope = context.turn_state.get(BotAdapter.BOT_OAUTH_SCOPE_KEY)
         app_credentials = oauth_app_credentials or await self.__get_app_credentials(
             app_id, scope
         )

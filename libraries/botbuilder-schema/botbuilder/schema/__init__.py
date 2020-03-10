@@ -53,6 +53,9 @@ try:
     from ._models_py3 import Thing
     from ._models_py3 import ThumbnailCard
     from ._models_py3 import ThumbnailUrl
+    from ._models_py3 import TokenExchangeInvokeRequest
+    from ._models_py3 import TokenExchangeInvokeResponse
+    from ._models_py3 import TokenExchangeState
     from ._models_py3 import TokenRequest
     from ._models_py3 import TokenResponse
     from ._models_py3 import Transcript
@@ -120,6 +123,8 @@ from ._connector_client_enums import (
     TextFormatTypes,
 )
 
+from ._sign_in_enums import SignInConstants
+
 __all__ = [
     "Activity",
     "AnimationCard",
@@ -160,11 +165,15 @@ __all__ = [
     "ResourceResponse",
     "SemanticAction",
     "SigninCard",
+    "SignInConstants",
     "SuggestedActions",
     "TextHighlight",
     "Thing",
     "ThumbnailCard",
     "ThumbnailUrl",
+    "TokenExchangeInvokeRequest",
+    "TokenExchangeInvokeResponse",
+    "TokenExchangeState",
     "TokenRequest",
     "TokenResponse",
     "Transcript",

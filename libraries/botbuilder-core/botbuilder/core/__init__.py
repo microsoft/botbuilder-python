@@ -19,6 +19,7 @@ from .bot_telemetry_client import BotTelemetryClient, Severity
 from .card_factory import CardFactory
 from .channel_service_handler import BotActionNotImplementedError, ChannelServiceHandler
 from .conversation_state import ConversationState
+from .extended_user_token_provider import ExtendedUserTokenProvider
 from .intent_score import IntentScore
 from .invoke_response import InvokeResponse
 from .bot_framework_http_client import BotFrameworkHttpClient
@@ -59,6 +60,7 @@ __all__ = [
     "ChannelServiceHandler",
     "ConversationState",
     "conversation_reference_extension",
+    "ExtendedUserTokenProvider",
     "IntentScore",
     "InvokeResponse",
     "BotFrameworkHttpClient",
