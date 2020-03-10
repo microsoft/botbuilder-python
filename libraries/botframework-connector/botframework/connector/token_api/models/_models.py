@@ -12,6 +12,8 @@
 from msrest.serialization import Model
 from msrest.exceptions import HttpOperationError
 
+# pylint: disable=invalid-name
+
 
 class AadResourceUrls(Model):
     """AadResourceUrls.
@@ -97,6 +99,74 @@ class InnerHttpError(Model):
         super(InnerHttpError, self).__init__(**kwargs)
         self.status_code = kwargs.get("status_code", None)
         self.body = kwargs.get("body", None)
+
+
+class SignInUrlResponse(Model):
+    """SignInUrlResponse.
+
+    :param sign_in_link:
+    :type sign_in_link: str
+    :param token_exchange_resource:
+    :type token_exchange_resource:
+     ~botframework.tokenapi.models.TokenExchangeResource
+    """
+
+    _attribute_map = {
+        "sign_in_link": {"key": "signInLink", "type": "str"},
+        "token_exchange_resource": {
+            "key": "tokenExchangeResource",
+            "type": "TokenExchangeResource",
+        },
+    }
+
+    def __init__(self, **kwargs):
+        super(SignInUrlResponse, self).__init__(**kwargs)
+        self.sign_in_link = kwargs.get("sign_in_link", None)
+        self.token_exchange_resource = kwargs.get("token_exchange_resource", None)
+
+
+class TokenExchangeRequest(Model):
+    """TokenExchangeRequest.
+
+    :param uri:
+    :type uri: str
+    :param token:
+    :type token: str
+    """
+
+    _attribute_map = {
+        "uri": {"key": "uri", "type": "str"},
+        "token": {"key": "token", "type": "str"},
+    }
+
+    def __init__(self, **kwargs):
+        super(TokenExchangeRequest, self).__init__(**kwargs)
+        self.uri = kwargs.get("uri", None)
+        self.token = kwargs.get("token", None)
+
+
+class TokenExchangeResource(Model):
+    """TokenExchangeResource.
+
+    :param id:
+    :type id: str
+    :param uri:
+    :type uri: str
+    :param provider_id:
+    :type provider_id: str
+    """
+
+    _attribute_map = {
+        "id": {"key": "id", "type": "str"},
+        "uri": {"key": "uri", "type": "str"},
+        "provider_id": {"key": "providerId", "type": "str"},
+    }
+
+    def __init__(self, **kwargs):
+        super(TokenExchangeResource, self).__init__(**kwargs)
+        self.id = kwargs.get("id", None)
+        self.uri = kwargs.get("uri", None)
+        self.provider_id = kwargs.get("provider_id", None)
 
 
 class TokenResponse(Model):

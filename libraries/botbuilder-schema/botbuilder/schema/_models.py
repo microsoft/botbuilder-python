@@ -133,7 +133,7 @@ class Activity(Model):
     :param delivery_mode: A delivery hint to signal to the recipient alternate
      delivery paths for the activity.
      The default delivery mode is "default". Possible values include: 'normal',
-     'notification', 'expectReplies'
+     'notification', 'expectReplies', 'ephemeral'
     :type delivery_mode: str or ~botframework.connector.models.DeliveryModes
     :param listen_for: List of phrases and references that speech and language
      priming systems should listen for
@@ -146,7 +146,7 @@ class Activity(Model):
     :type semantic_action: ~botframework.connector.models.SemanticAction
     :param caller_id: A string containing an IRI identifying the caller of a
      bot. This field is not intended to be transmitted over the wire, but is
-     instead populated by bots and clients based on cryptographically 
+     instead populated by bots and clients based on cryptographically
      verifiable data that asserts the identity of the callers (e.g. tokens).
     :type caller_id: str
     """

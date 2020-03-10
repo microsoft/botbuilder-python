@@ -1,9 +1,18 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+from http import HTTPStatus
+from typing import List, Union
 
-from typing import List
-
-from botbuilder.schema import ActivityTypes, ChannelAccount, MessageReaction
+from botbuilder.schema import (
+    Activity,
+    ActivityTypes,
+    ChannelAccount,
+    MessageReaction,
+    SignInConstants,
+)
+from .serializer_helper import serializer_helper
+from .bot_framework_adapter import BotFrameworkAdapter
+from .invoke_response import InvokeResponse
 from .turn_context import TurnContext
 
 
@@ -59,6 +68,16 @@ class ActivityHandler:
             await self.on_message_reaction_activity(turn_context)
         elif turn_context.activity.type == ActivityTypes.event:
             await self.on_event_activity(turn_context)
+        elif turn_context.activity.type == ActivityTypes.invoke:
+            invoke_response = await self.on_invoke_activity(turn_context)
+
+            # If OnInvokeActivityAsync has already sent an InvokeResponse, do not send another one.
+            if invoke_response and not turn_context.turn_state.get(
+                BotFrameworkAdapter._INVOKE_RESPONSE_KEY  # pylint: disable=protected-access
+            ):
+                await turn_context.send_activity(
+                    Activity(value=invoke_response, type=ActivityTypes.invoke_response)
+                )
         elif turn_context.activity.type == ActivityTypes.end_of_conversation:
             await self.on_end_of_conversation_activity(turn_context)
         else:
@@ -270,7 +289,7 @@ class ActivityHandler:
             The meaning of an event activity is defined by the event activity name property, which is meaningful within
             the scope of a channel.
         """
-        if turn_context.activity.name == "tokens/response":
+        if turn_context.activity.name == SignInConstants.token_response_event_name:
             return await self.on_token_response_event(turn_context)
 
         return await self.on_event(turn_context)
@@ -345,3 +364,58 @@ class ActivityHandler:
             conversation update, message reaction, or event activity, it calls this method.
         """
         return
+
+    async def on_invoke_activity(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext
+    ) -> Union[InvokeResponse, None]:
+        """
+        Registers an activity event handler for the _invoke_ event, emitted for every incoming event activity.
+
+        :param turn_context: The context object for this turn
+        :type turn_context: :class:`botbuilder.core.TurnContext`
+
+        :returns: A task that represents the work queued to execute
+        """
+        try:
+            if (
+                turn_context.activity.name
+                == SignInConstants.verify_state_operation_name
+                or turn_context.activity.name
+                == SignInConstants.token_exchange_operation_name
+            ):
+                await self.on_sign_in_invoke(turn_context)
+                return self._create_invoke_response()
+
+            raise _InvokeResponseException(HTTPStatus.NOT_IMPLEMENTED)
+        except _InvokeResponseException as invoke_exception:
+            return invoke_exception.create_invoke_response()
+
+    async def on_sign_in_invoke(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext
+    ):
+        """
+        Invoked when a signin/verifyState or signin/tokenExchange event is received when the base behavior of
+        on_invoke_activity(TurnContext{InvokeActivity}) is used.
+        If using an OAuthPrompt, override this method to forward this Activity"/ to the current dialog.
+        By default, this method does nothing.
+
+        :param turn_context: The context object for this turn
+        :type turn_context: :class:`botbuilder.core.TurnContext`
+
+        :returns: A task that represents the work queued to execute
+        """
+        raise _InvokeResponseException(HTTPStatus.NOT_IMPLEMENTED)
+
+    @staticmethod
+    def _create_invoke_response(body: object = None) -> InvokeResponse:
+        return InvokeResponse(status=int(HTTPStatus.OK), body=serializer_helper(body))
+
+
+class _InvokeResponseException(Exception):
+    def __init__(self, status_code: HTTPStatus, body: object = None):
+        super(_InvokeResponseException, self).__init__()
+        self._status_code = status_code
+        self._body = body
+
+    def create_invoke_response(self) -> InvokeResponse:
+        return InvokeResponse(status=int(self._status_code), body=self._body)

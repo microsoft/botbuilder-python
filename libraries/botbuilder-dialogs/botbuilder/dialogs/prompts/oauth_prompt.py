@@ -8,14 +8,16 @@ from typing import Union, Awaitable, Callable
 
 from botframework.connector import Channels
 from botframework.connector.auth import ClaimsIdentity, SkillValidation
+from botframework.connector.token_api.models import SignInUrlResponse
 from botbuilder.core import (
     CardFactory,
+    ExtendedUserTokenProvider,
     MessageFactory,
     InvokeResponse,
     TurnContext,
     UserTokenProvider,
-    BotAdapter,
 )
+from botbuilder.core.bot_framework_adapter import TokenExchangeRequest
 from botbuilder.dialogs import Dialog, DialogContext, DialogTurnResult
 from botbuilder.schema import (
     Activity,
@@ -24,13 +26,19 @@ from botbuilder.schema import (
     CardAction,
     InputHints,
     SigninCard,
+    SignInConstants,
     OAuthCard,
     TokenResponse,
+    TokenExchangeInvokeRequest,
+    TokenExchangeInvokeResponse,
 )
+
 from .prompt_options import PromptOptions
 from .oauth_prompt_settings import OAuthPromptSettings
 from .prompt_validator_context import PromptValidatorContext
 from .prompt_recognizer_result import PromptRecognizerResult
+
+# TODO: Consider moving TokenExchangeInvokeRequest and TokenExchangeInvokeResponse to here
 
 
 class OAuthPrompt(Dialog):
@@ -72,8 +80,8 @@ class OAuthPrompt(Dialog):
         """
         Creates a new instance of the :class:`OAuthPrompt` class.
 
-        :param dialogId: The Id to assign to this prompt.
-        :type dialogId: str
+        :param dialog_id: The Id to assign to this prompt.
+        :type dialog_id: str
         :param settings: Additional authentication settings to use with this instance of the prompt
         :type settings: :class:`OAuthPromptSettings`
         :param validator: Optional, contains additional, custom validation for this prompt
@@ -292,37 +300,30 @@ class OAuthPrompt(Dialog):
                 att.content_type == CardFactory.content_types.oauth_card
                 for att in prompt.attachments
             ):
-                link = None
+                adapter: ExtendedUserTokenProvider = context.adapter
                 card_action_type = ActionTypes.signin
-                bot_identity: ClaimsIdentity = context.turn_state.get(
-                    BotAdapter.BOT_IDENTITY_KEY
+                sign_in_resource: SignInUrlResponse = await adapter.get_sign_in_resource_from_user_and_credentials(
+                    context,
+                    self._settings.oath_app_credentials,
+                    self._settings.connection_name,
+                    context.activity.from_property.id,
                 )
+                link = sign_in_resource.sign_in_link
+                bot_identity: ClaimsIdentity = context.turn_state.get("BotIdentity")
 
-                # check if it's from streaming connection
-                if not context.activity.service_url.startswith("http"):
-                    if not hasattr(context.adapter, "get_oauth_sign_in_link"):
-                        raise Exception(
-                            "OAuthPrompt: get_oauth_sign_in_link() not supported by the current adapter"
-                        )
-                    link = await context.adapter.get_oauth_sign_in_link(
-                        context,
-                        self._settings.connection_name,
-                        None,
-                        self._settings.oath_app_credentials,
-                    )
-                elif bot_identity and SkillValidation.is_skill_claim(
-                    bot_identity.claims
-                ):
-                    link = await context.adapter.get_oauth_sign_in_link(
-                        context,
-                        self._settings.connection_name,
-                        None,
-                        self._settings.oath_app_credentials,
-                    )
-
-                    if context.activity.channel_id == "emulator":
+                if (
+                    bot_identity and SkillValidation.is_skill_claim(bot_identity.claims)
+                ) or not context.activity.service_url.startswith("http"):
+                    if context.activity.channel_id == Channels.emulator:
                         card_action_type = ActionTypes.open_url
+                else:
+                    link = None
 
+                json_token_ex_resource = (
+                    sign_in_resource.token_exchange_resource.as_dict()
+                    if sign_in_resource.token_exchange_resource
+                    else None
+                )
                 prompt.attachments.append(
                     CardFactory.oauth_card(
                         OAuthCard(
@@ -336,6 +337,7 @@ class OAuthPrompt(Dialog):
                                     value=link,
                                 )
                             ],
+                            token_exchange_resource=json_token_ex_resource,
                         )
                     )
                 )
@@ -384,23 +386,98 @@ class OAuthPrompt(Dialog):
                 if token is not None:
                     await context.send_activity(
                         Activity(
-                            type="invokeResponse", value=InvokeResponse(HTTPStatus.OK)
+                            type="invokeResponse",
+                            value=InvokeResponse(int(HTTPStatus.OK)),
                         )
                     )
                 else:
                     await context.send_activity(
                         Activity(
                             type="invokeResponse",
-                            value=InvokeResponse(HTTPStatus.NOT_FOUND),
+                            value=InvokeResponse(int(HTTPStatus.NOT_FOUND)),
                         )
                     )
             except Exception:
                 await context.send_activity(
                     Activity(
                         type="invokeResponse",
-                        value=InvokeResponse(HTTPStatus.INTERNAL_SERVER_ERROR),
+                        value=InvokeResponse(int(HTTPStatus.INTERNAL_SERVER_ERROR)),
                     )
                 )
+        elif self._is_token_exchange_request_invoke(context):
+            if isinstance(context.activity.value, dict):
+                context.activity.value = TokenExchangeInvokeRequest().from_dict(
+                    context.activity.value
+                )
+
+            if not (
+                context.activity.value
+                and self._is_token_exchange_request(context.activity.value)
+            ):
+                # Received activity is not a token exchange request.
+                await context.send_activity(
+                    self._get_token_exchange_invoke_response(
+                        int(HTTPStatus.BAD_REQUEST),
+                        "The bot received an InvokeActivity that is missing a TokenExchangeInvokeRequest value."
+                        " This is required to be sent with the InvokeActivity.",
+                    )
+                )
+            elif (
+                context.activity.value.connection_name != self._settings.connection_name
+            ):
+                # Connection name on activity does not match that of setting.
+                await context.send_activity(
+                    self._get_token_exchange_invoke_response(
+                        int(HTTPStatus.BAD_REQUEST),
+                        "The bot received an InvokeActivity with a TokenExchangeInvokeRequest containing a"
+                        " ConnectionName that does not match the ConnectionName expected by the bots active"
+                        " OAuthPrompt. Ensure these names match when sending the InvokeActivityInvalid"
+                        " ConnectionName in the TokenExchangeInvokeRequest",
+                    )
+                )
+            elif not getattr(context.adapter, "exchange_token"):
+                # Token Exchange not supported in the adapter.
+                await context.send_activity(
+                    self._get_token_exchange_invoke_response(
+                        int(HTTPStatus.BAD_GATEWAY),
+                        "The bot's BotAdapter does not support token exchange operations."
+                        " Ensure the bot's Adapter supports the ITokenExchangeProvider interface.",
+                    )
+                )
+
+                raise AttributeError(
+                    "OAuthPrompt.recognize(): not supported by the current adapter."
+                )
+            else:
+                # No errors. Proceed with token exchange.
+                extended_user_token_provider: ExtendedUserTokenProvider = context.adapter
+                token_exchange_response = await extended_user_token_provider.exchange_token_from_credentials(
+                    context,
+                    self._settings.oath_app_credentials,
+                    self._settings.connection_name,
+                    context.activity.from_property.id,
+                    TokenExchangeRequest(token=context.activity.value.token),
+                )
+
+                if not token_exchange_response or not token_exchange_response.token:
+                    await context.send_activity(
+                        self._get_token_exchange_invoke_response(
+                            int(HTTPStatus.CONFLICT),
+                            "The bot is unable to exchange token. Proceed with regular login.",
+                        )
+                    )
+                else:
+                    await context.send_activity(
+                        self._get_token_exchange_invoke_response(
+                            int(HTTPStatus.OK), None, context.activity.value.id
+                        )
+                    )
+                    token = TokenResponse(
+                        channel_id=token_exchange_response.channel_id,
+                        connection_name=token_exchange_response.connection_name,
+                        token=token_exchange_response.token,
+                        expiration=None,
+                    )
         elif context.activity.type == ActivityTypes.message and context.activity.text:
             match = re.match(r"(?<!\d)\d{6}(?!\d)", context.activity.text)
             if match:
@@ -412,12 +489,28 @@ class OAuthPrompt(Dialog):
             else PromptRecognizerResult()
         )
 
+    def _get_token_exchange_invoke_response(
+        self, status: int, failure_detail: str, identifier: str = None
+    ) -> Activity:
+        return Activity(
+            type=ActivityTypes.invoke_response,
+            value=InvokeResponse(
+                status=status,
+                body=TokenExchangeInvokeResponse(
+                    id=identifier,
+                    connection_name=self._settings.connection_name,
+                    failure_detail=failure_detail,
+                ),
+            ),
+        )
+
     @staticmethod
     def _is_token_response_event(context: TurnContext) -> bool:
         activity = context.activity
 
         return (
-            activity.type == ActivityTypes.event and activity.name == "tokens/response"
+            activity.type == ActivityTypes.event
+            and activity.name == SignInConstants.token_response_event_name
         )
 
     @staticmethod
@@ -426,7 +519,7 @@ class OAuthPrompt(Dialog):
 
         return (
             activity.type == ActivityTypes.invoke
-            and activity.name == "signin/verifyState"
+            and activity.name == SignInConstants.verify_state_operation_name
         )
 
     @staticmethod
@@ -440,3 +533,16 @@ class OAuthPrompt(Dialog):
             return False
 
         return True
+
+    @staticmethod
+    def _is_token_exchange_request_invoke(context: TurnContext) -> bool:
+        activity = context.activity
+
+        return (
+            activity.type == ActivityTypes.invoke
+            and activity.name == SignInConstants.token_exchange_operation_name
+        )
+
+    @staticmethod
+    def _is_token_exchange_request(obj: TokenExchangeInvokeRequest) -> bool:
+        return bool(obj.connection_name) and bool(obj.token)

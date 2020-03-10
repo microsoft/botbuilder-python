@@ -9,7 +9,12 @@ from logging import Logger
 import aiohttp
 from botbuilder.core import InvokeResponse
 from botbuilder.core.skills import BotFrameworkClient
-from botbuilder.schema import Activity, ExpectedReplies
+from botbuilder.schema import (
+    Activity,
+    ExpectedReplies,
+    ConversationReference,
+    ConversationAccount,
+)
 from botframework.connector.auth import (
     ChannelProvider,
     CredentialProvider,
@@ -72,6 +77,24 @@ class BotFrameworkHttpClient(BotFrameworkClient):
         original_relates_to = activity.relates_to
 
         try:
+            # TODO: The relato has to be ported to the adapter in the new integration library when
+            #  resolving conflicts in merge
+            activity.relates_to = ConversationReference(
+                service_url=activity.service_url,
+                activity_id=activity.id,
+                channel_id=activity.channel_id,
+                conversation=ConversationAccount(
+                    id=activity.conversation.id,
+                    name=activity.conversation.name,
+                    conversation_type=activity.conversation.conversation_type,
+                    aad_object_id=activity.conversation.aad_object_id,
+                    is_group=activity.conversation.is_group,
+                    role=activity.conversation.role,
+                    tenant_id=activity.conversation.tenant_id,
+                    properties=activity.conversation.properties,
+                ),
+                bot=None,
+            )
             activity.conversation.id = conversation_id
             activity.service_url = service_url
             activity.caller_id = from_bot_id

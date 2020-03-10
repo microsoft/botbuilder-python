@@ -8,6 +8,7 @@
 import asyncio
 import inspect
 from datetime import datetime
+from uuid import uuid4
 from typing import Awaitable, Coroutine, Dict, List, Callable, Union
 from copy import copy
 from threading import Lock
@@ -20,10 +21,15 @@ from botbuilder.schema import (
     ResourceResponse,
     TokenResponse,
 )
-from botframework.connector.auth import ClaimsIdentity, AppCredentials
+from botframework.connector.auth import AppCredentials, ClaimsIdentity
+from botframework.connector.token_api.models import (
+    SignInUrlResponse,
+    TokenExchangeResource,
+    TokenExchangeRequest,
+)
 from ..bot_adapter import BotAdapter
 from ..turn_context import TurnContext
-from ..user_token_provider import UserTokenProvider
+from ..extended_user_token_provider import ExtendedUserTokenProvider
 
 
 class UserToken:
@@ -48,13 +54,42 @@ class UserToken:
         )
 
 
+class ExchangeableToken(UserToken):
+    def __init__(
+        self,
+        connection_name: str = None,
+        user_id: str = None,
+        channel_id: str = None,
+        token: str = None,
+        exchangeable_item: str = None,
+    ):
+        super(ExchangeableToken, self).__init__(
+            connection_name=connection_name,
+            user_id=user_id,
+            channel_id=channel_id,
+            token=token,
+        )
+
+        self.exchangeable_item = exchangeable_item
+
+    def equals_key(self, rhs: "ExchangeableToken") -> bool:
+        return (
+            rhs is not None
+            and self.exchangeable_item == rhs.exchangeable_item
+            and super().equals_key(rhs)
+        )
+
+    def to_key(self) -> str:
+        return self.exchangeable_item
+
+
 class TokenMagicCode:
     def __init__(self, key: UserToken = None, magic_code: str = None):
         self.key = key
         self.magic_code = magic_code
 
 
-class TestAdapter(BotAdapter, UserTokenProvider):
+class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
     __test__ = False
 
     def __init__(
@@ -62,7 +97,7 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         logic: Coroutine = None,
         template_or_conversation: Union[Activity, ConversationReference] = None,
         send_trace_activities: bool = False,
-    ):  # pylint: disable=unused-argument
+    ):
         """
         Creates a new TestAdapter instance.
         :param logic:
@@ -74,6 +109,7 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         self._user_tokens: List[UserToken] = []
         self._magic_codes: List[TokenMagicCode] = []
         self._conversation_lock = Lock()
+        self.exchangeable_tokens: Dict[str, ExchangeableToken] = {}
         self.activity_buffer: List[Activity] = []
         self.updated_activities: List[Activity] = []
         self.deleted_activities: List[ConversationReference] = []
@@ -164,7 +200,7 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         reference: ConversationReference,
         callback: Callable,
         bot_id: str = None,
-        claims_identity: ClaimsIdentity = None,
+        claims_identity: ClaimsIdentity = None,  # pylint: disable=unused-argument
         audience: str = None,
     ):
         """
@@ -278,7 +314,7 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         context: TurnContext,
         connection_name: str,
         magic_code: str = None,
-        oauth_app_credentials: AppCredentials = None,
+        oauth_app_credentials: AppCredentials = None,  # pylint: disable=unused-argument
     ) -> TokenResponse:
         key = UserToken()
         key.channel_id = context.activity.channel_id
@@ -318,7 +354,7 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         context: TurnContext,
         connection_name: str = None,
         user_id: str = None,
-        oauth_app_credentials: AppCredentials = None,
+        oauth_app_credentials: AppCredentials = None,  # pylint: disable=unused-argument
     ):
         channel_id = context.activity.channel_id
         user_id = context.activity.from_property.id
@@ -337,8 +373,8 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         self,
         context: TurnContext,
         connection_name: str,
-        final_redirect: str = None,
-        oauth_app_credentials: AppCredentials = None,
+        final_redirect: str = None,  # pylint: disable=unused-argument
+        oauth_app_credentials: AppCredentials = None,  # pylint: disable=unused-argument
     ) -> str:
         return (
             f"https://fake.com/oauthsignin"
@@ -360,9 +396,93 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         context: TurnContext,
         connection_name: str,
         resource_urls: List[str],
-        user_id: str = None,
-        oauth_app_credentials: AppCredentials = None,
+        user_id: str = None,  # pylint: disable=unused-argument
+        oauth_app_credentials: AppCredentials = None,  # pylint: disable=unused-argument
     ) -> Dict[str, TokenResponse]:
+        return None
+
+    def add_exchangeable_token(
+        self,
+        connection_name: str,
+        channel_id: str,
+        user_id: str,
+        exchangeable_item: str,
+        token: str,
+    ):
+        key = ExchangeableToken(
+            connection_name=connection_name,
+            channel_id=channel_id,
+            user_id=user_id,
+            exchangeable_item=exchangeable_item,
+            token=token,
+        )
+        self.exchangeable_tokens[key.to_key()] = key
+
+    async def get_sign_in_resource_from_user(
+        self,
+        turn_context: TurnContext,
+        connection_name: str,
+        user_id: str,
+        final_redirect: str = None,
+    ) -> SignInUrlResponse:
+        return await self.get_sign_in_resource_from_user_and_credentials(
+            turn_context, None, connection_name, user_id, final_redirect
+        )
+
+    async def get_sign_in_resource_from_user_and_credentials(
+        self,
+        turn_context: TurnContext,
+        oauth_app_credentials: AppCredentials,
+        connection_name: str,
+        user_id: str,
+        final_redirect: str = None,
+    ) -> SignInUrlResponse:
+        return SignInUrlResponse(
+            sign_in_link=f"https://fake.com/oauthsignin/{connection_name}/{turn_context.activity.channel_id}/{user_id}",
+            token_exchange_resource=TokenExchangeResource(
+                id=str(uuid4()),
+                provider_id=None,
+                uri=f"api://{connection_name}/resource",
+            ),
+        )
+
+    async def exchange_token(
+        self,
+        turn_context: TurnContext,
+        connection_name: str,
+        user_id: str,
+        exchange_request: TokenExchangeRequest,
+    ) -> TokenResponse:
+        return await self.exchange_token_from_credentials(
+            turn_context, None, connection_name, user_id, exchange_request
+        )
+
+    async def exchange_token_from_credentials(
+        self,
+        turn_context: TurnContext,
+        oauth_app_credentials: AppCredentials,
+        connection_name: str,
+        user_id: str,
+        exchange_request: TokenExchangeRequest,
+    ) -> TokenResponse:
+        exchangeable_value = exchange_request.token or exchange_request.uri
+
+        key = ExchangeableToken(
+            channel_id=turn_context.activity.channel_id,
+            connection_name=connection_name,
+            exchangeable_item=exchangeable_value,
+            user_id=user_id,
+        )
+
+        token_exchange_response = self.exchangeable_tokens.get(key.to_key())
+        if token_exchange_response:
+            return TokenResponse(
+                channel_id=key.channel_id,
+                connection_name=key.connection_name,
+                token=token_exchange_response.token,
+                expiration=None,
+            )
+
         return None
 
 
@@ -371,7 +491,7 @@ class TestFlow:
 
     def __init__(self, previous: Callable, adapter: TestAdapter):
         """
-        INTERNAL: creates a new TestFlow instance.
+        INTERNAL: creates a TestFlow instance.
         :param previous:
         :param adapter:
         """
