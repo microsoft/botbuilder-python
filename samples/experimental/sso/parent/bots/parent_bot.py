@@ -12,7 +12,7 @@ from botbuilder.core import (
     ConversationState,
     UserState,
     MessageFactory,
-    TurnContext
+    TurnContext,
 )
 from botbuilder.schema import (
     Activity,
@@ -21,9 +21,12 @@ from botbuilder.schema import (
     DeliveryModes,
     ChannelAccount,
     OAuthCard,
-    TokenExchangeInvokeRequest
+    TokenExchangeInvokeRequest,
 )
-from botframework.connector.token_api.models import TokenExchangeResource, TokenExchangeRequest
+from botframework.connector.token_api.models import (
+    TokenExchangeResource,
+    TokenExchangeRequest,
+)
 
 from config import DefaultConfig
 from helpers.dialog_helper import DialogHelper
@@ -44,7 +47,7 @@ class ParentBot(ActivityHandler):
         self._user_state = user_state
         self._dialog = dialog
         self._from_bot_id = config.APP_ID
-        self._to_bot_id = config.SKILL_APP_ID
+        self._to_bot_id = config.SKILL_MICROSOFT_APP_ID
         self._connection_name = config.CONNECTION_NAME
 
     async def on_turn(self, turn_context: TurnContext):
@@ -57,7 +60,10 @@ class ParentBot(ActivityHandler):
         # for signin, just use an oauth prompt to get the exchangeable token
         # also ensure that the channelId is not emulator
         if turn_context.activity.type != "emulator":
-            if turn_context.activity.text == "login" or turn_context.activity.text.isdigit():
+            if (
+                turn_context.activity.text == "login"
+                or turn_context.activity.text.isdigit()
+            ):
                 await self._conversation_state.load(turn_context, True)
                 await self._user_state.load(turn_context, True)
                 await DialogHelper.run_dialog(
@@ -68,7 +74,9 @@ class ParentBot(ActivityHandler):
             elif turn_context.activity.text == "logout":
                 bot_adapter = turn_context.adapter
                 await bot_adapter.sign_out_user(turn_context, self._connection_name)
-                await turn_context.send_activity(MessageFactory.text("You have been signed out."))
+                await turn_context.send_activity(
+                    MessageFactory.text("You have been signed out.")
+                )
             elif turn_context.activity.text in ("skill login", "skill logout"):
                 # incoming activity needs to be cloned for buffered replies
                 clone_activity = MessageFactory.text(turn_context.activity.text)
@@ -76,23 +84,25 @@ class ParentBot(ActivityHandler):
                 TurnContext.apply_conversation_reference(
                     clone_activity,
                     TurnContext.get_conversation_reference(turn_context.activity),
-                    True
+                    True,
                 )
 
                 clone_activity.delivery_mode = DeliveryModes.expect_replies
 
-                response_1 = await self._client.post_activity(
+                activities = await self._client.post_buffered_activity(
                     self._from_bot_id,
                     self._to_bot_id,
-                    "http://localhost:2303/api/messages",
+                    "http://localhost:3979/api/messages",
                     "http://tempuri.org/whatever",
                     turn_context.activity.conversation.id,
                     clone_activity,
                 )
 
-                if response_1.status == int(HTTPStatus.OK):
-                    if not await self._intercept_oauth_cards(response_1.body, turn_context):
-                        await turn_context.send_activities(response_1.body)
+                if activities:
+                    if not await self._intercept_oauth_cards(
+                        activities, turn_context
+                    ):
+                        await turn_context.send_activities(activities)
 
             return
 
@@ -102,22 +112,20 @@ class ParentBot(ActivityHandler):
         TurnContext.apply_conversation_reference(
             activity,
             TurnContext.get_conversation_reference(turn_context.activity),
-            True
+            True,
         )
         activity.delivery_mode = DeliveryModes.expect_replies
 
-        response = await self._client.post_activity(
+        activities = await self._client.post_buffered_activity(
             self._from_bot_id,
             self._to_bot_id,
-            "http://localhost:2303/api/messages",
+            "http://localhost:3979/api/messages",
             "http://tempuri.org/whatever",
             str(uuid4()),
-            activity
+            activity,
         )
 
-        if response.status == int(HTTPStatus.OK):
-            await turn_context.send_activities(response.body)
-
+        await turn_context.send_activities(activities)
         await turn_context.send_activity(MessageFactory.text("parent: after child"))
 
     async def on_members_added_activity(
@@ -130,20 +138,21 @@ class ParentBot(ActivityHandler):
                 )
 
     async def _intercept_oauth_cards(
-        self,
-        activities: List[Activity],
-        turn_context: TurnContext,
+        self, activities: List[Activity], turn_context: TurnContext,
     ) -> bool:
         if not activities:
             return False
         activity = activities[0]
 
         if activity.attachments:
-            for attachment in filter(lambda att: att.content_type == CardFactory.content_types.oauth_card,
-                                     activity.attachments):
+            for attachment in filter(
+                lambda att: att.content_type == CardFactory.content_types.oauth_card,
+                activity.attachments,
+            ):
                 oauth_card: OAuthCard = OAuthCard().from_dict(attachment.content)
                 oauth_card.token_exchange_resource: TokenExchangeResource = TokenExchangeResource().from_dict(
-                    oauth_card.token_exchange_resource)
+                    oauth_card.token_exchange_resource
+                )
                 if oauth_card.token_exchange_resource:
                     token_exchange_provider: BotFrameworkAdapter = turn_context.adapter
 
@@ -151,7 +160,9 @@ class ParentBot(ActivityHandler):
                         turn_context,
                         self._connection_name,
                         turn_context.activity.from_property.id,
-                        TokenExchangeRequest(uri=oauth_card.token_exchange_resource.uri)
+                        TokenExchangeRequest(
+                            uri=oauth_card.token_exchange_resource.uri
+                        ),
                     )
 
                     if result.token:
@@ -159,7 +170,7 @@ class ParentBot(ActivityHandler):
                             turn_context,
                             activity,
                             oauth_card.token_exchange_resource.id,
-                            result.token
+                            result.token,
                         )
         return False
 
@@ -168,33 +179,32 @@ class ParentBot(ActivityHandler):
         turn_context: TurnContext,
         incoming_activity: Activity,
         identifier: str,
-        token: str
+        token: str,
     ) -> bool:
         activity = self._create_reply(incoming_activity)
         activity.type = ActivityTypes.invoke
         activity.name = "signin/tokenExchange"
-        activity.value = TokenExchangeInvokeRequest(
-            id=identifier,
-            token=token,
-        )
+        activity.value = TokenExchangeInvokeRequest(id=identifier, token=token,)
 
         # route the activity to the skill
         response = await self._client.post_activity(
             self._from_bot_id,
             self._to_bot_id,
-            "http://localhost:2303/api/messages",
+            "http://localhost:3979/api/messages",
             "http://tempuri.org/whatever",
             incoming_activity.conversation.id,
-            activity
+            activity,
         )
 
         # Check response status: true if success, false if failure
         is_success = int(HTTPStatus.OK) <= response.status <= 299
-        message = "Skill token exchange successful" if is_success else "Skill token exchange failed"
+        message = (
+            "Skill token exchange successful"
+            if is_success
+            else "Skill token exchange failed"
+        )
 
-        await turn_context.send_activity(MessageFactory.text(
-            message
-        ))
+        await turn_context.send_activity(MessageFactory.text(message))
 
         return is_success
 
