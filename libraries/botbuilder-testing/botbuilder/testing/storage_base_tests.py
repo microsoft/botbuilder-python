@@ -38,6 +38,7 @@ from botbuilder.dialogs import (
 
 
 class StorageBaseTests:
+    # pylint: disable=pointless-string-statement
     @staticmethod
     async def return_empty_object_when_reading_unknown_key(storage) -> bool:
         result = await storage.read(["unknown"])
