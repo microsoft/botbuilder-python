@@ -9,7 +9,7 @@ variables:
   python.36: 3.6.10
   python.37: 3.7.6
   python.38: 3.8.2
-
+  # PythonCoverallsToken: get this from Azure
 
 jobs:
 # Build and publish container
@@ -79,7 +79,7 @@ jobs:
   - script: 'pylint --rcfile=.pylintrc libraries'
     displayName: Pylint
 
-  - script: 'COVERALLS_REPO_TOKEN=$(COVERALLS_TOKEN) coveralls'
+  - script: 'COVERALLS_REPO_TOKEN=$(PythonCoverallsToken) coveralls'
     displayName: 'Push test results to coveralls https://coveralls.io/github/microsoft/botbuilder-python'
     continueOnError: true
 
