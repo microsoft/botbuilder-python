@@ -1,3 +1,0 @@
-aiohttp
-botbuilder-core>=4.7.1
-datatypes-date-time>=1.0.0a2
