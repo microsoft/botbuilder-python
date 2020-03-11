@@ -4,24 +4,17 @@
 import os
 from setuptools import setup
 
+VERSION = os.environ["packageVersion"] if "packageVersion" in os.environ else "4.7.1"
 REQUIRES = [
-    "regex<=2019.08.19",
-    "recognizers-text-date-time>=1.0.2a1",
-    "recognizers-text-number-with-unit>=1.0.2a1",
-    "recognizers-text-number>=1.0.2a1",
-    "recognizers-text>=1.0.2a1",
-    "recognizers-text-choice>=1.0.2a1",
-    "babel==2.7.0",
     "botbuilder-schema>=4.7.1",
     "botframework-connector>=4.7.1",
     "botbuilder-core>=4.7.1",
+    "aiohttp==3.6.2",
 ]
-
-TEST_REQUIRES = ["aiounittest==1.3.0"]
 
 root = os.path.abspath(os.path.dirname(__file__))
 
-with open(os.path.join(root, "botbuilder", "dialogs", "about.py")) as f:
+with open(os.path.join(root, "botbuilder", "integration", "aiohttp", "about.py")) as f:
     package_info = {}
     info = f.read()
     exec(info, package_info)
@@ -35,19 +28,21 @@ setup(
     url=package_info["__uri__"],
     author=package_info["__author__"],
     description=package_info["__description__"],
-    keywords=["BotBuilderDialogs", "bots", "ai", "botframework", "botbuilder"],
+    keywords=[
+        "BotBuilderIntegrationAiohttp",
+        "bots",
+        "ai",
+        "botframework",
+        "botbuilder",
+    ],
     long_description=long_description,
     long_description_content_type="text/x-rst",
     license=package_info["__license__"],
     packages=[
-        "botbuilder.dialogs",
-        "botbuilder.dialogs.prompts",
-        "botbuilder.dialogs.choices",
-        "botbuilder.dialogs.skills",
+        "botbuilder.integration.aiohttp",
+        "botbuilder.integration.aiohttp.skills",
     ],
-    install_requires=REQUIRES + TEST_REQUIRES,
-    tests_require=TEST_REQUIRES,
-    include_package_data=True,
+    install_requires=REQUIRES,
     classifiers=[
         "Programming Language :: Python :: 3.7",
         "Intended Audience :: Developers",

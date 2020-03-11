@@ -1,5 +1,5 @@
 import aiounittest
-from botbuilder.core import BotFrameworkHttpClient
+from botbuilder.integration.aiohttp import BotFrameworkHttpClient
 
 
 class TestBotFrameworkHttpClient(aiounittest.AsyncTestCase):

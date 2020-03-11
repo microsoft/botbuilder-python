@@ -8,6 +8,7 @@
 from .about import __version__
 from .component_dialog import ComponentDialog
 from .dialog_context import DialogContext
+from .dialog_events import DialogEvents
 from .dialog_instance import DialogInstance
 from .dialog_reason import DialogReason
 from .dialog_set import DialogSet
@@ -17,12 +18,15 @@ from .dialog_turn_status import DialogTurnStatus
 from .dialog import Dialog
 from .waterfall_dialog import WaterfallDialog
 from .waterfall_step_context import WaterfallStepContext
+from .dialog_extensions import DialogExtensions
 from .prompts import *
 from .choices import *
+from .skills import *
 
 __all__ = [
     "ComponentDialog",
     "DialogContext",
+    "DialogEvents",
     "DialogInstance",
     "DialogReason",
     "DialogSet",
@@ -43,5 +47,6 @@ __all__ = [
     "Prompt",
     "PromptOptions",
     "TextPrompt",
+    "DialogExtensions",
     "__version__",
 ]

@@ -22,7 +22,6 @@ from .conversation_state import ConversationState
 from .extended_user_token_provider import ExtendedUserTokenProvider
 from .intent_score import IntentScore
 from .invoke_response import InvokeResponse
-from .bot_framework_http_client import BotFrameworkHttpClient
 from .memory_storage import MemoryStorage
 from .memory_transcript_store import MemoryTranscriptStore
 from .message_factory import MessageFactory
@@ -63,7 +62,6 @@ __all__ = [
     "ExtendedUserTokenProvider",
     "IntentScore",
     "InvokeResponse",
-    "BotFrameworkHttpClient",
     "MemoryStorage",
     "MemoryTranscriptStore",
     "MessageFactory",

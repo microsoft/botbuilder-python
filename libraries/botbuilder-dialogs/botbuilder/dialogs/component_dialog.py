@@ -189,7 +189,7 @@ class ComponentDialog(Dialog):
             self.initial_dialog_id = dialog.id
         return self
 
-    def find_dialog(self, dialog_id: str) -> Dialog:
+    async def find_dialog(self, dialog_id: str) -> Dialog:
         """
         Finds a dialog by ID.
 
@@ -197,7 +197,7 @@ class ComponentDialog(Dialog):
         :return: The dialog; or None if there is not a match for the ID.
         :rtype: :class:`botbuilder.dialogs.Dialog`
         """
-        return self._dialogs.find(dialog_id)
+        return await self._dialogs.find(dialog_id)
 
     async def on_begin_dialog(
         self, inner_dc: DialogContext, options: object
