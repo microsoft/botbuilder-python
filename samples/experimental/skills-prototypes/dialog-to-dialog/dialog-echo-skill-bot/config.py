@@ -9,8 +9,8 @@ class DefaultConfig:
     """ Bot Configuration """
 
     PORT = 39793
-    APP_ID = os.environ.get("MicrosoftAppId", "fb7a9f3c-2b30-4ac8-86a0-c44bdeaa380e")
-    APP_PASSWORD = os.environ.get("MicrosoftAppPassword", "b0tframew0rks3cr3t!")
+    APP_ID = os.environ.get("MicrosoftAppId", "")
+    APP_PASSWORD = os.environ.get("MicrosoftAppPassword", "")
 
     # If ALLOWED_CALLERS is empty, any bot can call this Skill.  Add MicrosoftAppIds to restrict
     # callers to only those specified.

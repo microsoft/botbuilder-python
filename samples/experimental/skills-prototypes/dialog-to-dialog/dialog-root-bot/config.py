@@ -11,18 +11,18 @@ class DefaultConfig:
     """ Bot Configuration """
 
     PORT = 3978
-    APP_ID = os.environ.get("MicrosoftAppId", "b56a1b59-7081-4546-b3fa-177401fd0657")
-    APP_PASSWORD = os.environ.get("MicrosoftAppPassword", "b0tframew0rks3cr3t!")
+    APP_ID = os.environ.get("MicrosoftAppId", "")
+    APP_PASSWORD = os.environ.get("MicrosoftAppPassword", "")
     SKILL_HOST_ENDPOINT = "http://localhost:3978/api/skills"
     SKILLS = [
         {
             "id": "EchoSkillBot",
-            "app_id": "fb7a9f3c-2b30-4ac8-86a0-c44bdeaa380e",
+            "app_id": "",
             "skill_endpoint": "http://localhost:39793/api/messages",
         },
         {
             "id": "DialogSkillBot",
-            "app_id": "67ec4e96-f4f6-424b-911f-de362a2a81d4",
+            "app_id": "",
             "skill_endpoint": "http://localhost:39783/api/messages",
         },
     ]
