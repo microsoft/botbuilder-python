@@ -30,7 +30,13 @@ class DialogExtensions:
             if (
                 turn_context.activity.type == ActivityTypes.end_of_conversation
                 and dialog_context.stack
+                and DialogExtensions.__is_eoc_coming_from_parent(turn_context)
             ):
+                remote_cancel_text = "Skill was canceled through an EndOfConversation activity from the parent."
+                await turn_context.send_trace_activity(
+                    f"Extension {Dialog.__name__}.run_dialog", label=remote_cancel_text,
+                )
+
                 await dialog_context.cancel_all_dialogs()
             else:
                 # Process a reprompt event sent from the parent.
@@ -75,3 +81,9 @@ class DialogExtensions:
             results = await dialog_context.continue_dialog()
             if results.status == DialogTurnStatus.Empty:
                 await dialog_context.begin_dialog(dialog.id)
+
+    @staticmethod
+    def __is_eoc_coming_from_parent(turn_context: TurnContext) -> bool:
+        # To determine the direction we check callerId property which is set to the parent bot
+        # by the BotFrameworkHttpClient on outgoing requests.
+        return bool(turn_context.activity.caller_id)
