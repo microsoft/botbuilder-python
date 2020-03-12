@@ -1,16 +1,19 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+# pylint: disable=no-member
 
 import json
 from typing import Dict
 from logging import Logger
-import aiohttp
 
+import aiohttp
+from botbuilder.core import InvokeResponse
+from botbuilder.core.skills import BotFrameworkClient
 from botbuilder.schema import (
     Activity,
     ExpectedReplies,
-    ConversationAccount,
     ConversationReference,
+    ConversationAccount,
 )
 from botframework.connector.auth import (
     ChannelProvider,
@@ -19,10 +22,8 @@ from botframework.connector.auth import (
     MicrosoftAppCredentials,
 )
 
-from . import InvokeResponse
 
-
-class BotFrameworkHttpClient:
+class BotFrameworkHttpClient(BotFrameworkClient):
 
     """
     A skill host adapter implements API to forward activity to a skill and
@@ -73,6 +74,7 @@ class BotFrameworkHttpClient:
         original_conversation_id = activity.conversation.id
         original_service_url = activity.service_url
         original_caller_id = activity.caller_id
+        original_relates_to = activity.relates_to
 
         try:
             # TODO: The relato has to be ported to the adapter in the new integration library when
@@ -95,7 +97,7 @@ class BotFrameworkHttpClient:
             )
             activity.conversation.id = conversation_id
             activity.service_url = service_url
-            activity.caller_id = from_bot_id
+            activity.caller_id = f"urn:botframework:aadappid:{from_bot_id}"
 
             headers_dict = {
                 "Content-type": "application/json; charset=utf-8",
@@ -121,6 +123,7 @@ class BotFrameworkHttpClient:
             activity.conversation.id = original_conversation_id
             activity.service_url = original_service_url
             activity.caller_id = original_caller_id
+            activity.relates_to = original_relates_to
 
     async def post_buffered_activity(
         self,

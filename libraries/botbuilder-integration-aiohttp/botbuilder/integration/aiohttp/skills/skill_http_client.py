@@ -1,10 +1,10 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from botbuilder.core import (
-    BotFrameworkHttpClient,
-    InvokeResponse,
-)
+from logging import Logger
+
+from botbuilder.core import InvokeResponse
+from botbuilder.integration.aiohttp import BotFrameworkHttpClient
 from botbuilder.core.skills import (
     ConversationIdFactoryBase,
     SkillConversationIdFactoryOptions,
@@ -25,6 +25,7 @@ class SkillHttpClient(BotFrameworkHttpClient):
         credential_provider: SimpleCredentialProvider,
         skill_conversation_id_factory: ConversationIdFactoryBase,
         channel_provider: ChannelProvider = None,
+        logger: Logger = None,
     ):
         if not skill_conversation_id_factory:
             raise TypeError(

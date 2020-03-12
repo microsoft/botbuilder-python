@@ -6,9 +6,9 @@ import uuid
 from botbuilder.core import (
     ActivityHandler,
     TurnContext,
-    BotFrameworkHttpClient,
     MessageFactory,
 )
+from botbuilder.integration import BotFrameworkHttpClient
 
 from botbuilder.schema import DeliveryModes
 

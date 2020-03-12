@@ -14,7 +14,7 @@ from .middleware_set import MiddlewareSet
 
 class BotAdapter(ABC):
     BOT_IDENTITY_KEY = "BotIdentity"
-    BOT_OAUTH_SCOPE_KEY = "OAuthScope"
+    BOT_OAUTH_SCOPE_KEY = "botbuilder.core.BotAdapter.OAuthScope"
     BOT_CONNECTOR_CLIENT_KEY = "ConnectorClient"
     BOT_CALLBACK_HANDLER_KEY = "BotCallbackHandler"
 

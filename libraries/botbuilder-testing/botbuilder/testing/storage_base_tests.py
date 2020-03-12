@@ -38,6 +38,7 @@ from botbuilder.dialogs import (
 
 
 class StorageBaseTests:
+    # pylint: disable=pointless-string-statement
     @staticmethod
     async def return_empty_object_when_reading_unknown_key(storage) -> bool:
         result = await storage.read(["unknown"])
@@ -94,8 +95,11 @@ class StorageBaseTests:
             store_items["createPocoStoreItem"]["id"]
             == read_store_items["createPocoStoreItem"]["id"]
         )
+        """
+        If decided to validate e_tag integrity aagain, uncomment this code
         assert read_store_items["createPoco"]["e_tag"] is not None
         assert read_store_items["createPocoStoreItem"]["e_tag"] is not None
+        """
 
         return True
 
@@ -127,9 +131,9 @@ class StorageBaseTests:
         loaded_store_items = await storage.read(["pocoItem", "pocoStoreItem"])
 
         update_poco_item = loaded_store_items["pocoItem"]
-        update_poco_item["e_tag"] = None
+        # update_poco_item["e_tag"] = None
         update_poco_store_item = loaded_store_items["pocoStoreItem"]
-        assert update_poco_store_item["e_tag"] is not None
+        # assert update_poco_store_item["e_tag"] is not None
 
         # 2nd write should work
         update_poco_item["count"] += 1
@@ -142,10 +146,6 @@ class StorageBaseTests:
         reloaded_update_poco_item = reloaded_store_items["pocoItem"]
         reloaded_update_poco_store_item = reloaded_store_items["pocoStoreItem"]
 
-        assert reloaded_update_poco_item["e_tag"] is not None
-        assert (
-            update_poco_store_item["e_tag"] != reloaded_update_poco_store_item["e_tag"]
-        )
         assert reloaded_update_poco_item["count"] == 2
         assert reloaded_update_poco_store_item["count"] == 2
 
@@ -153,17 +153,20 @@ class StorageBaseTests:
         update_poco_item["count"] = 123
         await storage.write({"pocoItem": update_poco_item})
 
+        """
+        If decided to validate e_tag integrity aagain, uncomment this code
         # Write with old eTag should FAIL for storeItem
         update_poco_store_item["count"] = 123
 
         with pytest.raises(Exception) as err:
             await storage.write({"pocoStoreItem": update_poco_store_item})
         assert err.value is not None
+        """
 
         reloaded_store_items2 = await storage.read(["pocoItem", "pocoStoreItem"])
 
         reloaded_poco_item2 = reloaded_store_items2["pocoItem"]
-        reloaded_poco_item2["e_tag"] = None
+        # reloaded_poco_item2["e_tag"] = None
         reloaded_poco_store_item2 = reloaded_store_items2["pocoStoreItem"]
 
         assert reloaded_poco_item2["count"] == 123
@@ -172,7 +175,7 @@ class StorageBaseTests:
         # write with wildcard etag should work
         reloaded_poco_item2["count"] = 100
         reloaded_poco_store_item2["count"] = 100
-        reloaded_poco_store_item2["e_tag"] = "*"
+        # reloaded_poco_store_item2["e_tag"] = "*"
 
         wildcard_etag_dict = {
             "pocoItem": reloaded_poco_item2,
@@ -192,12 +195,15 @@ class StorageBaseTests:
 
         assert reloaded_store_item4 is not None
 
+        """
+        If decided to validate e_tag integrity aagain, uncomment this code
         reloaded_store_item4["e_tag"] = ""
         dict2 = {"pocoStoreItem": reloaded_store_item4}
 
         with pytest.raises(Exception) as err:
             await storage.write(dict2)
         assert err.value is not None
+        """
 
         final_store_items = await storage.read(["pocoItem", "pocoStoreItem"])
         assert final_store_items["pocoItem"]["count"] == 100
@@ -213,7 +219,7 @@ class StorageBaseTests:
 
         read_store_items = await storage.read(["delete1"])
 
-        assert read_store_items["delete1"]["e_tag"]
+        # assert read_store_items["delete1"]["e_tag"]
         assert read_store_items["delete1"]["count"] == 1
 
         await storage.delete(["delete1"])
@@ -248,9 +254,12 @@ class StorageBaseTests:
         assert result["batch1"]["count"] == 10
         assert result["batch2"]["count"] == 20
         assert result["batch3"]["count"] == 30
+        """
+        If decided to validate e_tag integrity aagain, uncomment this code
         assert result["batch1"].get("e_tag", None) is not None
         assert result["batch2"].get("e_tag", None) is not None
         assert result["batch3"].get("e_tag", None) is not None
+        """
 
         await storage.delete(["batch1", "batch2", "batch3"])
 
