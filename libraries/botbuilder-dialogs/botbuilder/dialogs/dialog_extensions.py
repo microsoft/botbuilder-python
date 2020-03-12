@@ -86,4 +86,4 @@ class DialogExtensions:
     def __is_eoc_coming_from_parent(turn_context: TurnContext) -> bool:
         # To determine the direction we check callerId property which is set to the parent bot
         # by the BotFrameworkHttpClient on outgoing requests.
-        return not turn_context.activity.caller_id
+        return bool(turn_context.activity.caller_id)
