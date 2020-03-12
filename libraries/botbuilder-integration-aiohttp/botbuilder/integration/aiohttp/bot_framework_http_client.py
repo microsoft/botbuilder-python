@@ -97,7 +97,7 @@ class BotFrameworkHttpClient(BotFrameworkClient):
             )
             activity.conversation.id = conversation_id
             activity.service_url = service_url
-            activity.caller_id = from_bot_id
+            activity.caller_id = f"urn:botframework:aadappid:{from_bot_id}"
 
             headers_dict = {
                 "Content-type": "application/json; charset=utf-8",
