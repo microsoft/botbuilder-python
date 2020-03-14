@@ -311,9 +311,18 @@ class OAuthPrompt(Dialog):
                 link = sign_in_resource.sign_in_link
                 bot_identity: ClaimsIdentity = context.turn_state.get("BotIdentity")
 
+                # use the SignInLink when
+                # in speech channel or
+                # bot is a skill or
+                # an extra OAuthAppCredentials is being passed in
                 if (
-                    bot_identity and SkillValidation.is_skill_claim(bot_identity.claims)
-                ) or not context.activity.service_url.startswith("http"):
+                    (
+                        bot_identity
+                        and SkillValidation.is_skill_claim(bot_identity.claims)
+                    )
+                    or not context.activity.service_url.startswith("http")
+                    or self._settings.oath_app_credentials
+                ):
                     if context.activity.channel_id == Channels.emulator:
                         card_action_type = ActionTypes.open_url
                 else:
