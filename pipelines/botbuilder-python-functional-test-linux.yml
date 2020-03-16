@@ -1,9 +1,15 @@
-trigger:
+#
+# Run functional test on bot deployed to a Docker Linux environment in Azure.
+#
+pool:
+  vmImage: 'Ubuntu-16.04'
+
+trigger: # ci trigger
   branches:
     include:
-    - daveta-python-functional
-    exclude:
-    - master
+     - master
+
+pr: none # no pr trigger
 
 variables:
   # Container registry service connection established during pipeline creation
@@ -14,15 +20,11 @@ variables:
   webAppName: 'e2epython'
   containerRegistry: 'nightlye2etest.azurecr.io'
   imageRepository: 'functionaltestpy'
-
-
-
+  # LinuxTestBotAppId: get this from azure
+  # LinuxTestBotAppSecret: get this from Azure
 
 jobs:
-# Build and publish container
 - job: Build
-  pool:
-    vmImage: 'Ubuntu-16.04'
   displayName: Build and push bot image
   continueOnError: false
   steps:
@@ -35,12 +37,8 @@ jobs:
       containerRegistry: $(dockerRegistryServiceConnection)
       tags: $(buildIdTag)
 
-
-
 - job: Deploy
   displayName: Provision bot container
-  pool:
-    vmImage: 'Ubuntu-16.04'
   dependsOn:
   - Build
   steps:
@@ -54,8 +52,6 @@ jobs:
       DockerNamespace: $(containerRegistry)
       DockerRepository: $(imageRepository)
       DockerImageTag: $(buildIdTag)
-      AppSettings: '-MicrosoftAppId $(botAppId) -MicrosoftAppPassword $(botAppPassword) -FLASK_APP /functionaltestbot/app.py -FLASK_DEBUG 1'
+      AppSettings: '-MicrosoftAppId $(LinuxTestBotAppId) -MicrosoftAppPassword $(LinuxTestBotAppSecret) -FLASK_APP /functionaltestbot/app.py -FLASK_DEBUG 1'
 
       #StartupCommand: 'flask run --host=0.0.0.0 --port=3978'
-
-
