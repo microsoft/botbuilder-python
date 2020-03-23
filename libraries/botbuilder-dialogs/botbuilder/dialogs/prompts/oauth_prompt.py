@@ -266,7 +266,7 @@ class OAuthPrompt(Dialog):
         :type context:  :class:`TurnContext`
         :return: A task representing the work queued to execute
 
-        .. remarks::
+        .. note::
             If the task is successful and the user already has a token or the user successfully signs in,
             the result contains the user's token.
         """
