@@ -555,3 +555,4 @@ class OAuthPrompt(Dialog):
     @staticmethod
     def _is_token_exchange_request(obj: TokenExchangeInvokeRequest) -> bool:
         return bool(obj.connection_name) and bool(obj.token)
+    
