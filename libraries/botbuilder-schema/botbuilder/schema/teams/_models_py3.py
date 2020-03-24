@@ -132,7 +132,7 @@ class FileConsentCardResponse(Model):
 
     :param action: The action the user took. Possible values include:
      'accept', 'decline'
-    :type action: str or ~botframework.connector.teams.models.enum
+    :type action: str
     :param context: The context associated with the action.
     :type context: object
     :param upload_info: If the user accepted the file, contains information
@@ -346,7 +346,7 @@ class MessageActionsPayloadBody(Model):
 
     :param content_type: Type of the content. Possible values include: 'html',
      'text'
-    :type content_type: str or ~botframework.connector.teams.models.enum
+    :type content_type: str
     :param content: The content of the body.
     :type content: str
     """
@@ -463,7 +463,7 @@ class MessageActionsPayloadReaction(Model):
 
     :param reaction_type: The type of reaction given to the message. Possible
      values include: 'like', 'heart', 'laugh', 'surprised', 'sad', 'angry'
-    :type reaction_type: str or ~botframework.connector.teams.models.enum
+    :type reaction_type: str
     :param created_date_time: Timestamp of when the user reacted to the
      message.
     :type created_date_time: str
@@ -491,7 +491,7 @@ class MessageActionsPayloadUser(Model):
 
     :param user_identity_type: The identity type of the user. Possible values
      include: 'aadUser', 'onPremiseAadUser', 'anonymousGuest', 'federatedUser'
-    :type user_identity_type: str or ~botframework.connector.teams.models.enum
+    :type user_identity_type: str
     :param id: The id of the user.
     :type id: str
     :param display_name: The plaintext display name of the user.
@@ -528,7 +528,7 @@ class MessageActionsPayload(Model):
     :type reply_to_id: str
     :param message_type: Type of message - automatically set to message.
      Possible values include: 'message'
-    :type message_type: str or ~botframework.connector.teams.models.enum
+    :type message_type: str
     :param created_date_time: Timestamp of when the message was created.
     :type created_date_time: str
     :param last_modified_date_time: Timestamp of when the message was edited
@@ -543,7 +543,7 @@ class MessageActionsPayload(Model):
     :type summary: str
     :param importance: The importance of the message. Possible values include:
      'normal', 'high', 'urgent'
-    :type importance: str or ~botframework.connector.teams.models.enum
+    :type importance: str
     :param locale: Locale of the message set by the client.
     :type locale: str
     :param from_property: Sender of the message.
@@ -639,7 +639,7 @@ class MessagingExtensionAction(TaskModuleRequest):
     :type command_id: str
     :param command_context: The context from which the command originates.
      Possible values include: 'message', 'compose', 'commandbox'
-    :type command_context: str or ~botframework.connector.teams.models.enum
+    :type command_context: str
     :param bot_message_preview_action: Bot message preview action taken by
      user. Possible values include: 'edit', 'send'
     :type bot_message_preview_action: str or
@@ -864,10 +864,10 @@ class MessagingExtensionResult(Model):
 
     :param attachment_layout: Hint for how to deal with multiple attachments.
      Possible values include: 'list', 'grid'
-    :type attachment_layout: str or ~botframework.connector.teams.models.enum
+    :type attachment_layout: str
     :param type: The type of the result. Possible values include: 'result',
      'auth', 'config', 'message', 'botMessagePreview'
-    :type type: str or ~botframework.connector.teams.models.enum
+    :type type: str
     :param attachments: (Only when type is result) Attachments
     :type attachments:
      list[~botframework.connector.teams.models.MessagingExtensionAttachment]
@@ -1002,7 +1002,7 @@ class O365ConnectorCardInputBase(Model):
 
     :param type: Input type name. Possible values include: 'textInput',
      'dateInput', 'multichoiceInput'
-    :type type: str or ~botframework.connector.teams.models.enum
+    :type type: str
     :param id: Input Id. It must be unique per entire O365 connector card.
     :type id: str
     :param is_required: Define if this input is a required field. Default
@@ -1045,7 +1045,7 @@ class O365ConnectorCardActionBase(Model):
 
     :param type: Type of the action. Possible values include: 'ViewAction',
      'OpenUri', 'HttpPOST', 'ActionCard'
-    :type type: str or ~botframework.connector.teams.models.enum
+    :type type: str
     :param name: Name of the action that will be used as button title
     :type name: str
     :param id: Action Id
@@ -1072,7 +1072,7 @@ class O365ConnectorCardActionCard(O365ConnectorCardActionBase):
 
     :param type: Type of the action. Possible values include: 'ViewAction',
      'OpenUri', 'HttpPOST', 'ActionCard'
-    :type type: str or ~botframework.connector.teams.models.enum
+    :type type: str
     :param name: Name of the action that will be used as button title
     :type name: str
     :param id: Action Id
@@ -1141,7 +1141,7 @@ class O365ConnectorCardDateInput(O365ConnectorCardInputBase):
 
     :param type: Input type name. Possible values include: 'textInput',
      'dateInput', 'multichoiceInput'
-    :type type: str or ~botframework.connector.teams.models.enum
+    :type type: str
     :param id: Input Id. It must be unique per entire O365 connector card.
     :type id: str
     :param is_required: Define if this input is a required field. Default
@@ -1212,7 +1212,7 @@ class O365ConnectorCardHttpPOST(O365ConnectorCardActionBase):
 
     :param type: Type of the action. Possible values include: 'ViewAction',
      'OpenUri', 'HttpPOST', 'ActionCard'
-    :type type: str or ~botframework.connector.teams.models.enum
+    :type type: str
     :param name: Name of the action that will be used as button title
     :type name: str
     :param id: Action Id
@@ -1262,7 +1262,7 @@ class O365ConnectorCardMultichoiceInput(O365ConnectorCardInputBase):
 
     :param type: Input type name. Possible values include: 'textInput',
      'dateInput', 'multichoiceInput'
-    :type type: str or ~botframework.connector.teams.models.enum
+    :type type: str
     :param id: Input Id. It must be unique per entire O365 connector card.
     :type id: str
     :param is_required: Define if this input is a required field. Default
@@ -1278,7 +1278,7 @@ class O365ConnectorCardMultichoiceInput(O365ConnectorCardInputBase):
      list[~botframework.connector.teams.models.O365ConnectorCardMultichoiceInputChoice]
     :param style: Choice item rendering style. Default value is 'compact'.
      Possible values include: 'compact', 'expanded'
-    :type style: str or ~botframework.connector.teams.models.enum
+    :type style: str
     :param is_multi_select: Define if this input field allows multiple
      selections. Default value is false.
     :type is_multi_select: bool
@@ -1349,7 +1349,7 @@ class O365ConnectorCardOpenUri(O365ConnectorCardActionBase):
 
     :param type: Type of the action. Possible values include: 'ViewAction',
      'OpenUri', 'HttpPOST', 'ActionCard'
-    :type type: str or ~botframework.connector.teams.models.enum
+    :type type: str
     :param name: Name of the action that will be used as button title
     :type name: str
     :param id: Action Id
@@ -1380,7 +1380,7 @@ class O365ConnectorCardOpenUriTarget(Model):
 
     :param os: Target operating system. Possible values include: 'default',
      'iOS', 'android', 'windows'
-    :type os: str or ~botframework.connector.teams.models.enum
+    :type os: str
     :param uri: Target url
     :type uri: str
     """
@@ -1481,7 +1481,7 @@ class O365ConnectorCardTextInput(O365ConnectorCardInputBase):
 
     :param type: Input type name. Possible values include: 'textInput',
      'dateInput', 'multichoiceInput'
-    :type type: str or ~botframework.connector.teams.models.enum
+    :type type: str
     :param id: Input Id. It must be unique per entire O365 connector card.
     :type id: str
     :param is_required: Define if this input is a required field. Default
@@ -1538,7 +1538,7 @@ class O365ConnectorCardViewAction(O365ConnectorCardActionBase):
 
     :param type: Type of the action. Possible values include: 'ViewAction',
      'OpenUri', 'HttpPOST', 'ActionCard'
-    :type type: str or ~botframework.connector.teams.models.enum
+    :type type: str
     :param name: Name of the action that will be used as button title
     :type name: str
     :param id: Action Id
@@ -1586,7 +1586,7 @@ class TaskModuleResponseBase(Model):
 
     :param type: Choice of action options when responding to the task/submit
      message. Possible values include: 'message', 'continue'
-    :type type: str or ~botframework.connector.teams.models.enum
+    :type type: str
     """
 
     _attribute_map = {
@@ -1601,9 +1601,6 @@ class TaskModuleResponseBase(Model):
 class TaskModuleContinueResponse(TaskModuleResponseBase):
     """Task Module Response with continue action.
 
-    :param type: Choice of action options when responding to the task/submit
-     message. Possible values include: 'message', 'continue'
-    :type type: str or ~botframework.connector.teams.models.enum
     :param value: The JSON for the Adaptive card to appear in the task module.
     :type value: ~botframework.connector.teams.models.TaskModuleTaskInfo
     """
@@ -1613,17 +1610,14 @@ class TaskModuleContinueResponse(TaskModuleResponseBase):
         "value": {"key": "value", "type": "TaskModuleTaskInfo"},
     }
 
-    def __init__(self, *, type=None, value=None, **kwargs) -> None:
-        super(TaskModuleContinueResponse, self).__init__(type=type, **kwargs)
+    def __init__(self, *, value=None, **kwargs) -> None:
+        super(TaskModuleContinueResponse, self).__init__(type="continue", **kwargs)
         self.value = value
 
 
 class TaskModuleMessageResponse(TaskModuleResponseBase):
     """Task Module response with message action.
 
-    :param type: Choice of action options when responding to the task/submit
-     message. Possible values include: 'message', 'continue'
-    :type type: str or ~botframework.connector.teams.models.enum
     :param value: Teams will display the value of value in a popup message
      box.
     :type value: str
@@ -1634,8 +1628,8 @@ class TaskModuleMessageResponse(TaskModuleResponseBase):
         "value": {"key": "value", "type": "str"},
     }
 
-    def __init__(self, *, type=None, value: str = None, **kwargs) -> None:
-        super(TaskModuleMessageResponse, self).__init__(type=type, **kwargs)
+    def __init__(self, *, value: str = None, **kwargs) -> None:
+        super(TaskModuleMessageResponse, self).__init__(type="message", **kwargs)
         self.value = value
 
 
