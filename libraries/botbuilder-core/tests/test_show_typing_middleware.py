@@ -1,7 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
-
-import time
+import asyncio
 import aiounittest
 
 from botbuilder.core import ShowTypingMiddleware
@@ -12,7 +11,7 @@ from botbuilder.schema import ActivityTypes
 class TestShowTypingMiddleware(aiounittest.AsyncTestCase):
     async def test_should_automatically_send_a_typing_indicator(self):
         async def aux(context):
-            time.sleep(0.600)
+            await asyncio.sleep(0.600)
             await context.send_activity(f"echo:{context.activity.text}")
 
         def assert_is_typing(activity, description):  # pylint: disable=unused-argument
@@ -41,7 +40,7 @@ class TestShowTypingMiddleware(aiounittest.AsyncTestCase):
 
     async def test_should_not_immediately_respond_with_message(self):
         async def aux(context):
-            time.sleep(0.600)
+            await asyncio.sleep(0.600)
             await context.send_activity(f"echo:{context.activity.text}")
 
         def assert_is_not_message(
