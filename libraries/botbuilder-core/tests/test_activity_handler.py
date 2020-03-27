@@ -59,6 +59,14 @@ class TestingActivityHandler(ActivityHandler):
         self.record.append("on_event")
         return await super().on_event(turn_context)
 
+    async def on_end_of_conversation_activity(self, turn_context: TurnContext):
+        self.record.append("on_end_of_conversation_activity")
+        return await super().on_end_of_conversation_activity(turn_context)
+
+    async def on_typing_activity(self, turn_context: TurnContext):
+        self.record.append("on_typing_activity")
+        return await super().on_typing_activity(turn_context)
+
     async def on_unrecognized_activity_type(self, turn_context: TurnContext):
         self.record.append("on_unrecognized_activity_type")
         return await super().on_unrecognized_activity_type(turn_context)
@@ -172,3 +180,29 @@ class TestActivityHandler(aiounittest.AsyncTestCase):
         assert len(bot.record) == 1
         assert bot.record[0] == "on_invoke_activity"
         assert adapter.activity.value.status == int(HTTPStatus.NOT_IMPLEMENTED)
+
+    async def test_on_end_of_conversation_activity(self):
+        activity = Activity(type=ActivityTypes.end_of_conversation)
+
+        adapter = TestInvokeAdapter()
+        turn_context = TurnContext(adapter, activity)
+
+        # Act
+        bot = TestingActivityHandler()
+        await bot.on_turn(turn_context)
+
+        assert len(bot.record) == 1
+        assert bot.record[0] == "on_end_of_conversation_activity"
+
+    async def test_typing_activity(self):
+        activity = Activity(type=ActivityTypes.typing)
+
+        adapter = TestInvokeAdapter()
+        turn_context = TurnContext(adapter, activity)
+
+        # Act
+        bot = TestingActivityHandler()
+        await bot.on_turn(turn_context)
+
+        assert len(bot.record) == 1
+        assert bot.record[0] == "on_typing_activity"
