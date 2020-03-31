@@ -72,7 +72,7 @@ class QnAMakerDialog(WaterfallDialog):
         self.card_no_match_response = card_no_match_response
         self.strict_filters = strict_filters
 
-        self.maximum_score_for_low_score_variation = 0.99
+        self.maximum_score_for_low_score_variation = 0.95
 
         self.add_step(self.__call_generate_answer)
         self.add_step(self.__call_train)
@@ -204,7 +204,7 @@ class QnAMakerDialog(WaterfallDialog):
         ):
             # Get filtered list of the response that support low score variation criteria.
             response.answers = qna_client.get_low_score_variation(response.answers)
-            if response.answers:
+            if len(response.answers) > 1:
                 suggested_questions = [qna.questions[0] for qna in response.answers]
                 message = QnACardBuilder.get_suggestions_card(
                     suggested_questions,
