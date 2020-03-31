@@ -757,7 +757,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         qna = QnAMaker(QnaApplicationTest.tests_endpoint)
         question: str = "where can I buy?"
         context = QnARequestContext(
-            previous_qna_id=5, prvious_user_query="how do I clean the stove?"
+            previous_qna_id=5, previous_user_query="how do I clean the stove?"
         )
         options = QnAMakerOptions(top=2, qna_id=55, context=context)
         turn_context = QnaApplicationTest._get_context(question, TestAdapter())

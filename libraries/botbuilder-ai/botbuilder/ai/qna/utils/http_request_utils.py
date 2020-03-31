@@ -55,6 +55,9 @@ class HttpRequestUtils:
 
         serialized_payload_body = json.dumps(payload_body.serialize())
 
+        # at least for call_train, QnAMaker didn't like values with a leading space.  Odd.
+        serialized_payload_body = serialized_payload_body.replace(": ", ":")
+
         headers = self._get_headers(endpoint)
 
         if timeout:
