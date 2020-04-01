@@ -66,7 +66,8 @@ class DialogContext:
     async def begin_dialog(self, dialog_id: str, options: object = None):
         """
         Pushes a new dialog onto the dialog stack.
-        :param dialog_id: ID of the dialog to start..
+        
+        :param dialog_id: ID of the dialog to start.
         :param options: (Optional) additional argument(s) to pass to the dialog being started.
         """
         if not dialog_id:
@@ -95,6 +96,7 @@ class DialogContext:
         """
         Helper function to simplify formatting the options for calling a prompt dialog. This helper will
         take a `PromptOptions` argument and then call.
+        
         :param dialog_id: ID of the prompt to start.
         :param options: Contains a Prompt, potentially a RetryPrompt and if using ChoicePrompt, Choices.
         :return:
@@ -112,6 +114,7 @@ class DialogContext:
         Continues execution of the active dialog, if there is one, by passing the context object to
         its `Dialog.continue_dialog()` method. You can check `turn_context.responded` after the call completes
         to determine if a dialog was run and a reply was sent to the user.
+        
         :return:
         """
         # Check for a dialog on the stack
@@ -139,6 +142,7 @@ class DialogContext:
         result. If the parent dialog hasn't implemented a `resume_dialog()` method then it will be
         automatically ended as well and the result passed to its parent. If there are no more
         parent dialogs on the stack then processing of the turn will end.
+        
         :param result: (Optional) result to pass to the parent dialogs.
         :return:
         """
@@ -162,6 +166,7 @@ class DialogContext:
     async def cancel_all_dialogs(self):
         """
         Deletes any existing dialog stack thus cancelling all dialogs on the stack.
+        
         :param result: (Optional) result to pass to the parent dialogs.
         :return:
         """
@@ -176,6 +181,7 @@ class DialogContext:
         """
         If the dialog cannot be found within the current `DialogSet`, the parent `DialogContext`
         will be searched if there is one.
+        
         :param dialog_id: ID of the dialog to search for.
         :return:
         """
@@ -191,6 +197,7 @@ class DialogContext:
         """
         Ends the active dialog and starts a new dialog in its place. This is particularly useful
         for creating loops or redirecting to another dialog.
+        
         :param dialog_id: ID of the dialog to search for.
         :param options: (Optional) additional argument(s) to pass to the new dialog.
         :return:
@@ -204,6 +211,7 @@ class DialogContext:
     async def reprompt_dialog(self):
         """
         Calls reprompt on the currently active dialog, if there is one. Used with Prompts that have a reprompt behavior.
+        
         :return:
         """
         # Check for a dialog on the stack

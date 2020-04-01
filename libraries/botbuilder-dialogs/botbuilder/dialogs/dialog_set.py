@@ -37,6 +37,7 @@ class DialogSet:
     def add(self, dialog: Dialog):
         """
         Adds a new dialog to the set and returns the added dialog.
+        
         :param dialog: The dialog to add.
         """
         if dialog is None or not isinstance(dialog, Dialog):
@@ -71,6 +72,7 @@ class DialogSet:
     async def find(self, dialog_id: str) -> Dialog:
         """
         Finds a dialog that was previously added to the set using add(dialog)
+        
         :param dialog_id: ID of the dialog/prompt to look up.
         :return: The dialog if found, otherwise null.
         """

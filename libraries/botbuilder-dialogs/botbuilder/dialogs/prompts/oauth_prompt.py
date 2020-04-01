@@ -65,8 +65,8 @@ class OAuthPrompt(Dialog):
 
         When used with your bots :class:`DialogSet`, you can simply add a new instance of the prompt as a named
         dialog using :meth`DialogSet.add()`.
-        You can then start the prompt from a waterfall step using either :meth:`DialogContext.begin()` or
-        :meth:`DialogContext.prompt()`.
+        You can then start the prompt from a waterfall step using either :meth:`botbuilder.dialogs.DialogContext.begin()` or
+        :meth:`botbuilder.dialogs.DialogContext.prompt()`.
         The user will be prompted to sign in as needed and their access token will be passed as an argument to
         the callers next waterfall step.
     """
@@ -78,14 +78,14 @@ class OAuthPrompt(Dialog):
         validator: Callable[[PromptValidatorContext], Awaitable[bool]] = None,
     ):
         """
-        Creates a new instance of the :class:`OAuthPrompt` class.
+        Creates a new instance of the :class:`botbuilder.dialogs.OAuthPrompt` class.
 
         :param dialog_id: The Id to assign to this prompt.
         :type dialog_id: str
         :param settings: Additional authentication settings to use with this instance of the prompt
-        :type settings: :class:`OAuthPromptSettings`
+        :type settings: :class:`botbuilder.dialogs.OAuthPromptSettings`
         :param validator: Optional, contains additional, custom validation for this prompt
-        :type validator: :class:`PromptValidatorContext`
+        :type validator: :class:`botbuilder.dialogs.PromptValidatorContext`
 
         .. remarks::
             The value of :param dialogId: must be unique within the :class:`DialogSet`or :class:`ComponentDialog`
@@ -110,12 +110,12 @@ class OAuthPrompt(Dialog):
         dialog stack and is being activated.
 
         :param dialog_context: The dialog context for the current turn of the conversation
-        :type dialog_context:  :class:`DialogContext`
+        :type dialog_context:  :class:`botbuilder.dialogs.DialogContext`
         :param options: Optional, additional information to pass to the prompt being started
-        :type options: :class:`PromptOptions`
+        :type options: :class:`botbuilder.dialogs.PromptOptions`
 
         :return: Dialog turn result
-        :rtype: :class`:`DialogTurnResult`
+        :rtype: :class:`botbuilder.dialogs.DialogTurnResult`
 
         .. remarks::
 
@@ -170,10 +170,10 @@ class OAuthPrompt(Dialog):
         Continues a dialog. Called when a prompt dialog is the active dialog and the user replied with a new activity.
 
         :param dialog_context: The dialog context for the current turn of the conversation
-        :type dialog_context:  :class:`DialogContext`
+        :type dialog_context:  :class:`botbuilder.dialogs.DialogContext`
 
         :return: Dialog turn result
-        :rtype: :class:`DialogTurnResult`
+        :rtype: :class:`botbuilder.dialogs.DialogTurnResult`
 
         .. remarks::
             If the task is successful, the result indicates whether the dialog is still
@@ -232,7 +232,7 @@ class OAuthPrompt(Dialog):
         Gets the user's tokeN.
 
         :param context: Context for the current turn of conversation with the user
-        :type context:  :class:`TurnContext`
+        :type context:  :class:`botbuilder.core.TurnContext`
         :param code: (Optional) Optional user entered code to validate.
         :type code: str
 
@@ -263,7 +263,7 @@ class OAuthPrompt(Dialog):
         Signs out the user
 
         :param context: Context for the current turn of conversation with the user
-        :type context:  :class:`TurnContext`
+        :type context:  :class:`botbuilder.core.TurnContext`
         :return: A task representing the work queued to execute
 
         .. remarks::

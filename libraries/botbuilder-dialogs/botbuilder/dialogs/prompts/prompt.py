@@ -33,8 +33,9 @@ class Prompt(Dialog):
         a dialog set or component dialog, respectively.
 
         Use :meth:`DialogContext.prompt()` or :meth:`DialogContext.begin_dialog()` to start the prompt.
-        If you start a prompt from a :class:`WaterfallStep` in a :class:`WaterfallDialog`, then the
-        prompt result will be available in the next step of the waterfall.
+        If you start a prompt from a :class:`botbuilder.dialogs.WaterfallStep` in a
+        :class:`botbuilder.dialogs.WaterfallDialog`, then the prompt result will be available
+        in the next step of the waterfall.
     """
 
     ATTEMPT_COUNT_KEY = "AttemptCount"
@@ -211,8 +212,7 @@ class Prompt(Dialog):
         :type turn_context:  :class:`botbuilder.core.TurnContext`
         :param state: Contains state for the current instance of the prompt on the dialog stack
         :type state:  :class:`Dict`
-        :param options: A prompt options object constructed from the options initially provided
-        in the call :meth:`DialogContext.prompt()`
+        :param options: A prompt options object constructed from :meth:`DialogContext.prompt()`
         :type options:  :class:`PromptOptions`
         :param is_retry: true if is the first time the user for input; otherwise, false
         :type is_retry:  bool
@@ -235,8 +235,7 @@ class Prompt(Dialog):
         :type turn_context:  :class:`botbuilder.core.TurnContext`
         :param state: Contains state for the current instance of the prompt on the dialog stack
         :type state:  :class:`Dict`
-        :param options: A prompt options object constructed from the options initially provided
-        in the call to :meth:`DialogContext.prompt()`
+        :param options: A prompt options object constructed from :meth:`DialogContext.prompt()`
         :type options:  :class:`PromptOptions`
 
         :return: A task representing the asynchronous operation.

@@ -46,6 +46,7 @@ class Dialog(ABC):
     ):
         """
         Method called when a new dialog has been pushed onto the stack and is being activated.
+        
         :param dialog_context: The dialog context for the current turn of conversation.
         :param options: (Optional) additional argument(s) to pass to the dialog being started.
         """
@@ -57,6 +58,7 @@ class Dialog(ABC):
         user replies with a new activity. The dialog will generally continue to receive the user's
         replies until it calls either `end_dialog()` or `begin_dialog()`.
         If this method is NOT implemented then the dialog will automatically be ended when the user replies.
+        
         :param dialog_context: The dialog context for the current turn of conversation.
         :return:
         """
@@ -72,6 +74,7 @@ class Dialog(ABC):
         If this method is NOT implemented then the dialog will be automatically ended with a call
         to `end_dialog()`. Any result passed from the called dialog will be passed
         to the current dialog's parent.
+        
         :param dialog_context: The dialog context for the current turn of conversation.
         :param reason: Reason why the dialog resumed.
         :param result: (Optional) value returned from the dialog that was called. The type of the value returned is
