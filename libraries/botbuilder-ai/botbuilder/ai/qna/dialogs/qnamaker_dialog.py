@@ -27,19 +27,64 @@ from ..utils import QnACardBuilder
 
 
 class QnAMakerDialog(WaterfallDialog):
+    """
+    A dialog that supports multi-step and adaptive-learning QnA Maker services.
+
+    .. remarks::
+      An instance of this class targets a specific QnA Maker knowledge base.
+      It supports knowledge bases that include follow-up prompt and active learning features.
+    """
+
     KEY_QNA_CONTEXT_DATA = "qnaContextData"
+    """
+    The path for storing and retrieving QnA Maker context data.
+
+    .. remarks:
+      This represents context about the current or previous call to QnA Maker.
+      It is stored within the current step's :class:'botbuilder.dialogs.WaterfallStepContext'.
+      It supports QnA Maker's follow-up prompt and active learning features.
+    """
+
     KEY_PREVIOUS_QNA_ID = "prevQnAId"
+    """
+    The path for storing and retrieving the previous question ID.
+
+    .. remarks:
+      This represents the QnA question ID from the previous turn.
+      It is stored within the current step's :class:'botbuilder.dialogs.WaterfallStepContext'.
+      It supports QnA Maker's follow-up prompt and active learning features.
+    """
+
     KEY_OPTIONS = "options"
+    """
+    The path for storing and retrieving the options for this instance of the dialog.
+
+    .. remarks:
+      This includes the options with which the dialog was started and options
+      expected by the QnA Maker service.
+      It is stored within the current step's :class:'botbuilder.dialogs.WaterfallStepContext'.
+      It supports QnA Maker and the dialog system.
+    """
 
     # Dialog Options parameters
     DEFAULT_THRESHOLD = 0.3
+    """ The default threshold for answers returned, based on score. """
+
     DEFAULT_TOP_N = 3
+    """ The default maximum number of answers to be returned for the question. """
+
     DEFAULT_NO_ANSWER = "No QnAMaker answers found."
+    """ The default no answer text sent to the user. """
 
     # Card parameters
     DEFAULT_CARD_TITLE = "Did you mean:"
+    """ The default active learning card title. """
+
     DEFAULT_CARD_NO_MATCH_TEXT = "None of the above."
+    """ The default active learning no match text. """
+
     DEFAULT_CARD_NO_MATCH_RESPONSE = "Thanks for the feedback."
+    """ The default active learning response text. """
 
     # Value Properties
     PROPERTY_CURRENT_QUERY = "currentQuery"
@@ -59,6 +104,26 @@ class QnAMakerDialog(WaterfallDialog):
         strict_filters: [Metadata] = None,
         dialog_id: str = "QnAMakerDialog",
     ):
+        """
+        Initializes a new instance of the QnAMakerDialog class.
+
+        :param knowledgebase_id: The ID of the QnA Maker knowledge base to query.
+        :param endpoint_key: The QnA Maker endpoint key to use to query the knowledge base.
+        :param hostname: The QnA Maker host URL for the knowledge base, starting with "https://" and
+        ending with "/qnamaker".
+        :param no_answer: The activity to send the user when QnA Maker does not find an answer.
+        :param threshold: The threshold for answers returned, based on score.
+        :param active_learning_card_title: The card title to use when showing active learning options
+        to the user, if active learning is enabled.
+        :param card_no_match_text: The button text to use with active learning options,
+        allowing a user to indicate none of the options are applicable.
+        :param top: The maximum number of answers to return from the knowledge base.
+        :param card_no_match_response: The activity to send the user if they select the no match option
+        on an active learning card.
+        :param strict_filters: QnA Maker metadata with which to filter or boost queries to the
+        knowledge base; or null to apply none.
+        :param dialog_id: The ID of this dialog.
+        """
         super().__init__(dialog_id)
 
         self.knowledgebase_id = knowledgebase_id
@@ -82,6 +147,17 @@ class QnAMakerDialog(WaterfallDialog):
     async def begin_dialog(
         self, dialog_context: DialogContext, options: object = None
     ) -> DialogTurnResult:
+        """
+        Called when the dialog is started and pushed onto the dialog stack.
+
+        .. remarks:
+          If the task is successful, the result indicates whether the dialog is still
+          active after the turn has been processed by the dialog.
+
+        :param dialog_context: The :class:'botbuilder.dialogs.DialogContext' for the current turn of conversation.
+        :param options: Optional, initial information to pass to the dialog.
+        """
+
         if not dialog_context:
             raise TypeError("DialogContext is required")
 
@@ -109,6 +185,12 @@ class QnAMakerDialog(WaterfallDialog):
         return await super().begin_dialog(dialog_context, dialog_options)
 
     def _get_qnamaker_client(self, dialog_context: DialogContext) -> QnAMaker:
+        """
+        Gets a :class:'botbuilder.ai.qna.QnAMaker' to use to access the QnA Maker knowledge base.
+
+        :param dialog_context: The :class:'botbuilder.dialogs.DialogContext' for the current turn of conversation.
+        """
+
         endpoint = QnAMakerEndpoint(
             endpoint_key=self.endpoint_key,
             host=self.hostname,
@@ -122,6 +204,12 @@ class QnAMakerDialog(WaterfallDialog):
     def _get_qnamaker_options(  # pylint: disable=unused-argument
         self, dialog_context: DialogContext
     ) -> QnAMakerOptions:
+        """
+        Gets the options for the QnAMaker client that the dialog will use to query the knowledge base.
+
+        :param dialog_context: The :class:'botbuilder.dialogs.DialogContext' for the current turn of conversation.
+        """
+
         return QnAMakerOptions(
             score_threshold=self.threshold,
             strict_filters=self.strict_filters,
@@ -135,6 +223,12 @@ class QnAMakerDialog(WaterfallDialog):
     def _get_qna_response_options(  # pylint: disable=unused-argument
         self, dialog_context: DialogContext
     ) -> QnADialogResponseOptions:
+        """
+        Gets the options the dialog will use to display query results to the user.
+
+        :param dialog_context: The :class:'botbuilder.dialogs.DialogContext' for the current turn of conversation.
+        """
+
         return QnADialogResponseOptions(
             no_answer=self.no_answer,
             active_learning_card_title=self.active_learning_card_title
