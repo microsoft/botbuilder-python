@@ -163,9 +163,7 @@ class BotFrameworkHttpClient(BotFrameworkClient):
         app_password = await self._credential_provider.get_app_password(app_id)
 
         app_credentials = (
-            MicrosoftGovernmentAppCredentials(
-                app_id, app_password, scope=oauth_scope
-            )
+            MicrosoftGovernmentAppCredentials(app_id, app_password, scope=oauth_scope)
             if self._credential_provider and self._channel_provider.is_government()
             else MicrosoftAppCredentials(app_id, app_password, oauth_scope=oauth_scope)
         )
