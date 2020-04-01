@@ -18,7 +18,6 @@ from botbuilder.schema import (
 from botframework.connector.auth import (
     ChannelProvider,
     CredentialProvider,
-    GovernmentConstants,
     MicrosoftAppCredentials,
     AppCredentials,
     MicrosoftGovernmentAppCredentials,
