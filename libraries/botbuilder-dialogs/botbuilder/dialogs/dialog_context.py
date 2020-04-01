@@ -64,9 +64,9 @@ class DialogContext:
         return None
 
     async def begin_dialog(self, dialog_id: str, options: object = None):
-        """Pushes a new dialog onto the dialog stack.
-        
-        :param dialog_id: ID of the dialog to start.
+        """
+        Pushes a new dialog onto the dialog stack.
+        :param dialog_id: ID of the dialog to start..
         :param options: (Optional) additional argument(s) to pass to the dialog being started.
         """
         if not dialog_id:
