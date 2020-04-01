@@ -32,6 +32,7 @@ class WaterfallDialog(Dialog):
     def add_step(self, step):
         """
         Adds a new step to the waterfall.
+        
         :param step: Step to add
         :return: Waterfall dialog for fluent calls to `add_step()`.
         """
