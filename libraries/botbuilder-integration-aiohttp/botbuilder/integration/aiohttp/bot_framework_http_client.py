@@ -20,6 +20,8 @@ from botframework.connector.auth import (
     CredentialProvider,
     GovernmentConstants,
     MicrosoftAppCredentials,
+    AppCredentials,
+    MicrosoftGovernmentAppCredentials,
 )
 
 
@@ -147,27 +149,28 @@ class BotFrameworkHttpClient(BotFrameworkClient):
 
     async def _get_app_credentials(
         self, app_id: str, oauth_scope: str
-    ) -> MicrosoftAppCredentials:
+    ) -> AppCredentials:
         if not app_id:
-            return MicrosoftAppCredentials(None, None)
+            return MicrosoftAppCredentials.empty()
 
+        # in the cache?
         cache_key = f"{app_id}{oauth_scope}"
         app_credentials = BotFrameworkHttpClient._APP_CREDENTIALS_CACHE.get(cache_key)
-
         if app_credentials:
             return app_credentials
 
+        # create a new AppCredentials
         app_password = await self._credential_provider.get_app_password(app_id)
-        app_credentials = MicrosoftAppCredentials(
-            app_id, app_password, oauth_scope=oauth_scope
-        )
-        if self._channel_provider and self._channel_provider.is_government():
-            app_credentials.oauth_endpoint = (
-                GovernmentConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL
-            )
-            app_credentials.oauth_scope = (
-                GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
-            )
 
+        app_credentials = (
+            MicrosoftGovernmentAppCredentials(
+                app_id, app_password, scope=oauth_scope
+            )
+            if self._credential_provider and self._channel_provider.is_government()
+            else MicrosoftAppCredentials(app_id, app_password, oauth_scope=oauth_scope)
+        )
+
+        # put it in the cache
         BotFrameworkHttpClient._APP_CREDENTIALS_CACHE[cache_key] = app_credentials
+
         return app_credentials
