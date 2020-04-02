@@ -87,14 +87,14 @@ class ComponentDialog(Dialog):
             If this method is *not* overriden the component dialog calls the
             :meth:`botbuilder.dialogs.DialogContext.continue_dialog` method on it's inner dialog
             context. If the inner dialog stack is empty, the component dialog ends,
-            and if a :var:`botbuilder.dialogs.DialogTurnResult.result` is available, the component dialog
+            and if a :class:`botbuilder.dialogs.DialogTurnResult.result` is available, the component dialog
             uses that as it's return value.
 
 
         :param dialog_context: The parent dialog context for the current turn of the conversation.
         :type dialog_context: :class:`botbuilder.dialogs.DialogContext`
         :return: Signals the end of the turn
-        :rtype: :var:`botbuilder.dialogs.Dialog.end_of_turn`
+        :rtype: :class:`botbuilder.dialogs.Dialog.end_of_turn`
         """
         if dialog_context is None:
             raise TypeError("ComponentDialog.begin_dialog(): outer_dc cannot be None.")
@@ -164,7 +164,6 @@ class ComponentDialog(Dialog):
         :param context: The context object for this turn.
         :type context: :class:`botbuilder.core.TurnContext`
         :param instance: State information associated with the instance of this component dialog.
-        on its parent's dialog stack.
         :type instance: :class:`botbuilder.dialogs.DialogInstance`
         :param reason: Reason why the dialog ended.
         :type reason: :class:`botbuilder.dialogs.DialogReason`
@@ -271,6 +270,6 @@ class ComponentDialog(Dialog):
         :param result: Optional, value to return from the dialog component to the parent context.
         :type result: object
         :return: Value to return.
-        :rtype: :var:`botbuilder.dialogs.DialogTurnResult.result`
+        :rtype: :class:`botbuilder.dialogs.DialogTurnResult.result`
         """
         return await outer_dc.end_dialog(result)

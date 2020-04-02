@@ -211,8 +211,7 @@ class Prompt(Dialog):
         :type turn_context:  :class:`botbuilder.core.TurnContext`
         :param state: Contains state for the current instance of the prompt on the dialog stack
         :type state:  :class:`Dict`
-        :param options: A prompt options object constructed from the options initially provided
-        in the call :meth:`DialogContext.prompt()`
+        :param options: A prompt options object constructed from:meth:`DialogContext.prompt()`
         :type options:  :class:`PromptOptions`
         :param is_retry: true if is the first time the user for input; otherwise, false
         :type is_retry:  bool
@@ -235,8 +234,7 @@ class Prompt(Dialog):
         :type turn_context:  :class:`botbuilder.core.TurnContext`
         :param state: Contains state for the current instance of the prompt on the dialog stack
         :type state:  :class:`Dict`
-        :param options: A prompt options object constructed from the options initially provided
-        in the call to :meth:`DialogContext.prompt()`
+        :param options: A prompt options object constructed from :meth:`DialogContext.prompt()`
         :type options:  :class:`PromptOptions`
 
         :return: A task representing the asynchronous operation.
