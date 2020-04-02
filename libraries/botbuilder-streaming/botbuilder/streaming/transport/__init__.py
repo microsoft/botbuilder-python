@@ -4,6 +4,4 @@
 
 from .streaming_transport_service import StreamingTransportService
 
-__all__ = [
-    "StreamingTransportService"
-]
+__all__ = ["StreamingTransportService"]

@@ -4,6 +4,4 @@
 
 from .web_socket import WebSocket
 
-__all__ = [
-    "WebSocket"
-]
+__all__ = ["WebSocket"]

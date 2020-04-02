@@ -14,7 +14,13 @@ from .streaming_activity_processor import StreamingActivityProcessor
 
 
 class StreamingRequestHandler(RequestHandler):
-    def __init__(self, bot: Bot, activity_processor: StreamingActivityProcessor, web_socket: WebSocket, logger: Logger = None):
+    def __init__(
+        self,
+        bot: Bot,
+        activity_processor: StreamingActivityProcessor,
+        web_socket: WebSocket,
+        logger: Logger = None,
+    ):
         if not bot:
             raise TypeError("'bot' argument can not be None")
         if not activity_processor:
@@ -25,7 +31,7 @@ class StreamingRequestHandler(RequestHandler):
         self._logger = logger
         self._conversations: Dict[str, datetime] = {}
         self._user_agent = StreamingRequestHandler._get_user_agent()
-        self._server =
+        self._server
 
     @staticmethod
     def _get_user_agent() -> str:

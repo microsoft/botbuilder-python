@@ -35,7 +35,7 @@ setup(
         "botbuilder.streaming",
         "botbuilder.streaming.payloads",
         "botbuilder.streaming.transport",
-        "botbuilder.streaming.transport.web_socket"
+        "botbuilder.streaming.transport.web_socket",
     ],
     install_requires=REQUIRES,
     classifiers=[

@@ -13,20 +13,25 @@ class StreamingRequest:
     PUT = "PUT"
     DELETE = "DELETE"
 
-    def __init__(self, *, verb: str = None, path: str = None, streams: List[ResponseMessageStream] = None):
+    def __init__(
+        self,
+        *,
+        verb: str = None,
+        path: str = None,
+        streams: List[ResponseMessageStream] = None
+    ):
         self.verb = verb
         self.path = path
         self.streams = streams
 
     @staticmethod
-    def create_request(method: str, path: str = None, body: object = None) -> "StreamingRequest":
+    def create_request(
+        method: str, path: str = None, body: object = None
+    ) -> "StreamingRequest":
         if not method:
             return None
 
-        request = StreamingRequest(
-            verb=method,
-            path=path,
-        )
+        request = StreamingRequest(verb=method, path=path,)
 
         if body:
             request.add_stream(body)
@@ -56,8 +61,5 @@ class StreamingRequest:
             self.streams = []
 
         self.streams.append(
-            ResponseMessageStream(
-                id=stream_id or uuid4(),
-                content=content
-            )
+            ResponseMessageStream(id=stream_id or uuid4(), content=content)
         )

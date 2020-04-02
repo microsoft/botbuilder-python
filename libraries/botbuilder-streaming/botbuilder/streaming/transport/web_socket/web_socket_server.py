@@ -9,4 +9,3 @@ from .web_socket import WebSocket
 class WebSocketServer:
     def __init__(self, socket: WebSocket, request_handler: RequestHandler):
         self._request_handler = request_handler
-
