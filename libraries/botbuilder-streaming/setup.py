@@ -31,7 +31,12 @@ setup(
     long_description=long_description,
     long_description_content_type="text/x-rst",
     license=package_info["__license__"],
-    packages=["botbuilder.streaming", "botbuilder.streaming.payloads"],
+    packages=[
+        "botbuilder.streaming",
+        "botbuilder.streaming.payloads",
+        "botbuilder.streaming.transport",
+        "botbuilder.streaming.transport.web_socket"
+    ],
     install_requires=REQUIRES,
     classifiers=[
         "Programming Language :: Python :: 3.7",

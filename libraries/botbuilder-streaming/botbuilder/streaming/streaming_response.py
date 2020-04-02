@@ -3,8 +3,7 @@
 
 from typing import List
 
-# TODO: reconsider to absolute import
-from .payloads import ResponseMessageStream
+from botbuilder.streaming.payloads import ResponseMessageStream
 
 
 class StreamingResponse:
