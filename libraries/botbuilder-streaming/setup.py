@@ -34,6 +34,8 @@ setup(
     packages=[
         "botbuilder.streaming",
         "botbuilder.streaming.payloads",
+        "botbuilder.streaming.payloads.models",
+        "botbuilder.streaming.payload_transport",
         "botbuilder.streaming.transport",
         "botbuilder.streaming.transport.web_socket",
     ],

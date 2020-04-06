@@ -18,7 +18,7 @@ class StreamingRequest:
         *,
         verb: str = None,
         path: str = None,
-        streams: List[ResponseMessageStream] = None
+        streams: List[ResponseMessageStream] = None,
     ):
         self.verb = verb
         self.path = path
@@ -56,7 +56,9 @@ class StreamingRequest:
 
     def add_stream(self, content: object, stream_id: UUID = None):
         if not content:
-            raise TypeError("'content' argument can not be None")
+            raise TypeError(
+                f"'content: {content.__class__.__name__}' argument can't be None"
+            )
         if not self.streams:
             self.streams = []
 

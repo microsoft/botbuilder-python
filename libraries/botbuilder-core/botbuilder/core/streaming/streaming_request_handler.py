@@ -22,9 +22,11 @@ class StreamingRequestHandler(RequestHandler):
         logger: Logger = None,
     ):
         if not bot:
-            raise TypeError("'bot' argument can not be None")
+            raise TypeError(f"'bot: {bot.__class__.__name__}' argument can't be None")
         if not activity_processor:
-            raise TypeError("'activity_processor' argument can not be None")
+            raise TypeError(
+                f"'activity_processor: {activity_processor.__class__.__name__}' argument can't be None"
+            )
 
         self._bot = bot
         self._activity_processor = activity_processor
