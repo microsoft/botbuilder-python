@@ -7,6 +7,7 @@
 
 import asyncio
 import inspect
+import uuid
 from datetime import datetime
 from uuid import uuid4
 from typing import Awaitable, Coroutine, Dict, List, Callable, Union
@@ -214,6 +215,19 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
         await super().continue_conversation(
             reference, callback, bot_id, claims_identity, audience
         )
+
+    async def create_conversation(self, channel_id: str, callback: Callable):
+        self.activity_buffer.clear()
+        update = Activity(
+            type=ActivityTypes.conversation_update,
+            members_added=[],
+            members_removed=[],
+            conversation=ConversationAccount(
+                id=str(uuid.uuid4())
+            )
+        )
+        context = TurnContext(self, update)
+        return await callback(context)
 
     async def receive_activity(self, activity):
         """
