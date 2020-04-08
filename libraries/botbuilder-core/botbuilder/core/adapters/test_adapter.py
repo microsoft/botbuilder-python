@@ -216,15 +216,15 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
             reference, callback, bot_id, claims_identity, audience
         )
 
-    async def create_conversation(self, channel_id: str, callback: Callable):
+    async def create_conversation(
+        self, channel_id: str, callback: Callable  # pylint: disable=unused-argument
+    ):
         self.activity_buffer.clear()
         update = Activity(
             type=ActivityTypes.conversation_update,
             members_added=[],
             members_removed=[],
-            conversation=ConversationAccount(
-                id=str(uuid.uuid4())
-            )
+            conversation=ConversationAccount(id=str(uuid.uuid4())),
         )
         context = TurnContext(self, update)
         return await callback(context)
