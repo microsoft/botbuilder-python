@@ -3,9 +3,24 @@
 
 from typing import List
 
+from botbuilder.streaming.payloads import ContentStream
+
 
 class ReceiveRequest:
-    def __init__(self, *, verb: str = None, path: str = None, streams: List[object]):
+    def __init__(
+        self, *, verb: str = None, path: str = None, streams: List[ContentStream]
+    ):
         self.verb = verb
         self.path = path
-        self.streams = streams or []
+        self.streams: List[ContentStream] = streams or []
+
+    def read_body_as_str(self) -> str:
+        try:
+            content_stream = self.streams[0] if self.streams else None
+
+            if not content_stream:
+                return ""
+
+            return bytes(content_stream.stream).decode("utf8")
+        except Exception as error:
+            raise error

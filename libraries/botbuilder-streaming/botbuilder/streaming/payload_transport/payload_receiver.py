@@ -43,6 +43,14 @@ class PayloadReceiver:
     def _run_receive(self):
         asyncio.create_task(self._receive_packets())
 
+    def subscribe(
+        self,
+        get_stream: Callable[[Header], List[int]],
+        receive_action: Callable[[Header, List[int]], int],
+    ):
+        self._get_stream = get_stream
+        self._receive_action = receive_action
+
     def disconnect(self, event_args: DisconnectedEventArgs = None):
         did_disconnect = False
 

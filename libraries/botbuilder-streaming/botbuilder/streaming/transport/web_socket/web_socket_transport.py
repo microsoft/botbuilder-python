@@ -1,13 +1,15 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from botbuilder.streaming.transport import TransportReceiverBase, TransportSenderBase
+
 from .web_socket import WebSocket
 from .web_socket_message_type import WebSocketMessageType
 from .web_socket_close_status import WebSocketCloseStatus
 from .web_socket_state import WebSocketState
 
 
-class WebSocketTransport:
+class WebSocketTransport(TransportReceiverBase, TransportSenderBase):
     def __init__(self, web_socket: WebSocket):
         self._socket = web_socket
 

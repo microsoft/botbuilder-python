@@ -3,5 +3,6 @@
 
 from .bot_framework_http_adapter_base import BotFrameworkHttpAdapterBase
 from .streaming_activity_processor import StreamingActivityProcessor
+from .version_info import VersionInfo
 
-__all__ = ["BotFrameworkHttpAdapterBase", "StreamingActivityProcessor"]
+__all__ = ["BotFrameworkHttpAdapterBase", "StreamingActivityProcessor", "VersionInfo"]

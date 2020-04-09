@@ -20,14 +20,16 @@ class StreamDescription(Serializable):
 
         return obj
 
-    def from_dict(self, json_dict: dict):
+    def from_dict(self, json_dict: dict) -> "StreamDescription":
         self.id = json_dict.get("id")
         self.content_type = json_dict.get("contentType")
         self.length = json_dict.get("length")
 
+        return self
+
     def to_json(self) -> str:
         return json.dumps(self.to_dict)
 
-    def from_json(self, json_str: str):
+    def from_json(self, json_str: str) -> "StreamDescription":
         obj = json.loads(json_str)
-        self.from_dict(obj)
+        return self.from_dict(obj)

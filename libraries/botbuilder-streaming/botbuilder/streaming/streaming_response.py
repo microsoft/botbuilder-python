@@ -1,9 +1,12 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from typing import List
+import json
+from typing import List, Union
 
+from msrest.serialization import Model
 from botbuilder.streaming.payloads import ResponseMessageStream
+from botbuilder.streaming.payloads.models import Serializable
 
 
 class StreamingResponse:
@@ -21,6 +24,18 @@ class StreamingResponse:
             self.streams: List[ResponseMessageStream] = []
 
         self.streams.append(ResponseMessageStream(content=content))
+
+    def set_body(self, body: Union[str, Serializable, Model]):
+        # TODO: verify if msrest.serialization.Model is necessary
+        if not body:
+            return
+
+        if isinstance(body, Serializable):
+            body = body.to_json()
+        elif isinstance(body, Model):
+            body = json.dumps(body.as_dict())
+
+        self.add_stream(list(body.encode()))
 
     @staticmethod
     def create_response(status_code: int, body: object) -> "StreamingResponse":
