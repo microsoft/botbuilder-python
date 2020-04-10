@@ -68,4 +68,4 @@ class BotFrameworkHttpAdapterBase(BotFrameworkAdapter, StreamingActivityProcesso
             else MicrosoftGovernmentAppCredentials.empty()
         )
 
-        streaming_client =
+        streaming_client

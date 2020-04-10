@@ -12,15 +12,16 @@ from .streaming_request_handler import StreamingRequestHandler
 class StreamingHttpClient:
     def __init__(self, request_handler: StreamingRequestHandler, logger: Logger = None):
         if not request_handler:
-            raise TypeError(f"'request_handler: {request_handler.__class__.__name__}' argument can't be None")
+            raise TypeError(
+                f"'request_handler: {request_handler.__class__.__name__}' argument can't be None"
+            )
         self._request_handler = request_handler
         self._logger = logger
-    
+
     async def send(self, request: object) -> object:
         # TODO: validate form of request to perform operations
         streaming_request = StreamingRequest(
-            path=request.path[request.path.index("/v3"):],
-            verb=request.method
+            path=request.path[request.path.index("/v3") :], verb=request.method
         )
         streaming_request.set_body(request.content)
 
@@ -28,7 +29,9 @@ class StreamingHttpClient:
 
     async def _send_request(self, request: StreamingRequest) -> object:
         try:
-            server_response = await self._request_handler.send_streaming_request(request)
+            server_response = await self._request_handler.send_streaming_request(
+                request
+            )
 
             if not server_response:
                 raise Exception("Server response from streaming request is None")
