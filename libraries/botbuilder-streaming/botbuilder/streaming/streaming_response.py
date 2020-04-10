@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 import json
+from uuid import UUID, uuid4
 from typing import List, Union
 
 from msrest.serialization import Model
@@ -16,14 +17,16 @@ class StreamingResponse:
         self.status_code = status_code
         self.streams = streams
 
-    def add_stream(self, content: object):
+    def add_stream(self, content: object, identifier: UUID = None):
         if not content:
             raise TypeError("content can't be None")
 
         if self.streams is None:
             self.streams: List[ResponseMessageStream] = []
 
-        self.streams.append(ResponseMessageStream(content=content))
+        self.streams.append(
+            ResponseMessageStream(id=identifier or uuid4(), content=content)
+        )
 
     def set_body(self, body: Union[str, Serializable, Model]):
         # TODO: verify if msrest.serialization.Model is necessary

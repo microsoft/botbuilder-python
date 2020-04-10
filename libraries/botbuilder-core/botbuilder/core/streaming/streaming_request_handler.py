@@ -2,7 +2,6 @@
 # Licensed under the MIT License.
 
 import platform
-from collections import Counter
 from http import HTTPStatus
 from datetime import datetime
 from logging import Logger
@@ -13,15 +12,23 @@ from botbuilder.schema import Activity, Attachment, ResourceResponse
 from botbuilder.streaming import (
     RequestHandler,
     ReceiveRequest,
+    ReceiveResponse,
     StreamingRequest,
     StreamingResponse,
     __title__,
     __version__,
 )
+from botbuilder.streaming.transport import DisconnectedEventArgs
 from botbuilder.streaming.transport.web_socket import WebSocket, WebSocketServer
 
 from .streaming_activity_processor import StreamingActivityProcessor
 from .version_info import VersionInfo
+
+
+class StreamContent:
+    def __init__(self, stream: List[int], *, headers: Dict[str, str] = None):
+        self.stream = stream
+        self.headers: Dict[str, str] = headers if headers is not None else {}
 
 
 class StreamingRequestHandler(RequestHandler):
@@ -152,7 +159,48 @@ class StreamingRequestHandler(RequestHandler):
         else:
             request_path = f"/v3/conversations/{activity.conversation.id if activity.conversation else ''}/activities"
 
-        stream_attachments = self.updat
+        stream_attachments = self._update_attachment_streams(activity)
+        request = StreamingRequest.create_post(request_path)
+        request.set_body(activity)
+        if stream_attachments:
+            for attachment in stream_attachments:
+                # TODO: might be necessary to serialize this before adding
+                request.add_stream(attachment)
+
+        try:
+            if not self._server_is_connected:
+                raise Exception(
+                    "Error while attempting to send: Streaming transport is disconnected."
+                )
+
+            server_response = await self._server.send(request)
+
+            if server_response.status_code == HTTPStatus.OK:
+                return server_response.read_body_as_json(ResourceResponse)
+        except Exception:
+            # TODO: log error
+            pass
+
+        return None
+
+    async def send_streaming_request(
+        self, request: StreamingRequest
+    ) -> ReceiveResponse:
+        try:
+            if not self._server_is_connected:
+                raise Exception(
+                    "Error while attempting to send: Streaming transport is disconnected."
+                )
+
+            server_response = await self._server.send(request)
+
+            if server_response.status_code == HTTPStatus.OK:
+                return server_response.read_body_as_json(ReceiveResponse)
+        except Exception:
+            # TODO: log error
+            pass
+
+        return None
 
     @staticmethod
     def _get_user_agent() -> str:
@@ -164,7 +212,7 @@ class StreamingRequestHandler(RequestHandler):
         user_agent = f"{package_user_agent} {platform_user_agent}"
         return user_agent
 
-    async def update_attachment_streams(self, activity: Activity) -> List[object]:
+    def _update_attachment_streams(self, activity: Activity) -> List[object]:
         if not activity or not activity.attachments:
             return None
 
@@ -186,6 +234,20 @@ class StreamingRequestHandler(RequestHandler):
                 for attachment in activity.attachments
                 if not validate_int_list(attachment.content)
             ]
+
+            # TODO: validate StreamContent parallel
+            return [
+                StreamContent(
+                    attachment.content,
+                    headers={"Content-Type": attachment.content_type},
+                )
+                for attachment in stream_attachments
+            ]
+
+        return None
+
+    def _server_disconnected(self, sender: object, event: DisconnectedEventArgs):
+        self._server_is_connected = False
 
     def _handle_custom_paths(
         self, request: ReceiveRequest, response: StreamingResponse

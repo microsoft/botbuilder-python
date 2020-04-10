@@ -1,10 +1,13 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import json
 from uuid import UUID, uuid4
-from typing import List
+from typing import List, Union
 
+from msrest.serialization import Model
 from botbuilder.streaming.payloads import ResponseMessageStream
+from botbuilder.streaming.payloads.models import Serializable
 
 
 class StreamingRequest:
@@ -53,6 +56,18 @@ class StreamingRequest:
     @staticmethod
     def create_delete(path: str = None, body: object = None) -> "StreamingRequest":
         return StreamingRequest.create_request("DELETE", path, body)
+
+    def set_body(self, body: Union[str, Serializable, Model]):
+        # TODO: verify if msrest.serialization.Model is necessary
+        if not body:
+            return
+
+        if isinstance(body, Serializable):
+            body = body.to_json()
+        elif isinstance(body, Model):
+            body = json.dumps(body.as_dict())
+
+        self.add_stream(list(body.encode()))
 
     def add_stream(self, content: object, stream_id: UUID = None):
         if not content:
