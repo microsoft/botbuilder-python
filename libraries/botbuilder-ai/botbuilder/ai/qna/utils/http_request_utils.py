@@ -80,6 +80,7 @@ class HttpRequestUtils:
             "Content-Type": "application/json",
             "User-Agent": self._get_user_agent(),
             "Authorization": f"EndpointKey {endpoint.endpoint_key}",
+            "Ocp-Apim-Subscription-Key": f"EndpointKey {endpoint.endpoint_key}",
         }
 
         return headers
