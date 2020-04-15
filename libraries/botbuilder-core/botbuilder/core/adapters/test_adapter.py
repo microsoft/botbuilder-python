@@ -287,6 +287,20 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
                     timeout = arg[3]
             await self.test(arg[0], arg[1], description, timeout)
 
+    @staticmethod
+    def create_conversation_reference(
+        name: str, user: str = "User1", bot: str = "Bot"
+    ) -> ConversationReference:
+        return ConversationReference(
+            channel_id="test",
+            service_url="https://test.com",
+            conversation=ConversationAccount(
+                is_group=False, conversation_type=name, id=name,
+            ),
+            user=ChannelAccount(id=user.lower(), name=user.lower(),),
+            bot=ChannelAccount(id=bot.lower(), name=bot.lower(),),
+        )
+
     def add_user_token(
         self,
         connection_name: str,

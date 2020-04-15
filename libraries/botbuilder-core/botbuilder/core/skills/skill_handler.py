@@ -7,7 +7,6 @@ from botbuilder.core import Bot, BotAdapter, ChannelServiceHandler, TurnContext
 from botbuilder.schema import (
     Activity,
     ActivityTypes,
-    ConversationReference,
     ResourceResponse,
 )
 from botframework.connector.auth import (
@@ -120,42 +119,35 @@ class SkillHandler(ChannelServiceHandler):
         reply_to_activity_id: str,
         activity: Activity,
     ) -> ResourceResponse:
+        # Get the SkillsConversationReference
         conversation_reference_result = await self._conversation_id_factory.get_conversation_reference(
             conversation_id
         )
 
-        oauth_scope = None
-        conversation_reference = None
+        skill_conversation_reference: SkillConversationReference = None
         if isinstance(conversation_reference_result, SkillConversationReference):
-            oauth_scope = conversation_reference_result.oauth_scope
-            conversation_reference = (
-                conversation_reference_result.conversation_reference
-            )
+            skill_conversation_reference = conversation_reference_result
         else:
-            conversation_reference = conversation_reference_result
-            oauth_scope = (
-                GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
-                if self._channel_provider and self._channel_provider.is_government()
-                else AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
+            skill_conversation_reference = SkillConversationReference(
+                conversation_reference=conversation_reference_result,
+                oauth_scope=(
+                    GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
+                    if self._channel_provider and self._channel_provider.is_government()
+                    else AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
+                ),
             )
 
-        if not conversation_reference:
-            raise KeyError("ConversationReference not found")
-
-        activity_conversation_reference = ConversationReference(
-            activity_id=activity.id,
-            user=activity.from_property,
-            bot=activity.recipient,
-            conversation=activity.conversation,
-            channel_id=activity.channel_id,
-            service_url=activity.service_url,
-        )
+        if not skill_conversation_reference:
+            raise KeyError("SkillConversationReference not found")
 
         async def callback(context: TurnContext):
             context.turn_state[
                 SkillHandler.SKILL_CONVERSATION_REFERENCE_KEY
-            ] = activity_conversation_reference
-            TurnContext.apply_conversation_reference(activity, conversation_reference)
+            ] = skill_conversation_reference
+
+            TurnContext.apply_conversation_reference(
+                activity, skill_conversation_reference.conversation_reference
+            )
             context.activity.id = reply_to_activity_id
 
             if activity.type == ActivityTypes.end_of_conversation:
@@ -171,10 +163,10 @@ class SkillHandler(ChannelServiceHandler):
                 await context.send_activity(activity)
 
         await self._adapter.continue_conversation(
-            conversation_reference,
+            skill_conversation_reference.conversation_reference,
             callback,
             claims_identity=claims_identity,
-            audience=oauth_scope,
+            audience=skill_conversation_reference.oauth_scope,
         )
         return ResourceResponse(id=str(uuid4()))
 
