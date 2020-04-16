@@ -445,7 +445,7 @@ class QnAMakerDialog(WaterfallDialog):
 
         # If previous QnAId is present, replace the dialog
         previous_qna_id = ObjectPath.get_path_value(
-            step_context.active_dialog.state, QnAMakerDialog.KEY_PREVIOUS_QNA_ID
+            step_context.active_dialog.state, QnAMakerDialog.KEY_PREVIOUS_QNA_ID, 0
         )
         if previous_qna_id > 0:
             return await super().run_step(
