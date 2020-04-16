@@ -351,7 +351,7 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
             if reference.conversation and reference.conversation.tenant_id:
                 # Putting tenant_id in channel_data is a temporary while we wait for the Teams API to be updated
                 parameters.channel_data = {
-                    "tenant": {"id": reference.conversation.tenant_id}
+                    "tenant": {"tenantId": reference.conversation.tenant_id}
                 }
 
                 # Permanent solution is to put tenant_id in parameters.tenant_id
