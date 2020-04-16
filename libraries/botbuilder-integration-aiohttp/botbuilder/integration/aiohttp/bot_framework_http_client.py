@@ -70,15 +70,11 @@ class BotFrameworkHttpClient(BotFrameworkClient):
         )
 
         # Capture current activity settings before changing them.
-        # TODO: DO we need to set the activity ID? (events that are created manually don't have it).
         original_conversation_id = activity.conversation.id
         original_service_url = activity.service_url
-        original_caller_id = activity.caller_id
         original_relates_to = activity.relates_to
 
         try:
-            # TODO: The relato has to be ported to the adapter in the new integration library when
-            #  resolving conflicts in merge
             activity.relates_to = ConversationReference(
                 service_url=activity.service_url,
                 activity_id=activity.id,
@@ -97,7 +93,6 @@ class BotFrameworkHttpClient(BotFrameworkClient):
             )
             activity.conversation.id = conversation_id
             activity.service_url = service_url
-            activity.caller_id = f"urn:botframework:aadappid:{from_bot_id}"
 
             headers_dict = {
                 "Content-type": "application/json; charset=utf-8",
@@ -121,7 +116,6 @@ class BotFrameworkHttpClient(BotFrameworkClient):
             # Restore activity properties.
             activity.conversation.id = original_conversation_id
             activity.service_url = original_service_url
-            activity.caller_id = original_caller_id
             activity.relates_to = original_relates_to
 
     async def post_buffered_activity(

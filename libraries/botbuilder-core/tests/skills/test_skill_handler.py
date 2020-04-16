@@ -57,7 +57,7 @@ class ConversationIdFactoryForTest(ConversationIdFactoryBase):
         return conversation_reference
 
     async def delete_conversation_reference(self, skill_conversation_id: str):
-        raise NotImplementedError()
+        pass
 
 
 class SkillHandlerInstanceForTests(SkillHandler):
@@ -165,15 +165,15 @@ class SkillHandlerInstanceForTests(SkillHandler):
 class TestSkillHandler(aiounittest.AsyncTestCase):
     @classmethod
     def setUpClass(cls):
-        bot_id = str(uuid4())
-        skill_id = str(uuid4())
+        cls.bot_id = str(uuid4())
+        cls.skill_id = str(uuid4())
 
         cls._test_id_factory = ConversationIdFactoryForTest()
 
         cls._claims_identity = ClaimsIdentity({}, False)
 
-        cls._claims_identity.claims[AuthenticationConstants.AUDIENCE_CLAIM] = bot_id
-        cls._claims_identity.claims[AuthenticationConstants.APP_ID_CLAIM] = skill_id
+        cls._claims_identity.claims[AuthenticationConstants.AUDIENCE_CLAIM] = cls.bot_id
+        cls._claims_identity.claims[AuthenticationConstants.APP_ID_CLAIM] = cls.skill_id
         cls._claims_identity.claims[
             AuthenticationConstants.SERVICE_URL_CLAIM
         ] = "http://testbot.com/api/messages"
@@ -183,9 +183,13 @@ class TestSkillHandler(aiounittest.AsyncTestCase):
         )
 
     def create_skill_handler_for_testing(self, adapter) -> SkillHandlerInstanceForTests:
+        mock_bot = Mock()
+        mock_bot.on_turn = MagicMock(return_value=Future())
+        mock_bot.on_turn.return_value.set_result(Mock())
+
         return SkillHandlerInstanceForTests(
             adapter,
-            Mock(),
+            mock_bot,
             self._test_id_factory,
             Mock(),
             AuthenticationConfiguration(),
@@ -199,11 +203,15 @@ class TestSkillHandler(aiounittest.AsyncTestCase):
         mock_adapter = Mock()
         mock_adapter.continue_conversation = MagicMock(return_value=Future())
         mock_adapter.continue_conversation.return_value.set_result(Mock())
+        mock_adapter.send_activities = MagicMock(return_value=Future())
+        mock_adapter.send_activities.return_value.set_result([])
 
         sut = self.create_skill_handler_for_testing(mock_adapter)
 
         activity = Activity(type=ActivityTypes.message, attachments=[], entities=[])
         TurnContext.apply_conversation_reference(activity, self._conversation_reference)
+
+        assert not activity.caller_id
 
         await sut.test_on_send_to_conversation(
             self._claims_identity, self._conversation_id, activity
@@ -215,6 +223,9 @@ class TestSkillHandler(aiounittest.AsyncTestCase):
         assert callable(args[1])
         assert isinstance(kwargs["claims_identity"], ClaimsIdentity)
 
+        await args[1](TurnContext(mock_adapter, activity))
+        assert activity.caller_id == f"urn:botframework:aadappid:{self.skill_id}"
+
     async def test_on_reply_to_activity(self):
         self._conversation_id = await self._test_id_factory.create_skill_conversation_id(
             self._conversation_reference
@@ -223,6 +234,8 @@ class TestSkillHandler(aiounittest.AsyncTestCase):
         mock_adapter = Mock()
         mock_adapter.continue_conversation = MagicMock(return_value=Future())
         mock_adapter.continue_conversation.return_value.set_result(Mock())
+        mock_adapter.send_activities = MagicMock(return_value=Future())
+        mock_adapter.send_activities.return_value.set_result([])
 
         sut = self.create_skill_handler_for_testing(mock_adapter)
 
@@ -239,6 +252,9 @@ class TestSkillHandler(aiounittest.AsyncTestCase):
         assert isinstance(args[0], ConversationReference)
         assert callable(args[1])
         assert isinstance(kwargs["claims_identity"], ClaimsIdentity)
+
+        await args[1](TurnContext(mock_adapter, activity))
+        assert activity.caller_id == f"urn:botframework:aadappid:{self.skill_id}"
 
     async def test_on_update_activity(self):
         self._conversation_id = ""
@@ -366,3 +382,41 @@ class TestSkillHandler(aiounittest.AsyncTestCase):
             await sut.test_on_upload_attachment(
                 self._claims_identity, self._conversation_id, attachment_data
             )
+
+    async def test_event_activity(self):
+        activity = Activity(type=ActivityTypes.event)
+        await self.__activity_callback_test(activity)
+        assert activity.caller_id == f"urn:botframework:aadappid:{self.skill_id}"
+
+    async def test_eoc_activity(self):
+        activity = Activity(type=ActivityTypes.end_of_conversation)
+        await self.__activity_callback_test(activity)
+        assert activity.caller_id == f"urn:botframework:aadappid:{self.skill_id}"
+
+    async def __activity_callback_test(self, activity: Activity):
+        self._conversation_id = await self._test_id_factory.create_skill_conversation_id(
+            self._conversation_reference
+        )
+
+        mock_adapter = Mock()
+        mock_adapter.continue_conversation = MagicMock(return_value=Future())
+        mock_adapter.continue_conversation.return_value.set_result(Mock())
+        mock_adapter.send_activities = MagicMock(return_value=Future())
+        mock_adapter.send_activities.return_value.set_result([])
+
+        sut = self.create_skill_handler_for_testing(mock_adapter)
+
+        activity_id = str(uuid4())
+        TurnContext.apply_conversation_reference(activity, self._conversation_reference)
+
+        await sut.test_on_reply_to_activity(
+            self._claims_identity, self._conversation_id, activity_id, activity
+        )
+
+        args, kwargs = mock_adapter.continue_conversation.call_args_list[0]
+
+        assert isinstance(args[0], ConversationReference)
+        assert callable(args[1])
+        assert isinstance(kwargs["claims_identity"], ClaimsIdentity)
+
+        await args[1](TurnContext(mock_adapter, activity))

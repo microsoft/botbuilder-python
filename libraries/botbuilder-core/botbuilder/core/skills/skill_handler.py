@@ -17,6 +17,7 @@ from botframework.connector.auth import (
     ClaimsIdentity,
     CredentialProvider,
     GovernmentConstants,
+    JwtTokenValidation,
 )
 from .skill_conversation_reference import SkillConversationReference
 from .conversation_id_factory import ConversationIdFactoryBase
@@ -156,6 +157,10 @@ class SkillHandler(ChannelServiceHandler):
                 SkillHandler.SKILL_CONVERSATION_REFERENCE_KEY
             ] = activity_conversation_reference
             TurnContext.apply_conversation_reference(activity, conversation_reference)
+
+            app_id = JwtTokenValidation.get_app_id_from_claims(claims_identity.claims)
+            activity.caller_id = f"urn:botframework:aadappid:{app_id}"
+
             context.activity.id = reply_to_activity_id
 
             if activity.type == ActivityTypes.end_of_conversation:

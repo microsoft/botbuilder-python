@@ -409,6 +409,7 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
 
             scope = context.turn_state[BotFrameworkAdapter.BOT_OAUTH_SCOPE_KEY]
             assert AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE == scope
+            assert not context.activity.caller_id
 
         settings = BotFrameworkAdapterSettings(bot_app_id)
         sut = BotFrameworkAdapter(settings)
@@ -442,6 +443,9 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
 
             scope = context.turn_state[BotFrameworkAdapter.BOT_OAUTH_SCOPE_KEY]
             assert bot_app_id == scope
+            assert (
+                context.activity.caller_id == f"urn:botframework:aadappid:{bot_app_id}"
+            )
 
         settings = BotFrameworkAdapterSettings(bot_app_id)
         sut = BotFrameworkAdapter(settings)

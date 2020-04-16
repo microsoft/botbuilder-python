@@ -440,14 +440,18 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
         context.turn_state[BotAdapter.BOT_IDENTITY_KEY] = identity
         context.turn_state[BotAdapter.BOT_CALLBACK_HANDLER_KEY] = logic
 
-        # To create the correct cache key, provide the OAuthScope when calling CreateConnectorClientAsync.
-        # The OAuthScope is also stored on the TurnState to get the correct AppCredentials if fetching a token
-        # is required.
-        scope = (
-            self.__get_botframework_oauth_scope()
-            if not SkillValidation.is_skill_claim(identity.claims)
-            else JwtTokenValidation.get_app_id_from_claims(identity.claims)
-        )
+        # To create the correct cache key, provide the OAuthScope when calling 'create_connector_client'
+        if not SkillValidation.is_skill_claim(identity.claims):
+            scope = self.__get_botframework_oauth_scope()
+        else:
+            # For activities received from another bot, the appropriate audience is obtained from the claims.
+            scope = JwtTokenValidation.get_app_id_from_claims(identity.claims)
+
+            # For skill calls we set the caller ID property in the activity based on the appId in the claims.
+            activity.caller_id = f"urn:botframework:aadappid:{scope}"
+
+        # The OAuthScope is also stored on the TurnState to get the correct AppCredentials if fetching
+        # a token is required.
         context.turn_state[BotAdapter.BOT_OAUTH_SCOPE_KEY] = scope
 
         client = await self.create_connector_client(
