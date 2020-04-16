@@ -395,7 +395,7 @@ class QnAMakerDialog(WaterfallDialog):
                 previous_context_data = ObjectPath.get_path_value(
                     step_context.active_dialog.state,
                     QnAMakerDialog.KEY_QNA_CONTEXT_DATA,
-                    {}
+                    {},
                 )
                 for prompt in answer.context.prompts:
                     previous_context_data[prompt.display_text] = prompt.qna_id
