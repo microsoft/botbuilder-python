@@ -116,8 +116,7 @@ class BotFrameworkHttpClient(BotFrameworkClient):
             data = (await resp.read()).decode()
             content = json.loads(data) if data else None
 
-            if content:
-                return InvokeResponse(status=resp.status, body=content)
+            return InvokeResponse(status=resp.status, body=content)
 
         finally:
             # Restore activity properties.
