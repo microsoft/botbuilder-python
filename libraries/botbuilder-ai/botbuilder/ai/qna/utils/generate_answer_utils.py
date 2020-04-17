@@ -212,7 +212,9 @@ class GenerateAnswerUtils:
             answers_within_threshold, key=lambda ans: ans["score"], reverse=True
         )
 
-        answers_as_query_results = [QueryResult().deserialize(answer) for answer in sorted_answers]
+        answers_as_query_results = [
+            QueryResult().deserialize(answer) for answer in sorted_answers
+        ]
 
         active_learning_enabled = (
             json_res["activeLearningEnabled"]
