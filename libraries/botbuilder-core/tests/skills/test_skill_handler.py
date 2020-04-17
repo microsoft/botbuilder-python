@@ -22,6 +22,7 @@ from botbuilder.schema import (
     PagedMembersResult,
     ResourceResponse,
     Transcript,
+    CallerIdConstants,
 )
 from botframework.connector.auth import (
     AuthenticationConfiguration,
@@ -224,7 +225,7 @@ class TestSkillHandler(aiounittest.AsyncTestCase):
         assert isinstance(kwargs["claims_identity"], ClaimsIdentity)
 
         await args[1](TurnContext(mock_adapter, activity))
-        assert activity.caller_id == f"urn:botframework:aadappid:{self.skill_id}"
+        assert activity.caller_id == f"{CallerIdConstants.bot_to_bot_prefix}{self.skill_id}"
 
     async def test_on_reply_to_activity(self):
         self._conversation_id = await self._test_id_factory.create_skill_conversation_id(
@@ -254,7 +255,7 @@ class TestSkillHandler(aiounittest.AsyncTestCase):
         assert isinstance(kwargs["claims_identity"], ClaimsIdentity)
 
         await args[1](TurnContext(mock_adapter, activity))
-        assert activity.caller_id == f"urn:botframework:aadappid:{self.skill_id}"
+        assert activity.caller_id == f"{CallerIdConstants.bot_to_bot_prefix}{self.skill_id}"
 
     async def test_on_update_activity(self):
         self._conversation_id = ""
@@ -386,12 +387,12 @@ class TestSkillHandler(aiounittest.AsyncTestCase):
     async def test_event_activity(self):
         activity = Activity(type=ActivityTypes.event)
         await self.__activity_callback_test(activity)
-        assert activity.caller_id == f"urn:botframework:aadappid:{self.skill_id}"
+        assert activity.caller_id == f"{CallerIdConstants.bot_to_bot_prefix}{self.skill_id}"
 
     async def test_eoc_activity(self):
         activity = Activity(type=ActivityTypes.end_of_conversation)
         await self.__activity_callback_test(activity)
-        assert activity.caller_id == f"urn:botframework:aadappid:{self.skill_id}"
+        assert activity.caller_id == f"{CallerIdConstants.bot_to_bot_prefix}{self.skill_id}"
 
     async def __activity_callback_test(self, activity: Activity):
         self._conversation_id = await self._test_id_factory.create_skill_conversation_id(

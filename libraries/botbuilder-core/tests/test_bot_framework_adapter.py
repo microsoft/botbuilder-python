@@ -21,6 +21,7 @@ from botbuilder.schema import (
     ChannelAccount,
     DeliveryModes,
     ExpectedReplies,
+    CallerIdConstants,
 )
 from botframework.connector.aio import ConnectorClient
 from botframework.connector.auth import (
@@ -28,6 +29,9 @@ from botframework.connector.auth import (
     AuthenticationConstants,
     AppCredentials,
     CredentialProvider,
+    SimpleChannelProvider,
+    GovernmentConstants,
+    SimpleCredentialProvider,
 )
 
 REFERENCE = ConversationReference(
@@ -318,22 +322,23 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
         turn_context: TurnContext,
         expected_app_id: str,
         expected_scope: str,
-        creds_count: int = None,
+        creds_count: int,
     ):
-        # pylint: disable=protected-access
-        credential_cache = turn_context.adapter._app_credential_map
-        cache_key = BotFrameworkAdapter.key_for_app_credentials(
-            expected_app_id, expected_scope
-        )
-        credentials = credential_cache.get(cache_key)
-        assert credentials
+        if creds_count > 0:
+            # pylint: disable=protected-access
+            credential_cache = turn_context.adapter._app_credential_map
+            cache_key = BotFrameworkAdapter.key_for_app_credentials(
+                expected_app_id, expected_scope
+            )
+            credentials = credential_cache.get(cache_key)
+            assert credentials
 
-        TestBotFrameworkAdapter.assert_credentials_values(
-            credentials, expected_app_id, expected_scope
-        )
+            TestBotFrameworkAdapter.assert_credentials_values(
+                credentials, expected_app_id, expected_scope
+            )
 
-        if creds_count:
-            assert creds_count == len(credential_cache)
+            if creds_count:
+                assert creds_count == len(credential_cache)
 
     @staticmethod
     def get_client_and_assert_values(
@@ -341,22 +346,21 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
         expected_app_id: str,
         expected_scope: str,
         expected_url: str,
-        client_count: int = None,
+        client_count: int,
     ):
         # pylint: disable=protected-access
         client_cache = turn_context.adapter._connector_client_cache
         cache_key = BotFrameworkAdapter.key_for_connector_client(
             expected_url, expected_app_id, expected_scope
         )
-        client = client_cache[cache_key]
+        client = client_cache.get(cache_key)
         assert client
 
         TestBotFrameworkAdapter.assert_connectorclient_vaules(
             client, expected_app_id, expected_url, expected_scope
         )
 
-        if client_count:
-            assert client_count == len(client_cache)
+        assert client_count == len(client_cache)
 
     @staticmethod
     def assert_connectorclient_vaules(
@@ -366,9 +370,17 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
         expected_scope=AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE,
     ):
         creds = client.config.credentials
-        assert expected_app_id == creds.microsoft_app_id
-        assert expected_scope == creds.oauth_scope
-        assert expected_service_url == client.config.base_url
+        assert TestBotFrameworkAdapter.__str_equal(
+            expected_app_id, creds.microsoft_app_id
+        )
+        assert TestBotFrameworkAdapter.__str_equal(expected_scope, creds.oauth_scope)
+        assert TestBotFrameworkAdapter.__str_equal(
+            expected_service_url, client.config.base_url
+        )
+
+    @staticmethod
+    def __str_equal(str1: str, str2: str) -> bool:
+        return (str1 if str1 is not None else "") == (str2 if str2 is not None else "")
 
     @staticmethod
     def assert_credentials_values(
@@ -379,39 +391,77 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
         assert expected_app_id == credentials.microsoft_app_id
         assert expected_scope == credentials.oauth_scope
 
-    async def test_process_activity_creates_correct_creds_and_client(self):
-        bot_app_id = "00000000-0000-0000-0000-000000000001"
-        identity = ClaimsIdentity(
-            claims={
+    async def test_process_activity_creates_correct_creds_and_client_channel_to_bot(
+        self,
+    ):
+        await self.__process_activity_creates_correct_creds_and_client(
+            None,
+            None,
+            None,
+            AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE,
+            0,
+            1,
+        )
+
+    async def test_process_activity_creates_correct_creds_and_client_public_azure(self):
+        await self.__process_activity_creates_correct_creds_and_client(
+            "00000000-0000-0000-0000-000000000001",
+            CallerIdConstants.public_azure_channel,
+            None,
+            AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE,
+            1,
+            1,
+        )
+
+    async def test_process_activity_creates_correct_creds_and_client_us_gov(self):
+        await self.__process_activity_creates_correct_creds_and_client(
+            "00000000-0000-0000-0000-000000000001",
+            CallerIdConstants.us_gov_channel,
+            GovernmentConstants.CHANNEL_SERVICE,
+            GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE,
+            1,
+            1,
+        )
+
+    async def __process_activity_creates_correct_creds_and_client(
+        self,
+        bot_app_id: str,
+        expected_caller_id: str,
+        channel_service: str,
+        expected_scope: str,
+        expected_app_credentials_count: int,
+        expected_client_credentials_count: int,
+    ):
+        identity = ClaimsIdentity({}, True)
+        if bot_app_id:
+            identity.claims = {
                 AuthenticationConstants.AUDIENCE_CLAIM: bot_app_id,
                 AuthenticationConstants.APP_ID_CLAIM: bot_app_id,
                 AuthenticationConstants.VERSION_CLAIM: "1.0",
-            },
-            is_authenticated=True,
-        )
+            }
 
+        credential_provider = SimpleCredentialProvider(bot_app_id, None)
         service_url = "https://smba.trafficmanager.net/amer/"
 
         async def callback(context: TurnContext):
             TestBotFrameworkAdapter.get_creds_and_assert_values(
-                context,
-                bot_app_id,
-                AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE,
-                1,
+                context, bot_app_id, expected_scope, expected_app_credentials_count,
             )
             TestBotFrameworkAdapter.get_client_and_assert_values(
                 context,
                 bot_app_id,
-                AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE,
+                expected_scope,
                 service_url,
-                1,
+                expected_client_credentials_count,
             )
 
-            scope = context.turn_state[BotFrameworkAdapter.BOT_OAUTH_SCOPE_KEY]
-            assert AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE == scope
-            assert not context.activity.caller_id
+            assert context.activity.caller_id == expected_caller_id
 
-        settings = BotFrameworkAdapterSettings(bot_app_id)
+        settings = BotFrameworkAdapterSettings(
+            bot_app_id,
+            credential_provider=credential_provider,
+            channel_provider=SimpleChannelProvider(channel_service),
+        )
         sut = BotFrameworkAdapter(settings)
         await sut.process_activity_with_identity(
             Activity(channel_id="emulator", service_url=service_url, text="test",),
@@ -444,7 +494,7 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
             scope = context.turn_state[BotFrameworkAdapter.BOT_OAUTH_SCOPE_KEY]
             assert bot_app_id == scope
             assert (
-                context.activity.caller_id == f"urn:botframework:aadappid:{bot_app_id}"
+                context.activity.caller_id == f"{CallerIdConstants.bot_to_bot_prefix}{bot_app_id}"
             )
 
         settings = BotFrameworkAdapterSettings(bot_app_id)

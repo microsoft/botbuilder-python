@@ -9,6 +9,7 @@ from botbuilder.schema import (
     ActivityTypes,
     ConversationReference,
     ResourceResponse,
+    CallerIdConstants,
 )
 from botframework.connector.auth import (
     AuthenticationConfiguration,
@@ -125,7 +126,6 @@ class SkillHandler(ChannelServiceHandler):
             conversation_id
         )
 
-        oauth_scope = None
         conversation_reference = None
         if isinstance(conversation_reference_result, SkillConversationReference):
             oauth_scope = conversation_reference_result.oauth_scope
@@ -159,7 +159,7 @@ class SkillHandler(ChannelServiceHandler):
             TurnContext.apply_conversation_reference(activity, conversation_reference)
 
             app_id = JwtTokenValidation.get_app_id_from_claims(claims_identity.claims)
-            activity.caller_id = f"urn:botframework:aadappid:{app_id}"
+            activity.caller_id = f"{CallerIdConstants.bot_to_bot_prefix}{app_id}"
 
             context.activity.id = reply_to_activity_id
 
