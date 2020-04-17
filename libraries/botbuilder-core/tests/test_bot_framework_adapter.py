@@ -307,7 +307,7 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
                 "request has invalid tenant_id on conversation",
             )
             self.assertEqual(
-                context.activity.channel_data["tenant"]["id"],
+                context.activity.channel_data["tenant"]["tenantId"],
                 tenant_id,
                 "request has invalid tenant_id in channel_data",
             )
