@@ -23,7 +23,20 @@ class CertificateAppCredentials(AppCredentials, ABC):
         certificate_private_key: str,
         channel_auth_tenant: str = None,
         oauth_scope: str = None,
+        certificate_public: str = None,
     ):
+        """
+        AppCredentials implementation using a certificate.
+
+        :param app_id:
+        :param certificate_thumbprint:
+        :param certificate_private_key:
+        :param channel_auth_tenant:
+        :param oauth_scope:
+        :param certificate_public: public_certificate (optional) is public key certificate which will be sent
+        through ‘x5c’ JWT header only for subject name and issuer authentication to support cert auto rolls.
+        """
+
         # super will set proper scope and endpoint.
         super().__init__(
             app_id=app_id,
@@ -35,6 +48,7 @@ class CertificateAppCredentials(AppCredentials, ABC):
         self.app = None
         self.certificate_thumbprint = certificate_thumbprint
         self.certificate_private_key = certificate_private_key
+        self.certificate_public = certificate_public
 
     def get_access_token(self, force_refresh: bool = False) -> str:
         """
@@ -63,6 +77,9 @@ class CertificateAppCredentials(AppCredentials, ABC):
                 client_credential={
                     "thumbprint": self.certificate_thumbprint,
                     "private_key": self.certificate_private_key,
+                    "public_certificate": self.certificate_public
+                    if self.certificate_public
+                    else None,
                 },
             )
 
