@@ -68,6 +68,9 @@ class QnAMaker(QnAMakerTelemetryClient):
             self._endpoint, self._http_client
         )
 
+    async def close(self):
+        await self._http_client.close()
+
     async def get_answers(
         self,
         context: TurnContext,

@@ -1,10 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from typing import List
 from msrest.serialization import Model
-
-from .feedback_record import FeedbackRecord
 
 
 class TrainRequestBody(Model):
@@ -14,14 +11,6 @@ class TrainRequestBody(Model):
         "feedback_records": {"key": "feedbackRecords", "type": "[FeedbackRecord]"}
     }
 
-    def __init__(self, feedback_records: List[FeedbackRecord], **kwargs):
-        """
-        Parameters:
-        -----------
-
-        feedback_records: List of feedback records.
-        """
-
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
-        self.feedback_records = feedback_records
+        self.feedback_records = kwargs.get("feedback_records", None)
