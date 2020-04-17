@@ -156,12 +156,14 @@ class SkillHandler(ChannelServiceHandler):
             context.turn_state[
                 SkillHandler.SKILL_CONVERSATION_REFERENCE_KEY
             ] = activity_conversation_reference
+
             TurnContext.apply_conversation_reference(activity, conversation_reference)
+            context.activity.id = reply_to_activity_id
 
             app_id = JwtTokenValidation.get_app_id_from_claims(claims_identity.claims)
-            activity.caller_id = f"{CallerIdConstants.bot_to_bot_prefix}{app_id}"
-
-            context.activity.id = reply_to_activity_id
+            context.activity.caller_id = (
+                f"{CallerIdConstants.bot_to_bot_prefix}{app_id}"
+            )
 
             if activity.type == ActivityTypes.end_of_conversation:
                 await self._conversation_id_factory.delete_conversation_reference(

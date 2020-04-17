@@ -7,7 +7,11 @@ from typing import Dict, List
 from unittest.mock import Mock, MagicMock
 import aiounittest
 
-from botbuilder.core import TurnContext, BotActionNotImplementedError
+from botbuilder.core import (
+    TurnContext,
+    BotActionNotImplementedError,
+    conversation_reference_extension,
+)
 from botbuilder.core.skills import ConversationIdFactoryBase, SkillHandler
 from botbuilder.schema import (
     Activity,
@@ -224,11 +228,15 @@ class TestSkillHandler(aiounittest.AsyncTestCase):
         assert callable(args[1])
         assert isinstance(kwargs["claims_identity"], ClaimsIdentity)
 
-        await args[1](TurnContext(mock_adapter, activity))
-        assert (
-            activity.caller_id
-            == f"{CallerIdConstants.bot_to_bot_prefix}{self.skill_id}"
+        await args[1](
+            TurnContext(
+                mock_adapter,
+                conversation_reference_extension.get_continuation_activity(
+                    self._conversation_reference
+                ),
+            )
         )
+        assert activity.caller_id is None
 
     async def test_on_reply_to_activity(self):
         self._conversation_id = await self._test_id_factory.create_skill_conversation_id(
@@ -257,11 +265,15 @@ class TestSkillHandler(aiounittest.AsyncTestCase):
         assert callable(args[1])
         assert isinstance(kwargs["claims_identity"], ClaimsIdentity)
 
-        await args[1](TurnContext(mock_adapter, activity))
-        assert (
-            activity.caller_id
-            == f"{CallerIdConstants.bot_to_bot_prefix}{self.skill_id}"
+        await args[1](
+            TurnContext(
+                mock_adapter,
+                conversation_reference_extension.get_continuation_activity(
+                    self._conversation_reference
+                ),
+            )
         )
+        assert activity.caller_id is None
 
     async def test_on_update_activity(self):
         self._conversation_id = ""
