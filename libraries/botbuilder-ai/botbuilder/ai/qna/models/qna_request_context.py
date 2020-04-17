@@ -15,19 +15,7 @@ class QnARequestContext(Model):
         "previous_user_query": {"key": "previousUserQuery", "type": "string"},
     }
 
-    def __init__(
-        self, previous_qna_id: int = None, previous_user_query: str = None, **kwargs
-    ):
-        """
-        Parameters:
-        -----------
-
-        previous_qna_id: The previous QnA Id that was returned.
-
-        previous_user_query: The previous user query/question.
-        """
-
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
-        self.previous_qna_id = previous_qna_id
-        self.previous_user_query = previous_user_query
+        self.previous_qna_id = kwargs.get("previous_qna_id", None)
+        self.previous_user_query = kwargs.get("previous_user_query", None)

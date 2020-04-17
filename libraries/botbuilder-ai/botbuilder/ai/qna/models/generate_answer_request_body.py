@@ -1,13 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from typing import List
-
 from msrest.serialization import Model
-
-from .metadata import Metadata
-from .qna_request_context import QnARequestContext
-from .ranker_types import RankerTypes
 
 
 class GenerateAnswerRequestBody(Model):
@@ -24,47 +18,13 @@ class GenerateAnswerRequestBody(Model):
         "ranker_type": {"key": "rankerType", "type": "RankerTypes"},
     }
 
-    def __init__(
-        self,
-        question: str,
-        top: int,
-        score_threshold: float,
-        strict_filters: List[Metadata],
-        context: QnARequestContext = None,
-        qna_id: int = None,
-        is_test: bool = False,
-        ranker_type: str = RankerTypes.DEFAULT,
-        **kwargs
-    ):
-        """
-        Parameters:
-        -----------
-
-        question: The user question to query against the knowledge base.
-
-        top: Max number of answers to be returned for the question.
-
-        score_threshold: Threshold for answers returned based on score.
-
-        strict_filters: Find answers that contains these metadata.
-
-        context: The context from which the QnA was extracted.
-
-        qna_id: Id of the current question asked.
-
-        is_test: (Optional) A value indicating whether to call test or prod environment of knowledgebase.
-
-        ranker_types: (Optional) Ranker types.
-
-        """
-
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
-        self.question = question
-        self.top = top
-        self.score_threshold = score_threshold
-        self.strict_filters = strict_filters
-        self.context = context
-        self.qna_id = qna_id
-        self.is_test = is_test
-        self.ranker_type = ranker_type
+        self.question = kwargs.get("question", None)
+        self.top = kwargs.get("top", None)
+        self.score_threshold = kwargs.get("score_threshold", None)
+        self.strict_filters = kwargs.get("strict_filters", None)
+        self.context = kwargs.get("context", None)
+        self.qna_id = kwargs.get("qna_id", None)
+        self.is_test = kwargs.get("is_test", None)
+        self.ranker_type = kwargs.get("ranker_type", None)

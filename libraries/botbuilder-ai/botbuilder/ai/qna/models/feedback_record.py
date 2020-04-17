@@ -13,20 +13,8 @@ class FeedbackRecord(Model):
         "qna_id": {"key": "qnaId", "type": "int"},
     }
 
-    def __init__(self, user_id: str, user_question: str, qna_id: int, **kwargs):
-        """
-        Parameters:
-        -----------
-
-        user_id: ID of the user.
-
-        user_question: User question.
-
-        qna_id: QnA ID.
-        """
-
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
-        self.user_id = user_id
-        self.user_question = user_question
-        self.qna_id = qna_id
+        self.user_id = kwargs.get("user_id", None)
+        self.user_question = kwargs.get("user_question", None)
+        self.qna_id = kwargs.get("qna_id", None)
