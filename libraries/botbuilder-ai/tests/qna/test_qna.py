@@ -109,7 +109,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
             score_threshold=0.8,
             timeout=9000,
             top=5,
-            strict_filters=[Metadata("movie", "disney")],
+            strict_filters=[Metadata(**{"movie": "disney"})],
         )
 
         qna_with_options = QnAMaker(self.tests_endpoint, options)
@@ -118,7 +118,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         expected_threshold = 0.8
         expected_timeout = 9000
         expected_top = 5
-        expected_strict_filters = [Metadata("movie", "disney")]
+        expected_strict_filters = [Metadata(**{"movie": "disney"})]
 
         self.assertEqual(expected_threshold, actual_options.score_threshold)
         self.assertEqual(expected_timeout, actual_options.timeout)
@@ -168,7 +168,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         question: str = "up"
         response_path: str = "AnswerWithOptions.json"
         options = QnAMakerOptions(
-            score_threshold=0.8, top=5, strict_filters=[Metadata("movie", "disney")]
+            score_threshold=0.8, top=5, strict_filters=[Metadata(**{"movie": "disney"})]
         )
 
         # Act
@@ -757,7 +757,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         qna = QnAMaker(QnaApplicationTest.tests_endpoint)
         question: str = "where can I buy?"
         context = QnARequestContext(
-            previous_qna_id=5, prvious_user_query="how do I clean the stove?"
+            previous_qna_id=5, previous_user_query="how do I clean the stove?"
         )
         options = QnAMakerOptions(top=2, qna_id=55, context=context)
         turn_context = QnaApplicationTest._get_context(question, TestAdapter())

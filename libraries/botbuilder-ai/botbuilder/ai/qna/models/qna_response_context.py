@@ -1,9 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from typing import List
 from msrest.serialization import Model
-from .prompt import Prompt
 
 
 class QnAResponseContext(Model):
@@ -17,9 +15,7 @@ class QnAResponseContext(Model):
         "prompts": {"key": "prompts", "type": "[Prompt]"},
     }
 
-    def __init__(
-        self, *, is_context_only: bool = False, prompts: List[Prompt] = None, **kwargs
-    ):
+    def __init__(self, **kwargs):
         """
         Parameters:
         -----------
@@ -31,5 +27,5 @@ class QnAResponseContext(Model):
         """
 
         super(QnAResponseContext, self).__init__(**kwargs)
-        self.is_context_only = is_context_only
-        self.prompts = prompts
+        self.is_context_only = kwargs.get("is_context_only", None)
+        self.prompts = kwargs.get("prompts", None)
