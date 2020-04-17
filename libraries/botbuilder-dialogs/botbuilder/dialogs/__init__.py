@@ -22,6 +22,7 @@ from .dialog_extensions import DialogExtensions
 from .prompts import *
 from .choices import *
 from .skills import *
+from .object_path import ObjectPath
 
 __all__ = [
     "ComponentDialog",
@@ -48,5 +49,6 @@ __all__ = [
     "PromptOptions",
     "TextPrompt",
     "DialogExtensions",
+    "ObjectPath",
     "__version__",
 ]

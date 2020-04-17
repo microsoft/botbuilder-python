@@ -5,6 +5,7 @@ from .qnamaker import QnAMaker
 from .qnamaker_endpoint import QnAMakerEndpoint
 from .qnamaker_options import QnAMakerOptions
 from .qnamaker_telemetry_client import QnAMakerTelemetryClient
+from .qna_dialog_response_options import QnADialogResponseOptions
 from .utils import (
     ActiveLearningUtils,
     GenerateAnswerUtils,
@@ -36,4 +37,5 @@ __all__ = [
     "QnAMakerTelemetryClient",
     "QnAMakerTraceInfo",
     "QnATelemetryConstants",
+    "QnADialogResponseOptions",
 ]

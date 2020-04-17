@@ -3,6 +3,7 @@
 
 # pylint: disable=line-too-long,missing-docstring,unused-variable
 import copy
+import uuid
 from typing import Dict
 from unittest.mock import Mock
 import aiounittest
@@ -27,6 +28,47 @@ class TestTelemetryMiddleware(aiounittest.AsyncTestCase):
         telemetry = NullTelemetryClient()
         my_logger = TelemetryLoggerMiddleware(telemetry, True)
         assert my_logger
+
+    async def test_do_not_throw_on_null_from(self):
+        telemetry = Mock()
+        my_logger = TelemetryLoggerMiddleware(telemetry, False)
+
+        adapter = TestAdapter(
+            template_or_conversation=Activity(
+                channel_id="test",
+                recipient=ChannelAccount(id="bot", name="Bot"),
+                conversation=ConversationAccount(id=str(uuid.uuid4())),
+            )
+        )
+        adapter.use(my_logger)
+
+        async def send_proactive(context: TurnContext):
+            await context.send_activity("proactive")
+
+        async def logic(context: TurnContext):
+            await adapter.create_conversation(
+                context.activity.channel_id, send_proactive,
+            )
+
+        adapter.logic = logic
+
+        test_flow = TestFlow(None, adapter)
+        await test_flow.send("foo")
+        await test_flow.assert_reply("proactive")
+
+        telemetry_calls = [
+            (
+                TelemetryLoggerConstants.BOT_MSG_RECEIVE_EVENT,
+                {
+                    "fromId": None,
+                    "conversationName": None,
+                    "locale": None,
+                    "recipientId": "bot",
+                    "recipientName": "Bot",
+                },
+            ),
+        ]
+        self.assert_telemetry_calls(telemetry, telemetry_calls)
 
     async def test_should_send_receive(self):
         telemetry = Mock()
@@ -55,7 +97,7 @@ class TestTelemetryMiddleware(aiounittest.AsyncTestCase):
                     "conversationName": None,
                     "locale": None,
                     "recipientId": "bot",
-                    "recipientName": "user",
+                    "recipientName": "Bot",
                 },
             ),
             (
@@ -76,7 +118,7 @@ class TestTelemetryMiddleware(aiounittest.AsyncTestCase):
                     "conversationName": None,
                     "locale": None,
                     "recipientId": "bot",
-                    "recipientName": "user",
+                    "recipientName": "Bot",
                     "fromName": "user",
                 },
             ),
@@ -147,7 +189,7 @@ class TestTelemetryMiddleware(aiounittest.AsyncTestCase):
                     "conversationName": None,
                     "locale": None,
                     "recipientId": "bot",
-                    "recipientName": "user",
+                    "recipientName": "Bot",
                 },
             ),
             (
@@ -169,7 +211,7 @@ class TestTelemetryMiddleware(aiounittest.AsyncTestCase):
                     "conversationName": None,
                     "locale": None,
                     "recipientId": "bot",
-                    "recipientName": "user",
+                    "recipientName": "Bot",
                     "fromName": "user",
                 },
             ),
