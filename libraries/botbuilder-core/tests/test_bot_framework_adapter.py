@@ -494,7 +494,8 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
             scope = context.turn_state[BotFrameworkAdapter.BOT_OAUTH_SCOPE_KEY]
             assert bot_app_id == scope
             assert (
-                context.activity.caller_id == f"{CallerIdConstants.bot_to_bot_prefix}{bot_app_id}"
+                context.activity.caller_id
+                == f"{CallerIdConstants.bot_to_bot_prefix}{bot_app_id}"
             )
 
         settings = BotFrameworkAdapterSettings(bot_app_id)
