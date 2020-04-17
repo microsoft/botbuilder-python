@@ -4,7 +4,7 @@
 from .models import Metadata, QnARequestContext
 from .models.ranker_types import RankerTypes
 
-# figure out if 300 milliseconds is ok for python requests library...or 100000
+
 class QnAMakerOptions:
     def __init__(
         self,
@@ -15,7 +15,7 @@ class QnAMakerOptions:
         context: [QnARequestContext] = None,
         qna_id: int = None,
         is_test: bool = False,
-        ranker_type: bool = RankerTypes.DEFAULT,
+        ranker_type: str = RankerTypes.DEFAULT,
     ):
         self.score_threshold = score_threshold
         self.timeout = timeout
