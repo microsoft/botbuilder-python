@@ -12,20 +12,10 @@ class QnARequestContext(Model):
 
     _attribute_map = {
         "previous_qna_id": {"key": "previousQnAId", "type": "int"},
-        "prvious_user_query": {"key": "previousUserQuery", "type": "string"},
+        "previous_user_query": {"key": "previousUserQuery", "type": "string"},
     }
 
-    def __init__(self, previous_qna_id: int, prvious_user_query: str, **kwargs):
-        """
-        Parameters:
-        -----------
-
-        previous_qna_id: The previous QnA Id that was returned.
-
-        prvious_user_query: The previous user query/question.
-        """
-
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
-        self.previous_qna_id = previous_qna_id
-        self.prvious_user_query = prvious_user_query
+        self.previous_qna_id = kwargs.get("previous_qna_id", None)
+        self.previous_user_query = kwargs.get("previous_user_query", None)
