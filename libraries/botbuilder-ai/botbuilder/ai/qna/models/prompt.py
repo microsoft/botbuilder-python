@@ -14,32 +14,9 @@ class Prompt(Model):
         "display_text": {"key": "displayText", "type": "str"},
     }
 
-    def __init__(
-        self,
-        *,
-        display_order: int,
-        qna_id: int,
-        display_text: str,
-        qna: object = None,
-        **kwargs
-    ):
-        """
-        Parameters:
-        -----------
-
-        display_order: Index of the prompt - used in ordering of the prompts.
-
-        qna_id: QnA ID.
-
-        display_text: Text displayed to represent a follow up question prompt.
-
-        qna: The QnA object returned from the API (Optional).
-
-        """
-
+    def __init__(self, **kwargs):
         super(Prompt, self).__init__(**kwargs)
-
-        self.display_order = display_order
-        self.qna_id = qna_id
-        self.display_text = display_text
-        self.qna = qna
+        self.display_order = kwargs.get("display_order", None)
+        self.qna_id = kwargs.get("qna_id", None)
+        self.display_text = kwargs.get("display_text", None)
+        self.qna = kwargs.get("qna", None)

@@ -10,6 +10,7 @@ from .generate_answer_utils import GenerateAnswerUtils
 from .http_request_utils import HttpRequestUtils
 from .qna_telemetry_constants import QnATelemetryConstants
 from .train_utils import TrainUtils
+from .qna_card_builder import QnACardBuilder
 
 __all__ = [
     "ActiveLearningUtils",
@@ -17,4 +18,5 @@ __all__ = [
     "HttpRequestUtils",
     "QnATelemetryConstants",
     "TrainUtils",
+    "QnACardBuilder",
 ]

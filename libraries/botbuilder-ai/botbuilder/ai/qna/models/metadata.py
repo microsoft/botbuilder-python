@@ -12,17 +12,7 @@ class Metadata(Model):
         "value": {"key": "value", "type": "str"},
     }
 
-    def __init__(self, name: str, value: str, **kwargs):
-        """
-        Parameters:
-        -----------
-
-        name: Metadata name. Max length: 100.
-
-        value: Metadata value. Max length: 100.
-        """
-
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
-        self.name = name
-        self.value = value
+        self.name = kwargs.get("name", None)
+        self.value = kwargs.get("value", None)

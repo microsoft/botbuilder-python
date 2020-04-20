@@ -3,12 +3,12 @@
 BotBuilder-Integration-Aiohttp for Python
 =========================================
 
-.. image:: https://fuselabs.visualstudio.com/SDK_v4/_apis/build/status/Python/SDK_v4-Python-CI?branchName=master
-   :target:  https://fuselabs.visualstudio.com/SDK_v4/_apis/build/status/Python/SDK_v4-Python-CI
+.. image:: https://dev.azure.com/FuseLabs/SDK_v4/_apis/build/status/Python/Python-CI-PR-yaml?branchName=master
+   :target:  https://dev.azure.com/FuseLabs/SDK_v4/_apis/build/status/Python/Python-CI-PR-yaml?branchName=master
    :align: right
    :alt: Azure DevOps status for master branch
-.. image:: https://badge.fury.io/py/botbuilder-core.svg
-   :target: https://badge.fury.io/py/botbuilder-core
+.. image:: https://badge.fury.io/py/botbuilder-integration-aiohttp.svg
+   :target: https://badge.fury.io/py/botbuilder-integration-aiohttp
    :alt: Latest PyPI package version
 
 Within the Bot Framework, This library enables you to integrate your bot within an aiohttp web application.
