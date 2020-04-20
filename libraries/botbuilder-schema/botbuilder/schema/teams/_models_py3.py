@@ -39,15 +39,19 @@ class AppBasedLinkQuery(Model):
 
     :param url: Url queried by user
     :type url: str
+    :param state: The magic code for OAuth Flow
+    :type state: str
     """
 
     _attribute_map = {
         "url": {"key": "url", "type": "str"},
+        "state": {"key": "state", "type": "str"},
     }
 
-    def __init__(self, *, url: str = None, **kwargs) -> None:
+    def __init__(self, *, url: str = None, state: str = None, **kwargs) -> None:
         super(AppBasedLinkQuery, self).__init__(**kwargs)
         self.url = url
+        self.state = state
 
 
 class ChannelInfo(Model):
