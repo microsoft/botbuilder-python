@@ -3,12 +3,12 @@
 BotBuilder-ApplicationInsights SDK extension for aiohttp
 ========================================================
 
-.. image:: https://fuselabs.visualstudio.com/SDK_v4/_apis/build/status/Python/SDK_v4-Python-CI?branchName=master
-   :target:  https://fuselabs.visualstudio.com/SDK_v4/_apis/build/status/Python/SDK_v4-Python-CI
+.. image:: https://dev.azure.com/FuseLabs/SDK_v4/_apis/build/status/Python/Python-CI-PR-yaml?branchName=master
+   :target:  https://dev.azure.com/FuseLabs/SDK_v4/_apis/build/status/Python/Python-CI-PR-yaml?branchName=master
    :align: right
    :alt: Azure DevOps status for master branch
-.. image:: https://badge.fury.io/py/botbuilder-applicationinsights.svg
-   :target: https://badge.fury.io/py/botbuilder-applicationinsights
+.. image:: https://badge.fury.io/py/botbuilder-integration-applicationinsights-aiohttp.svg
+   :target: https://badge.fury.io/py/botbuilder-integration-applicationinsights-aiohttp
    :alt: Latest PyPI package version
 
 Within the Bot Framework, BotBuilder-ApplicationInsights enables the Azure Application Insights service.
@@ -22,7 +22,7 @@ How to Install
 
 .. code-block:: python
   
-  pip install botbuilder-applicationinsights-aiohttp
+  pip install botbuilder-integration-applicationinsights-aiohttp
 
 
 Documentation/Wiki
