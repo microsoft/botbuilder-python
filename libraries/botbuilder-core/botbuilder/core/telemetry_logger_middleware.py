@@ -160,15 +160,21 @@ class TelemetryLoggerMiddleware(Middleware):
         BotTelemetryClient.track_event method for the BotMessageReceived event.
         """
         properties = {
-            TelemetryConstants.FROM_ID_PROPERTY: activity.from_property.id,
+            TelemetryConstants.FROM_ID_PROPERTY: activity.from_property.id
+            if activity.from_property
+            else None,
             TelemetryConstants.CONVERSATION_NAME_PROPERTY: activity.conversation.name,
             TelemetryConstants.LOCALE_PROPERTY: activity.locale,
             TelemetryConstants.RECIPIENT_ID_PROPERTY: activity.recipient.id,
-            TelemetryConstants.RECIPIENT_NAME_PROPERTY: activity.from_property.name,
+            TelemetryConstants.RECIPIENT_NAME_PROPERTY: activity.recipient.name,
         }
 
         if self.log_personal_information:
-            if activity.from_property.name and activity.from_property.name.strip():
+            if (
+                activity.from_property
+                and activity.from_property.name
+                and activity.from_property.name.strip()
+            ):
                 properties[
                     TelemetryConstants.FROM_NAME_PROPERTY
                 ] = activity.from_property.name
