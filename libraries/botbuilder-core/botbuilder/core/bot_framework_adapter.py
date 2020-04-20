@@ -48,6 +48,7 @@ from botbuilder.schema import (
     TokenResponse,
     ResourceResponse,
     DeliveryModes,
+    CallerIdConstants,
 )
 
 from . import __version__
@@ -437,16 +438,17 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
         self, activity: Activity, identity: ClaimsIdentity, logic: Callable
     ):
         context = self._create_context(activity)
+
+        activity.caller_id = await self.__generate_callerid(identity)
         context.turn_state[BotAdapter.BOT_IDENTITY_KEY] = identity
         context.turn_state[BotAdapter.BOT_CALLBACK_HANDLER_KEY] = logic
 
-        # To create the correct cache key, provide the OAuthScope when calling CreateConnectorClientAsync.
-        # The OAuthScope is also stored on the TurnState to get the correct AppCredentials if fetching a token
-        # is required.
+        # The OAuthScope is also stored on the TurnState to get the correct AppCredentials if fetching
+        # a token is required.
         scope = (
-            self.__get_botframework_oauth_scope()
-            if not SkillValidation.is_skill_claim(identity.claims)
-            else JwtTokenValidation.get_app_id_from_claims(identity.claims)
+            JwtTokenValidation.get_app_id_from_claims(identity.claims)
+            if SkillValidation.is_skill_claim(identity.claims)
+            else self.__get_botframework_oauth_scope()
         )
         context.turn_state[BotAdapter.BOT_OAUTH_SCOPE_KEY] = scope
 
@@ -491,6 +493,29 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
             ).serialize()
             return InvokeResponse(status=int(HTTPStatus.OK), body=expected_replies)
 
+        return None
+
+    async def __generate_callerid(self, claims_identity: ClaimsIdentity) -> str:
+        # Is the bot accepting all incoming messages?
+        is_auth_disabled = await self._credential_provider.is_authentication_disabled()
+        if is_auth_disabled:
+            # Return None so that the callerId is cleared.
+            return None
+
+        # Is the activity from another bot?
+        if SkillValidation.is_skill_claim(claims_identity.claims):
+            app_id = JwtTokenValidation.get_app_id_from_claims(claims_identity.claims)
+            return f"{CallerIdConstants.bot_to_bot_prefix}{app_id}"
+
+        # Is the activity from Public Azure?
+        if not self._channel_provider or self._channel_provider.is_public_azure():
+            return CallerIdConstants.public_azure_channel
+
+        # Is the activity from Azure Gov?
+        if self._channel_provider and self._channel_provider.is_government():
+            return CallerIdConstants.us_gov_channel
+
+        # Return None so that the callerId is cleared.
         return None
 
     async def _authenticate_request(
@@ -1221,7 +1246,7 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
 
     @staticmethod
     def key_for_connector_client(service_url: str, app_id: str, scope: str):
-        return f"{service_url}:{app_id}:{scope}"
+        return f"{service_url if service_url else ''}:{app_id if app_id else ''}:{scope if scope else ''}"
 
     async def _create_token_api_client(
         self, context: TurnContext, oauth_app_credentials: AppCredentials = None,
