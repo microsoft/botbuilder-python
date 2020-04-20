@@ -9,7 +9,9 @@
 # regenerated.
 # --------------------------------------------------------------------------
 
-from msrest.async_client import SDKClientAsync
+from typing import Optional, Type
+
+from msrest.async_client import SDKClientAsync, AsyncPipeline
 from msrest import Serializer, Deserializer
 
 from .._configuration import ConnectorClientConfiguration
@@ -18,7 +20,14 @@ from .operations_async import ConversationsOperations
 from .. import models
 
 
-class ConnectorClient(SDKClientAsync):
+# TODO: experimental
+from ..bot_framework_sdk_client_async import (
+    BotFrameworkSDKClientAsync,
+    BotFrameworkConnectorConfiguration,
+)
+
+
+class ConnectorClient(BotFrameworkSDKClientAsync):
     """The Bot Connector REST API allows your bot to send and receive messages to channels configured in the
     [Bot Framework Developer Portal](https://dev.botframework.com). The Connector service uses industry-standard REST
     and JSON over HTTPS.
@@ -49,9 +58,17 @@ class ConnectorClient(SDKClientAsync):
     :param str base_url: Service URL
     """
 
-    def __init__(self, credentials, base_url=None):
+    def __init__(
+        self,
+        credentials,
+        base_url=None,
+        *,
+        pipeline_class: Optional[Type[AsyncPipeline]] = None
+    ):
 
-        self.config = ConnectorClientConfiguration(credentials, base_url)
+        self.config = BotFrameworkConnectorConfiguration(
+            credentials, base_url, pipeline=pipeline_class
+        )
         super(ConnectorClient, self).__init__(self.config)
 
         client_models = {
