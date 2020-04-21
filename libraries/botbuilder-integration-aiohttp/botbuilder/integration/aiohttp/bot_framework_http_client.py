@@ -14,6 +14,7 @@ from botbuilder.schema import (
     ExpectedReplies,
     ConversationReference,
     ConversationAccount,
+    ChannelAccount,
 )
 from botframework.connector.auth import (
     ChannelProvider,
@@ -74,6 +75,7 @@ class BotFrameworkHttpClient(BotFrameworkClient):
         original_conversation_id = activity.conversation.id
         original_service_url = activity.service_url
         original_relates_to = activity.relates_to
+        original_recipient = activity.recipient
 
         try:
             activity.relates_to = ConversationReference(
@@ -94,30 +96,38 @@ class BotFrameworkHttpClient(BotFrameworkClient):
             )
             activity.conversation.id = conversation_id
             activity.service_url = service_url
+            if not activity.recipient:
+                activity.recipient = ChannelAccount()
 
-            headers_dict = {
-                "Content-type": "application/json; charset=utf-8",
-            }
-            if token:
-                headers_dict.update(
-                    {"Authorization": f"Bearer {token}",}
-                )
+            status, content = await self._post_content(to_url, token, activity)
 
-            json_content = json.dumps(activity.serialize())
-            resp = await self._session.post(
-                to_url, data=json_content.encode("utf-8"), headers=headers_dict,
-            )
-            resp.raise_for_status()
-            data = (await resp.read()).decode()
-            content = json.loads(data) if data else None
-
-            return InvokeResponse(status=resp.status, body=content)
+            return InvokeResponse(status=status, body=content)
 
         finally:
             # Restore activity properties.
             activity.conversation.id = original_conversation_id
             activity.service_url = original_service_url
             activity.relates_to = original_relates_to
+            activity.recipient = original_recipient
+
+    async def _post_content(
+        self, to_url: str, token: str, activity: Activity
+    ) -> (int, object):
+        headers_dict = {
+            "Content-type": "application/json; charset=utf-8",
+        }
+        if token:
+            headers_dict.update(
+                {"Authorization": f"Bearer {token}",}
+            )
+
+        json_content = json.dumps(activity.serialize())
+        resp = await self._session.post(
+            to_url, data=json_content.encode("utf-8"), headers=headers_dict,
+        )
+        resp.raise_for_status()
+        data = (await resp.read()).decode()
+        return resp.status, json.loads(data) if data else None
 
     async def post_buffered_activity(
         self,
