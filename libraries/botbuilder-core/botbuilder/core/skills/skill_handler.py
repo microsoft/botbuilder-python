@@ -124,6 +124,10 @@ class SkillHandler(ChannelServiceHandler):
             conversation_id
         )
 
+        # ConversationIdFactory can return either a SkillConversationReference (the newer way),
+        # or a ConversationReference (the old way, but still here for compatibility).  If a
+        # ConversationReference is returned, build a new SkillConversationReference to simplify
+        # the remainder of this method.
         skill_conversation_reference: SkillConversationReference = None
         if isinstance(conversation_reference_result, SkillConversationReference):
             skill_conversation_reference = conversation_reference_result
