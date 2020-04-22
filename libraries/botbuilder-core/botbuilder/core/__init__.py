@@ -40,9 +40,12 @@ from .telemetry_logger_middleware import TelemetryLoggerMiddleware
 from .turn_context import TurnContext
 from .user_state import UserState
 from .user_token_provider import UserTokenProvider
+from .register_class_middleware import RegisterClassMiddleware
+from .adapter_extensions import AdapterExtensions
 
 __all__ = [
     "ActivityHandler",
+    "AdapterExtensions",
     "AnonymousReceiveMiddleware",
     "AutoSaveStateMiddleware",
     "Bot",
@@ -69,6 +72,7 @@ __all__ = [
     "MiddlewareSet",
     "NullTelemetryClient",
     "PrivateConversationState",
+    "RegisterClassMiddleware",
     "Recognizer",
     "RecognizerResult",
     "Severity",
