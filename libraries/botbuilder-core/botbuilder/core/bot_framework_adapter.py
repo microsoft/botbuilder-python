@@ -1219,6 +1219,14 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
             exchange_request.token,
         )
 
+    def can_process_outgoing_activity(self, activity: Activity) -> bool:
+        return False
+
+    async def process_outgoing_activity(
+        self, turn_context: TurnContext, activity: Activity
+    ) -> ResourceResponse:
+        raise NotImplementedError()
+
     @staticmethod
     def key_for_connector_client(service_url: str, app_id: str, scope: str):
         return f"{service_url}:{app_id}:{scope}"

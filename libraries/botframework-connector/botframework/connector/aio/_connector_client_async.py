@@ -11,10 +11,11 @@
 
 from typing import Optional, Type
 
-from msrest.async_client import SDKClientAsync, AsyncPipeline
+from msrest.universal_http.async_abc import AsyncHTTPSender as AsyncHttpDriver
+from msrest.pipeline.aiohttp import AsyncHTTPSender
+from msrest.async_client import AsyncPipeline
 from msrest import Serializer, Deserializer
 
-from .._configuration import ConnectorClientConfiguration
 from .operations_async import AttachmentsOperations
 from .operations_async import ConversationsOperations
 from .. import models
@@ -63,11 +64,17 @@ class ConnectorClient(BotFrameworkSDKClientAsync):
         credentials,
         base_url=None,
         *,
-        pipeline_class: Optional[Type[AsyncPipeline]] = None
+        pipeline_type: Optional[Type[AsyncPipeline]] = None,
+        sender: Optional[AsyncHTTPSender] = None,
+        driver: Optional[AsyncHttpDriver] = None
     ):
 
         self.config = BotFrameworkConnectorConfiguration(
-            credentials, base_url, pipeline=pipeline_class
+            credentials,
+            base_url,
+            pipeline_type=pipeline_type,
+            sender=sender,
+            driver=driver,
         )
         super(ConnectorClient, self).__init__(self.config)
 

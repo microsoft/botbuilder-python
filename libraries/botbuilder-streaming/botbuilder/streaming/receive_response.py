@@ -14,7 +14,7 @@ class ReceiveResponse:
         self.streams = streams
 
     def read_body_as_json(
-        self, cls: Type[Model, Serializable]
+        self, cls: Union[Type[Model], Type[Serializable]]
     ) -> Union[Model, Serializable]:
         try:
             body_str = self.read_body_as_str()
@@ -29,11 +29,22 @@ class ReceiveResponse:
 
     def read_body_as_str(self) -> str:
         try:
-            content_stream = self.streams[0] if self.streams else None
+            content_stream = self.read_body()
 
             if not content_stream:
                 return ""
 
             return bytes(content_stream.stream).decode("utf8")
+        except Exception as error:
+            raise error
+
+    def read_body(self) -> bytes:
+        try:
+            content_stream = self.streams[0] if self.streams else None
+
+            if not content_stream:
+                return None
+
+            return bytes(content_stream.stream)
         except Exception as error:
             raise error

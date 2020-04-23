@@ -6,8 +6,8 @@ from uuid import UUID
 from threading import Lock
 from typing import Awaitable, Callable, List
 
-from botbuilder.streaming import ReceiveRequest
-from botbuilder.streaming.payloads import ContentStream, StreamManager
+import botbuilder.streaming as streaming
+import botbuilder.streaming.payloads as payloads
 from botbuilder.streaming.payloads.models import Header, RequestPayload
 
 from .assembler import Assembler
@@ -17,8 +17,8 @@ class ReceiveRequestAssembler(Assembler):
     def __init__(
         self,
         header: Header,
-        stream_manager: StreamManager,
-        on_completed: Callable[[UUID, ReceiveRequest], Awaitable],
+        stream_manager: "payloads.StreamManager",
+        on_completed: Callable[[UUID, "streaming.ReceiveRequest"], Awaitable],
     ):
         if not header:
             raise TypeError(
@@ -57,7 +57,7 @@ class ReceiveRequestAssembler(Assembler):
     async def process_request(self, stream: List[int]):
         request_payload = RequestPayload().from_json(bytes(stream).decode("utf8"))
 
-        request = ReceiveRequest(
+        request = streaming.ReceiveRequest(
             verb=request_payload.verb, path=request_payload.path, streams=[]
         )
 
@@ -76,7 +76,7 @@ class ReceiveRequestAssembler(Assembler):
                 stream_assembler.content_type = stream_description.content_type
                 stream_assembler.content_length = stream_description.length
 
-                content_stream = ContentStream(
+                content_stream = payloads.ContentStream(
                     identifier=identifier, assembler=stream_assembler
                 )
                 content_stream.length = stream_description.length

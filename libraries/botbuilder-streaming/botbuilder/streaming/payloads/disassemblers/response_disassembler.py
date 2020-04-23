@@ -4,7 +4,7 @@
 from uuid import UUID
 from typing import List
 
-from botbuilder.streaming import StreamingResponse
+import botbuilder.streaming as streaming
 from botbuilder.streaming.payload_transport import PayloadSender
 from botbuilder.streaming.payloads.models import PayloadTypes, ResponsePayload
 
@@ -13,7 +13,10 @@ from .payload_disassembler import PayloadDisassembler
 
 class ResponseDisassembler(PayloadDisassembler):
     def __init__(
-        self, sender: PayloadSender, identifier: UUID, response: StreamingResponse
+        self,
+        sender: PayloadSender,
+        identifier: UUID,
+        response: "streaming.StreamingResponse",
     ):
         super().__init__(sender, identifier)
 

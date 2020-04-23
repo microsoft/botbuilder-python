@@ -57,17 +57,22 @@ class StreamingRequest:
     def create_delete(path: str = None, body: object = None) -> "StreamingRequest":
         return StreamingRequest.create_request("DELETE", path, body)
 
-    def set_body(self, body: Union[str, Serializable, Model]):
+    def set_body(self, body: Union[str, Serializable, Model, bytes]):
         # TODO: verify if msrest.serialization.Model is necessary
         if not body:
             return
 
-        if isinstance(body, Serializable):
-            body = body.to_json()
-        elif isinstance(body, Model):
-            body = json.dumps(body.as_dict())
+        if isinstance(body, bytes):
+            pass
+        else:
+            if isinstance(body, Serializable):
+                body = body.to_json()
+            elif isinstance(body, Model):
+                body = json.dumps(body.as_dict())
 
-        self.add_stream(list(body.encode()))
+            body = body.encode("utf8")
+
+        self.add_stream(list(body))
 
     def add_stream(self, content: object, stream_id: UUID = None):
         if not content:

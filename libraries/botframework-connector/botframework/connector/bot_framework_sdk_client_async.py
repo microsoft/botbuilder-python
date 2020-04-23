@@ -4,7 +4,9 @@
 from typing import Optional, Type
 
 from msrest.async_client import SDKClientAsync, ServiceClientAsync
+from msrest.universal_http.async_abc import AsyncHTTPSender as AsyncHttpDriver
 from msrest.pipeline import AsyncPipeline
+from msrest.pipeline.aiohttp import AsyncHTTPSender
 
 
 from ._configuration import ConnectorClientConfiguration
@@ -16,12 +18,18 @@ class BotFrameworkConnectorConfiguration(ConnectorClientConfiguration):
         credentials,
         base_url: str,
         *,
-        pipeline: Optional[Type[AsyncPipeline]] = None
+        pipeline_type: Optional[Type[AsyncPipeline]] = None,
+        sender: Optional[AsyncHTTPSender] = None,
+        driver: Optional[AsyncHttpDriver] = None
     ):
         super().__init__(credentials, base_url)
 
-        if pipeline:
-            self.pipeline = pipeline(self)
+        # The overwrite hierarchy should be well documented
+        self.sender = sender
+        self.driver = driver
+
+        if pipeline_type:
+            self.pipeline = pipeline_type(self)
 
 
 class BotFrameworkSDKClientAsync(SDKClientAsync):

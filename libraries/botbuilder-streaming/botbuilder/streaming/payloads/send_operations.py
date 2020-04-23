@@ -4,7 +4,7 @@
 import asyncio
 from uuid import UUID
 
-from botbuilder.streaming import StreamingRequest, StreamingResponse
+import botbuilder.streaming as streaming
 from botbuilder.streaming.payload_transport import PayloadSender
 from botbuilder.streaming.payloads.disassemblers import (
     CancelDisassembler,
@@ -19,7 +19,9 @@ class SendOperations:
     def __init__(self, payload_sender: PayloadSender):
         self._payload_sender = payload_sender
 
-    async def send_request(self, identifier: UUID, request: StreamingRequest):
+    async def send_request(
+        self, identifier: UUID, request: "streaming.StreamingRequest"
+    ):
         disassembler = RequestDisassembler(self._payload_sender, identifier, request)
 
         await disassembler.disassemble()
@@ -34,7 +36,9 @@ class SendOperations:
 
             await asyncio.gather(*tasks)
 
-    async def send_response(self, identifier: UUID, response: StreamingResponse):
+    async def send_response(
+        self, identifier: UUID, response: "streaming.StreamingResponse"
+    ):
         disassembler = ResponseDisassembler(self._payload_sender, identifier, response)
 
         await disassembler.disassemble()

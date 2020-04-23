@@ -15,9 +15,9 @@ from .emulator_api_client import EmulatorApiClient
 from .version import VERSION
 
 # TODO: Experimental
-from .aiohttp_bf_pipeline import AiohttpBfPipeline
+from .aiohttp_bf_pipeline import AsyncBfPipeline
 from .bot_framework_sdk_client_async import BotFrameworkConnectorConfiguration
 
-__all__ = ["AiohttpBfPipeline", "Channels", "ConnectorClient", "EmulatorApiClient"]
+__all__ = ["AsyncBfPipeline", "Channels", "ConnectorClient", "EmulatorApiClient"]
 
 __version__ = VERSION

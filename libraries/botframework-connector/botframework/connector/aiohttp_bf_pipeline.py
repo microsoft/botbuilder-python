@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 import asyncio
-from msrest.async_client import ServiceClientAsync
+
 from msrest.pipeline import AsyncPipeline, AsyncHTTPPolicy, SansIOHTTPPolicy
 from msrest.pipeline.aiohttp import AioHTTPSender
 from msrest.universal_http.aiohttp import AioHTTPSender as Driver
@@ -12,7 +12,7 @@ from msrest.pipeline.universal import RawDeserializer
 from .bot_framework_sdk_client_async import BotFrameworkConnectorConfiguration
 
 
-class AiohttpBfPipeline(AsyncPipeline):
+class AsyncBfPipeline(AsyncPipeline):
     def __init__(self, config: BotFrameworkConnectorConfiguration):
         creds = config.credentials
 
@@ -28,7 +28,8 @@ class AiohttpBfPipeline(AsyncPipeline):
                 # Assume this is the old credentials class, and then requests. Wrap it.
                 policies.insert(1, AsyncRequestsCredentialsPolicy(creds))
 
-        super().__init__(policies, AioHTTPSender(BFAioHTTPDriver))
+        sender = config.sender or AioHTTPSender(config.driver or BFAioHTTPDriver)
+        super().__init__(policies, sender)
 
 
 class BFAioHTTPDriver(Driver):

@@ -5,15 +5,19 @@ from asyncio import Future
 from uuid import UUID
 from typing import Dict
 
-from botbuilder.streaming import ReceiveResponse
+import botbuilder.streaming as streaming
 
 
 class RequestManager:
-    def __init__(self, *, pending_requests: Dict[UUID, "Future[ReceiveResponse]"]):
+    def __init__(
+        self,
+        *,
+        pending_requests: Dict[UUID, "Future[streaming.ReceiveResponse]"] = None
+    ):
         self._pending_requests = pending_requests or {}
 
     async def signal_response(
-        self, request_id: UUID, response: ReceiveResponse
+        self, request_id: UUID, response: "streaming.ReceiveResponse"
     ) -> bool:
         # TODO: dive more into this logic
         signal: Future = self._pending_requests.get(request_id)
@@ -26,7 +30,7 @@ class RequestManager:
 
         return False
 
-    async def get_response(self, request_id: UUID) -> ReceiveResponse:
+    async def get_response(self, request_id: UUID) -> "streaming.ReceiveResponse":
         if request_id in self._pending_requests:
             return None
 
@@ -34,7 +38,7 @@ class RequestManager:
         self._pending_requests[request_id] = pending_request
 
         try:
-            response: ReceiveResponse = await pending_request
+            response: streaming.ReceiveResponse = await pending_request
             return response
 
         finally:

@@ -5,6 +5,7 @@ from uuid import UUID
 from typing import List
 from threading import Lock
 
+import botbuilder.streaming.payloads as payloads
 from botbuilder.streaming.payloads.models import Header
 
 from .assembler import Assembler
@@ -13,14 +14,13 @@ from .assembler import Assembler
 class PayloadStreamAssembler(Assembler):
     def __init__(
         self,
-        stream_manager: "StreamManager",
+        stream_manager: "payloads.StreamManager",
         identifier: UUID,
         type: str = None,
         length: int = None,
     ):
-        from botbuilder.streaming.payloads import StreamManager
 
-        self._stream_manager = stream_manager or StreamManager()
+        self._stream_manager = stream_manager or payloads.StreamManager()
         self._stream: List[int] = []
         self._lock = Lock()
         self.identifier = identifier

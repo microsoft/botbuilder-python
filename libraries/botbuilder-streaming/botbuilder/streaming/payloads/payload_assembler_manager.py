@@ -4,7 +4,7 @@
 from uuid import UUID
 from typing import Awaitable, Callable, Dict, List
 
-from botbuilder.streaming import ReceiveResponse, ReceiveRequest
+import botbuilder.streaming as streaming
 from botbuilder.streaming.payloads.assemblers import (
     Assembler,
     ReceiveRequestAssembler,
@@ -19,8 +19,8 @@ class PayloadAssemblerManager:
     def __init__(
         self,
         stream_manager: StreamManager,
-        on_receive_request: Callable[[UUID, ReceiveRequest], Awaitable],
-        on_receive_response: Callable[[UUID, ReceiveResponse], Awaitable],
+        on_receive_request: Callable[[UUID, "streaming.ReceiveRequest"], Awaitable],
+        on_receive_response: Callable[[UUID, "streaming.ReceiveResponse"], Awaitable],
     ):
         self._on_receive_request = on_receive_request
         self._on_receive_response = on_receive_response
