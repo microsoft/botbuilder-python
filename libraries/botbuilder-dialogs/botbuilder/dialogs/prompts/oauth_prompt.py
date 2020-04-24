@@ -124,7 +124,7 @@ class OAuthPrompt(Dialog):
         """
         if dialog_context is None:
             raise TypeError(
-                f"OAuthPrompt.begin_dialog: Expected DialogContext but got NoneType instead"
+                f"OAuthPrompt.begin_dialog(): Expected DialogContext but got NoneType instead"
             )
 
         options = options or PromptOptions()
@@ -149,7 +149,7 @@ class OAuthPrompt(Dialog):
 
         if not isinstance(dialog_context.context.adapter, UserTokenProvider):
             raise TypeError(
-                "OAuthPrompt.get_user_token(): not supported by the current adapter"
+                "OAuthPrompt.begin_dialog(): not supported by the current adapter"
             )
 
         output = await dialog_context.context.adapter.get_user_token(
@@ -357,7 +357,7 @@ class OAuthPrompt(Dialog):
             ):
                 if not hasattr(context.adapter, "get_oauth_sign_in_link"):
                     raise Exception(
-                        "OAuthPrompt.send_oauth_card(): get_oauth_sign_in_link() not supported by the current adapter"
+                        "OAuthPrompt._send_oauth_card(): get_oauth_sign_in_link() not supported by the current adapter"
                     )
 
                 link = await context.adapter.get_oauth_sign_in_link(
@@ -455,7 +455,7 @@ class OAuthPrompt(Dialog):
                 )
 
                 raise AttributeError(
-                    "OAuthPrompt.recognize(): not supported by the current adapter."
+                    "OAuthPrompt._recognize_token(): not supported by the current adapter."
                 )
             else:
                 # No errors. Proceed with token exchange.
