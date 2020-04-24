@@ -450,7 +450,7 @@ class OAuthPrompt(Dialog):
                     self._get_token_exchange_invoke_response(
                         int(HTTPStatus.BAD_GATEWAY),
                         "The bot's BotAdapter does not support token exchange operations."
-                        " Ensure the bot's Adapter supports the ITokenExchangeProvider interface.",
+                        " Ensure the bot's Adapter supports the ExtendedUserTokenProvider interface.",
                     )
                 )
 
