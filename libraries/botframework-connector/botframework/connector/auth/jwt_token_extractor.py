@@ -126,7 +126,7 @@ class _OpenIdMetadata:
 
     async def get(self, key_id: str):
         # If keys are more than 5 days old, refresh them
-        if self.last_updated < (datetime.now() + timedelta(days=5)):
+        if self.last_updated < (datetime.now() - timedelta(days=5)):
             await self._refresh()
         return self._find(key_id)
 
