@@ -37,7 +37,7 @@ from botframework.connector.auth import (
 REFERENCE = ConversationReference(
     activity_id="1234",
     channel_id="test",
-    locale="en-uS", # Intentionally oddly-cased to check that it isn't defaulted somewhere, but tests stay in English
+    locale="en-uS",  # Intentionally oddly-cased to check that it isn't defaulted somewhere, but tests stay in English
     service_url="https://example.org/channel",
     user=ChannelAccount(id="user", name="User Name"),
     bot=ChannelAccount(id="bot", name="Bot Name"),

@@ -84,7 +84,9 @@ class DialogExtensions:
                 )
 
                 activity = Activity(
-                    type=ActivityTypes.end_of_conversation, value=result.result, locale=turn_context.activity.locale
+                    type=ActivityTypes.end_of_conversation,
+                    value=result.result,
+                    locale=turn_context.activity.locale,
                 )
                 await turn_context.send_activity(activity)
 

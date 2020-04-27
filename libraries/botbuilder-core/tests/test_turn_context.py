@@ -23,7 +23,7 @@ ACTIVITY = Activity(
     recipient=ChannelAccount(id="bot", name="Bot Name"),
     conversation=ConversationAccount(id="convo", name="Convo Name"),
     channel_id="UnitTest",
-    locale="en-uS", # Intentionally oddly-cased to check that it isn't defaulted somewhere, but tests stay in English
+    locale="en-uS",  # Intentionally oddly-cased to check that it isn't defaulted somewhere, but tests stay in English
     service_url="https://example.org",
 )
 
