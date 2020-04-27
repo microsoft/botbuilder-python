@@ -1259,7 +1259,7 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
             self._is_emulating_oauth_cards = True
 
         app_id = self.__get_app_id(context)
-        scope = context.turn_state.get(BotAdapter.BOT_OAUTH_SCOPE_KEY)
+        scope = self.__get_botframework_oauth_scope()
         app_credentials = oauth_app_credentials or await self.__get_app_credentials(
             app_id, scope
         )
