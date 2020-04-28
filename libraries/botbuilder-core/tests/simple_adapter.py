@@ -91,5 +91,7 @@ class TestConnectorClient:
 
 
 class TestConversations:
-    async def get_conversation_member(self, conversation_id, member_id):
+    async def get_conversation_member(  # pylint: disable=unused-argument
+        self, conversation_id, member_id
+    ):
         return TeamsChannelAccount(id=member_id)
