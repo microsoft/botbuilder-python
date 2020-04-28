@@ -23,6 +23,7 @@ ACTIVITY = Activity(
     recipient=ChannelAccount(id="bot", name="Bot Name"),
     conversation=ConversationAccount(id="convo", name="Convo Name"),
     channel_id="UnitTest",
+    locale="en-uS",  # Intentionally oddly-cased to check that it isn't defaulted somewhere, but tests stay in English
     service_url="https://example.org",
 )
 
@@ -257,6 +258,7 @@ class TestBotContext(aiounittest.AsyncTestCase):
         assert reference.bot == ACTIVITY.recipient
         assert reference.conversation == ACTIVITY.conversation
         assert reference.channel_id == ACTIVITY.channel_id
+        assert reference.locale == ACTIVITY.locale
         assert reference.service_url == ACTIVITY.service_url
 
     def test_apply_conversation_reference_should_return_prepare_reply_when_is_incoming_is_false(
@@ -270,6 +272,7 @@ class TestBotContext(aiounittest.AsyncTestCase):
         assert reply.recipient == ACTIVITY.from_property
         assert reply.from_property == ACTIVITY.recipient
         assert reply.conversation == ACTIVITY.conversation
+        assert reply.locale == ACTIVITY.locale
         assert reply.service_url == ACTIVITY.service_url
         assert reply.channel_id == ACTIVITY.channel_id
 
@@ -284,6 +287,7 @@ class TestBotContext(aiounittest.AsyncTestCase):
         assert reply.recipient == ACTIVITY.recipient
         assert reply.from_property == ACTIVITY.from_property
         assert reply.conversation == ACTIVITY.conversation
+        assert reply.locale == ACTIVITY.locale
         assert reply.service_url == ACTIVITY.service_url
         assert reply.channel_id == ACTIVITY.channel_id
 

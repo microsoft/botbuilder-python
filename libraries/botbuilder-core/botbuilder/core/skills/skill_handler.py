@@ -193,6 +193,7 @@ class SkillHandler(ChannelServiceHandler):
         context.activity.reply_to_id = end_of_conversation_activity.reply_to_id
         context.activity.value = end_of_conversation_activity.value
         context.activity.entities = end_of_conversation_activity.entities
+        context.activity.locale = end_of_conversation_activity.locale
         context.activity.local_timestamp = end_of_conversation_activity.local_timestamp
         context.activity.timestamp = end_of_conversation_activity.timestamp
         context.activity.channel_data = end_of_conversation_activity.channel_data
@@ -212,6 +213,7 @@ class SkillHandler(ChannelServiceHandler):
         context.activity.reply_to_id = event_activity.reply_to_id
         context.activity.value = event_activity.value
         context.activity.entities = event_activity.entities
+        context.activity.locale = event_activity.locale
         context.activity.local_timestamp = event_activity.local_timestamp
         context.activity.timestamp = event_activity.timestamp
         context.activity.channel_data = event_activity.channel_data
