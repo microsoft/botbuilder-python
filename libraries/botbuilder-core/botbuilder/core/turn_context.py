@@ -325,6 +325,7 @@ class TurnContext:
             bot=copy(activity.recipient),
             conversation=copy(activity.conversation),
             channel_id=activity.channel_id,
+            locale=activity.locale,
             service_url=activity.service_url,
         )
 
@@ -342,6 +343,7 @@ class TurnContext:
         :return:
         """
         activity.channel_id = reference.channel_id
+        activity.locale = reference.locale
         activity.service_url = reference.service_url
         activity.conversation = reference.conversation
         if is_incoming:
