@@ -267,7 +267,7 @@ class TestActivityHandler(aiounittest.AsyncTestCase):
 
         response = HealthCheckResponse.deserialize(adapter.activity.value.body)
         self.assertTrue(response.health_results.success)
-        self.assertEqual(response.health_results.authorization, "awesome")
+        self.assertEqual(response.health_results.authorization, "Bearer awesome")
         self.assertEqual(response.health_results.user_agent, USER_AGENT)
         self.assertTrue(response.health_results.messages)
         self.assertEqual(response.health_results.messages[0], "Health check succeeded.")
