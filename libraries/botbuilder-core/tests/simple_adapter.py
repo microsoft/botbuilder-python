@@ -10,6 +10,7 @@ from botbuilder.schema import (
     ResourceResponse,
     ConversationParameters,
 )
+from botbuilder.schema.teams import TeamsChannelAccount
 
 
 class SimpleAdapter(BotAdapter):
@@ -79,3 +80,18 @@ class SimpleAdapter(BotAdapter):
     async def process_request(self, activity, handler):
         context = TurnContext(self, activity)
         return await self.run_pipeline(context, handler)
+
+    async def create_connector_client(self, service_url: str):
+        return TestConnectorClient()
+
+
+class TestConnectorClient:
+    def __init__(self) -> None:
+        self.conversations = TestConversations()
+
+
+class TestConversations:
+    async def get_conversation_member(  # pylint: disable=unused-argument
+        self, conversation_id, member_id
+    ):
+        return TeamsChannelAccount(id=member_id)

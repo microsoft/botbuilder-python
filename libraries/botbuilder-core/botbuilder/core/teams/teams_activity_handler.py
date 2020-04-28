@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 from http import HTTPStatus
-from botbuilder.schema import ChannelAccount, SignInConstants
+from botbuilder.schema import ChannelAccount, ErrorResponseException, SignInConstants
 from botbuilder.core import ActivityHandler, InvokeResponse
 from botbuilder.core.activity_handler import _InvokeResponseException
 from botbuilder.core.turn_context import TurnContext
@@ -348,7 +348,6 @@ class TeamsActivityHandler(ActivityHandler):
         turn_context: TurnContext,
     ):
 
-        team_members = {}
         team_members_added = []
         for member in members_added:
             if member.additional_properties != {}:
@@ -356,20 +355,25 @@ class TeamsActivityHandler(ActivityHandler):
                     deserializer_helper(TeamsChannelAccount, member)
                 )
             else:
-                if team_members == {}:
-                    result = await TeamsInfo.get_members(turn_context)
-                    team_members = {i.id: i for i in result}
-
-                if member.id in team_members:
-                    team_members_added.append(member)
-                else:
-                    new_teams_channel_account = TeamsChannelAccount(
-                        id=member.id,
-                        name=member.name,
-                        aad_object_id=member.aad_object_id,
-                        role=member.role,
-                    )
-                    team_members_added.append(new_teams_channel_account)
+                team_member = None
+                try:
+                    team_member = await TeamsInfo.get_member(turn_context, member.id)
+                    team_members_added.append(team_member)
+                except ErrorResponseException as ex:
+                    if (
+                        ex.error
+                        and ex.error.error
+                        and ex.error.error.code == "ConversationNotFound"
+                    ):
+                        new_teams_channel_account = TeamsChannelAccount(
+                            id=member.id,
+                            name=member.name,
+                            aad_object_id=member.aad_object_id,
+                            role=member.role,
+                        )
+                        team_members_added.append(new_teams_channel_account)
+                    else:
+                        raise ex
 
         return await self.on_teams_members_added(
             team_members_added, team_info, turn_context
