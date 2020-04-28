@@ -123,10 +123,7 @@ class TeamsInfo:
 
         connector_client = await TeamsInfo._get_connector_client(turn_context)
         return await TeamsInfo._get_paged_members(
-            connector_client,
-            turn_context.activity.conversation.id,
-            continuation_token,
-            page_size,
+            connector_client, team_id, continuation_token, page_size,
         )
 
     @staticmethod
@@ -142,7 +139,9 @@ class TeamsInfo:
                 connector_client, conversation_id, continuation_token, page_size
             )
 
-        return await TeamsInfo.get_paged_team_members(turn_context, team_id, page_size)
+        return await TeamsInfo.get_paged_team_members(
+            turn_context, team_id, continuation_token, page_size
+        )
 
     @staticmethod
     async def get_team_member(
@@ -245,7 +244,7 @@ class TeamsInfo:
             )
 
         return await connector_client.conversations.get_teams_conversation_paged_members(
-            conversation_id, continuation_token, page_size
+            conversation_id, page_size, continuation_token
         )
 
     @staticmethod
