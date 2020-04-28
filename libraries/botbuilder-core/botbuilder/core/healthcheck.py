@@ -16,8 +16,8 @@ class HealthCheck:
         health_results = HealthResults(success=True)
 
         if connector_client:
-            health_results.authorization = (
-                connector_client.config.credentials.get_access_token()
+            health_results.authorization = "{} {}".format(
+                "Bearer", connector_client.config.credentials.get_access_token()
             )
             health_results.user_agent = USER_AGENT
 
