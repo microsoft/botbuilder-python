@@ -736,6 +736,12 @@ class ConversationReference(Model):
     :type conversation: ~botframework.connector.models.ConversationAccount
     :param channel_id: Channel ID
     :type channel_id: str
+    :param locale: A locale name for the contents of the text field.
+        The locale name is a combination of an ISO 639 two- or three-letter
+        culture code associated with a language and an ISO 3166 two-letter
+        subculture code associated with a country or region.
+        The locale name can also correspond to a valid BCP-47 language tag.
+    :type locale: str
     :param service_url: Service endpoint where operations concerning the
      referenced conversation may be performed
     :type service_url: str
@@ -747,6 +753,7 @@ class ConversationReference(Model):
         "bot": {"key": "bot", "type": "ChannelAccount"},
         "conversation": {"key": "conversation", "type": "ConversationAccount"},
         "channel_id": {"key": "channelId", "type": "str"},
+        "locale": {"key": "locale", "type": "str"},
         "service_url": {"key": "serviceUrl", "type": "str"},
     }
 
@@ -757,6 +764,7 @@ class ConversationReference(Model):
         self.bot = kwargs.get("bot", None)
         self.conversation = kwargs.get("conversation", None)
         self.channel_id = kwargs.get("channel_id", None)
+        self.locale = kwargs.get("locale", None)
         self.service_url = kwargs.get("service_url", None)
 
 
