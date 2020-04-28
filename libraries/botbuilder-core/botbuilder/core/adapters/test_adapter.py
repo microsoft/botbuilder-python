@@ -30,7 +30,7 @@ from botframework.connector.token_api.models import (
 )
 from ..bot_adapter import BotAdapter
 from ..turn_context import TurnContext
-from ..extended_user_token_provider import ExtendedUserTokenProvider
+from botbuilder.core.oauth.extended_user_token_provider import ExtendedUserTokenProvider
 
 
 class UserToken:

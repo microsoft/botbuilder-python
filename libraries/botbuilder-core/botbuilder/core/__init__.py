@@ -19,7 +19,7 @@ from .bot_telemetry_client import BotTelemetryClient, Severity
 from .card_factory import CardFactory
 from .channel_service_handler import BotActionNotImplementedError, ChannelServiceHandler
 from .conversation_state import ConversationState
-from .extended_user_token_provider import ExtendedUserTokenProvider
+from botbuilder.core.oauth.extended_user_token_provider import ExtendedUserTokenProvider
 from .intent_score import IntentScore
 from .invoke_response import InvokeResponse
 from .memory_storage import MemoryStorage
@@ -39,7 +39,6 @@ from .telemetry_logger_constants import TelemetryLoggerConstants
 from .telemetry_logger_middleware import TelemetryLoggerMiddleware
 from .turn_context import TurnContext
 from .user_state import UserState
-from .user_token_provider import UserTokenProvider
 from .register_class_middleware import RegisterClassMiddleware
 from .adapter_extensions import AdapterExtensions
 
