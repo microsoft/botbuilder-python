@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 # pylint: disable=protected-access
+# pylint: disable=too-many-lines
 
 import json
 from os import path
@@ -827,15 +828,11 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         ):
             results = await qna.get_answers(turn_context, options)
             self.assertIsNotNone(results)
-            self.assertEqual(
-                4, len(results), "should get four results"
-            )
+            self.assertEqual(4, len(results), "should get four results")
 
             filtered_results = qna.get_low_score_variation(results)
             self.assertIsNotNone(filtered_results)
-            self.assertEqual(
-                3, len(filtered_results), "should get three results"
-            )
+            self.assertEqual(3, len(filtered_results), "should get three results")
 
         # active learning disabled
         turn_context = QnaApplicationTest._get_context("Q11", TestAdapter())
@@ -849,15 +846,11 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         ):
             results = await qna.get_answers(turn_context, options)
             self.assertIsNotNone(results)
-            self.assertEqual(
-                4, len(results), "should get four results"
-            )
+            self.assertEqual(4, len(results), "should get four results")
 
             filtered_results = qna.get_low_score_variation(results)
             self.assertIsNotNone(filtered_results)
-            self.assertEqual(
-                3, len(filtered_results), "should get three results"
-            )
+            self.assertEqual(3, len(filtered_results), "should get three results")
 
     @classmethod
     async def _get_service_result(
