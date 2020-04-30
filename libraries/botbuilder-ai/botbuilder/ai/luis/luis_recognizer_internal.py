@@ -4,9 +4,7 @@ from .luis_application import LuisApplication
 
 
 class LuisRecognizerInternal(ABC):
-    def __init__(
-        self, luis_application: LuisApplication
-    ):
+    def __init__(self, luis_application: LuisApplication):
         if luis_application is None:
             raise TypeError(luis_application.__class__.__name__)
 
