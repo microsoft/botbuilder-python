@@ -5,7 +5,6 @@ import json
 from typing import Dict, List, Tuple, Union
 
 from azure.cognitiveservices.language.luis.runtime import LUISRuntimeClient
-from azure.cognitiveservices.language.luis.runtime.models import LuisResult
 from msrest.authentication import CognitiveServicesCredentials
 
 from botbuilder.core import (
@@ -308,20 +307,20 @@ class LuisRecognizer(Recognizer):
     ):
         if isinstance(luis_prediction_options, LuisRecognizerOptionsV3):
             return LuisRecognizerV3(self._application, luis_prediction_options)
-        elif isinstance(luis_prediction_options, LuisRecognizerOptionsV2):
+        if isinstance(luis_prediction_options, LuisRecognizerOptionsV2):
             return LuisRecognizerV3(self._application, luis_prediction_options)
-        else:
-            recognizer_options = LuisRecognizerOptionsV2(
-                luis_prediction_options.bing_spell_check_subscription_key,
-                luis_prediction_options.include_all_intents,
-                luis_prediction_options.include_instance_data,
-                luis_prediction_options.log,
-                luis_prediction_options.spell_check,
-                luis_prediction_options.staging,
-                luis_prediction_options.timeout,
-                luis_prediction_options.timezone_offset,
-                self._include_api_results,
-                luis_prediction_options.telemetry_client,
-                luis_prediction_options.log_personal_information,
-            )
-            return LuisRecognizerV2(self._application, recognizer_options)
+
+        recognizer_options = LuisRecognizerOptionsV2(
+            luis_prediction_options.bing_spell_check_subscription_key,
+            luis_prediction_options.include_all_intents,
+            luis_prediction_options.include_instance_data,
+            luis_prediction_options.log,
+            luis_prediction_options.spell_check,
+            luis_prediction_options.staging,
+            luis_prediction_options.timeout,
+            luis_prediction_options.timezone_offset,
+            self._include_api_results,
+            luis_prediction_options.telemetry_client,
+            luis_prediction_options.log_personal_information,
+        )
+        return LuisRecognizerV2(self._application, recognizer_options)

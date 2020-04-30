@@ -1,17 +1,19 @@
 import aiohttp
-import asyncio
-import json
-
-from typing import Dict
-from .luis_recognizer_internal import LuisRecognizerInternal
-from .luis_recognizer_options_v3 import LuisRecognizerOptionsV3
-from .luis_application import LuisApplication
-
 from botbuilder.core import (
     RecognizerResult,
     TurnContext,
 )
-from .activity_util import ActivityUtil
+from .luis_recognizer_internal import LuisRecognizerInternal
+from .luis_recognizer_options_v3 import LuisRecognizerOptionsV3
+from .luis_application import LuisApplication
+
+
+# from .activity_util import ActivityUtil
+#
+# import asyncio
+# import json
+#
+# from typing import Dict
 
 
 class LuisRecognizerV3(LuisRecognizerInternal):
@@ -60,11 +62,15 @@ class LuisRecognizerV3(LuisRecognizerInternal):
         async with aiohttp.ClientSession() as session:
             async with session.post(url, json=body, headers=headers) as result:
                 luis_result = await result.json()
-                recognizer_result["intents"] = self._get_intents(
-                    luis_result["prediction"]
-                )
-                recognizer_result["entities"] = self._extract_entities_and_metadata(
-                    luis_result["prediction"]
+
+                recognizer_result = RecognizerResult(
+                    text=utterance,
+                    # intents = self._get_intents(
+                    #     luis_result["prediction"]
+                    # ),
+                    entities=self._extract_entities_and_metadata(
+                        luis_result["prediction"]
+                    ),
                 )
 
         return recognizer_result
@@ -80,9 +86,9 @@ class LuisRecognizerV3(LuisRecognizerInternal):
         )
 
         if self.luis_recognizer_options_v3.version:
-            uri += "versions/%/predict" % (self.luis_recognizer_options_v3.version)
+            uri += "/versions/%s/predict" % (self.luis_recognizer_options_v3.version)
         else:
-            uri += "slots/%/predict" % (self.luis_recognizer_options_v3.slot)
+            uri += "/slots/%s/predict" % (self.luis_recognizer_options_v3.slot)
 
         params = "?verbose=%s&show-all-intents=%s&log=%s" % (
             "true"
@@ -108,61 +114,61 @@ class LuisRecognizerV3(LuisRecognizerInternal):
 
         return body
 
-    def _get_intents(self, luisResult):
+    def _get_intents(self, luis_result):
         intents = {}
-        if not luisResult["intents"]:
+        if not luis_result["intents"]:
             return intents
 
-        for intent in luisResult["intents"]:
+        for intent in luis_result["intents"]:
             intents[self._normalize(intent)] = {
-                "score": luisResult["intents"][intent]["score"]
+                "score": luis_result["intents"][intent]["score"]
             }
 
         return intents
 
     def _normalize(self, entity):
-        splitEntity = entity.split(":")
-        entityName = splitEntity[-1]
-        return entityName
+        split_entity = entity.split(":")
+        entity_name = split_entity[-1]
+        return entity_name
 
-    def _extract_entities_and_metadata(self, luisResult):
-        entities = luisResult["entities"]
+    def _extract_entities_and_metadata(self, luis_result):
+        entities = luis_result["entities"]
         return self._map_properties(entities, False)
 
-    def _map_properties(self, source, inInstance):
+    def _map_properties(self, source, in_instance):
 
-        if isinstance(source, int) or isinstance(source, float):
+        if isinstance(source, (int, float)):
             return source
 
         result = source
         if isinstance(source, list):
             narr = []
             for item in source:
-                isGeographyV2 = ""
+                is_geography_v2 = ""
                 if (
                     isinstance(item, dict)
                     and "type" in item
                     and item["type"] in self._geographySubtypes
                 ):
-                    isGeographyV2 = item["type"]
+                    is_geography_v2 = item["type"]
 
-                if inInstance and isGeographyV2:
-                    geoEntity = {}
-                    for itemProps in item:
-                        if itemProps == "value":
-                            geoEntity["location"] = item[itemProps]
+                if in_instance and is_geography_v2:
+                    geo_entity = {}
+                    for item_props in item:
+                        if item_props == "value":
+                            geo_entity["location"] = item[item_props]
 
-                    geoEntity["type"] = isGeographyV2
-                    narr.append(geoEntity)
+                    geo_entity["type"] = is_geography_v2
+                    narr.append(geo_entity)
                 else:
-                    narr.append(self._map_properties(item, inInstance))
+                    narr.append(self._map_properties(item, in_instance))
 
             result = narr
 
         elif not isinstance(source, str):
             nobj = {}
             if (
-                not inInstance
+                not in_instance
                 and isinstance(source, dict)
                 and "type" in source
                 and isinstance(source["type"], str)
@@ -186,28 +192,28 @@ class LuisRecognizerV3(LuisRecognizerInternal):
             else:
                 for property in source:
                     name = property
-                    isArray = isinstance(source[property], list)
-                    isString = isinstance(source[property], str)
-                    isInt = isinstance(source[property], int)
+                    is_array = isinstance(source[property], list)
+                    is_string = isinstance(source[property], str)
+                    is_int = isinstance(source[property], int)
                     val = self._map_properties(
-                        source[property], inInstance or property == self._metadata_key
+                        source[property], in_instance or property == self._metadata_key
                     )
-                    if name == "datetime" and isArray:
+                    if name == "datetime" and is_array:
                         nobj["datetimeV1"] = val
 
-                    elif name == "datetimeV2" and isArray:
+                    elif name == "datetimeV2" and is_array:
                         nobj["datetime"] = val
 
-                    elif inInstance:
-                        if name == "length" and isInt:
+                    elif in_instance:
+                        if name == "length" and is_int:
                             nobj["endIndex"] = source[name] + source["startIndex"]
                         elif not (
-                            (isInt and name == "modelTypeId")
-                            or (isString and name == "role")
+                            (is_int and name == "modelTypeId")
+                            or (is_string and name == "role")
                         ):
                             nobj[name] = val
                     else:
-                        if name == "unit" and isString:
+                        if name == "unit" and is_string:
                             nobj.units = val
                         else:
                             nobj[name] = val
