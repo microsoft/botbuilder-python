@@ -19,7 +19,7 @@ from .send_packet import SendPacket
 
 # TODO: consider interface this class
 class PayloadSender:
-    def __init__(self,):
+    def __init__(self):
         self._connected_event = Event()
         self._sender: TransportSenderBase = None
         self._is_disconnecting: bool = False
@@ -36,7 +36,7 @@ class PayloadSender:
 
     @property
     def is_connected(self) -> bool:
-        return self._sender is None
+        return self._sender is not None
 
     def connect(self, sender: TransportSenderBase):
         if self._sender:

@@ -62,6 +62,7 @@ class StreamingRequestHandler(RequestHandler):
 
     async def listen(self):
         await self._server.start()
+
         # TODO: log it
 
     def has_conversation(self, conversation_id: str) -> bool:

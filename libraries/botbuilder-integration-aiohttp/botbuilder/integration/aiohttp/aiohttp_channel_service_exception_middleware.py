@@ -3,6 +3,7 @@
 
 from aiohttp.web import (
     middleware,
+    HTTPError,
     HTTPNotImplemented,
     HTTPUnauthorized,
     HTTPNotFound,
@@ -25,5 +26,8 @@ async def aiohttp_error_middleware(request, handler):
         raise HTTPUnauthorized()
     except KeyError:
         raise HTTPNotFound()
+    except HTTPError as error:
+        # In the case the integration adapter raises a specific HTTPError
+        raise error
     except Exception:
         raise HTTPInternalServerError()

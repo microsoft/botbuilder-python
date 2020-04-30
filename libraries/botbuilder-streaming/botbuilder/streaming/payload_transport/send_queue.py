@@ -17,15 +17,15 @@ class SendQueue:
 
         # TODO: this have to be abstracted so can remove asyncio dependency
         loop = asyncio.get_event_loop()
-        loop.create_task(self._process)
+        loop.create_task(self._process())
 
     def post(self, item: object):
-        self.post_internal(item)
+        self._post_internal(item)
 
-    def post_internal(self, item: object):
+    def _post_internal(self, item: object):
         self._queue.put(item)
 
-    async def process(self):
+    async def _process(self):
         while True:
             try:
                 while True:

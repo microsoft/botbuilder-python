@@ -53,7 +53,7 @@ class WebSocketServer:
     async def start(self):
         self._closed_signal = Future()
         self._sender.connect(self._web_socket_transport)
-        self._receiver.connect(self._web_socket_transport)
+        await self._receiver.connect(self._web_socket_transport)
 
         return self._closed_signal
 

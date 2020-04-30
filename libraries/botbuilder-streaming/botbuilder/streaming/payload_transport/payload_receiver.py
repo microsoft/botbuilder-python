@@ -31,17 +31,17 @@ class PayloadReceiver:
 
     @property
     def is_connected(self) -> bool:
-        return self._receiver is None
+        return self._receiver is not None
 
-    def connect(self, receiver: TransportReceiverBase):
+    async def connect(self, receiver: TransportReceiverBase):
         if self._receiver:
             raise RuntimeError(f"{self.__class__.__name__} instance already connected.")
 
         self._receiver = receiver
-        self._connected_event.set()
+        await self._run_receive()
 
-    def _run_receive(self):
-        asyncio.create_task(self._receive_packets())
+    async def _run_receive(self):
+        await self._receive_packets()
 
     def subscribe(
         self,

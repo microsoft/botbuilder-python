@@ -35,14 +35,18 @@ class AiohttpWebSocket(WebSocket):
         )
 
     async def receive(self) -> WebSocketMessage:
-        message = await self._aiohttp_ws.receive()
+        try:
+            # message = await self._aiohttp_ws.receive()
 
-        return WebSocketMessage(
-            message_type=WebSocketMessageType(int(message.type)),
-            data=list(str(message.data).encode("utf8"))
-            if message.type == WSMsgType.TEXT
-            else list(message.data),
-        )
+            async for message in self._aiohttp_ws:
+                return WebSocketMessage(
+                    message_type=WebSocketMessageType(int(message.type)),
+                    data=list(str(message.data).encode("utf8"))
+                    if message.type == WSMsgType.TEXT
+                    else list(message.data),
+                )
+        except Exception as error:
+            raise error
 
     async def send(
         self, buffer: Any, message_type: WebSocketMessageType, end_of_message: bool
@@ -57,5 +61,5 @@ class AiohttpWebSocket(WebSocket):
             )
 
     @property
-    async def status(self) -> WebSocketState:
+    def status(self) -> WebSocketState:
         return WebSocketState.CLOSED if self._aiohttp_ws.closed else WebSocketState.OPEN

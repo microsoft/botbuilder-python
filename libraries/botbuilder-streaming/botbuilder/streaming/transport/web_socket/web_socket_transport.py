@@ -19,11 +19,11 @@ class WebSocketTransport(TransportReceiverBase, TransportSenderBase):
     def is_connected(self):
         print("Getting value")
         # TODO: mock logic
-        return self._socket.status == "Open"
+        return self._socket.status == WebSocketState.OPEN
 
     async def close(self):
         # TODO: mock logic
-        if self._socket.status == "Open":
+        if self._socket.status == WebSocketState.OPEN:
             try:
                 await self._socket.close(
                     WebSocketCloseStatus.NORMAL_CLOSURE,
