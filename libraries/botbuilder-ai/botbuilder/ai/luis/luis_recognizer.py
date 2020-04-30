@@ -41,7 +41,9 @@ class LuisRecognizer(Recognizer):
     def __init__(
         self,
         application: Union[LuisApplication, str],
-        prediction_options: Union[LuisRecognizerOptionsV2 , LuisRecognizerOptionsV3 , LuisPredictionOptions] = None,
+        prediction_options: Union[
+            LuisRecognizerOptionsV2, LuisRecognizerOptionsV3, LuisPredictionOptions
+        ] = None,
         include_api_results: bool = False,
     ):
         """Initializes a new instance of the <see cref="LuisRecognizer"/> class.
@@ -254,7 +256,9 @@ class LuisRecognizer(Recognizer):
         turn_context: TurnContext,
         telemetry_properties: Dict[str, str],
         telemetry_metrics: Dict[str, float],
-        luis_prediction_options: Union [LuisPredictionOptions, LuisRecognizerOptionsV2, LuisRecognizerOptionsV3] = None,
+        luis_prediction_options: Union[
+            LuisPredictionOptions, LuisRecognizerOptionsV2, LuisRecognizerOptionsV3
+        ] = None,
     ) -> RecognizerResult:
 
         BotAssert.context_not_none(turn_context)
@@ -287,14 +291,20 @@ class LuisRecognizer(Recognizer):
         return recognizer_result
 
     def _merge_options(
-        self, user_defined_options: Union [LuisRecognizerOptionsV3, LuisRecognizerOptionsV2, LuisPredictionOptions]
+        self,
+        user_defined_options: Union[
+            LuisRecognizerOptionsV3, LuisRecognizerOptionsV2, LuisPredictionOptions
+        ],
     ) -> LuisPredictionOptions:
         merged_options = LuisPredictionOptions()
         merged_options.__dict__.update(user_defined_options.__dict__)
         return merged_options
 
     def _build_recognizer(
-        self, luis_prediction_options: Union [LuisRecognizerOptionsV3, LuisRecognizerOptionsV2, LuisPredictionOptions]
+        self,
+        luis_prediction_options: Union[
+            LuisRecognizerOptionsV3, LuisRecognizerOptionsV2, LuisPredictionOptions
+        ],
     ):
         if isinstance(luis_prediction_options, LuisRecognizerOptionsV3):
             return LuisRecognizerV3(self._application, luis_prediction_options)
@@ -312,7 +322,6 @@ class LuisRecognizer(Recognizer):
                 luis_prediction_options.timezone_offset,
                 self._include_api_results,
                 luis_prediction_options.telemetry_client,
-                luis_prediction_options.log_personal_information)
+                luis_prediction_options.log_personal_information,
+            )
             return LuisRecognizerV2(self._application, recognizer_options)
-
-

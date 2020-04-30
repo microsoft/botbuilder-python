@@ -15,7 +15,16 @@ from .activity_util import ActivityUtil
 
 
 class LuisRecognizerV3(LuisRecognizerInternal):
-    _dateSubtypes = ["date", "daterange", "datetime", "datetimerange", "duration", "set", "time", "timerange"]
+    _dateSubtypes = [
+        "date",
+        "daterange",
+        "datetime",
+        "datetimerange",
+        "duration",
+        "set",
+        "time",
+        "timerange",
+    ]
     _geographySubtypes = ["poi", "city", "countryRegion", "continent", "state"]
     _metadata_key = "$instance"
     # The value type for a LUIS trace activity.
@@ -24,15 +33,19 @@ class LuisRecognizerV3(LuisRecognizerInternal):
     # The context label for a LUIS trace activity.
     luis_trace_label: str = "Luis Trace"
 
-    def __init__(self, luis_application: LuisApplication, luis_recognizer_options_v3: LuisRecognizerOptionsV3 = None):
+    def __init__(
+        self,
+        luis_application: LuisApplication,
+        luis_recognizer_options_v3: LuisRecognizerOptionsV3 = None,
+    ):
         super().__init__(luis_application)
 
-        self.luis_recognizer_options_v3 = luis_recognizer_options_v3 or LuisRecognizerOptionsV3()
+        self.luis_recognizer_options_v3 = (
+            luis_recognizer_options_v3 or LuisRecognizerOptionsV3()
+        )
         self._application = luis_application
 
-    async def recognizer_internal(
-            self,
-            turn_context: TurnContext):
+    async def recognizer_internal(self, turn_context: TurnContext):
         recognizer_result: RecognizerResult = None
 
         utterance: str = turn_context.activity.text if turn_context.activity is not None else None
@@ -40,39 +53,51 @@ class LuisRecognizerV3(LuisRecognizerInternal):
         url = self._build_url()
         body = self._build_request(utterance)
         headers = {
-            'Ocp-Apim-Subscription-Key': self.luis_application.endpoint_key,
-            'Content-Type': 'application/json'
+            "Ocp-Apim-Subscription-Key": self.luis_application.endpoint_key,
+            "Content-Type": "application/json",
         }
 
         async with aiohttp.ClientSession() as session:
             async with session.post(url, json=body, headers=headers) as result:
                 luis_result = await result.json()
-                recognizer_result["intents"] = self._get_intents(luis_result["prediction"])
-                recognizer_result["entities"] = self._extract_entities_and_metadata(luis_result["prediction"])
+                recognizer_result["intents"] = self._get_intents(
+                    luis_result["prediction"]
+                )
+                recognizer_result["entities"] = self._extract_entities_and_metadata(
+                    luis_result["prediction"]
+                )
 
         return recognizer_result
 
     def _build_url(self):
 
-        base_uri = self._application.endpoint or 'https://westus.api.cognitive.microsoft.com';
-        uri = "%s/luis/prediction/v3.0/apps/%s" % (base_uri, self._application.application_id)
+        base_uri = (
+            self._application.endpoint or "https://westus.api.cognitive.microsoft.com"
+        )
+        uri = "%s/luis/prediction/v3.0/apps/%s" % (
+            base_uri,
+            self._application.application_id,
+        )
 
-        if (self.luis_recognizer_options_v3.version):
+        if self.luis_recognizer_options_v3.version:
             uri += "versions/%/predict" % (self.luis_recognizer_options_v3.version)
         else:
             uri += "slots/%/predict" % (self.luis_recognizer_options_v3.slot)
 
         params = "?verbose=%s&show-all-intents=%s&log=%s" % (
-            "true" if self.luis_recognizer_options_v3.include_instance_data else "false",
+            "true"
+            if self.luis_recognizer_options_v3.include_instance_data
+            else "false",
             "true" if self.luis_recognizer_options_v3.include_all_intents else "false",
-            "true" if self.luis_recognizer_options_v3.log else "false")
+            "true" if self.luis_recognizer_options_v3.log else "false",
+        )
 
         return uri + params
 
     def _build_request(self, utterance: str):
         body = {
-            'query': utterance,
-            'preferExternalEntities' : self.luis_recognizer_options_v3.prefer_external_entities
+            "query": utterance,
+            "preferExternalEntities": self.luis_recognizer_options_v3.prefer_external_entities,
         }
 
         if self.luis_recognizer_options_v3.dynamic_lists:
@@ -89,7 +114,9 @@ class LuisRecognizerV3(LuisRecognizerInternal):
             return intents
 
         for intent in luisResult["intents"]:
-            intents[self._normalize(intent)] = {'score': luisResult["intents"][intent]["score"]}
+            intents[self._normalize(intent)] = {
+                "score": luisResult["intents"][intent]["score"]
+            }
 
         return intents
 
@@ -112,7 +139,11 @@ class LuisRecognizerV3(LuisRecognizerInternal):
             narr = []
             for item in source:
                 isGeographyV2 = ""
-                if isinstance(item, dict) and "type" in item and item["type"] in self._geographySubtypes:
+                if (
+                    isinstance(item, dict)
+                    and "type" in item
+                    and item["type"] in self._geographySubtypes
+                ):
                     isGeographyV2 = item["type"]
 
                 if inInstance and isGeographyV2:
@@ -130,8 +161,13 @@ class LuisRecognizerV3(LuisRecognizerInternal):
 
         elif not isinstance(source, str):
             nobj = {}
-            if not inInstance and isinstance(source, dict) and "type" in source and isinstance(source["type"], str) and \
-                    source["type"] in self._dateSubtypes:
+            if (
+                not inInstance
+                and isinstance(source, dict)
+                and "type" in source
+                and isinstance(source["type"], str)
+                and source["type"] in self._dateSubtypes
+            ):
                 timexs = source["values"]
                 arr = []
                 if timexs:
@@ -153,7 +189,9 @@ class LuisRecognizerV3(LuisRecognizerInternal):
                     isArray = isinstance(source[property], list)
                     isString = isinstance(source[property], str)
                     isInt = isinstance(source[property], int)
-                    val = self._map_properties(source[property], inInstance or property == self._metadata_key)
+                    val = self._map_properties(
+                        source[property], inInstance or property == self._metadata_key
+                    )
                     if name == "datetime" and isArray:
                         nobj["datetimeV1"] = val
 
@@ -163,8 +201,10 @@ class LuisRecognizerV3(LuisRecognizerInternal):
                     elif inInstance:
                         if name == "length" and isInt:
                             nobj["endIndex"] = source[name] + source["startIndex"]
-                        elif not ((isInt and name == "modelTypeId") or
-                                  (isString and name == "role")):
+                        elif not (
+                            (isInt and name == "modelTypeId")
+                            or (isString and name == "role")
+                        ):
                             nobj[name] = val
                     else:
                         if name == "unit" and isString:

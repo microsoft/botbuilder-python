@@ -7,25 +7,26 @@ from .luis_recognizer_options import LuisRecognizerOptions
 class LuisRecognizerOptionsV3(LuisRecognizerOptions):
     def __init__(
         self,
-
         include_all_intents: bool = False,
         include_instance_data: bool = True,
         log: bool = True,
         prefer_external_entities: bool = False,
         dynamic_lists: List = None,
         external_entities: List = None,
-        slot: str = 'production' or 'staging',
+        slot: str = "production" or "staging",
         version: str = None,
         include_api_results: bool = True,
         telemetry_client: BotTelemetryClient = NullTelemetryClient(),
         log_personal_information: bool = False,
     ):
-        super().__init__(include_api_results, telemetry_client, log_personal_information)
+        super().__init__(
+            include_api_results, telemetry_client, log_personal_information
+        )
         self.include_all_intents = include_all_intents
         self.include_instance_data = include_instance_data
         self.log = log
         self.prefer_external_entities = prefer_external_entities
-        self.dynamic_lists =dynamic_lists
+        self.dynamic_lists = dynamic_lists
         self.external_entities = external_entities
         self.slot = slot
         self.version: str = version

@@ -1,4 +1,3 @@
-
 from typing import Dict
 from .luis_recognizer_internal import LuisRecognizerInternal
 from .luis_recognizer_options_v2 import LuisRecognizerOptionsV2
@@ -22,18 +21,24 @@ class LuisRecognizerV2(LuisRecognizerInternal):
     # The context label for a LUIS trace activity.
     luis_trace_label: str = "Luis Trace"
 
-    def __init__(self, luis_application: LuisApplication, luis_recognizer_options_v2: LuisRecognizerOptionsV2 = None):
+    def __init__(
+        self,
+        luis_application: LuisApplication,
+        luis_recognizer_options_v2: LuisRecognizerOptionsV2 = None,
+    ):
         super().__init__(luis_application)
         credentials = CognitiveServicesCredentials(luis_application.endpoint_key)
         self._runtime = LUISRuntimeClient(luis_application.endpoint, credentials)
         self._runtime.config.add_user_agent(LuisUtil.get_user_agent())
-        self._runtime.config.connection.timeout = luis_recognizer_options_v2.timeout // 1000
-        self.luis_recognizer_options_v2 = luis_recognizer_options_v2 or LuisRecognizerOptionsV2()
+        self._runtime.config.connection.timeout = (
+            luis_recognizer_options_v2.timeout // 1000
+        )
+        self.luis_recognizer_options_v2 = (
+            luis_recognizer_options_v2 or LuisRecognizerOptionsV2()
+        )
         self._application = luis_application
 
-    async def recognizer_internal(
-            self,
-            turn_context: TurnContext):
+    async def recognizer_internal(self, turn_context: TurnContext):
 
         utterance: str = turn_context.activity.text if turn_context.activity is not None else None
         luis_result: LuisResult = self._runtime.prediction.resolve(
@@ -44,7 +49,9 @@ class LuisRecognizerV2(LuisRecognizerInternal):
             staging=self.luis_recognizer_options_v2.staging,
             spell_check=self.luis_recognizer_options_v2.spell_check,
             bing_spell_check_subscription_key=self.luis_recognizer_options_v2.bing_spell_check_subscription_key,
-            log=self.luis_recognizer_options_v2.log if self.luis_recognizer_options_v2.log is not None else True,
+            log=self.luis_recognizer_options_v2.log
+            if self.luis_recognizer_options_v2.log is not None
+            else True,
         )
 
         recognizer_result: RecognizerResult = RecognizerResult(
@@ -65,7 +72,10 @@ class LuisRecognizerV2(LuisRecognizerInternal):
             recognizer_result.properties["luisResult"] = luis_result
 
         await self._emit_trace_info(
-            turn_context, luis_result, recognizer_result, self.luis_recognizer_options_v2
+            turn_context,
+            luis_result,
+            recognizer_result,
+            self.luis_recognizer_options_v2,
         )
 
         return recognizer_result

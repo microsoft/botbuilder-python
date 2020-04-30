@@ -17,7 +17,9 @@ class LuisRecognizerOptionsV2(LuisRecognizerOptions):
         telemetry_client: BotTelemetryClient = NullTelemetryClient(),
         log_personal_information: bool = False,
     ):
-        super().__init__(include_api_results, telemetry_client, log_personal_information)
+        super().__init__(
+            include_api_results, telemetry_client, log_personal_information
+        )
         self.bing_spell_check_subscription_key = bing_spell_check_subscription_key
         self.include_all_intents = include_all_intents
         self.include_instance_data = include_instance_data
