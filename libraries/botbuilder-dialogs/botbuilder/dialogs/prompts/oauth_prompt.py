@@ -460,13 +460,21 @@ class OAuthPrompt(Dialog):
             else:
                 # No errors. Proceed with token exchange.
                 extended_user_token_provider: ExtendedUserTokenProvider = context.adapter
-                token_exchange_response = await extended_user_token_provider.exchange_token_from_credentials(
-                    context,
-                    self._settings.oath_app_credentials,
-                    self._settings.connection_name,
-                    context.activity.from_property.id,
-                    TokenExchangeRequest(token=context.activity.value.token),
-                )
+
+                token_exchange_response = None
+                try:
+                    token_exchange_response = await extended_user_token_provider.exchange_token_from_credentials(
+                        context,
+                        self._settings.oath_app_credentials,
+                        self._settings.connection_name,
+                        context.activity.from_property.id,
+                        TokenExchangeRequest(token=context.activity.value.token),
+                    )
+                except:
+                    # Ignore Exceptions
+                    # If token exchange failed for any reason, tokenExchangeResponse above stays null, and
+                    # hence we send back a failure invoke response to the caller.
+                    pass
 
                 if not token_exchange_response or not token_exchange_response.token:
                     await context.send_activity(

@@ -92,6 +92,7 @@ class TokenMagicCode:
 
 class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
     __test__ = False
+    __EXCEPTION_EXPECTED = "ExceptionExpected"
 
     def __init__(
         self,
@@ -446,6 +447,23 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
         )
         self.exchangeable_tokens[key.to_key()] = key
 
+    def throw_on_exchange_request(
+        self,
+        connection_name: str,
+        channel_id: str,
+        user_id: str,
+        exchangeable_item: str,
+    ):
+        key = ExchangeableToken(
+            connection_name=connection_name,
+            channel_id=channel_id,
+            user_id=user_id,
+            exchangeable_item=exchangeable_item,
+            token=TestAdapter.__EXCEPTION_EXPECTED,
+        )
+
+        self.exchangeable_tokens[key.to_key()] = key
+
     async def get_sign_in_resource_from_user(
         self,
         turn_context: TurnContext,
@@ -504,6 +522,9 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
 
         token_exchange_response = self.exchangeable_tokens.get(key.to_key())
         if token_exchange_response:
+            if token_exchange_response.token == TestAdapter.__EXCEPTION_EXPECTED:
+                raise Exception("Exception occurred during exchanging tokens")
+
             return TokenResponse(
                 channel_id=key.channel_id,
                 connection_name=key.connection_name,
