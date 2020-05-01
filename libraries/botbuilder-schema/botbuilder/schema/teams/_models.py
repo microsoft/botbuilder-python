@@ -1537,6 +1537,10 @@ class TeamsChannelAccount(ChannelAccount):
     :type email: str
     :param user_principal_name: Unique user principal name
     :type user_principal_name: str
+    :param tenant_id: Tenant Id of the user.
+    :type tenant_id: str
+    :param user_role: User Role of the user.
+    :type user_role: str
     """
 
     _attribute_map = {
@@ -1547,6 +1551,8 @@ class TeamsChannelAccount(ChannelAccount):
         "email": {"key": "email", "type": "str"},
         "userPrincipalName": {"key": "userPrincipalName", "type": "str"},
         "aad_object_id": {"key": "objectId", "type": "str"},
+        "tenant_id": {"key": "tenantId", "type": "str"},
+        "user_role": {"key": "userRole", "type": "str"},
     }
 
     def __init__(self, **kwargs):
@@ -1555,6 +1561,8 @@ class TeamsChannelAccount(ChannelAccount):
         self.surname = kwargs.get("surname", None)
         self.email = kwargs.get("email", None)
         self.user_principal_name = kwargs.get("userPrincipalName", None)
+        self.tenant_id = kwargs.get("tenantId", None)
+        self.user_role = kwargs.get("userRole", None)
 
 
 class TeamsPagedMembersResult(PagedMembersResult):

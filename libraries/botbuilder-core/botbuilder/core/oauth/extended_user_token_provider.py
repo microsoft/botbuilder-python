@@ -11,7 +11,7 @@ from botframework.connector.token_api.models import (
 )
 from botframework.connector.auth import AppCredentials
 
-from .turn_context import TurnContext
+from botbuilder.core.turn_context import TurnContext
 from .user_token_provider import UserTokenProvider
 
 
