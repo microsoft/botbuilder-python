@@ -53,8 +53,11 @@ from botbuilder.schema import (
 
 from . import __version__
 from .bot_adapter import BotAdapter
+from .oauth import (
+    ConnectorClientBuilder,
+    ExtendedUserTokenProvider,
+)
 from .turn_context import TurnContext
-from .extended_user_token_provider import ExtendedUserTokenProvider
 from .invoke_response import InvokeResponse
 from .conversation_reference_extension import get_continuation_activity
 
@@ -164,7 +167,9 @@ class BotFrameworkAdapterSettings:
         )
 
 
-class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
+class BotFrameworkAdapter(
+    BotAdapter, ExtendedUserTokenProvider, ConnectorClientBuilder
+):
     """
     Defines an adapter to connect a bot to a service endpoint.
 
@@ -1083,7 +1088,8 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
         self, service_url: str, identity: ClaimsIdentity = None, audience: str = None
     ) -> ConnectorClient:
         """
-        Creates the connector client
+        Implementation of ConnectorClientProvider.create_connector_client.
+
         :param service_url: The service URL
         :param identity: The claims identity
         :param audience:
