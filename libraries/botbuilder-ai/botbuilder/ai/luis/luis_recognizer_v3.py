@@ -1,5 +1,6 @@
 import aiohttp
 from botbuilder.core import (
+    IntentScore,
     RecognizerResult,
     TurnContext,
 )
@@ -9,11 +10,6 @@ from .luis_application import LuisApplication
 
 
 # from .activity_util import ActivityUtil
-#
-# import asyncio
-# import json
-#
-# from typing import Dict
 
 
 class LuisRecognizerV3(LuisRecognizerInternal):
@@ -65,12 +61,17 @@ class LuisRecognizerV3(LuisRecognizerInternal):
 
                 recognizer_result = RecognizerResult(
                     text=utterance,
-                    # intents = self._get_intents(
-                    #     luis_result["prediction"]
-                    # ),
+                    intents=self._get_intents(luis_result["prediction"]),
                     entities=self._extract_entities_and_metadata(
                         luis_result["prediction"]
                     ),
+                )
+
+            if self.luis_recognizer_options_v3.include_instance_data:
+                recognizer_result.entities[self._metadata_key] = (
+                    recognizer_result.entities[self._metadata_key]
+                    if recognizer_result.entities[self._metadata_key]
+                    else {}
                 )
 
         return recognizer_result
@@ -120,9 +121,7 @@ class LuisRecognizerV3(LuisRecognizerInternal):
             return intents
 
         for intent in luis_result["intents"]:
-            intents[self._normalize(intent)] = {
-                "score": luis_result["intents"][intent]["score"]
-            }
+            intents[intent] = IntentScore(luis_result["intents"][intent]["score"])
 
         return intents
 
@@ -137,7 +136,7 @@ class LuisRecognizerV3(LuisRecognizerInternal):
 
     def _map_properties(self, source, in_instance):
 
-        if isinstance(source, (int, float)):
+        if isinstance(source, (int, float, bool, str)):
             return source
 
         result = source
@@ -152,7 +151,7 @@ class LuisRecognizerV3(LuisRecognizerInternal):
                 ):
                     is_geography_v2 = item["type"]
 
-                if in_instance and is_geography_v2:
+                if not in_instance and is_geography_v2:
                     geo_entity = {}
                     for item_props in item:
                         if item_props == "value":
@@ -179,7 +178,7 @@ class LuisRecognizerV3(LuisRecognizerInternal):
                 if timexs:
                     unique = []
                     for elt in timexs:
-                        if elt["timex"] and elt["timex"] in unique:
+                        if elt["timex"] and elt["timex"] not in unique:
                             unique.append(elt["timex"])
 
                     for timex in unique:
@@ -191,10 +190,10 @@ class LuisRecognizerV3(LuisRecognizerInternal):
 
             else:
                 for property in source:
-                    name = property
+                    name = self._normalize(property)
                     is_array = isinstance(source[property], list)
                     is_string = isinstance(source[property], str)
-                    is_int = isinstance(source[property], int)
+                    is_int = isinstance(source[property], (int, float))
                     val = self._map_properties(
                         source[property], in_instance or property == self._metadata_key
                     )
@@ -214,7 +213,7 @@ class LuisRecognizerV3(LuisRecognizerInternal):
                             nobj[name] = val
                     else:
                         if name == "unit" and is_string:
-                            nobj.units = val
+                            nobj["units"] = val
                         else:
                             nobj[name] = val
 

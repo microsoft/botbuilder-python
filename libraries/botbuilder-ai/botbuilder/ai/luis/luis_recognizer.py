@@ -70,11 +70,12 @@ class LuisRecognizer(Recognizer):
 
         self.telemetry_client = self._options.telemetry_client
         self.log_personal_information = self._options.log_personal_information
-
         credentials = CognitiveServicesCredentials(self._application.endpoint_key)
         self._runtime = LUISRuntimeClient(self._application.endpoint, credentials)
         self._runtime.config.add_user_agent(LuisUtil.get_user_agent())
-        self._runtime.config.connection.timeout = self._options.timeout // 1000
+
+        if isinstance(prediction_options, LuisPredictionOptions):
+            self._runtime.config.connection.timeout = self._options.timeout // 1000
 
     @staticmethod
     def top_intent(
