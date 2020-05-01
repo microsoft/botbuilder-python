@@ -9,7 +9,6 @@ from botbuilder.schema import (
     ActivityTypes,
     ExpectedReplies,
     DeliveryModes,
-    OAuthCard,
     SignInConstants,
     TokenExchangeInvokeRequest,
 )
