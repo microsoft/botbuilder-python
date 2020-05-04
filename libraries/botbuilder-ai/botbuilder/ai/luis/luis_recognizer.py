@@ -3,10 +3,6 @@
 
 import json
 from typing import Dict, List, Tuple, Union
-
-from azure.cognitiveservices.language.luis.runtime import LUISRuntimeClient
-from msrest.authentication import CognitiveServicesCredentials
-
 from botbuilder.core import (
     BotAssert,
     IntentScore,
@@ -15,11 +11,7 @@ from botbuilder.core import (
     TurnContext,
 )
 from botbuilder.schema import ActivityTypes
-
 from . import LuisApplication, LuisPredictionOptions, LuisTelemetryConstants
-
-from .luis_util import LuisUtil
-
 from .luis_recognizer_v3 import LuisRecognizerV3
 from .luis_recognizer_v2 import LuisRecognizerV2
 from .luis_recognizer_options_v2 import LuisRecognizerOptionsV2
@@ -65,17 +57,16 @@ class LuisRecognizer(Recognizer):
             )
 
         self._options = prediction_options or LuisPredictionOptions()
-
-        self._include_api_results = include_api_results
+        self._include_api_results = include_api_results or (
+            prediction_options.include_api_results
+            if isinstance(
+                prediction_options, (LuisRecognizerOptionsV3, LuisRecognizerOptionsV2)
+            )
+            else False
+        )
 
         self.telemetry_client = self._options.telemetry_client
         self.log_personal_information = self._options.log_personal_information
-        credentials = CognitiveServicesCredentials(self._application.endpoint_key)
-        self._runtime = LUISRuntimeClient(self._application.endpoint, credentials)
-        self._runtime.config.add_user_agent(LuisUtil.get_user_agent())
-
-        if isinstance(prediction_options, LuisPredictionOptions):
-            self._runtime.config.connection.timeout = self._options.timeout // 1000
 
     @staticmethod
     def top_intent(

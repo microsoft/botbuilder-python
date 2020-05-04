@@ -11,6 +11,7 @@ class LuisRecognizerOptionsV3(LuisRecognizerOptions):
         include_instance_data: bool = True,
         log: bool = True,
         prefer_external_entities: bool = False,
+        datetime_reference: str = None,
         dynamic_lists: List = None,
         external_entities: List = None,
         slot: str = "production" or "staging",
@@ -26,6 +27,7 @@ class LuisRecognizerOptionsV3(LuisRecognizerOptions):
         self.include_instance_data = include_instance_data
         self.log = log
         self.prefer_external_entities = prefer_external_entities
+        self.datetime_reference = datetime_reference
         self.dynamic_lists = dynamic_lists
         self.external_entities = external_entities
         self.slot = slot

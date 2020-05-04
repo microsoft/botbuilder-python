@@ -1,4 +1,9 @@
+import re
+from typing import Dict
+
 import aiohttp
+from botbuilder.ai.luis.activity_util import ActivityUtil
+from botbuilder.ai.luis.luis_util import LuisUtil
 from botbuilder.core import (
     IntentScore,
     RecognizerResult,
@@ -25,6 +30,7 @@ class LuisRecognizerV3(LuisRecognizerInternal):
     ]
     _geographySubtypes = ["poi", "city", "countryRegion", "continent", "state"]
     _metadata_key = "$instance"
+
     # The value type for a LUIS trace activity.
     luis_trace_type: str = "https://www.luis.ai/schemas/trace"
 
@@ -67,11 +73,23 @@ class LuisRecognizerV3(LuisRecognizerInternal):
                     ),
                 )
 
-            if self.luis_recognizer_options_v3.include_instance_data:
-                recognizer_result.entities[self._metadata_key] = (
-                    recognizer_result.entities[self._metadata_key]
-                    if recognizer_result.entities[self._metadata_key]
-                    else {}
+                if self.luis_recognizer_options_v3.include_instance_data:
+                    recognizer_result.entities[self._metadata_key] = (
+                        recognizer_result.entities[self._metadata_key]
+                        if self._metadata_key in recognizer_result.entities
+                        else {}
+                    )
+
+                if "sentiment" in luis_result["prediction"]:
+                    recognizer_result.properties["sentiment"] = self._get_sentiment(
+                        luis_result["prediction"]
+                    )
+
+                await self._emit_trace_info(
+                    turn_context,
+                    luis_result,
+                    recognizer_result,
+                    self.luis_recognizer_options_v3,
                 )
 
         return recognizer_result
@@ -104,8 +122,15 @@ class LuisRecognizerV3(LuisRecognizerInternal):
     def _build_request(self, utterance: str):
         body = {
             "query": utterance,
-            "preferExternalEntities": self.luis_recognizer_options_v3.prefer_external_entities,
+            "options": {
+                "preferExternalEntities": self.luis_recognizer_options_v3.prefer_external_entities,
+            },
         }
+
+        if self.luis_recognizer_options_v3.datetime_reference:
+            body["options"][
+                "datetimeReference"
+            ] = self.luis_recognizer_options_v3.datetime_reference
 
         if self.luis_recognizer_options_v3.dynamic_lists:
             body["dynamicLists"] = self.luis_recognizer_options_v3.dynamic_lists
@@ -121,14 +146,19 @@ class LuisRecognizerV3(LuisRecognizerInternal):
             return intents
 
         for intent in luis_result["intents"]:
-            intents[intent] = IntentScore(luis_result["intents"][intent]["score"])
+            intents[self._normalize_name(intent)] = IntentScore(
+                luis_result["intents"][intent]["score"]
+            )
 
         return intents
+
+    def _normalize_name(self, name):
+        return re.sub(r"\.", "_", name)
 
     def _normalize(self, entity):
         split_entity = entity.split(":")
         entity_name = split_entity[-1]
-        return entity_name
+        return self._normalize_name(entity_name)
 
     def _extract_entities_and_metadata(self, luis_result):
         entities = luis_result["entities"]
@@ -219,3 +249,33 @@ class LuisRecognizerV3(LuisRecognizerInternal):
 
             result = nobj
         return result
+
+    def _get_sentiment(self, luis_result):
+        return {
+            "label": luis_result["sentiment"]["label"],
+            "score": luis_result["sentiment"]["score"],
+        }
+
+    async def _emit_trace_info(
+        self,
+        turn_context: TurnContext,
+        luis_result,
+        recognizer_result: RecognizerResult,
+        options: LuisRecognizerOptionsV3,
+    ) -> None:
+        trace_info: Dict[str, object] = {
+            "recognizerResult": LuisUtil.recognizer_result_as_dict(recognizer_result),
+            "luisModel": {"ModelID": self._application.application_id},
+            "luisOptions": {"Slot": options.slot},
+            "luisResult": luis_result,
+        }
+
+        trace_activity = ActivityUtil.create_trace(
+            turn_context.activity,
+            "LuisRecognizer",
+            trace_info,
+            LuisRecognizerV3.luis_trace_type,
+            LuisRecognizerV3.luis_trace_label,
+        )
+
+        await turn_context.send_activity(trace_activity)

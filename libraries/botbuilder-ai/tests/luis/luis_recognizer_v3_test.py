@@ -7,8 +7,12 @@ import json
 from os import path
 from typing import Dict, Tuple, Union
 
-from aiounittest import AsyncTestCase
+import re
+from aioresponses import aioresponses
 
+from aiounittest import AsyncTestCase
+from unittest import mock
+from unittest.mock import MagicMock, Mock
 from botbuilder.ai.luis import LuisRecognizerOptionsV3
 
 from asynctest import CoroutineMock, patch
@@ -54,7 +58,8 @@ class LuisRecognizerV3Test(AsyncTestCase):
         return dictionary
 
     @classmethod
-    @patch('aiohttp.ClientSession.post')
+    # @patch('aiohttp.ClientSession.post')
+    @aioresponses()
     async def _get_recognizer_result(
         cls,
         utterance: str,
@@ -77,7 +82,10 @@ class LuisRecognizerV3Test(AsyncTestCase):
             recognizer_class, include_api_results=include_api_results, options=options
         )
         context = LuisRecognizerV3Test._get_context(utterance, bot_adapter)
-        mock_get.return_value.__aenter__.return_value.json = CoroutineMock(side_effect=[response_json])
+        # mock_get.return_value.__aenter__.return_value.json = CoroutineMock(side_effect=[response_json])
+
+        pattern = re.compile(r'^https://westus.api.cognitive.microsoft.com.*$')
+        mock_get.post(pattern, payload=response_json, status=200)
 
         result = await recognizer.recognize(
             context, telemetry_properties, telemetry_metrics
@@ -146,6 +154,10 @@ class LuisRecognizerV3Test(AsyncTestCase):
         if "version" in test_options:
             options.version=test_options["version"]
 
+        if "externalEntities" in test_options:
+            options.external_entities=test_options["externalEntities"]
+
+
         # dynamic_lists: List = None,
         # external_entities: List = None,
         # telemetry_client: BotTelemetryClient = NullTelemetryClient(),
@@ -160,9 +172,9 @@ class LuisRecognizerV3Test(AsyncTestCase):
         # Assert
         actual_result_json = LuisUtil.recognizer_result_as_dict(result)
         del expected_json["v3"]
-        del expected_json["sentiment"]
         trimmed_expected = LuisRecognizerV3Test._remove_none_property(expected_json)
         trimmed_actual = LuisRecognizerV3Test._remove_none_property(actual_result_json)
+
         self.assertEqual(trimmed_expected, trimmed_actual)
 
     async def test_composite1_v3(self):
@@ -173,3 +185,72 @@ class LuisRecognizerV3Test(AsyncTestCase):
 
     async def test_composite3_v3(self):
         await self._test_json_v3("Composite3_v3.json")
+
+    async def test_external_entities_and_built_in_v3(self):
+        await self._test_json_v3("ExternalEntitiesAndBuiltIn_v3.json")
+
+    async def test_external_entities_and_composite_v3(self):
+        await self._test_json_v3("ExternalEntitiesAndComposite_v3.json")
+
+    async def test_external_entities_and_list_v3(self):
+        await self._test_json_v3("ExternalEntitiesAndList_v3.json")
+
+    async def test_external_entities_and_regex_v3(self):
+        await self._test_json_v3("ExternalEntitiesAndRegex_v3.json")
+
+    async def test_external_entities_and_simple_v3(self):
+        await self._test_json_v3("ExternalEntitiesAndSimple_v3.json")
+
+    async def test_geo_people_ordinal_v3(self):
+        await self._test_json_v3("GeoPeopleOrdinal_v3.json")
+
+    async def test_minimal_v3(self):
+        await self._test_json_v3("Minimal_v3.json")
+
+    async def test_no_entities_instance_true_v3(self):
+        await self._test_json_v3("NoEntitiesInstanceTrue_v3.json")
+
+    async def test_patterns_v3(self):
+        await self._test_json_v3("Patterns_v3.json")
+
+    async def test_prebuilt_v3(self):
+        await self._test_json_v3("Prebuilt_v3.json")
+
+    async def test_roles_v3(self):
+        await self._test_json_v3("roles_v3.json")
+
+    async def test_trace_activity(self):
+        # Arrange
+        utterance: str = "fly on delta at 3pm"
+        expected_json = LuisRecognizerV3Test._get_json_for_file("Minimal_v3.json")
+        response_json = expected_json["v3"]["response"]
+
+        # add async support to magic mock.
+        async def async_magic():
+            pass
+
+        MagicMock.__await__ = lambda x: async_magic().__await__()
+
+        # Act
+        with mock.patch.object(TurnContext, "send_activity") as mock_send_activity:
+            await self._get_recognizer_result(utterance, response_json, options= LuisRecognizerOptionsV3())
+            trace_activity: Activity = mock_send_activity.call_args[0][0]
+
+        # Assert
+        self.assertIsNotNone(trace_activity)
+        self.assertEqual(LuisRecognizer.luis_trace_type, trace_activity.value_type)
+        self.assertEqual(LuisRecognizer.luis_trace_label, trace_activity.label)
+
+        luis_trace_info = trace_activity.value
+        self.assertIsNotNone(luis_trace_info)
+        self.assertIsNotNone(luis_trace_info["recognizerResult"])
+        self.assertIsNotNone(luis_trace_info["luisResult"])
+        self.assertIsNotNone(luis_trace_info["luisOptions"])
+        self.assertIsNotNone(luis_trace_info["luisModel"])
+
+        recognizer_result: RecognizerResult = luis_trace_info["recognizerResult"]
+        self.assertEqual(utterance, recognizer_result["text"])
+        self.assertIsNotNone(recognizer_result["intents"]["Roles"])
+        self.assertEqual(
+            LuisRecognizerV3Test._luisAppId, luis_trace_info["luisModel"]["ModelID"]
+        )

@@ -295,7 +295,7 @@
             "Travel": {
               "score": 0.0154484725
             },
-            "Weather_GetForecast": {
+            "Weather.GetForecast": {
               "score": 0.0237181056
             }
           },
