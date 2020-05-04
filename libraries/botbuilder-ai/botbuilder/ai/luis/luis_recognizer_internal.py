@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 from abc import ABC, abstractmethod
 from botbuilder.core import TurnContext
 from .luis_application import LuisApplication

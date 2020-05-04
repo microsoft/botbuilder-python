@@ -1,5 +1,7 @@
-from botbuilder.core import BotTelemetryClient, NullTelemetryClient
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
 
+from botbuilder.core import BotTelemetryClient, NullTelemetryClient
 
 class LuisRecognizerOptions:
     def __init__(

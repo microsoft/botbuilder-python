@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 from typing import Dict
 from azure.cognitiveservices.language.luis.runtime import LUISRuntimeClient
 from azure.cognitiveservices.language.luis.runtime.models import LuisResult
