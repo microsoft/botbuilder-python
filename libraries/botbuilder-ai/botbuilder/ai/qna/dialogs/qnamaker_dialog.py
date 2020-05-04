@@ -292,13 +292,12 @@ class QnAMakerDialog(WaterfallDialog):
         # Check if active learning is enabled and send card
         # maximum_score_for_low_score_variation is the score above which no need to check for feedback.
         if (
-            is_active_learning_enabled
-            and response.answers
+            response.answers
             and response.answers[0].score <= self.maximum_score_for_low_score_variation
         ):
             # Get filtered list of the response that support low score variation criteria.
             response.answers = qna_client.get_low_score_variation(response.answers)
-            if len(response.answers) > 1:
+            if len(response.answers) > 1 and is_active_learning_enabled:
                 suggested_questions = [qna.questions[0] for qna in response.answers]
                 message = QnACardBuilder.get_suggestions_card(
                     suggested_questions,

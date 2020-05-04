@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 # pylint: disable=protected-access
+# pylint: disable=too-many-lines
 
 import json
 from os import path
@@ -810,6 +811,46 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
                 2, len(results), "Should have received more than one answers."
             )
             self.assertEqual(True, results[0].score < 1, "Score should be low.")
+
+    async def test_low_score_variation(self):
+        qna = QnAMaker(QnaApplicationTest.tests_endpoint)
+        options = QnAMakerOptions(top=5, context=None)
+
+        turn_context = QnaApplicationTest._get_context("Q11", TestAdapter())
+        response_json = QnaApplicationTest._get_json_for_file(
+            "QnaMaker_TopNAnswer.json"
+        )
+
+        # active learning enabled
+        with patch(
+            "aiohttp.ClientSession.post",
+            return_value=aiounittest.futurized(response_json),
+        ):
+            results = await qna.get_answers(turn_context, options)
+            self.assertIsNotNone(results)
+            self.assertEqual(4, len(results), "should get four results")
+
+            filtered_results = qna.get_low_score_variation(results)
+            self.assertIsNotNone(filtered_results)
+            self.assertEqual(3, len(filtered_results), "should get three results")
+
+        # active learning disabled
+        turn_context = QnaApplicationTest._get_context("Q11", TestAdapter())
+        response_json = QnaApplicationTest._get_json_for_file(
+            "QnaMaker_TopNAnswer_DisableActiveLearning.json"
+        )
+
+        with patch(
+            "aiohttp.ClientSession.post",
+            return_value=aiounittest.futurized(response_json),
+        ):
+            results = await qna.get_answers(turn_context, options)
+            self.assertIsNotNone(results)
+            self.assertEqual(4, len(results), "should get four results")
+
+            filtered_results = qna.get_low_score_variation(results)
+            self.assertIsNotNone(filtered_results)
+            self.assertEqual(3, len(filtered_results), "should get three results")
 
     @classmethod
     async def _get_service_result(
