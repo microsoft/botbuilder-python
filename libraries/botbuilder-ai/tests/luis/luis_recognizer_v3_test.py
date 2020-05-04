@@ -15,8 +15,6 @@ from unittest import mock
 from unittest.mock import MagicMock, Mock
 from botbuilder.ai.luis import LuisRecognizerOptionsV3
 
-from asynctest import CoroutineMock, patch
-
 from botbuilder.ai.luis import LuisApplication, LuisPredictionOptions, LuisRecognizer
 from botbuilder.ai.luis.luis_util import LuisUtil
 from botbuilder.core import (
