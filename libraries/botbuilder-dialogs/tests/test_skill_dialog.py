@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 import uuid
+from http import HTTPStatus
 from typing import Callable, Union
 from unittest.mock import Mock
 
@@ -12,6 +13,7 @@ from botbuilder.core import (
     TurnContext,
     MessageFactory,
 )
+from botbuilder.core.card_factory import ContentTypes
 from botbuilder.core.skills import (
     BotFrameworkSkill,
     ConversationIdFactoryBase,
@@ -19,7 +21,17 @@ from botbuilder.core.skills import (
     SkillConversationReference,
     BotFrameworkClient,
 )
-from botbuilder.schema import Activity, ActivityTypes, ConversationReference
+from botbuilder.schema import (
+    Activity,
+    ActivityTypes,
+    ConversationReference,
+    OAuthCard,
+    Attachment,
+    ConversationAccount,
+    ChannelAccount,
+    ExpectedReplies,
+    DeliveryModes,
+)
 from botbuilder.testing import DialogTestClient
 
 from botbuilder.dialogs import (
@@ -28,6 +40,7 @@ from botbuilder.dialogs import (
     BeginSkillDialogOptions,
     DialogTurnStatus,
 )
+from botframework.connector.token_api.models import TokenExchangeResource
 
 
 class SimpleConversationIdFactory(ConversationIdFactoryBase):
@@ -91,15 +104,6 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
         with self.assertRaises(TypeError):
             await client.send_activity("irrelevant")
 
-        # Only Message and Event activities are supported
-        client = DialogTestClient(
-            "test",
-            sut,
-            BeginSkillDialogOptions(Activity(type=ActivityTypes.conversation_update)),
-        )
-        with self.assertRaises(TypeError):
-            await client.send_activity("irrelevant")
-
     async def test_begin_dialog_calls_skill(self):
         activity_sent = None
         from_bot_id_sent = None
@@ -123,7 +127,7 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
         mock_skill_client = self._create_mock_skill_client(capture)
 
         conversation_state = ConversationState(MemoryStorage())
-        dialog_options = self._create_skill_dialog_options(
+        dialog_options = SkillDialogTests.create_skill_dialog_options(
             conversation_state, mock_skill_client
         )
 
@@ -171,7 +175,7 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
         mock_skill_client = self._create_mock_skill_client(capture)
 
         conversation_state = ConversationState(MemoryStorage())
-        dialog_options = self._create_skill_dialog_options(
+        dialog_options = SkillDialogTests.create_skill_dialog_options(
             conversation_state, mock_skill_client
         )
 
@@ -199,7 +203,7 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
         mock_skill_client = self._create_mock_skill_client(None, 500)
 
         conversation_state = ConversationState(MemoryStorage())
-        dialog_options = self._create_skill_dialog_options(
+        dialog_options = SkillDialogTests.create_skill_dialog_options(
             conversation_state, mock_skill_client
         )
 
@@ -217,8 +221,223 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
         with self.assertRaises(Exception):
             await client.send_activity("irrelevant")
 
-    def _create_skill_dialog_options(
-        self, conversation_state: ConversationState, skill_client: BotFrameworkClient
+    async def test_should_intercept_oauth_cards_for_sso(self):
+        connection_name = "connectionName"
+        first_response = ExpectedReplies(
+            activities=[
+                SkillDialogTests.create_oauth_card_attachment_activity("https://test")
+            ]
+        )
+
+        sequence = 0
+
+        async def post_return():
+            nonlocal sequence
+            if sequence == 0:
+                result = InvokeResponse(body=first_response, status=HTTPStatus.OK)
+            else:
+                result = InvokeResponse(status=HTTPStatus.OK)
+            sequence += 1
+            return result
+
+        mock_skill_client = self._create_mock_skill_client(None, post_return)
+        conversation_state = ConversationState(MemoryStorage())
+
+        dialog_options = SkillDialogTests.create_skill_dialog_options(
+            conversation_state, mock_skill_client
+        )
+        sut = SkillDialog(dialog_options, dialog_id="dialog")
+        activity_to_send = SkillDialogTests.create_send_activity()
+
+        client = DialogTestClient(
+            "test",
+            sut,
+            BeginSkillDialogOptions(
+                activity=activity_to_send, connection_name=connection_name,
+            ),
+            conversation_state=conversation_state,
+        )
+
+        client.test_adapter.add_exchangeable_token(
+            connection_name, "test", "User1", "https://test", "https://test1"
+        )
+
+        final_activity = await client.send_activity(MessageFactory.text("irrelevant"))
+        self.assertIsNone(final_activity)
+
+    async def test_should_not_intercept_oauth_cards_for_empty_connection_name(self):
+        connection_name = "connectionName"
+        first_response = ExpectedReplies(
+            activities=[
+                SkillDialogTests.create_oauth_card_attachment_activity("https://test")
+            ]
+        )
+
+        sequence = 0
+
+        async def post_return():
+            nonlocal sequence
+            if sequence == 0:
+                result = InvokeResponse(body=first_response, status=HTTPStatus.OK)
+            else:
+                result = InvokeResponse(status=HTTPStatus.OK)
+            sequence += 1
+            return result
+
+        mock_skill_client = self._create_mock_skill_client(None, post_return)
+        conversation_state = ConversationState(MemoryStorage())
+
+        dialog_options = SkillDialogTests.create_skill_dialog_options(
+            conversation_state, mock_skill_client
+        )
+        sut = SkillDialog(dialog_options, dialog_id="dialog")
+        activity_to_send = SkillDialogTests.create_send_activity()
+
+        client = DialogTestClient(
+            "test",
+            sut,
+            BeginSkillDialogOptions(activity=activity_to_send,),
+            conversation_state=conversation_state,
+        )
+
+        client.test_adapter.add_exchangeable_token(
+            connection_name, "test", "User1", "https://test", "https://test1"
+        )
+
+        final_activity = await client.send_activity(MessageFactory.text("irrelevant"))
+        self.assertIsNotNone(final_activity)
+        self.assertEqual(len(final_activity.attachments), 1)
+
+    async def test_should_not_intercept_oauth_cards_for_empty_token(self):
+        first_response = ExpectedReplies(
+            activities=[
+                SkillDialogTests.create_oauth_card_attachment_activity("https://test")
+            ]
+        )
+
+        sequence = 0
+
+        async def post_return():
+            nonlocal sequence
+            if sequence == 0:
+                result = InvokeResponse(body=first_response, status=HTTPStatus.OK)
+            else:
+                result = InvokeResponse(status=HTTPStatus.OK)
+            sequence += 1
+            return result
+
+        mock_skill_client = self._create_mock_skill_client(None, post_return)
+        conversation_state = ConversationState(MemoryStorage())
+
+        dialog_options = SkillDialogTests.create_skill_dialog_options(
+            conversation_state, mock_skill_client
+        )
+        sut = SkillDialog(dialog_options, dialog_id="dialog")
+        activity_to_send = SkillDialogTests.create_send_activity()
+
+        client = DialogTestClient(
+            "test",
+            sut,
+            BeginSkillDialogOptions(activity=activity_to_send,),
+            conversation_state=conversation_state,
+        )
+
+        # Don't add exchangeable token to test adapter
+
+        final_activity = await client.send_activity(MessageFactory.text("irrelevant"))
+        self.assertIsNotNone(final_activity)
+        self.assertEqual(len(final_activity.attachments), 1)
+
+    async def test_should_not_intercept_oauth_cards_for_token_exception(self):
+        connection_name = "connectionName"
+        first_response = ExpectedReplies(
+            activities=[
+                SkillDialogTests.create_oauth_card_attachment_activity("https://test")
+            ]
+        )
+
+        sequence = 0
+
+        async def post_return():
+            nonlocal sequence
+            if sequence == 0:
+                result = InvokeResponse(body=first_response, status=HTTPStatus.OK)
+            else:
+                result = InvokeResponse(status=HTTPStatus.OK)
+            sequence += 1
+            return result
+
+        mock_skill_client = self._create_mock_skill_client(None, post_return)
+        conversation_state = ConversationState(MemoryStorage())
+
+        dialog_options = SkillDialogTests.create_skill_dialog_options(
+            conversation_state, mock_skill_client
+        )
+        sut = SkillDialog(dialog_options, dialog_id="dialog")
+        activity_to_send = SkillDialogTests.create_send_activity()
+        initial_dialog_options = BeginSkillDialogOptions(
+            activity=activity_to_send, connection_name=connection_name,
+        )
+
+        client = DialogTestClient(
+            "test", sut, initial_dialog_options, conversation_state=conversation_state,
+        )
+        client.test_adapter.throw_on_exchange_request(
+            connection_name, "test", "User1", "https://test"
+        )
+
+        final_activity = await client.send_activity(MessageFactory.text("irrelevant"))
+        self.assertIsNotNone(final_activity)
+        self.assertEqual(len(final_activity.attachments), 1)
+
+    async def test_should_not_intercept_oauth_cards_for_bad_request(self):
+        connection_name = "connectionName"
+        first_response = ExpectedReplies(
+            activities=[
+                SkillDialogTests.create_oauth_card_attachment_activity("https://test")
+            ]
+        )
+
+        sequence = 0
+
+        async def post_return():
+            nonlocal sequence
+            if sequence == 0:
+                result = InvokeResponse(body=first_response, status=HTTPStatus.OK)
+            else:
+                result = InvokeResponse(status=HTTPStatus.CONFLICT)
+            sequence += 1
+            return result
+
+        mock_skill_client = self._create_mock_skill_client(None, post_return)
+        conversation_state = ConversationState(MemoryStorage())
+
+        dialog_options = SkillDialogTests.create_skill_dialog_options(
+            conversation_state, mock_skill_client
+        )
+        sut = SkillDialog(dialog_options, dialog_id="dialog")
+        activity_to_send = SkillDialogTests.create_send_activity()
+
+        client = DialogTestClient(
+            "test",
+            sut,
+            BeginSkillDialogOptions(
+                activity=activity_to_send, connection_name=connection_name,
+            ),
+            conversation_state=conversation_state,
+        )
+
+        client.test_adapter.add_exchangeable_token(
+            connection_name, "test", "User1", "https://test", "https://test1"
+        )
+
+        final_activity = await client.send_activity(MessageFactory.text("irrelevant"))
+        self.assertIsNotNone(final_activity)
+        self.assertEqual(len(final_activity.attachments), 1)
+
+    @staticmethod
+    def create_skill_dialog_options(
+        conversation_state: ConversationState, skill_client: BotFrameworkClient
     ):
         return SkillDialogOptions(
             bot_id=str(uuid.uuid4()),
@@ -232,8 +451,29 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
             ),
         )
 
+    @staticmethod
+    def create_send_activity() -> Activity:
+        return Activity(
+            type=ActivityTypes.message,
+            delivery_mode=DeliveryModes.expect_replies,
+            text=str(uuid.uuid4()),
+        )
+
+    @staticmethod
+    def create_oauth_card_attachment_activity(uri: str) -> Activity:
+        oauth_card = OAuthCard(token_exchange_resource=TokenExchangeResource(uri=uri))
+        attachment = Attachment(
+            content_type=ContentTypes.oauth_card, content=oauth_card,
+        )
+
+        attachment_activity = MessageFactory.attachment(attachment)
+        attachment_activity.conversation = ConversationAccount(id=str(uuid.uuid4()))
+        attachment_activity.from_property = ChannelAccount(id="blah", name="name")
+
+        return attachment_activity
+
     def _create_mock_skill_client(
-        self, callback: Callable, return_status: int = 200
+        self, callback: Callable, return_status: Union[Callable, int] = 200
     ) -> BotFrameworkClient:
         mock_client = Mock()
 
@@ -255,6 +495,9 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
                     conversation_id,
                     activity,
                 )
+
+            if isinstance(return_status, Callable):
+                return await return_status()
             return InvokeResponse(status=return_status)
 
         mock_client.post_activity.side_effect = mock_post_activity

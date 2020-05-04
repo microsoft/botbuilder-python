@@ -8,6 +8,7 @@
 # Changes may cause incorrect behavior and will be lost if the code is
 # regenerated.
 # --------------------------------------------------------------------------
+from datetime import datetime
 
 from msrest.serialization import Model
 from msrest.exceptions import HttpOperationError
@@ -286,6 +287,32 @@ class Activity(Model):
         self.text_highlights = text_highlights
         self.semantic_action = semantic_action
         self.caller_id = caller_id
+
+    def create_reply(self, text: str = None, locale: str = None):
+        return Activity(
+            type="message",
+            timestamp=datetime.utcnow(),
+            from_property=ChannelAccount(
+                id=self.recipient.id if self.recipient else None,
+                name=self.recipient.name if self.recipient else None,
+            ),
+            recipient=ChannelAccount(
+                id=self.from_property.id if self.from_property else None,
+                name=self.from_property.name if self.from_property else None,
+            ),
+            reply_to_id=self.id,
+            service_url=self.service_url,
+            channel_id=self.channel_id,
+            conversation=ConversationAccount(
+                is_group=self.conversation.is_group,
+                id=self.conversation.id,
+                name=self.conversation.name,
+            ),
+            text=text if text else "",
+            locale=locale if locale else self.locale,
+            attachments=[],
+            entities=[],
+        )
 
 
 class AnimationCard(Model):

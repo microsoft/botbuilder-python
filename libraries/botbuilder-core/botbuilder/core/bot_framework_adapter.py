@@ -1242,13 +1242,17 @@ class BotFrameworkAdapter(
             turn_context, oauth_app_credentials
         )
 
-        return client.user_token.exchange_async(
+        result = client.user_token.exchange_async(
             user_id,
             connection_name,
             turn_context.activity.channel_id,
             exchange_request.uri,
             exchange_request.token,
         )
+
+        if isinstance(result, TokenResponse):
+            return result
+        raise TypeError(f"exchange_async returned improper result: {type(result)}")
 
     @staticmethod
     def key_for_connector_client(service_url: str, app_id: str, scope: str):
