@@ -3,6 +3,7 @@
 
 from botbuilder.core import BotTelemetryClient, NullTelemetryClient
 
+
 class LuisRecognizerOptions:
     def __init__(
         self,

@@ -4,6 +4,7 @@
 from botbuilder.core import BotTelemetryClient, NullTelemetryClient
 from .luis_recognizer_options import LuisRecognizerOptions
 
+
 class LuisRecognizerOptionsV2(LuisRecognizerOptions):
     def __init__(
         self,
