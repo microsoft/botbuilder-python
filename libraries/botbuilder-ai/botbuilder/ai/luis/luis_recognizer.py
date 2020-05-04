@@ -3,11 +3,6 @@
 
 import json
 from typing import Dict, List, Tuple, Union
-
-from azure.cognitiveservices.language.luis.runtime import LUISRuntimeClient
-from azure.cognitiveservices.language.luis.runtime.models import LuisResult
-from msrest.authentication import CognitiveServicesCredentials
-
 from botbuilder.core import (
     BotAssert,
     IntentScore,
@@ -16,10 +11,11 @@ from botbuilder.core import (
     TurnContext,
 )
 from botbuilder.schema import ActivityTypes
-
 from . import LuisApplication, LuisPredictionOptions, LuisTelemetryConstants
-from .activity_util import ActivityUtil
-from .luis_util import LuisUtil
+from .luis_recognizer_v3 import LuisRecognizerV3
+from .luis_recognizer_v2 import LuisRecognizerV2
+from .luis_recognizer_options_v2 import LuisRecognizerOptionsV2
+from .luis_recognizer_options_v3 import LuisRecognizerOptionsV3
 
 
 class LuisRecognizer(Recognizer):
@@ -36,7 +32,9 @@ class LuisRecognizer(Recognizer):
     def __init__(
         self,
         application: Union[LuisApplication, str],
-        prediction_options: LuisPredictionOptions = None,
+        prediction_options: Union[
+            LuisRecognizerOptionsV2, LuisRecognizerOptionsV3, LuisPredictionOptions
+        ] = None,
         include_api_results: bool = False,
     ):
         """Initializes a new instance of the <see cref="LuisRecognizer"/> class.
@@ -59,16 +57,16 @@ class LuisRecognizer(Recognizer):
             )
 
         self._options = prediction_options or LuisPredictionOptions()
-
-        self._include_api_results = include_api_results
+        self._include_api_results = include_api_results or (
+            prediction_options.include_api_results
+            if isinstance(
+                prediction_options, (LuisRecognizerOptionsV3, LuisRecognizerOptionsV2)
+            )
+            else False
+        )
 
         self.telemetry_client = self._options.telemetry_client
         self.log_personal_information = self._options.log_personal_information
-
-        credentials = CognitiveServicesCredentials(self._application.endpoint_key)
-        self._runtime = LUISRuntimeClient(self._application.endpoint, credentials)
-        self._runtime.config.add_user_agent(LuisUtil.get_user_agent())
-        self._runtime.config.connection.timeout = self._options.timeout // 1000
 
     @staticmethod
     def top_intent(
@@ -249,7 +247,9 @@ class LuisRecognizer(Recognizer):
         turn_context: TurnContext,
         telemetry_properties: Dict[str, str],
         telemetry_metrics: Dict[str, float],
-        luis_prediction_options: LuisPredictionOptions = None,
+        luis_prediction_options: Union[
+            LuisPredictionOptions, LuisRecognizerOptionsV2, LuisRecognizerOptionsV3
+        ] = None,
     ) -> RecognizerResult:
 
         BotAssert.context_not_none(turn_context)
@@ -259,10 +259,9 @@ class LuisRecognizer(Recognizer):
 
         utterance: str = turn_context.activity.text if turn_context.activity is not None else None
         recognizer_result: RecognizerResult = None
-        luis_result: LuisResult = None
 
         if luis_prediction_options:
-            options = self._merge_options(luis_prediction_options)
+            options = luis_prediction_options
         else:
             options = self._options
 
@@ -271,71 +270,49 @@ class LuisRecognizer(Recognizer):
                 text=utterance, intents={"": IntentScore(score=1.0)}, entities={}
             )
         else:
-            luis_result = self._runtime.prediction.resolve(
-                self._application.application_id,
-                utterance,
-                timezone_offset=options.timezone_offset,
-                verbose=options.include_all_intents,
-                staging=options.staging,
-                spell_check=options.spell_check,
-                bing_spell_check_subscription_key=options.bing_spell_check_subscription_key,
-                log=options.log if options.log is not None else True,
-            )
 
-            recognizer_result = RecognizerResult(
-                text=utterance,
-                altered_text=luis_result.altered_query,
-                intents=LuisUtil.get_intents(luis_result),
-                entities=LuisUtil.extract_entities_and_metadata(
-                    luis_result.entities,
-                    luis_result.composite_entities,
-                    options.include_instance_data
-                    if options.include_instance_data is not None
-                    else True,
-                ),
-            )
-            LuisUtil.add_properties(luis_result, recognizer_result)
-            if self._include_api_results:
-                recognizer_result.properties["luisResult"] = luis_result
+            luis_recognizer = self._build_recognizer(options)
+            recognizer_result = await luis_recognizer.recognizer_internal(turn_context)
 
         # Log telemetry
         self.on_recognizer_result(
             recognizer_result, turn_context, telemetry_properties, telemetry_metrics
         )
 
-        await self._emit_trace_info(
-            turn_context, luis_result, recognizer_result, options
-        )
-
         return recognizer_result
 
-    async def _emit_trace_info(
-        self,
-        turn_context: TurnContext,
-        luis_result: LuisResult,
-        recognizer_result: RecognizerResult,
-        options: LuisPredictionOptions,
-    ) -> None:
-        trace_info: Dict[str, object] = {
-            "recognizerResult": LuisUtil.recognizer_result_as_dict(recognizer_result),
-            "luisModel": {"ModelID": self._application.application_id},
-            "luisOptions": {"Staging": options.staging},
-            "luisResult": LuisUtil.luis_result_as_dict(luis_result),
-        }
-
-        trace_activity = ActivityUtil.create_trace(
-            turn_context.activity,
-            "LuisRecognizer",
-            trace_info,
-            LuisRecognizer.luis_trace_type,
-            LuisRecognizer.luis_trace_label,
-        )
-
-        await turn_context.send_activity(trace_activity)
-
     def _merge_options(
-        self, user_defined_options: LuisPredictionOptions
+        self,
+        user_defined_options: Union[
+            LuisRecognizerOptionsV3, LuisRecognizerOptionsV2, LuisPredictionOptions
+        ],
     ) -> LuisPredictionOptions:
         merged_options = LuisPredictionOptions()
         merged_options.__dict__.update(user_defined_options.__dict__)
         return merged_options
+
+    def _build_recognizer(
+        self,
+        luis_prediction_options: Union[
+            LuisRecognizerOptionsV3, LuisRecognizerOptionsV2, LuisPredictionOptions
+        ],
+    ):
+        if isinstance(luis_prediction_options, LuisRecognizerOptionsV3):
+            return LuisRecognizerV3(self._application, luis_prediction_options)
+        if isinstance(luis_prediction_options, LuisRecognizerOptionsV2):
+            return LuisRecognizerV3(self._application, luis_prediction_options)
+
+        recognizer_options = LuisRecognizerOptionsV2(
+            luis_prediction_options.bing_spell_check_subscription_key,
+            luis_prediction_options.include_all_intents,
+            luis_prediction_options.include_instance_data,
+            luis_prediction_options.log,
+            luis_prediction_options.spell_check,
+            luis_prediction_options.staging,
+            luis_prediction_options.timeout,
+            luis_prediction_options.timezone_offset,
+            self._include_api_results,
+            luis_prediction_options.telemetry_client,
+            luis_prediction_options.log_personal_information,
+        )
+        return LuisRecognizerV2(self._application, recognizer_options)
