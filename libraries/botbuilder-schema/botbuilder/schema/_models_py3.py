@@ -296,6 +296,10 @@ class Activity(Model):
                 id=self.recipient.id if self.recipient else None,
                 name=self.recipient.name if self.recipient else None,
             ),
+            recipient=ChannelAccount(
+                id=self.from_property.id if self.from_property else None,
+                name=self.from_property.name if self.from_property else None,
+            ),
             reply_to_id=self.id,
             service_url=self.service_url,
             channel_id=self.channel_id,
