@@ -65,7 +65,9 @@ class LuisRecognizerV3(LuisRecognizerInternal):
         }
 
         async with aiohttp.ClientSession() as session:
-            async with session.post(url, json=body, headers=headers) as result:
+            async with session.post(
+                url, json=body, headers=headers, ssl=False
+            ) as result:
                 luis_result = await result.json()
 
                 recognizer_result = RecognizerResult(
