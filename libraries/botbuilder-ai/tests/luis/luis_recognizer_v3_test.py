@@ -1,20 +1,18 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-# pylint: disable=protected-access
+# pylint: disable=no-value-for-parameter
 
 import json
 from os import path
 from typing import Dict, Tuple, Union
 
 import re
-from aioresponses import aioresponses
-
-from aiounittest import AsyncTestCase
 from unittest import mock
-from unittest.mock import MagicMock, Mock
+from unittest.mock import MagicMock
+from aioresponses import aioresponses
+from aiounittest import AsyncTestCase
 from botbuilder.ai.luis import LuisRecognizerOptionsV3
-
 from botbuilder.ai.luis import LuisApplication, LuisPredictionOptions, LuisRecognizer
 from botbuilder.ai.luis.luis_util import LuisUtil
 from botbuilder.core import (
@@ -56,7 +54,6 @@ class LuisRecognizerV3Test(AsyncTestCase):
         return dictionary
 
     @classmethod
-    # @patch('aiohttp.ClientSession.post')
     @aioresponses()
     async def _get_recognizer_result(
         cls,
@@ -69,7 +66,6 @@ class LuisRecognizerV3Test(AsyncTestCase):
         telemetry_properties: Dict[str, str] = None,
         telemetry_metrics: Dict[str, float] = None,
         recognizer_class: type = LuisRecognizer,
-
     ) -> Tuple[LuisRecognizer, RecognizerResult]:
         if isinstance(response_json, str):
             response_json = LuisRecognizerV3Test._get_json_for_file(
@@ -82,7 +78,7 @@ class LuisRecognizerV3Test(AsyncTestCase):
         context = LuisRecognizerV3Test._get_context(utterance, bot_adapter)
         # mock_get.return_value.__aenter__.return_value.json = CoroutineMock(side_effect=[response_json])
 
-        pattern = re.compile(r'^https://westus.api.cognitive.microsoft.com.*$')
+        pattern = re.compile(r"^https://westus.api.cognitive.microsoft.com.*$")
         mock_get.post(pattern, payload=response_json, status=200)
 
         result = await recognizer.recognize(
@@ -141,20 +137,19 @@ class LuisRecognizerV3Test(AsyncTestCase):
         test_options = expected_json["v3"]["options"]
 
         options = LuisRecognizerOptionsV3(
-            include_all_intents = test_options["includeAllIntents"],
+            include_all_intents=test_options["includeAllIntents"],
             include_instance_data=test_options["includeInstanceData"],
             log=test_options["log"],
             prefer_external_entities=test_options["preferExternalEntities"],
             slot=test_options["slot"],
-            include_api_results = test_options["includeAPIResults"],
+            include_api_results=test_options["includeAPIResults"],
         )
 
         if "version" in test_options:
-            options.version=test_options["version"]
+            options.version = test_options["version"]
 
         if "externalEntities" in test_options:
-            options.external_entities=test_options["externalEntities"]
-
+            options.external_entities = test_options["externalEntities"]
 
         # dynamic_lists: List = None,
         # external_entities: List = None,
@@ -231,7 +226,9 @@ class LuisRecognizerV3Test(AsyncTestCase):
 
         # Act
         with mock.patch.object(TurnContext, "send_activity") as mock_send_activity:
-            await self._get_recognizer_result(utterance, response_json, options= LuisRecognizerOptionsV3())
+            await LuisRecognizerV3Test._get_recognizer_result(
+                utterance, response_json, options=LuisRecognizerOptionsV3()
+            )
             trace_activity: Activity = mock_send_activity.call_args[0][0]
 
         # Assert

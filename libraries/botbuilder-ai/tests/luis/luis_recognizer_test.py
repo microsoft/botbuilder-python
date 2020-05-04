@@ -10,10 +10,6 @@ from unittest import mock
 from unittest.mock import MagicMock, Mock
 
 from aiounittest import AsyncTestCase
-from azure.cognitiveservices.language.luis.runtime import LUISRuntimeClient
-from azure.cognitiveservices.language.luis.runtime.luis_runtime_client import (
-    LUISRuntimeClientConfiguration,
-)
 from msrest import Deserializer
 from requests import Session
 from requests.models import Response
