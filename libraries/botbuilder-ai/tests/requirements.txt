@@ -1,1 +1,1 @@
-asynctest==0.13.0
+aioresponses==0.6.3
