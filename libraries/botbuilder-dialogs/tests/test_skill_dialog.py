@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 import uuid
+from http import HTTPStatus
 from typing import Callable, Union
 from unittest.mock import Mock
 
@@ -233,9 +234,9 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
         async def post_return():
             nonlocal sequence
             if sequence == 0:
-                result = InvokeResponse(body=first_response, status=200)
+                result = InvokeResponse(body=first_response, status=HTTPStatus.OK)
             else:
-                result = InvokeResponse(status=200)
+                result = InvokeResponse(status=HTTPStatus.OK)
             sequence += 1
             return result
 
@@ -277,9 +278,9 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
         async def post_return():
             nonlocal sequence
             if sequence == 0:
-                result = InvokeResponse(body=first_response, status=200)
+                result = InvokeResponse(body=first_response, status=HTTPStatus.OK)
             else:
-                result = InvokeResponse(status=200)
+                result = InvokeResponse(status=HTTPStatus.OK)
             sequence += 1
             return result
 
@@ -319,9 +320,9 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
         async def post_return():
             nonlocal sequence
             if sequence == 0:
-                result = InvokeResponse(body=first_response, status=200)
+                result = InvokeResponse(body=first_response, status=HTTPStatus.OK)
             else:
-                result = InvokeResponse(status=200)
+                result = InvokeResponse(status=HTTPStatus.OK)
             sequence += 1
             return result
 
@@ -360,9 +361,9 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
         async def post_return():
             nonlocal sequence
             if sequence == 0:
-                result = InvokeResponse(body=first_response, status=200)
+                result = InvokeResponse(body=first_response, status=HTTPStatus.OK)
             else:
-                result = InvokeResponse(status=200)
+                result = InvokeResponse(status=HTTPStatus.OK)
             sequence += 1
             return result
 
@@ -402,9 +403,9 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
         async def post_return():
             nonlocal sequence
             if sequence == 0:
-                result = InvokeResponse(body=first_response, status=200)
+                result = InvokeResponse(body=first_response, status=HTTPStatus.OK)
             else:
-                result = InvokeResponse(status=409)
+                result = InvokeResponse(status=HTTPStatus.CONFLICT)
             sequence += 1
             return result
 
