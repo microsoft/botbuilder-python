@@ -71,7 +71,7 @@
     "text": "42ski is a part like kb423",
     "v3": {
       "options": {
-        "ExternalEntities": [
+        "externalEntities": [
           {
             "entityLength": 5,
             "entityName": "Part",
