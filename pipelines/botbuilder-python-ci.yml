@@ -56,6 +56,7 @@ jobs:
       pip install -e ./libraries/botbuilder-integration-aiohttp
       pip install -r ./libraries/botframework-connector/tests/requirements.txt
       pip install -r ./libraries/botbuilder-core/tests/requirements.txt
+      pip install -r ./libraries/botbuilder-ai/tests/requirements.txt
       pip install coveralls
       pip install pylint==2.4.4
       pip install black
