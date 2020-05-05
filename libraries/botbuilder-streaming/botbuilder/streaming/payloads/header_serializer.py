@@ -80,7 +80,10 @@ class HeaderSerializer:
             raise ValueError("Header type delimeter is malformed")
 
         length_str = HeaderSerializer._binary_array_to_str(
-            buffer[HeaderSerializer.LENGTH_OFFSET : HeaderSerializer.LENGTH_LENGTH]
+            buffer[
+                HeaderSerializer.LENGTH_OFFSET : HeaderSerializer.LENGTH_OFFSET
+                + HeaderSerializer.LENGTH_LENGTH
+            ]
         )
 
         try:
@@ -97,11 +100,14 @@ class HeaderSerializer:
             raise ValueError("Header length delimeter is malformed")
 
         identifier_str = HeaderSerializer._binary_array_to_str(
-            buffer[HeaderSerializer.ID_OFFSET : HeaderSerializer.ID_LENGTH]
+            buffer[
+                HeaderSerializer.ID_OFFSET : HeaderSerializer.ID_OFFSET
+                + HeaderSerializer.ID_LENGTH
+            ]
         )
 
         try:
-            identifier = UUID(int=int(identifier_str))
+            identifier = UUID(identifier_str)
         except Exception:
             raise ValueError("Header id is malformed")
 
@@ -115,6 +121,8 @@ class HeaderSerializer:
             HeaderSerializer.NOT_END,
         ]:
             raise ValueError("Header end is malformed")
+
+        header.end = buffer[HeaderSerializer.END_OFFSET] == HeaderSerializer.END
 
         if buffer[HeaderSerializer.TERMINATOR_OFFSET] != HeaderSerializer.TERMINATOR:
             raise ValueError("Header terminator is malformed")
@@ -135,19 +143,19 @@ class HeaderSerializer:
 
     @staticmethod
     def _int_to_formatted_encoded_str(value: int, str_format: str) -> bytes:
-        return str_format.format(value).encode()
+        return str_format.format(value).encode("ascii")
 
     @staticmethod
     def _uuid_to_numeric_encoded_str(value: UUID) -> bytes:
-        return str(int(value)).encode()
+        return str(int(value)).encode("ascii")
 
     @staticmethod
     def _binary_int_to_char(binary_int: int) -> str:
-        return bytes([binary_int]).decode("utf8")
+        return bytes([binary_int]).decode("ascii")
 
     @staticmethod
     def _binary_array_to_str(binary_array: List[int]) -> str:
-        return bytes(binary_array).decode("utf8")
+        return bytes(binary_array).decode("ascii")
 
     @staticmethod
     def _write_in_buffer(data: List[int], buffer: List[int], insert_index: int):

@@ -34,6 +34,7 @@ class ReceiveResponse:
             if not content_stream:
                 return ""
 
+            # TODO: encoding double check
             return bytes(content_stream.stream).decode("utf8")
         except Exception as error:
             raise error

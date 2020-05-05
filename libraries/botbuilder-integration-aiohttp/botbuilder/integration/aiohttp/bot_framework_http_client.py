@@ -109,7 +109,7 @@ class BotFrameworkHttpClient(BotFrameworkClient):
 
             json_content = json.dumps(activity.serialize())
             resp = await self._session.post(
-                to_url, data=json_content.encode("utf-8"), headers=headers_dict,
+                to_url, data=json_content.encode("utf8"), headers=headers_dict,
             )
             resp.raise_for_status()
             data = (await resp.read()).decode()

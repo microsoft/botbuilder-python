@@ -128,7 +128,7 @@ class PayloadReceiver:
                                 "TransportDisconnectedException: Stream closed while reading header bytes"
                             )
 
-                        if content_stream:
+                        if content_stream is not None:
                             # write chunks to the content_stream if it's not a stream type
                             # TODO: this has to be improved in custom buffer class (validate buffer ended)
                             if not PayloadTypes.is_stream(header):
@@ -138,13 +138,13 @@ class PayloadReceiver:
                         offset += length
 
                     # give the full payload buffer to the contentStream if it's a stream
-                    if content_stream and PayloadTypes.is_stream(header):
+                    if content_stream is not None and PayloadTypes.is_stream(header):
                         # TODO: should this be a copy?
                         content_stream = buffer
 
                     self._receive_action(header, content_stream, offset)
             except Exception as exception:
                 is_closed = True
-                disconnect_args = DisconnectedEventArgs(reason=exception.message)
+                disconnect_args = DisconnectedEventArgs(reason=str(exception))
 
         self.disconnect(disconnect_args)

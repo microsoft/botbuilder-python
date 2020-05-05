@@ -1,11 +1,14 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import traceback
+
 from queue import Queue
 from typing import Awaitable, Callable
 from threading import Event, Lock, Semaphore
 
 import asyncio
+import threading
 
 
 class SendQueue:
@@ -16,8 +19,13 @@ class SendQueue:
         self._timeout_seconds = timeout
 
         # TODO: this have to be abstracted so can remove asyncio dependency
-        loop = asyncio.get_event_loop()
-        loop.create_task(self._process())
+        def schedule_task():
+            loop = asyncio.new_event_loop()
+            loop.run_until_complete(self._process())
+
+        new_thread = threading.Thread(target=schedule_task, args=())
+        new_thread.daemon = True
+        new_thread.start()
 
     def post(self, item: object):
         self._post_internal(item)
@@ -29,9 +37,8 @@ class SendQueue:
         while True:
             try:
                 while True:
-                    item = self._queue.get()
-                    if not item:
-                        break
+                    await asyncio.sleep(1)
+                    item = self._queue.get(block=False)
                     try:
                         await self._action(item)
                     except Exception:
@@ -41,4 +48,5 @@ class SendQueue:
                         self._queue.task_done()
             except Exception:
                 # AppInsights.TrackException(e)
+                # traceback.print_exc()
                 pass

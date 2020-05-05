@@ -36,15 +36,15 @@ class AiohttpWebSocket(WebSocket):
 
     async def receive(self) -> WebSocketMessage:
         try:
-            # message = await self._aiohttp_ws.receive()
+            message = await self._aiohttp_ws.receive()
 
-            async for message in self._aiohttp_ws:
-                return WebSocketMessage(
-                    message_type=WebSocketMessageType(int(message.type)),
-                    data=list(str(message.data).encode("utf8"))
-                    if message.type == WSMsgType.TEXT
-                    else list(message.data),
-                )
+            # async for message in self._aiohttp_ws:
+            return WebSocketMessage(
+                message_type=WebSocketMessageType(int(message.type)),
+                data=list(str(message.data).encode("ascii"))
+                if message.type == WSMsgType.TEXT
+                else list(message.data),
+            )
         except Exception as error:
             raise error
 

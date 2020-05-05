@@ -31,5 +31,5 @@ class WebSocket(ABC):
         raise NotImplementedError()
 
     @property
-    async def status(self) -> WebSocketState:
+    def status(self) -> WebSocketState:
         raise NotImplementedError()

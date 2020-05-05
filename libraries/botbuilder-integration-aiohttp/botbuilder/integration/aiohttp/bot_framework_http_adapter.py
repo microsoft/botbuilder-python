@@ -35,8 +35,8 @@ class BotFrameworkHttpAdapter(BotFrameworkHttpAdapterBase):
         # TODO: maybe it's not necessary to expose the ws_response
         if not request:
             raise TypeError("request can't be None")
-        #if ws_response is None:
-            #raise TypeError("ws_response can't be None")
+        # if ws_response is None:
+        # raise TypeError("ws_response can't be None")
         if not bot:
             raise TypeError("bot can't be None")
 
@@ -90,8 +90,6 @@ class BotFrameworkHttpAdapter(BotFrameworkHttpAdapterBase):
 
             request_handler = StreamingRequestHandler(bot, self, bf_web_socket)
 
-            # await request_handler._server._receiver.connect(request_handler._server._web_socket_transport)
-
             if self.request_handlers is None:
                 self.request_handlers = []
 
@@ -100,6 +98,7 @@ class BotFrameworkHttpAdapter(BotFrameworkHttpAdapterBase):
             await request_handler.listen()
         except Exception as error:
             import traceback
+
             traceback.print_exc()
             raise Exception(f"Unable to create transport server. Error: {str(error)}")
 
@@ -128,9 +127,12 @@ class BotFrameworkHttpAdapter(BotFrameworkHttpAdapterBase):
                 if not claims_identity.is_authenticated:
                     raise HTTPUnauthorized()
 
-                self._credentials = self._credentials or await self._BotFrameworkAdapter__get_app_credentials(
-                    self.settings.app_id,
-                    AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE,
+                self._credentials = (
+                    self._credentials
+                    or await self._BotFrameworkAdapter__get_app_credentials(
+                        self.settings.app_id,
+                        AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE,
+                    )
                 )
 
                 # Add ServiceURL to the cache of trusted sites in order to allow token refreshing.

@@ -70,7 +70,7 @@ class StreamingRequest:
             elif isinstance(body, Model):
                 body = json.dumps(body.as_dict())
 
-            body = body.encode("utf8")
+            body = body.encode("ascii")
 
         self.add_stream(list(body))
 

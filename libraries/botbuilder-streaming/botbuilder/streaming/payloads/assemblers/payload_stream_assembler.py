@@ -28,8 +28,8 @@ class PayloadStreamAssembler(Assembler):
         self.content_length = length
         self.end: bool = None
 
-    # TODO: highly probable this can be removed
     def create_stream_from_payload(self) -> List[int]:
+        # TODO: return PayloadStream(self)
         return []
 
     # TODO: somewhat probable this can be removed
@@ -40,9 +40,7 @@ class PayloadStreamAssembler(Assembler):
 
         return self._stream
 
-    def on_receive(
-        self, header: Header, stream: List[int], content_length: int
-    ) -> List[int]:
+    def on_receive(self, header: Header, stream: List[int], content_length: int):
         if header.end:
             self.end = True
 

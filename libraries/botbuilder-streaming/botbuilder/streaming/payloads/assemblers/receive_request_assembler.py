@@ -55,7 +55,7 @@ class ReceiveRequestAssembler(Assembler):
         self._stream_manager.close_stream(self.identifier)
 
     async def process_request(self, stream: List[int]):
-        request_payload = RequestPayload().from_json(bytes(stream).decode("utf8"))
+        request_payload = RequestPayload().from_json(bytes(stream).decode("utf-8-sig"))
 
         request = streaming.ReceiveRequest(
             verb=request_payload.verb, path=request_payload.path, streams=[]
@@ -64,7 +64,7 @@ class ReceiveRequestAssembler(Assembler):
         if request_payload.streams:
             for stream_description in request_payload.streams:
                 try:
-                    identifier = UUID(int=int(stream_description.id))
+                    identifier = UUID(stream_description.id)
                 except Exception:
                     raise ValueError(
                         f"Stream description id '{stream_description.id}' is not a Guid"

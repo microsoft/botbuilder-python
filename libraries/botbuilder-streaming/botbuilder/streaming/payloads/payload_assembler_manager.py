@@ -68,4 +68,4 @@ class PayloadAssemblerManager:
         return None
 
     def _is_stream_payload(self, header: Header) -> bool:
-        return header.type == PayloadTypes
+        return PayloadTypes.is_stream(header)

@@ -20,7 +20,7 @@ from .web_socket_transport import WebSocketTransport
 
 class WebSocketServer:
     def __init__(self, socket: WebSocket, request_handler: RequestHandler):
-        if not socket:
+        if socket is None:
             raise TypeError(
                 f"'socket: {socket.__class__.__name__}' argument can't be None"
             )

@@ -25,8 +25,8 @@ class Header:
         self._internal_payload_length = value
 
     def _validate_length(self, value: int, max_val: int, min_val: int):
-        if value > max:
+        if value > max_val:
             raise ValueError(f"Length must be less or equal than {max_val}")
 
-        if value < min:
+        if value < min_val:
             raise ValueError(f"Length must be greater or equal than {min_val}")

@@ -47,7 +47,16 @@ class WebSocketTransport(TransportReceiverBase, TransportSenderBase):
         try:
             if self._socket:
                 result = await self._socket.receive()
-                buffer.extend(result.data)
+                buffer_index = buffer.index(None) if None in buffer else 0
+                result_index = 0
+                while (
+                    buffer_index < len(buffer)
+                    and result_index < len(result.data)
+                    and result_index < count
+                ):
+                    buffer[buffer_index] = result.data[result_index]
+                    buffer_index += 1
+                    result_index += 1
                 if result.message_type == WebSocketMessageType.CLOSE:
                     await self._socket.close(
                         WebSocketCloseStatus.NORMAL_CLOSURE, "Socket closed"
@@ -57,7 +66,7 @@ class WebSocketTransport(TransportReceiverBase, TransportSenderBase):
                     if self._socket.status == WebSocketState.CLOSED:
                         self._socket.dispose()
 
-                    return len(result.data)
+                return len(result.data)
         except Exception as error:
             # Exceptions of the three types below will also have set the socket's state to closed, which fires an
             # event consumers of this class are subscribed to and have handling around. Any other exception needs to
