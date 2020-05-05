@@ -38,6 +38,7 @@ setup(
         "botbuilder.core.integration",
         "botbuilder.core.skills",
         "botbuilder.core.teams",
+        "botbuilder.core.oauth",
     ],
     install_requires=REQUIRES,
     classifiers=[
