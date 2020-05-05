@@ -4,11 +4,11 @@
 import os
 from setuptools import setup
 
-VERSION = os.environ["packageVersion"] if "packageVersion" in os.environ else "4.7.1"
+VERSION = os.environ["packageVersion"] if "packageVersion" in os.environ else "4.10.0"
 REQUIRES = [
-    "botbuilder-schema>=4.7.1",
-    "botframework-connector>=4.7.1",
-    "botbuilder-core>=4.7.1",
+    "botbuilder-schema>=4.10.0",
+    "botframework-connector>=4.10.0",
+    "botbuilder-core>=4.10.0",
     "aiohttp==3.6.2",
 ]
 
