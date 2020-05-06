@@ -5,19 +5,13 @@ from botbuilder.schema import Activity
 
 
 class BeginSkillDialogOptions:
-    def __init__(
-        self, activity: Activity, connection_name: str = None
-    ):  # pylint: disable=unused-argument
+    def __init__(self, activity: Activity):
         self.activity = activity
-        self.connection_name = connection_name
 
     @staticmethod
     def from_object(obj: object) -> "BeginSkillDialogOptions":
         if isinstance(obj, dict) and "activity" in obj:
-            return BeginSkillDialogOptions(obj["activity"], obj.get("connection_name"))
+            return BeginSkillDialogOptions(obj["activity"])
         if hasattr(obj, "activity"):
-            return BeginSkillDialogOptions(
-                obj.activity,
-                obj.connection_name if hasattr(obj, "connection_name") else None,
-            )
+            return BeginSkillDialogOptions(obj.activity)
         return None
