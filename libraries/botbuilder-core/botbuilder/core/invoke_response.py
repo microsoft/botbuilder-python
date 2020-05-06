@@ -24,3 +24,11 @@ class InvokeResponse:
         """
         self.status = status
         self.body = body
+
+    def is_successful_status_code(self) -> bool:
+        """
+        Gets a value indicating whether the invoke response was successful.
+        :return: A value that indicates if the HTTP response was successful. true if status is in
+        the Successful range (200-299); otherwise false.
+        """
+        return 200 <= self.status <= 299

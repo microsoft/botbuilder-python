@@ -104,7 +104,13 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
         with self.assertRaises(TypeError):
             await client.send_activity("irrelevant")
 
-    async def test_begin_dialog_calls_skill(self):
+    async def test_begin_dialog_calls_skill_no_deliverymode(self):
+        return await self.begin_dialog_calls_skill(None)
+
+    async def test_begin_dialog_calls_skill_expect_replies(self):
+        return await self.begin_dialog_calls_skill(DeliveryModes.expect_replies)
+
+    async def begin_dialog_calls_skill(self, deliver_mode: str):
         activity_sent = None
         from_bot_id_sent = None
         to_bot_id_sent = None
@@ -133,6 +139,7 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
 
         sut = SkillDialog(dialog_options, "dialog_id")
         activity_to_send = MessageFactory.text(str(uuid.uuid4()))
+        activity_to_send.delivery_mode = deliver_mode
 
         client = DialogTestClient(
             "test",
@@ -141,21 +148,87 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
             conversation_state=conversation_state,
         )
 
+        # Send something to the dialog to start it
         await client.send_activity(MessageFactory.text("irrelevant"))
 
+        # Assert results and data sent to the SkillClient for fist turn
         assert dialog_options.bot_id == from_bot_id_sent
         assert dialog_options.skill.app_id == to_bot_id_sent
         assert dialog_options.skill.skill_endpoint == to_url_sent
         assert activity_to_send.text == activity_sent.text
         assert DialogTurnStatus.Waiting == client.dialog_turn_result.status
 
+        # Send a second message to continue the dialog
         await client.send_activity(MessageFactory.text("Second message"))
 
+        # Assert results for second turn
         assert activity_sent.text == "Second message"
         assert DialogTurnStatus.Waiting == client.dialog_turn_result.status
 
+        # Send EndOfConversation to the dialog
         await client.send_activity(Activity(type=ActivityTypes.end_of_conversation))
 
+        # Assert we are done.
+        assert DialogTurnStatus.Complete == client.dialog_turn_result.status
+
+    async def test_should_handle_invoke_activities(self):
+        activity_sent = None
+        from_bot_id_sent = None
+        to_bot_id_sent = None
+        to_url_sent = None
+
+        async def capture(
+            from_bot_id: str,
+            to_bot_id: str,
+            to_url: str,
+            service_url: str,  # pylint: disable=unused-argument
+            conversation_id: str,  # pylint: disable=unused-argument
+            activity: Activity,
+        ):
+            nonlocal from_bot_id_sent, to_bot_id_sent, to_url_sent, activity_sent
+            from_bot_id_sent = from_bot_id
+            to_bot_id_sent = to_bot_id
+            to_url_sent = to_url
+            activity_sent = activity
+
+        mock_skill_client = self._create_mock_skill_client(capture)
+
+        conversation_state = ConversationState(MemoryStorage())
+        dialog_options = SkillDialogTests.create_skill_dialog_options(
+            conversation_state, mock_skill_client
+        )
+
+        sut = SkillDialog(dialog_options, "dialog_id")
+        activity_to_send = Activity(type=ActivityTypes.invoke, name=str(uuid.uuid4()),)
+
+        client = DialogTestClient(
+            "test",
+            sut,
+            BeginSkillDialogOptions(activity=activity_to_send),
+            conversation_state=conversation_state,
+        )
+
+        # Send something to the dialog to start it
+        await client.send_activity(MessageFactory.text("irrelevant"))
+
+        # Assert results and data sent to the SkillClient for fist turn
+        assert dialog_options.bot_id == from_bot_id_sent
+        assert dialog_options.skill.app_id == to_bot_id_sent
+        assert dialog_options.skill.skill_endpoint == to_url_sent
+        assert activity_to_send.text == activity_sent.text
+        assert DialogTurnStatus.Waiting == client.dialog_turn_result.status
+
+        # Send a second message to continue the dialog
+        await client.send_activity(MessageFactory.text("Second message"))
+
+        # Assert results for second turn
+        assert activity_sent.text == "Second message"
+        assert DialogTurnStatus.Waiting == client.dialog_turn_result.status
+
+        # Send EndOfConversation to the dialog
+        await client.send_activity(Activity(type=ActivityTypes.end_of_conversation))
+
+        # Assert we are done.
         assert DialogTurnStatus.Complete == client.dialog_turn_result.status
 
     async def test_cancel_dialog_sends_eoc(self):
@@ -244,7 +317,7 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
         conversation_state = ConversationState(MemoryStorage())
 
         dialog_options = SkillDialogTests.create_skill_dialog_options(
-            conversation_state, mock_skill_client
+            conversation_state, mock_skill_client, connection_name
         )
         sut = SkillDialog(dialog_options, dialog_id="dialog")
         activity_to_send = SkillDialogTests.create_send_activity()
@@ -252,9 +325,7 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
         client = DialogTestClient(
             "test",
             sut,
-            BeginSkillDialogOptions(
-                activity=activity_to_send, connection_name=connection_name,
-            ),
+            BeginSkillDialogOptions(activity=activity_to_send,),
             conversation_state=conversation_state,
         )
 
@@ -371,13 +442,11 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
         conversation_state = ConversationState(MemoryStorage())
 
         dialog_options = SkillDialogTests.create_skill_dialog_options(
-            conversation_state, mock_skill_client
+            conversation_state, mock_skill_client, connection_name
         )
         sut = SkillDialog(dialog_options, dialog_id="dialog")
         activity_to_send = SkillDialogTests.create_send_activity()
-        initial_dialog_options = BeginSkillDialogOptions(
-            activity=activity_to_send, connection_name=connection_name,
-        )
+        initial_dialog_options = BeginSkillDialogOptions(activity=activity_to_send,)
 
         client = DialogTestClient(
             "test", sut, initial_dialog_options, conversation_state=conversation_state,
@@ -413,7 +482,7 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
         conversation_state = ConversationState(MemoryStorage())
 
         dialog_options = SkillDialogTests.create_skill_dialog_options(
-            conversation_state, mock_skill_client
+            conversation_state, mock_skill_client, connection_name
         )
         sut = SkillDialog(dialog_options, dialog_id="dialog")
         activity_to_send = SkillDialogTests.create_send_activity()
@@ -421,9 +490,7 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
         client = DialogTestClient(
             "test",
             sut,
-            BeginSkillDialogOptions(
-                activity=activity_to_send, connection_name=connection_name,
-            ),
+            BeginSkillDialogOptions(activity=activity_to_send,),
             conversation_state=conversation_state,
         )
 
@@ -437,7 +504,9 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
 
     @staticmethod
     def create_skill_dialog_options(
-        conversation_state: ConversationState, skill_client: BotFrameworkClient
+        conversation_state: ConversationState,
+        skill_client: BotFrameworkClient,
+        connection_name: str = None,
     ):
         return SkillDialogOptions(
             bot_id=str(uuid.uuid4()),
@@ -449,6 +518,7 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
                 app_id=str(uuid.uuid4()),
                 skill_endpoint="http://testskill.contoso.com/api/messages",
             ),
+            connection_name=connection_name,
         )
 
     @staticmethod
