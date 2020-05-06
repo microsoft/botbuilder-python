@@ -481,14 +481,8 @@ class BotFrameworkAdapter(
 
         await self.run_pipeline(context, logic)
 
-        if activity.type == ActivityTypes.invoke:
-            invoke_response = context.turn_state.get(
-                BotFrameworkAdapter._INVOKE_RESPONSE_KEY  # pylint: disable=protected-access
-            )
-            if invoke_response is None:
-                return InvokeResponse(status=int(HTTPStatus.NOT_IMPLEMENTED))
-            return invoke_response.value
-
+        # Handle ExpectedReplies scenarios where the all the activities have been buffered and sent back at once
+        # in an invoke response.
         # Return the buffered activities in the response.  In this case, the invoker
         # should deserialize accordingly:
         #    activities = ExpectedReplies().deserialize(response.body).activities
@@ -497,6 +491,16 @@ class BotFrameworkAdapter(
                 activities=context.buffered_reply_activities
             ).serialize()
             return InvokeResponse(status=int(HTTPStatus.OK), body=expected_replies)
+
+        # Handle Invoke scenarios, which deviate from the request/request model in that
+        # the Bot will return a specific body and return code.
+        if activity.type == ActivityTypes.invoke:
+            invoke_response = context.turn_state.get(
+                BotFrameworkAdapter._INVOKE_RESPONSE_KEY  # pylint: disable=protected-access
+            )
+            if invoke_response is None:
+                return InvokeResponse(status=int(HTTPStatus.NOT_IMPLEMENTED))
+            return invoke_response.value
 
         return None
 

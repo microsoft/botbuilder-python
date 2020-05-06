@@ -36,7 +36,6 @@ class SkillDialog(Dialog):
 
         self.dialog_options = dialog_options
         self._deliver_mode_state_key = "deliverymode"
-        self._sso_connection_name_key = "SkillDialog.SSOConnectionName"
 
     async def begin_dialog(self, dialog_context: DialogContext, options: object = None):
         """
@@ -44,7 +43,7 @@ class SkillDialog(Dialog):
         :param dialog_context: The dialog context for the current turn of conversation.
         :param options: (Optional) additional argument(s) to pass to the dialog being started.
         """
-        dialog_args = SkillDialog._validate_begin_dialog_args(options)
+        dialog_args = self._validate_begin_dialog_args(options)
 
         await dialog_context.context.send_trace_activity(
             f"{SkillDialog.__name__}.BeginDialogAsync()",
@@ -61,24 +60,22 @@ class SkillDialog(Dialog):
             is_incoming=True,
         )
 
+        # Store delivery mode in dialog state for later use.
         dialog_context.active_dialog.state[
             self._deliver_mode_state_key
         ] = dialog_args.activity.delivery_mode
 
-        dialog_context.active_dialog.state[
-            self._sso_connection_name_key
-        ] = dialog_args.connection_name
-
         # Send the activity to the skill.
-        eoc_activity = await self._send_to_skill(
-            dialog_context.context, skill_activity, dialog_args.connection_name
-        )
+        eoc_activity = await self._send_to_skill(dialog_context.context, skill_activity)
         if eoc_activity:
             return await dialog_context.end_dialog(eoc_activity.value)
 
         return self.end_of_turn
 
     async def continue_dialog(self, dialog_context: DialogContext):
+        if not self._on_validate_activity(dialog_context.context.activity):
+            return self.end_of_turn
+
         await dialog_context.context.send_trace_activity(
             f"{SkillDialog.__name__}.continue_dialog()",
             label=f"ActivityType: {dialog_context.context.activity.type}",
@@ -98,17 +95,13 @@ class SkillDialog(Dialog):
 
         # Create deep clone of the original activity to avoid altering it before forwarding it.
         skill_activity = deepcopy(dialog_context.context.activity)
+
         skill_activity.delivery_mode = dialog_context.active_dialog.state[
             self._deliver_mode_state_key
         ]
-        connection_name = dialog_context.active_dialog.state[
-            self._sso_connection_name_key
-        ]
 
         # Just forward to the remote skill
-        eoc_activity = await self._send_to_skill(
-            dialog_context.context, skill_activity, connection_name
-        )
+        eoc_activity = await self._send_to_skill(dialog_context.context, skill_activity)
         if eoc_activity:
             return await dialog_context.end_dialog(eoc_activity.value)
 
@@ -163,8 +156,7 @@ class SkillDialog(Dialog):
 
         await super().end_dialog(context, instance, reason)
 
-    @staticmethod
-    def _validate_begin_dialog_args(options: object) -> BeginSkillDialogOptions:
+    def _validate_begin_dialog_args(self, options: object) -> BeginSkillDialogOptions:
         if not options:
             raise TypeError("options cannot be None.")
 
@@ -182,26 +174,36 @@ class SkillDialog(Dialog):
 
         return dialog_args
 
-    async def _send_to_skill(
-        self, context: TurnContext, activity: Activity, connection_name: str = None
-    ) -> Activity:
-        # Create a conversationId to interact with the skill and send the activity
-        conversation_id_factory_options = SkillConversationIdFactoryOptions(
-            from_bot_oauth_scope=context.turn_state.get(BotAdapter.BOT_OAUTH_SCOPE_KEY),
-            from_bot_id=self.dialog_options.bot_id,
-            activity=activity,
-            bot_framework_skill=self.dialog_options.skill,
-        )
+    def _on_validate_activity(
+        self, activity: Activity  # pylint: disable=unused-argument
+    ) -> bool:
+        """
+        Validates the activity sent during continue_dialog.
 
-        skill_conversation_id = await self.dialog_options.conversation_id_factory.create_skill_conversation_id(
-            conversation_id_factory_options
+        Override this method to implement a custom validator for the activity being sent during continue_dialog.
+        This method can be used to ignore activities of a certain type if needed.
+        If this method returns false, the dialog will end the turn without processing the activity.
+        """
+        return True
+
+    async def _send_to_skill(
+        self, context: TurnContext, activity: Activity
+    ) -> Activity:
+        if activity.type == ActivityTypes.invoke:
+            # Force ExpectReplies for invoke activities so we can get the replies right away and send
+            # them back to the channel if needed. This makes sure that the dialog will receive the Invoke
+            # response from the skill and any other activities sent, including EoC.
+            activity.delivery_mode = DeliveryModes.expect_replies
+
+        skill_conversation_id = await self._create_skill_conversation_id(
+            context, activity
         )
 
         # Always save state before forwarding
         # (the dialog stack won't get updated with the skillDialog and things won't work if you don't)
-        skill_info = self.dialog_options.skill
         await self.dialog_options.conversation_state.save_changes(context, True)
 
+        skill_info = self.dialog_options.skill
         response = await self.dialog_options.skill_client.post_activity(
             self.dialog_options.bot_id,
             skill_info.app_id,
@@ -229,7 +231,7 @@ class SkillDialog(Dialog):
                     # Capture the EndOfConversation activity if it was sent from skill
                     eoc_activity = from_skill_activity
                 elif await self._intercept_oauth_cards(
-                    context, from_skill_activity, connection_name
+                    context, from_skill_activity, self.dialog_options.connection_name
                 ):
                     # do nothing. Token exchange succeeded, so no oauthcard needs to be shown to the user
                     pass
@@ -238,6 +240,21 @@ class SkillDialog(Dialog):
                     await context.send_activity(from_skill_activity)
 
         return eoc_activity
+
+    async def _create_skill_conversation_id(
+        self, context: TurnContext, activity: Activity
+    ) -> str:
+        # Create a conversationId to interact with the skill and send the activity
+        conversation_id_factory_options = SkillConversationIdFactoryOptions(
+            from_bot_oauth_scope=context.turn_state.get(BotAdapter.BOT_OAUTH_SCOPE_KEY),
+            from_bot_id=self.dialog_options.bot_id,
+            activity=activity,
+            bot_framework_skill=self.dialog_options.skill,
+        )
+        skill_conversation_id = await self.dialog_options.conversation_id_factory.create_skill_conversation_id(
+            conversation_id_factory_options
+        )
+        return skill_conversation_id
 
     async def _intercept_oauth_cards(
         self, context: TurnContext, activity: Activity, connection_name: str
@@ -248,6 +265,8 @@ class SkillDialog(Dialog):
         if not connection_name or not isinstance(
             context.adapter, ExtendedUserTokenProvider
         ):
+            # The adapter may choose not to support token exchange, in which case we fallback to
+            # showing an oauth card to the user.
             return False
 
         oauth_card_attachment = next(
@@ -273,6 +292,8 @@ class SkillDialog(Dialog):
                     )
 
                     if result and result.token:
+                        # If token above is null, then SSO has failed and hence we return false.
+                        # If not, send an invoke to the skill with the token.
                         return await self._send_token_exchange_invoke_to_skill(
                             activity,
                             oauth_card.token_exchange_resource.id,
@@ -280,6 +301,8 @@ class SkillDialog(Dialog):
                             result.token,
                         )
                 except:
+                    # Failures in token exchange are not fatal. They simply mean that the user needs
+                    # to be shown the OAuth card.
                     return False
 
         return False
@@ -310,4 +333,4 @@ class SkillDialog(Dialog):
         )
 
         # Check response status: true if success, false if failure
-        return response.status / 100 == 2
+        return response.is_successful_status_code()
