@@ -13,7 +13,7 @@ from botbuilder.core import (
     TurnContext,
 )
 from botbuilder.schema import Activity, ActivityTypes, ResourceResponse
-from botframework.connector import AsyncBfPipeline
+from botframework.connector import AsyncBfPipeline, BotFrameworkConnectorConfiguration
 from botframework.connector.aio import ConnectorClient
 from botframework.connector.auth import (
     ClaimsIdentity,
@@ -160,13 +160,14 @@ class BotFrameworkHttpAdapterBase(BotFrameworkAdapter, StreamingActivityProcesso
             if self._channel_provider and self._channel_provider.is_government()
             else MicrosoftGovernmentAppCredentials.empty()
         )
-
         streaming_driver = StreamingHttpDriver(request_handler)
-        connector_client = ConnectorClient(
+        config = BotFrameworkConnectorConfiguration(
             empty_credentials,
             activity.service_url,
             pipeline_type=AsyncBfPipeline,
             driver=streaming_driver,
         )
+        streaming_driver.config = config
+        connector_client = ConnectorClient(None, custom_configuration=config)
 
         return connector_client

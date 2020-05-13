@@ -145,5 +145,5 @@ class PayloadSender:
                 # TODO: should this really run in the background?
                 asyncio.create_task(packet.sent_callback(packet.header))
         except Exception as exception:
-            disconnected_args = DisconnectedEventArgs(reason=exception.message)
+            disconnected_args = DisconnectedEventArgs(reason=str(exception))
             self.disconnect(disconnected_args)

@@ -66,16 +66,19 @@ class ConnectorClient(BotFrameworkSDKClientAsync):
         *,
         pipeline_type: Optional[Type[AsyncPipeline]] = None,
         sender: Optional[AsyncHTTPSender] = None,
-        driver: Optional[AsyncHttpDriver] = None
+        driver: Optional[AsyncHttpDriver] = None,
+        custom_configuration: [BotFrameworkConnectorConfiguration] = None,
     ):
-
-        self.config = BotFrameworkConnectorConfiguration(
-            credentials,
-            base_url,
-            pipeline_type=pipeline_type,
-            sender=sender,
-            driver=driver,
-        )
+        if custom_configuration:
+            self.config = custom_configuration
+        else:
+            self.config = BotFrameworkConnectorConfiguration(
+                credentials,
+                base_url,
+                pipeline_type=pipeline_type,
+                sender=sender,
+                driver=driver,
+            )
         super(ConnectorClient, self).__init__(self.config)
 
         client_models = {

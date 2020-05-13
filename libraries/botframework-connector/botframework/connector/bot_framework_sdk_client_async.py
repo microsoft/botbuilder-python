@@ -28,18 +28,13 @@ class BotFrameworkConnectorConfiguration(ConnectorClientConfiguration):
         self.sender = sender
         self.driver = driver
 
-        if pipeline_type:
-            self.pipeline = pipeline_type(self)
+        self.custom_pipeline = pipeline_type(self) if pipeline_type else None
 
 
 class BotFrameworkSDKClientAsync(SDKClientAsync):
     def __init__(self, config: BotFrameworkConnectorConfiguration) -> None:
         super().__init__(config)
-        self._client = BotFrameworkServiceClientAsync(config)
 
-
-class BotFrameworkServiceClientAsync(ServiceClientAsync):
-    def __init__(self, config: BotFrameworkConnectorConfiguration) -> None:
-        super(ServiceClientAsync, self).__init__(config)
-
-        self.config.pipeline = config.pipeline or self._create_default_pipeline()
+        self._client.config.pipeline = (
+            config.custom_pipeline or self._client.config.pipeline
+        )

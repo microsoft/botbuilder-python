@@ -1,9 +1,9 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import asyncio
 from typing import Callable, List
 
+import botbuilder.streaming as streaming
 from botbuilder.streaming.payloads import HeaderSerializer
 from botbuilder.streaming.payloads.models import Header, PayloadTypes
 from botbuilder.streaming.transport import (
@@ -138,9 +138,10 @@ class PayloadReceiver:
                         offset += length
 
                     # give the full payload buffer to the contentStream if it's a stream
-                    if content_stream is not None and PayloadTypes.is_stream(header):
-                        # TODO: should this be a copy?
-                        content_stream = buffer
+                    if PayloadTypes.is_stream(header) and isinstance(
+                        content_stream, streaming.PayloadStream
+                    ):
+                        content_stream.give_buffer(buffer)
 
                     self._receive_action(header, content_stream, offset)
             except Exception as exception:

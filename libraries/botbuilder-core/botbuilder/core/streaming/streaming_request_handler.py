@@ -5,6 +5,7 @@ import platform
 from http import HTTPStatus
 from datetime import datetime
 from logging import Logger
+from json import loads
 from typing import Dict, List
 
 from botbuilder.core import Bot
@@ -90,7 +91,7 @@ class StreamingRequestHandler(RequestHandler):
 
         # Convert the StreamingRequest into an activity the adapter can understand.
         try:
-            body = request.read_body_as_str()
+            body_str = request.read_body_as_str()
         except Exception as error:
             response.status_code = int(HTTPStatus.BAD_REQUEST)
             # TODO: log error
@@ -99,7 +100,8 @@ class StreamingRequestHandler(RequestHandler):
 
         try:
             # TODO: validate if should use deserialize or from_dict
-            activity: Activity = Activity.deserialize(body)
+            body_dict = loads(body_str)
+            activity: Activity = Activity.deserialize(body_dict)
 
             # All activities received by this StreamingRequestHandler will originate from the same channel, but we won't
             # know what that channel is until we've received the first request.

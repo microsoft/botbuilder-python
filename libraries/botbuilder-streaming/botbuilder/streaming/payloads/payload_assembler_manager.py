@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 from uuid import UUID
-from typing import Awaitable, Callable, Dict, List
+from typing import Awaitable, Callable, Dict, List, Union
 
 import botbuilder.streaming as streaming
 from botbuilder.streaming.payloads.assemblers import (
@@ -27,7 +27,10 @@ class PayloadAssemblerManager:
         self._stream_manager = stream_manager
         self._active_assemblers: Dict[UUID, Assembler] = {}
 
-    def get_payload_stream(self, header: Header) -> List[int]:
+    def get_payload_stream(
+        self, header: Header
+    ) -> Union[List[int], "streaming.PayloadStream"]:
+        # TODO: The return value SHOULDN'T be a union, we should interface List[int] into a BFStream class
         if self._is_stream_payload(header):
             return self._stream_manager.get_payload_stream(header)
         elif not self._active_assemblers.get(header.id):

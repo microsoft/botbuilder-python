@@ -19,9 +19,11 @@ class ReceiveRequest:
             content_stream = self.streams[0] if self.streams else None
 
             if not content_stream:
+                # TODO: maybe raise an error
                 return ""
 
             # TODO: encoding double check
-            return bytes(content_stream.stream).decode("utf8")
+            stream = content_stream.stream.read_until_end()
+            return bytes(stream).decode("utf-8-sig")
         except Exception as error:
             raise error

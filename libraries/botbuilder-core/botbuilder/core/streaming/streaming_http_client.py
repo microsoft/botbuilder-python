@@ -1,12 +1,16 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import asyncio
 from http import HTTPStatus
 from logging import Logger
-from typing import Any, Optional
+from typing import Any
 
 from msrest.universal_http import ClientRequest
-from msrest.universal_http.async_abc import AsyncClientResponse, AsyncHTTPSender
+from msrest.universal_http.async_abc import AsyncClientResponse
+from msrest.universal_http.async_requests import (
+    AsyncRequestsHTTPSender as AsyncRequestsHTTPDriver,
+)
 from botbuilder.streaming import StreamingRequest, ReceiveResponse
 
 from .streaming_request_handler import StreamingRequestHandler
@@ -44,20 +48,21 @@ class StreamingProtocolClientResponse(AsyncClientResponse):
             raise Exception(f"Http error: {self.internal_response.status_code}")
 
 
-class StreamingHttpDriver(AsyncHTTPSender):
-    def __init__(self, request_handler: StreamingRequestHandler, logger: Logger = None):
+class StreamingHttpDriver(AsyncRequestsHTTPDriver):
+    def __init__(
+        self,
+        request_handler: StreamingRequestHandler,
+        *,
+        config=None,
+        logger: Logger = None,
+    ):
+        super().__init__(config)
         if not request_handler:
             raise TypeError(
                 f"'request_handler: {request_handler.__class__.__name__}' argument can't be None"
             )
         self._request_handler = request_handler
         self._logger = logger
-
-    async def __aenter__(self):
-        raise Exception("This driver currently does not support context manager")
-
-    async def __aexit__(self, *exc_details):  # pylint: disable=arguments-differ
-        raise Exception("This driver currently does not support context manager")
 
     async def send(self, request: ClientRequest, **config: Any) -> AsyncClientResponse:
         # TODO: validate form of request to perform operations

@@ -13,7 +13,7 @@ class StreamDescription(Serializable):
         self.length = length
 
     def to_dict(self) -> dict:
-        obj = {"id": self.id, "contentType": self.content_type}
+        obj = {"id": self.id, "type": self.content_type}
 
         if self.length is not None:
             obj["length"] = self.length
@@ -22,7 +22,7 @@ class StreamDescription(Serializable):
 
     def from_dict(self, json_dict: dict) -> "StreamDescription":
         self.id = json_dict.get("id")
-        self.content_type = json_dict.get("contentType")
+        self.content_type = json_dict.get("type")
         self.length = json_dict.get("length")
 
         return self

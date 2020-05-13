@@ -7,6 +7,7 @@
 
 from .about import __version__, __title__
 from .receive_request import ReceiveRequest
+from .payload_stream import PayloadStream
 from .protocol_adapter import ProtocolAdapter
 from .receive_response import ReceiveResponse
 from .request_handler import RequestHandler
@@ -17,6 +18,7 @@ __all__ = [
     "ReceiveRequest",
     "ProtocolAdapter",
     "ReceiveResponse",
+    "PayloadStream",
     "RequestHandler",
     "StreamingRequest",
     "StreamingResponse",

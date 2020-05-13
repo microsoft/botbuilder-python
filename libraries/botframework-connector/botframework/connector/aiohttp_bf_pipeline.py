@@ -4,9 +4,11 @@
 import asyncio
 
 from msrest.pipeline import AsyncPipeline, AsyncHTTPPolicy, SansIOHTTPPolicy
-from msrest.pipeline.aiohttp import AioHTTPSender
-from msrest.universal_http.aiohttp import AioHTTPSender as Driver
-from msrest.pipeline.async_requests import AsyncRequestsCredentialsPolicy
+from msrest.universal_http.async_requests import AsyncRequestsHTTPSender as Driver
+from msrest.pipeline.async_requests import (
+    AsyncRequestsCredentialsPolicy,
+    AsyncPipelineRequestsHTTPSender,
+)
 from msrest.pipeline.universal import RawDeserializer
 
 from .bot_framework_sdk_client_async import BotFrameworkConnectorConfiguration
@@ -28,13 +30,7 @@ class AsyncBfPipeline(AsyncPipeline):
                 # Assume this is the old credentials class, and then requests. Wrap it.
                 policies.insert(1, AsyncRequestsCredentialsPolicy(creds))
 
-        sender = config.sender or AioHTTPSender(config.driver or BFAioHTTPDriver)
+        sender = config.sender or AsyncPipelineRequestsHTTPSender(
+            config.driver or Driver(config)
+        )
         super().__init__(policies, sender)
-
-
-class BFAioHTTPDriver(Driver):
-    """AioHttp HTTP sender implementation.
-    """
-
-    def __del__(self):
-        asyncio.create_task(self._session.close())

@@ -4,6 +4,7 @@
 from uuid import UUID
 from typing import Callable, Dict, List
 
+import botbuilder.streaming as streaming
 from botbuilder.streaming.payloads.assemblers import PayloadStreamAssembler
 from botbuilder.streaming.payloads.models import Header
 
@@ -22,7 +23,7 @@ class StreamManager:
 
         return self._active_assemblers[identifier]
 
-    def get_payload_stream(self, header: Header) -> List[int]:
+    def get_payload_stream(self, header: Header) -> "streaming.PayloadStream":
         assembler = self.get_payload_assembler(header.id)
 
         return assembler.get_payload_as_stream()

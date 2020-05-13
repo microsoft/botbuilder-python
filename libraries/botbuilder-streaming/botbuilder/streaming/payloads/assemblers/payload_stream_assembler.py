@@ -5,6 +5,7 @@ from uuid import UUID
 from typing import List
 from threading import Lock
 
+import botbuilder.streaming as streaming
 import botbuilder.streaming.payloads as payloads
 from botbuilder.streaming.payloads.models import Header
 
@@ -21,21 +22,19 @@ class PayloadStreamAssembler(Assembler):
     ):
 
         self._stream_manager = stream_manager or payloads.StreamManager()
-        self._stream: List[int] = []
+        self._stream: "streaming.PayloadStream" = None
         self._lock = Lock()
         self.identifier = identifier
         self.content_type = type
         self.content_length = length
         self.end: bool = None
 
-    def create_stream_from_payload(self) -> List[int]:
-        # TODO: return PayloadStream(self)
-        return []
+    def create_stream_from_payload(self) -> "streaming.PayloadStream":
+        return streaming.PayloadStream(self)
 
-    # TODO: somewhat probable this can be removed
-    def get_payload_as_stream(self) -> List[int]:
+    def get_payload_as_stream(self) -> "streaming.PayloadStream":
         with self._lock:
-            if self._stream is None:
+            if not self._stream:
                 self._stream = self.create_stream_from_payload()
 
         return self._stream
@@ -43,6 +42,7 @@ class PayloadStreamAssembler(Assembler):
     def on_receive(self, header: Header, stream: List[int], content_length: int):
         if header.end:
             self.end = True
+            self._stream.done_producing()
 
     def close(self):
         self._stream_manager.close_stream(self.identifier)
