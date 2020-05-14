@@ -385,6 +385,38 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         assert bot.record[0] == "on_conversation_update_activity"
         assert bot.record[1] == "on_teams_members_added"
 
+    async def test_bot_on_teams_members_added_activity(self):
+        # arrange
+        activity = Activity(
+            recipient=ChannelAccount(id="botid"),
+            type=ActivityTypes.conversation_update,
+            channel_data={
+                "eventType": "teamMemberAdded",
+                "team": {"id": "team_id_1", "name": "new_team_name"},
+            },
+            members_added=[
+                ChannelAccount(
+                    id="botid",
+                    name="test_user",
+                    aad_object_id="asdfqwerty",
+                    role="tester",
+                )
+            ],
+            channel_id=Channels.ms_teams,
+            conversation=ConversationAccount(id="456"),
+        )
+
+        turn_context = TurnContext(SimpleAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        # Assert
+        assert len(bot.record) == 2
+        assert bot.record[0] == "on_conversation_update_activity"
+        assert bot.record[1] == "on_teams_members_added"
+
     async def test_on_teams_members_removed_activity(self):
         # arrange
         activity = Activity(
