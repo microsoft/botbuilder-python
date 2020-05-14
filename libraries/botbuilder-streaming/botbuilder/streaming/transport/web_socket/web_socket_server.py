@@ -66,7 +66,7 @@ class WebSocketServer:
         if not self._sender.is_connected or not self._sender.is_connected:
             raise RuntimeError("The server is not connected")
 
-        return await self._protocol_adapter.send_request()
+        return await self._protocol_adapter.send_request(request)
 
     def disconnect(self):
         self._sender.disconnect()

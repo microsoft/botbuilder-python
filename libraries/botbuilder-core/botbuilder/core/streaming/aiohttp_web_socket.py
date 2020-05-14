@@ -51,14 +51,19 @@ class AiohttpWebSocket(WebSocket):
     async def send(
         self, buffer: Any, message_type: WebSocketMessageType, end_of_message: bool
     ):
-        if message_type == WebSocketMessageType.BINARY:
-            await self._aiohttp_ws.send_bytes(buffer)
-        elif message_type == WebSocketMessageType.TEXT:
-            await self._aiohttp_ws.send_str(buffer)
-        else:
-            raise RuntimeError(
-                f"AiohttpWebSocket - message_type: {message_type} currently not supported"
-            )
+        try:
+            if message_type == WebSocketMessageType.BINARY:
+                # TODO: The clening buffer line should be removed, just for bypassing bug in POC
+                clean_buffer = bytes([byte for byte in buffer if byte is not None])
+                await self._aiohttp_ws.send_bytes(clean_buffer)
+            elif message_type == WebSocketMessageType.TEXT:
+                await self._aiohttp_ws.send_str(buffer)
+            else:
+                raise RuntimeError(
+                    f"AiohttpWebSocket - message_type: {message_type} currently not supported"
+                )
+        except Exception as error:
+            raise error
 
     @property
     def status(self) -> WebSocketState:

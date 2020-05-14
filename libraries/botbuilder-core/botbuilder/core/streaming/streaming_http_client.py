@@ -67,7 +67,7 @@ class StreamingHttpDriver(AsyncRequestsHTTPDriver):
     async def send(self, request: ClientRequest, **config: Any) -> AsyncClientResponse:
         # TODO: validate form of request to perform operations
         streaming_request = StreamingRequest(
-            path=request.url[request.url.index("/v3") :], verb=request.method
+            path=request.url[request.url.index("v3/") :], verb=request.method
         )
         streaming_request.set_body(request.data)
 

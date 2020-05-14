@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import traceback
 from typing import List
 
 from botbuilder.streaming.transport import TransportReceiverBase, TransportSenderBase
@@ -85,6 +86,7 @@ class WebSocketTransport(TransportReceiverBase, TransportSenderBase):
             # Exceptions of the three types below will also have set the socket's state to closed, which fires an
             # event consumers of this class are subscribed to and have handling around. Any other exception needs to
             # be thrown to cause a non-transport-connectivity failure.
+            traceback.print_exc()
             raise error
 
         return 0

@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 import platform
+import traceback
 from http import HTTPStatus
 from datetime import datetime
 from logging import Logger
@@ -199,7 +200,9 @@ class StreamingRequestHandler(RequestHandler):
 
             if server_response.status_code == HTTPStatus.OK:
                 return server_response.read_body_as_json(ReceiveResponse)
-        except Exception:
+        except Exception as error:
+            # TODO: remove printing
+            traceback.print_exc()
             # TODO: log error
             pass
 

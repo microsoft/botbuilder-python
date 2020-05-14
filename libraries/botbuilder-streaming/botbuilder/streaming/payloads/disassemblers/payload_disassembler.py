@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import json
 from asyncio import Future
 from abc import ABC, abstractmethod
 from uuid import UUID
@@ -43,18 +44,25 @@ class PayloadDisassembler(ABC):
     def get_stream_description(stream: ResponseMessageStream) -> StreamDescription:
         description = StreamDescription(id=str(int(stream.id)))
 
-        # TODO: validate statement below, also make the string a constant
-        content_type: List[str] = stream.content.headers().get("Content-Type")
-        if content_type:
-            description.content_type = content_type[0]
+        # TODO: This content type is hardcoded for POC, investigate how to proceed
+        content = bytes(stream.content).decode('utf8')
+
+        try:
+            json.loads(content)
+            content_type = "application/json"
+        except ValueError:
+            content_type = "text/plain"
+
+        description.content_type = content_type
+        description.length = len(content)
 
         # TODO: validate statement below, also make the string a constant
-        content_length: int = stream.content.headers.get("Content-Length")
-        if content_length:
-            description.length = int(content_length)
-        else:
-            # TODO: check statement validity
-            description.length = stream.content.headers.content_length
+        # content_length: int = stream.content.headers.get("Content-Length")
+        # if content_length:
+        #     description.length = int(content_length)
+        # else:
+        #     # TODO: check statement validity
+        #     description.length = stream.content.headers.content_length
 
         return description
 
@@ -86,7 +94,7 @@ class PayloadDisassembler(ABC):
             )
             is_length_known = True
 
-        self.sender.send_payload(header, self._stream, is_length_known, self._on_sent)
+        self.sender.send_payload(header, self._stream, is_length_known, self._on_send)
 
     async def _on_send(self, header: Header):
         self._send_offset += header.payload_length
