@@ -396,7 +396,7 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
             },
             members_added=[
                 ChannelAccount(
-                    id="botidx",
+                    id="botid",
                     name="test_user",
                     aad_object_id="asdfqwerty",
                     role="tester",
