@@ -122,9 +122,11 @@ class ConfirmPrompt(Prompt):
         result = PromptRecognizerResult()
         if turn_context.activity.type == ActivityTypes.message:
             # Recognize utterance
-            message = turn_context.activity
+            utterance = turn_context.activity.text
+            if not utterance:
+                return result
             culture = self.determine_culture(turn_context.activity)
-            results = recognize_boolean(message.text, culture)
+            results = recognize_boolean(utterance, culture)
             if results:
                 first = results[0]
                 if "value" in first.resolution:
@@ -151,7 +153,7 @@ class ConfirmPrompt(Prompt):
                     )
                     choices = {confirm_choices[0], confirm_choices[1]}
                     second_attempt_results = ChoiceRecognizers.recognize_choices(
-                        message.text, choices
+                        utterance, choices
                     )
                     if second_attempt_results:
                         result.succeeded = True

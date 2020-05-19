@@ -152,6 +152,8 @@ class ChoicePrompt(Prompt):
         if turn_context.activity.type == ActivityTypes.message:
             activity: Activity = turn_context.activity
             utterance: str = activity.text
+            if not utterance:
+                return result
             opt: FindChoicesOptions = self.recognizer_options if self.recognizer_options else FindChoicesOptions()
             opt.locale = (
                 activity.locale

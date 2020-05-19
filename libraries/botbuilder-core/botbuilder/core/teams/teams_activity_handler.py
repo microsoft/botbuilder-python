@@ -350,7 +350,11 @@ class TeamsActivityHandler(ActivityHandler):
 
         team_members_added = []
         for member in members_added:
-            if member.additional_properties != {}:
+            is_bot = (
+                turn_context.activity.recipient is not None
+                and member.id == turn_context.activity.recipient.id
+            )
+            if member.additional_properties != {} or is_bot:
                 team_members_added.append(
                     deserializer_helper(TeamsChannelAccount, member)
                 )
