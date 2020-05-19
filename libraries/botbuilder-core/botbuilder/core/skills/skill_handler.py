@@ -101,8 +101,9 @@ class SkillHandler(ChannelServiceHandler):
         support nested replies, ReplyToActivity falls back to SendToConversation.
 
         Use ReplyToActivity when replying to a specific activity in the
-        conversation. Use SendToConversation in all other cases.
+        conversation.
 
+        Use SendToConversation in all other cases.
         :param claims_identity:
         :param conversation_id:
         :param activity_id:
