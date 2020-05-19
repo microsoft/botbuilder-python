@@ -5,7 +5,7 @@ import os
 from setuptools import setup
 
 REQUIRES = [
-    "botbuilder-core>=4.10.0a0",
+    "botbuilder-core>=4.9.0",
     "flask==1.1.1",
 ]
 
