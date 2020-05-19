@@ -73,6 +73,7 @@ class LuisRecognizer(Recognizer):
         results: RecognizerResult, default_intent: str = "None", min_score: float = 0.0
     ) -> str:
         """Returns the name of the top scoring intent from a set of LUIS results.
+
         :param results: Result set to be searched.
         :type results: RecognizerResult
         :param default_intent: Intent name to return should a top intent be found, defaults to "None"
