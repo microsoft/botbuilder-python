@@ -108,6 +108,7 @@ class LuisRecognizer(Recognizer):
         luis_prediction_options: LuisPredictionOptions = None,
     ) -> RecognizerResult:
         """Return results of the analysis (Suggested actions and intents).
+
         :param turn_context: Context object containing information for a single turn of conversation with a user.
         :type turn_context: TurnContext
         :param telemetry_properties: Additional properties to be logged to telemetry with the LuisResult event, defaults
