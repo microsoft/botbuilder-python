@@ -38,6 +38,7 @@ class LuisRecognizer(Recognizer):
         include_api_results: bool = False,
     ):
         """Initializes a new instance of the <see cref="LuisRecognizer"/> class.
+
         :param application: The LUIS application to use to recognize text.
         :type application: LuisApplication
         :param prediction_options: The LUIS prediction options to use, defaults to None
