@@ -47,6 +47,7 @@ class LuisApplication:
     @classmethod
     def from_application_endpoint(cls, application_endpoint: str):
         """Initializes a new instance of the <see cref="LuisApplication"/> class.
+
         :param application_endpoint: LUIS application endpoint.
         :type application_endpoint: str
         :return:
