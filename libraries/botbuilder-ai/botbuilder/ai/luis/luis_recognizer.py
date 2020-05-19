@@ -136,6 +136,7 @@ class LuisRecognizer(Recognizer):
         telemetry_metrics: Dict[str, float] = None,
     ):
         """Invoked prior to a LuisResult being logged.
+
         :param recognizer_result: The Luis Results for the call.
         :type recognizer_result: RecognizerResult
         :param turn_context: Context object containing information for a single turn of conversation with a user.
@@ -179,6 +180,7 @@ class LuisRecognizer(Recognizer):
         telemetry_properties: Dict[str, str] = None,
     ) -> Dict[str, str]:
         """Fills the event properties for LuisResult event for telemetry.
+
         These properties are logged when the recognizer is called.
         :param recognizer_result: Last activity sent from user.
         :type recognizer_result: RecognizerResult
