@@ -7,8 +7,8 @@ from setuptools import setup
 REQUIRES = [
     "azure-cosmos==3.1.2",
     "azure-storage-blob==2.1.0",
-    "botbuilder-schema>=4.10.0",
-    "botframework-connector>=4.10.0",
+    "botbuilder-schema==4.10.0",
+    "botframework-connector==4.10.0",
     "jsonpickle==1.2",
 ]
 TEST_REQUIRES = ["aiounittest==1.3.0"]
