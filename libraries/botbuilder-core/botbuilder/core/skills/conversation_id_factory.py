@@ -28,11 +28,10 @@ class ConversationIdFactoryBase(ABC):
         Using the options passed in, creates a conversation id and
         SkillConversationReference, storing them for future use.
 
-        :param options_or_conversation_reference: The options contain properties useful
-        for generating a SkillConversationReference and conversation id.
+        :param options_or_conversation_reference: The options contain properties
+        useful for generating a SkillConversationReference and conversation id.
         :type options_or_conversation_reference: :class:
         `Union[SkillConversationIdFactoryOptions, ConversationReference]`
-
         :returns: A skill conversation id.
 
         .. note::
@@ -48,8 +47,7 @@ class ConversationIdFactoryBase(ABC):
         """
         Retrieves a SkillConversationReference using a conversation id passed in.
 
-        :param skill_conversation_id: The conversation id for which to retrieve
-        the SkillConversationReference.
+        :param skill_conversation_id: The conversation id for which to retrieve the SkillConversationReference.
         :type skill_conversation_id: str
 
         .. note::
