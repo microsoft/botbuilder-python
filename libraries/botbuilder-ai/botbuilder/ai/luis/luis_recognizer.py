@@ -73,6 +73,7 @@ class LuisRecognizer(Recognizer):
         results: RecognizerResult, default_intent: str = "None", min_score: float = 0.0
     ) -> str:
         """Returns the name of the top scoring intent from a set of LUIS results.
+
         :param results: Result set to be searched.
         :type results: RecognizerResult
         :param default_intent: Intent name to return should a top intent be found, defaults to "None"
@@ -107,6 +108,7 @@ class LuisRecognizer(Recognizer):
         luis_prediction_options: LuisPredictionOptions = None,
     ) -> RecognizerResult:
         """Return results of the analysis (Suggested actions and intents).
+
         :param turn_context: Context object containing information for a single turn of conversation with a user.
         :type turn_context: TurnContext
         :param telemetry_properties: Additional properties to be logged to telemetry with the LuisResult event, defaults
@@ -134,6 +136,7 @@ class LuisRecognizer(Recognizer):
         telemetry_metrics: Dict[str, float] = None,
     ):
         """Invoked prior to a LuisResult being logged.
+
         :param recognizer_result: The Luis Results for the call.
         :type recognizer_result: RecognizerResult
         :param turn_context: Context object containing information for a single turn of conversation with a user.
@@ -178,6 +181,7 @@ class LuisRecognizer(Recognizer):
     ) -> Dict[str, str]:
         """Fills the event properties for LuisResult event for telemetry.
         These properties are logged when the recognizer is called.
+
         :param recognizer_result: Last activity sent from user.
         :type recognizer_result: RecognizerResult
         :param turn_context: Context object containing information for a single turn of conversation with a user.

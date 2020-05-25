@@ -48,8 +48,7 @@ class ConversationIdFactoryBase(ABC):
         """
         Retrieves a SkillConversationReference using a conversation id passed in.
 
-        :param skill_conversation_id: The conversation id for which to retrieve
-        the SkillConversationReference.
+        :param skill_conversation_id: The conversation id for which to retrieve the SkillConversationReference.
         :type skill_conversation_id: str
 
         .. note::

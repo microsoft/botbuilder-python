@@ -71,6 +71,7 @@ class SkillHandler(ChannelServiceHandler):
         Use ReplyToActivity when replying to a specific activity in the
         conversation.
 
+
         Use SendToConversation in all other cases.
         :param claims_identity:
         :param conversation_id:
@@ -102,6 +103,7 @@ class SkillHandler(ChannelServiceHandler):
 
         Use ReplyToActivity when replying to a specific activity in the
         conversation.
+
 
         Use SendToConversation in all other cases.
         :param claims_identity:
