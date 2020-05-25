@@ -72,7 +72,6 @@ class SkillHandler(ChannelServiceHandler):
         conversation.
 
         Use SendToConversation in all other cases.
-
         :param claims_identity:
         :param conversation_id:
         :param activity:
@@ -105,7 +104,6 @@ class SkillHandler(ChannelServiceHandler):
         conversation.
 
         Use SendToConversation in all other cases.
-
         :param claims_identity:
         :param conversation_id:
         :param activity_id:
