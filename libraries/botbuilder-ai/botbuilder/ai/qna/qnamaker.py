@@ -78,10 +78,16 @@ class QnAMaker(QnAMakerTelemetryClient):
         telemetry_properties: Dict[str, str] = None,
         telemetry_metrics: Dict[str, int] = None,
     ) -> [QueryResult]:
-        """Generates answers from the knowledge base.
+        """
+        Generates answers from the knowledge base.
 
-        :return: A list of answers for the user's query, sorted in decreasing order of ranking score.
-        :rtype:List[QueryResult]
+        return:
+        -------
+        A list of answers for the user's query, sorted in decreasing order of ranking score.
+
+        rtype:
+        ------
+        List[QueryResult]
         """
         result = await self.get_answers_raw(
             context, options, telemetry_properties, telemetry_metrics
