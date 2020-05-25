@@ -127,13 +127,10 @@ class QnAMaker(QnAMakerTelemetryClient):
         """
         Filters the ambiguous question for active learning.
 
-        Parameters:
-        -----------
-        query_result: User query output.
+        :param query_result: User query output.
+        :type query_result: :class:`QueryResult`
 
-        Return:
-        -------
-        Filtered aray of ambigous questions.
+        :return: Filtered array of ambiguous questions.
         """
         return ActiveLearningUtils.get_low_score_variation(query_result)
 
@@ -141,9 +138,8 @@ class QnAMaker(QnAMakerTelemetryClient):
         """
         Sends feedback to the knowledge base.
 
-        Parameters:
-        -----------
-        feedback_records
+        :param feedback_records:
+        :type feedback_records: :class:`typing.List`
         """
         return await self._active_learning_train_helper.call_train(feedback_records)
 
