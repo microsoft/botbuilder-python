@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import traceback
+
 from typing import Callable, List
 
 import botbuilder.streaming as streaming
@@ -83,6 +85,7 @@ class PayloadReceiver:
             try:
                 # read the header
                 header_offset = 0
+                # TODO: this while is probalby not necessary
                 while header_offset < TransportConstants.MAX_HEADER_LENGTH:
                     length = await self._receiver.receive(
                         self._receive_header_buffer,
@@ -145,6 +148,7 @@ class PayloadReceiver:
 
                     self._receive_action(header, content_stream, offset)
             except Exception as exception:
+                traceback.print_exc()
                 is_closed = True
                 disconnect_args = DisconnectedEventArgs(reason=str(exception))
 

@@ -42,7 +42,7 @@ class PayloadDisassembler(ABC):
 
     @staticmethod
     def get_stream_description(stream: ResponseMessageStream) -> StreamDescription:
-        description = StreamDescription(id=str(int(stream.id)))
+        description = StreamDescription(id=str(stream.id))
 
         # TODO: This content type is hardcoded for POC, investigate how to proceed
         content = bytes(stream.content).decode('utf8')
