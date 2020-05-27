@@ -50,7 +50,10 @@ class TestingTeamsActivityHandler(TeamsActivityHandler):
         )
 
     async def on_teams_members_removed(
-        self, teams_members_removed: [TeamsChannelAccount], team_info: TeamInfo, turn_context: TurnContext
+        self,
+        teams_members_removed: [TeamsChannelAccount],
+        team_info: TeamInfo,
+        turn_context: TurnContext,
     ):
         self.record.append("on_teams_members_removed")
         return await super().on_teams_members_removed(
@@ -422,9 +425,9 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         activity = Activity(
             type=ActivityTypes.conversation_update,
             channel_data={
-                        "eventType": "teamMemberRemoved",
-                        "team": {"id": "team_id_1", "name": "new_team_name"}
-                        },
+                "eventType": "teamMemberRemoved",
+                "team": {"id": "team_id_1", "name": "new_team_name"},
+            },
             members_removed=[
                 ChannelAccount(
                     id="123",
