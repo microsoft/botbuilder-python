@@ -1,8 +1,3 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger: none # no ci trigger
 
 pr: none # no pr trigger
@@ -22,10 +17,11 @@ steps:
     azureSubscription: 'FUSE Temporary (174c5021-8109-4087-a3e2-a1de20420569)'
     ScriptType: 'InlineScript'
     Inline: |
-      # You can write your azure powershell scripts inline here. 
-      # You can also pass predefined and custom variables to this script using arguments
-      Write-Host 'blah'
+      Set-PSDebug -Trace 1;
+      Write-Host 'blah';
+      Write-Host 'az group create --name NightlyPythonFunctionalTestContainerRegistryRG --location eastus'
       az group create --name NightlyPythonFunctionalTestContainerRegistryRG --location eastus
+      Write-Host 'az acr create --resource-group NightlyPythonFunctionalTestContainerRegistryRG --name NightlyPythonFunctionalTestContainerRegistry --sku Basic'
       az acr create --resource-group NightlyPythonFunctionalTestContainerRegistryRG --name NightlyPythonFunctionalTestContainerRegistry --sku Basic
       az acr login --name NightlyPythonFunctionalTestContainerRegistry
       docker pull hello-world
