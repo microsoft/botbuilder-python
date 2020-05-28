@@ -10,6 +10,31 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
+- task: AzurePowerShell@5
+  inputs:
+    azureSubscription: 'FUSE Temporary (174c5021-8109-4087-a3e2-a1de20420569)'
+    ScriptType: 'InlineScript'
+    azurePowerShellVersion: 'LatestVersion'
+
+- task: AzurePowerShell@5
+  inputs:
+    azureSubscription: 'FUSE Temporary (174c5021-8109-4087-a3e2-a1de20420569)'
+    ScriptType: 'InlineScript'
+    Inline: |
+      # You can write your azure powershell scripts inline here. 
+      # You can also pass predefined and custom variables to this script using arguments
+      Write-Host 'blah'
+      az group create --name NightlyPythonFunctionalTestContainerRegistryRG --location eastus
+      az acr create --resource-group NightlyPythonFunctionalTestContainerRegistryRG --name NightlyPythonFunctionalTestContainerRegistry --sku Basic
+      az acr login --name NightlyPythonFunctionalTestContainerRegistry
+      docker pull hello-world
+      docker tag hello-world nightlypythonfunctionaltestcontainerregistry.azurecr.io/hello-world:v1
+      docker push nightlypythonfunctionaltestcontainerregistry.azurecr.io/hello-world:v1
+      docker rmi nightlypythonfunctionaltestcontainerregistry.azurecr.io/hello-world:v1
+      az acr repository list --name NightlyPythonFunctionalTestContainerRegistry --output table
+      az acr repository show-tags --name NightlyPythonFunctionalTestContainerRegistry --repository hello-world --output table
+    azurePowerShellVersion: 'LatestVersion'
+
 - script: echo Hello, world!
   displayName: 'Run a one-line script'
 
