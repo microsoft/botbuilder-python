@@ -7,12 +7,7 @@ pool:
 
 steps:
 - task: AzurePowerShell@5
-  inputs:
-    azureSubscription: 'FUSE Temporary (174c5021-8109-4087-a3e2-a1de20420569)'
-    ScriptType: 'InlineScript'
-    azurePowerShellVersion: 'LatestVersion'
-
-- task: AzurePowerShell@5
+  displayName: 'Create container'
   inputs:
     azureSubscription: 'FUSE Temporary (174c5021-8109-4087-a3e2-a1de20420569)'
     ScriptType: 'InlineScript'
