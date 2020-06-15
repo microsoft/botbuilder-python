@@ -41,7 +41,7 @@ class NullTelemetryClient(BotTelemetryClient):
         Send information about a single exception that occurred in the application.
         :param exception_type: the type of the exception that was thrown.
         :param value: the exception that the client wants to send.
-        :param trace: the traceback information as returned by :func:`sys.exc_info`.
+        :param trace: the traceback information as returned by sys.exc_info().
         :param properties: the set of custom properties the client wants attached to this data item. (defaults to: None)
         :param measurements: the set of custom measurements the client wants to attach to this data item. \
         (defaults to: None)
@@ -118,7 +118,7 @@ class NullTelemetryClient(BotTelemetryClient):
         :param url: The actual URL for this request (to show in individual request instances).
         :param success: True if the request ended in success, False otherwise.
         :param start_time: the start time of the request. The value should look the same as the one returned \
-        by :func:`datetime.isoformat()` (defaults to: None)
+        by datetime.isoformat() (defaults to: None).
         :param duration: the number of milliseconds that this request lasted. (defaults to: None)
         :param response_code: the response code that this request returned. (defaults to: None)
         :param http_method: the HTTP method that triggered this request. (defaults to: None)
