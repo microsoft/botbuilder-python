@@ -117,8 +117,7 @@ class NullTelemetryClient(BotTelemetryClient):
         :param name: The name for this request. All requests with the same name will be grouped together.
         :param url: The actual URL for this request (to show in individual request instances).
         :param success: True if the request ended in success, False otherwise.
-        :param start_time: the start time of the request. The value should look the same as the one returned \
-        by :func:`datetime.isoformat()` (defaults to: None)
+        :param start_time: the start time of the request. The value should look the same as the one returned by datetime.isoformat(). Defaults to None.
         :param duration: the number of milliseconds that this request lasted. (defaults to: None)
         :param response_code: the response code that this request returned. (defaults to: None)
         :param http_method: the HTTP method that triggered this request. (defaults to: None)
