@@ -10,10 +10,10 @@ Therefore, all tests using theses static tests should strictly check that the me
 
 Note: Python cannot have dicts with properties with a None value like other SDKs can have properties with null values.
       Because of this, StoreItem tests have "e_tag: *" where the tests in the other SDKs do not.
-      This has also caused us to comment out some parts of these tests where we assert that "e_tag" is None for the same reason.
-      A null e_tag should work just like a * e_tag when writing, as far as the storage adapters are concerened,
-      so this shouldn't cause issues.
-      
+      This has also caused us to comment out some parts of these tests where we assert that "e_tag"
+      is None for the same reason. A null e_tag should work just like a * e_tag when writing,
+      as far as the storage adapters are concerened, so this shouldn't cause issues.
+
 
 :Example:
     async def test_handle_null_keys_when_reading(self):
@@ -102,7 +102,7 @@ class StorageBaseTests:
             store_items["createPocoStoreItem"]["id"]
             == read_store_items["createPocoStoreItem"]["id"]
         )
-     
+
         # If decided to validate e_tag integrity again, uncomment this code
         # assert read_store_items["createPoco"]["e_tag"] is not None
         assert read_store_items["createPocoStoreItem"]["e_tag"] is not None
