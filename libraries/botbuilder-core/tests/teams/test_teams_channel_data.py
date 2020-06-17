@@ -4,7 +4,7 @@
 import aiounittest
 
 from botbuilder.schema import Activity
-from botbuilder.schema.teams import TeamInfo, TeamsChannelData
+from botbuilder.schema.teams import TeamsChannelData
 from botbuilder.core.teams import teams_get_team_info
 
 
