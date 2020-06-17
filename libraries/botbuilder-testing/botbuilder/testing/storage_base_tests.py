@@ -8,6 +8,13 @@ They handle the storage-based assertions, internally.
 All tests return true if assertions pass to indicate that the code ran to completion, passing internal assertions.
 Therefore, all tests using theses static tests should strictly check that the method returns true.
 
+Note: Python cannot have dicts with properties with a None value like other SDKs can have properties with null values.
+      Because of this, StoreItem tests have "e_tag: *" where the tests in the other SDKs do not.
+      This has also caused us to comment out some parts of these tests where we assert that "e_tag" is None for the same reason.
+      A null e_tag should work just like a * e_tag when writing, as far as the storage adapters are concerened,
+      so this shouldn't cause issues.
+      
+
 :Example:
     async def test_handle_null_keys_when_reading(self):
         await reset()
@@ -83,7 +90,7 @@ class StorageBaseTests:
     async def create_object(storage) -> bool:
         store_items = {
             "createPoco": {"id": 1},
-            "createPocoStoreItem": {"id": 2},
+            "createPocoStoreItem": {"id": 2, "e_tag": "*"},
         }
 
         await storage.write(store_items)
@@ -95,11 +102,10 @@ class StorageBaseTests:
             store_items["createPocoStoreItem"]["id"]
             == read_store_items["createPocoStoreItem"]["id"]
         )
-        """
-        If decided to validate e_tag integrity aagain, uncomment this code
-        assert read_store_items["createPoco"]["e_tag"] is not None
+     
+        # If decided to validate e_tag integrity again, uncomment this code
+        # assert read_store_items["createPoco"]["e_tag"] is not None
         assert read_store_items["createPocoStoreItem"]["e_tag"] is not None
-        """
 
         return True
 
@@ -122,7 +128,7 @@ class StorageBaseTests:
     async def update_object(storage) -> bool:
         original_store_items = {
             "pocoItem": {"id": 1, "count": 1},
-            "pocoStoreItem": {"id": 1, "count": 1},
+            "pocoStoreItem": {"id": 1, "count": 1, "e_tag": "*"},
         }
 
         # 1st write should work
@@ -131,9 +137,9 @@ class StorageBaseTests:
         loaded_store_items = await storage.read(["pocoItem", "pocoStoreItem"])
 
         update_poco_item = loaded_store_items["pocoItem"]
-        # update_poco_item["e_tag"] = None
+        update_poco_item["e_tag"] = None
         update_poco_store_item = loaded_store_items["pocoStoreItem"]
-        # assert update_poco_store_item["e_tag"] is not None
+        assert update_poco_store_item["e_tag"] is not None
 
         # 2nd write should work
         update_poco_item["count"] += 1
@@ -153,10 +159,12 @@ class StorageBaseTests:
         update_poco_item["count"] = 123
         await storage.write({"pocoItem": update_poco_item})
 
-        """
-        If decided to validate e_tag integrity aagain, uncomment this code
         # Write with old eTag should FAIL for storeItem
         update_poco_store_item["count"] = 123
+
+        """
+        This assert exists in the other SDKs but can't in python, currently
+        due to using "e_tag: *" above (see comment near the top of this file for details).
 
         with pytest.raises(Exception) as err:
             await storage.write({"pocoStoreItem": update_poco_store_item})
@@ -166,7 +174,7 @@ class StorageBaseTests:
         reloaded_store_items2 = await storage.read(["pocoItem", "pocoStoreItem"])
 
         reloaded_poco_item2 = reloaded_store_items2["pocoItem"]
-        # reloaded_poco_item2["e_tag"] = None
+        reloaded_poco_item2["e_tag"] = None
         reloaded_poco_store_item2 = reloaded_store_items2["pocoStoreItem"]
 
         assert reloaded_poco_item2["count"] == 123
@@ -175,7 +183,7 @@ class StorageBaseTests:
         # write with wildcard etag should work
         reloaded_poco_item2["count"] = 100
         reloaded_poco_store_item2["count"] = 100
-        # reloaded_poco_store_item2["e_tag"] = "*"
+        reloaded_poco_store_item2["e_tag"] = "*"
 
         wildcard_etag_dict = {
             "pocoItem": reloaded_poco_item2,
@@ -195,15 +203,12 @@ class StorageBaseTests:
 
         assert reloaded_store_item4 is not None
 
-        """
-        If decided to validate e_tag integrity aagain, uncomment this code
         reloaded_store_item4["e_tag"] = ""
         dict2 = {"pocoStoreItem": reloaded_store_item4}
 
         with pytest.raises(Exception) as err:
             await storage.write(dict2)
         assert err.value is not None
-        """
 
         final_store_items = await storage.read(["pocoItem", "pocoStoreItem"])
         assert final_store_items["pocoItem"]["count"] == 100
@@ -213,13 +218,13 @@ class StorageBaseTests:
 
     @staticmethod
     async def delete_object(storage) -> bool:
-        store_items = {"delete1": {"id": 1, "count": 1}}
+        store_items = {"delete1": {"id": 1, "count": 1, "e_tag": "*"}}
 
         await storage.write(store_items)
 
         read_store_items = await storage.read(["delete1"])
 
-        # assert read_store_items["delete1"]["e_tag"]
+        assert read_store_items["delete1"]["e_tag"]
         assert read_store_items["delete1"]["count"] == 1
 
         await storage.delete(["delete1"])
