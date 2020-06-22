@@ -1508,17 +1508,21 @@ class TeamInfo(Model):
     :type id: str
     :param name: Name of team.
     :type name: str
+    :param name: Azure AD Teams group ID.
+    :type name: str
     """
 
     _attribute_map = {
         "id": {"key": "id", "type": "str"},
         "name": {"key": "name", "type": "str"},
+        "aad_group_id": {"key": "aadGroupId", "type": "str"},
     }
 
     def __init__(self, **kwargs):
         super(TeamInfo, self).__init__(**kwargs)
         self.id = kwargs.get("id", None)
         self.name = kwargs.get("name", None)
+        self.aad_group_id = kwargs.get("aad_group_id", None)
 
 
 class TeamsChannelAccount(ChannelAccount):
