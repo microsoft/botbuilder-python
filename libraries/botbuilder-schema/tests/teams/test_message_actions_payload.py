@@ -55,13 +55,17 @@ class TestingMessageActionsPayload(aiounittest.AsyncTestCase):
         reactions=reactions,
     )
 
-    def test_assign_id_assign(self, message_action_payload=message, test_id=test_id):
+    def test_assign_id(self, message_action_payload=message, test_id=test_id):
         # Assert
         self.assertEqual(message_action_payload.id, test_id)
 
-    def test_reply_to_id_assign(self, message_action_payload=message, reply_to_id=reply_to_id):
+    def test_assign_reply_to_id(self, message_action_payload=message, reply_to_id=reply_to_id):
         # Assert
         self.assertEqual(message_action_payload.reply_to_id, reply_to_id)
+
+    def test_assign_message_type(self, message_action_payload=message, message_type=message_type):
+        # Assert
+        self.assertEqual(message_action_payload.message_type, message_type)
 
     def test_assign_link_to_message(self, message_action_payload=message, link_to_message=link_to_message):
         # Assert
