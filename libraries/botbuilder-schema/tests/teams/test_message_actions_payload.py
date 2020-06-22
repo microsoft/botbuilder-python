@@ -67,7 +67,42 @@ class TestingMessageActionsPayload(aiounittest.AsyncTestCase):
         # Assert
         self.assertEqual(message_action_payload.message_type, message_type)
 
+    def test_assign_created_date_time(self, message_action_payload=message, created_date_time=created_date_time):
+        # Assert
+        self.assertEqual(message_action_payload.created_date_time, created_date_time)
+
+    def test_assign_last_modified_date_time(self, message_action_payload=message, last_modified_date_time=last_modified_date_time):
+        # Assert
+        self.assertEqual(message_action_payload.last_modified_date_time, last_modified_date_time)
+
+    def test_assign_deleted(self, message_action_payload=message, deleted=deleted):
+        # Assert
+        self.assertEqual(message_action_payload.deleted, deleted)
+
+    def test_assign_subject(self, message_action_payload=message, subject=subject):
+        # Assert
+        self.assertEqual(message_action_payload.subject, subject)
+
+    def test_assign_summary(self, message_action_payload=message, summary=summary):
+        # Assert
+        self.assertEqual(message_action_payload.summary, summary)
+
+    def test_assign_importance(self, message_action_payload=message, importance=importance):
+        # Assert
+        self.assertEqual(message_action_payload.importance, importance)
+
+    def test_assign_locale(self, message_action_payload=message, locale=locale):
+        # Assert
+        self.assertEqual(message_action_payload.locale, locale)
+
     def test_assign_link_to_message(self, message_action_payload=message, link_to_message=link_to_message):
         # Assert
         self.assertEqual(message_action_payload.link_to_message, link_to_message)
 
+    def test_assign_from_property(self, message_action_payload=message, from_property=from_property):
+        # Assert
+        self.assertEqual(message_action_payload.from_property, from_property)
+
+    def test_assign_body(self, message_action_payload=message, body=body):
+        # Assert
+        self.assertEqual(message_action_payload.body, body)
