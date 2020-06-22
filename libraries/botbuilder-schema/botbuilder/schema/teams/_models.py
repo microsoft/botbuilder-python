@@ -459,6 +459,8 @@ class MessageActionsPayload(Model):
     :type importance: str or ~botframework.connector.teams.models.enum
     :param locale: Locale of the message set by the client.
     :type locale: str
+    :param link_to_message: Link back to the message.
+    :type link_to_message: str
     :param from_property: Sender of the message.
     :type from_property:
      ~botframework.connector.teams.models.MessageActionsPayloadFrom
@@ -489,6 +491,7 @@ class MessageActionsPayload(Model):
         "summary": {"key": "summary", "type": "str"},
         "importance": {"key": "importance", "type": "str"},
         "locale": {"key": "locale", "type": "str"},
+        "link_to_message": {"key": "linkToMessage", "type": "str"},
         "from_property": {"key": "from", "type": "MessageActionsPayloadFrom"},
         "body": {"key": "body", "type": "MessageActionsPayloadBody"},
         "attachment_layout": {"key": "attachmentLayout", "type": "str"},
@@ -512,6 +515,7 @@ class MessageActionsPayload(Model):
         self.summary = kwargs.get("summary", None)
         self.importance = kwargs.get("importance", None)
         self.locale = kwargs.get("locale", None)
+        self.link_to_message = kwargs.get("link_to_message", None)
         self.from_property = kwargs.get("from_property", None)
         self.body = kwargs.get("body", None)
         self.attachment_layout = kwargs.get("attachment_layout", None)
