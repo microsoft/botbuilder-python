@@ -106,3 +106,19 @@ class TestingMessageActionsPayload(aiounittest.AsyncTestCase):
     def test_assign_body(self, message_action_payload=message, body=body):
         # Assert
         self.assertEqual(message_action_payload.body, body)
+
+    def test_assign_attachment_layout(self, message_action_payload=message, attachment_layout=attachment_layout):
+        # Assert
+        self.assertEqual(message_action_payload.attachment_layout, attachment_layout)
+
+    def test_assign_attachments(self, message_action_payload=message, attachments=attachments):
+        # Assert
+        self.assertEqual(message_action_payload.attachments, attachments)
+
+    def test_assign_mentions(self, message_action_payload=message, mentions=mentions):
+        # Assert
+        self.assertEqual(message_action_payload.mentions, mentions)
+
+    def test_assign_reactions(self, message_action_payload=message, reactions=reactions):
+        # Assert
+        self.assertEqual(message_action_payload.reactions, reactions)
