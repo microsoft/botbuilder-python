@@ -7,11 +7,9 @@ from botframework.connector.models import (
     MessageActionsPayloadBody,
     MessageActionsPayloadAttachment,
     MessageActionsPayloadMention,
-    MessageActionsPayloadReaction
+    MessageActionsPayloadReaction,
 )
-from botbuilder.schema.teams import (
-    MessageActionsPayload,
-)
+from botbuilder.schema.teams import MessageActionsPayload
 
 
 class TestingMessageActionsPayload(aiounittest.AsyncTestCase):
@@ -59,21 +57,33 @@ class TestingMessageActionsPayload(aiounittest.AsyncTestCase):
         # Assert
         self.assertEqual(message_action_payload.id, test_id)
 
-    def test_assign_reply_to_id(self, message_action_payload=message, reply_to_id=reply_to_id):
+    def test_assign_reply_to_id(
+        self, message_action_payload=message, reply_to_id=reply_to_id
+    ):
         # Assert
         self.assertEqual(message_action_payload.reply_to_id, reply_to_id)
 
-    def test_assign_message_type(self, message_action_payload=message, message_type=message_type):
+    def test_assign_message_type(
+        self, message_action_payload=message, message_type=message_type
+    ):
         # Assert
         self.assertEqual(message_action_payload.message_type, message_type)
 
-    def test_assign_created_date_time(self, message_action_payload=message, created_date_time=created_date_time):
+    def test_assign_created_date_time(
+        self, message_action_payload=message, created_date_time=created_date_time
+    ):
         # Assert
         self.assertEqual(message_action_payload.created_date_time, created_date_time)
 
-    def test_assign_last_modified_date_time(self, message_action_payload=message, last_modified_date_time=last_modified_date_time):
+    def test_assign_last_modified_date_time(
+        self,
+        message_action_payload=message,
+        last_modified_date_time=last_modified_date_time,
+    ):
         # Assert
-        self.assertEqual(message_action_payload.last_modified_date_time, last_modified_date_time)
+        self.assertEqual(
+            message_action_payload.last_modified_date_time, last_modified_date_time
+        )
 
     def test_assign_deleted(self, message_action_payload=message, deleted=deleted):
         # Assert
@@ -87,7 +97,9 @@ class TestingMessageActionsPayload(aiounittest.AsyncTestCase):
         # Assert
         self.assertEqual(message_action_payload.summary, summary)
 
-    def test_assign_importance(self, message_action_payload=message, importance=importance):
+    def test_assign_importance(
+        self, message_action_payload=message, importance=importance
+    ):
         # Assert
         self.assertEqual(message_action_payload.importance, importance)
 
@@ -95,11 +107,15 @@ class TestingMessageActionsPayload(aiounittest.AsyncTestCase):
         # Assert
         self.assertEqual(message_action_payload.locale, locale)
 
-    def test_assign_link_to_message(self, message_action_payload=message, link_to_message=link_to_message):
+    def test_assign_link_to_message(
+        self, message_action_payload=message, link_to_message=link_to_message
+    ):
         # Assert
         self.assertEqual(message_action_payload.link_to_message, link_to_message)
 
-    def test_assign_from_property(self, message_action_payload=message, from_property=from_property):
+    def test_assign_from_property(
+        self, message_action_payload=message, from_property=from_property
+    ):
         # Assert
         self.assertEqual(message_action_payload.from_property, from_property)
 
@@ -107,11 +123,15 @@ class TestingMessageActionsPayload(aiounittest.AsyncTestCase):
         # Assert
         self.assertEqual(message_action_payload.body, body)
 
-    def test_assign_attachment_layout(self, message_action_payload=message, attachment_layout=attachment_layout):
+    def test_assign_attachment_layout(
+        self, message_action_payload=message, attachment_layout=attachment_layout
+    ):
         # Assert
         self.assertEqual(message_action_payload.attachment_layout, attachment_layout)
 
-    def test_assign_attachments(self, message_action_payload=message, attachments=attachments):
+    def test_assign_attachments(
+        self, message_action_payload=message, attachments=attachments
+    ):
         # Assert
         self.assertEqual(message_action_payload.attachments, attachments)
 
@@ -119,6 +139,8 @@ class TestingMessageActionsPayload(aiounittest.AsyncTestCase):
         # Assert
         self.assertEqual(message_action_payload.mentions, mentions)
 
-    def test_assign_reactions(self, message_action_payload=message, reactions=reactions):
+    def test_assign_reactions(
+        self, message_action_payload=message, reactions=reactions
+    ):
         # Assert
         self.assertEqual(message_action_payload.reactions, reactions)
