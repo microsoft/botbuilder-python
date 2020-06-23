@@ -1,45 +1,143 @@
 # ![Bot Framework SDK v4 Python](./doc/media/FrameWorkPython.png)
 
-### [Click here to find out what's new with Bot Framework](https://docs.microsoft.com/en-us/azure/bot-service/what-is-new?view=azure-bot-service-4.0)
+### [What's new with Bot Framework](https://docs.microsoft.com/en-us/azure/bot-service/what-is-new?view=azure-bot-service-4.0)
 
-# Bot Framework SDK v4 for Python
-[![Build Status](https://fuselabs.visualstudio.com/SDK_v4/_apis/build/status/Python/Python-CI-PR-yaml?branchName=master)](https://fuselabs.visualstudio.com/SDK_v4/_build/latest?definitionId=771&branchName=master)
-[![roadmap badge](https://img.shields.io/badge/visit%20the-roadmap-blue.svg)](https://github.com/Microsoft/botbuilder-python/wiki/Roadmap)
-[![Coverage Status](https://coveralls.io/repos/github/microsoft/botbuilder-python/badge.svg?branch=HEAD)](https://coveralls.io/github/microsoft/botbuilder-python?branch=HEAD)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Microsoft/botbuilder-python/blob/master/LICENSE)
-[![Gitter](https://img.shields.io/gitter/room/Microsoft/BotBuilder.svg)](https://gitter.im/Microsoft/BotBuilder)
+This repository contains code for the Python version of the [Microsoft Bot Framework SDK](https://github.com/Microsoft/botframework-sdk), which is part of the Microsoft Bot Framework - a comprehensive framework for building enterprise-grade conversational AI experiences. 
 
-This repository contains code for the Python version of the [Microsoft Bot Framework SDK](https://github.com/Microsoft/botbuilder). The Bot Framework SDK v4 enables developers to model conversation and build sophisticated bot applications using Python.  This Python version is GA and ready for production usage.
+This SDK enables developers to model conversation and build sophisticated bot applications using Python. SDKs for [JavaScript](https://github.com/Microsoft/botbuilder-js), [.NET](https://github.com/Microsoft/botbuilder-dotnet) and [Java (preview)](https://github.com/Microsoft/botbuilder-java) are also available.
 
-This repo is part the [Microsoft Bot Framework](https://github.com/Microsoft/botframework) - a comprehensive framework for building enterprise-grade conversational AI experiences.
+To get started building bots using the SDK, see the [Azure Bot Service Documentation](https://docs.microsoft.com/en-us/azure/bot-service/?view=azure-bot-service-4.0).
 
-In addition to the Python SDK, Bot Builder supports creating bots in other popular programming languages like [.Net SDK](https://github.com/Microsoft/botbuilder-dotnet), [JavaScript](https://github.com/Microsoft/botbuilder-js), and [Java](https://github.com/Microsoft/botbuilder-java). 
+For more information jump to a section below.
 
-To get started see the [Azure Bot Service Documentation](https://docs.microsoft.com/en-us/azure/bot-service/?view=azure-bot-service-4.0) for the v4 SDK.
+* [Build status](#build-status)
+* [Packages](#packages)
+* [Getting started](#getting-started)
+* [Getting support and providing feedback](#getting-support-and-providing-feedback)
+* [Contributing and our code of conduct](contributing-and-our-code-of-conduct)
+* [Reporting security sssues](#reporting-security-issues)
+
+## Build Status
+
+| Branch | Description        | Build Status | Coverage Status | Code Style |
+ |----|---------------|--------------|-----------------|--|
+| Master | 4.10.* Preview Builds | [![Build Status](https://fuselabs.visualstudio.com/SDK_v4/_apis/build/status/Python/Python-CI-PR-yaml?branchName=master)](https://fuselabs.visualstudio.com/SDK_v4/_build/latest?definitionId=771&branchName=master) | [![Coverage Status](https://coveralls.io/repos/github/microsoft/botbuilder-python/badge.svg?branch=HEAD)](https://coveralls.io/github/microsoft/botbuilder-python?branch=HEAD) | [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) |
 
 ## Packages
 
-- [![PyPI version](https://badge.fury.io/py/botbuilder-ai.svg)](https://pypi.org/project/botbuilder-ai/) botbuilder-ai
-- [![PyPI version](https://badge.fury.io/py/botbuilder-applicationinsights.svg)](https://pypi.org/project/botbuilder-applicationinsights/) botbuilder-applicationinsights
-- [![PyPI version](https://badge.fury.io/py/botbuilder-azure.svg)](https://pypi.org/project/botbuilder-azure/) botbuilder-azure
-- [![PyPI version](https://badge.fury.io/py/botbuilder-core.svg)](https://pypi.org/project/botbuilder-core/) botbuilder-core
-- [![PyPI version](https://badge.fury.io/py/botbuilder-dialogs.svg)](https://pypi.org/project/botbuilder-dialogs/) botbuilder-dialogs
-- [![PyPI version](https://badge.fury.io/py/botbuilder-schema.svg)](https://pypi.org/project/botbuilder-schema/) botbuilder-schema
-- [![PyPI version](https://badge.fury.io/py/botframework-connector.svg)](https://pypi.org/project/botframework-connector/) botframework-connector
+| Build | Released Package |
+ |----|---------------|
+| botbuilder-ai | [![PyPI version](https://badge.fury.io/py/botbuilder-ai.svg)](https://pypi.org/project/botbuilder-ai/) |
+| botbuilder-applicationinsights | [![PyPI version](https://badge.fury.io/py/botbuilder-applicationinsights.svg)](https://pypi.org/project/botbuilder-applicationinsights/) |
+| botbuilder-azure | [![PyPI version](https://badge.fury.io/py/botbuilder-azure.svg)](https://pypi.org/project/botbuilder-azure/) |
+| botbuilder-core | [![PyPI version](https://badge.fury.io/py/botbuilder-core.svg)](https://pypi.org/project/botbuilder-core/) |
+| botbuilder-dialogs | [![PyPI version](https://badge.fury.io/py/botbuilder-dialogs.svg)](https://pypi.org/project/botbuilder-dialogs/) |
+| botbuilder-schema | [![PyPI version](https://badge.fury.io/py/botbuilder-schema.svg)](https://pypi.org/project/botbuilder-schema/) |
+| botframework-connector | [![PyPI version](https://badge.fury.io/py/botframework-connector.svg)](https://pypi.org/project/botframework-connector/) |
 
-## Contributing
-This project welcomes contributions and suggestions. Most contributions require you to agree to a
-Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit https://cla.microsoft.com.
-When you submit a pull request, a CLA-bot will automatically determine whether you need to provide
-a CLA and decorate the PR appropriately (e.g., label, comment). Simply follow the instructions
-provided by the bot. You will only need to do this once across all repos using our CLA.
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+## Getting Started
+To get started building bots using the SDK, see the [Azure Bot Service Documentation](https://docs.microsoft.com/en-us/azure/bot-service/?view=azure-bot-service-4.0).
+
+The [Bot Framework Samples](https://github.com/microsoft/botbuilder-samples) includes a rich set of samples repository.
+
+If you want to debug an issue, would like to [contribute](#contributing), or understand how the Bot Builder SDK works, instructions for building and testing the SDK are below.
+
+### Prerequisites
+- [Git](https://git-scm.com/downloads)
+- [Python 3.8.2](https://www.python.org/downloads/)
+
+Python "Virtual Environments" allow Python packages to be installed in an isolated location for a particular application, rather than being installed globally, as such it is common practice to use them. Click [here](https://packaging.python.org/tutorials/installing-packages/#creating-virtual-environments) to learn more about creating _and activating_ Virtual Environments in Python. 
+
+### Clone
+Clone a copy of the repo:
+```bash
+git clone https://github.com/Microsoft/botbuilder-python.git
+```
+Change to the SDK's directory:
+```bash
+cd botbuilder-python
+```
+
+### Using the SDK locally
+
+You will need the following 3 packages installed in your environment:
+- [botframework-connector](https://pypi.org/project/botframework-connector/)
+- [botbuilder-core](https://pypi.org/project/botbuilder-core/)
+- [botbuilder-schema](https://pypi.org/project/botbuilder-schema/)
+
+To use a local copy of the SDK you can link to these packages with the pip -e option. 
+
+```bash
+pip install -e ./libraries/botbuilder-schema
+pip install -e ./libraries/botframework-connector
+pip install -e ./libraries/botbuilder-core
+pip install -e ./libraries/botbuilder-integration-aiohttp
+pip install -e ./libraries/botbuilder-ai
+pip install -e ./libraries/botbuilder-applicationinsights
+pip install -e ./libraries/botbuilder-integration-applicationinsights-aiohttp
+pip install -e ./libraries/botbuilder-dialogs
+pip install -e ./libraries/botbuilder-azure
+pip install -e ./libraries/botbuilder-adapters-slack
+pip install -e ./libraries/botbuilder-testing
+```
+
+### Running unit tests
+First execute the following command from the root level of the repo:
+```bash
+pip install -r ./libraries/botframework-connector/tests/requirements.txt
+pip install -r ./libraries/botbuilder-core/tests/requirements.txt
+pip install -r ./libraries/botbuilder-ai/tests/requirements.txt
+```
+
+Then enter run pytest by simply typing it into your CLI:
+
+```bash
+pytest
+```
+
+This is the expected output:
+```bash
+============================= test session starts =============================
+platform win32 -- Python 3.8.2, pytest-3.4.0, py-1.5.2, pluggy-0.6.0
+rootdir: C:\projects\botbuilder-python, inifile:
+plugins: cov-2.5.1
+...
+```
+
+## Getting support and providing feedback
+Below are the various channels that are available to you for obtaining support and providing feedback. Please pay carful attention to which channel should be used for which type of content. e.g. general "how do I..." questions should be asked on Stack Overflow, Twitter or Gitter, with GitHub issues being for feature requests and bug reports.
+
+### Github issues
+[Github issues](https://github.com/Microsoft/botbuilder-python/issues) should be used for bugs and feature requests. 
+
+### Stack overflow
+[Stack Overflow](https://stackoverflow.com/questions/tagged/botframework) is a great place for getting high-quality answers. Our support team, as well as many of our community members are already on Stack Overflow providing answers to 'how-to' questions.
+
+### Azure Support 
+If you issues relates to [Azure Bot Service](https://azure.microsoft.com/en-gb/services/bot-service/), you can take advantage of the available [Azure support options](https://azure.microsoft.com/en-us/support/options/).
+
+### Twitter
+We use the [@botframework](https://twitter.com/botframework) account on twitter for announcements and members from the development team watch for tweets for @botframework.
+
+### Gitter Chat Room
+The [Gitter Channel](https://gitter.im/Microsoft/BotBuilder) provides a place where the Community can get together and collaborate.
+
+## Contributing and our code of conduct
+We welcome contributions and suggestions. Please see our [contributing guidelines](./contributing.md) for more information.
+
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). 
+For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact
+ [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
 ## Reporting Security Issues
-Security issues and bugs should be reported privately, via email, to the Microsoft Security Response Center (MSRC) at [secure@microsoft.com](mailto:secure@microsoft.com). You should receive a response within 24 hours. If for some reason you do not, please follow up via email to ensure we received your original message. Further information, including the [MSRC PGP](https://technet.microsoft.com/en-us/security/dn606155) key, can be found in the [Security TechCenter](https://technet.microsoft.com/en-us/security/default).
+Security issues and bugs should be reported privately, via email, to the Microsoft Security Response Center (MSRC) 
+at [secure@microsoft.com](mailto:secure@microsoft.com).  You should receive a response within 24 hours.  If for some
+ reason you do not, please follow up via email to ensure we received your original message. Further information, 
+ including the [MSRC PGP](https://technet.microsoft.com/en-us/security/dn606155) key, can be found in the 
+[Security TechCenter](https://technet.microsoft.com/en-us/security/default).
 
 Copyright (c) Microsoft Corporation. All rights reserved.
+
+Licensed under the [MIT](./LICENSE.md) License.
+
+
