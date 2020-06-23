@@ -68,3 +68,6 @@ src/build
 
 # [begoldsm] ignore virtual env if it exists.
 adlEnv/
+
+# Auto gen by antlr tool
+.antlr/
