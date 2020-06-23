@@ -652,6 +652,48 @@ class TestFlow:
         return TestFlow(await test_flow_previous(), self.adapter)
 
 
+    async def assert_no_reply(
+        self,
+        description=None,
+        timeout=None,  # pylint: disable=unused-argument
+    ) -> "TestFlow":
+        """
+        Generates an assertion if the bot responds when no response is expected.
+        :param description:
+        :param timeout:
+        """
+        if description is None:
+            description = ""
+        
+        async def test_flow_previous():
+            nonlocal timeout
+            if not timeout:
+                timeout = 3000
+            start = datetime.now()
+            adapter = self.adapter
+
+            async def wait_for_activity():
+                nonlocal timeout
+                current = datetime.now()
+
+                if (current - start).total_seconds() * 1000 > timeout:
+                    # operation timed out and recieved no reply
+                    return
+
+                elif adapter.activity_buffer:
+                    reply = adapter.activity_buffer.pop(0)
+                    raise RuntimeError(
+                        f"TestAdapter.assert_no_reply(): '{reply.text}' is responded when waiting for no reply."
+                    )
+
+                else:
+                    await asyncio.sleep(0.05)
+                    await wait_for_activity()
+
+            await wait_for_activity()
+
+        return TestFlow(await test_flow_previous(), self.adapter)
+
 def validate_activity(activity, expected) -> None:
     """
     Helper method that compares activities
