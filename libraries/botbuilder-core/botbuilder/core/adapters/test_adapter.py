@@ -651,11 +651,8 @@ class TestFlow:
 
         return TestFlow(await test_flow_previous(), self.adapter)
 
-
     async def assert_no_reply(
-        self,
-        description=None,
-        timeout=None,  # pylint: disable=unused-argument
+        self, description=None, timeout=None,  # pylint: disable=unused-argument
     ) -> "TestFlow":
         """
         Generates an assertion if the bot responds when no response is expected.
@@ -664,7 +661,7 @@ class TestFlow:
         """
         if description is None:
             description = ""
-        
+
         async def test_flow_previous():
             nonlocal timeout
             if not timeout:
@@ -693,6 +690,7 @@ class TestFlow:
             await wait_for_activity()
 
         return TestFlow(await test_flow_previous(), self.adapter)
+
 
 def validate_activity(activity, expected) -> None:
     """
