@@ -65,7 +65,7 @@ You will need the following 3 packages installed in your environment:
 - [botbuilder-core](https://pypi.org/project/botbuilder-core/)
 - [botbuilder-schema](https://pypi.org/project/botbuilder-schema/)
 
-To use a local copy of the SDK you can link to these packages with the pip -e option.
+To use a local copy of the SDK you can link to these packages with the pip -e option. 
 
 ```bash
 pip install -e ./libraries/botbuilder-schema
@@ -107,13 +107,13 @@ plugins: cov-2.5.1
 ## Getting support and providing feedback
 Below are the various channels that are available to you for obtaining support and providing feedback. Please pay carful attention to which channel should be used for which type of content. e.g. general "how do I..." questions should be asked on Stack Overflow, Twitter or Gitter, with GitHub issues being for feature requests and bug reports.
 
-### Github issues
+### Github issues 
 [Github issues](https://github.com/Microsoft/botbuilder-python/issues) should be used for bugs and feature requests.
 
 ### Stack overflow
 [Stack Overflow](https://stackoverflow.com/questions/tagged/botframework) is a great place for getting high-quality answers. Our support team, as well as many of our community members are already on Stack Overflow providing answers to 'how-to' questions.
 
-### Azure Support
+### Azure Support 
 If you issues relates to [Azure Bot Service](https://azure.microsoft.com/en-gb/services/bot-service/), you can take advantage of the available [Azure support options](https://azure.microsoft.com/en-us/support/options/).
 
 ### Twitter
@@ -125,15 +125,15 @@ The [Gitter Channel](https://gitter.im/Microsoft/BotBuilder) provides a place wh
 ## Contributing and our code of conduct
 We welcome contributions and suggestions. Please see our [contributing guidelines](./contributing.md) for more information.
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). 
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact
  [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
 ## Reporting Security Issues
-Security issues and bugs should be reported privately, via email, to the Microsoft Security Response Center (MSRC)
+Security issues and bugs should be reported privately, via email, to the Microsoft Security Response Center (MSRC) 
 at [secure@microsoft.com](mailto:secure@microsoft.com).  You should receive a response within 24 hours.  If for some
- reason you do not, please follow up via email to ensure we received your original message. Further information,
- including the [MSRC PGP](https://technet.microsoft.com/en-us/security/dn606155) key, can be found in the
+ reason you do not, please follow up via email to ensure we received your original message. Further information, 
+ including the [MSRC PGP](https://technet.microsoft.com/en-us/security/dn606155) key, can be found in the 
 [Security TechCenter](https://technet.microsoft.com/en-us/security/default).
 
 Copyright (c) Microsoft Corporation. All rights reserved.
