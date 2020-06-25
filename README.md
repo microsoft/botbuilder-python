@@ -2,7 +2,7 @@
 
 ### [What's new with Bot Framework](https://docs.microsoft.com/en-us/azure/bot-service/what-is-new?view=azure-bot-service-4.0)
 
-This repository contains code for the Python version of the [Microsoft Bot Framework SDK](https://github.com/Microsoft/botframework-sdk), which is part of the Microsoft Bot Framework - a comprehensive framework for building enterprise-grade conversational AI experiences.
+This repository contains code for the Python version of the [Microsoft Bot Framework SDK](https://github.com/Microsoft/botframework-sdk), which is part of the Microsoft Bot Framework - a comprehensive framework for building enterprise-grade conversational AI experiences. 
 
 This SDK enables developers to model conversation and build sophisticated bot applications using Python. SDKs for [JavaScript](https://github.com/Microsoft/botbuilder-js), [.NET](https://github.com/Microsoft/botbuilder-dotnet) and [Java (preview)](https://github.com/Microsoft/botbuilder-java) are also available.
 
@@ -46,7 +46,7 @@ If you want to debug an issue, would like to [contribute](#contributing), or und
 - [Git](https://git-scm.com/downloads)
 - [Python 3.8.2](https://www.python.org/downloads/)
 
-Python "Virtual Environments" allow Python packages to be installed in an isolated location for a particular application, rather than being installed globally, as such it is common practice to use them. Click [here](https://packaging.python.org/tutorials/installing-packages/#creating-virtual-environments) to learn more about creating _and activating_ Virtual Environments in Python.
+Python "Virtual Environments" allow Python packages to be installed in an isolated location for a particular application, rather than being installed globally, as such it is common practice to use them. Click [here](https://packaging.python.org/tutorials/installing-packages/#creating-virtual-environments) to learn more about creating _and activating_ Virtual Environments in Python. 
 
 ### Clone
 Clone a copy of the repo:
