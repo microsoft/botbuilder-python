@@ -91,6 +91,33 @@ class TestActivity(aiounittest.AsyncTestCase):
         self.assertEqual(conversation_reference.user.id, activity.recipient.id)
         self.assertEqual(conversation_reference.activity_id, activity.reply_to_id)
 
+    def test_apply_conversation_reference_with_is_incoming_true(self):
+        # Arrange
+        activity = self.__create_activity()
+        conversation_reference = ConversationReference(
+            channel_id="cr_123",
+            service_url="cr_serviceUrl",
+            conversation=ConversationAccount(id="cr_456"),
+            user=ChannelAccount(id="cr_abc"),
+            bot=ChannelAccount(id="cr_def"),
+            activity_id="cr_12345",
+            locale="en-uS",
+        )
+
+        # Act
+        activity.apply_conversation_reference(reference=conversation_reference, is_incoming=True)
+
+        # Assert
+        self.assertEqual(conversation_reference.channel_id, activity.channel_id)
+        self.assertEqual(conversation_reference.locale, activity.locale)
+        self.assertEqual(conversation_reference.service_url, activity.service_url)
+        self.assertEqual(
+            conversation_reference.conversation.id, activity.conversation.id
+        )
+        self.assertEqual(conversation_reference.user.id, activity.from_property.id)
+        self.assertEqual(conversation_reference.bot.id, activity.recipient.id)
+        self.assertEqual(conversation_reference.activity_id, activity.id)
+
     def test_as_contact_relation_update_activity_return_activity(self):
         # Arrange
         activity = self.__create_activity()
