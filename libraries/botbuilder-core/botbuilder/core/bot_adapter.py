@@ -13,8 +13,6 @@ from .middleware_set import MiddlewareSet
 
 
 class BotAdapter(ABC):
-    """ Represents a bot adapter that can connect a bot to a service endpoint.
-    """
     BOT_IDENTITY_KEY = "BotIdentity"
     BOT_OAUTH_SCOPE_KEY = "botbuilder.core.BotAdapter.OAuthScope"
     BOT_CONNECTOR_CLIENT_KEY = "ConnectorClient"
