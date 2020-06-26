@@ -101,7 +101,7 @@ class QnAMaker(QnAMakerTelemetryClient):
         Generates raw answers from the knowledge base.
 
         :return: A list of answers for the user's query, sorted in decreasing order of ranking score.
-        :rtype: class:`QueryResult`
+        :rtype: :class:`QueryResult`
         """
         if not context:
             raise TypeError("QnAMaker.get_answers(): context cannot be None.")
@@ -124,7 +124,7 @@ class QnAMaker(QnAMakerTelemetryClient):
         Filters the ambiguous question for active learning.
 
         :param query_result: User query output.
-        :type query_result: class:`QueryResult`
+        :type query_result: :class:`QueryResult`
         :return: Filtered array of ambiguous questions.
         """
         return ActiveLearningUtils.get_low_score_variation(query_result)
