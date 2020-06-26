@@ -296,6 +296,17 @@ class TestActivity(aiounittest.AsyncTestCase):
         # Assert
         self.assertIsNone(result)
 
+    def test_as_message_activity_type_none(self):
+        # Arrange
+        activity = self.__create_activity()
+        activity.type = None
+
+        # Act
+        result = activity.as_message_activity()
+
+        # Assert
+        self.assertIsNone(result)
+
     def test_as_message_delete_activity_return_activity(self):
         # Arrange
         activity = self.__create_activity()
@@ -491,6 +502,18 @@ class TestActivity(aiounittest.AsyncTestCase):
         self.assertEqual(result.locale, locale)
         self.assertEqual(result.type, ActivityTypes.message)
 
+    def test_create_reply_without_arguments(self):
+        # Arrange
+        activity = self.__create_activity()
+
+        # Act
+        result = activity.create_reply()
+
+        # Assert
+        self.assertEqual(result.type, ActivityTypes.message)
+        self.assertEqual(result.text, "")
+        self.assertEqual(result.locale, activity.locale)
+
     def test_create_trace(self):
         # Arrange
         activity = self.__create_activity()
@@ -509,6 +532,32 @@ class TestActivity(aiounittest.AsyncTestCase):
         self.assertEqual(result.name, name)
         self.assertEqual(result.value_type, value_type)
         self.assertEqual(result.value, value)
+        self.assertEqual(result.label, label)
+
+    def test_create_trace_activity_no_recipient(self):
+        # Arrange
+        activity = self.__create_activity()
+        activity.recipient = None
+
+        # Act
+        result = activity.create_trace("test")
+
+        # Assert
+        self.assertIsNone(result.from_property.id)
+        self.assertIsNone(result.from_property.name)
+
+    def test_crete_trace_activity_no_value_type(self):
+        # Arrange
+        name = "test-activity"
+        value = "test-value"
+        label = "test-label"
+
+        # Act
+        result = Activity.create_trace_activity(name=name, value=value, label=label)
+
+        # Assert
+        self.assertEqual(result.type, ActivityTypes.trace)
+        self.assertEqual(result.value_type, type(value))
         self.assertEqual(result.label, label)
 
     def test_create_trace_activity(self):

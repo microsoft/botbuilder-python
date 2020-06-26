@@ -667,9 +667,8 @@ class Activity(Model):
 
         :returns: The new trace activity.
         """
-        if not value_type:
-            if value and hasattr(value, "type"):
-                value_type = value.type
+        if not value_type and value:
+            value_type = type(value)
 
         return Activity(
             type=ActivityTypes.trace,
@@ -711,9 +710,8 @@ class Activity(Model):
 
         :returns: The new trace activity.
         """
-        if not value_type:
-            if value and hasattr(value, "type"):
-                value_type = value.type
+        if not value_type and value:
+            value_type = type(value)
 
         return Activity(
             type=ActivityTypes.trace,
