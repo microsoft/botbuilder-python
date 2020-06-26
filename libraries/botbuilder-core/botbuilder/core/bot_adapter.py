@@ -13,11 +13,6 @@ from .middleware_set import MiddlewareSet
 
 
 class BotAdapter(ABC):
-    """
-    Represents a bot adapter that can connect a bot to a service endpoint.
-
-    :var on_turn_error: Gets or sets an error handler.
-    """
     BOT_IDENTITY_KEY = "BotIdentity"
     BOT_OAUTH_SCOPE_KEY = "botbuilder.core.BotAdapter.OAuthScope"
     BOT_CONNECTOR_CLIENT_KEY = "ConnectorClient"
@@ -35,11 +30,8 @@ class BotAdapter(ABC):
     ) -> List[ResourceResponse]:
         """
         Sends a set of activities to the user. An array of responses from the server will be returned.
-
-        :param context: The context object for the turn.
-        :type context: :class:`TurnContext`
-        :param activities: The activities to send.
-        :type activities: :class:`typing.List[Activity]`
+        :param context:
+        :param activities:
         :return:
         """
         raise NotImplementedError()
@@ -48,11 +40,8 @@ class BotAdapter(ABC):
     async def update_activity(self, context: TurnContext, activity: Activity):
         """
         Replaces an existing activity.
-
-        :param context: The context object for the turn.
-        :type context: :class:`TurnContext`
-        :param activity: New replacement activity.
-        :type activity: :class:`botbuilder.schema.Activity`
+        :param context:
+        :param activity:
         :return:
         """
         raise NotImplementedError()
@@ -63,11 +52,8 @@ class BotAdapter(ABC):
     ):
         """
         Deletes an existing activity.
-
-        :param context: The context object for the turn.
-        :type context: :class:`TurnContext`
-        :param reference: Conversation reference for the activity to delete.
-        :type reference: :class:`botbuilder.schema.ConversationReference`
+        :param context:
+        :param reference:
         :return:
         """
         raise NotImplementedError()
@@ -75,8 +61,7 @@ class BotAdapter(ABC):
     def use(self, middleware):
         """
         Registers a middleware handler with the adapter.
-
-        :param middleware: The middleware to register.
+        :param middleware:
         :return:
         """
         self._middleware.use(middleware)
@@ -94,12 +79,11 @@ class BotAdapter(ABC):
         Sends a proactive message to a conversation. Call this method to proactively send a message to a conversation.
         Most _channels require a user to initiate a conversation with a bot before the bot can send activities
         to the user.
-
         :param bot_id: The application ID of the bot. This parameter is ignored in
-        single tenant the Adapters (Console, Test, etc) but is critical to the BotFrameworkAdapter
-        which is multi-tenant aware.
-        :param reference: A reference to the conversation to continue.
-        :param callback: The method to call for the resulting bot turn.
+        single tenant the Adpters (Console, Test, etc) but is critical to the BotFrameworkAdapter
+        which is multi-tenant aware. </param>
+        :param reference: A reference to the conversation to continue.</param>
+        :param callback: The method to call for the resulting bot turn.</param>
         :param claims_identity:
         :param audience:
         """
@@ -112,13 +96,10 @@ class BotAdapter(ABC):
         self, context: TurnContext, callback: Callable[[TurnContext], Awaitable] = None
     ):
         """
-        Called by the parent class to run the adapters middleware set and calls
-        the passed in `callback()` handler at the end of the chain.
-
-        :param context: The context object for the turn.
-        :type context: :class:`TurnContext`
-        :param callback: A callback method to run at the end of the pipeline.
-        :type callbacK: :class:`typing.Callable[[TurnContext], Awaitable]`
+        Called by the parent class to run the adapters middleware set and calls the passed in `callback()` handler at
+        the end of the chain.
+        :param context:
+        :param callback:
         :return:
         """
         BotAssert.context_not_none(context)
