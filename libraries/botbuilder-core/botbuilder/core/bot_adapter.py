@@ -94,9 +94,13 @@ class BotAdapter(ABC):
         single tenant the Adapters (Console, Test, etc) but is critical to the BotFrameworkAdapter
         which is multi-tenant aware.
         :param reference: A reference to the conversation to continue.
+        :type reference: :class:`botbuilder.schema.ConversationReference`
         :param callback: The method to call for the resulting bot turn.
-        :param claims_identity:
-        :param audience:
+        :type callback: :class:`typing.Callable`
+        :param claims_identity: A :class:`botframework.connector.auth.ClaimsIdentity` for the conversation.
+        :type claims_identity: :class:`botframework.connector.auth.ClaimsIdentity`
+        :param audience:A value signifying the recipient of the proactive message.
+        :type audience: str
         """
         context = TurnContext(
             self, conversation_reference_extension.get_continuation_activity(reference)
@@ -113,7 +117,7 @@ class BotAdapter(ABC):
         :param context: The context object for the turn.
         :type context: :class:`TurnContext`
         :param callback: A callback method to run at the end of the pipeline.
-        :type callbacK: :class:`typing.Callable[[TurnContext], Awaitable]`
+        :type callback: :class:`typing.Callable[[TurnContext], Awaitable]`
         :return:
         """
         BotAssert.context_not_none(context)
