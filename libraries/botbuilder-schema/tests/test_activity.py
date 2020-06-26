@@ -105,7 +105,9 @@ class TestActivity(aiounittest.AsyncTestCase):
         )
 
         # Act
-        activity.apply_conversation_reference(reference=conversation_reference, is_incoming=True)
+        activity.apply_conversation_reference(
+            reference=conversation_reference, is_incoming=True
+        )
 
         # Assert
         self.assertEqual(conversation_reference.channel_id, activity.channel_id)
