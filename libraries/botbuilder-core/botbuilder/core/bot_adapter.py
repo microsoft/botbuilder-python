@@ -14,9 +14,6 @@ from .middleware_set import MiddlewareSet
 
 class BotAdapter(ABC):
     """ Represents a bot adapter that can connect a bot to a service endpoint.
-
-    :var on_turn_error: Gets or sets an error handler that can catch exceptions.
-    :vartype on_turn_error: :class:`typing.Callable[[TurnContext, Exception], Awaitable]`
     """
     BOT_IDENTITY_KEY = "BotIdentity"
     BOT_OAUTH_SCOPE_KEY = "botbuilder.core.BotAdapter.OAuthScope"
