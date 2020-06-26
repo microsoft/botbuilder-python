@@ -33,7 +33,8 @@ class BotAdapter(ABC):
 
         :param context: The context object for the turn.
         :type context: :class:`TurnContext`
-        :param activities:
+        :param activities: The activities to send.
+        :type activities: :class:`typing.List[Activity]`
         :return:
         """
         raise NotImplementedError()
@@ -45,7 +46,8 @@ class BotAdapter(ABC):
 
         :param context: The context object for the turn.
         :type context: :class:`TurnContext`
-        :param activity:
+        :param activity: New replacement activity.
+        :type activity: :class:`botbuilder.schema.Activity`
         :return:
         """
         raise NotImplementedError()
@@ -59,7 +61,8 @@ class BotAdapter(ABC):
 
         :param context: The context object for the turn.
         :type context: :class:`TurnContext`
-        :param reference:
+        :param reference: Conversation reference for the activity to delete.
+        :type reference: :class:`botbuilder.schema.ConversationReference`
         :return:
         """
         raise NotImplementedError()
@@ -68,7 +71,7 @@ class BotAdapter(ABC):
         """
         Registers a middleware handler with the adapter.
 
-        :param middleware:
+        :param middleware: The middleware to register.
         :return:
         """
         self._middleware.use(middleware)
@@ -109,7 +112,8 @@ class BotAdapter(ABC):
 
         :param context: The context object for the turn.
         :type context: :class:`TurnContext`
-        :param callback:
+        :param callback: A callback method to run at the end of the pipeline.
+        :type callbacK: :class:`typing.Callable[[TurnContext], Awaitable]`
         :return:
         """
         BotAssert.context_not_none(context)
