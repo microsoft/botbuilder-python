@@ -42,7 +42,7 @@ class LuisRecognizer(Recognizer):
         :param application: The LUIS application to use to recognize text.
         :type application: :class:`LuisApplication`
         :param prediction_options: The LUIS prediction options to use, defaults to None.
-        :type prediction_options: :class:LuisPredictionOptions`, optional
+        :type prediction_options: :class:`LuisPredictionOptions`, optional
         :param include_api_results: True to include raw LUIS API response, defaults to False.
         :type include_api_results: bool, optional
         :raises TypeError:
@@ -144,7 +144,7 @@ class LuisRecognizer(Recognizer):
         :type turn_context: :class:`botbuilder.core.TurnContext`
         :param telemetry_properties: Additional properties to be logged to telemetry with the LuisResult event, defaults
          to None.
-        :type telemetry_properties: :class:`typing.Dict[str, str], optional
+        :type telemetry_properties: :class:`typing.Dict[str, str]`, optional
         :param telemetry_metrics: Additional metrics to be logged to telemetry with the LuisResult event, defaults
          to None.
         :type telemetry_metrics: :class:`typing.Dict[str, float]`, optional
@@ -189,7 +189,7 @@ class LuisRecognizer(Recognizer):
         :type turn_context: :class:`botbuilder.core.TurnContext`
         :param telemetry_properties: Additional properties to be logged to telemetry with the LuisResult event,
          defaults to None
-        :param telemetry_properties: Dict[str, str], optional
+        :param telemetry_properties: :class:`typing.Dict[str, str]`, optional
         :return: A dictionary that is sent as "Properties" to :func:`botbuilder.core.BotTelemetryClient.track_event`
         method for the BotMessageSend event.
         :rtype: `typing.Dict[str, str]`
