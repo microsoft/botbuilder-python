@@ -171,7 +171,7 @@ class SlackAdapter(BotAdapter, ABC):
         Accept an incoming webhook request and convert it into a TurnContext which can be processed by the bot's logic.
 
         :param req: The aoihttp Request object
-        :param logic: The method to call for the resulting bot turn.</param>
+        :param logic: The method to call for the resulting bot turn.
         :return: The aoihttp Response
         """
         if not req:
