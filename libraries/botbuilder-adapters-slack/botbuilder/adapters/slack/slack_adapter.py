@@ -138,6 +138,7 @@ class SlackAdapter(BotAdapter, ABC):
         Sends a proactive message to a conversation. Call this method to proactively send a message to a conversation.
         Most _channels require a user to initiate a conversation with a bot before the bot can send activities
         to the user.
+
         :param bot_id: Unused for this override.
         :param reference: A reference to the conversation to continue.
         :param callback: The method to call for the resulting bot turn.
