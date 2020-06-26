@@ -81,13 +81,8 @@ class QnAMaker(QnAMakerTelemetryClient):
         """
         Generates answers from the knowledge base.
 
-        return:
-        -------
-        A list of answers for the user's query, sorted in decreasing order of ranking score.
-
-        rtype:
-        ------
-        List[QueryResult]
+        :return: A list of answers for the user's query, sorted in decreasing order of ranking score.
+        :rtype: :class:`typing.List[QueryResult]`
         """
         result = await self.get_answers_raw(
             context, options, telemetry_properties, telemetry_metrics
@@ -105,13 +100,8 @@ class QnAMaker(QnAMakerTelemetryClient):
         """
         Generates raw answers from the knowledge base.
 
-        return:
-        -------
-        A list of answers for the user's query, sorted in decreasing order of ranking score.
-
-        rtype:
-        ------
-        QueryResults
+        :return: A list of answers for the user's query, sorted in decreasing order of ranking score.
+        :rtype: class:`QueryResult`
         """
         if not context:
             raise TypeError("QnAMaker.get_answers(): context cannot be None.")
@@ -133,13 +123,9 @@ class QnAMaker(QnAMakerTelemetryClient):
         """
         Filters the ambiguous question for active learning.
 
-        Parameters:
-        -----------
-        query_result: User query output.
-
-        Return:
-        -------
-        Filtered aray of ambigous questions.
+        :param query_result: User query output.
+        :type query_result: class:`QueryResult`
+        :return: Filtered array of ambiguous questions.
         """
         return ActiveLearningUtils.get_low_score_variation(query_result)
 
@@ -147,9 +133,8 @@ class QnAMaker(QnAMakerTelemetryClient):
         """
         Sends feedback to the knowledge base.
 
-        Parameters:
-        -----------
-        feedback_records
+        :param feedback_records: Feedback records.
+        :type feedback_records: :class:`typing.List[FeedbackRecord]`
         """
         return await self._active_learning_train_helper.call_train(feedback_records)
 
@@ -181,14 +166,12 @@ class QnAMaker(QnAMakerTelemetryClient):
         """
         Fills the event properties and metrics for the QnaMessage event for telemetry.
 
-        return:
-        -------
-        A tuple of event data properties and metrics that will be sent to the
-        BotTelemetryClient.track_event() method for the QnAMessage event.
+        :return: A tuple of event data properties and metrics that will be sent to the
+        :func:`botbuilder.core.BotTelemetryClient.track_event` method for the QnAMessage event.
         The properties and metrics returned the standard properties logged
-        with any properties passed from the get_answers() method.
-
-        rtype:
+        with any properties passed from the :func:`get_answers` method.
+        :return: Event properties and metrics for the QnaMessage event for telemetry.
+        :rtype: :class:`EventData`
         ------
         EventData
         """
