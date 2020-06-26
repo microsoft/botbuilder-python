@@ -386,8 +386,23 @@ class Activity(Model):
         self.caller_id = caller_id
 
     def apply_conversation_reference(
-        self, reference: ConversationReference, is_comming: bool = False
+        self, reference: ConversationReference, is_incoming: bool = False
     ):
+        """
+        Updates this activity with the delivery information from an existing ConversationReference
+
+        :param reference: The existing conversation reference.
+        :param is_incoming: Optional, True to treat the activity as an
+        incoming activity, where the bot is the recipient; otherwise, False.
+        Default is False, and the activity will show the bot as the sender.
+
+        :returns: his activity, updated with the delivery information.
+
+        .. remarks::
+            Call GetConversationReference on an incoming
+            activity to get a conversation reference that you can then use to update an
+            outgoing activity with the correct delivery information.
+        """
         self.channel_id = reference.channel_id
         self.service_url = reference.service_url
         self.conversation = reference.conversation
@@ -395,7 +410,7 @@ class Activity(Model):
         if reference.locale is not None:
             self.locale = reference.locale
 
-        if is_comming:
+        if is_incoming:
             self.from_property = reference.user
             self.recipient = reference.bot
 
@@ -411,78 +426,208 @@ class Activity(Model):
         return self
 
     def as_contact_relation_update_activity(self):
+        """
+        Returns this activity as a ContactRelationUpdateActivity object;
+        or None, if this is not that type of activity.
+
+        :returns: This activity as a message activity; or None.
+        """
         return (
             self if self.__is_activity(ActivityTypes.contact_relation_update) else None
         )
 
     def as_conversation_update_activity(self):
+        """
+        Returns this activity as a ConversationUpdateActivity object;
+        or None, if this is not that type of activity.
+
+        :returns: This activity as a conversation update activity; or None.
+        """
         return self if self.__is_activity(ActivityTypes.conversation_update) else None
 
     def as_end_of_conversation_activity(self):
+        """
+        Returns this activity as an EndOfConversationActivity object;
+        or None, if this is not that type of activity.
+
+        :returns: This activity as an end of conversation activity; or None.
+        """
         return self if self.__is_activity(ActivityTypes.end_of_conversation) else None
 
     def as_event_activity(self):
+        """
+        Returns this activity as an EventActivity object;
+        or None, if this is not that type of activity.
+
+        :returns: This activity as an event activity; or None.
+        """
         return self if self.__is_activity(ActivityTypes.event) else None
 
     def as_handoff_activity(self):
+        """
+        Returns this activity as a HandoffActivity object;
+        or None, if this is not that type of activity.
+
+        :returns: This activity as a handoff activity; or None.
+        """
         return self if self.__is_activity(ActivityTypes.handoff) else None
 
     def as_installation_update_activity(self):
+        """
+        Returns this activity as an InstallationUpdateActivity object;
+        or None, if this is not that type of activity.
+
+        :returns: This activity as an installation update activity; or None.
+        """
         return self if self.__is_activity(ActivityTypes.installation_update) else None
 
     def as_invoke_activity(self):
+        """
+        Returns this activity as an InvokeActivity object;
+        or None, if this is not that type of activity.
+
+        :returns: This activity as an invoke activity; or None.
+        """
         return self if self.__is_activity(ActivityTypes.invoke) else None
 
     def as_message_activity(self):
+        """
+        Returns this activity as a MessageActivity object;
+        or None, if this is not that type of activity.
+
+        :returns: This activity as a message activity; or None.
+        """
         return self if self.__is_activity(ActivityTypes.message) else None
 
     def as_message_delete_activity(self):
+        """
+        Returns this activity as a MessageDeleteActivity object;
+        or None, if this is not that type of activity.
+
+        :returns: This activity as a message delete request; or None.
+        """
         return self if self.__is_activity(ActivityTypes.message_delete) else None
 
     def as_message_reaction_activity(self):
+        """
+        Returns this activity as a MessageReactionActivity object;
+        or None, if this is not that type of activity.
+
+        :return: This activity as a message reaction activity; or None.
+        """
         return self if self.__is_activity(ActivityTypes.message_reaction) else None
 
     def as_message_update_activity(self):
+        """
+        Returns this activity as an MessageUpdateActivity object;
+        or None, if this is not that type of activity.
+
+        :returns: This activity as a message update request; or None.
+        """
         return self if self.__is_activity(ActivityTypes.message_update) else None
 
     def as_suggestion_activity(self):
+        """
+        Returns this activity as a SuggestionActivity object;
+        or None, if this is not that type of activity.
+
+        :returns: This activity as a suggestion activity; or None.
+        """
         return self if self.__is_activity(ActivityTypes.suggestion) else None
 
     def as_trace_activity(self):
+        """
+        Returns this activity as a TraceActivity object;
+        or None, if this is not that type of activity.
+
+        :returns: This activity as a trace activity; or None.
+        """
         return self if self.__is_activity(ActivityTypes.trace) else None
 
     def as_typing_activity(self):
+        """
+        Returns this activity as a TypingActivity object;
+        or null, if this is not that type of activity.
+
+        :returns: This activity as a typing activity; or null.
+        """
         return self if self.__is_activity(ActivityTypes.typing) else None
 
     @staticmethod
     def create_contact_relation_update_activity():
+        """
+        Creates an instance of the :class:`Activity` class as aContactRelationUpdateActivity object.
+
+        :returns: The new contact relation update activity.
+        """
         return Activity(type=ActivityTypes.contact_relation_update)
 
     @staticmethod
     def create_conversation_update_activity():
+        """
+        Creates an instance of the :class:`Activity` class as a ConversationUpdateActivity object.
+
+        :returns: The new conversation update activity.
+        """
         return Activity(type=ActivityTypes.conversation_update)
 
     @staticmethod
     def create_end_of_conversation_activity():
+        """
+        Creates an instance of the :class:`Activity` class as an EndOfConversationActivity object.
+
+        :returns: The new end of conversation activity.
+        """
         return Activity(type=ActivityTypes.end_of_conversation)
 
     @staticmethod
     def create_event_activity():
+        """
+        Creates an instance of the :class:`Activity` class as an EventActivity object.
+
+        :returns: The new event activity.
+        """
         return Activity(type=ActivityTypes.event)
 
     @staticmethod
     def create_handoff_activity():
+        """
+        Creates an instance of the :class:`Activity` class as a HandoffActivity object.
+
+        :returns: The new handoff activity.
+        """
         return Activity(type=ActivityTypes.handoff)
 
     @staticmethod
     def create_invoke_activity():
+        """
+        Creates an instance of the :class:`Activity` class as an InvokeActivity object.
+
+        :returns: The new invoke activity.
+        """
         return Activity(type=ActivityTypes.invoke)
 
     @staticmethod
     def create_message_activity():
+        """
+        Creates an instance of the :class:`Activity` class as a MessageActivity object.
+
+        :returns: The new message activity.
+        """
         return Activity(type=ActivityTypes.message)
 
     def create_reply(self, text: str = None, locale: str = None):
+        """
+        Creates a new message activity as a response to this activity.
+
+        :param text: The text of the reply.
+        :param locale: The language code for the text.
+
+        :returns: The new message activity.
+
+        .. remarks::
+            The new activity sets up routing information based on this activity.
+        """
         return Activity(
             type=ActivityTypes.message,
             timestamp=datetime.utcnow(),
@@ -511,6 +656,17 @@ class Activity(Model):
     def create_trace(
         self, name: str, value: object = None, value_type: str = None, label: str = None
     ):
+        """
+        Creates a new trace activity based on this activity.
+
+        :param name: The name of the trace operation to create.
+        :param value: Optional, the content for this trace operation.
+        :param value_type: Optional, identifier for the format of the value
+        Default is the name of type of the value.
+        :param label: Optional, a descriptive label for this trace operation.
+
+        :returns: The new trace activity.
+        """
         if not value_type:
             if value and hasattr(value, "type"):
                 value_type = value.type
@@ -544,6 +700,17 @@ class Activity(Model):
     def create_trace_activity(
         name: str, value: object = None, value_type: str = None, label: str = None
     ):
+        """
+        Creates an instance of the :class:`Activity` class as a TraceActivity object.
+
+        :param name: The name of the trace operation to create.
+        :param value: Optional, the content for this trace operation.
+        :param value_type: Optional, identifier for the format of the value.
+        Default is the name of type of the value.
+        :param label: Optional, a descriptive label for this trace operation.
+
+        :returns: The new trace activity.
+        """
         if not value_type:
             if value and hasattr(value, "type"):
                 value_type = value.type
@@ -558,9 +725,19 @@ class Activity(Model):
 
     @staticmethod
     def create_typing_activity():
+        """
+        Creates an instance of the :class:`Activity` class as a TypingActivity object.
+
+        :returns: The new typing activity.
+        """
         return Activity(type=ActivityTypes.typing)
 
     def get_conversation_reference(self):
+        """
+        Creates a ConversationReference based on this activity.
+
+        :returns: A conversation reference for the conversation that contains this activity.
+        """
         return ConversationReference(
             activity_id=self.id,
             user=self.from_property,
@@ -572,17 +749,45 @@ class Activity(Model):
         )
 
     def get_mentions(self) -> [Mention]:
+        """
+        Resolves the mentions from the entities of this activity.
+
+        :returns: The array of mentions; or an empty array, if none are found.
+
+        .. remarks::
+            This method is defined on the :class:`Activity` class, but is only intended
+            for use with a message activity, where the activity Activity.Type is set to
+            ActivityTypes.Message.
+        """
         _list = self.entities
         return [x for x in _list if str(x.type).lower() == "mention"]
 
     def get_reply_conversation_reference(
         self, reply: ResourceResponse
     ) -> ConversationReference:
+        """
+        Create a ConversationReference based on this Activity's Conversation info
+        and the ResourceResponse from sending an activity.
+
+        :param reply: ResourceResponse returned from send_activity.
+
+        :return: A ConversationReference that can be stored and used later to delete or update the activity.
+        """
         reference = self.get_conversation_reference()
         reference.activity_id = reply.id
         return reference
 
     def has_content(self) -> bool:
+        """
+        Indicates whether this activity has content.
+
+        :returns: True, if this activity has any content to send; otherwise, false.
+
+        .. remarks::
+            This method is defined on the :class:`Activity` class, but is only intended
+            for use with a message activity, where the activity Activity.Type is set to
+            ActivityTypes.Message.
+        """
         if self.text and self.text.strip():
             return True
 
@@ -598,11 +803,25 @@ class Activity(Model):
         return False
 
     def is_from_streaming_connection(self) -> bool:
+        """
+        Determine if the Activity was sent via an Http/Https connection or Streaming
+        This can be determined by looking at the service_url property:
+        (1) All channels that send messages via http/https are not streaming
+        (2) Channels that send messages via streaming have a ServiceUrl that does not begin with http/https.
+
+        :returns: True if the Activity originated from a streaming connection.
+        """
         if self.service_url:
             return not self.service_url.lower().startswith("http")
         return False
 
     def __is_activity(self, activity_type: str) -> bool:
+        """
+        Indicates whether this activity is of a specified activity type.
+
+        :param activity_type: The activity type to check for.
+        :return: True if this activity is of the specified activity type; otherwise, False.
+        """
         if self.type is None:
             return False
 
