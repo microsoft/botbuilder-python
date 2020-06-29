@@ -412,10 +412,15 @@ class TeamsActivityHandler(ActivityHandler):
                 TeamsChannelAccount().deserialize(new_account_json)
             )
 
-        return await self.on_teams_members_removed(teams_members_removed, turn_context)
+        return await self.on_teams_members_removed(
+            teams_members_removed, team_info, turn_context
+        )
 
-    async def on_teams_members_removed(
-        self, teams_members_removed: [TeamsChannelAccount], turn_context: TurnContext
+    async def on_teams_members_removed(  # pylint: disable=unused-argument
+        self,
+        teams_members_removed: [TeamsChannelAccount],
+        team_info: TeamInfo,
+        turn_context: TurnContext,
     ):
         members_removed = [
             ChannelAccount().deserialize(member.serialize())

@@ -7,14 +7,14 @@ import urllib.parse
 from aiohttp.web_request import Request
 from aiohttp.web_response import Response
 
+from slack.web.classes.attachments import Attachment
+
 from botbuilder.schema import (
     Activity,
     ConversationAccount,
     ChannelAccount,
     ActivityTypes,
 )
-
-from slack.web.classes.attachments import Attachment
 
 from .slack_message import SlackMessage
 from .slack_client import SlackClient
@@ -53,7 +53,7 @@ class SlackHelper:
                         message.blocks = att.content
                     else:
                         new_attachment = Attachment(
-                            author_name=att.name, thumb_url=att.thumbnail_url,
+                            author_name=att.name, thumb_url=att.thumbnail_url, text="",
                         )
                         attachments.append(new_attachment)
 
