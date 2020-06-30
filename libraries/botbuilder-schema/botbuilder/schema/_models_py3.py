@@ -1196,6 +1196,8 @@ class CardAction(Model):
     :type value: object
     :param channel_data: Channel-specific data associated with this action
     :type channel_data: object
+    :param image_alt_text: Alternate image text to be used in place of the `image` field
+    :type image_alt_text: str
     """
 
     _attribute_map = {
@@ -1206,6 +1208,7 @@ class CardAction(Model):
         "display_text": {"key": "displayText", "type": "str"},
         "value": {"key": "value", "type": "object"},
         "channel_data": {"key": "channelData", "type": "object"},
+        "image_alt_text": {"key": "imageAltText", "type": "str"},
     }
 
     def __init__(
@@ -1218,6 +1221,7 @@ class CardAction(Model):
         display_text: str = None,
         value=None,
         channel_data=None,
+        image_alt_text: str = None,
         **kwargs
     ) -> None:
         super(CardAction, self).__init__(**kwargs)
@@ -1228,6 +1232,7 @@ class CardAction(Model):
         self.display_text = display_text
         self.value = value
         self.channel_data = channel_data
+        self.image_alt_text = image_alt_text
 
 
 class CardImage(Model):
