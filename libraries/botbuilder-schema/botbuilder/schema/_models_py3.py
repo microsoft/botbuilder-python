@@ -1206,6 +1206,7 @@ class CardAction(Model):
         "display_text": {"key": "displayText", "type": "str"},
         "value": {"key": "value", "type": "object"},
         "channel_data": {"key": "channelData", "type": "object"},
+        "image_alt_text": {"key": "imageAltText", "type": "str"},
     }
 
     def __init__(
@@ -1218,6 +1219,7 @@ class CardAction(Model):
         display_text: str = None,
         value=None,
         channel_data=None,
+        image_alt_text: str = None,
         **kwargs
     ) -> None:
         super(CardAction, self).__init__(**kwargs)
@@ -1228,6 +1230,7 @@ class CardAction(Model):
         self.display_text = display_text
         self.value = value
         self.channel_data = channel_data
+        self.image_alt_text = image_alt_text
 
 
 class CardImage(Model):
