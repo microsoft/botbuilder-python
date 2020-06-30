@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+
 class ContentType:
     O365_CONNECTOR_CARD = "application/vnd.microsoft.teams.card.o365connector"
     FILE_CONSENT_CARD = "application/vnd.microsoft.teams.card.file.consent"
