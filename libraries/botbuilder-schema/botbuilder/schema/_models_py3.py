@@ -1196,6 +1196,8 @@ class CardAction(Model):
     :type value: object
     :param channel_data: Channel-specific data associated with this action
     :type channel_data: object
+    :param image_alt_text: Alternate image text to be used in place of the `image` field
+    :type image_alt_text: str
     """
 
     _attribute_map = {
