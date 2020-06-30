@@ -39,6 +39,7 @@ setup(
         "botbuilder.ai.luis",
         "botbuilder.ai.qna.models",
         "botbuilder.ai.qna.utils",
+        "botbuilder.ai.qna.dialogs",
     ],
     install_requires=REQUIRES + TESTS_REQUIRES,
     tests_require=TESTS_REQUIRES,
