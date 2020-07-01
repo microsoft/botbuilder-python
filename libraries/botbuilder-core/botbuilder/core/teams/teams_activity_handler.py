@@ -403,7 +403,7 @@ class TeamsActivityHandler(ActivityHandler):
     ):
         return
 
-    async def on_teams_team_restored(  # pyling: disable=unused-argument
+    async def on_teams_team_restored(  # pylint: disable=unused-argument
         self, team_info: TeamInfo, turn_context: TurnContext
     ):
         """
