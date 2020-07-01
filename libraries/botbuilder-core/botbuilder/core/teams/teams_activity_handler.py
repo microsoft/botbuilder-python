@@ -32,7 +32,7 @@ class TeamsActivityHandler(ActivityHandler):
         Invoked when an invoke activity is received from the connector.
         Invoke activities can be used to communicate many different things.
 
-        :param turn_context: A strongly-typed context object for this turn.
+        :param turn_context: A context object for this turn.
 
         :returns: A task that represents the work queued to execute.
 
@@ -170,7 +170,7 @@ class TeamsActivityHandler(ActivityHandler):
         """
         Invoked when a signIn invoke activity is received from the connector.
 
-        :param turn_context: A strongly-typed context object for this turn.
+        :param turn_context: A context object for this turn.
 
         :returns: A task that represents the work queued to execute.
         """
@@ -182,7 +182,7 @@ class TeamsActivityHandler(ActivityHandler):
         """
         Invoked when an card action invoke activity is received from the connector.
 
-        :param turn_context: A strongly-typed context object for this turn.
+        :param turn_context: A context object for this turn.
 
         :returns: A task that represents the work queued to execute.
         """
@@ -192,7 +192,7 @@ class TeamsActivityHandler(ActivityHandler):
         """
         Invoked when a signIn verify state activity is received from the connector.
 
-        :param turn_context: A strongly-typed context object for this turn.
+        :param turn_context: A context object for this turn.
 
         :returns: A task that represents the work queued to execute.
         """
@@ -209,7 +209,7 @@ class TeamsActivityHandler(ActivityHandler):
         """
         Invoked when a file consent card activity is received from the connector.
 
-        :param turn_context: A strongly-typed context object for this turn.
+        :param turn_context: A context object for this turn.
         :param file_consent_card_response: The response representing the value of the invoke
         activity sent when the user acts on a file consent card.
 
@@ -240,7 +240,7 @@ class TeamsActivityHandler(ActivityHandler):
         """
         Invoked when a file consent card is accepted by the user.
 
-        :param turn_context: A strongly-typed context object for this turn.
+        :param turn_context: A context object for this turn.
         :param file_consent_card_response: The response representing the value of the invoke
         activity sent when the user accepts a file consent card.
 
@@ -256,7 +256,7 @@ class TeamsActivityHandler(ActivityHandler):
         """
         Invoked when a file consent card is declined by the user.
 
-        :param turn_context: A strongly-typed context object for this turn.
+        :param turn_context: A context object for this turn.
         :param file_consent_card_response: The response representing the value of the invoke
         activity sent when the user declines a file consent card.
 
@@ -270,7 +270,7 @@ class TeamsActivityHandler(ActivityHandler):
         """
         Invoked when a O365 Connector Card Action activity is received from the connector.
 
-        :param turn_context: A strongly-typed context object for this turn.
+        :param turn_context: A context object for this turn.
         :param query: The O365 connector card HttpPOST invoke query.
 
         :returns: A task that represents the work queued to execute.
@@ -283,7 +283,7 @@ class TeamsActivityHandler(ActivityHandler):
         """
         Invoked when an app based link query activity is received from the connector.
 
-        :param turn_context: A strongly-typed context object for this turn.
+        :param turn_context: A context object for this turn.
         :param query: The invoke request body type for app-based link query.
 
         :returns: The Messaging Extension Response for the query.
@@ -296,7 +296,7 @@ class TeamsActivityHandler(ActivityHandler):
         """
         Invoked when a Messaging Extension Query activity is received from the connector.
 
-        :param turn_context: A strongly-typed context object for this turn.
+        :param turn_context: A context object for this turn.
         :param query: The query for the search command.
 
         :returns: The Messaging Extension Response for the query.
@@ -309,7 +309,7 @@ class TeamsActivityHandler(ActivityHandler):
         """
         Invoked when a messaging extension select item activity is received from the connector.
 
-        :param turn_context: A strongly-typed context object for this turn.
+        :param turn_context: A context object for this turn.
         :param query: The object representing the query.
 
         :returns: The Messaging Extension Response for the query.
@@ -322,7 +322,7 @@ class TeamsActivityHandler(ActivityHandler):
         """
         Invoked when a messaging extension submit action dispatch activity is received from the connector.
 
-        :param turn_context: A strongly-typed context object for this turn.
+        :param turn_context: A context object for this turn.
         :param action: The messaging extension action.
 
         :returns: The Messaging Extension Action Response for the action.
@@ -353,7 +353,7 @@ class TeamsActivityHandler(ActivityHandler):
         """
         Invoked when a messaging extension bot message preview edit activity is received from the connector.
 
-        :param turn_context: A strongly-typed context object for this turn.
+        :param turn_context: A context object for this turn.
         :param action: The messaging extension action.
 
         :returns: The Messaging Extension Action Response for the action.
@@ -366,7 +366,7 @@ class TeamsActivityHandler(ActivityHandler):
         """
         Invoked when a messaging extension bot message preview send activity is received from the connector.
 
-        :param turn_context: A strongly-typed context object for this turn.
+        :param turn_context: A context object for this turn.
         :param action: The messaging extension action.
 
         :returns: The Messaging Extension Action Response for the action.
@@ -379,7 +379,7 @@ class TeamsActivityHandler(ActivityHandler):
         """
         Invoked when a messaging extension submit action activity is received from the connector.
 
-        :param turn_context: A strongly-typed context object for this turn.
+        :param turn_context: A context object for this turn.
         :param action: The messaging extension action.
 
         :returns: The Messaging Extension Action Response for the action.
@@ -392,7 +392,7 @@ class TeamsActivityHandler(ActivityHandler):
         """
         Invoked when a Messaging Extension Fetch activity is received from the connector.
 
-        :param turn_context: A strongly-typed context object for this turn.
+        :param turn_context: A context object for this turn.
         :param action: The messaging extension action.
 
         :returns: The Messaging Extension Action Response for the action.
@@ -405,7 +405,7 @@ class TeamsActivityHandler(ActivityHandler):
         """
         Invoked when a messaging extension configuration query setting url activity is received from the connector.
 
-        :param turn_context: A strongly-typed context object for this turn.
+        :param turn_context: A context object for this turn.
         :param query: The Messaging extension query.
 
         :returns: The Messaging Extension Response for the query.
@@ -418,7 +418,7 @@ class TeamsActivityHandler(ActivityHandler):
         """
         Override this in a derived class to provide logic for when a configuration is set for a messaging extension.
 
-        :param turn_context: A strongly-typed context object for this turn.
+        :param turn_context: A context object for this turn.
         :param settings: Object representing the configuration settings.
 
         :returns: A task that represents the work queued to execute.
@@ -431,7 +431,7 @@ class TeamsActivityHandler(ActivityHandler):
         """
         Override this in a derived class to provide logic for when a card button is clicked in a messaging extension.
 
-        :param turn_context: A strongly-typed context object for this turn.
+        :param turn_context: A context object for this turn.
         :param card_data: Object representing the card data.
 
         :returns: A task that represents the work queued to execute.
@@ -444,7 +444,7 @@ class TeamsActivityHandler(ActivityHandler):
         """
         Override this in a derived class to provide logic for when a task module is fetched.
 
-        :param turn_context: A strongly-typed context object for this turn.
+        :param turn_context: A context object for this turn.
         :param task_module_request: The task module invoke request value payload.
 
         :returns: A Task Module Response for the request.
@@ -457,7 +457,7 @@ class TeamsActivityHandler(ActivityHandler):
         """
         Override this in a derived class to provide logic for when a task module is submitted.
 
-        :param turn_context: A strongly-typed context object for this turn.
+        :param turn_context: A context object for this turn.
         :param task_module_request: The task module invoke request value payload.
 
         :returns: A Task Module Response for the request.
@@ -471,7 +471,7 @@ class TeamsActivityHandler(ActivityHandler):
         being added to or removed from the channel.
         For example, a bot could respond to a user being added by greeting the user.
 
-        :param turn_context: A strongly-typed context object for this turn.
+        :param turn_context: A context object for this turn.
 
         :returns: A task that represents the work queued to execute.
 
@@ -530,7 +530,7 @@ class TeamsActivityHandler(ActivityHandler):
 
         :param channel_info: The channel info object which describes the channel.
         :param team_info: The team info object representing the team.
-        :param turn_context: A strongly-typed context object for this turn.
+        :param turn_context: A context object for this turn.
 
         :returns: A task that represents the work queued to execute.
         """
@@ -544,7 +544,7 @@ class TeamsActivityHandler(ActivityHandler):
         Team Renamed correspond to the user renaming an existing team.
 
         :param team_info: The team info object representing the team.
-        :param turn_context: A strongly-typed context object for this turn.
+        :param turn_context: A context object for this turn.
 
         :returns: A task that represents the work queued to execute.
         """
@@ -564,7 +564,7 @@ class TeamsActivityHandler(ActivityHandler):
         :param members_added: A list of all the accounts added to the channel, as
         described by the conversation update activity.
         :param team_info: The team info object representing the team.
-        :param turn_context: A strongly-typed context object for this turn.
+        :param turn_context: A context object for this turn.
 
         :returns: A task that represents the work queued to execute.
         """
@@ -616,7 +616,7 @@ class TeamsActivityHandler(ActivityHandler):
         :param teams_members_added: A list of all the members added to the channel, as
         described by the conversation update activity.
         :param team_info: The team info object representing the team.
-        :param turn_context: A strongly-typed context object for this turn.
+        :param turn_context: A context object for this turn.
 
         :returns: A task that represents the work queued to execute.
         """
@@ -642,7 +642,7 @@ class TeamsActivityHandler(ActivityHandler):
         :param members_removed: A list of all the accounts removed from the channel, as
         described by the conversation update activity.
         :param team_info: The team info object representing the team.
-        :param turn_context: A strongly-typed context object for this turn.
+        :param turn_context: A context object for this turn.
 
         :returns: A task that represents the work queued to execute.
         """
@@ -672,7 +672,7 @@ class TeamsActivityHandler(ActivityHandler):
         :param teams_members_removed: A list of all the members removed from the channel, as
         described by the conversation update activity.
         :param team_info: The team info object representing the team.
-        :param turn_context: A strongly-typed context object for this turn.
+        :param turn_context: A context object for this turn.
 
         :returns: A task that represents the work queued to execute.
         """
@@ -691,7 +691,7 @@ class TeamsActivityHandler(ActivityHandler):
 
         :param channel_info: The channel info object which describes the channel.
         :param team_info: The team info object representing the team.
-        :param turn_context: A strongly-typed context object for this turn.
+        :param turn_context: A context object for this turn.
 
         :returns: A task that represents the work queued to execute.
         """
@@ -706,7 +706,7 @@ class TeamsActivityHandler(ActivityHandler):
 
         :param channel_info: The channel info object which describes the channel.
         :param team_info: The team info object representing the team.
-        :param turn_context: A strongly-typed context object for this turn.
+        :param turn_context: A context object for this turn.
 
         :returns: A task that represents the work queued to execute.
         """
@@ -721,7 +721,7 @@ class TeamsActivityHandler(ActivityHandler):
 
         :param channel_info: The channel info object which describes the channel.
         :param team_info: The team info object representing the team.
-        :param turn_context: A strongly-typed context object for this turn.
+        :param turn_context: A context object for this turn.
 
         :returns: A task that represents the work queued to execute.
         """
