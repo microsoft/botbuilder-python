@@ -108,11 +108,41 @@ class TestingTeamsActivityHandler(TeamsActivityHandler):
             channel_info, team_info, turn_context
         )
 
+    async def on_teams_team_archived(
+        self, team_info: TeamInfo, turn_context: TurnContext
+    ):
+        self.record.append("on_teams_team_archived")
+        return await super().on_teams_team_archived(team_info, turn_context)
+
+    async def on_teams_team_deleted(
+        self, team_info: TeamInfo, turn_context: TurnContext
+    ):
+        self.record.append("on_teams_team_deleted")
+        return await super().on_teams_team_deleted(team_info, turn_context)
+
+    async def on_teams_team_hard_deleted(
+        self, team_info: TeamInfo, turn_context: TurnContext
+    ):
+        self.record.append("on_teams_team_hard_deleted")
+        return await super().on_teams_team_hard_deleted(team_info, turn_context)
+
     async def on_teams_team_renamed_activity(
         self, team_info: TeamInfo, turn_context: TurnContext
     ):
         self.record.append("on_teams_team_renamed_activity")
         return await super().on_teams_team_renamed_activity(team_info, turn_context)
+
+    async def on_teams_team_restored(
+        self, team_info: TeamInfo, turn_context: TurnContext
+    ):
+        self.record.append("on_teams_team_restored")
+        return await super().on_teams_team_restored(team_info, turn_context)
+
+    async def on_teams_team_unarchived(
+        self, team_info: TeamInfo, turn_context: TurnContext
+    ):
+        self.record.append("on_teams_team_unarchived")
+        return await super().on_teams_team_unarchived(team_info, turn_context)
 
     async def on_invoke_activity(self, turn_context: TurnContext):
         self.record.append("on_invoke_activity")
@@ -335,6 +365,72 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         assert bot.record[0] == "on_conversation_update_activity"
         assert bot.record[1] == "on_teams_channel_deleted"
 
+    async def test_on_teams_team_archived(self):
+        # arrange
+        activity = Activity(
+            type=ActivityTypes.conversation_update,
+            channel_data={
+                "eventType": "teamArchived",
+                "team": {"id": "team_id_1", "name": "archived_team_name"},
+            },
+            channel_id=Channels.ms_teams,
+        )
+
+        turn_context = TurnContext(NotImplementedAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        # Assert
+        assert len(bot.record) == 2
+        assert bot.record[0] == "on_conversation_update_activity"
+        assert bot.record[1] == "on_teams_team_archived"
+
+    async def test_on_teams_team_deleted(self):
+        # arrange
+        activity = Activity(
+            type=ActivityTypes.conversation_update,
+            channel_data={
+                "eventType": "teamDeleted",
+                "team": {"id": "team_id_1", "name": "deleted_team_name"},
+            },
+            channel_id=Channels.ms_teams,
+        )
+
+        turn_context = TurnContext(NotImplementedAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        # Assert
+        assert len(bot.record) == 2
+        assert bot.record[0] == "on_conversation_update_activity"
+        assert bot.record[1] == "on_teams_team_deleted"
+
+    async def test_on_teams_team_hard_deleted(self):
+        # arrange
+        activity = Activity(
+            type=ActivityTypes.conversation_update,
+            channel_data={
+                "eventType": "teamHardDeleted",
+                "team": {"id": "team_id_1", "name": "hard_deleted_team_name"},
+            },
+            channel_id=Channels.ms_teams,
+        )
+
+        turn_context = TurnContext(NotImplementedAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        # Assert
+        assert len(bot.record) == 2
+        assert bot.record[0] == "on_conversation_update_activity"
+        assert bot.record[1] == "on_teams_team_hard_deleted"
+
     async def test_on_teams_team_renamed_activity(self):
         # arrange
         activity = Activity(
@@ -356,6 +452,50 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         assert len(bot.record) == 2
         assert bot.record[0] == "on_conversation_update_activity"
         assert bot.record[1] == "on_teams_team_renamed_activity"
+
+    async def test_on_teams_team_restored(self):
+        # arrange
+        activity = Activity(
+            type=ActivityTypes.conversation_update,
+            channel_data={
+                "eventType": "teamRestored",
+                "team": {"id": "team_id_1", "name": "restored_team_name"},
+            },
+            channel_id=Channels.ms_teams,
+        )
+
+        turn_context = TurnContext(NotImplementedAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        # Assert
+        assert len(bot.record) == 2
+        assert bot.record[0] == "on_conversation_update_activity"
+        assert bot.record[1] == "on_teams_team_restored"
+
+    async def test_on_teams_team_unarchived(self):
+        # arrange
+        activity = Activity(
+            type=ActivityTypes.conversation_update,
+            channel_data={
+                "eventType": "teamUnarchived",
+                "team": {"id": "team_id_1", "name": "unarchived_team_name"},
+            },
+            channel_id=Channels.ms_teams,
+        )
+
+        turn_context = TurnContext(NotImplementedAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        # Assert
+        assert len(bot.record) == 2
+        assert bot.record[0] == "on_conversation_update_activity"
+        assert bot.record[1] == "on_teams_team_unarchived"
 
     async def test_on_teams_members_added_activity(self):
         # arrange

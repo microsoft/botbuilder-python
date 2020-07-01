@@ -324,8 +324,28 @@ class TeamsActivityHandler(ActivityHandler):
                     return await self.on_teams_channel_renamed(
                         channel_data.channel, channel_data.team, turn_context
                     )
+                if channel_data.event_type == "teamArchived":
+                    return await self.on_teams_team_archived(
+                        channel_data.team, turn_context
+                    )
+                if channel_data.event_type == "teamDeleted":
+                    return await self.on_teams_team_deleted(
+                        channel_data.team, turn_context
+                    )
+                if channel_data.event_type == "teamHardDeleted":
+                    return await self.on_teams_team_hard_deleted(
+                        channel_data.team, turn_context
+                    )
                 if channel_data.event_type == "teamRenamed":
                     return await self.on_teams_team_renamed_activity(
+                        channel_data.team, turn_context
+                    )
+                if channel_data.event_type == "teamRestored":
+                    return await self.on_teams_team_restored(
+                        channel_data.team, turn_context
+                    )
+                if channel_data.event_type == "teamUnarchived":
+                    return await self.on_teams_team_unarchived(
                         channel_data.team, turn_context
                     )
 
@@ -336,9 +356,79 @@ class TeamsActivityHandler(ActivityHandler):
     ):
         return
 
+    async def on_teams_team_archived(  # pylint: disable=unused-argument
+        self, team_info: TeamInfo, turn_context: TurnContext
+    ):
+        """
+        Invoked when a Team Archived event activity is received from the connector.
+        Team Archived correspond to the user archiving a team.
+
+        :param team_info: The team info object representing the team.
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
+        return
+
+    async def on_teams_team_deleted(  # pylint: disable=unused-argument
+        self, team_info: TeamInfo, turn_context: TurnContext
+    ):
+        """
+        Invoked when a Team Deleted event activity is received from the connector.
+        Team Deleted corresponds to the user deleting a team.
+
+        :param team_info: The team info object representing the team.
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
+        return
+
+    async def on_teams_team_hard_deleted(  # pylint: disable=unused-argument
+        self, team_info: TeamInfo, turn_context: TurnContext
+    ):
+        """
+        Invoked when a Team Hard Deleted event activity is received from the connector.
+        Team Hard Deleted corresponds to the user hard deleting a team.
+
+        :param team_info: The team info object representing the team.
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
+        return
+
     async def on_teams_team_renamed_activity(  # pylint: disable=unused-argument
         self, team_info: TeamInfo, turn_context: TurnContext
     ):
+        return
+
+    async def on_teams_team_restored(  # pyling: disable=unused-argument
+        self, team_info: TeamInfo, turn_context: TurnContext
+    ):
+        """
+        Invoked when a Team Restored event activity is received from the connector.
+        Team Restored corresponds to the user restoring a team.
+
+        :param team_info: The team info object representing the team.
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
+        return
+
+    async def on_teams_team_unarchived(  # pylint: disable=unused-argument
+        self, team_info: TeamInfo, turn_context: TurnContext
+    ):
+        """
+        Invoked when a Team Unarchived event activity is received from the connector.
+        Team Unarchived correspond to the user unarchiving a team.
+
+        :param team_info: The team info object representing the team.
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
         return
 
     async def on_teams_members_added_dispatch(  # pylint: disable=unused-argument
