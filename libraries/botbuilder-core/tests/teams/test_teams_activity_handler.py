@@ -327,7 +327,7 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
             type=ActivityTypes.conversation_update,
             channel_data={
                 "eventType": "channelRestored",
-                "channel": {"id": "asdfqwerty", "name": "channel_restored"}
+                "channel": {"id": "asdfqwerty", "name": "channel_restored"},
             },
             channel_id=Channels.ms_teams,
         )
