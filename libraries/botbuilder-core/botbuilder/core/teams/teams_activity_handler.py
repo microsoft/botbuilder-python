@@ -34,7 +34,7 @@ class TeamsActivityHandler(ActivityHandler):
 
         :param turn_context: A context object for this turn.
 
-        :returns: A task that represents the work queued to execute.
+        :returns: An InvokeResponse that represents the work queued to execute.
 
         .. remarks::
             Invoke activities communicate programmatic commands from a client or channel to a bot.
@@ -184,7 +184,7 @@ class TeamsActivityHandler(ActivityHandler):
 
         :param turn_context: A context object for this turn.
 
-        :returns: A task that represents the work queued to execute.
+        :returns: An InvokeResponse that represents the work queued to execute.
         """
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
@@ -559,7 +559,7 @@ class TeamsActivityHandler(ActivityHandler):
         """
         Override this in a derived class to provide logic for when members other than the bot
         join the channel, such as your bot's welcome logic.
-        UseIt will get the associated members with the provided accounts.
+        It will get the associated members with the provided accounts.
 
         :param members_added: A list of all the accounts added to the channel, as
         described by the conversation update activity.
