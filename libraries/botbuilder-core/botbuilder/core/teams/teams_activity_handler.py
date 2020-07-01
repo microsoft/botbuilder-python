@@ -324,6 +324,10 @@ class TeamsActivityHandler(ActivityHandler):
                     return await self.on_teams_channel_renamed(
                         channel_data.channel, channel_data.team, turn_context
                     )
+                if channel_data.event_type == "channelRestored":
+                    return await self.on_teams_channel_restored(
+                        channel_data.channel, channel_data.team, turn_context
+                    )
                 if channel_data.event_type == "teamRenamed":
                     return await self.on_teams_team_renamed_activity(
                         channel_data.team, turn_context
@@ -434,6 +438,11 @@ class TeamsActivityHandler(ActivityHandler):
         return
 
     async def on_teams_channel_renamed(  # pylint: disable=unused-argument
+        self, channel_info: ChannelInfo, team_info: TeamInfo, turn_context: TurnContext
+    ):
+        return
+
+    async def on_teams_channel_restored(  # pylint: disable=unused-argument
         self, channel_info: ChannelInfo, team_info: TeamInfo, turn_context: TurnContext
     ):
         return
