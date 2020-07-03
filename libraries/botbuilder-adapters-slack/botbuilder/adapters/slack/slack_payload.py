@@ -15,6 +15,12 @@ class SlackPayload:
         self.team: str = kwargs.get("team")
         self.user: str = kwargs.get("user")
         self.actions: Optional[List[Action]] = None
+        self.trigger_id: str = kwargs.get("trigger_id")
+        self.action_ts: str = kwargs.get("action_ts")
+        self.submission: str = kwargs.get("submission")
+        self.callback_id: str = kwargs.get("callback_id")
+        self.state: str = kwargs.get("state")
+        self.response_url: str = kwargs.get("response_url")
 
         if "message" in kwargs:
             message = kwargs.get("message")
