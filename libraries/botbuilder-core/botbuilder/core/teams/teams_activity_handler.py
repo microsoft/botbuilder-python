@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+# pylint: disable=too-many-lines
+
 from http import HTTPStatus
 from botbuilder.schema import ChannelAccount, ErrorResponseException, SignInConstants
 from botbuilder.core import ActivityHandler, InvokeResponse
