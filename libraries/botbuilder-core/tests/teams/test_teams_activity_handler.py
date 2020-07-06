@@ -3,6 +3,7 @@
 
 # pylint: disable=too-many-lines
 
+from typing import List
 import aiounittest
 from botbuilder.core import BotAdapter, TurnContext
 from botbuilder.core.teams import TeamsActivityHandler
@@ -29,7 +30,6 @@ from botbuilder.schema.teams import (
 )
 from botframework.connector import Channels
 from simple_adapter import SimpleAdapter
-from typing import List
 
 
 class TestingTeamsActivityHandler(TeamsActivityHandler):
