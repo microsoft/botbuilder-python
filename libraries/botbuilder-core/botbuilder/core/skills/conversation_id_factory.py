@@ -25,19 +25,19 @@ class ConversationIdFactoryBase(ABC):
         ],
     ) -> str:
         """
-        Using the options passed in, creates a conversation id and
-        SkillConversationReference, storing them for future use.
+        Using the options passed in, creates a conversation id and :class:`SkillConversationReference`,
+         storing them for future use.
 
-        :param options_or_conversation_reference: The options contain properties useful
-        for generating a SkillConversationReference and conversation id.
-        :type options_or_conversation_reference: :class:
-        `Union[SkillConversationIdFactoryOptions, ConversationReference]`
+        :param options_or_conversation_reference: The options contain properties useful for generating a
+         :class:`SkillConversationReference` and conversation id.
+        :type options_or_conversation_reference:
+         :class:`Union[SkillConversationIdFactoryOptions, ConversationReference]`
 
         :returns: A skill conversation id.
 
         .. note::
-            SkillConversationIdFactoryOptions is the preferred parameter type, while ConversationReference
-            type is provided for backwards compatability.
+            :class:`SkillConversationIdFactoryOptions` is the preferred parameter type, while the
+             :class:`SkillConversationReference` type is provided for backwards compatability.
         """
         raise NotImplementedError()
 
@@ -46,14 +46,13 @@ class ConversationIdFactoryBase(ABC):
         self, skill_conversation_id: str
     ) -> Union[SkillConversationReference, ConversationReference]:
         """
-        Retrieves a SkillConversationReference using a conversation id passed in.
+        Retrieves a :class:`SkillConversationReference` using a conversation id passed in.
 
-        :param skill_conversation_id: The conversation id for which to retrieve
-        the SkillConversationReference.
+        :param skill_conversation_id: The conversation id for which to retrieve the :class:`SkillConversationReference`.
         :type skill_conversation_id: str
 
         .. note::
-            SkillConversationReference is the preferred return type, while ConversationReference
+            SkillConversationReference is the preferred return type, while the :class:`SkillConversationReference`
             type is provided for backwards compatability.
         """
         raise NotImplementedError()

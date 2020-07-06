@@ -213,7 +213,7 @@ class Prompt(Dialog):
         :type state:  :class:`Dict`
         :param options: A prompt options object constructed from:meth:`DialogContext.prompt()`
         :type options:  :class:`PromptOptions`
-        :param is_retry: true if is the first time the user for input; otherwise, false
+        :param is_retry: Determines whether `prompt` or `retry_prompt` should be used
         :type is_retry:  bool
 
         :return: A task representing the asynchronous operation.
