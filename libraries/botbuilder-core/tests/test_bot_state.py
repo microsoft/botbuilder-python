@@ -473,13 +473,32 @@ class TestBotState(aiounittest.AsyncTestCase):
 
         storage = MemoryStorage({})
 
-        conversation_state = ConversationState(storage)
+        test_bot_state = BotStateForTest(storage)
         (
-            await conversation_state.create_property("test-name").get(
+            await test_bot_state.create_property("test-name").get(
                 turn_context, lambda: TestPocoState()
             )
         ).value = "test-value"
 
-        result = conversation_state.get(turn_context)
+        result = test_bot_state.get(turn_context)
 
         assert result["test-name"].value == "test-value"
+
+    async def test_bot_state_get_cached_state(self):
+        # pylint: disable=unnecessary-lambda
+        turn_context = TestUtilities.create_empty_context()
+        turn_context.activity.conversation = ConversationAccount(id="1234")
+
+        storage = MemoryStorage({})
+
+        test_bot_state = BotStateForTest(storage)
+        (
+            await test_bot_state.create_property("test-name").get(
+                turn_context, lambda: TestPocoState()
+            )
+        ).value = "test-value"
+
+        result = test_bot_state.get_cached_state(turn_context)
+
+        assert result is not None
+        assert result == test_bot_state.get_cached_state(turn_context)

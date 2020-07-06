@@ -30,8 +30,11 @@ class BotAdapter(ABC):
     ) -> List[ResourceResponse]:
         """
         Sends a set of activities to the user. An array of responses from the server will be returned.
-        :param context:
-        :param activities:
+
+        :param context: The context object for the turn.
+        :type context: :class:`TurnContext`
+        :param activities: The activities to send.
+        :type activities: :class:`typing.List[Activity]`
         :return:
         """
         raise NotImplementedError()
@@ -40,8 +43,11 @@ class BotAdapter(ABC):
     async def update_activity(self, context: TurnContext, activity: Activity):
         """
         Replaces an existing activity.
-        :param context:
-        :param activity:
+
+        :param context: The context object for the turn.
+        :type context: :class:`TurnContext`
+        :param activity: New replacement activity.
+        :type activity: :class:`botbuilder.schema.Activity`
         :return:
         """
         raise NotImplementedError()
@@ -52,8 +58,11 @@ class BotAdapter(ABC):
     ):
         """
         Deletes an existing activity.
-        :param context:
-        :param reference:
+
+        :param context: The context object for the turn.
+        :type context: :class:`TurnContext`
+        :param reference: Conversation reference for the activity to delete.
+        :type reference: :class:`botbuilder.schema.ConversationReference`
         :return:
         """
         raise NotImplementedError()
@@ -61,7 +70,8 @@ class BotAdapter(ABC):
     def use(self, middleware):
         """
         Registers a middleware handler with the adapter.
-        :param middleware:
+
+        :param middleware: The middleware to register.
         :return:
         """
         self._middleware.use(middleware)
@@ -77,15 +87,20 @@ class BotAdapter(ABC):
     ):
         """
         Sends a proactive message to a conversation. Call this method to proactively send a message to a conversation.
-        Most _channels require a user to initiate a conversation with a bot before the bot can send activities
+        Most channels require a user to initiate a conversation with a bot before the bot can send activities
         to the user.
+
         :param bot_id: The application ID of the bot. This parameter is ignored in
-        single tenant the Adpters (Console, Test, etc) but is critical to the BotFrameworkAdapter
-        which is multi-tenant aware. </param>
-        :param reference: A reference to the conversation to continue.</param>
-        :param callback: The method to call for the resulting bot turn.</param>
-        :param claims_identity:
-        :param audience:
+        single tenant the Adapters (Console, Test, etc) but is critical to the BotFrameworkAdapter
+        which is multi-tenant aware.
+        :param reference: A reference to the conversation to continue.
+        :type reference: :class:`botbuilder.schema.ConversationReference`
+        :param callback: The method to call for the resulting bot turn.
+        :type callback: :class:`typing.Callable`
+        :param claims_identity: A :class:`botframework.connector.auth.ClaimsIdentity` for the conversation.
+        :type claims_identity: :class:`botframework.connector.auth.ClaimsIdentity`
+        :param audience:A value signifying the recipient of the proactive message.
+        :type audience: str
         """
         context = TurnContext(
             self, conversation_reference_extension.get_continuation_activity(reference)
@@ -98,8 +113,11 @@ class BotAdapter(ABC):
         """
         Called by the parent class to run the adapters middleware set and calls the passed in `callback()` handler at
         the end of the chain.
-        :param context:
-        :param callback:
+
+        :param context: The context object for the turn.
+        :type context: :class:`TurnContext`
+        :param callback: A callback method to run at the end of the pipeline.
+        :type callback: :class:`typing.Callable[[TurnContext], Awaitable]`
         :return:
         """
         BotAssert.context_not_none(context)

@@ -8,10 +8,107 @@
 # Changes may cause incorrect behavior and will be lost if the code is
 # regenerated.
 # --------------------------------------------------------------------------
-from datetime import datetime
 
+from botbuilder.schema._connector_client_enums import ActivityTypes
+from datetime import datetime
 from msrest.serialization import Model
 from msrest.exceptions import HttpOperationError
+
+
+class ConversationReference(Model):
+    """An object relating to a particular point in a conversation.
+
+    :param activity_id: (Optional) ID of the activity to refer to
+    :type activity_id: str
+    :param user: (Optional) User participating in this conversation
+    :type user: ~botframework.connector.models.ChannelAccount
+    :param bot: Bot participating in this conversation
+    :type bot: ~botframework.connector.models.ChannelAccount
+    :param conversation: Conversation reference
+    :type conversation: ~botframework.connector.models.ConversationAccount
+    :param channel_id: Channel ID
+    :type channel_id: str
+    :param locale: A locale name for the contents of the text field.
+        The locale name is a combination of an ISO 639 two- or three-letter
+        culture code associated with a language and an ISO 3166 two-letter
+        subculture code associated with a country or region.
+        The locale name can also correspond to a valid BCP-47 language tag.
+    :type locale: str
+    :param service_url: Service endpoint where operations concerning the
+     referenced conversation may be performed
+    :type service_url: str
+    """
+
+    _attribute_map = {
+        "activity_id": {"key": "activityId", "type": "str"},
+        "user": {"key": "user", "type": "ChannelAccount"},
+        "bot": {"key": "bot", "type": "ChannelAccount"},
+        "conversation": {"key": "conversation", "type": "ConversationAccount"},
+        "channel_id": {"key": "channelId", "type": "str"},
+        "locale": {"key": "locale", "type": "str"},
+        "service_url": {"key": "serviceUrl", "type": "str"},
+    }
+
+    def __init__(
+        self,
+        *,
+        activity_id: str = None,
+        user=None,
+        bot=None,
+        conversation=None,
+        channel_id: str = None,
+        locale: str = None,
+        service_url: str = None,
+        **kwargs
+    ) -> None:
+        super(ConversationReference, self).__init__(**kwargs)
+        self.activity_id = activity_id
+        self.user = user
+        self.bot = bot
+        self.conversation = conversation
+        self.channel_id = channel_id
+        self.locale = locale
+        self.service_url = service_url
+
+
+class Mention(Model):
+    """Mention information (entity type: "mention").
+
+    :param mentioned: The mentioned user
+    :type mentioned: ~botframework.connector.models.ChannelAccount
+    :param text: Sub Text which represents the mention (can be null or empty)
+    :type text: str
+    :param type: Type of this entity (RFC 3987 IRI)
+    :type type: str
+    """
+
+    _attribute_map = {
+        "mentioned": {"key": "mentioned", "type": "ChannelAccount"},
+        "text": {"key": "text", "type": "str"},
+        "type": {"key": "type", "type": "str"},
+    }
+
+    def __init__(
+        self, *, mentioned=None, text: str = None, type: str = None, **kwargs
+    ) -> None:
+        super(Mention, self).__init__(**kwargs)
+        self.mentioned = mentioned
+        self.text = text
+        self.type = type
+
+
+class ResourceResponse(Model):
+    """A response containing a resource ID.
+
+    :param id: Id of the resource
+    :type id: str
+    """
+
+    _attribute_map = {"id": {"key": "id", "type": "str"}}
+
+    def __init__(self, *, id: str = None, **kwargs) -> None:
+        super(ResourceResponse, self).__init__(**kwargs)
+        self.id = id
 
 
 class Activity(Model):
@@ -288,9 +385,251 @@ class Activity(Model):
         self.semantic_action = semantic_action
         self.caller_id = caller_id
 
+    def apply_conversation_reference(
+        self, reference: ConversationReference, is_incoming: bool = False
+    ):
+        """
+        Updates this activity with the delivery information from an existing ConversationReference
+
+        :param reference: The existing conversation reference.
+        :param is_incoming: Optional, True to treat the activity as an
+        incoming activity, where the bot is the recipient; otherwise, False.
+        Default is False, and the activity will show the bot as the sender.
+
+        :returns: his activity, updated with the delivery information.
+
+        .. remarks::
+            Call GetConversationReference on an incoming
+            activity to get a conversation reference that you can then use to update an
+            outgoing activity with the correct delivery information.
+        """
+        self.channel_id = reference.channel_id
+        self.service_url = reference.service_url
+        self.conversation = reference.conversation
+
+        if reference.locale is not None:
+            self.locale = reference.locale
+
+        if is_incoming:
+            self.from_property = reference.user
+            self.recipient = reference.bot
+
+            if reference.activity_id is not None:
+                self.id = reference.activity_id
+        else:
+            self.from_property = reference.bot
+            self.recipient = reference.user
+
+            if reference.activity_id is not None:
+                self.reply_to_id = reference.activity_id
+
+        return self
+
+    def as_contact_relation_update_activity(self):
+        """
+        Returns this activity as a ContactRelationUpdateActivity object;
+        or None, if this is not that type of activity.
+
+        :returns: This activity as a message activity; or None.
+        """
+        return (
+            self if self.__is_activity(ActivityTypes.contact_relation_update) else None
+        )
+
+    def as_conversation_update_activity(self):
+        """
+        Returns this activity as a ConversationUpdateActivity object;
+        or None, if this is not that type of activity.
+
+        :returns: This activity as a conversation update activity; or None.
+        """
+        return self if self.__is_activity(ActivityTypes.conversation_update) else None
+
+    def as_end_of_conversation_activity(self):
+        """
+        Returns this activity as an EndOfConversationActivity object;
+        or None, if this is not that type of activity.
+
+        :returns: This activity as an end of conversation activity; or None.
+        """
+        return self if self.__is_activity(ActivityTypes.end_of_conversation) else None
+
+    def as_event_activity(self):
+        """
+        Returns this activity as an EventActivity object;
+        or None, if this is not that type of activity.
+
+        :returns: This activity as an event activity; or None.
+        """
+        return self if self.__is_activity(ActivityTypes.event) else None
+
+    def as_handoff_activity(self):
+        """
+        Returns this activity as a HandoffActivity object;
+        or None, if this is not that type of activity.
+
+        :returns: This activity as a handoff activity; or None.
+        """
+        return self if self.__is_activity(ActivityTypes.handoff) else None
+
+    def as_installation_update_activity(self):
+        """
+        Returns this activity as an InstallationUpdateActivity object;
+        or None, if this is not that type of activity.
+
+        :returns: This activity as an installation update activity; or None.
+        """
+        return self if self.__is_activity(ActivityTypes.installation_update) else None
+
+    def as_invoke_activity(self):
+        """
+        Returns this activity as an InvokeActivity object;
+        or None, if this is not that type of activity.
+
+        :returns: This activity as an invoke activity; or None.
+        """
+        return self if self.__is_activity(ActivityTypes.invoke) else None
+
+    def as_message_activity(self):
+        """
+        Returns this activity as a MessageActivity object;
+        or None, if this is not that type of activity.
+
+        :returns: This activity as a message activity; or None.
+        """
+        return self if self.__is_activity(ActivityTypes.message) else None
+
+    def as_message_delete_activity(self):
+        """
+        Returns this activity as a MessageDeleteActivity object;
+        or None, if this is not that type of activity.
+
+        :returns: This activity as a message delete request; or None.
+        """
+        return self if self.__is_activity(ActivityTypes.message_delete) else None
+
+    def as_message_reaction_activity(self):
+        """
+        Returns this activity as a MessageReactionActivity object;
+        or None, if this is not that type of activity.
+
+        :return: This activity as a message reaction activity; or None.
+        """
+        return self if self.__is_activity(ActivityTypes.message_reaction) else None
+
+    def as_message_update_activity(self):
+        """
+        Returns this activity as an MessageUpdateActivity object;
+        or None, if this is not that type of activity.
+
+        :returns: This activity as a message update request; or None.
+        """
+        return self if self.__is_activity(ActivityTypes.message_update) else None
+
+    def as_suggestion_activity(self):
+        """
+        Returns this activity as a SuggestionActivity object;
+        or None, if this is not that type of activity.
+
+        :returns: This activity as a suggestion activity; or None.
+        """
+        return self if self.__is_activity(ActivityTypes.suggestion) else None
+
+    def as_trace_activity(self):
+        """
+        Returns this activity as a TraceActivity object;
+        or None, if this is not that type of activity.
+
+        :returns: This activity as a trace activity; or None.
+        """
+        return self if self.__is_activity(ActivityTypes.trace) else None
+
+    def as_typing_activity(self):
+        """
+        Returns this activity as a TypingActivity object;
+        or null, if this is not that type of activity.
+
+        :returns: This activity as a typing activity; or null.
+        """
+        return self if self.__is_activity(ActivityTypes.typing) else None
+
+    @staticmethod
+    def create_contact_relation_update_activity():
+        """
+        Creates an instance of the :class:`Activity` class as aContactRelationUpdateActivity object.
+
+        :returns: The new contact relation update activity.
+        """
+        return Activity(type=ActivityTypes.contact_relation_update)
+
+    @staticmethod
+    def create_conversation_update_activity():
+        """
+        Creates an instance of the :class:`Activity` class as a ConversationUpdateActivity object.
+
+        :returns: The new conversation update activity.
+        """
+        return Activity(type=ActivityTypes.conversation_update)
+
+    @staticmethod
+    def create_end_of_conversation_activity():
+        """
+        Creates an instance of the :class:`Activity` class as an EndOfConversationActivity object.
+
+        :returns: The new end of conversation activity.
+        """
+        return Activity(type=ActivityTypes.end_of_conversation)
+
+    @staticmethod
+    def create_event_activity():
+        """
+        Creates an instance of the :class:`Activity` class as an EventActivity object.
+
+        :returns: The new event activity.
+        """
+        return Activity(type=ActivityTypes.event)
+
+    @staticmethod
+    def create_handoff_activity():
+        """
+        Creates an instance of the :class:`Activity` class as a HandoffActivity object.
+
+        :returns: The new handoff activity.
+        """
+        return Activity(type=ActivityTypes.handoff)
+
+    @staticmethod
+    def create_invoke_activity():
+        """
+        Creates an instance of the :class:`Activity` class as an InvokeActivity object.
+
+        :returns: The new invoke activity.
+        """
+        return Activity(type=ActivityTypes.invoke)
+
+    @staticmethod
+    def create_message_activity():
+        """
+        Creates an instance of the :class:`Activity` class as a MessageActivity object.
+
+        :returns: The new message activity.
+        """
+        return Activity(type=ActivityTypes.message)
+
     def create_reply(self, text: str = None, locale: str = None):
+        """
+        Creates a new message activity as a response to this activity.
+
+        :param text: The text of the reply.
+        :param locale: The language code for the text.
+
+        :returns: The new message activity.
+
+        .. remarks::
+            The new activity sets up routing information based on this activity.
+        """
         return Activity(
-            type="message",
+            type=ActivityTypes.message,
             timestamp=datetime.utcnow(),
             from_property=ChannelAccount(
                 id=self.recipient.id if self.recipient else None,
@@ -313,6 +652,192 @@ class Activity(Model):
             attachments=[],
             entities=[],
         )
+
+    def create_trace(
+        self, name: str, value: object = None, value_type: str = None, label: str = None
+    ):
+        """
+        Creates a new trace activity based on this activity.
+
+        :param name: The name of the trace operation to create.
+        :param value: Optional, the content for this trace operation.
+        :param value_type: Optional, identifier for the format of the value
+        Default is the name of type of the value.
+        :param label: Optional, a descriptive label for this trace operation.
+
+        :returns: The new trace activity.
+        """
+        if not value_type and value:
+            value_type = type(value)
+
+        return Activity(
+            type=ActivityTypes.trace,
+            timestamp=datetime.utcnow(),
+            from_property=ChannelAccount(
+                id=self.recipient.id if self.recipient else None,
+                name=self.recipient.name if self.recipient else None,
+            ),
+            recipient=ChannelAccount(
+                id=self.from_property.id if self.from_property else None,
+                name=self.from_property.name if self.from_property else None,
+            ),
+            reply_to_id=self.id,
+            service_url=self.service_url,
+            channel_id=self.channel_id,
+            conversation=ConversationAccount(
+                is_group=self.conversation.is_group,
+                id=self.conversation.id,
+                name=self.conversation.name,
+            ),
+            name=name,
+            label=label,
+            value_type=value_type,
+            value=value,
+        ).as_trace_activity()
+
+    @staticmethod
+    def create_trace_activity(
+        name: str, value: object = None, value_type: str = None, label: str = None
+    ):
+        """
+        Creates an instance of the :class:`Activity` class as a TraceActivity object.
+
+        :param name: The name of the trace operation to create.
+        :param value: Optional, the content for this trace operation.
+        :param value_type: Optional, identifier for the format of the value.
+        Default is the name of type of the value.
+        :param label: Optional, a descriptive label for this trace operation.
+
+        :returns: The new trace activity.
+        """
+        if not value_type and value:
+            value_type = type(value)
+
+        return Activity(
+            type=ActivityTypes.trace,
+            name=name,
+            label=label,
+            value_type=value_type,
+            value=value,
+        )
+
+    @staticmethod
+    def create_typing_activity():
+        """
+        Creates an instance of the :class:`Activity` class as a TypingActivity object.
+
+        :returns: The new typing activity.
+        """
+        return Activity(type=ActivityTypes.typing)
+
+    def get_conversation_reference(self):
+        """
+        Creates a ConversationReference based on this activity.
+
+        :returns: A conversation reference for the conversation that contains this activity.
+        """
+        return ConversationReference(
+            activity_id=self.id,
+            user=self.from_property,
+            bot=self.recipient,
+            conversation=self.conversation,
+            channel_id=self.channel_id,
+            locale=self.locale,
+            service_url=self.service_url,
+        )
+
+    def get_mentions(self) -> [Mention]:
+        """
+        Resolves the mentions from the entities of this activity.
+
+        :returns: The array of mentions; or an empty array, if none are found.
+
+        .. remarks::
+            This method is defined on the :class:`Activity` class, but is only intended
+            for use with a message activity, where the activity Activity.Type is set to
+            ActivityTypes.Message.
+        """
+        _list = self.entities
+        return [x for x in _list if str(x.type).lower() == "mention"]
+
+    def get_reply_conversation_reference(
+        self, reply: ResourceResponse
+    ) -> ConversationReference:
+        """
+        Create a ConversationReference based on this Activity's Conversation info
+        and the ResourceResponse from sending an activity.
+
+        :param reply: ResourceResponse returned from send_activity.
+
+        :return: A ConversationReference that can be stored and used later to delete or update the activity.
+        """
+        reference = self.get_conversation_reference()
+        reference.activity_id = reply.id
+        return reference
+
+    def has_content(self) -> bool:
+        """
+        Indicates whether this activity has content.
+
+        :returns: True, if this activity has any content to send; otherwise, false.
+
+        .. remarks::
+            This method is defined on the :class:`Activity` class, but is only intended
+            for use with a message activity, where the activity Activity.Type is set to
+            ActivityTypes.Message.
+        """
+        if self.text and self.text.strip():
+            return True
+
+        if self.summary and self.summary.strip():
+            return True
+
+        if self.attachments and len(self.attachments) > 0:
+            return True
+
+        if self.channel_data:
+            return True
+
+        return False
+
+    def is_from_streaming_connection(self) -> bool:
+        """
+        Determine if the Activity was sent via an Http/Https connection or Streaming
+        This can be determined by looking at the service_url property:
+        (1) All channels that send messages via http/https are not streaming
+        (2) Channels that send messages via streaming have a ServiceUrl that does not begin with http/https.
+
+        :returns: True if the Activity originated from a streaming connection.
+        """
+        if self.service_url:
+            return not self.service_url.lower().startswith("http")
+        return False
+
+    def __is_activity(self, activity_type: str) -> bool:
+        """
+        Indicates whether this activity is of a specified activity type.
+
+        :param activity_type: The activity type to check for.
+        :return: True if this activity is of the specified activity type; otherwise, False.
+        """
+        if self.type is None:
+            return False
+
+        type_attribute = str(self.type).lower()
+        activity_type = str(activity_type).lower()
+
+        result = type_attribute.startswith(activity_type)
+
+        if result:
+            result = len(type_attribute) == len(activity_type)
+
+            if not result:
+                result = (
+                    len(type_attribute) > len(activity_type)
+                    and type_attribute[len(activity_type)] == "/"
+                )
+
+        return result
 
 
 class AnimationCard(Model):
@@ -671,6 +1196,8 @@ class CardAction(Model):
     :type value: object
     :param channel_data: Channel-specific data associated with this action
     :type channel_data: object
+    :param image_alt_text: Alternate image text to be used in place of the `image` field
+    :type image_alt_text: str
     """
 
     _attribute_map = {
@@ -681,6 +1208,7 @@ class CardAction(Model):
         "display_text": {"key": "displayText", "type": "str"},
         "value": {"key": "value", "type": "object"},
         "channel_data": {"key": "channelData", "type": "object"},
+        "image_alt_text": {"key": "imageAltText", "type": "str"},
     }
 
     def __init__(
@@ -693,6 +1221,7 @@ class CardAction(Model):
         display_text: str = None,
         value=None,
         channel_data=None,
+        image_alt_text: str = None,
         **kwargs
     ) -> None:
         super(CardAction, self).__init__(**kwargs)
@@ -703,6 +1232,7 @@ class CardAction(Model):
         self.display_text = display_text
         self.value = value
         self.channel_data = channel_data
+        self.image_alt_text = image_alt_text
 
 
 class CardImage(Model):
@@ -901,62 +1431,6 @@ class ConversationParameters(Model):
         self.activity = activity
         self.channel_data = channel_data
         self.tenant_id = tenant_id
-
-
-class ConversationReference(Model):
-    """An object relating to a particular point in a conversation.
-
-    :param activity_id: (Optional) ID of the activity to refer to
-    :type activity_id: str
-    :param user: (Optional) User participating in this conversation
-    :type user: ~botframework.connector.models.ChannelAccount
-    :param bot: Bot participating in this conversation
-    :type bot: ~botframework.connector.models.ChannelAccount
-    :param conversation: Conversation reference
-    :type conversation: ~botframework.connector.models.ConversationAccount
-    :param channel_id: Channel ID
-    :type channel_id: str
-    :param locale: A locale name for the contents of the text field.
-        The locale name is a combination of an ISO 639 two- or three-letter
-        culture code associated with a language and an ISO 3166 two-letter
-        subculture code associated with a country or region.
-        The locale name can also correspond to a valid BCP-47 language tag.
-    :type locale: str
-    :param service_url: Service endpoint where operations concerning the
-     referenced conversation may be performed
-    :type service_url: str
-    """
-
-    _attribute_map = {
-        "activity_id": {"key": "activityId", "type": "str"},
-        "user": {"key": "user", "type": "ChannelAccount"},
-        "bot": {"key": "bot", "type": "ChannelAccount"},
-        "conversation": {"key": "conversation", "type": "ConversationAccount"},
-        "channel_id": {"key": "channelId", "type": "str"},
-        "locale": {"key": "locale", "type": "str"},
-        "service_url": {"key": "serviceUrl", "type": "str"},
-    }
-
-    def __init__(
-        self,
-        *,
-        activity_id: str = None,
-        user=None,
-        bot=None,
-        conversation=None,
-        channel_id: str = None,
-        locale: str = None,
-        service_url: str = None,
-        **kwargs
-    ) -> None:
-        super(ConversationReference, self).__init__(**kwargs)
-        self.activity_id = activity_id
-        self.user = user
-        self.bot = bot
-        self.conversation = conversation
-        self.channel_id = channel_id
-        self.locale = locale
-        self.service_url = service_url
 
 
 class ConversationResourceResponse(Model):
@@ -1349,32 +1823,6 @@ class MediaUrl(Model):
         self.profile = profile
 
 
-class Mention(Model):
-    """Mention information (entity type: "mention").
-
-    :param mentioned: The mentioned user
-    :type mentioned: ~botframework.connector.models.ChannelAccount
-    :param text: Sub Text which represents the mention (can be null or empty)
-    :type text: str
-    :param type: Type of this entity (RFC 3987 IRI)
-    :type type: str
-    """
-
-    _attribute_map = {
-        "mentioned": {"key": "mentioned", "type": "ChannelAccount"},
-        "text": {"key": "text", "type": "str"},
-        "type": {"key": "type", "type": "str"},
-    }
-
-    def __init__(
-        self, *, mentioned=None, text: str = None, type: str = None, **kwargs
-    ) -> None:
-        super(Mention, self).__init__(**kwargs)
-        self.mentioned = mentioned
-        self.text = text
-        self.type = type
-
-
 class MessageReaction(Model):
     """Message reaction object.
 
@@ -1598,20 +2046,6 @@ class ReceiptItem(Model):
         self.price = price
         self.quantity = quantity
         self.tap = tap
-
-
-class ResourceResponse(Model):
-    """A response containing a resource ID.
-
-    :param id: Id of the resource
-    :type id: str
-    """
-
-    _attribute_map = {"id": {"key": "id", "type": "str"}}
-
-    def __init__(self, *, id: str = None, **kwargs) -> None:
-        super(ResourceResponse, self).__init__(**kwargs)
-        self.id = id
 
 
 class SemanticAction(Model):
