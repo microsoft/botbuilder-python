@@ -521,6 +521,7 @@ class TeamsActivityHandler(ActivityHandler):
                 if channel_data.event_type == "teamHardDeleted":
                     return await self.on_teams_team_hard_deleted(
                         channel_data.team, turn_context
+                    )
                 if channel_data.event_type == "channelRestored":
                     return await self.on_teams_channel_restored(
                         channel_data.channel, channel_data.team, turn_context
