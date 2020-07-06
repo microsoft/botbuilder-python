@@ -211,6 +211,8 @@ class TelemetryLoggerMiddleware(Middleware):
 
         # Use the LogPersonalInformation flag to toggle logging PII data, text and user name are common examples
         if self.log_personal_information:
+            if activity.attachments and activity.attachments.strip():
+                properties[TelemetryConstants.ATTACHMENTS_PROPERTY] = activity.attachments
             if activity.from_property.name and activity.from_property.name.strip():
                 properties[
                     TelemetryConstants.FROM_NAME_PROPERTY
