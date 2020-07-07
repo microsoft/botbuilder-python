@@ -1,5 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+from warnings import warn
+
 from botbuilder.core import (
     BotAdapter,
     BotState,
@@ -65,7 +67,7 @@ class AdapterExtensions:
         auto: bool = True,
     ) -> BotAdapter:
         """
-        Registers user and conversation state objects with the adapter. These objects will be available via
+        [DEPRECATED] Registers user and conversation state objects with the adapter. These objects will be available via
         the turn context's `turn_state` property.
 
         :param adapter: The BotAdapter on which to register the state objects.
@@ -74,6 +76,11 @@ class AdapterExtensions:
         :param auto: True to automatically persist state each turn.
         :return: The BotAdapter
         """
+        warn(
+            "This method is deprecated in 4.9. You should use the method .use_bot_state() instead.",
+            DeprecationWarning,
+        )
+
         if not adapter:
             raise TypeError("BotAdapter is required")
 
