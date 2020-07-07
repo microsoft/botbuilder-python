@@ -72,9 +72,12 @@ class SkillHandler(ChannelServiceHandler):
         conversation.
 
         Use SendToConversation in all other cases.
-        :param claims_identity:
-        :param conversation_id:
-        :param activity:
+        :param claims_identity: Claims identity for the bot.
+        :type claims_identity: :class:`botframework.connector.auth.ClaimsIdentity`
+        :param conversation_id:The conversation ID.
+        :type conversation_id: str
+        :param activity: Activity to send.
+        :type activity: Activity
         :return:
         """
         return await self._process_activity(
@@ -104,10 +107,12 @@ class SkillHandler(ChannelServiceHandler):
         conversation.
 
         Use SendToConversation in all other cases.
-        :param claims_identity:
-        :param conversation_id:
-        :param activity_id:
-        :param activity:
+        :param claims_identity: Claims identity for the bot.
+        :type claims_identity: :class:`botframework.connector.auth.ClaimsIdentity`
+        :param conversation_id:The conversation ID.
+        :type conversation_id: str
+        :param activity: Activity to send.
+        :type activity: Activity
         :return:
         """
         return await self._process_activity(
