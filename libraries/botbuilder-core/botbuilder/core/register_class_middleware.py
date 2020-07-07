@@ -10,8 +10,9 @@ class RegisterClassMiddleware(Middleware):
     Middleware for adding an object to or registering a service with the current turn context.
     """
 
-    def __init__(self, service):
+    def __init__(self, service, key: str = None):
         self.service = service
+        self._key = key
 
     async def on_turn(
         self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]
@@ -19,7 +20,8 @@ class RegisterClassMiddleware(Middleware):
         # C# has TurnStateCollection with has overrides for adding items
         # to TurnState.  Python does not.  In C#'s case, there is an 'Add'
         # to handle adding object, and that uses the fully qualified class name.
-        context.turn_state[self.fullname(self.service)] = self.service
+        key = self._key or self.fullname(self.service)
+        context.turn_state[key] = self.service
         await logic()
 
     @staticmethod
