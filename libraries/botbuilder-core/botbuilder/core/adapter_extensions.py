@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 from botbuilder.core import (
     BotAdapter,
+    BotState,
     Storage,
     RegisterClassMiddleware,
     UserState,
@@ -22,6 +23,39 @@ class AdapterExtensions:
         :return: The BotAdapter
         """
         return adapter.use(RegisterClassMiddleware(storage))
+
+    @staticmethod
+    def use_bot_state(
+        bot_adapter: BotAdapter, *bot_states: BotState, auto: bool = True
+    ) -> BotAdapter:
+        """
+        Registers bot state object into the TurnContext. The botstate will be available via the turn context.
+
+        :param bot_adapter: The BotAdapter on which to register the state objects.
+        :param bot_states: One or more BotState objects to register.
+        :return: The updated adapter.
+        """
+        if not bot_states:
+            raise TypeError("At least one BotAdapter is required")
+
+        for bot_state in bot_states:
+            bot_adapter.use(
+                RegisterClassMiddleware(
+                    bot_state, AdapterExtensions.fullname(bot_state)
+                )
+            )
+
+        if auto:
+            bot_adapter.use(AutoSaveStateMiddleware(bot_states))
+
+        return bot_adapter
+
+    @staticmethod
+    def fullname(obj):
+        module = obj.__class__.__module__
+        if module is None or module == str.__class__.__module__:
+            return obj.__class__.__name__  # Avoid reporting __builtin__
+        return module + "." + obj.__class__.__name__
 
     @staticmethod
     def use_state(

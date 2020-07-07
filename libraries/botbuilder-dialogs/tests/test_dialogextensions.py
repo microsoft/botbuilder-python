@@ -221,7 +221,7 @@ class DialogExtensionsTests(aiounittest.AsyncTestCase):
             logic, TestAdapter.create_conversation_reference(conversation_id)
         )
         AdapterExtensions.use_storage(adapter, storage)
-        AdapterExtensions.use_state(adapter, user_state, convo_state)
+        AdapterExtensions.use_bot_state(adapter, user_state, convo_state)
         adapter.use(TranscriptLoggerMiddleware(ConsoleTranscriptLogger()))
 
         return TestFlow(None, adapter)
