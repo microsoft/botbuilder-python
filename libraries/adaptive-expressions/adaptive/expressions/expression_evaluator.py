@@ -1,4 +1,5 @@
 from typing import NewType, Callable
+
 from .expression import Expression, ReturnType
 from .memory.memory_interface import MemoryInterface
 from .options import Options
@@ -7,10 +8,14 @@ class ExpressionEvaluator:
     expr_type: str
     return_type: ReturnType
 
-    _validator: Callable([Expression], object)
-    _evaluator: Callable([Expression, MemoryInterface, Options], object)
+    _validator: ValidateExpressionDelegate
+    _evaluator: EvaluateExpressionDelegate
 
-    def __init__(self, expr_type: str, evaluator: object, return_type=ReturnType.Object, validator=None):
+    def __init__(self,
+        expr_type: str,
+        evaluator: EvaluateExpressionDelegate,
+        return_type=ReturnType.Object,
+        validator: ValidateExpressionDelegate = None):
         self.expr_type = expr_type
         self._evaluator = evaluator
         self.return_type = return_type
@@ -23,3 +28,8 @@ class ExpressionEvaluator:
         self._validator(expression)
 
 EvaluatorLookup = NewType('EvaluatorLookup', Callable[[str], ExpressionEvaluator])
+
+EvaluateExpressionDelegate = NewType('EvaluateExpressionDelegate',
+    Callable[[Expression, MemoryInterface, Options], object])
+
+ValidateExpressionDelegate = NewType('ValidateExpressionDelegate', Callable[[Expression], object])

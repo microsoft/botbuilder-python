@@ -2,6 +2,7 @@ import re
 import json
 
 from extensions import Extensions
+from expression_functions import ExpressionFunctions
 from .memory_interface import MemoryInterface
 
 class SimpleObjectMemory(MemoryInterface):
