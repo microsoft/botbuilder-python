@@ -33,6 +33,7 @@
 /libraries/botbuilder-ai/botbuilder/ai/qna/**                                      @microsoft/bf-admin @bb-python @johnataylor
 /libraries/botbuilder-applicationinsights/**                                       @microsoft/bf-admin @bb-python @munozemilio
 /libraries/botbuilder-core/**                                                      @johnataylor @microsoft/bb-python @microsoft/bf-admin
+/libraries/botbuilder-core/botbuilder/core/teams/**                                @microsoft/bb-python @microsoft/bf-admin @microsoft/bf-teams
 /libraries/botbuilder-dialogs/**                                                   @johnataylor @microsoft/bb-python @microsoft/bf-admin
 /libraries/botframework-connector/**                                               @microsoft/bf-admin @bb-python @johnataylor
 /libraries/botframework-connector/botframework/connector/auth/**                   @microsoft/bf-admin @bb-python @bf-auth
