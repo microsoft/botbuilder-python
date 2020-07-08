@@ -1,8 +1,8 @@
 from typing import NewType, Callable
 
-from .expression import Expression, ReturnType
-from .memory.memory_interface import MemoryInterface
-from .options import Options
+from expression import Expression, ReturnType
+from memory.memory_interface import MemoryInterface
+from options import Options
 
 class ExpressionEvaluator:
     expr_type: str

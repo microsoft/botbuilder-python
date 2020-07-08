@@ -6,7 +6,9 @@
 # --------------------------------------------------------------------------
 
 from .about import __version__
+from .expression import Expression
 
 __all__ = [
-    "__version__"
+    "__version__",
+    "Expression"
 ]

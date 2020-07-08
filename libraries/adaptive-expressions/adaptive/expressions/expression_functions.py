@@ -1,30 +1,17 @@
+from expression_type import ADD
+from builtin_functions import Add
+
+def get_standard_functions() -> dict:
+    functions = []
+    functions.append(Add())
+
+    lookup = dict()
+    for function in functions:
+        lookup[function.expr_type] = function
+
+    lookup["add"] = lookup[ADD]
+
+    return lookup
+
 class ExpressionFunctions:
-    @staticmethod
-    def access_index(instance: object, index: int):
-        value: object = None
-        error: str = None
-
-        if instance is None:
-            return value, error
-
-        if isinstance(instance, list):
-            if index >= 0 and index < len(instance):
-                value = instance[index]
-            else:
-                error = str(index) + ' is out of range for ' + instance
-        else:
-            error = instance + ' is not a collection.'
-
-        return value, error
-
-    @staticmethod
-    def access_property(instance: object, property: str):
-        value: object = None
-        error: str = None
-
-        if instance is None:
-            return value, error
-
-        #TODO
-
-        return value, error
+    standard_functions = staticmethod(get_standard_functions())

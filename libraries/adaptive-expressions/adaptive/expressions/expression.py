@@ -3,11 +3,12 @@ import enum
 from typing import Callable
 from expression_parser import ExpressionParser
 from memory import MemoryInterface, SimpleObjectMemory
-from .extensions import Extensions
-from .options import Options
-from .expression_evaluator import ExpressionEvaluator, EvaluateExpressionDelegate
-from .expression_type import AND, OR, ACCESSOR, ELEMENT, FOREACH, WHERE, SELECT, EQUAL, NOT, LAMBDA, SETPATHTOVALUE
-from .constant import Constant
+from extensions import Extensions
+from options import Options
+from expression_evaluator import ExpressionEvaluator, EvaluateExpressionDelegate
+from expression_type import AND, OR, ACCESSOR, ELEMENT, FOREACH, WHERE, SELECT, EQUAL, NOT, LAMBDA, SETPATHTOVALUE
+from constant import Constant
+from function_table import FunctionTable
 
 
 class ReturnType(enum.Enum):
@@ -31,6 +32,7 @@ class Expression():
     evaluator: ExpressionEvaluator
     children = []
     functions = {}
+    functions = FunctionTable()
 
     def __init__(self, expr_type: str, evaluator: ExpressionEvaluator, children=None):
         if evaluator is not None:

@@ -2,7 +2,7 @@ import re
 import json
 
 from extensions import Extensions
-from expression_functions import ExpressionFunctions
+from function_utils import FunctionUtils
 from .memory_interface import MemoryInterface
 
 class SimpleObjectMemory(MemoryInterface):
@@ -34,9 +34,9 @@ class SimpleObjectMemory(MemoryInterface):
             is_int = self.is_int(part)
             if (is_int and isinstance(cur_scope, list)):
                 idx = int(part)
-                value, error = ExpressionFunctions.access_index(cur_scope, idx)
+                value, error = FunctionUtils.access_index(cur_scope, idx)
             else:
-                value, error = ExpressionFunctions.access_property(cur_scope, part)
+                value, error = FunctionUtils.access_property(cur_scope, part)
 
             if error is not None:
                 return None
@@ -61,9 +61,9 @@ class SimpleObjectMemory(MemoryInterface):
             is_int = self.is_int(parts[i])
             if is_int and isinstance(cur_scope, list):
                 idx = int(parts[i])
-                value, error = ExpressionFunctions.access_index(cur_scope, idx)
+                value, error = FunctionUtils.access_index(cur_scope, idx)
             else:
-                value, error = ExpressionFunctions.access_property(cur_scope, parts[i])
+                value, error = FunctionUtils.access_property(cur_scope, parts[i])
 
             if error is not None:
                 return
@@ -89,7 +89,7 @@ class SimpleObjectMemory(MemoryInterface):
             if error is not None:
                 return
         else:
-            error = ExpressionFunctions.set_property(cur_scope, parts[-1], input).error
+            error = FunctionUtils.set_property(cur_scope, parts[-1], input).error
             if error is not None:
                 return
 

@@ -1,7 +1,7 @@
 import numbers
-from .expression import Expression, ReturnType
-from .expression_evaluator import ExpressionEvaluator
-from .expression_type import CONSTANT
+from expression import Expression, ReturnType
+from expression_evaluator import ExpressionEvaluator
+from expression_type import CONSTANT
 
 class Constant(Expression):
     _value = None
