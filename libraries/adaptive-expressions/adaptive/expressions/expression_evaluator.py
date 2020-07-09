@@ -1,8 +1,14 @@
 from typing import NewType, Callable
-
-from expression import Expression, ReturnType
 from memory.memory_interface import MemoryInterface
 from options import Options
+from return_type import ReturnType
+
+EvaluatorLookup = NewType('EvaluatorLookup', Callable[[str], object])
+
+EvaluateExpressionDelegate = NewType('EvaluateExpressionDelegate',
+    Callable[[object, MemoryInterface, Options], object])
+
+ValidateExpressionDelegate = NewType('ValidateExpressionDelegate', Callable[[object], object])
 
 class ExpressionEvaluator:
     expr_type: str
@@ -21,15 +27,8 @@ class ExpressionEvaluator:
         self.return_type = return_type
         self._validator = validator if validator is not None else lambda expr: None
 
-    def try_evaluate(self, expression: Expression, state: MemoryInterface, options: Options):
+    def try_evaluate(self, expression: object, state: MemoryInterface, options: Options):
         return self._evaluator(expression, state, options)
 
-    def validate_expression(self, expression: Expression):
+    def validate_expression(self, expression: object):
         self._validator(expression)
-
-EvaluatorLookup = NewType('EvaluatorLookup', Callable[[str], ExpressionEvaluator])
-
-EvaluateExpressionDelegate = NewType('EvaluateExpressionDelegate',
-    Callable[[Expression, MemoryInterface, Options], object])
-
-ValidateExpressionDelegate = NewType('ValidateExpressionDelegate', Callable[[Expression], object])

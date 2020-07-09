@@ -1,16 +1,17 @@
 import numbers
 import sys
-from expression_evaluator import ExpressionEvaluator
+import expression_evaluator as expr_eval
 from expression_type import ADD
-from expression import ReturnType, EvaluateExpressionDelegate, Expression
-from function_utils import FunctionUtils
+import expression as expr
+import function_utils as func_utils
+from return_type import ReturnType
 
-class Add(ExpressionEvaluator):
+class Add(expr_eval.ExpressionEvaluator):
     def __init__(self):
         super().__init__(ADD, Add.evaluator, ReturnType.String | ReturnType.Number, Add.validator)
 
     @staticmethod
-    def evaluator() -> EvaluateExpressionDelegate:
+    def evaluator() -> expr_eval.EvaluateExpressionDelegate:
         def anonymous_function(args: []):
             result: object = None
             error: str = None
@@ -28,7 +29,7 @@ class Add(ExpressionEvaluator):
 
             return result, error
 
-        return FunctionUtils.apply_sequence_with_error(anonymous_function, FunctionUtils.verify_number_or_string_or_null)
+        return func_utils.FunctionUtils.apply_sequence_with_error(anonymous_function, func_utils.FunctionUtils.verify_number_or_string_or_null)
 
     @staticmethod
     def eval_add(num_a: numbers.Number, num_b: numbers.Number):
@@ -38,5 +39,5 @@ class Add(ExpressionEvaluator):
         return num_a + num_b
 
     @staticmethod
-    def validator(expression: Expression):
-        FunctionUtils.validate_arity_and_any_type(expression, 2, sys.maxsize, ReturnType.String | ReturnType.Number)
+    def validator(expression: expr.Expression):
+        func_utils.FunctionUtils.validate_arity_and_any_type(expression, 2, sys.maxsize, ReturnType.String | ReturnType.Number)

@@ -1,5 +1,3 @@
-from expression import Expression
-
 class ExpresssionParserInterface:
-    def parse(self, expression: str) -> Expression:
+    def parse(self, expression: str) -> object:
         pass

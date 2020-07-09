@@ -1,15 +1,16 @@
 import numbers
-from expression import Expression, ReturnType
-from expression_evaluator import ExpressionEvaluator
+import expression as expr
+import expression_evaluator as expr_eval
 from expression_type import CONSTANT
+from return_type import ReturnType
 
-class Constant(Expression):
+class Constant(expr.Expression):
     _value = None
 
     def __init__(self, value):
         error = None
         super().__init__(CONSTANT,
-            ExpressionEvaluator(CONSTANT, lambda expression: Constant(expression).get_value(), error))
+            expr_eval.ExpressionEvaluator(CONSTANT, lambda expression: Constant(expression).get_value(), error))
         self._value = value
 
     def get_value(self):
@@ -29,7 +30,7 @@ class Constant(Expression):
 
         self._value = value
 
-    def deep_equals(self, other: Expression) -> bool:
+    def deep_equals(self, other: expr.Expression) -> bool:
         equal: bool
         if (other is not None and other.expr_type != self.expr_type):
             equal = False

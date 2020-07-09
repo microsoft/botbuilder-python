@@ -1,40 +1,21 @@
-import enum
-
 from typing import Callable
-from expression_parser import ExpressionParser
+import expression_parser as expr_parser
+import expression_evaluator as expr_eval
 from memory import MemoryInterface, SimpleObjectMemory
 from extensions import Extensions
 from options import Options
-from expression_evaluator import ExpressionEvaluator, EvaluateExpressionDelegate
 from expression_type import AND, OR, ACCESSOR, ELEMENT, FOREACH, WHERE, SELECT, EQUAL, NOT, LAMBDA, SETPATHTOVALUE
-from constant import Constant
-from function_table import FunctionTable
-
-
-class ReturnType(enum.Enum):
-    "True or false boolean value."
-    Boolean = 1,
-
-    "Numerical value like int, float, double, ..."
-    Number = 2,
-
-    "Any value is possible."
-    Object = 4,
-
-    "String value."
-    String = 8,
-
-    "Array value."
-    Array = 16
-
+import constant as const
+import function_table as func_table
+from return_type import ReturnType
 
 class Expression():
-    evaluator: ExpressionEvaluator
+    evaluator: expr_eval.ExpressionEvaluator
     children = []
     functions = {}
-    functions = FunctionTable()
+    functions = func_table.FunctionTable()
 
-    def __init__(self, expr_type: str, evaluator: ExpressionEvaluator, children=None):
+    def __init__(self, expr_type: str, evaluator: expr_eval.ExpressionEvaluator, children=None):
         if evaluator is not None:
             self.evaluator = evaluator
             self.children = children if children is not None else []
@@ -96,7 +77,7 @@ class Expression():
         if extension is None or extension(expression):
             children = expression.children
             if expression.expr_type == ACCESSOR:
-                prop = str(Constant(children[0]).get_value())
+                prop = str(const.Constant(children[0]).get_value())
 
                 if len(children) == 1:
                     path = prop
@@ -108,8 +89,8 @@ class Expression():
             elif expression.expr_type == ELEMENT:
                 path, refs = self.reference_walk(children[0], extension)
                 if path is not None:
-                    if isinstance(children[1], Constant):
-                        cnst = Constant(children[1])
+                    if isinstance(children[1], const.Constant):
+                        cnst = const.Constant(children[1])
                         if cnst.return_type == ReturnType.String:
                             path += '.' + cnst.get_value()
                         else:
@@ -136,7 +117,7 @@ class Expression():
                 if child2_path is not None:
                     refs2.add(child2_path)
 
-                iterator_name = str(Constant(children[1].children[0]).get_value())
+                iterator_name = str(const.Constant(children[1].children[0]).get_value())
                 non_local_refs = list(filter(lambda x: (x == iterator_name or x.startswith(iterator_name + '.')
                     or x.startswith(iterator_name + '[')), refs2))
                 refs = refs.union(refs0, non_local_refs)
@@ -153,10 +134,10 @@ class Expression():
 
     @staticmethod
     def parse(expression: str, lookup=None):
-        return ExpressionParser(lookup if lookup is not None else Expression.lookup).parse(expression)
+        return expr_parser.ExpressionParser(lookup if lookup is not None else Expression.lookup).parse(expression)
 
     @staticmethod
-    def lookup(function_name: str) -> ExpressionEvaluator:
+    def lookup(function_name: str) -> expr_eval.ExpressionEvaluator:
         expr_evaluator = Expression.functions.get(function_name)
         if expr_evaluator is None:
             return None
@@ -164,15 +145,15 @@ class Expression():
         return expr_evaluator
 
     @staticmethod
-    def make_expression(exp_type: str, evaluator: ExpressionEvaluator, children: list) -> Expression:
+    def make_expression(exp_type: str, evaluator: expr_eval.ExpressionEvaluator, children: list) -> Expression:
         expr = Expression(exp_type, evaluator, children)
         expr.validate()
 
         return expr
 
     @staticmethod
-    def lambda_expression(func: EvaluateExpressionDelegate) -> Expression:
-        return Expression(LAMBDA, ExpressionEvaluator(LAMBDA, func))
+    def lambda_expression(func: expr_eval.EvaluateExpressionDelegate) -> Expression:
+        return Expression(LAMBDA, expr_eval.ExpressionEvaluator(LAMBDA, func))
 
     #TODO: lamda function
 
@@ -181,7 +162,7 @@ class Expression():
         if isinstance(value, Expression):
             return Expression.make_expression(SETPATHTOVALUE, None, property, value)
 
-        return Expression.make_expression(SETPATHTOVALUE, None, property, Constant(value))
+        return Expression.make_expression(SETPATHTOVALUE, None, property, const.Constant(value))
 
     @staticmethod
     def equals_expression(children: list) -> Expression:

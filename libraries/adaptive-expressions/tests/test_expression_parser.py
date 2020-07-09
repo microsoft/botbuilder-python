@@ -8,3 +8,6 @@ class ExpressionParserTests(unittest.TestCase):
         value, error = parsed.try_evaluate()
         self.assertEqual(value, 2)
         self.assertTrue(error is None)
+
+if __name__ == '__main__':
+    unittest.main()
