@@ -1,11 +1,9 @@
 from typing import Callable
-import expression_parser as expr_parser
 import expression_evaluator as expr_eval
 from memory import MemoryInterface, SimpleObjectMemory
 from extensions import Extensions
 from options import Options
 from expression_type import AND, OR, ACCESSOR, ELEMENT, FOREACH, WHERE, SELECT, EQUAL, NOT, LAMBDA, SETPATHTOVALUE
-import constant as const
 import function_table as func_table
 from return_type import ReturnType
 
@@ -35,7 +33,7 @@ class Expression():
     def expr_type(self):
         return self.evaluator.expr_type
 
-    def deep_equals(self, other: Expression) -> bool:
+    def deep_equals(self, other: object) -> bool:
         if other is None:
             return False
 
@@ -71,7 +69,9 @@ class Expression():
 
         return list(refs)
 
-    def reference_walk(self, expression: Expression, extension: Callable[[Expression], bool] = None):
+    def reference_walk(self, expression: object, extension: Callable[[object], bool] = None):
+        import constant as const
+
         path: str
         refs = set()
         if extension is None or extension(expression):
@@ -134,6 +134,8 @@ class Expression():
 
     @staticmethod
     def parse(expression: str, lookup=None):
+        import expression_parser as expr_parser
+        
         return expr_parser.ExpressionParser(lookup if lookup is not None else Expression.lookup).parse(expression)
 
     @staticmethod
@@ -145,45 +147,47 @@ class Expression():
         return expr_evaluator
 
     @staticmethod
-    def make_expression(exp_type: str, evaluator: expr_eval.ExpressionEvaluator, children: list) -> Expression:
+    def make_expression(exp_type: str, evaluator: expr_eval.ExpressionEvaluator, children: list):
         expr = Expression(exp_type, evaluator, children)
         expr.validate()
 
         return expr
 
     @staticmethod
-    def lambda_expression(func: expr_eval.EvaluateExpressionDelegate) -> Expression:
+    def lambda_expression(func: expr_eval.EvaluateExpressionDelegate):
         return Expression(LAMBDA, expr_eval.ExpressionEvaluator(LAMBDA, func))
 
     #TODO: lamda function
 
     @staticmethod
-    def set_path_to_value(property: Expression, value: object) -> Expression:
+    def set_path_to_value(property: object, value: object):
+        import constant as const
+
         if isinstance(value, Expression):
             return Expression.make_expression(SETPATHTOVALUE, None, property, value)
 
         return Expression.make_expression(SETPATHTOVALUE, None, property, const.Constant(value))
 
     @staticmethod
-    def equals_expression(children: list) -> Expression:
+    def equals_expression(children: list):
         return Expression.make_expression(EQUAL, None, children)
 
     @staticmethod
-    def and_expression(children: list) -> Expression:
+    def and_expression(children: list):
         if len(children) > 1:
             return Expression.make_expression(AND, None, children)
 
         return children[0]
 
     @staticmethod
-    def or_expression(children: list) -> Expression:
+    def or_expression(children: list):
         if len(children) > 1:
             return Expression.make_expression(OR, None, children)
 
         return children[0]
 
     @staticmethod
-    def not_expression(child: Expression) -> Expression:
+    def not_expression(child: object):
         return Expression.make_expression(NOT, None, child)
 
     def validate(self):

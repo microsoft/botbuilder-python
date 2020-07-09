@@ -10,23 +10,23 @@ class Constant(expr.Expression):
     def __init__(self, value):
         error = None
         super().__init__(CONSTANT,
-            expr_eval.ExpressionEvaluator(CONSTANT, lambda expression: Constant(expression).get_value(), error))
-        self._value = value
+            expr_eval.ExpressionEvaluator(CONSTANT, lambda expression, state, _: (expression.get_value(), error)))
+        self.set_value(value)
 
     def get_value(self):
         return self._value
 
     def set_value(self, value):
         if isinstance(value, str):
-            self.evaluator.returnType = ReturnType.String
+            self.evaluator.return_type = ReturnType.String
         elif isinstance(value, bool):
-            self.evaluator.returnType = ReturnType.Boolean
+            self.evaluator.return_type = ReturnType.Boolean
         elif isinstance(value, numbers.Number):
-            self.evaluator.returnType = ReturnType.Number
+            self.evaluator.return_type = ReturnType.Number
         elif isinstance(value, list):
-            self.evaluator.returnType = ReturnType.Array
+            self.evaluator.return_type = ReturnType.Array
         else:
-            self.evaluator.returnType = ReturnType.Object
+            self.evaluator.return_type = ReturnType.Object
 
         self._value = value
 

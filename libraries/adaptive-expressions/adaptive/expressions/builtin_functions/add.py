@@ -2,13 +2,12 @@ import numbers
 import sys
 import expression_evaluator as expr_eval
 from expression_type import ADD
-import expression as expr
 import function_utils as func_utils
 from return_type import ReturnType
 
 class Add(expr_eval.ExpressionEvaluator):
     def __init__(self):
-        super().__init__(ADD, Add.evaluator, ReturnType.String | ReturnType.Number, Add.validator)
+        super().__init__(ADD, Add.evaluator(), ReturnType.String | ReturnType.Number, Add.validator)
 
     @staticmethod
     def evaluator() -> expr_eval.EvaluateExpressionDelegate:
@@ -25,7 +24,7 @@ class Add(expr_eval.ExpressionEvaluator):
                 if string_concat:
                     result = (str(first_item) if first_item else '') + (str(second_item) if second_item else '')
                 else:
-                    Add.eval_add(args[0], args[1])
+                    result = Add.eval_add(args[0], args[1])
 
             return result, error
 
@@ -39,5 +38,5 @@ class Add(expr_eval.ExpressionEvaluator):
         return num_a + num_b
 
     @staticmethod
-    def validator(expression: expr.Expression):
+    def validator(expression: object):
         func_utils.FunctionUtils.validate_arity_and_any_type(expression, 2, sys.maxsize, ReturnType.String | ReturnType.Number)

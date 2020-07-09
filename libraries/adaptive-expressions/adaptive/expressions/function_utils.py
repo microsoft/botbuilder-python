@@ -38,7 +38,7 @@ class FunctionUtils:
             so_far = args[0]
             value: object
             error: str
-            for arg in args:
+            for arg in args[1:]:
                 binary_args[0] = so_far
                 binary_args[1] = arg
                 value, error = function(binary_args)
@@ -78,8 +78,11 @@ class FunctionUtils:
         value: object
         error: str
         pos = 0
+
         for child in expression.children:
-            value, error = child.try_evaluate(state, options)
+            res = child.try_evaluate(state, options)
+            value = res[0]
+            error = res[1]
             if error:
                 break
 

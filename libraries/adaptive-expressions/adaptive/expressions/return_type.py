@@ -1,6 +1,6 @@
-import enum
+from enum import IntFlag
 
-class ReturnType(enum.Enum):
+class ReturnType(IntFlag):
     "True or false boolean value."
     Boolean = 1,
 

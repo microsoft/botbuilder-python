@@ -143,7 +143,10 @@ class ExpressionTransformer(expression_antlr_parserVisitor):
     def defaultResult(self) -> expr.Expression:
         return const.Constant('')
 
-    def make_expression(self, function_type: str, children: []) -> expr.Expression:
+    def make_expression(self, function_type: str, *children) -> expr.Expression:
+        if len(children) > 0 and isinstance(children[0], list):
+            children = children[0]
+
         if self.lookup_function(function_type) is None:
             raise Exception(function_type
                 + ' does not have an evaluator, it\'s not a built-in function or a custom function.')
@@ -199,8 +202,8 @@ class ExpressionParser(expr_parser_interface.ExpresssionParserInterface):
 
     @staticmethod
     def antlr_parse(expression: str):
-        if ExpressionParser.expressionDict.get(expression) is not None:
-            return ExpressionParser.expressionDict.get(expression)
+        if ExpressionParser.expression_dict.get(expression) is not None:
+            return ExpressionParser.expression_dict.get(expression)
 
         input_stream = InputStream(expression)
         lexer = expression_antlr_lexer(input_stream)
@@ -214,12 +217,12 @@ class ExpressionParser(expr_parser_interface.ExpresssionParserInterface):
         if exp is not None:
             expression_context = exp.expression()
 
-        ExpressionParser.expressionDict.update({expression: expression_context})
+        ExpressionParser.expression_dict.update({expression: expression_context})
 
         return expression_context
 
     def parse(self, expression: str) -> object:
-        if expression:
+        if not expression:
             return const.Constant('')
         else:
-            return ExpressionTransformer(self.evaluator_lookup).transform(ExpressionParser.antlr_parse)
+            return ExpressionTransformer(self.evaluator_lookup).transform(ExpressionParser.antlr_parse(expression))
