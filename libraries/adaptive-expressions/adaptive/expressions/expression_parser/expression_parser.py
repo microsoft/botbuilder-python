@@ -1,7 +1,7 @@
 
 from antlr4 import InputStream
 from antlr4 import CommonTokenStream
-from antlr4 import ParseTree, TerminalNode
+from antlr4 import TerminalNode
 from expression_type import SUBTRACT, ADD, ACCESSOR, ELEMENT, CREATEARRAY, JSON, SETPROPERTY, CONCAT
 import expression as expr
 import expression_evaluator as expr_eval
@@ -21,7 +21,7 @@ class ExpressionTransformer(expression_antlr_parserVisitor):
         super().__init__()
         self.lookup_function = lookup
 
-    def transform(self, ctx: ParseTree):
+    def transform(self, ctx):
         return self.visit(ctx)
 
     def visitUnaryOpExp(self, ctx: ep_parser.UnaryOpExpContext) -> expr.Expression:
@@ -198,7 +198,7 @@ class ExpressionParser(expr_parser_interface.ExpresssionParserInterface):
         self.evaluator_lookup = lookup if lookup is not None else expr.Expression.lookup
 
     @staticmethod
-    def antlr_parse(expression: str) -> ParseTree:
+    def antlr_parse(expression: str):
         if ExpressionParser.expressionDict.get(expression) is not None:
             return ExpressionParser.expressionDict.get(expression)
 
