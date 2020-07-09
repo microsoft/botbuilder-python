@@ -15,7 +15,7 @@ For more information jump to a section below.
 * [Getting started](#getting-started)
 * [Getting support and providing feedback](#getting-support-and-providing-feedback)
 * [Contributing and our code of conduct](contributing-and-our-code-of-conduct)
-* [Reporting security sssues](#reporting-security-issues)
+* [Reporting security issues](#reporting-security-issues)
 
 ## Build Status
 

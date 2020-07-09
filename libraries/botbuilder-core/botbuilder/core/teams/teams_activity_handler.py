@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+# pylint: disable=too-many-lines
+
 from http import HTTPStatus
 from botbuilder.schema import ChannelAccount, ErrorResponseException, SignInConstants
 from botbuilder.core import ActivityHandler, InvokeResponse
@@ -28,6 +30,19 @@ from ..serializer_helper import deserializer_helper
 
 class TeamsActivityHandler(ActivityHandler):
     async def on_invoke_activity(self, turn_context: TurnContext) -> InvokeResponse:
+        """
+        Invoked when an invoke activity is received from the connector.
+        Invoke activities can be used to communicate many different things.
+
+        :param turn_context: A context object for this turn.
+
+        :returns: An InvokeResponse that represents the work queued to execute.
+
+        .. remarks::
+            Invoke activities communicate programmatic commands from a client or channel to a bot.
+            The meaning of an invoke activity is defined by the "invoke_activity.name" property,
+            which is meaningful within the scope of a channel.
+        """
         try:
             if (
                 not turn_context.activity.name
@@ -154,14 +169,35 @@ class TeamsActivityHandler(ActivityHandler):
             return invoke_exception.create_invoke_response()
 
     async def on_sign_in_invoke(self, turn_context: TurnContext):
+        """
+        Invoked when a signIn invoke activity is received from the connector.
+
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
         return await self.on_teams_signin_verify_state(turn_context)
 
     async def on_teams_card_action_invoke(
         self, turn_context: TurnContext
     ) -> InvokeResponse:
+        """
+        Invoked when an card action invoke activity is received from the connector.
+
+        :param turn_context: A context object for this turn.
+
+        :returns: An InvokeResponse that represents the work queued to execute.
+        """
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
     async def on_teams_signin_verify_state(self, turn_context: TurnContext):
+        """
+        Invoked when a signIn verify state activity is received from the connector.
+
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
     async def on_teams_signin_token_exchange(self, turn_context: TurnContext):
@@ -172,6 +208,15 @@ class TeamsActivityHandler(ActivityHandler):
         turn_context: TurnContext,
         file_consent_card_response: FileConsentCardResponse,
     ) -> InvokeResponse:
+        """
+        Invoked when a file consent card activity is received from the connector.
+
+        :param turn_context: A context object for this turn.
+        :param file_consent_card_response: The response representing the value of the invoke
+        activity sent when the user acts on a file consent card.
+
+        :returns: An InvokeResponse depending on the action of the file consent card.
+        """
         if file_consent_card_response.action == "accept":
             await self.on_teams_file_consent_accept(
                 turn_context, file_consent_card_response
@@ -194,6 +239,15 @@ class TeamsActivityHandler(ActivityHandler):
         turn_context: TurnContext,
         file_consent_card_response: FileConsentCardResponse,
     ):
+        """
+        Invoked when a file consent card is accepted by the user.
+
+        :param turn_context: A context object for this turn.
+        :param file_consent_card_response: The response representing the value of the invoke
+        activity sent when the user accepts a file consent card.
+
+        :returns: A task that represents the work queued to execute.
+        """
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
     async def on_teams_file_consent_decline(  # pylint: disable=unused-argument
@@ -201,31 +255,80 @@ class TeamsActivityHandler(ActivityHandler):
         turn_context: TurnContext,
         file_consent_card_response: FileConsentCardResponse,
     ):
+        """
+        Invoked when a file consent card is declined by the user.
+
+        :param turn_context: A context object for this turn.
+        :param file_consent_card_response: The response representing the value of the invoke
+        activity sent when the user declines a file consent card.
+
+        :returns: A task that represents the work queued to execute.
+        """
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
     async def on_teams_o365_connector_card_action(  # pylint: disable=unused-argument
         self, turn_context: TurnContext, query: O365ConnectorCardActionQuery
     ):
+        """
+        Invoked when a O365 Connector Card Action activity is received from the connector.
+
+        :param turn_context: A context object for this turn.
+        :param query: The O365 connector card HttpPOST invoke query.
+
+        :returns: A task that represents the work queued to execute.
+        """
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
     async def on_teams_app_based_link_query(  # pylint: disable=unused-argument
         self, turn_context: TurnContext, query: AppBasedLinkQuery
     ) -> MessagingExtensionResponse:
+        """
+        Invoked when an app based link query activity is received from the connector.
+
+        :param turn_context: A context object for this turn.
+        :param query: The invoke request body type for app-based link query.
+
+        :returns: The Messaging Extension Response for the query.
+        """
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
     async def on_teams_messaging_extension_query(  # pylint: disable=unused-argument
         self, turn_context: TurnContext, query: MessagingExtensionQuery
     ) -> MessagingExtensionResponse:
+        """
+        Invoked when a Messaging Extension Query activity is received from the connector.
+
+        :param turn_context: A context object for this turn.
+        :param query: The query for the search command.
+
+        :returns: The Messaging Extension Response for the query.
+        """
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
     async def on_teams_messaging_extension_select_item(  # pylint: disable=unused-argument
         self, turn_context: TurnContext, query
     ) -> MessagingExtensionResponse:
+        """
+        Invoked when a messaging extension select item activity is received from the connector.
+
+        :param turn_context: A context object for this turn.
+        :param query: The object representing the query.
+
+        :returns: The Messaging Extension Response for the query.
+        """
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
     async def on_teams_messaging_extension_submit_action_dispatch(
         self, turn_context: TurnContext, action: MessagingExtensionAction
     ) -> MessagingExtensionActionResponse:
+        """
+        Invoked when a messaging extension submit action dispatch activity is received from the connector.
+
+        :param turn_context: A context object for this turn.
+        :param action: The messaging extension action.
+
+        :returns: The Messaging Extension Action Response for the action.
+        """
         if not action.bot_message_preview_action:
             return await self.on_teams_messaging_extension_submit_action(
                 turn_context, action
@@ -249,50 +352,135 @@ class TeamsActivityHandler(ActivityHandler):
     async def on_teams_messaging_extension_bot_message_preview_edit(  # pylint: disable=unused-argument
         self, turn_context: TurnContext, action: MessagingExtensionAction
     ) -> MessagingExtensionActionResponse:
+        """
+        Invoked when a messaging extension bot message preview edit activity is received from the connector.
+
+        :param turn_context: A context object for this turn.
+        :param action: The messaging extension action.
+
+        :returns: The Messaging Extension Action Response for the action.
+        """
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
     async def on_teams_messaging_extension_bot_message_preview_send(  # pylint: disable=unused-argument
         self, turn_context: TurnContext, action: MessagingExtensionAction
     ) -> MessagingExtensionActionResponse:
+        """
+        Invoked when a messaging extension bot message preview send activity is received from the connector.
+
+        :param turn_context: A context object for this turn.
+        :param action: The messaging extension action.
+
+        :returns: The Messaging Extension Action Response for the action.
+        """
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
     async def on_teams_messaging_extension_submit_action(  # pylint: disable=unused-argument
         self, turn_context: TurnContext, action: MessagingExtensionAction
     ) -> MessagingExtensionActionResponse:
+        """
+        Invoked when a messaging extension submit action activity is received from the connector.
+
+        :param turn_context: A context object for this turn.
+        :param action: The messaging extension action.
+
+        :returns: The Messaging Extension Action Response for the action.
+        """
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
     async def on_teams_messaging_extension_fetch_task(  # pylint: disable=unused-argument
         self, turn_context: TurnContext, action: MessagingExtensionAction
     ) -> MessagingExtensionActionResponse:
+        """
+        Invoked when a Messaging Extension Fetch activity is received from the connector.
+
+        :param turn_context: A context object for this turn.
+        :param action: The messaging extension action.
+
+        :returns: The Messaging Extension Action Response for the action.
+        """
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
     async def on_teams_messaging_extension_configuration_query_settings_url(  # pylint: disable=unused-argument
         self, turn_context: TurnContext, query: MessagingExtensionQuery
     ) -> MessagingExtensionResponse:
+        """
+        Invoked when a messaging extension configuration query setting url activity is received from the connector.
+
+        :param turn_context: A context object for this turn.
+        :param query: The Messaging extension query.
+
+        :returns: The Messaging Extension Response for the query.
+        """
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
     async def on_teams_messaging_extension_configuration_setting(  # pylint: disable=unused-argument
         self, turn_context: TurnContext, settings
     ):
+        """
+        Override this in a derived class to provide logic for when a configuration is set for a messaging extension.
+
+        :param turn_context: A context object for this turn.
+        :param settings: Object representing the configuration settings.
+
+        :returns: A task that represents the work queued to execute.
+        """
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
     async def on_teams_messaging_extension_card_button_clicked(  # pylint: disable=unused-argument
         self, turn_context: TurnContext, card_data
     ):
+        """
+        Override this in a derived class to provide logic for when a card button is clicked in a messaging extension.
+
+        :param turn_context: A context object for this turn.
+        :param card_data: Object representing the card data.
+
+        :returns: A task that represents the work queued to execute.
+        """
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
     async def on_teams_task_module_fetch(  # pylint: disable=unused-argument
         self, turn_context: TurnContext, task_module_request: TaskModuleRequest
     ) -> TaskModuleResponse:
+        """
+        Override this in a derived class to provide logic for when a task module is fetched.
+
+        :param turn_context: A context object for this turn.
+        :param task_module_request: The task module invoke request value payload.
+
+        :returns: A Task Module Response for the request.
+        """
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
     async def on_teams_task_module_submit(  # pylint: disable=unused-argument
         self, turn_context: TurnContext, task_module_request: TaskModuleRequest
     ) -> TaskModuleResponse:
+        """
+        Override this in a derived class to provide logic for when a task module is submitted.
+
+        :param turn_context: A context object for this turn.
+        :param task_module_request: The task module invoke request value payload.
+
+        :returns: A Task Module Response for the request.
+        """
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
     async def on_conversation_update_activity(self, turn_context: TurnContext):
+        """
+        Invoked when a conversation update activity is received from the channel.
+        Conversation update activities are useful when it comes to responding to users
+        being added to or removed from the channel.
+        For example, a bot could respond to a user being added by greeting the user.
 
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+
+        .. remarks::
+            In a derived class, override this method to add logic that applies
+            to all conversation update activities.
+        """
         if turn_context.activity.channel_id == Channels.ms_teams:
             channel_data = TeamsChannelData().deserialize(
                 turn_context.activity.channel_data
@@ -324,8 +512,32 @@ class TeamsActivityHandler(ActivityHandler):
                     return await self.on_teams_channel_renamed(
                         channel_data.channel, channel_data.team, turn_context
                     )
+                if channel_data.event_type == "teamArchived":
+                    return await self.on_teams_team_archived(
+                        channel_data.team, turn_context
+                    )
+                if channel_data.event_type == "teamDeleted":
+                    return await self.on_teams_team_deleted(
+                        channel_data.team, turn_context
+                    )
+                if channel_data.event_type == "teamHardDeleted":
+                    return await self.on_teams_team_hard_deleted(
+                        channel_data.team, turn_context
+                    )
+                if channel_data.event_type == "channelRestored":
+                    return await self.on_teams_channel_restored(
+                        channel_data.channel, channel_data.team, turn_context
+                    )
                 if channel_data.event_type == "teamRenamed":
                     return await self.on_teams_team_renamed_activity(
+                        channel_data.team, turn_context
+                    )
+                if channel_data.event_type == "teamRestored":
+                    return await self.on_teams_team_restored(
+                        channel_data.team, turn_context
+                    )
+                if channel_data.event_type == "teamUnarchived":
+                    return await self.on_teams_team_unarchived(
                         channel_data.team, turn_context
                     )
 
@@ -334,11 +546,100 @@ class TeamsActivityHandler(ActivityHandler):
     async def on_teams_channel_created(  # pylint: disable=unused-argument
         self, channel_info: ChannelInfo, team_info: TeamInfo, turn_context: TurnContext
     ):
+        """
+        Invoked when a Channel Created event activity is received from the connector.
+        Channel Created correspond to the user creating a new channel.
+
+        :param channel_info: The channel info object which describes the channel.
+        :param team_info: The team info object representing the team.
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
+        return
+
+    async def on_teams_team_archived(  # pylint: disable=unused-argument
+        self, team_info: TeamInfo, turn_context: TurnContext
+    ):
+        """
+        Invoked when a Team Archived event activity is received from the connector.
+        Team Archived correspond to the user archiving a team.
+
+        :param team_info: The team info object representing the team.
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
+        return
+
+    async def on_teams_team_deleted(  # pylint: disable=unused-argument
+        self, team_info: TeamInfo, turn_context: TurnContext
+    ):
+        """
+        Invoked when a Team Deleted event activity is received from the connector.
+        Team Deleted corresponds to the user deleting a team.
+
+        :param team_info: The team info object representing the team.
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
+        return
+
+    async def on_teams_team_hard_deleted(  # pylint: disable=unused-argument
+        self, team_info: TeamInfo, turn_context: TurnContext
+    ):
+        """
+        Invoked when a Team Hard Deleted event activity is received from the connector.
+        Team Hard Deleted corresponds to the user hard deleting a team.
+
+        :param team_info: The team info object representing the team.
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
         return
 
     async def on_teams_team_renamed_activity(  # pylint: disable=unused-argument
         self, team_info: TeamInfo, turn_context: TurnContext
     ):
+        """
+        Invoked when a Team Renamed event activity is received from the connector.
+        Team Renamed correspond to the user renaming an existing team.
+
+        :param team_info: The team info object representing the team.
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
+        return
+
+    async def on_teams_team_restored(  # pylint: disable=unused-argument
+        self, team_info: TeamInfo, turn_context: TurnContext
+    ):
+        """
+        Invoked when a Team Restored event activity is received from the connector.
+        Team Restored corresponds to the user restoring a team.
+
+        :param team_info: The team info object representing the team.
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
+        return
+
+    async def on_teams_team_unarchived(  # pylint: disable=unused-argument
+        self, team_info: TeamInfo, turn_context: TurnContext
+    ):
+        """
+        Invoked when a Team Unarchived event activity is received from the connector.
+        Team Unarchived correspond to the user unarchiving a team.
+
+        :param team_info: The team info object representing the team.
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
         return
 
     async def on_teams_members_added_dispatch(  # pylint: disable=unused-argument
@@ -347,7 +648,18 @@ class TeamsActivityHandler(ActivityHandler):
         team_info: TeamInfo,
         turn_context: TurnContext,
     ):
+        """
+        Override this in a derived class to provide logic for when members other than the bot
+        join the channel, such as your bot's welcome logic.
+        It will get the associated members with the provided accounts.
 
+        :param members_added: A list of all the accounts added to the channel, as
+        described by the conversation update activity.
+        :param team_info: The team info object representing the team.
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
         team_members_added = []
         for member in members_added:
             is_bot = (
@@ -389,6 +701,17 @@ class TeamsActivityHandler(ActivityHandler):
         team_info: TeamInfo,
         turn_context: TurnContext,
     ):
+        """
+        Override this in a derived class to provide logic for when members other than the bot
+        join the channel, such as your bot's welcome logic.
+
+        :param teams_members_added: A list of all the members added to the channel, as
+        described by the conversation update activity.
+        :param team_info: The team info object representing the team.
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
         teams_members_added = [
             ChannelAccount().deserialize(member.serialize())
             for member in teams_members_added
@@ -403,6 +726,18 @@ class TeamsActivityHandler(ActivityHandler):
         team_info: TeamInfo,
         turn_context: TurnContext,
     ):
+        """
+        Override this in a derived class to provide logic for when members other than the bot
+        leave the channel, such as your bot's good-bye logic.
+        It will get the associated members with the provided accounts.
+
+        :param members_removed: A list of all the accounts removed from the channel, as
+        described by the conversation update activity.
+        :param team_info: The team info object representing the team.
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
         teams_members_removed = []
         for member in members_removed:
             new_account_json = member.serialize()
@@ -422,6 +757,17 @@ class TeamsActivityHandler(ActivityHandler):
         team_info: TeamInfo,
         turn_context: TurnContext,
     ):
+        """
+        Override this in a derived class to provide logic for when members other than the bot
+        leave the channel, such as your bot's good-bye logic.
+
+        :param teams_members_removed: A list of all the members removed from the channel, as
+        described by the conversation update activity.
+        :param team_info: The team info object representing the team.
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
         members_removed = [
             ChannelAccount().deserialize(member.serialize())
             for member in teams_members_removed
@@ -431,9 +777,44 @@ class TeamsActivityHandler(ActivityHandler):
     async def on_teams_channel_deleted(  # pylint: disable=unused-argument
         self, channel_info: ChannelInfo, team_info: TeamInfo, turn_context: TurnContext
     ):
+        """
+        Invoked when a Channel Deleted event activity is received from the connector.
+        Channel Deleted correspond to the user deleting an existing channel.
+
+        :param channel_info: The channel info object which describes the channel.
+        :param team_info: The team info object representing the team.
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
         return
 
     async def on_teams_channel_renamed(  # pylint: disable=unused-argument
         self, channel_info: ChannelInfo, team_info: TeamInfo, turn_context: TurnContext
     ):
+        """
+        Invoked when a Channel Renamed event activity is received from the connector.
+        Channel Renamed correspond to the user renaming an existing channel.
+
+        :param channel_info: The channel info object which describes the channel.
+        :param team_info: The team info object representing the team.
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
+        return
+
+    async def on_teams_channel_restored(  # pylint: disable=unused-argument
+        self, channel_info: ChannelInfo, team_info: TeamInfo, turn_context: TurnContext
+    ):
+        """
+        Invoked when a Channel Restored event activity is received from the connector.
+        Channel Restored correspond to the user restoring a previously deleted channel.
+
+        :param channel_info: The channel info object which describes the channel.
+        :param team_info: The team info object representing the team.
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
         return
