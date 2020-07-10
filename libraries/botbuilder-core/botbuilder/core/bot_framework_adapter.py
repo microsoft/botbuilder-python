@@ -1200,7 +1200,9 @@ class BotFrameworkAdapter(
         )
 
         state = base64.b64encode(
-            json.dumps(token_exchange_state.serialize()).encode(encoding="UTF-8", errors="strict")
+            json.dumps(token_exchange_state.serialize()).encode(
+                encoding="UTF-8", errors="strict"
+            )
         ).decode()
 
         client = await self._create_token_api_client(
