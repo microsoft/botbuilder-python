@@ -6,11 +6,38 @@
 # --------------------------------------------------------------------------
 
 from .about import __version__
+from .memory_interface import MemoryInterface
+from .extensions import Extensions
+from .expression_type import *
+from .return_type import ReturnType
+from .options import Options
+from .function_utils import FunctionUtils
+from .memory import SimpleObjectMemory
+from .expression_parser_interface import ExpresssionParserInterface
+from .expression_evaluator import ExpressionEvaluator, EvaluatorLookup, EvaluateExpressionDelegate, ValidateExpressionDelegate
+from .builtin_functions import Add
+from .expression_functions import ExpressionFunctions
+from .function_table import FunctionTable
 from .expression import Expression
-from .expression_evaluator import ExpressionEvaluator
+from .constant import Constant
+from .expression_parser import *
 
 __all__ = [
     "__version__",
+    "MemoryInterface",
+    "Constant",
     "Expression",
-    "ExpressionEvaluator"
+    "ExpressionEvaluator",
+    "EvaluatorLookup",
+    "EvaluateExpressionDelegate",
+    "ValidateExpressionDelegate",
+    "ExpressionFunctions",
+    "ExpresssionParserInterface",
+    "Extensions",
+    "FunctionTable",
+    "FunctionUtils",
+    "Options",
+    "ReturnType",
+    "ExpressionParser",
+    "SimpleObjectMemory"
 ]

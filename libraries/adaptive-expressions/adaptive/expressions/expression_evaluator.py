@@ -1,7 +1,7 @@
 from typing import NewType, Callable
-from memory.memory_interface import MemoryInterface
-from options import Options
-from return_type import ReturnType
+from .memory_interface import MemoryInterface
+from .options import Options
+from .return_type import ReturnType
 
 EvaluatorLookup = NewType('EvaluatorLookup', Callable[[str], object])
 

@@ -2,11 +2,11 @@
 from antlr4 import InputStream
 from antlr4 import CommonTokenStream
 from antlr4 import TerminalNode
-from expression_type import SUBTRACT, ADD, ACCESSOR, ELEMENT, CREATEARRAY, JSON, SETPROPERTY, CONCAT
-import expression as expr
-import expression_evaluator as expr_eval
-import expression_parser_interface as expr_parser_interface
-import constant as const
+from ..expression_type import SUBTRACT, ADD, ACCESSOR, ELEMENT, CREATEARRAY, JSON, SETPROPERTY, CONCAT
+from ..expression import Expression
+from ..expression_evaluator import EvaluatorLookup
+from ..expression_parser_interface import ExpresssionParserInterface
+from ..constant import Constant
 from .generated import expression_antlr_lexer
 from .generated import expression_antlr_parser as ep_parser
 from .generated import expression_antlr_parserVisitor
@@ -15,31 +15,31 @@ class ExpressionTransformer(expression_antlr_parserVisitor):
     #TODO: implement regex: escapeRegex = new RegExp(/\\[^\r\n]?/g)
     escape_regex = ''
 
-    lookup_function: expr_eval.EvaluatorLookup
+    lookup_function: EvaluatorLookup
 
-    def __init__(self, lookup: expr_eval.EvaluatorLookup):
+    def __init__(self, lookup: EvaluatorLookup):
         super().__init__()
         self.lookup_function = lookup
 
     def transform(self, ctx):
         return self.visit(ctx)
 
-    def visitUnaryOpExp(self, ctx: ep_parser.UnaryOpExpContext) -> expr.Expression:
+    def visitUnaryOpExp(self, ctx: ep_parser.UnaryOpExpContext) -> Expression:
         unary_operation_name = ctx.getChild(0).getText()
         operand = self.visit(ctx.expression())
         if unary_operation_name == SUBTRACT or unary_operation_name == ADD:
-            return self.make_expression(unary_operation_name, const.Constant(0), operand)
+            return self.make_expression(unary_operation_name, Constant(0), operand)
 
         return self.make_expression(unary_operation_name, operand)
 
-    def visitBinaryOpExp(self, ctx: ep_parser.BinaryOpExpContext) -> expr.Expression:
+    def visitBinaryOpExp(self, ctx: ep_parser.BinaryOpExpContext) -> Expression:
         binary_operation_name = ctx.getChild(1).getText()
         left = self.visit(ctx.expression(0))
         right = self.visit(ctx.expression(1))
 
         return self.make_expression(binary_operation_name, left, right)
 
-    def visitFuncInvokeExp(self, ctx: ep_parser.FuncInvokeExpContext) -> expr.Expression:
+    def visitFuncInvokeExp(self, ctx: ep_parser.FuncInvokeExpContext) -> Expression:
         parameters = self.process_args_list(ctx.argsList())
 
         #Remove the check to check primaryExpression is just an IDENTIFIER to support '.' in template name
@@ -50,44 +50,44 @@ class ExpressionTransformer(expression_antlr_parserVisitor):
 
         return self.make_expression(function_name, parameters)
 
-    def visitIdAtom(self, ctx: ep_parser.IdAtomContext) -> expr.Expression:
-        result: expr.Expression
+    def visitIdAtom(self, ctx: ep_parser.IdAtomContext) -> Expression:
+        result: Expression
         symbol = ctx.getText().lower()
         if symbol == 'false':
-            result = const.Constant(False)
+            result = Constant(False)
         elif symbol == 'true':
-            result = const.Constant(True)
+            result = Constant(True)
         elif symbol == 'none':
-            result = const.Constant(None)
+            result = Constant(None)
         else:
-            result = self.make_expression(ACCESSOR, const.Constant(symbol))
+            result = self.make_expression(ACCESSOR, Constant(symbol))
 
         return result
 
-    def visitIndexAccessExp(self, ctx: ep_parser.IndexAccessExpContext) -> expr.Expression:
+    def visitIndexAccessExp(self, ctx: ep_parser.IndexAccessExpContext) -> Expression:
         exp_property = self.visit(ctx.expression())
         instance = self.visit(ctx.primaryExpression())
 
         return self.make_expression(ELEMENT, instance, exp_property)
 
-    def visitMemberAccessExp(self, ctx: ep_parser.MemberAccessExpContext) -> expr.Expression:
+    def visitMemberAccessExp(self, ctx: ep_parser.MemberAccessExpContext) -> Expression:
         exp_property = ctx.IDENTIFIER().getText()
         instance = self.visit(ctx.primaryExpression())
 
-        return self.make_expression(ACCESSOR, const.Constant(exp_property), instance)
+        return self.make_expression(ACCESSOR, Constant(exp_property), instance)
 
-    def visitNumericAtom(self, ctx: ep_parser.NumericAtomContext) -> expr.Expression:
+    def visitNumericAtom(self, ctx: ep_parser.NumericAtomContext) -> Expression:
         try:
             number_value = float(ctx.getText())
 
-            return const.Constant(number_value)
+            return Constant(number_value)
         except:
             raise Exception(ctx.getText() + ' is not a number')
 
-    def visitParenthesisExp(self, ctx: ep_parser.ParenthesisExpContext) -> expr.Expression:
+    def visitParenthesisExp(self, ctx: ep_parser.ParenthesisExpContext) -> Expression:
         return self.visit(ctx.expression())
 
-    def visitArrayCreationExp(self, ctx: ep_parser.ArrayCreationExpContext) -> expr.Expression:
+    def visitArrayCreationExp(self, ctx: ep_parser.ArrayCreationExpContext) -> Expression:
         parameters = self.process_args_list(ctx.argsList())
 
         return self.make_expression(CREATEARRAY, parameters)
@@ -102,10 +102,10 @@ class ExpressionTransformer(expression_antlr_parserVisitor):
         else:
             raise Exception('Invalid string ' + text)
 
-        return const.Constant(self.eval_escape(text))
+        return Constant(self.eval_escape(text))
 
-    def visitJsonCreationExp(self, ctx: ep_parser.JsonCreationExpContext) -> expr.Expression:
-        exp = self.make_expression(JSON, const.Constant('{}'))
+    def visitJsonCreationExp(self, ctx: ep_parser.JsonCreationExpContext) -> Expression:
+        exp = self.make_expression(JSON, Constant('{}'))
         if ctx.keyValuePairList() is not None:
             for kv_pair in ctx.keyValuePairList().keyValuePair():
                 key = ''
@@ -116,34 +116,34 @@ class ExpressionTransformer(expression_antlr_parserVisitor):
                     else:
                         key = key_node.getText()[1:-1]
 
-                exp = self.make_expression(SETPROPERTY, exp, const.Constant(key), self.visit(kv_pair.expression()))
+                exp = self.make_expression(SETPROPERTY, exp, Constant(key), self.visit(kv_pair.expression()))
 
         return exp
 
-    def visitStringInterpolationAtom(self, ctx: ep_parser.StringInterpolationAtomContext) -> expr.Expression:
+    def visitStringInterpolationAtom(self, ctx: ep_parser.StringInterpolationAtomContext) -> Expression:
         children = []
         for node in ctx.stringInterpolation().children:
             if isinstance(node, TerminalNode):
                 node_type = node.symbol.type
                 if node_type == ep_parser.TEMPLATE:
                     expression_string = self.trim_expression(node.getText())
-                    children.append(expr.Expression.parse(expression_string, self.lookup_function))
+                    children.append(Expression.parse(expression_string, self.lookup_function))
                     break
                 elif node_type == ep_parser.ESCAPE_CHARACTER:
                     #TODO: align with js to replace ` and $
-                    children.append(const.Constant(self.eval_escape(node.getText())))
+                    children.append(Constant(self.eval_escape(node.getText())))
                 else:
                     break
             else:
                 text = self.eval_escape(node.getText())
-                children.append(const.Constant(text))
+                children.append(Constant(text))
 
         return self.make_expression(CONCAT, children)
 
-    def defaultResult(self) -> expr.Expression:
-        return const.Constant('')
+    def defaultResult(self) -> Expression:
+        return Constant('')
 
-    def make_expression(self, function_type: str, *children) -> expr.Expression:
+    def make_expression(self, function_type: str, *children) -> Expression:
         if len(children) > 0 and isinstance(children[0], list):
             children = children[0]
 
@@ -151,7 +151,7 @@ class ExpressionTransformer(expression_antlr_parserVisitor):
             raise Exception(function_type
                 + ' does not have an evaluator, it\'s not a built-in function or a custom function.')
 
-        return expr.Expression.make_expression(function_type, self.lookup_function(function_type), children)
+        return Expression.make_expression(function_type, self.lookup_function(function_type), children)
 
     def process_args_list(self, ctx: ep_parser.ArgsListContext):
         result = []
@@ -160,7 +160,7 @@ class ExpressionTransformer(expression_antlr_parserVisitor):
 
         for child in ctx.children:
             if isinstance(child, ep_parser.ExpLambdaContext):
-                eval_param = self.make_expression(ACCESSOR, const.Constant(child.IDENTIFIER().getText()))
+                eval_param = self.make_expression(ACCESSOR, Constant(child.IDENTIFIER().getText()))
                 eval_fun = self.visit(child.expression())
                 result.append(eval_param)
                 result.append(eval_fun)
@@ -192,13 +192,13 @@ class ExpressionTransformer(expression_antlr_parserVisitor):
         #TODO: eval escape use regex
         return text
 
-class ExpressionParser(expr_parser_interface.ExpresssionParserInterface):
-    evaluator_lookup: expr_eval.EvaluatorLookup
+class ExpressionParser(ExpresssionParserInterface):
+    evaluator_lookup: EvaluatorLookup
 
     expression_dict = {}
 
     def __init__(self, lookup=None):
-        self.evaluator_lookup = lookup if lookup is not None else expr.Expression.lookup
+        self.evaluator_lookup = lookup if lookup is not None else Expression.lookup
 
     @staticmethod
     def antlr_parse(expression: str):
@@ -223,6 +223,6 @@ class ExpressionParser(expr_parser_interface.ExpresssionParserInterface):
 
     def parse(self, expression: str) -> object:
         if not expression:
-            return const.Constant('')
+            return Constant('')
         else:
             return ExpressionTransformer(self.evaluator_lookup).transform(ExpressionParser.antlr_parse(expression))

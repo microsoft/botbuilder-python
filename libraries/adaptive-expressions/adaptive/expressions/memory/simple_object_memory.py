@@ -1,9 +1,9 @@
 import re
 import json
 
-from extensions import Extensions
-from function_utils import FunctionUtils
-from .memory_interface import MemoryInterface
+from ..memory_interface import MemoryInterface
+from ..extensions import Extensions
+from ..function_utils import FunctionUtils
 
 class SimpleObjectMemory(MemoryInterface):
     memory = None

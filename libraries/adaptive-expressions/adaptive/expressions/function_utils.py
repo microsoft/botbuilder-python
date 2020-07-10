@@ -1,8 +1,8 @@
 import numbers
 from typing import Callable, NewType
-from memory import MemoryInterface
-from options import Options
-from return_type import ReturnType
+from .memory_interface import MemoryInterface
+from .options import Options
+from .return_type import ReturnType
 
 VerifyExpression = NewType('VerifyExpression', Callable[[object, object, int], str])
 

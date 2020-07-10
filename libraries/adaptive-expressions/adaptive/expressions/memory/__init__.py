@@ -5,10 +5,8 @@
 # license information.
 # --------------------------------------------------------------------------
 
-from .memory_interface import MemoryInterface
 from .simple_object_memory import SimpleObjectMemory
 
 __all__ = [
-    "MemoryInterface",
     "SimpleObjectMemory"
 ]

@@ -1,19 +1,32 @@
-import unittest
+import aiounittest
 from adaptive.expressions import Expression
 
-class ExpressionParserTests(unittest.TestCase):
-    def test_add_valid(self):
+class ExpressionParserTests(aiounittest.AsyncTestCase):
+    def test_add(self):
         parsed = Expression.parse('1+1')
-        self.assertTrue(parsed is not None)
-        value, error = parsed.try_evaluate()
-        self.assertEqual(value, 2)
-        self.assertTrue(error is None)
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 2
+        assert error is None
+
+        parsed = Expression.parse('1+1+2')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 4
+        assert error is None
 
         parsed = Expression.parse('add(2, 3)')
-        self.assertTrue(parsed is not None)
-        value, error = parsed.try_evaluate()
-        self.assertEqual(value, 5)
-        self.assertTrue(error is None)
+        assert parsed is not None
 
-if __name__ == '__main__':
-    unittest.main()
+        value, error = parsed.try_evaluate({})
+        assert value == 5
+        assert error is None
+
+        parsed = Expression.parse('add(2, 3, 4)')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 9
+        assert error is None

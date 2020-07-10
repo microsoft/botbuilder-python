@@ -1,9 +1,9 @@
-import expression_evaluator as expr_eval
-import expression_functions as expr_functions
+from .expression_evaluator import ExpressionEvaluator
+from .expression_functions import ExpressionFunctions
 
 class FunctionTable:
-    def get(self, key: str) -> expr_eval.ExpressionEvaluator:
-        function = expr_functions.ExpressionFunctions.standard_functions.get(key)
+    def get(self, key: str) -> ExpressionEvaluator:
+        function = ExpressionFunctions.standard_functions.get(key)
         if function:
             return function
 

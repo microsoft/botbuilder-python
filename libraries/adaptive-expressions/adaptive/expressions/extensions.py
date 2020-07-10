@@ -1,4 +1,4 @@
-from memory import MemoryInterface
+from .memory_interface import MemoryInterface
 
 class Extensions:
     @staticmethod

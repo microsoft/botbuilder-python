@@ -1,5 +1,5 @@
-from expression_type import ADD
-from builtin_functions import Add
+from .expression_type import ADD
+from .builtin_functions.add import Add
 
 def get_standard_functions() -> dict:
     functions = []

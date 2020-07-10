@@ -1,19 +1,20 @@
 from typing import Callable
-import expression_evaluator as expr_eval
-from memory import MemoryInterface, SimpleObjectMemory
-from extensions import Extensions
-from options import Options
-from expression_type import AND, OR, ACCESSOR, ELEMENT, FOREACH, WHERE, SELECT, EQUAL, NOT, LAMBDA, SETPATHTOVALUE
-import function_table as func_table
-from return_type import ReturnType
+from .expression_evaluator import ExpressionEvaluator, EvaluateExpressionDelegate
+from .memory_interface import MemoryInterface
+from .memory.simple_object_memory import SimpleObjectMemory
+from .extensions import Extensions
+from .options import Options
+from .expression_type import AND, OR, ACCESSOR, ELEMENT, FOREACH, WHERE, SELECT, EQUAL, NOT, LAMBDA, SETPATHTOVALUE
+from .function_table import FunctionTable
+from .return_type import ReturnType
 
 class Expression():
-    evaluator: expr_eval.ExpressionEvaluator
+    evaluator: ExpressionEvaluator
     children = []
     functions = {}
-    functions = func_table.FunctionTable()
+    functions = FunctionTable()
 
-    def __init__(self, expr_type: str, evaluator: expr_eval.ExpressionEvaluator, children=None):
+    def __init__(self, expr_type: str, evaluator: ExpressionEvaluator, children=None):
         if evaluator is not None:
             self.evaluator = evaluator
             self.children = children if children is not None else []
@@ -134,12 +135,12 @@ class Expression():
 
     @staticmethod
     def parse(expression: str, lookup=None):
-        import expression_parser as expr_parser
+        from .expression_parser import ExpressionParser
         
-        return expr_parser.ExpressionParser(lookup if lookup is not None else Expression.lookup).parse(expression)
+        return ExpressionParser(lookup if lookup is not None else Expression.lookup).parse(expression)
 
     @staticmethod
-    def lookup(function_name: str) -> expr_eval.ExpressionEvaluator:
+    def lookup(function_name: str) -> ExpressionEvaluator:
         expr_evaluator = Expression.functions.get(function_name)
         if expr_evaluator is None:
             return None
@@ -147,15 +148,15 @@ class Expression():
         return expr_evaluator
 
     @staticmethod
-    def make_expression(exp_type: str, evaluator: expr_eval.ExpressionEvaluator, children: list):
+    def make_expression(exp_type: str, evaluator: ExpressionEvaluator, children: list):
         expr = Expression(exp_type, evaluator, children)
         expr.validate()
 
         return expr
 
     @staticmethod
-    def lambda_expression(func: expr_eval.EvaluateExpressionDelegate):
-        return Expression(LAMBDA, expr_eval.ExpressionEvaluator(LAMBDA, func))
+    def lambda_expression(func: EvaluateExpressionDelegate):
+        return Expression(LAMBDA, ExpressionEvaluator(LAMBDA, func))
 
     #TODO: lamda function
 
