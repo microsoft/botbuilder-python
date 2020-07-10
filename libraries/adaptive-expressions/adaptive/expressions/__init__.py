@@ -7,8 +7,10 @@
 
 from .about import __version__
 from .expression import Expression
+from .expression_evaluator import ExpressionEvaluator
 
 __all__ = [
     "__version__",
-    "Expression"
+    "Expression",
+    "ExpressionEvaluator"
 ]

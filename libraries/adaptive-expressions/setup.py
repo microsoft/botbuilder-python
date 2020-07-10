@@ -30,6 +30,11 @@ setup(
     long_description_content_type="text/x-rst",
     license=package_info["__license__"],
     packages=[
+        "adaptive.expressions",
+        "adaptive.expressions.expression_parser",
+        "adaptive.expressions.expression_parser.generated"
+        "adaptive.expressions.memory",
+        "adaptive.expressions.builtin_functions"
     ],
     install_requires=REQUIRES + TEST_REQUIRES,
     tests_require=TEST_REQUIRES,
