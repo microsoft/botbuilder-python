@@ -79,6 +79,7 @@ pip install -e ./libraries/botbuilder-dialogs
 pip install -e ./libraries/botbuilder-azure
 pip install -e ./libraries/botbuilder-adapters-slack
 pip install -e ./libraries/botbuilder-testing
+pip install -e ./libraries/adaptive-expressions
 ```
 
 ### Running unit tests
