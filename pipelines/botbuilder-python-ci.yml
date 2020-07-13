@@ -9,6 +9,7 @@ variables:
   python.36: 3.6.x
   python.37: 3.7.x
   python.38: 3.8.x
+
   # PythonCoverallsToken: get this from Azure
 
 jobs:
