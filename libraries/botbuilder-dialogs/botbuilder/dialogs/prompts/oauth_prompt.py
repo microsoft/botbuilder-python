@@ -362,7 +362,7 @@ class OAuthPrompt(Dialog):
                 ):
                     if context.activity.channel_id == Channels.emulator:
                         card_action_type = ActionTypes.open_url
-                elif not _channel_requires_sign_in_link(context.activity.channel_id):
+                elif not OAuthPrompt._channel_requires_sign_in_link(context.activity.channel_id):
                     link = None
 
                 json_token_ex_resource = (
