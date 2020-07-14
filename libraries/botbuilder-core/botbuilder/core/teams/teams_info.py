@@ -22,8 +22,8 @@ class TeamsInfo:
     ) -> Tuple[ConversationReference, str]:
         if not turn_context:
             raise ValueError("The turn_context cannot be None")
-        if not turn_context.activity:
-            raise ValueError("The turn_context.activity cannot be None")
+        if not activity:
+            raise ValueError("The activity cannot be None")
         if not teams_channel_id:
             raise ValueError("The teams_channel_id cannot be None or empty")
 
