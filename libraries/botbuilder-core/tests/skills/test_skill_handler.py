@@ -238,6 +238,42 @@ class TestSkillHandler(aiounittest.AsyncTestCase):
         )
         assert activity.caller_id is None
 
+    async def test_forwarding_on_send_to_conversation(self):
+        self._conversation_id = await self._test_id_factory.create_skill_conversation_id(
+            self._conversation_reference
+        )
+
+        resource_response_id = "rId"
+
+        async def side_effect(
+            *arg_list, **args_dict
+        ):  # pylint: disable=unused-argument
+            fake_context = Mock()
+            fake_context.turn_state = {}
+            fake_context.send_activity = MagicMock(return_value=Future())
+            fake_context.send_activity.return_value.set_result(
+                ResourceResponse(id=resource_response_id)
+            )
+            await arg_list[1](fake_context)
+
+        mock_adapter = Mock()
+        mock_adapter.continue_conversation = side_effect
+        mock_adapter.send_activities = MagicMock(return_value=Future())
+        mock_adapter.send_activities.return_value.set_result([])
+
+        sut = self.create_skill_handler_for_testing(mock_adapter)
+
+        activity = Activity(type=ActivityTypes.message, attachments=[], entities=[])
+        TurnContext.apply_conversation_reference(activity, self._conversation_reference)
+
+        assert not activity.caller_id
+
+        response = await sut.test_on_send_to_conversation(
+            self._claims_identity, self._conversation_id, activity
+        )
+
+        assert response.id is resource_response_id
+
     async def test_on_reply_to_activity(self):
         self._conversation_id = await self._test_id_factory.create_skill_conversation_id(
             self._conversation_reference
