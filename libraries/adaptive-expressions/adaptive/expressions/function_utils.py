@@ -34,7 +34,7 @@ class FunctionUtils:
                     raise Exception("return type validation failed.")
 
     @staticmethod
-    def verify_number_or_string_or_null(value: object, expression: object, number: int):
+    def verify_number_or_string_or_null(value: object, expression: object):
         error: str = None
         if not isinstance(value, numbers.Number) and not isinstance(value, str):
             error = expression + " is not string or number"
@@ -108,7 +108,7 @@ class FunctionUtils:
                 break
 
             if verify:
-                error = verify(value, child, pos)
+                error = verify(value, child)
 
             if error:
                 break
@@ -127,7 +127,7 @@ class FunctionUtils:
             return value, error
 
         if isinstance(instance, list):
-            if index >= 0 and index < len(instance):
+            if 0 <= index < len(instance):
                 value = instance[index]
             else:
                 error = str(index) + " is out of range for " + instance

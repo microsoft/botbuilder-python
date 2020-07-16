@@ -36,7 +36,7 @@ class ExpressionTransformer(expression_antlr_parserVisitor):
     def visitUnaryOpExp(self, ctx: ep_parser.UnaryOpExpContext) -> Expression:
         unary_operation_name = ctx.getChild(0).getText()
         operand = self.visit(ctx.expression())
-        if unary_operation_name == SUBTRACT or unary_operation_name == ADD:
+        if unary_operation_name in (SUBTRACT, ADD):
             return self.make_expression(unary_operation_name, Constant(0), operand)
 
         return self.make_expression(unary_operation_name, operand)
@@ -146,7 +146,8 @@ class ExpressionTransformer(expression_antlr_parserVisitor):
                         Expression.parse(expression_string, self.lookup_function)
                     )
                     break
-                elif node_type == ep_parser.ESCAPE_CHARACTER:
+
+                if node_type == ep_parser.ESCAPE_CHARACTER:
                     # TODO: align with js to replace ` and $
                     children.append(Constant(self.eval_escape(node.getText())))
                 else:
@@ -205,8 +206,6 @@ class ExpressionTransformer(expression_antlr_parserVisitor):
         return result.strip()
 
     def eval_escape(self, text: str) -> str:
-        valid_characters_dict = {"\\r": "\r", "\\n": "\n", "\\t": "\t", "\\\\": "\\"}
-
         # TODO: eval escape use regex
         return text
 
@@ -243,7 +242,7 @@ class ExpressionParser(ExpresssionParserInterface):
     def parse(self, expression: str) -> object:
         if not expression:
             return Constant("")
-        else:
-            return ExpressionTransformer(self.evaluator_lookup).transform(
-                ExpressionParser.antlr_parse(expression)
-            )
+
+        return ExpressionTransformer(self.evaluator_lookup).transform(
+            ExpressionParser.antlr_parse(expression)
+        )

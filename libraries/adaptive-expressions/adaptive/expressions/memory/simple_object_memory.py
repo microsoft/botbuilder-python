@@ -109,7 +109,7 @@ class SimpleObjectMemory(MemoryInterface):
             if error is not None:
                 return
         else:
-            error = FunctionUtils.set_property(cur_scope, parts[-1], input).error
+            value, error = FunctionUtils.set_property(cur_scope, parts[-1], input)
             if error is not None:
                 return
 

@@ -20,7 +20,7 @@ from .expression_type import (
 from .function_table import FunctionTable
 from .return_type import ReturnType
 
-
+# pylint: disable=import-outside-toplevel
 class Expression:
     evaluator: ExpressionEvaluator
     children = []
@@ -84,6 +84,7 @@ class Expression:
 
         return list(refs)
 
+    # pylint: disable=too-many-statements
     def reference_walk(
         self, expression: object, extension: Callable[[object], bool] = None
     ):

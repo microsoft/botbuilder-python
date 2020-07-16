@@ -25,7 +25,7 @@ from .expression_functions import ExpressionFunctions
 from .function_table import FunctionTable
 from .expression import Expression
 from .constant import Constant
-from .expression_parser import *
+from .expression_parser import ExpressionParser
 
 __all__ = [
     "__version__",
