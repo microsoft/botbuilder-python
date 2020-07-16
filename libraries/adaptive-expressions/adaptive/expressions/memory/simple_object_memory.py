@@ -5,8 +5,10 @@ from ..memory_interface import MemoryInterface
 from ..extensions import Extensions
 from ..function_utils import FunctionUtils
 
+
 class SimpleObjectMemory(MemoryInterface):
     memory = None
+
     def __init__(self, memory: object):
         self.memory = memory
 
@@ -21,9 +23,18 @@ class SimpleObjectMemory(MemoryInterface):
         if self.memory is None or len(path) == 0:
             return None
 
-        parts = re.findall(r'\[([^[\]]*)\]', path)
-        parts = list(map(lambda x: x[1:-1]
-            if x.startswith('"') and x.endswith('"') or x.startswith('\'') and x.endswith('\'') else x, parts))
+        parts = re.findall(r"\[([^[\]]*)\]", path)
+        parts = list(
+            map(
+                lambda x: x[1:-1]
+                if x.startswith('"')
+                and x.endswith('"')
+                or x.startswith("'")
+                and x.endswith("'")
+                else x,
+                parts,
+            )
+        )
         parts = list(filter(lambda x: (x is not None and x), parts))
 
         value = None
@@ -32,7 +43,7 @@ class SimpleObjectMemory(MemoryInterface):
         for part in parts:
             error: str
             is_int = self.is_int(part)
-            if (is_int and isinstance(cur_scope, list)):
+            if is_int and isinstance(cur_scope, list):
                 idx = int(part)
                 value, error = FunctionUtils.access_index(cur_scope, idx)
             else:
@@ -49,9 +60,18 @@ class SimpleObjectMemory(MemoryInterface):
         if self.memory is None:
             return
 
-        parts = re.findall(r'\[([^[\]]*)\]', path)
-        parts = list(map(lambda x: x[1:-1]
-            if x.startswith('"') and x.endswith('"') or x.startswith('\'') and x.endswith('\'') else x, parts))
+        parts = re.findall(r"\[([^[\]]*)\]", path)
+        parts = list(
+            map(
+                lambda x: x[1:-1]
+                if x.startswith('"')
+                and x.endswith('"')
+                or x.startswith("'")
+                and x.endswith("'")
+                else x,
+                parts,
+            )
+        )
         parts = list(filter(lambda x: (x is not None and x), parts))
 
         cur_scope = self.memory
@@ -78,13 +98,13 @@ class SimpleObjectMemory(MemoryInterface):
             idx = int(parts[-1])
             if isinstance(cur_scope, list):
                 if idx > len(cur_scope):
-                    error = parts[-1] + ' index out of range'
+                    error = parts[-1] + " index out of range"
                 elif idx == len(cur_scope):
                     cur_scope.append(input)
                 else:
                     cur_scope[idx] = input
             else:
-                error = 'set value for an index to a non-list object'
+                error = "set value for an index to a non-list object"
 
             if error is not None:
                 return

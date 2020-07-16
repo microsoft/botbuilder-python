@@ -4,13 +4,18 @@ from .expression_evaluator import ExpressionEvaluator
 from .expression_type import CONSTANT
 from .return_type import ReturnType
 
+
 class Constant(Expression):
     _value = None
 
     def __init__(self, value):
         error = None
-        super().__init__(CONSTANT,
-            ExpressionEvaluator(CONSTANT, lambda expression, state, _: (expression.get_value(), error)))
+        super().__init__(
+            CONSTANT,
+            ExpressionEvaluator(
+                CONSTANT, lambda expression, state, _: (expression.get_value(), error)
+            ),
+        )
         self.set_value(value)
 
     def get_value(self):
@@ -32,7 +37,7 @@ class Constant(Expression):
 
     def deep_equals(self, other: Expression) -> bool:
         equal: bool
-        if (other is not None and other.expr_type != self.expr_type):
+        if other is not None and other.expr_type != self.expr_type:
             equal = False
         else:
             other_val = Constant(other).get_value()
@@ -40,5 +45,5 @@ class Constant(Expression):
 
         return equal
 
-    #TODO: toString
-    #TODO: reverseString
+    # TODO: toString
+    # TODO: reverseString

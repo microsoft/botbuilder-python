@@ -4,11 +4,24 @@ from .memory_interface import MemoryInterface
 from .memory.simple_object_memory import SimpleObjectMemory
 from .extensions import Extensions
 from .options import Options
-from .expression_type import AND, OR, ACCESSOR, ELEMENT, FOREACH, WHERE, SELECT, EQUAL, NOT, LAMBDA, SETPATHTOVALUE
+from .expression_type import (
+    AND,
+    OR,
+    ACCESSOR,
+    ELEMENT,
+    FOREACH,
+    WHERE,
+    SELECT,
+    EQUAL,
+    NOT,
+    LAMBDA,
+    SETPATHTOVALUE,
+)
 from .function_table import FunctionTable
 from .return_type import ReturnType
 
-class Expression():
+
+class Expression:
     evaluator: ExpressionEvaluator
     children = []
     functions = {}
@@ -20,8 +33,10 @@ class Expression():
             self.children = children if children is not None else []
         elif expr_type is not None:
             if self.functions.get(expr_type) is None:
-                raise Exception(expr_type
-                                + ' does not have an evaluator, it\'s not a built-in function or a custom function.')
+                raise Exception(
+                    expr_type
+                    + " does not have an evaluator, it's not a built-in function or a custom function."
+                )
 
             self.evaluator = self.functions.get(expr_type)
             self.children = children if children is not None else []
@@ -57,8 +72,7 @@ class Expression():
         else:
             index = 0
             while equal and index < len(self.children):
-                equal = self.children[index].deep_equals(
-                    other.children[index])
+                equal = self.children[index].deep_equals(other.children[index])
                 index = index + 1
 
         return equal
@@ -70,7 +84,9 @@ class Expression():
 
         return list(refs)
 
-    def reference_walk(self, expression: object, extension: Callable[[object], bool] = None):
+    def reference_walk(
+        self, expression: object, extension: Callable[[object], bool] = None
+    ):
         import constant as const
 
         path: str
@@ -86,16 +102,16 @@ class Expression():
                 if len(children) == 2:
                     path, refs = self.reference_walk(children[1], extension)
                     if path is not None:
-                        path = path + '.' + prop
+                        path = path + "." + prop
             elif expression.expr_type == ELEMENT:
                 path, refs = self.reference_walk(children[0], extension)
                 if path is not None:
                     if isinstance(children[1], const.Constant):
                         cnst = const.Constant(children[1])
                         if cnst.return_type == ReturnType.String:
-                            path += '.' + cnst.get_value()
+                            path += "." + cnst.get_value()
                         else:
-                            path += '[' + cnst.get_value + ']'
+                            path += "[" + cnst.get_value + "]"
                     else:
                         refs.add(path)
 
@@ -105,7 +121,11 @@ class Expression():
                 refs = refs.union(refs1)
                 if idx_path is not None:
                     refs.add(idx_path)
-            elif expression.expr_type == FOREACH or expression.expr_type == WHERE or expression.expr_type == SELECT:
+            elif (
+                expression.expr_type == FOREACH
+                or expression.expr_type == WHERE
+                or expression.expr_type == SELECT
+            ):
                 result = self.reference_walk(children[0], extension)
                 child0_path = result[0]
                 refs0 = result[1]
@@ -119,8 +139,16 @@ class Expression():
                     refs2.add(child2_path)
 
                 iterator_name = str(const.Constant(children[1].children[0]).get_value())
-                non_local_refs = list(filter(lambda x: (x == iterator_name or x.startswith(iterator_name + '.')
-                    or x.startswith(iterator_name + '[')), refs2))
+                non_local_refs = list(
+                    filter(
+                        lambda x: (
+                            x == iterator_name
+                            or x.startswith(iterator_name + ".")
+                            or x.startswith(iterator_name + "[")
+                        ),
+                        refs2,
+                    )
+                )
                 refs = refs.union(refs0, non_local_refs)
             else:
                 for child in expression.children:
@@ -136,8 +164,10 @@ class Expression():
     @staticmethod
     def parse(expression: str, lookup=None):
         from .expression_parser import ExpressionParser
-        
-        return ExpressionParser(lookup if lookup is not None else Expression.lookup).parse(expression)
+
+        return ExpressionParser(
+            lookup if lookup is not None else Expression.lookup
+        ).parse(expression)
 
     @staticmethod
     def lookup(function_name: str) -> ExpressionEvaluator:
@@ -158,7 +188,7 @@ class Expression():
     def lambda_expression(func: EvaluateExpressionDelegate):
         return Expression(LAMBDA, ExpressionEvaluator(LAMBDA, func))
 
-    #TODO: lamda function
+    # TODO: lamda function
 
     @staticmethod
     def set_path_to_value(property: object, value: object):
@@ -167,7 +197,9 @@ class Expression():
         if isinstance(value, Expression):
             return Expression.make_expression(SETPATHTOVALUE, None, property, value)
 
-        return Expression.make_expression(SETPATHTOVALUE, None, property, const.Constant(value))
+        return Expression.make_expression(
+            SETPATHTOVALUE, None, property, const.Constant(value)
+        )
 
     @staticmethod
     def equals_expression(children: list):
@@ -208,4 +240,4 @@ class Expression():
 
         return self.evaluator.try_evaluate(self, state, options)
 
-    #TODO: toString
+    # TODO: toString

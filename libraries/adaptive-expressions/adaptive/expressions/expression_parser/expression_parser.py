@@ -1,8 +1,16 @@
-
 from antlr4 import InputStream
 from antlr4 import CommonTokenStream
 from antlr4 import TerminalNode
-from ..expression_type import SUBTRACT, ADD, ACCESSOR, ELEMENT, CREATEARRAY, JSON, SETPROPERTY, CONCAT
+from ..expression_type import (
+    SUBTRACT,
+    ADD,
+    ACCESSOR,
+    ELEMENT,
+    CREATEARRAY,
+    JSON,
+    SETPROPERTY,
+    CONCAT,
+)
 from ..expression import Expression
 from ..expression_evaluator import EvaluatorLookup
 from ..expression_parser_interface import ExpresssionParserInterface
@@ -11,9 +19,10 @@ from .generated import expression_antlr_lexer
 from .generated import expression_antlr_parser as ep_parser
 from .generated import expression_antlr_parserVisitor
 
+
 class ExpressionTransformer(expression_antlr_parserVisitor):
-    #TODO: implement regex: escapeRegex = new RegExp(/\\[^\r\n]?/g)
-    escape_regex = ''
+    # TODO: implement regex: escapeRegex = new RegExp(/\\[^\r\n]?/g)
+    escape_regex = ""
 
     lookup_function: EvaluatorLookup
 
@@ -42,7 +51,7 @@ class ExpressionTransformer(expression_antlr_parserVisitor):
     def visitFuncInvokeExp(self, ctx: ep_parser.FuncInvokeExpContext) -> Expression:
         parameters = self.process_args_list(ctx.argsList())
 
-        #Remove the check to check primaryExpression is just an IDENTIFIER to support '.' in template name
+        # Remove the check to check primaryExpression is just an IDENTIFIER to support '.' in template name
         function_name = ctx.primaryExpression().getText()
 
         if ctx.NON() is not None:
@@ -53,11 +62,11 @@ class ExpressionTransformer(expression_antlr_parserVisitor):
     def visitIdAtom(self, ctx: ep_parser.IdAtomContext) -> Expression:
         result: Expression
         symbol = ctx.getText().lower()
-        if symbol == 'false':
+        if symbol == "false":
             result = Constant(False)
-        elif symbol == 'true':
+        elif symbol == "true":
             result = Constant(True)
-        elif symbol == 'none':
+        elif symbol == "none":
             result = Constant(None)
         else:
             result = self.make_expression(ACCESSOR, Constant(symbol))
@@ -82,33 +91,35 @@ class ExpressionTransformer(expression_antlr_parserVisitor):
 
             return Constant(number_value)
         except:
-            raise Exception(ctx.getText() + ' is not a number')
+            raise Exception(ctx.getText() + " is not a number")
 
     def visitParenthesisExp(self, ctx: ep_parser.ParenthesisExpContext) -> Expression:
         return self.visit(ctx.expression())
 
-    def visitArrayCreationExp(self, ctx: ep_parser.ArrayCreationExpContext) -> Expression:
+    def visitArrayCreationExp(
+        self, ctx: ep_parser.ArrayCreationExpContext
+    ) -> Expression:
         parameters = self.process_args_list(ctx.argsList())
 
         return self.make_expression(CREATEARRAY, parameters)
 
     def visitStringAtom(self, ctx: ep_parser.StringAtomContext):
         text = ctx.getText()
-        if text.startswith('\'') and text.endswith('\''):
-            #TODO: need to align with js to replace sth
+        if text.startswith("'") and text.endswith("'"):
+            # TODO: need to align with js to replace sth
             text = text[1:-1]
         elif text.startswith('"') and text.endswith('"'):
             text = text[1:-1]
         else:
-            raise Exception('Invalid string ' + text)
+            raise Exception("Invalid string " + text)
 
         return Constant(self.eval_escape(text))
 
     def visitJsonCreationExp(self, ctx: ep_parser.JsonCreationExpContext) -> Expression:
-        exp = self.make_expression(JSON, Constant('{}'))
+        exp = self.make_expression(JSON, Constant("{}"))
         if ctx.keyValuePairList() is not None:
             for kv_pair in ctx.keyValuePairList().keyValuePair():
-                key = ''
+                key = ""
                 key_node = kv_pair.key().getChild(0)
                 if isinstance(key_node, TerminalNode):
                     if key_node.symbol.type == ep_parser.IDENTIFIER:
@@ -116,21 +127,27 @@ class ExpressionTransformer(expression_antlr_parserVisitor):
                     else:
                         key = key_node.getText()[1:-1]
 
-                exp = self.make_expression(SETPROPERTY, exp, Constant(key), self.visit(kv_pair.expression()))
+                exp = self.make_expression(
+                    SETPROPERTY, exp, Constant(key), self.visit(kv_pair.expression())
+                )
 
         return exp
 
-    def visitStringInterpolationAtom(self, ctx: ep_parser.StringInterpolationAtomContext) -> Expression:
+    def visitStringInterpolationAtom(
+        self, ctx: ep_parser.StringInterpolationAtomContext
+    ) -> Expression:
         children = []
         for node in ctx.stringInterpolation().children:
             if isinstance(node, TerminalNode):
                 node_type = node.symbol.type
                 if node_type == ep_parser.TEMPLATE:
                     expression_string = self.trim_expression(node.getText())
-                    children.append(Expression.parse(expression_string, self.lookup_function))
+                    children.append(
+                        Expression.parse(expression_string, self.lookup_function)
+                    )
                     break
                 elif node_type == ep_parser.ESCAPE_CHARACTER:
-                    #TODO: align with js to replace ` and $
+                    # TODO: align with js to replace ` and $
                     children.append(Constant(self.eval_escape(node.getText())))
                 else:
                     break
@@ -141,17 +158,21 @@ class ExpressionTransformer(expression_antlr_parserVisitor):
         return self.make_expression(CONCAT, children)
 
     def defaultResult(self) -> Expression:
-        return Constant('')
+        return Constant("")
 
     def make_expression(self, function_type: str, *children) -> Expression:
         if len(children) > 0 and isinstance(children[0], list):
             children = children[0]
 
         if self.lookup_function(function_type) is None:
-            raise Exception(function_type
-                + ' does not have an evaluator, it\'s not a built-in function or a custom function.')
+            raise Exception(
+                function_type
+                + " does not have an evaluator, it's not a built-in function or a custom function."
+            )
 
-        return Expression.make_expression(function_type, self.lookup_function(function_type), children)
+        return Expression.make_expression(
+            function_type, self.lookup_function(function_type), children
+        )
 
     def process_args_list(self, ctx: ep_parser.ArgsListContext):
         result = []
@@ -160,7 +181,9 @@ class ExpressionTransformer(expression_antlr_parserVisitor):
 
         for child in ctx.children:
             if isinstance(child, ep_parser.ExpLambdaContext):
-                eval_param = self.make_expression(ACCESSOR, Constant(child.IDENTIFIER().getText()))
+                eval_param = self.make_expression(
+                    ACCESSOR, Constant(child.IDENTIFIER().getText())
+                )
                 eval_fun = self.visit(child.expression())
                 result.append(eval_param)
                 result.append(eval_fun)
@@ -171,26 +194,22 @@ class ExpressionTransformer(expression_antlr_parserVisitor):
 
     def trim_expression(self, expression: str) -> str:
         result = expression.strip()
-        if result.startswith('$'):
+        if result.startswith("$"):
             result = result[1:]
 
         result = result.strip()
 
-        if result.startswith('{') and result.endswith('}'):
+        if result.startswith("{") and result.endswith("}"):
             result = result[1, -1]
 
         return result.strip()
 
     def eval_escape(self, text: str) -> str:
-        valid_characters_dict = {
-            '\\r': '\r',
-            '\\n': '\n',
-            '\\t': '\t',
-            '\\\\': '\\'
-        }
+        valid_characters_dict = {"\\r": "\r", "\\n": "\n", "\\t": "\t", "\\\\": "\\"}
 
-        #TODO: eval escape use regex
+        # TODO: eval escape use regex
         return text
+
 
 class ExpressionParser(ExpresssionParserInterface):
     evaluator_lookup: EvaluatorLookup
@@ -210,7 +229,7 @@ class ExpressionParser(ExpresssionParserInterface):
         token_stream = CommonTokenStream(lexer)
         parser = ep_parser(token_stream)
 
-        #TODO: add error listener
+        # TODO: add error listener
         parser.buildParseTrees = True
         exp = parser.exp()
         expression_context = None
@@ -223,6 +242,8 @@ class ExpressionParser(ExpresssionParserInterface):
 
     def parse(self, expression: str) -> object:
         if not expression:
-            return Constant('')
+            return Constant("")
         else:
-            return ExpressionTransformer(self.evaluator_lookup).transform(ExpressionParser.antlr_parse(expression))
+            return ExpressionTransformer(self.evaluator_lookup).transform(
+                ExpressionParser.antlr_parse(expression)
+            )

@@ -1,33 +1,33 @@
 "Math"
-ADD = '+'
-SUBTRACT = '-'
+ADD = "+"
+SUBTRACT = "-"
 
 "Comparisons"
-EQUAL = 'Equal'
+EQUAL = "Equal"
 
 "Logic"
-AND = '&&'
-OR = '||'
-NOT = '!'
+AND = "&&"
+OR = "||"
+NOT = "!"
 
 "String"
-CONCAT = 'concat'
+CONCAT = "concat"
 
 "Memory"
-ACCESSOR = 'Accessor'
-ELEMENT = 'Element'
-CREATEARRAY = 'CreateArray'
+ACCESSOR = "Accessor"
+ELEMENT = "Element"
+CREATEARRAY = "CreateArray"
 
 "Collection"
-FOREACH = 'foreach'
-WHERE = 'where'
-SELECT = 'select'
+FOREACH = "foreach"
+WHERE = "where"
+SELECT = "select"
 
 "Misc"
-CONSTANT = 'Constant'
-LAMBDA = 'Lambda'
+CONSTANT = "Constant"
+LAMBDA = "Lambda"
 
 "Object manipulation and construction functions"
-JSON = 'json'
-SETPROPERTY = 'setProperty'
-SETPATHTOVALUE = 'setPathToValue'
+JSON = "json"
+SETPROPERTY = "setProperty"
+SETPATHTOVALUE = "setPathToValue"

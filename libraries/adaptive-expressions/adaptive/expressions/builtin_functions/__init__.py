@@ -1,5 +1,3 @@
 from .add import Add
 
-__all__ = [
-    "Add"
-]
+__all__ = ["Add"]

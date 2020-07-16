@@ -4,9 +4,7 @@
 import os
 from setuptools import setup
 
-REQUIRES = [
-    "antlr4-python3-runtime==4.8.0"
-]
+REQUIRES = ["antlr4-python3-runtime==4.8.0"]
 
 TEST_REQUIRES = ["aiounittest==1.3.0"]
 
@@ -35,7 +33,7 @@ setup(
         "adaptive.expressions.expression_parser",
         "adaptive.expressions.expression_parser.generated",
         "adaptive.expressions.memory",
-        "adaptive.expressions.builtin_functions"
+        "adaptive.expressions.builtin_functions",
     ],
     install_requires=REQUIRES + TEST_REQUIRES,
     tests_require=TEST_REQUIRES,

@@ -1,6 +1,7 @@
 from .expression_type import ADD
 from .builtin_functions.add import Add
 
+
 def get_standard_functions() -> dict:
     functions = []
     functions.append(Add())
@@ -12,6 +13,7 @@ def get_standard_functions() -> dict:
     lookup["add"] = lookup[ADD]
 
     return lookup
+
 
 class ExpressionFunctions:
     standard_functions = staticmethod(get_standard_functions())

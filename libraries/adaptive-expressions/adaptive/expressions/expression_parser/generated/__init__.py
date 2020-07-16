@@ -14,5 +14,5 @@ __all__ = [
     "expression_antlr_lexer",
     "expression_antlr_parser",
     "expression_antlr_parserListener",
-    "expression_antlr_parserVisitor"
+    "expression_antlr_parserVisitor",
 ]

@@ -14,7 +14,12 @@ from .options import Options
 from .function_utils import FunctionUtils
 from .memory import SimpleObjectMemory
 from .expression_parser_interface import ExpresssionParserInterface
-from .expression_evaluator import ExpressionEvaluator, EvaluatorLookup, EvaluateExpressionDelegate, ValidateExpressionDelegate
+from .expression_evaluator import (
+    ExpressionEvaluator,
+    EvaluatorLookup,
+    EvaluateExpressionDelegate,
+    ValidateExpressionDelegate,
+)
 from .builtin_functions import Add
 from .expression_functions import ExpressionFunctions
 from .function_table import FunctionTable
@@ -39,5 +44,5 @@ __all__ = [
     "Options",
     "ReturnType",
     "ExpressionParser",
-    "SimpleObjectMemory"
+    "SimpleObjectMemory",
 ]
