@@ -1,6 +1,8 @@
 "Math"
 ADD = "+"
 SUBTRACT = "-"
+MULTIPLY = "*"
+DIVIDE = "/"
 
 "Comparisons"
 EQUAL = "Equal"

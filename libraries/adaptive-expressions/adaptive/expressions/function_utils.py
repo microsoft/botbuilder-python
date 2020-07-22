@@ -1,4 +1,5 @@
 import numbers
+import sys
 from typing import Callable, NewType
 from .memory_interface import MemoryInterface
 from .options import Options
@@ -34,10 +35,26 @@ class FunctionUtils:
                     raise Exception("return type validation failed.")
 
     @staticmethod
-    def verify_number_or_string_or_null(value: object, expression: object):
+    def validate_two_or_more_than_two_numbers(expression: object):
+        FunctionUtils.validate_arity_and_any_type(
+            expression, 2, sys.maxsize, ReturnType.Number
+        )
+
+    @staticmethod
+    # pylint: disable=unused-argument
+    def verify_number_or_string_or_null(value: object, expression: object, number: int):
         error: str = None
         if not isinstance(value, numbers.Number) and not isinstance(value, str):
             error = expression + " is not string or number"
+
+        return error
+
+    @staticmethod
+    # pylint: disable=unused-argument
+    def verify_numbers(value: object, expression: object, pos: int):
+        error: str = None
+        if not isinstance(value, numbers.Number):
+            error = expression + " is not a number."
 
         return error
 
@@ -89,6 +106,43 @@ class FunctionUtils:
         return anonymous_function
 
     @staticmethod
+    def apply_sequence(
+        function: Callable[[list], object], verify: VerifyExpression = None
+    ):
+        def anonymous_function(args: list):
+            binary_args = [None, None]
+            so_far = args[0]
+            for arg in args[1:]:
+                binary_args[0] = so_far
+                binary_args[1] = arg
+                so_far = function(binary_args)
+
+            return so_far
+
+        return FunctionUtils.apply(anonymous_function, verify)
+
+    @staticmethod
+    def apply(function: Callable[[list], object], verify: VerifyExpression = None):
+        def anonymous_function(
+            expression: object, state: MemoryInterface, options: Options
+        ):
+            value: object
+            error: str
+            args: []
+            args, error = FunctionUtils.evaluate_children(
+                expression, state, options, verify
+            )
+            if error is None:
+                try:
+                    value = function(args)
+                except Exception as err:
+                    error = str(err)
+
+            return value, error
+
+        return anonymous_function
+
+    @staticmethod
     def evaluate_children(
         expression: object,
         state: MemoryInterface,
@@ -108,7 +162,7 @@ class FunctionUtils:
                 break
 
             if verify:
-                error = verify(value, child)
+                error = verify(value, child, pos)
 
             if error:
                 break
