@@ -38,13 +38,18 @@ class ApplicationInsightsTelemetryClient(BotTelemetryClient):
         instrumentation_key: str,
         telemetry_client: TelemetryClient = None,
         telemetry_processor: Callable[[object, object], bool] = None,
+        client_queue_size: int = None,
     ):
         self._instrumentation_key = instrumentation_key
+
         self._client = (
             telemetry_client
             if telemetry_client is not None
             else TelemetryClient(self._instrumentation_key)
         )
+        if client_queue_size:
+            self._client.channel.queue.max_queue_length = client_queue_size
+
         # Telemetry Processor
         processor = (
             telemetry_processor

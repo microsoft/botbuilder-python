@@ -13,6 +13,26 @@ from simple_adapter_with_create_conversation import SimpleAdapterWithCreateConve
 
 
 class TestTeamsInfo(aiounittest.AsyncTestCase):
+    async def test_send_message_to_teams_channels_without_activity(self):
+        def create_conversation():
+            pass
+
+        adapter = SimpleAdapterWithCreateConversation(
+            call_create_conversation=create_conversation
+        )
+
+        activity = Activity()
+        turn_context = TurnContext(adapter, activity)
+
+        try:
+            await TeamsInfo.send_message_to_teams_channel(
+                turn_context, None, "channelId123"
+            )
+        except ValueError:
+            pass
+        else:
+            assert False, "should have raise ValueError"
+
     async def test_send_message_to_teams(self):
         def create_conversation():
             pass

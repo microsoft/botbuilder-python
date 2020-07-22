@@ -151,7 +151,14 @@ class SkillHandler(ChannelServiceHandler):
         if not skill_conversation_reference:
             raise KeyError("SkillConversationReference not found")
 
+        if not skill_conversation_reference.conversation_reference:
+            raise KeyError("conversationReference not found")
+
+        # If an activity is sent, return the ResourceResponse
+        resource_response: ResourceResponse = None
+
         async def callback(context: TurnContext):
+            nonlocal resource_response
             context.turn_state[
                 SkillHandler.SKILL_CONVERSATION_REFERENCE_KEY
             ] = skill_conversation_reference
@@ -177,7 +184,7 @@ class SkillHandler(ChannelServiceHandler):
                 self._apply_event_to_turn_context_activity(context, activity)
                 await self._bot.on_turn(context)
             else:
-                await context.send_activity(activity)
+                resource_response = await context.send_activity(activity)
 
         await self._adapter.continue_conversation(
             skill_conversation_reference.conversation_reference,
@@ -185,7 +192,11 @@ class SkillHandler(ChannelServiceHandler):
             claims_identity=claims_identity,
             audience=skill_conversation_reference.oauth_scope,
         )
-        return ResourceResponse(id=str(uuid4()))
+
+        if not resource_response:
+            resource_response = ResourceResponse(id=str(uuid4()))
+
+        return resource_response
 
     @staticmethod
     def _apply_eoc_to_turn_context_activity(

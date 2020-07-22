@@ -1,0 +1,91 @@
+# Lines starting with '#' are comments.
+# Each line is a file pattern followed by one or more owners.
+
+# More details are here: https://help.github.com/articles/about-codeowners/
+
+# The '*' pattern is global owners.
+
+# Order is important. The last matching pattern has the most precedence.
+# The folders are ordered as follows:
+
+# In each subsection folders are ordered first by depth, then alphabetically.
+# This should make it easy to add new rules without breaking existing ones.
+
+# Global rule:
+* @microsoft/bb-python
+
+# Functional tests
+/libraries/functional-tests/**                                                      @tracyboehrer
+
+# Adapters
+/libraries/botbuilder-adapters-slack/**                                             @tracyboehrer @garypretty
+
+# Platform Integration Libaries (aiohttp)
+/libraries/botbuilder-integration-aiohttp/**                                        @microsoft/bb-python-integration
+/libraries/botbuilder-integration-applicationinsights-aiohttp/**                    @microsoft/bb-python-integration @garypretty
+
+# Application Insights/Telemetry
+/libraries/botbuilder-applicationinsights/**                                        @axelsrz @garypretty
+
+# AI: LUIS + QnA Maker
+/libraries/botbuilder-ai/**                                                         @microsoft/bf-cog-services
+
+# Azure (Storage)
+/libraries/botbuilder-azure/**                                                      @tracyboehrer @EricDahlvang
+
+# Adaptive Dialogs
+/libraries/botbuilder-dialogs-*/**                                                  @tracyboehrer @microsoft/bf-adaptive
+
+# AdaptiveExpressions & LanguageGeneration libraries
+/libraries/adaptive-expressions/**                                                  @axelsrz @microsoft/bf-adaptive
+/libraries/botbuilder-lg/**                                                         @axelsrz @microsoft/bf-adaptive
+
+# BotBuilder Testing
+/libraries/botbuilder-testing/**                                                    @axelsrz @gabog
+
+# Streaming library
+/libraries/botbuilder-streaming/**                                                  @microsoft/bf-streaming
+
+# BotBuilder library
+/libraries/botbuilder-core/**                                                       @axelsrz @gabog @johnataylor
+
+# BotBuilder Dialogs
+/libraries/botbuilder-dialogs/**                                                    @microsoft/bf-dialogs
+
+# Swagger
+/libraries/swagger/**                                                               @axelsrz @EricDahlvang
+
+# Bot Framework Schema
+/libraries/botbuilder-schema/**                                                     @EricDahlvang @johnataylor
+
+# Bot Framework connector
+libraries\botframework-connector/**                                                 @axelsrz @carlosscastro @johnataylor
+
+# Bot Framework Authentication
+/libraries/botbuilder-core/botbuilder/core/oauth/**                                 @microsoft/bf-auth
+/libraries/botframework-connector/botframework/connector/auth/**                    @microsoft/bf-auth
+
+# Bot Framework Skills
+/libraries/botbuilder-core/botbuilder/core/skills/**                                @microsoft/bf-skills
+/libraries/botbuilder-integration-aiohttp/botbuilder/integration/aiohttp/skills/**  @microsoft/bf-skills
+/tests/skills/**                                                                    @microsoft/bf-skills
+
+# Bot Framework & Microsoft Teams
+/libraries/botbuilder-core/botbuilder/core/teams/**                                 @microsoft/bf-teams
+/libraries/botbuilder-schema/botbuilder/schema/teams/**                             @microsoft/bf-teams
+/tests/teams/**                                                                     @microsoft/bf-teams
+
+# Ownership by specific files or file types
+# This section MUST stay at the bottom of the CODEOWNERS file. For more information, see
+# https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/about-code-owners#example-of-a-codeowners-file
+
+# Shipped package files
+# e.g. READMEs, requirements.txt, setup.py, MANIFEST.in
+/libraries/**/README.rst                                                            @microsoft/bb-python
+/libraries/**/requirements.txt                                                      @microsoft/bb-python
+/libraries/**/setup.py                                                              @microsoft/bb-python
+/libraries/**/setup.cfg                                                             @microsoft/bb-python
+/libraries/**/MANIFEST.in                                                           @microsoft/bb-python
+
+# CODEOWNERS
+/.github/CODEOWNERS                                                                 @stevengum @cleemullins @microsoft/bb-python
