@@ -3,6 +3,7 @@ ADD = "+"
 SUBTRACT = "-"
 MULTIPLY = "*"
 DIVIDE = "/"
+MIN = "min"
 
 "Comparisons"
 EQUAL = "Equal"

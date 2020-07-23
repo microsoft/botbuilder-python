@@ -119,3 +119,32 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         value, error = parsed.try_evaluate({})
         assert value == 10
         assert error is None
+
+    def test_min(self):
+        parsed = Expression.parse("min(2, 1)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 1
+        assert error is None
+
+        parsed = Expression.parse("min(3, 4.5, 1.5)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 1.5
+        assert error is None
+
+        parsed = Expression.parse("min(2, 100, -10.5)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == -10.5
+        assert error is None
+
+        parsed = Expression.parse("min(6, 0.3, 0.3)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 0.3
+        assert error is None
