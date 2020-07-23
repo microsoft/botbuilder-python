@@ -4,6 +4,7 @@ from .builtin_functions.subtract import Subtract
 from .builtin_functions.multiply import Multiply
 from .builtin_functions.divide import Divide
 from .builtin_functions.min import Min
+from .builtin_functions.max import Max
 
 
 def get_standard_functions() -> dict:
@@ -13,6 +14,7 @@ def get_standard_functions() -> dict:
     functions.append(Multiply())
     functions.append(Divide())
     functions.append(Min())
+    functions.append(Max())
 
     lookup = dict()
     for function in functions:

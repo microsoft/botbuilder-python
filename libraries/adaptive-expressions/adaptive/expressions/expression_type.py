@@ -4,6 +4,7 @@ SUBTRACT = "-"
 MULTIPLY = "*"
 DIVIDE = "/"
 MIN = "min"
+MAX = "max"
 
 "Comparisons"
 EQUAL = "Equal"

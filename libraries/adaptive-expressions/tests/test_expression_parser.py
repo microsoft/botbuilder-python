@@ -148,3 +148,32 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         value, error = parsed.try_evaluate({})
         assert value == 0.3
         assert error is None
+
+    def test_max(self):
+        parsed = Expression.parse("max(2, 1)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 2
+        assert error is None
+
+        parsed = Expression.parse("max(3, 4.5, 1.5)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 4.5
+        assert error is None
+
+        parsed = Expression.parse("max(2, 100, -10.5)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 100
+        assert error is None
+
+        parsed = Expression.parse("max(6.2, 6.2, 0.3)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 6.2
+        assert error is None
