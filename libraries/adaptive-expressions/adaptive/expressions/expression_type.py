@@ -5,6 +5,7 @@ MULTIPLY = "*"
 DIVIDE = "/"
 MIN = "min"
 MAX = "max"
+POWER = "^"
 
 "Comparisons"
 EQUAL = "Equal"

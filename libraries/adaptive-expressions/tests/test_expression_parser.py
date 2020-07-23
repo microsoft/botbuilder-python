@@ -48,14 +48,14 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert value == 0.8
         assert error is None
 
-        parsed = Expression.parse("subtract(1, 1)")
+        parsed = Expression.parse("sub(1, 1)")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
         assert value == 0
         assert error is None
 
-        parsed = Expression.parse("subtract(5, 3, 1.2)")
+        parsed = Expression.parse("sub(5, 3, 1.2)")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
@@ -77,14 +77,14 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert math.isclose(value, 6.6, rel_tol=1e-9)
         assert error is None
 
-        parsed = Expression.parse("multiply(1, 2)")
+        parsed = Expression.parse("mul(1, 2)")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
         assert value == 2
         assert error is None
 
-        parsed = Expression.parse("multiply(2, 3, 1.1)")
+        parsed = Expression.parse("mul(2, 3, 1.1)")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
@@ -106,14 +106,14 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert value == 1.5
         assert error is None
 
-        parsed = Expression.parse("divide(2, 2)")
+        parsed = Expression.parse("div(2, 2)")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
         assert value == 1
         assert error is None
 
-        parsed = Expression.parse("divide(6, 2, 0.3)")
+        parsed = Expression.parse("div(6, 2, 0.3)")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
@@ -176,4 +176,19 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
 
         value, error = parsed.try_evaluate({})
         assert value == 6.2
+        assert error is None
+
+    def test_power(self):
+        parsed = Expression.parse("2^3")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 8
+        assert error is None
+
+        parsed = Expression.parse("3^2^2")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 81
         assert error is None
