@@ -47,7 +47,6 @@ class FunctionUtils:
         )
 
     @staticmethod
-<<<<<<< HEAD
     def validate_binary_number_or_string(expression: object):
         FunctionUtils.validate_arity_and_any_type(
             expression, 2, 2, ReturnType.Number | ReturnType.String
@@ -55,12 +54,10 @@ class FunctionUtils:
 
     @staticmethod
     # pylint: disable=unused-argument
-=======
     def validate_at_least_one(expression: object):
         return FunctionUtils.validate_arity_and_any_type(expression, 1, sys.maxsize)
 
     @staticmethod
->>>>>>> 8a7180a99248a64197acb35db99ebcbb3369a5e9
     def verify_number_or_string_or_null(value: object, expression: object, number: int):
         error: str = None
         if not isinstance(value, numbers.Number) and not isinstance(value, str):
