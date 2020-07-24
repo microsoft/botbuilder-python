@@ -48,14 +48,14 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert value == 0.8
         assert error is None
 
-        parsed = Expression.parse("subtract(1, 1)")
+        parsed = Expression.parse("sub(1, 1)")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
         assert value == 0
         assert error is None
 
-        parsed = Expression.parse("subtract(5, 3, 1.2)")
+        parsed = Expression.parse("sub(5, 3, 1.2)")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
@@ -77,14 +77,14 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert math.isclose(value, 6.6, rel_tol=1e-9)
         assert error is None
 
-        parsed = Expression.parse("multiply(1, 2)")
+        parsed = Expression.parse("mul(1, 2)")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
         assert value == 2
         assert error is None
 
-        parsed = Expression.parse("multiply(2, 3, 1.1)")
+        parsed = Expression.parse("mul(2, 3, 1.1)")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
@@ -106,20 +106,21 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert value == 1.5
         assert error is None
 
-        parsed = Expression.parse("divide(2, 2)")
+        parsed = Expression.parse("div(2, 2)")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
         assert value == 1
         assert error is None
 
-        parsed = Expression.parse("divide(6, 2, 0.3)")
+        parsed = Expression.parse("div(6, 2, 0.3)")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
         assert value == 10
         assert error is None
 
+<<<<<<< HEAD
     def test_equal(self):
         parsed = Expression.parse("1 == 2")
         assert parsed is not None
@@ -154,4 +155,77 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
 
         value, error = parsed.try_evaluate({})
         assert value == False
+=======
+    def test_min(self):
+        parsed = Expression.parse("min(2, 1)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 1
+        assert error is None
+
+        parsed = Expression.parse("min(3, 4.5, 1.5)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 1.5
+        assert error is None
+
+        parsed = Expression.parse("min(2, 100, -10.5)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == -10.5
+        assert error is None
+
+        parsed = Expression.parse("min(6, 0.3, 0.3)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 0.3
+        assert error is None
+
+    def test_max(self):
+        parsed = Expression.parse("max(2, 1)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 2
+        assert error is None
+
+        parsed = Expression.parse("max(3, 4.5, 1.5)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 4.5
+        assert error is None
+
+        parsed = Expression.parse("max(2, 100, -10.5)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 100
+        assert error is None
+
+        parsed = Expression.parse("max(6.2, 6.2, 0.3)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 6.2
+        assert error is None
+
+    def test_power(self):
+        parsed = Expression.parse("2^3")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 8
+        assert error is None
+
+        parsed = Expression.parse("3^2^2")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 81
+>>>>>>> 8a7180a99248a64197acb35db99ebcbb3369a5e9
         assert error is None

@@ -7,7 +7,7 @@ from .return_type import ReturnType
 
 VerifyExpression = NewType("VerifyExpression", Callable[[object, object, int], str])
 
-
+# pylint: disable=unused-argument
 class FunctionUtils:
     verify_expression = VerifyExpression
 
@@ -47,6 +47,7 @@ class FunctionUtils:
         )
 
     @staticmethod
+<<<<<<< HEAD
     def validate_binary_number_or_string(expression: object):
         FunctionUtils.validate_arity_and_any_type(
             expression, 2, 2, ReturnType.Number | ReturnType.String
@@ -54,6 +55,12 @@ class FunctionUtils:
 
     @staticmethod
     # pylint: disable=unused-argument
+=======
+    def validate_at_least_one(expression: object):
+        return FunctionUtils.validate_arity_and_any_type(expression, 1, sys.maxsize)
+
+    @staticmethod
+>>>>>>> 8a7180a99248a64197acb35db99ebcbb3369a5e9
     def verify_number_or_string_or_null(value: object, expression: object, number: int):
         error: str = None
         if not isinstance(value, numbers.Number) and not isinstance(value, str):
@@ -62,11 +69,26 @@ class FunctionUtils:
         return error
 
     @staticmethod
-    # pylint: disable=unused-argument
     def verify_numbers(value: object, expression: object, pos: int):
         error: str = None
         if not isinstance(value, numbers.Number):
             error = expression + " is not a number."
+
+        return error
+
+    @staticmethod
+    def verify_numeric_list_or_number(value: object, expression: object, number: int):
+        error: str = None
+        if isinstance(value, numbers.Number):
+            return error
+
+        if not isinstance(value, list):
+            error = expression + " is neither a list nor a number."
+        else:
+            for elt in value:
+                if not isinstance(elt, numbers.Number):
+                    error = elt + " is not a number in " + expression
+                    break
 
         return error
 

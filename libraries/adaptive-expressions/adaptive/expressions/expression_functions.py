@@ -5,6 +5,9 @@ from .builtin_functions.multiply import Multiply
 from .builtin_functions.divide import Divide
 from .builtin_functions.equal import Equal
 from .builtin_functions.less_then import LessThen
+from .builtin_functions.min import Min
+from .builtin_functions.max import Max
+from .builtin_functions.power import Power
 
 
 def get_standard_functions() -> dict:
@@ -15,17 +18,20 @@ def get_standard_functions() -> dict:
     functions.append(Divide())
     functions.append(Equal())
     functions.append(LessThen())
+    functions.append(Min())
+    functions.append(Max())
+    functions.append(Power())
 
     lookup = dict()
     for function in functions:
         lookup[function.expr_type] = function
 
     lookup["add"] = lookup[ADD]
-    lookup["subtract"] = lookup[SUBTRACT]
-    lookup["multiply"] = lookup[MULTIPLY]
-    lookup["divide"] = lookup[DIVIDE]
     lookup["equal"] = lookup[EQUAL]
     lookup["lessthen"] = lookup[LESSTHEN]
+    lookup["sub"] = lookup[SUBTRACT]
+    lookup["mul"] = lookup[MULTIPLY]
+    lookup["div"] = lookup[DIVIDE]
 
     return lookup
 
