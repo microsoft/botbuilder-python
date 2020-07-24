@@ -8,9 +8,14 @@ MAX = "max"
 POWER = "^"
 
 "Comparisons"
+NOTEQUAL = "!="
 EQUAL = "=="
 LESSTHAN = "<"
 LESSTHANOREQUAL = "<="
+GREATERTHAN = ">"
+GREATERTHANOREQUAL = ">="
+EXIST = "exists"
+
 
 "Logic"
 AND = "&&"

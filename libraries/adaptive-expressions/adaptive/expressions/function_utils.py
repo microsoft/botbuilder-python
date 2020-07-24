@@ -58,6 +58,10 @@ class FunctionUtils:
         return FunctionUtils.validate_arity_and_any_type(expression, 1, sys.maxsize)
 
     @staticmethod
+    def validate_unary(expression: object):
+        return FunctionUtils.validate_arity_and_any_type(expression, 1, 1)
+
+    @staticmethod
     def verify_number_or_string_or_null(value: object, expression: object, number: int):
         error: str = None
         if not isinstance(value, numbers.Number) and not isinstance(value, str):
@@ -87,6 +91,13 @@ class FunctionUtils:
                     error = elt + " is not a number in " + expression
                     break
 
+        return error
+
+    @staticmethod
+    def verify_not_null(value: object, expression, number: int):
+        error: str = None
+        if value is not None:
+            error = str(expression) + " is null."
         return error
 
     @staticmethod
@@ -247,3 +258,12 @@ class FunctionUtils:
         value = result
         error = None
         return value, error
+
+    @staticmethod
+    def is_logic_true(instance: object):
+        result = True
+        if isinstance(instance, bool):
+            result = instance
+        elif instance is None:
+            result = False
+        return result
