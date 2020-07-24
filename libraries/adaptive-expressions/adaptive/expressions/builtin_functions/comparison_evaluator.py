@@ -31,13 +31,10 @@ class ComparisonEvaluator(ExpressionEvaluator):
                     obj = arg
                     if is_number is not None:
                         if obj is not None and isinstance(obj, numbers.Number) != is_number:
-                            print(type(obj))
-                            print(obj)
                             error = "Arguments must either all be numbers or strings in " + str(expression) + "}"
                             break
                     else:
                         is_number = isinstance(obj, numbers.Number)
-                        print(obj)
                 if error is None:
                     try:
                         result = func(args)

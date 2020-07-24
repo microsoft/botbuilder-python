@@ -120,41 +120,6 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert value == 10
         assert error is None
 
-    def test_equal(self):
-        parsed = Expression.parse("1 == 2")
-        assert parsed is not None
-
-        value, error = parsed.try_evaluate({})
-        assert value == False
-        assert error is None
-
-        parsed = Expression.parse("3 == 3")
-        assert parsed is not None
-
-        value, error = parsed.try_evaluate({})
-        assert value == True
-        assert error is None
-
-        parsed = Expression.parse("(1 + 2) == (4 - 1)")
-        assert parsed is not None
-
-        value, error = parsed.try_evaluate({})
-        assert value == True
-        assert error is None
-
-        parsed = Expression.parse("(1 + 2) ==\r\n (4 - 1)")
-        assert parsed is not None
-
-        value, error = parsed.try_evaluate({})
-        assert value == True
-        assert error is None
-
-        parsed = Expression.parse("\"123\" == \"132\"")
-        assert parsed is not None
-
-        value, error = parsed.try_evaluate({})
-        assert value == False
-
     def test_min(self):
         parsed = Expression.parse("min(2, 1)")
         assert parsed is not None
@@ -227,3 +192,54 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         value, error = parsed.try_evaluate({})
         assert value == 81
         assert error is None
+
+    def test_equal(self):
+        parsed = Expression.parse("1 == 2")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == False
+        assert error is None
+
+        parsed = Expression.parse("3 == 3")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == True
+        assert error is None
+
+        parsed = Expression.parse("(1 + 2) == (4 - 1)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == True
+        assert error is None
+
+        parsed = Expression.parse("(1 + 2) ==\r\n (4 - 1)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == True
+        assert error is None
+
+        parsed = Expression.parse("\"123\" == \"132\"")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == False
+
+    def test_lessthen(self):
+        parsed = Expression.parse("1 < 2")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == True
+        assert error is None
+
+        parsed = Expression.parse("3 < 1")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == False
+        assert error is None
+
