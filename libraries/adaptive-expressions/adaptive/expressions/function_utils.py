@@ -9,6 +9,8 @@ VerifyExpression = NewType("VerifyExpression", Callable[[object, object, int], s
 
 
 class FunctionUtils:
+    verify_expression = VerifyExpression
+
     @staticmethod
     def validate_arity_and_any_type(
         expression: object,
@@ -35,9 +37,19 @@ class FunctionUtils:
                     raise Exception("return type validation failed.")
 
     @staticmethod
+    def validate_binary(expression: object):
+        FunctionUtils.validate_arity_and_any_type(expression, 2, 2)
+
+    @staticmethod
     def validate_two_or_more_than_two_numbers(expression: object):
         FunctionUtils.validate_arity_and_any_type(
             expression, 2, sys.maxsize, ReturnType.Number
+        )
+
+    @staticmethod
+    def validate_binary_number_or_string(expression: object):
+        FunctionUtils.validate_arity_and_any_type(
+            expression, 2, 2, ReturnType.Number | ReturnType.String
         )
 
     @staticmethod
@@ -216,3 +228,17 @@ class FunctionUtils:
         value = result
         error = None
         return value, error
+
+    @staticmethod
+    def try_parse_list(value: object, out_list: list):
+        islist = False
+        out_list.clear()
+        if isinstance(value, list):
+            for i in list(value):
+                out_list.append(i)
+            islist = True
+        return islist
+
+    @staticmethod
+    def culture_invariant_double_convert(number: object):
+        return float(number)

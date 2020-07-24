@@ -5,7 +5,8 @@ MULTIPLY = "*"
 DIVIDE = "/"
 
 "Comparisons"
-EQUAL = "Equal"
+EQUAL = "=="
+LESSTHEN = "<"
 
 "Logic"
 AND = "&&"
