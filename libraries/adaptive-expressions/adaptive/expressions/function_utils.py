@@ -247,17 +247,3 @@ class FunctionUtils:
         value = result
         error = None
         return value, error
-
-    @staticmethod
-    def try_parse_list(value: object, out_list: list):
-        islist = False
-        out_list.clear()
-        if isinstance(value, list):
-            for i in list(value):
-                out_list.append(i)
-            islist = True
-        return islist
-
-    @staticmethod
-    def culture_invariant_double_convert(number: object):
-        return float(number)

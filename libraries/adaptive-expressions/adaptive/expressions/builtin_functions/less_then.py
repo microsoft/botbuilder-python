@@ -13,4 +13,4 @@ class LessThen(ComparisonEvaluator):
 
     @staticmethod
     def function(args: list):
-        return FunctionUtils.culture_invariant_double_convert(args[0]) < FunctionUtils.culture_invariant_double_convert(args[1])
+        return float(args[0]) < float(args[1])
