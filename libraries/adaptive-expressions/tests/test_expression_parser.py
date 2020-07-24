@@ -120,7 +120,6 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert value == 10
         assert error is None
 
-<<<<<<< HEAD
     def test_equal(self):
         parsed = Expression.parse("1 == 2")
         assert parsed is not None
@@ -155,7 +154,7 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
 
         value, error = parsed.try_evaluate({})
         assert value == False
-=======
+
     def test_min(self):
         parsed = Expression.parse("min(2, 1)")
         assert parsed is not None
@@ -227,5 +226,4 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
 
         value, error = parsed.try_evaluate({})
         assert value == 81
->>>>>>> 8a7180a99248a64197acb35db99ebcbb3369a5e9
         assert error is None
