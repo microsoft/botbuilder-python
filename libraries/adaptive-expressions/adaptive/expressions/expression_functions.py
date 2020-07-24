@@ -1,4 +1,4 @@
-from .expression_type import ADD, SUBTRACT, MULTIPLY, DIVIDE, EQUAL, LESSTHAN, LESSTHANOREQUAL, GREATERTHAN, GREATERTHANOREQUAL, NOT, NOTEQUAL, EXIST
+from .expression_type import ADD, SUBTRACT, MULTIPLY, DIVIDE, EQUAL, LESSTHAN, LESSTHANOREQUAL, GREATERTHAN, GREATERTHANOREQUAL, NOT, NOTEQUAL, EXIST, OR, AND
 from .builtin_functions.add import Add
 from .builtin_functions.subtract import Subtract
 from .builtin_functions.multiply import Multiply
@@ -15,7 +15,8 @@ from .builtin_functions.not_equal import NotEqual
 from .builtin_functions.exist import Exist
 
 from .builtin_functions.not_function import Not
-
+from .builtin_functions.or_function import Or
+from .builtin_functions.and_function import And
 
 def get_standard_functions() -> dict:
     functions = []
@@ -40,6 +41,8 @@ def get_standard_functions() -> dict:
 
     # logic
     functions.append(Not())
+    functions.append(Or())
+    functions.append(And())
 
     lookup = dict()
     for function in functions:
@@ -57,11 +60,11 @@ def get_standard_functions() -> dict:
     lookup["lessOrEuqals"] = lookup[LESSTHANOREQUAL]
     lookup["greater"] = lookup[GREATERTHAN]
     lookup["greaterOrEquals"] = lookup[GREATERTHANOREQUAL]
-    lookup["notequal"] = lookup[NOTEQUAL]
-    lookup["exists"] = lookup[EXIST]
 
-    # Logic
+    # Logic aliases
     lookup["not"] = lookup[NOT]
+    lookup["or"] = lookup[OR]
+    lookup["and"] = lookup[AND]
 
     return lookup
 

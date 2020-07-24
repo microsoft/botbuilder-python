@@ -198,63 +198,63 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
-        assert value == False
+        assert value is False
         assert error is None
 
         parsed = Expression.parse("3 == 3")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
-        assert value == True
+        assert value is True
         assert error is None
 
         parsed = Expression.parse("(1 + 2) == (4 - 1)")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
-        assert value == True
+        assert value is True
         assert error is None
 
         parsed = Expression.parse("(1 + 2) ==\r\n (4 - 1)")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
-        assert value == True
+        assert value is True
         assert error is None
 
         parsed = Expression.parse("\"123\" == \"132\"")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
-        assert value == False
+        assert value is False
 
     def test_lessthan(self):
         parsed = Expression.parse("1 < 2")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
-        assert value == True
+        assert value is True
         assert error is None
 
         parsed = Expression.parse("3 < 1")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
-        assert value == False
+        assert value is False
         assert error is None
 
         parsed = Expression.parse("1.1 < 2")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
-        assert value == True
+        assert value is True
         assert error is None
 
         parsed = Expression.parse("3.5 < 1")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
-        assert value == False
+        assert value is False
         assert error is None
 
     def test_lessthanorequal(self):
@@ -262,21 +262,21 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
-        assert value == True
+        assert value is True
         assert error is None
 
         parsed = Expression.parse("3.3 <= 1")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
-        assert value == False
+        assert value is False
         assert error is None
 
         parsed = Expression.parse("2 <= 2")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
-        assert value == True
+        assert value is True
         assert error is None
 
     def test_greatthan(self):
@@ -284,21 +284,21 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
-        assert value == False
+        assert value is False
         assert error is None
 
         parsed = Expression.parse("3.3 > 1")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
-        assert value == True
+        assert value is True
         assert error is None
 
         parsed = Expression.parse("2 > 2")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
-        assert value == False
+        assert value is False
         assert error is None
 
     def test_greatthanorequal(self):
@@ -306,21 +306,21 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
-        assert value == False
+        assert value is False
         assert error is None
 
         parsed = Expression.parse("3.3 >= 1")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
-        assert value == True
+        assert value is True
         assert error is None
 
         parsed = Expression.parse("2 >= 2")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
-        assert value == True
+        assert value is True
         assert error is None
 
     def test_not(self):
@@ -328,7 +328,7 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
-        assert value == True
+        assert value is True
         assert error is None
 
     def test_not_equal(self):
@@ -336,13 +336,50 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
-        assert value == True
+        assert value is True
         assert error is None
 
         parsed = Expression.parse("2 != 2")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
-        assert value == False
+        assert value is False
         assert error is None
 
+    # def test_exist(self):
+    #     parsed = Expression.parse("exists(one)")
+    #     assert parsed is not None
+
+    #     value, error = parsed.try_evaluate({})
+    #     assert value == True
+    #     assert error is None
+
+    def test_or(self):
+        parsed = Expression.parse("(1 != 2) || (1!=1)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is True
+        assert error is None
+
+        parsed = Expression.parse("(1 == 2) || (1!=1)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is False
+        assert error is None
+
+    def test_and(self):
+        parsed = Expression.parse("(1 != 2) && (1!=1)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is False
+        assert error is None
+
+        parsed = Expression.parse("(1 != 2) || (1==1)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is True
+        assert error is None
