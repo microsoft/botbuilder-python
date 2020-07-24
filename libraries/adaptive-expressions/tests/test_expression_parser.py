@@ -228,7 +228,7 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         value, error = parsed.try_evaluate({})
         assert value == False
 
-    def test_lessthen(self):
+    def test_lessthan(self):
         parsed = Expression.parse("1 < 2")
         assert parsed is not None
 
@@ -242,4 +242,41 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         value, error = parsed.try_evaluate({})
         assert value == False
         assert error is None
+
+        parsed = Expression.parse("1.1 < 2")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == True
+        assert error is None
+
+        parsed = Expression.parse("3.5 < 1")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == False
+        assert error is None
+
+    def test_lessthanorequal(self):
+        parsed = Expression.parse("1 <= 2")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == True
+        assert error is None
+
+        parsed = Expression.parse("3.3 <= 1")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == False
+        assert error is None
+
+        parsed = Expression.parse("2 <= 2")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == True
+        assert error is None
+
 

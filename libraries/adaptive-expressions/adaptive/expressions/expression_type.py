@@ -9,7 +9,8 @@ POWER = "^"
 
 "Comparisons"
 EQUAL = "=="
-LESSTHEN = "<"
+LESSTHAN = "<"
+LESSTHANOREQUAL = "<="
 
 "Logic"
 AND = "&&"
