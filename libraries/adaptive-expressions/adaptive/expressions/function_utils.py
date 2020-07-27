@@ -9,6 +9,8 @@ VerifyExpression = NewType("VerifyExpression", Callable[[object, object, int], s
 
 # pylint: disable=unused-argument
 class FunctionUtils:
+    verify_expression = VerifyExpression
+
     @staticmethod
     def validate_arity_and_any_type(
         expression: object,
@@ -35,14 +37,42 @@ class FunctionUtils:
                     raise Exception("return type validation failed.")
 
     @staticmethod
+    def validate_binary(expression: object):
+        FunctionUtils.validate_arity_and_any_type(expression, 2, 2)
+
+    @staticmethod
     def validate_two_or_more_than_two_numbers(expression: object):
         FunctionUtils.validate_arity_and_any_type(
             expression, 2, sys.maxsize, ReturnType.Number
         )
 
     @staticmethod
+    def validate_binary_number_or_string(expression: object):
+        FunctionUtils.validate_arity_and_any_type(
+            expression, 2, 2, ReturnType.Number | ReturnType.String
+        )
+
+    @staticmethod
+    # pylint: disable=unused-argument
     def validate_at_least_one(expression: object):
         return FunctionUtils.validate_arity_and_any_type(expression, 1, sys.maxsize)
+
+    @staticmethod
+    def validate_unary(expression: object):
+        return FunctionUtils.validate_arity_and_any_type(expression, 1, 1)
+
+    @staticmethod
+    def validate_unary_string(expression: object):
+        return FunctionUtils.validate_arity_and_any_type(
+            expression, 1, 1, ReturnType.String
+        )
+
+    @staticmethod
+    def verify_string_or_null(value: object, expression: object, number: int):
+        error: str = None
+        if not isinstance(value, str) and value is not None:
+            error = str(expression) + " is neither a string nor a null object."
+        return error
 
     @staticmethod
     def verify_number_or_string_or_null(value: object, expression: object, number: int):
@@ -74,6 +104,13 @@ class FunctionUtils:
                     error = elt + " is not a number in " + expression
                     break
 
+        return error
+
+    @staticmethod
+    def verify_not_null(value: object, expression, number: int):
+        error: str = None
+        if value is not None:
+            error = str(expression) + " is null."
         return error
 
     @staticmethod
@@ -234,3 +271,12 @@ class FunctionUtils:
         value = result
         error = None
         return value, error
+
+    @staticmethod
+    def is_logic_true(instance: object):
+        result = True
+        if isinstance(instance, bool):
+            result = instance
+        elif instance is None:
+            result = False
+        return result

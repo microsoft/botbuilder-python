@@ -192,3 +192,256 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         value, error = parsed.try_evaluate({})
         assert value == 81
         assert error is None
+
+    def test_equal(self):
+        parsed = Expression.parse("1 == 2")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is False
+        assert error is None
+
+        parsed = Expression.parse("3 == 3")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is True
+        assert error is None
+
+        parsed = Expression.parse("(1 + 2) == (4 - 1)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is True
+        assert error is None
+
+        parsed = Expression.parse("(1 + 2) ==\r\n (4 - 1)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is True
+        assert error is None
+
+        parsed = Expression.parse('"123" == "132"')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is False
+
+    def test_lessthan(self):
+        parsed = Expression.parse("1 < 2")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is True
+        assert error is None
+
+        parsed = Expression.parse("3 < 1")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is False
+        assert error is None
+
+        parsed = Expression.parse("1.1 < 2")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is True
+        assert error is None
+
+        parsed = Expression.parse("3.5 < 1")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is False
+        assert error is None
+
+    def test_lessthanorequal(self):
+        parsed = Expression.parse("1 <= 2")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is True
+        assert error is None
+
+        parsed = Expression.parse("3.3 <= 1")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is False
+        assert error is None
+
+        parsed = Expression.parse("2 <= 2")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is True
+        assert error is None
+
+    def test_greatthan(self):
+        parsed = Expression.parse("1 > 2")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is False
+        assert error is None
+
+        parsed = Expression.parse("3.3 > 1")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is True
+        assert error is None
+
+        parsed = Expression.parse("2 > 2")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is False
+        assert error is None
+
+    def test_greatthanorequal(self):
+        parsed = Expression.parse("1 >= 2")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is False
+        assert error is None
+
+        parsed = Expression.parse("3.3 >= 1")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is True
+        assert error is None
+
+        parsed = Expression.parse("2 >= 2")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is True
+        assert error is None
+
+    def test_not(self):
+        parsed = Expression.parse("!(1 >= 2)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is True
+        assert error is None
+
+    def test_not_equal(self):
+        parsed = Expression.parse("1 != 2")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is True
+        assert error is None
+
+        parsed = Expression.parse("2 != 2")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is False
+        assert error is None
+
+    # TODO: add exists test
+
+    def test_or(self):
+        parsed = Expression.parse("(1 != 2) || (1!=1)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is True
+        assert error is None
+
+        parsed = Expression.parse("(1 == 2) || (1!=1)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is False
+        assert error is None
+
+    def test_and(self):
+        parsed = Expression.parse("(1 != 2) && (1!=1)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is False
+        assert error is None
+
+        parsed = Expression.parse("(1 != 2) || (1==1)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is True
+        assert error is None
+
+    def test_concat(self):
+        # parsed = Expression.parse("concat([1,2], [2,3])")
+        # assert parsed is not None
+
+        # value, error = parsed.try_evaluate({})
+        # assert value == [1, 2, 2, 3]
+        # assert error is None
+
+        parsed = Expression.parse('concat("hello", "world")')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == "helloworld"
+        assert error is None
+
+    def test_length(self):
+        # parsed = Expression.parse("length([1,2])")
+        # assert parsed is not None
+
+        # value, error = parsed.try_evaluate({})
+        # assert value == 2
+        # assert error is None
+
+        parsed = Expression.parse('length("hello")')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 5
+        assert error is None
+
+    def test_replace(self):
+        parsed = Expression.parse('replace("hello", "l", "k")')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == "hekko"
+        assert error is None
+
+    def test_replace_ignore_case(self):
+        parsed = Expression.parse('replaceIgnoreCase("hello", "L", "K")')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == "hekko"
+        assert error is None
+
+    def test_split(self):
+        parsed = Expression.parse('split("hello", "e")')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == ["h", "llo"]
+        assert error is None
+
+        parsed = Expression.parse('split("hello")')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == ["h", "e", "l", "l", "o"]
+        assert error is None
+
+        parsed = Expression.parse('split("", "e")')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == [""]
+        assert error is None
