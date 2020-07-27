@@ -1,6 +1,17 @@
 from .expression_type import ADD, SUBTRACT, MULTIPLY, DIVIDE, MOD
+from .expression_type import (
+    EQUAL,
+    LESSTHAN,
+    LESSTHANOREQUAL,
+    GREATERTHAN,
+    GREATERTHANOREQUAL,
+    NOT,
+    OR,
+    AND,
+    CONCAT,
+)
 
-# math
+# Math
 from .builtin_functions.add import Add
 from .builtin_functions.subtract import Subtract
 from .builtin_functions.multiply import Multiply
@@ -16,14 +27,46 @@ from .builtin_functions.floor import Floor
 from .builtin_functions.ceiling import Ceiling
 from .builtin_functions.round import Round
 
-# memory
+# Comparisons
+from .builtin_functions.equal import Equal
+from .builtin_functions.less_than import LessThan
+from .builtin_functions.less_than_or_equal import LessThanOrEqual
+from .builtin_functions.greater_than import GreaterThan
+from .builtin_functions.greater_than_or_equal import GreaterThanOrEqual
+from .builtin_functions.not_equal import NotEqual
+from .builtin_functions.exist import Exist
+
+# Logic
+from .builtin_functions.not_function import Not
+from .builtin_functions.or_function import Or
+from .builtin_functions.and_function import And
+
+# String
+from .builtin_functions.concat import Concat
+from .builtin_functions.length import Length
+from .builtin_functions.replace import Replace
+from .builtin_functions.replace_ignore_case import ReplaceIgnoreCase
+from .builtin_functions.split import Split
+
+# Colleaction
+# DataTime
+# Timex
+# Conversions
+# URI Parsing Functions
+
+# Memory
 from .builtin_functions.create_array import CreateArray
+
+# Misc
+# Object manipulation and construction functions
+# Regular expression
+# Type Checking
 
 
 def get_standard_functions() -> dict:
     functions = []
 
-    # math
+    # Math
     functions.append(Add())
     functions.append(Subtract())
     functions.append(Multiply())
@@ -39,18 +82,66 @@ def get_standard_functions() -> dict:
     functions.append(Ceiling())
     functions.append(Round())
 
-    # memory
+    # Comparisons
+    functions.append(Equal())
+    functions.append(LessThan())
+    functions.append(LessThanOrEqual())
+    functions.append(GreaterThan())
+    functions.append(GreaterThanOrEqual())
+    functions.append(NotEqual())
+    functions.append(Exist())
+
+    # Logic
+    functions.append(Not())
+    functions.append(Or())
+    functions.append(And())
+
+    # String
+    functions.append(Concat())
+    functions.append(Length())
+    functions.append(Replace())
+    functions.append(ReplaceIgnoreCase())
+    functions.append(Split())
+    # TODO: substring, skipped
+
+    # Colleaction
+    # DataTime
+    # Timex
+    # Conversions
+    # URI Parsing Functions
+
+    # Memory
     functions.append(CreateArray())
+
+    # Misc
+    # Object manipulation and construction functions
+    # Regular expression
+    # Type Checking
 
     lookup = dict()
     for function in functions:
         lookup[function.expr_type] = function
 
+    # Math aliases
     lookup["add"] = lookup[ADD]
     lookup["sub"] = lookup[SUBTRACT]
     lookup["mul"] = lookup[MULTIPLY]
     lookup["div"] = lookup[DIVIDE]
     lookup["mod"] = lookup[MOD]
+
+    # Comparison aliases
+    lookup["equals"] = lookup[EQUAL]
+    lookup["less"] = lookup[LESSTHAN]
+    lookup["lessOrEuqals"] = lookup[LESSTHANOREQUAL]
+    lookup["greater"] = lookup[GREATERTHAN]
+    lookup["greaterOrEquals"] = lookup[GREATERTHANOREQUAL]
+
+    # Logic aliases
+    lookup["not"] = lookup[NOT]
+    lookup["or"] = lookup[OR]
+    lookup["and"] = lookup[AND]
+
+    lookup["&"] = lookup[CONCAT]
 
     return lookup
 

@@ -15,7 +15,14 @@ CEILING = "ceiling"
 ROUND = "round"
 
 "Comparisons"
-EQUAL = "Equal"
+NOTEQUAL = "!="
+EQUAL = "=="
+LESSTHAN = "<"
+LESSTHANOREQUAL = "<="
+GREATERTHAN = ">"
+GREATERTHANOREQUAL = ">="
+EXIST = "exists"
+
 
 "Logic"
 AND = "&&"
@@ -24,6 +31,11 @@ NOT = "!"
 
 "String"
 CONCAT = "concat"
+LENGTH = "length"
+REPLACE = "replace"
+REPLACEIGNORECASE = "replaceIgnoreCase"
+SPLIT = "split"
+SUBSTRING = "substring"
 
 "Memory"
 ACCESSOR = "Accessor"
