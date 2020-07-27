@@ -73,6 +73,10 @@ class TestingActivityHandler(ActivityHandler):
         self.record.append("on_typing_activity")
         return await super().on_typing_activity(turn_context)
 
+    async def on_installation_update(self, turn_context: TurnContext):
+        self.record.append("on_installation_update")
+        return await super().on_installation_update(turn_context)
+
     async def on_unrecognized_activity_type(self, turn_context: TurnContext):
         self.record.append("on_unrecognized_activity_type")
         return await super().on_unrecognized_activity_type(turn_context)
@@ -228,6 +232,19 @@ class TestActivityHandler(aiounittest.AsyncTestCase):
 
         assert len(bot.record) == 1
         assert bot.record[0] == "on_typing_activity"
+
+    async def test_on_installation_update(self):
+        activity = Activity(type=ActivityTypes.installation_update)
+
+        adapter = TestInvokeAdapter()
+        turn_context = TurnContext(adapter, activity)
+
+        # Act
+        bot = TestingActivityHandler()
+        await bot.on_turn(turn_context)
+
+        assert len(bot.record) == 1
+        assert bot.record[0] == "on_installation_update"
 
     async def test_healthcheck(self):
         activity = Activity(type=ActivityTypes.invoke, name="healthcheck",)
