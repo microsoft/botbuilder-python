@@ -36,13 +36,6 @@ class FunctionUtils:
                     # TODO: raise error with BuildTypeValidatorError
                     raise Exception("return type validation failed.")
 
-    # @staticmethod
-    # def validate_order(expression: object, optional: list, types: list):
-    #     if optional is None:
-    #         optional = []
-    #     if len(expression.children) < len(types) or len(expression.children) > len(types) + len(optional):
-    #         raise Exception()
-
     @staticmethod
     def validate_binary(expression: object):
         FunctionUtils.validate_arity_and_any_type(expression, 2, 2)

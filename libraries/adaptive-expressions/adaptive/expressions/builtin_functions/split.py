@@ -22,7 +22,7 @@ class Split(ExpressionEvaluator):
                 if isinstance(args[1], str):
                     seperator = args[1]
             if len(seperator) == 0:
-                return [s for s in input_str]
+                return list(input_str)
             res = [input_str]
             for sep in seperator:
                 temp = []

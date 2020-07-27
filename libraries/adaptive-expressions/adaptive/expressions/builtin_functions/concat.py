@@ -22,13 +22,12 @@ class Concat(ExpressionEvaluator):
             is_second_list = isinstance(second_item, list)
             if first_item is None and second_item is None:
                 return None
-            elif first_item is None and is_second_list:
+            if first_item is None and is_second_list:
                 return second_item
-            elif second_item is None and is_first_list:
+            if second_item is None and is_first_list:
                 return first_item
-            elif is_first_list and is_second_list:
+            if is_first_list and is_second_list:
                 return first_item + second_item
-            else:
-                return str(first_item) + str(second_item)
+            return str(first_item) + str(second_item)
 
         return FunctionUtils.apply_sequence(anonymous_function)
