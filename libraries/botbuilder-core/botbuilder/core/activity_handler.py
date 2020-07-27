@@ -86,6 +86,8 @@ class ActivityHandler:
             await self.on_end_of_conversation_activity(turn_context)
         elif turn_context.activity.type == ActivityTypes.typing:
             await self.on_typing_activity(turn_context)
+        elif turn_context.activity.type == ActivityTypes.installation_update:
+            await self.on_installation_update(turn_context)
         else:
             await self.on_unrecognized_activity_type(turn_context)
 
@@ -358,6 +360,19 @@ class ActivityHandler:
         """
         Override this in a derived class to provide logic specific to
         ActivityTypes.typing activities, such as the conversational logic.
+
+        :param turn_context: The context object for this turn
+        :type turn_context: :class:`botbuilder.core.TurnContext`
+        :returns: A task that represents the work queued to execute
+        """
+        return
+
+    async def on_installation_update(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext
+    ):
+        """
+        Override this in a derived class to provide logic specific to
+        ActivityTypes.InstallationUpdate activities.
 
         :param turn_context: The context object for this turn
         :type turn_context: :class:`botbuilder.core.TurnContext`
