@@ -67,7 +67,7 @@ def get_standard_functions() -> dict:
     functions.append(Replace())
     functions.append(ReplaceIgnoreCase())
     functions.append(Split())
-    # skip substring
+    # TODO: substring, skipped
 
     lookup = dict()
     for function in functions:

@@ -346,13 +346,7 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert value is False
         assert error is None
 
-    # def test_exist(self):
-    #     parsed = Expression.parse("exists(one)")
-    #     assert parsed is not None
-
-    #     value, error = parsed.try_evaluate({})
-    #     assert value == True
-    #     assert error is None
+    # TODO: add exists test
 
     def test_or(self):
         parsed = Expression.parse("(1 != 2) || (1!=1)")
