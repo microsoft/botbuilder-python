@@ -14,7 +14,7 @@ class Divide(MultivariateNumericEvaluator):
 
     @staticmethod
     def verify(val: object, expression: object, pos: int):
-        error = FunctionUtils.verify_numbers(val, expression, pos)
+        error = FunctionUtils.verify_number(val, expression, pos)
         if error is None and pos > 0 and val == 0:
             error = "Cannot divide by 0 from " + expression
 

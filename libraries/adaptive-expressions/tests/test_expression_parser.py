@@ -192,3 +192,170 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         value, error = parsed.try_evaluate({})
         assert value == 81
         assert error is None
+
+    def test_mod(self):
+        parsed = Expression.parse("3 % 2")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 1
+        assert error is None
+
+        parsed = Expression.parse("(4+1) % 2")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 1
+        assert error is None
+
+        parsed = Expression.parse("(4+1.5) % 2")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 1.5
+        assert error is None
+
+        parsed = Expression.parse("mod(8, 3)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 2
+        assert error is None
+
+    def test_average(self):
+        parsed = Expression.parse("average(createArray(3, 2))")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 2.5
+        assert error is None
+
+        parsed = Expression.parse("average(createArray(5, 2))")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 3.5
+        assert error is None
+
+        parsed = Expression.parse("average(createArray(4, 2))")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 3
+        assert error is None
+
+        parsed = Expression.parse("average(createArray(8, -3))")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 2.5
+        assert error is None
+
+    def test_sum(self):
+        parsed = Expression.parse("sum(createArray(3, 2))")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 5
+        assert error is None
+
+        parsed = Expression.parse("sum(createArray(5.2, 2.8))")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 8
+        assert error is None
+
+        parsed = Expression.parse("sum(createArray(4.2, 2))")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 6.2
+        assert error is None
+
+        parsed = Expression.parse("sum(createArray(8.5, -3))")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 5.5
+        assert error is None
+
+    def test_range(self):
+        parsed = Expression.parse("range(1, 4)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        print(value)
+        assert value == [1, 2, 3, 4]
+        assert error is None
+
+        parsed = Expression.parse("range(-1, 6)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == [-1, 0, 1, 2, 3, 4]
+        assert error is None
+
+    def test_floor(self):
+        parsed = Expression.parse("floor(3.51)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        print(value)
+        assert value == 3
+        assert error is None
+
+        parsed = Expression.parse("floor(4.00)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 4
+        assert error is None
+
+    def test_ceiling(self):
+        parsed = Expression.parse("ceiling(3.51)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        print(value)
+        assert value == 4
+        assert error is None
+
+        parsed = Expression.parse("ceiling(4.00)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 4
+        assert error is None
+
+    def test_round(self):
+        parsed = Expression.parse("round(3.51)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        print(value)
+        assert value == 4
+        assert error is None
+
+        # please notice that 5 will not round up
+        parsed = Expression.parse("round(3.55, 1)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 3.5
+        assert error is None
+
+        # it will round up only if value is more than 5
+        parsed = Expression.parse("round(3.56, 1)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 3.6
+        assert error is None
+
+        parsed = Expression.parse("round(3.12134, 3)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 3.121
+        assert error is None

@@ -45,6 +45,33 @@ class FunctionUtils:
         return FunctionUtils.validate_arity_and_any_type(expression, 1, sys.maxsize)
 
     @staticmethod
+    def validate_unary(expression: object):
+        return FunctionUtils.validate_arity_and_any_type(expression, 1, 1)
+
+    @staticmethod
+    def validate_binary_number(expression: object):
+        return FunctionUtils.validate_arity_and_any_type(
+            expression, 2, 2, ReturnType.Number
+        )
+
+    @staticmethod
+    def validator_order(expression: object, optional: list, types: list):
+        # TODO: add implmentation
+        pass
+
+    @staticmethod
+    def validate_unary_number(expression: object):
+        return FunctionUtils.validate_arity_and_any_type(
+            expression, 1, 1, ReturnType.Number
+        )
+
+    @staticmethod
+    def validate_unary_or_binary_number(expression: object):
+        return FunctionUtils.validate_arity_and_any_type(
+            expression, 1, 2, ReturnType.Number
+        )
+
+    @staticmethod
     def verify_number_or_string_or_null(value: object, expression: object, number: int):
         error: str = None
         if not isinstance(value, numbers.Number) and not isinstance(value, str):
@@ -53,7 +80,7 @@ class FunctionUtils:
         return error
 
     @staticmethod
-    def verify_numbers(value: object, expression: object, pos: int):
+    def verify_number(value: object, expression: object, pos: int):
         error: str = None
         if not isinstance(value, numbers.Number):
             error = expression + " is not a number."
@@ -68,6 +95,27 @@ class FunctionUtils:
 
         if not isinstance(value, list):
             error = expression + " is neither a list nor a number."
+        else:
+            for elt in value:
+                if not isinstance(elt, numbers.Number):
+                    error = elt + " is not a number in " + expression
+                    break
+
+        return error
+
+    @staticmethod
+    def verify_integer(value: object, expression: object, number: int):
+        error: str = None
+        if isinstance(value, int):
+            error = expression + " is not an integer."
+
+        return error
+
+    @staticmethod
+    def verify_numeric_list(value: object, expression: object, number: int):
+        error: str = None
+        if not isinstance(value, list):
+            error = expression + " is not a list."
         else:
             for elt in value:
                 if not isinstance(elt, numbers.Number):
@@ -234,3 +282,14 @@ class FunctionUtils:
         value = result
         error = None
         return value, error
+
+    @staticmethod
+    def parse_int(obj: object):
+        result: int = 0
+        error: str = None
+        if not obj.is_integer():
+            error = str(obj) + " must be a integer."
+        else:
+            result = int(obj)
+
+        return result, error

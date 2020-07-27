@@ -23,5 +23,5 @@ class MultivariateNumericEvaluator(ExpressionEvaluator):
         function: Callable[[list], object], verify: VerifyExpression = None
     ):
         return FunctionUtils.apply_sequence(
-            function, verify if verify is not None else FunctionUtils.verify_numbers,
+            function, verify if verify is not None else FunctionUtils.verify_number,
         )
