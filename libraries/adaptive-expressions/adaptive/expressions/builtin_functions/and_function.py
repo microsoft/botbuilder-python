@@ -4,6 +4,7 @@ from ..options import Options
 from ..function_utils import FunctionUtils
 from ..return_type import ReturnType
 
+
 class And(ExpressionEvaluator):
     def __init__(self):
         super().__init__(

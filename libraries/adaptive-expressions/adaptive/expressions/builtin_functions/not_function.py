@@ -4,6 +4,7 @@ from ..return_type import ReturnType
 from ..options import Options
 from ..function_utils import FunctionUtils
 
+
 class Not(ExpressionEvaluator):
     def __init__(self):
         super().__init__(
@@ -23,4 +24,3 @@ class Not(ExpressionEvaluator):
             error = None
             result = True
         return result, error
-            

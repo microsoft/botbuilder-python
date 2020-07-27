@@ -2,6 +2,7 @@ from .comparison_evaluator import ComparisonEvaluator
 from ..expression_type import GREATERTHAN
 from ..function_utils import FunctionUtils
 
+
 class GreaterThan(ComparisonEvaluator):
     def __init__(self):
         super().__init__(

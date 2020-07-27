@@ -24,6 +24,11 @@ NOT = "!"
 
 "String"
 CONCAT = "concat"
+LENGTH = "length"
+REPLACE = "replace"
+REPLACEIGNORECASE = "replaceIgnoreCase"
+SPLIT = "split"
+SUBSTRING = "substring"
 
 "Memory"
 ACCESSOR = "Accessor"

@@ -2,6 +2,7 @@ from .comparison_evaluator import ComparisonEvaluator
 from ..expression_type import LESSTHANOREQUAL
 from ..function_utils import FunctionUtils
 
+
 class LessThanOrEqual(ComparisonEvaluator):
     def __init__(self):
         super().__init__(

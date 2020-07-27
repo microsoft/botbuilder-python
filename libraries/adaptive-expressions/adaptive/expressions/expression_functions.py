@@ -1,4 +1,14 @@
-from .expression_type import ADD, SUBTRACT, MULTIPLY, DIVIDE, EQUAL, LESSTHAN, LESSTHANOREQUAL, GREATERTHAN, GREATERTHANOREQUAL, NOT, NOTEQUAL, EXIST, OR, AND
+from .expression_type import ADD, SUBTRACT, MULTIPLY, DIVIDE, EQUAL
+from .expression_type import (
+    LESSTHAN,
+    LESSTHANOREQUAL,
+    GREATERTHAN,
+    GREATERTHANOREQUAL,
+    NOT,
+    OR,
+    AND,
+    CONCAT,
+)
 from .builtin_functions.add import Add
 from .builtin_functions.subtract import Subtract
 from .builtin_functions.multiply import Multiply
@@ -17,6 +27,13 @@ from .builtin_functions.exist import Exist
 from .builtin_functions.not_function import Not
 from .builtin_functions.or_function import Or
 from .builtin_functions.and_function import And
+
+from .builtin_functions.concat import Concat
+from .builtin_functions.length import Length
+from .builtin_functions.replace import Replace
+from .builtin_functions.replace_ignore_case import ReplaceIgnoreCase
+from .builtin_functions.split import Split
+
 
 def get_standard_functions() -> dict:
     functions = []
@@ -44,6 +61,14 @@ def get_standard_functions() -> dict:
     functions.append(Or())
     functions.append(And())
 
+    # string
+    functions.append(Concat())
+    functions.append(Length())
+    functions.append(Replace())
+    functions.append(ReplaceIgnoreCase())
+    functions.append(Split())
+    # skip substring
+
     lookup = dict()
     for function in functions:
         lookup[function.expr_type] = function
@@ -65,6 +90,8 @@ def get_standard_functions() -> dict:
     lookup["not"] = lookup[NOT]
     lookup["or"] = lookup[OR]
     lookup["and"] = lookup[AND]
+
+    lookup["&"] = lookup[CONCAT]
 
     return lookup
 

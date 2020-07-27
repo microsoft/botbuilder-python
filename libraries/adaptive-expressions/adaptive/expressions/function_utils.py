@@ -36,6 +36,13 @@ class FunctionUtils:
                     # TODO: raise error with BuildTypeValidatorError
                     raise Exception("return type validation failed.")
 
+    # @staticmethod
+    # def validate_order(expression: object, optional: list, types: list):
+    #     if optional is None:
+    #         optional = []
+    #     if len(expression.children) < len(types) or len(expression.children) > len(types) + len(optional):
+    #         raise Exception()
+
     @staticmethod
     def validate_binary(expression: object):
         FunctionUtils.validate_arity_and_any_type(expression, 2, 2)
@@ -60,6 +67,19 @@ class FunctionUtils:
     @staticmethod
     def validate_unary(expression: object):
         return FunctionUtils.validate_arity_and_any_type(expression, 1, 1)
+
+    @staticmethod
+    def validate_unary_string(expression: object):
+        return FunctionUtils.validate_arity_and_any_type(
+            expression, 1, 1, ReturnType.String
+        )
+
+    @staticmethod
+    def verify_string_or_null(value: object, expression: object, number: int):
+        error: str = None
+        if not isinstance(value, str) and value is not None:
+            error = str(expression) + " is neither a string nor a null object."
+        return error
 
     @staticmethod
     def verify_number_or_string_or_null(value: object, expression: object, number: int):

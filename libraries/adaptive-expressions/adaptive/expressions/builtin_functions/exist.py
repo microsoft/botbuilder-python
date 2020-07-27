@@ -2,11 +2,14 @@ from .comparison_evaluator import ComparisonEvaluator
 from ..expression_type import EXIST
 from ..function_utils import FunctionUtils
 
-class Exist(ComparisonEvaluator):
 
+class Exist(ComparisonEvaluator):
     def __init__(self):
         super().__init__(
-            EXIST, Exist.function, FunctionUtils.validate_unary, FunctionUtils.verify_not_null
+            EXIST,
+            Exist.function,
+            FunctionUtils.validate_unary,
+            FunctionUtils.verify_not_null,
         )
 
     @staticmethod
