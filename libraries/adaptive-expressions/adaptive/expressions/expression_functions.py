@@ -47,6 +47,12 @@ from .builtin_functions.length import Length
 from .builtin_functions.replace import Replace
 from .builtin_functions.replace_ignore_case import ReplaceIgnoreCase
 from .builtin_functions.split import Split
+from .builtin_functions.to_lower import ToLower
+from .builtin_functions.to_upper import ToUpper
+from .builtin_functions.trim import Trim
+from .builtin_functions.ends_with import EndsWith
+from .builtin_functions.starts_with import StartsWith
+from .builtin_functions.count_word import CountWord
 
 # Colleaction
 # DataTime
@@ -103,6 +109,12 @@ def get_standard_functions() -> dict:
     functions.append(ReplaceIgnoreCase())
     functions.append(Split())
     # TODO: substring, skipped
+    functions.append(ToLower())
+    functions.append(ToUpper())
+    functions.append(Trim())
+    functions.append(EndsWith())
+    functions.append(StartsWith())
+    functions.append(CountWord())
 
     # Colleaction
     # DataTime

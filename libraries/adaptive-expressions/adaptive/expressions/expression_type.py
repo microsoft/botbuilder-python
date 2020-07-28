@@ -23,7 +23,6 @@ GREATERTHAN = ">"
 GREATERTHANOREQUAL = ">="
 EXIST = "exists"
 
-
 "Logic"
 AND = "&&"
 OR = "||"
@@ -36,6 +35,13 @@ REPLACE = "replace"
 REPLACEIGNORECASE = "replaceIgnoreCase"
 SPLIT = "split"
 SUBSTRING = "substring"
+TOLOWER = "toLower"
+TOUPPER = "toUpper"
+TRIM = "trim"
+ENDSWITH = "endsWith"
+STARTSWITH = "startsWith"
+COUNTWORD = "countWord"
+
 
 "Memory"
 ACCESSOR = "Accessor"

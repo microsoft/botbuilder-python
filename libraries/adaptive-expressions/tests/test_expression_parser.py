@@ -621,6 +621,8 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert value == "heo"
         assert error is None
 
+        # TODO: escape sign, the following two cases is different from C#!
+
         parsed = Expression.parse("replace('hello\n', '\n', '\\\\')")
         assert parsed is not None
 
@@ -678,3 +680,155 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         value, error = parsed.try_evaluate({})
         assert value == ["h", "e", "l", "l", "o"]
         assert error is None
+
+    # TODO: test of substring
+
+    def test_to_lower(self):
+        parsed = Expression.parse('toLower("UpCase")')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 'upcase'
+        assert error is None
+
+    def test_to_upper(self):
+        parsed = Expression.parse('toUpper("UpCase")')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 'UPCASE'
+        assert error is None
+
+        parsed = Expression.parse('toUpper(toLower("UpCase"))')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 'UPCASE'
+        assert error is None
+
+    def test_trim(self):
+        parsed = Expression.parse('trim("  hello  ")')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 'hello'
+        assert error is None
+
+        parsed = Expression.parse('trim(" hello")')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 'hello'
+        assert error is None
+
+        parsed = Expression.parse('trim("")')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == ''
+        assert error is None
+
+        # TODO: the following test
+        # parsed = Expression.parse('trim(nullobj)')
+        # assert parsed is not None
+
+        # value, error = parsed.try_evaluate({})
+        # assert value == ''
+        # assert error is None
+
+    def test_ends_with(self):
+        parsed = Expression.parse('endsWith("hello", "o")')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is True
+        assert error is None
+
+        parsed = Expression.parse('endsWith("hello", "e")')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is False
+        assert error is None
+
+        # TODO: the following four cases
+        # parsed = Expression.parse('endsWith(hello, "o")')
+        # assert parsed is not None
+
+        # value, error = parsed.try_evaluate({})
+        # assert value is True
+        # assert error is None
+
+        # parsed = Expression.parse('endsWith(hello, "a")')
+        # assert parsed is not None
+
+        # value, error = parsed.try_evaluate({})
+        # assert value is False
+        # assert error is None
+
+        # parsed = Expression.parse('endsWith(nullObj, "o")')
+        # assert parsed is not None
+
+        # value, error = parsed.try_evaluate({})
+        # assert value is False
+        # assert error is None
+
+        # parsed = Expression.parse('endsWith(hello, nullObj)')
+        # assert parsed is not None
+
+        # value, error = parsed.try_evaluate({})
+        # assert value is True
+        # assert error is None
+
+    def test_starts_with(self):
+        parsed = Expression.parse('startsWith("hello", "h")')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is True
+        assert error is None
+
+        parsed = Expression.parse('startsWith("hello", "a")')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is False
+        assert error is None
+
+        # TODO: the following two cases
+        # parsed = Expression.parse('startsWith(nullObj, "o")')
+        # assert parsed is not None
+
+        # value, error = parsed.try_evaluate({})
+        # assert value is False
+        # assert error is None
+
+        # parsed = Expression.parse('endsWith("hello", nullObj)')
+        # assert parsed is not None
+
+        # value, error = parsed.try_evaluate({})
+        # assert value is True
+        # assert error is None
+
+    def test_count_word(self):
+        parsed = Expression.parse('countWord("hello")')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 1
+        assert error is None
+
+        parsed = Expression.parse('countWord(concat("hello", " ", "world"))')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 2
+        assert error is None
+
+        # TODO: the following case
+        # parsed = Expression.parse('countWord(nullObj)')
+        # assert parsed is not None
+
+        # value, error = parsed.try_evaluate({})
+        # assert value == 0
+        # assert error is None
