@@ -832,3 +832,98 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         # value, error = parsed.try_evaluate({})
         # assert value == 0
         # assert error is None
+
+    def test_add_ordinal(self):
+        parsed = Expression.parse('addOrdinal(11)')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == "11th"
+        assert error is None
+
+        parsed = Expression.parse('addOrdinal(11+1)')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == "12th"
+        assert error is None
+
+        parsed = Expression.parse('addOrdinal(11+2)')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == "13th"
+        assert error is None
+
+        parsed = Expression.parse('addOrdinal(11+10)')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == "21st"
+        assert error is None
+
+        parsed = Expression.parse('addOrdinal(11+11)')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == "22nd"
+        assert error is None
+
+        parsed = Expression.parse('addOrdinal(11+12)')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == "23rd"
+        assert error is None
+
+        parsed = Expression.parse('addOrdinal(11+13)')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == "24th"
+        assert error is None
+
+        parsed = Expression.parse('addOrdinal(-1)')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == "-1"
+        assert error is None
+
+    def test_new_guid(self):
+        parsed = Expression.parse('length(newGuid())')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 36
+        assert error is None
+
+    # TODO: test_index_of
+    # def test_index_of(self):
+    #     parsed = Expression.parse("indexOf('hello', '-')")
+    #     assert parsed is not None
+
+    #     value, error = parsed.try_evaluate({})
+    #     assert value == -1
+    #     assert error is None
+
+    #     parsed = Expression.parse("indexOf('hello', 'h')")
+    #     assert parsed is not None
+
+    #     value, error = parsed.try_evaluate({})
+    #     assert value == 0
+    #     assert error is None
+
+    #     parsed = Expression.parse("indexOf(createArray('abc', 'def', 'ghi'), 'def')")
+    #     assert parsed is not None
+
+    #     value, error = parsed.try_evaluate({})
+    #     assert value == 1
+    #     assert error is None
+
+    #     parsed = Expression.parse("indexOf(createArray('abc', 'def', 'ghi'), 'klm')")
+    #     assert parsed is not None
+
+    #     value, error = parsed.try_evaluate({})
+    #     assert value == 1
+    #     assert error is None

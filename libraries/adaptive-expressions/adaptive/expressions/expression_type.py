@@ -41,6 +41,9 @@ TRIM = "trim"
 ENDSWITH = "endsWith"
 STARTSWITH = "startsWith"
 COUNTWORD = "countWord"
+ADDORDINAL = "addOrdinal"
+NEWGUID = "newGuid"
+INDEXOF = "indexOf"
 
 
 "Memory"

@@ -224,7 +224,7 @@ class FunctionUtils:
         def anonymous_function(
             expression: object, state: MemoryInterface, options: Options
         ):
-            value: object
+            value: object = None
             error: str
             args: []
             args, error = FunctionUtils.evaluate_children(
@@ -249,7 +249,7 @@ class FunctionUtils:
     ):
         args = []
         value: object
-        error: str
+        error: str = None
         pos = 0
 
         for child in expression.children:
