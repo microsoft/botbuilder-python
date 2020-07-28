@@ -72,7 +72,7 @@ from .builtin_functions.create_array import CreateArray
 # Regular expression
 # Type Checking
 
-
+# pylint: disable=R0915
 def get_standard_functions() -> dict:
     functions = []
 
