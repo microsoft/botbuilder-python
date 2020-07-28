@@ -477,6 +477,13 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert value is False
         assert error is None
 
+        parsed = Expression.parse("(1+2) >= (4-1)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is True
+        assert error is None
+
         parsed = Expression.parse("3.3 >= 1")
         assert parsed is not None
 
@@ -504,6 +511,20 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
 
         value, error = parsed.try_evaluate({})
         assert value is False
+        assert error is None
+
+        parsed = Expression.parse("\'hello\' != \'hello\'")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is False
+        assert error is None
+
+        parsed = Expression.parse("\'hello\' != \'world\'")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is True
         assert error is None
 
     # TODO: add exists test
@@ -586,6 +607,34 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert value == "hekko"
         assert error is None
 
+        parsed = Expression.parse('replace("hello", "L", "k")')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == "hello"
+        assert error is None
+
+        parsed = Expression.parse('replace("hello", "l", "")')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == "heo"
+        assert error is None
+
+        parsed = Expression.parse("replace('hello\n', '\n', '\\\\')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == r"hello\\"
+        assert error is None
+
+        parsed = Expression.parse(r"replace('hello\\', '\\', '\\\\')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == r"hello\\\\"
+        assert error is None
+
     def test_replace_ignore_case(self):
         parsed = Expression.parse('replaceIgnoreCase("hello", "L", "K")')
         assert parsed is not None
@@ -614,4 +663,18 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
 
         value, error = parsed.try_evaluate({})
         assert value == [""]
+        assert error is None
+
+        parsed = Expression.parse('split("", "")')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == []
+        assert error is None
+
+        parsed = Expression.parse('split("hello", "")')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == ["h", "e", "l", "l", "o"]
         assert error is None
