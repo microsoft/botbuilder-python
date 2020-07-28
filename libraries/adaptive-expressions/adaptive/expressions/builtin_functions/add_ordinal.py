@@ -20,6 +20,7 @@ class AddOrdinal(ExpressionEvaluator):
             if error is None:
                 result = AddOrdinal.eval_add_ordinal(input_var)
             return result, error
+
         return FunctionUtils.apply_with_error(
             anonymous_function, FunctionUtils.verify_integer
         )

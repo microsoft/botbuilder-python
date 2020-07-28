@@ -1,6 +1,7 @@
 from ..expression_type import TRIM
 from .string_transform_evaluator import StringTransformEvaluator
 
+
 class Trim(StringTransformEvaluator):
     def __init__(self):
         super().__init__(TRIM, Trim.func)

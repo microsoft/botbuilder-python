@@ -16,6 +16,7 @@ class NewGuid(ExpressionEvaluator):
         # pylint: disable = W0613
         def anonymous_function(args):
             return str(uuid.uuid1())
+
         return FunctionUtils.apply(anonymous_function)
 
     @staticmethod

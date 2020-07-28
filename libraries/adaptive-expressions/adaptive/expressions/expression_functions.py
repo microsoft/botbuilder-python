@@ -55,6 +55,7 @@ from .builtin_functions.starts_with import StartsWith
 from .builtin_functions.count_word import CountWord
 from .builtin_functions.add_ordinal import AddOrdinal
 from .builtin_functions.new_guid import NewGuid
+
 # from .builtin_functions.index_of import IndexOf
 
 # Colleaction

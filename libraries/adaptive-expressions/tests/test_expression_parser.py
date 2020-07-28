@@ -513,14 +513,14 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert value is False
         assert error is None
 
-        parsed = Expression.parse("\'hello\' != \'hello\'")
+        parsed = Expression.parse("'hello' != 'hello'")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
         assert value is False
         assert error is None
 
-        parsed = Expression.parse("\'hello\' != \'world\'")
+        parsed = Expression.parse("'hello' != 'world'")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
@@ -688,7 +688,7 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
-        assert value == 'upcase'
+        assert value == "upcase"
         assert error is None
 
     def test_to_upper(self):
@@ -696,14 +696,14 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
-        assert value == 'UPCASE'
+        assert value == "UPCASE"
         assert error is None
 
         parsed = Expression.parse('toUpper(toLower("UpCase"))')
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
-        assert value == 'UPCASE'
+        assert value == "UPCASE"
         assert error is None
 
     def test_trim(self):
@@ -711,21 +711,21 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
-        assert value == 'hello'
+        assert value == "hello"
         assert error is None
 
         parsed = Expression.parse('trim(" hello")')
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
-        assert value == 'hello'
+        assert value == "hello"
         assert error is None
 
         parsed = Expression.parse('trim("")')
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
-        assert value == ''
+        assert value == ""
         assert error is None
 
         # TODO: the following test
@@ -834,56 +834,56 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         # assert error is None
 
     def test_add_ordinal(self):
-        parsed = Expression.parse('addOrdinal(11)')
+        parsed = Expression.parse("addOrdinal(11)")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
         assert value == "11th"
         assert error is None
 
-        parsed = Expression.parse('addOrdinal(11+1)')
+        parsed = Expression.parse("addOrdinal(11+1)")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
         assert value == "12th"
         assert error is None
 
-        parsed = Expression.parse('addOrdinal(11+2)')
+        parsed = Expression.parse("addOrdinal(11+2)")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
         assert value == "13th"
         assert error is None
 
-        parsed = Expression.parse('addOrdinal(11+10)')
+        parsed = Expression.parse("addOrdinal(11+10)")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
         assert value == "21st"
         assert error is None
 
-        parsed = Expression.parse('addOrdinal(11+11)')
+        parsed = Expression.parse("addOrdinal(11+11)")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
         assert value == "22nd"
         assert error is None
 
-        parsed = Expression.parse('addOrdinal(11+12)')
+        parsed = Expression.parse("addOrdinal(11+12)")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
         assert value == "23rd"
         assert error is None
 
-        parsed = Expression.parse('addOrdinal(11+13)')
+        parsed = Expression.parse("addOrdinal(11+13)")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
         assert value == "24th"
         assert error is None
 
-        parsed = Expression.parse('addOrdinal(-1)')
+        parsed = Expression.parse("addOrdinal(-1)")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
@@ -891,7 +891,7 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert error is None
 
     def test_new_guid(self):
-        parsed = Expression.parse('length(newGuid())')
+        parsed = Expression.parse("length(newGuid())")
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})

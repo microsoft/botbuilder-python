@@ -1,6 +1,7 @@
 from ..expression_type import TOLOWER
 from .string_transform_evaluator import StringTransformEvaluator
 
+
 class ToLower(StringTransformEvaluator):
     def __init__(self):
         super().__init__(TOLOWER, ToLower.func)

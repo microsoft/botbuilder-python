@@ -20,6 +20,7 @@ class StartsWith(ExpressionEvaluator):
             if isinstance(args[1], str):
                 seek_str = args[1]
             return raw_str.startswith(seek_str)
+
         return FunctionUtils.apply(
             anonymous_function, FunctionUtils.verify_string_or_null
         )
