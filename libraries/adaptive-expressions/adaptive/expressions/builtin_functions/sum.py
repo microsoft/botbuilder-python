@@ -23,4 +23,4 @@ class Sum(ExpressionEvaluator):
 
     @staticmethod
     def validator(expression: object):
-        FunctionUtils.validator_order(expression, None, ReturnType.Array)
+        FunctionUtils.validator_order(expression, None, [ReturnType.Array])

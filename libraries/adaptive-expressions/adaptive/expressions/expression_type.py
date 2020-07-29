@@ -44,6 +44,10 @@ COUNTWORD = "countWord"
 ADDORDINAL = "addOrdinal"
 NEWGUID = "newGuid"
 INDEXOF = "indexOf"
+LASTINDEXOF = "lastIndexOf"
+EOL = "EOL"
+SENTENCECASE = "sentenceCase"
+TITLECASE = "titleCase"
 
 
 "Memory"

@@ -33,8 +33,7 @@ class FunctionUtils:
                 if (child.return_type & ReturnType.Object == 0) and (
                     return_type & child.return_type == 0
                 ):
-                    # TODO: raise error with BuildTypeValidatorError
-                    raise Exception("return type validation failed.")
+                    raise Exception(FunctionUtils.build_type_validator_error(return_type, child, expression))
 
     @staticmethod
     def validate_binary(expression: object):
@@ -68,8 +67,36 @@ class FunctionUtils:
 
     @staticmethod
     def validator_order(expression: object, optional: list, types: list):
-        # TODO: add implmentation
-        pass
+        if optional is None:
+            optional = []
+        if len(expression.children) < len(types) or len(expression.children) > len(types) + len(optional):
+            if len(optional) == 0:
+
+                raise Exception("{" + expression.to_string() + "} should have {" \
+                    + str(len(types)) + "} children.")
+
+            raise Exception("{" + expression.to_string() + "} should have between {" + str(len(types)) \
+                    + "} and {" + str(len(types) + len(optional)) + "} children.")
+
+        for i, child_type in enumerate(types):
+            child = expression.children[i]
+            child_return_type = child.return_type
+
+            if child_type & ReturnType.Object == 0 and child_return_type & ReturnType.Object == 0 \
+                 and child_type & child_return_type == 0:
+
+                raise Exception(FunctionUtils.build_type_validator_error(child_type, child, expression))
+        for i, child_type in enumerate(optional):
+            i_c = i + len(types)
+            if i_c >= len(expression.children):
+                break
+            child = expression.children[i_c]
+            child_return_type = child.return_type()
+
+            if child_type & ReturnType.Object == 0 and child_return_type & ReturnType.Object == 0 \
+                and child_type & child_return_type == 0:
+
+                raise Exception(FunctionUtils.build_type_validator_error(child_type, child, expression))
 
     @staticmethod
     def validate_unary_number(expression: object):
@@ -93,7 +120,7 @@ class FunctionUtils:
     def verify_string_or_null(value: object, expression: object, number: int):
         error: str = None
         if not isinstance(value, str) and value is not None:
-            error = str(expression) + " is neither a string nor a null object."
+            error = expression.to_string() + " is neither a string nor a null object."
         return error
 
     @staticmethod
@@ -153,7 +180,7 @@ class FunctionUtils:
     def verify_not_null(value: object, expression, number: int):
         error: str = None
         if value is not None:
-            error = str(expression) + " is null."
+            error = expression.to_string() + " is null."
         return error
 
     @staticmethod
@@ -333,4 +360,25 @@ class FunctionUtils:
             result = instance
         elif instance is None:
             result = False
+        return result
+
+    @staticmethod
+    def build_type_validator_error(return_type: ReturnType, child_expr: object, expr: object):
+        result: str
+        names: str
+        if return_type == (1,):
+            names = "Boolean"
+        elif return_type == (2,):
+            names = "Number"
+        elif return_type == (4,):
+            names = "Object"
+        elif return_type == (8,):
+            names = "String"
+        else:
+            names = "Array"
+        if not "," in names:
+            result = "{" + child_expr.to_string() + "} is not a {" \
+                + names + "} expression in {" + expr.to_string() + "}."
+        else:
+            result = "{" + child_expr.to_string() + "} in {" + expr.to_string() + "} is not any of [{" + names + "}]."
         return result

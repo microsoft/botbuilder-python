@@ -55,8 +55,11 @@ from .builtin_functions.starts_with import StartsWith
 from .builtin_functions.count_word import CountWord
 from .builtin_functions.add_ordinal import AddOrdinal
 from .builtin_functions.new_guid import NewGuid
-
-# from .builtin_functions.index_of import IndexOf
+from .builtin_functions.index_of import IndexOf
+from .builtin_functions.last_index_of import LastIndexOf
+from .builtin_functions.eol import Eol
+from .builtin_functions.sentence_case import SentenceCase
+from .builtin_functions.title_case import TitleCase
 
 # Colleaction
 # DataTime
@@ -121,8 +124,11 @@ def get_standard_functions() -> dict:
     functions.append(CountWord())
     functions.append(AddOrdinal())
     functions.append(NewGuid())
-    # TODO: indexOf, skipped
-    # functions.append(IndexOf())
+    functions.append(IndexOf())
+    functions.append(LastIndexOf())
+    functions.append(Eol())
+    functions.append(SentenceCase())
+    functions.append(TitleCase())
 
     # Colleaction
     # DataTime

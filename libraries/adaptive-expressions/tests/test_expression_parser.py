@@ -1,4 +1,5 @@
 import math
+import platform
 import aiounittest
 from adaptive.expressions import Expression
 
@@ -898,32 +899,112 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert value == 36
         assert error is None
 
-    # TODO: test_index_of
-    # def test_index_of(self):
-    #     parsed = Expression.parse("indexOf('hello', '-')")
-    #     assert parsed is not None
+    def test_index_of(self):
+        parsed = Expression.parse("indexOf('hello', '-')")
+        assert parsed is not None
 
-    #     value, error = parsed.try_evaluate({})
-    #     assert value == -1
-    #     assert error is None
+        value, error = parsed.try_evaluate({})
+        assert value == -1
+        assert error is None
 
-    #     parsed = Expression.parse("indexOf('hello', 'h')")
-    #     assert parsed is not None
+        parsed = Expression.parse("indexOf('hello', 'h')")
+        assert parsed is not None
 
-    #     value, error = parsed.try_evaluate({})
-    #     assert value == 0
-    #     assert error is None
+        value, error = parsed.try_evaluate({})
+        assert value == 0
+        assert error is None
 
-    #     parsed = Expression.parse("indexOf(createArray('abc', 'def', 'ghi'), 'def')")
-    #     assert parsed is not None
+        parsed = Expression.parse("indexOf(createArray('abc', 'def', 'ghi'), 'def')")
+        assert parsed is not None
 
-    #     value, error = parsed.try_evaluate({})
-    #     assert value == 1
-    #     assert error is None
+        value, error = parsed.try_evaluate({})
+        assert value == 1
+        assert error is None
 
-    #     parsed = Expression.parse("indexOf(createArray('abc', 'def', 'ghi'), 'klm')")
-    #     assert parsed is not None
+        parsed = Expression.parse("indexOf(createArray('abc', 'def', 'ghi'), 'klm')")
+        assert parsed is not None
 
-    #     value, error = parsed.try_evaluate({})
-    #     assert value == 1
-    #     assert error is None
+        value, error = parsed.try_evaluate({})
+        assert value == -1
+        assert error is None
+
+    def test_last_index_of(self):
+        parsed = Expression.parse("lastIndexOf('hello', '-')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == -1
+        assert error is None
+
+        parsed = Expression.parse("lastIndexOf('hello', 'l')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 3
+        assert error is None
+
+        parsed = Expression.parse("lastIndexOf(createArray('abc', 'def', 'ghi', 'def'), 'def')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 3
+        assert error is None
+
+        parsed = Expression.parse("lastIndexOf(createArray('abc', 'def', 'ghi'), 'klm')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == -1
+        assert error is None
+
+        parsed = Expression.parse("lastIndexOf(newGuid(), '-')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 23
+        assert error is None
+
+    def test_eol(self):
+        parsed = Expression.parse("EOL()")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == "\r\n" if platform.system() == "Windows" else "\n"
+        assert error is None
+
+    def test_sentence_case(self):
+        parsed = Expression.parse("sentenceCase('abc')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == "Abc"
+        assert error is None
+
+        parsed = Expression.parse("sentenceCase('aBc')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == "Abc"
+        assert error is None
+
+        parsed = Expression.parse("sentenceCase('a')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == "A"
+        assert error is None
+
+    def test_title_case(self):
+        parsed = Expression.parse("titleCase('a')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == "A"
+        assert error is None
+
+        parsed = Expression.parse("titleCase('abc dEF')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == "Abc Def"
+        assert error is None
