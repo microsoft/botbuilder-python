@@ -1013,3 +1013,124 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         value, error = parsed.try_evaluate({})
         assert value == "Abc Def"
         assert error is None
+
+    # Datetime
+    # TODO: test of add days
+    def test_add_days(self):
+        parsed = Expression.parse("addDays('2018-03-15T13:00:00.000000Z', 1)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == "2018-03-16T13:00:00.000000Z"
+        assert error is None
+
+    #     parsed = Expression.parse("addDays(timestamp, 1)")
+    #     assert parsed is not None
+
+    #     value, error = parsed.try_evaluate({})
+    #     assert value == "2018-03-16T13:00:00.000Z"
+    #     assert error is None
+
+    #     parsed = Expression.parse("addDays(timestampObj, 1)")
+    #     assert parsed is not None
+
+    #     value, error = parsed.try_evaluate({})
+    #     assert value == "2018-03-16T13:00:00.000Z"
+    #     assert error is None
+
+    #     parsed = Expression.parse("addDays(timestamp, 1,'MM-dd-yy')")
+    #     assert parsed is not None
+
+    #     value, error = parsed.try_evaluate({})
+    #     assert value == "03-16-18"
+    #     assert error is None
+
+    # TODO: test of add hours
+    def test_add_hours(self):
+        parsed = Expression.parse("addHours('2018-03-15T13:00:00.000000Z', 1)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == "2018-03-15T14:00:00.000000Z"
+        assert error is None
+
+    #     parsed = Expression.parse("addHours(timestamp, 1)")
+    #     assert parsed is not None
+
+    #     value, error = parsed.try_evaluate({})
+    #     assert value == "2018-03-15T14:00:00.000Z"
+    #     assert error is None
+
+    #     parsed = Expression.parse("addHours(timestampObj, 1)")
+    #     assert parsed is not None
+
+    #     value, error = parsed.try_evaluate({})
+    #     assert value == "2018-03-15T14:00:00.000Z"
+    #     assert error is None
+
+    #     parsed = Expression.parse("addHours(timestamp, 1,'MM-dd-yy hh-mm')")
+    #     assert parsed is not None
+
+    #     value, error = parsed.try_evaluate({})
+    #     assert value == "03-15-18 02-00"
+    #     assert error is None
+
+    # TODO: test of add minutes
+    def test_add_minutes(self):
+        parsed = Expression.parse("addMinutes('2018-03-15T13:00:00.000000Z', 1)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == "2018-03-15T13:01:00.000000Z"
+        assert error is None
+
+    #     parsed = Expression.parse("addMinutes(timestamp, 1)")
+    #     assert parsed is not None
+
+    #     value, error = parsed.try_evaluate({})
+    #     assert value == "2018-03-15T13:01:00.000Z"
+    #     assert error is None
+
+    #     parsed = Expression.parse("addMinutes(timestampObj, 1)")
+    #     assert parsed is not None
+
+    #     value, error = parsed.try_evaluate({})
+    #     assert value == "2018-03-15T13:01:00.000Z"
+    #     assert error is None
+
+    #     parsed = Expression.parse("addMinutes(timestamp, 1,'MM-dd-yy hh-mm')")
+    #     assert parsed is not None
+
+    #     value, error = parsed.try_evaluate({})
+    #     assert value == "03-15-18 01-01"
+    #     assert error is None
+
+    # TODO: test of add seconds
+    def test_add_seconds(self):
+        parsed = Expression.parse("addSeconds('2018-03-15T13:00:00.000000Z', 1)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == "2018-03-15T13:00:01.000000Z"
+        assert error is None
+
+    #     parsed = Expression.parse("addSeconds(timestamp, 1)")
+    #     assert parsed is not None
+
+    #     value, error = parsed.try_evaluate({})
+    #     assert value == "2018-03-15T13:00:01.000Z"
+    #     assert error is None
+
+    #     parsed = Expression.parse("addSeconds(timestampObj, 1)")
+    #     assert parsed is not None
+
+    #     value, error = parsed.try_evaluate({})
+    #     assert value == "2018-03-15T13:00:01.000Z"
+    #     assert error is None
+
+    #     parsed = Expression.parse("addSeconds(timestamp, 1,'MM-dd-yy hh-mm-ss')")
+    #     assert parsed is not None
+
+    #     value, error = parsed.try_evaluate({})
+    #     assert value == "03-15-18 01-00-01"
+    #     assert error is None

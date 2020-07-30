@@ -49,7 +49,6 @@ EOL = "EOL"
 SENTENCECASE = "sentenceCase"
 TITLECASE = "titleCase"
 
-
 "Memory"
 ACCESSOR = "Accessor"
 ELEMENT = "Element"
@@ -59,6 +58,12 @@ CREATEARRAY = "createArray"
 FOREACH = "foreach"
 WHERE = "where"
 SELECT = "select"
+
+"DateTime"
+ADDDAYS = "addDays"
+ADDHOURS = "addHours"
+ADDMINUTES = "addMinutes"
+ADDSECONDS = "addSeconds"
 
 "Misc"
 CONSTANT = "Constant"

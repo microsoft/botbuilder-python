@@ -88,14 +88,14 @@ class Expression:
     def reference_walk(
         self, expression: object, extension: Callable[[object], bool] = None
     ):
-        import constant as const
+        from .constant import Constant
 
         path: str
         refs = set()
         if extension is None or extension(expression):
             children = expression.children
             if expression.expr_type == ACCESSOR:
-                prop = str(const.Constant(children[0]).get_value())
+                prop = str(Constant(children[0]).get_value())
 
                 if len(children) == 1:
                     path = prop
@@ -107,8 +107,8 @@ class Expression:
             elif expression.expr_type == ELEMENT:
                 path, refs = self.reference_walk(children[0], extension)
                 if path is not None:
-                    if isinstance(children[1], const.Constant):
-                        cnst = const.Constant(children[1])
+                    if isinstance(children[1], Constant):
+                        cnst = Constant(children[1])
                         if cnst.return_type == ReturnType.String:
                             path += "." + cnst.get_value()
                         else:
@@ -139,7 +139,7 @@ class Expression:
                 if child2_path is not None:
                     refs2.add(child2_path)
 
-                iterator_name = str(const.Constant(children[1].children[0]).get_value())
+                iterator_name = str(Constant(children[1].children[0]).get_value())
                 non_local_refs = list(
                     filter(
                         lambda x: (
@@ -193,13 +193,13 @@ class Expression:
 
     @staticmethod
     def set_path_to_value(property: object, value: object):
-        import constant as const
+        from .constant import Constant
 
         if isinstance(value, Expression):
             return Expression.make_expression(SETPATHTOVALUE, None, property, value)
 
         return Expression.make_expression(
-            SETPATHTOVALUE, None, property, const.Constant(value)
+            SETPATHTOVALUE, None, property, Constant(value)
         )
 
     @staticmethod
@@ -242,15 +242,15 @@ class Expression:
         return self.evaluator.try_evaluate(self, state, options)
 
     def to_string(self):
-        import constant as const
+        from .constant import Constant
 
         builder = ""
         valid = False
         # Special support for memory paths
         if self.expr_type == ACCESSOR and len(self.children) >= 1:
             # pylint: disable=line-too-long
-            if isinstance(self.children[0], const.Constant) and isinstance(
-                const.Constant(self.children[0]).get_value(), str
+            if isinstance(self.children[0], Constant) and isinstance(
+                Constant(self.children[0]).get_value(), str
             ):
                 prop = self.children[0].get_value()
                 if len(self.children) == 1:

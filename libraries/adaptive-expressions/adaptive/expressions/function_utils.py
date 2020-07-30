@@ -1,5 +1,6 @@
 import numbers
 import sys
+from datetime import datetime
 from typing import Callable, NewType
 from .memory_interface import MemoryInterface
 from .options import Options
@@ -10,6 +11,8 @@ VerifyExpression = NewType("VerifyExpression", Callable[[object, object, int], s
 # pylint: disable=unused-argument
 class FunctionUtils:
     verify_expression = VerifyExpression
+    # default_date_time_format = "yyyy-MM-ddTHH:mm:ss.fffZ"
+    default_date_time_format = "%Y-%m-%dT%H:%M:%S.%fZ"
 
     @staticmethod
     def validate_arity_and_any_type(
@@ -393,6 +396,39 @@ class FunctionUtils:
         elif instance is None:
             result = False
         return result
+
+    @staticmethod
+    def normalize_to_date_time(timestamp: object, transform: Callable[[datetime], object] = None):
+        result: object = None
+        error: str = None
+        if isinstance(timestamp, str):
+            result, error = FunctionUtils.parse_iso_timestamp(timestamp, transform)
+        elif isinstance(timestamp, datetime):
+            result, error = transform(timestamp) if transform is not None else timestamp, None
+        else:
+            error = "{" + timestamp + "} should be a standard ISO format string or a DateTime object."
+        return result, error
+
+    @staticmethod
+    def parse_iso_timestamp(timestamp: str, transform: Callable[[datetime], object] = None):
+        result: object = None
+        error: str = None
+        parsed = None
+        try:
+            parsed = datetime.strptime(timestamp, FunctionUtils.default_date_time_format)
+            if parsed.strftime(FunctionUtils.default_date_time_format).upper() == timestamp.upper():
+                if transform is not None:
+                    result, error = transform(parsed)
+                else:
+                    result = parsed
+                    error = None
+            else:
+                error = "{" + timestamp + "} is not standard ISO format."
+        except:
+            error = "Could not parse {" + timestamp + "}"
+        return result, error
+
+
 
     @staticmethod
     def build_type_validator_error(

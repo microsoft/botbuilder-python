@@ -62,7 +62,13 @@ from .builtin_functions.sentence_case import SentenceCase
 from .builtin_functions.title_case import TitleCase
 
 # Colleaction
+
 # DataTime
+from .builtin_functions.add_days import AddDays
+from .builtin_functions.add_hours import AddHours
+from .builtin_functions.add_minutes import AddMinutes
+from .builtin_functions.add_seconds import AddSeconds
+
 # Timex
 # Conversions
 # URI Parsing Functions
@@ -131,7 +137,13 @@ def get_standard_functions() -> dict:
     functions.append(TitleCase())
 
     # Colleaction
+
     # DataTime
+    functions.append(AddDays())
+    functions.append(AddHours())
+    functions.append(AddMinutes())
+    functions.append(AddSeconds())
+
     # Timex
     # Conversions
     # URI Parsing Functions
