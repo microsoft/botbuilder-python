@@ -1,3 +1,4 @@
+# pylint: disable=too-many-lines
 import math
 import platform
 import aiounittest
@@ -943,14 +944,18 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert value == 3
         assert error is None
 
-        parsed = Expression.parse("lastIndexOf(createArray('abc', 'def', 'ghi', 'def'), 'def')")
+        parsed = Expression.parse(
+            "lastIndexOf(createArray('abc', 'def', 'ghi', 'def'), 'def')"
+        )
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})
         assert value == 3
         assert error is None
 
-        parsed = Expression.parse("lastIndexOf(createArray('abc', 'def', 'ghi'), 'klm')")
+        parsed = Expression.parse(
+            "lastIndexOf(createArray('abc', 'def', 'ghi'), 'klm')"
+        )
         assert parsed is not None
 
         value, error = parsed.try_evaluate({})

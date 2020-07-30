@@ -21,7 +21,9 @@ class LastIndexOf(ExpressionEvaluator):
                     result = str(args[0][::-1]).find(args[1])
                     result = -1 if result == -1 else len(args[0]) - result - 1
                 else:
-                    error = "Can only look for indexof string in " + expression.to_string()
+                    error = (
+                        "Can only look for indexof string in " + expression.to_string()
+                    )
             elif isinstance(args[0], list):
                 for i, arg in enumerate(list(args[0])[::-1]):
                     if args[1] == arg:
@@ -33,4 +35,6 @@ class LastIndexOf(ExpressionEvaluator):
 
     @staticmethod
     def validator(expression: object):
-        FunctionUtils.validator_order(expression, None, [ReturnType.Array | ReturnType.String, ReturnType.Object])
+        FunctionUtils.validator_order(
+            expression, None, [ReturnType.Array | ReturnType.String, ReturnType.Object]
+        )

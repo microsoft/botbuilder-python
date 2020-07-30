@@ -241,17 +241,18 @@ class Expression:
 
         return self.evaluator.try_evaluate(self, state, options)
 
-    # TODO: toString
     def to_string(self):
         import constant as const
+
         builder = ""
         valid = False
-        expr_type = self.evaluator.expr_type
         # Special support for memory paths
-        if expr_type == ACCESSOR and len(self.children) >= 1:
+        if self.expr_type == ACCESSOR and len(self.children) >= 1:
             # pylint: disable=line-too-long
-            if isinstance(self.children[0], const.Constant) and isinstance(const.Constant(self.children[0]).get_value(), str):
-                prop = str(const.Constant(self.children[0]).get_value())
+            if isinstance(self.children[0], const.Constant) and isinstance(
+                const.Constant(self.children[0]).get_value(), str
+            ):
+                prop = self.children[0].get_value()
                 if len(self.children) == 1:
                     valid = True
                     builder += prop
@@ -260,7 +261,7 @@ class Expression:
                     builder += self.children[1].to_string()
                     builder += "."
                     builder += prop
-        elif expr_type == ELEMENT and len(self.children) == 2:
+        elif self.expr_type == ELEMENT and len(self.children) == 2:
             valid = True
             builder += self.children[0].to_string()
             builder += "["
@@ -268,18 +269,22 @@ class Expression:
             builder += "]"
 
         if valid is False:
-            infix = len(expr_type) > 0 and not expr_type[0].isalpha() and self.children.count() >= 2
+            infix = (
+                len(self.expr_type) > 0
+                and not self.expr_type[0].isalpha()
+                and len(self.children) >= 2
+            )
             if infix is False:
-                builder += expr_type
+                builder += self.expr_type
             builder += "("
             first = True
             for child in self.children:
-                if first is True:
+                if first:
                     first = False
                 else:
-                    if infix is True:
+                    if infix:
                         builder += " "
-                        builder += expr_type
+                        builder += self.expr_type
                         builder += " "
                     else:
                         builder += ", "

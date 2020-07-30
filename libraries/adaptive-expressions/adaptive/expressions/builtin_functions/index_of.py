@@ -20,7 +20,9 @@ class IndexOf(ExpressionEvaluator):
                 if isinstance(args[1], str) or args[1] is None:
                     result = str(args[0]).find(args[1])
                 else:
-                    error = "Can only look for indexof string in " + expression.to_string()
+                    error = (
+                        "Can only look for indexof string in " + expression.to_string()
+                    )
             elif isinstance(args[0], list):
                 for i, arg in enumerate(list(args[0])):
                     if args[1] == arg:
@@ -32,4 +34,6 @@ class IndexOf(ExpressionEvaluator):
 
     @staticmethod
     def validator(expression: object):
-        FunctionUtils.validator_order(expression, None, [ReturnType.Array | ReturnType.String, ReturnType.Object])
+        FunctionUtils.validator_order(
+            expression, None, [ReturnType.Array | ReturnType.String, ReturnType.Object]
+        )

@@ -33,7 +33,11 @@ class FunctionUtils:
                 if (child.return_type & ReturnType.Object == 0) and (
                     return_type & child.return_type == 0
                 ):
-                    raise Exception(FunctionUtils.build_type_validator_error(return_type, child, expression))
+                    raise Exception(
+                        FunctionUtils.build_type_validator_error(
+                            return_type, child, expression
+                        )
+                    )
 
     @staticmethod
     def validate_binary(expression: object):
@@ -69,23 +73,44 @@ class FunctionUtils:
     def validator_order(expression: object, optional: list, types: list):
         if optional is None:
             optional = []
-        if len(expression.children) < len(types) or len(expression.children) > len(types) + len(optional):
+        if len(expression.children) < len(types) or len(expression.children) > len(
+            types
+        ) + len(optional):
             if len(optional) == 0:
 
-                raise Exception("{" + expression.to_string() + "} should have {" \
-                    + str(len(types)) + "} children.")
+                raise Exception(
+                    "{"
+                    + expression.to_string()
+                    + "} should have {"
+                    + str(len(types))
+                    + "} children."
+                )
 
-            raise Exception("{" + expression.to_string() + "} should have between {" + str(len(types)) \
-                    + "} and {" + str(len(types) + len(optional)) + "} children.")
+            raise Exception(
+                "{"
+                + expression.to_string()
+                + "} should have between {"
+                + str(len(types))
+                + "} and {"
+                + str(len(types) + len(optional))
+                + "} children."
+            )
 
         for i, child_type in enumerate(types):
             child = expression.children[i]
             child_return_type = child.return_type
 
-            if child_type & ReturnType.Object == 0 and child_return_type & ReturnType.Object == 0 \
-                 and child_type & child_return_type == 0:
+            if (
+                child_type & ReturnType.Object == 0
+                and child_return_type & ReturnType.Object == 0
+                and child_type & child_return_type == 0
+            ):
 
-                raise Exception(FunctionUtils.build_type_validator_error(child_type, child, expression))
+                raise Exception(
+                    FunctionUtils.build_type_validator_error(
+                        child_type, child, expression
+                    )
+                )
         for i, child_type in enumerate(optional):
             i_c = i + len(types)
             if i_c >= len(expression.children):
@@ -93,10 +118,17 @@ class FunctionUtils:
             child = expression.children[i_c]
             child_return_type = child.return_type()
 
-            if child_type & ReturnType.Object == 0 and child_return_type & ReturnType.Object == 0 \
-                and child_type & child_return_type == 0:
+            if (
+                child_type & ReturnType.Object == 0
+                and child_return_type & ReturnType.Object == 0
+                and child_type & child_return_type == 0
+            ):
 
-                raise Exception(FunctionUtils.build_type_validator_error(child_type, child, expression))
+                raise Exception(
+                    FunctionUtils.build_type_validator_error(
+                        child_type, child, expression
+                    )
+                )
 
     @staticmethod
     def validate_unary_number(expression: object):
@@ -363,7 +395,9 @@ class FunctionUtils:
         return result
 
     @staticmethod
-    def build_type_validator_error(return_type: ReturnType, child_expr: object, expr: object):
+    def build_type_validator_error(
+        return_type: ReturnType, child_expr: object, expr: object
+    ):
         result: str
         names: str
         if return_type == (1,):
@@ -377,8 +411,23 @@ class FunctionUtils:
         else:
             names = "Array"
         if not "," in names:
-            result = "{" + child_expr.to_string() + "} is not a {" \
-                + names + "} expression in {" + expr.to_string() + "}."
+            result = (
+                "{"
+                + child_expr.to_string()
+                + "} is not a {"
+                + names
+                + "} expression in {"
+                + expr.to_string()
+                + "}."
+            )
         else:
-            result = "{" + child_expr.to_string() + "} in {" + expr.to_string() + "} is not any of [{" + names + "}]."
+            result = (
+                "{"
+                + child_expr.to_string()
+                + "} in {"
+                + expr.to_string()
+                + "} is not any of [{"
+                + names
+                + "}]."
+            )
         return result
