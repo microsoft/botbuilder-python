@@ -4,6 +4,8 @@ from adaptive.expressions import Expression
 
 
 class ExpressionParserTests(aiounittest.AsyncTestCase):
+    scope = {"bag": {"three": 3.0}, "items": ["zero", "one", "two"]}
+
     # Math
     def test_add(self):
         parsed = Expression.parse("1+1.5")
@@ -614,4 +616,77 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
 
         value, error = parsed.try_evaluate({})
         assert value == [""]
+        assert error is None
+
+    # Collection
+    def test_count(self):
+        parsed = Expression.parse("count('hello')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 5
+        assert error is None
+
+        parsed = Expression.parse('count("hello")')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 5
+        assert error is None
+
+        parsed = Expression.parse("count(createArray('h', 'e', 'l', 'l', 'o'))")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 5
+        assert error is None
+
+    def test_contains(self):
+        parsed = Expression.parse("contains('hello world', 'hello')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value
+        assert error is None
+
+        parsed = Expression.parse("contains('hello world', 'hellow')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert not value
+        assert error is None
+
+        parsed = Expression.parse("contains('hello world',\r\n 'hellow')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert not value
+        assert error is None
+
+        parsed = Expression.parse("contains(items, 'zero')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value
+        assert error is None
+
+        parsed = Expression.parse("contains(items, 'hi')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert not value
+        assert error is None
+
+        parsed = Expression.parse("contains(bag, 'three')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value
+        assert error is None
+
+        parsed = Expression.parse("contains(bag, 'xxx')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert not value
         assert error is None

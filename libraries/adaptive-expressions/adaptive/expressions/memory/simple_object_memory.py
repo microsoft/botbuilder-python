@@ -23,7 +23,6 @@ class SimpleObjectMemory(MemoryInterface):
         if self.memory is None or len(path) == 0:
             return None
 
-        parts = re.findall(r"\[([^[\]]*)\]", path)
         parts = list(
             map(
                 lambda x: x[1:-1]
@@ -32,10 +31,9 @@ class SimpleObjectMemory(MemoryInterface):
                 or x.startswith("'")
                 and x.endswith("'")
                 else x,
-                parts,
+                list(filter(lambda x: (x is not None and x != ''), re.split(r"[.\[\]]+", path))),
             )
         )
-        parts = list(filter(lambda x: (x is not None and x), parts))
 
         value = None
         cur_scope = self.memory

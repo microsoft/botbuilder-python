@@ -49,12 +49,16 @@ from .builtin_functions.replace_ignore_case import ReplaceIgnoreCase
 from .builtin_functions.split import Split
 
 # Colleaction
+from .builtin_functions.count import Count
+from .builtin_functions.contains import Contains
+
 # DataTime
 # Timex
 # Conversions
 # URI Parsing Functions
 
 # Memory
+from .builtin_functions.accessor import Accessor
 from .builtin_functions.create_array import CreateArray
 
 # Misc
@@ -105,12 +109,16 @@ def get_standard_functions() -> dict:
     # TODO: substring, skipped
 
     # Colleaction
+    functions.append(Count())
+    functions.append(Contains())
+
     # DataTime
     # Timex
     # Conversions
     # URI Parsing Functions
 
     # Memory
+    functions.append(Accessor())
     functions.append(CreateArray())
 
     # Misc

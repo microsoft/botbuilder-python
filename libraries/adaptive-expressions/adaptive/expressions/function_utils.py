@@ -1,9 +1,11 @@
 import numbers
 import sys
+from collections.abc import Iterable
 from typing import Callable, NewType
 from .memory_interface import MemoryInterface
 from .options import Options
 from .return_type import ReturnType
+from .expression_type import ACCESSOR, ELEMENT
 
 VerifyExpression = NewType("VerifyExpression", Callable[[object, object, int], str])
 
@@ -67,7 +69,7 @@ class FunctionUtils:
         )
 
     @staticmethod
-    def validator_order(expression: object, optional: list, types: list):
+    def validate_order(expression: object, optional: list, types: list):
         # TODO: add implmentation
         pass
 
@@ -154,6 +156,14 @@ class FunctionUtils:
         error: str = None
         if value is not None:
             error = str(expression) + " is null."
+        return error
+
+    @staticmethod
+    def verify_container(value: object, expression: object, number: int):
+        error: str = None
+        if not isinstance(value, str) and not isinstance(value, Iterable):
+            error = expression + " must be a string or list."
+
         return error
 
     @staticmethod
@@ -334,3 +344,51 @@ class FunctionUtils:
         elif instance is None:
             result = False
         return result
+
+    @staticmethod
+    def try_accumulate_path(expression: object, state: MemoryInterface, options: Options):
+        path: str = ''
+        error: str = None
+        left = expression
+        while left is not None:
+            if left.expr_type == ACCESSOR:
+                path = str(left.children[0].get_value()) + '.' + path
+                left = left.children[1] if len(left.children) == 2 else None
+            elif left.expr_type == ELEMENT:
+                value, error = left.children[1].try_evaluate(state, options)
+
+                if error is not None:
+                    path = None
+                    left = None
+                    return path, left, error
+
+                if isinstance(value, numbers.Number) and value.is_integer():
+                    path = "[" + len(int(value)) + "]." + path
+                elif isinstance(value, str):
+                    path = "['" + value + "']." + path
+                else:
+                    path = None
+                    left = None
+                    error = left.children[1].to_string() + " doesn't return an int or string"
+                    return path, left, error
+
+                left = left.children[0]
+            else:
+                break
+
+        path = path.rstrip('.').replace(".[", "[")
+        if path == '':
+            path = None
+
+        return path, left, error
+
+    @staticmethod
+    def wrap_get_value(state: MemoryInterface, path: str, options: Options):
+        result = state.get_value(path)
+        if result is not None:
+            return result
+
+        if options.null_substitution is not None:
+            return options.null_substitution(path)
+
+        return None
