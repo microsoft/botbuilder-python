@@ -6,7 +6,12 @@ from adaptive.expressions import Expression
 
 
 class ExpressionParserTests(aiounittest.AsyncTestCase):
-    scope = {"bag": {"three": 3.0}, "items": ["zero", "one", "two"]}
+    scope = {
+        "hello": "hello",
+        "nullObj": None,
+        "bag": {"three": 3.0},
+        "items": ["zero", "one", "two"],
+    }
 
     # Math
     def test_add(self):
@@ -718,13 +723,12 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert value == ""
         assert error is None
 
-        # TODO: the following test
-        # parsed = Expression.parse('trim(nullobj)')
-        # assert parsed is not None
+        parsed = Expression.parse("trim(nullObj)")
+        assert parsed is not None
 
-        # value, error = parsed.try_evaluate({})
-        # assert value == ''
-        # assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == ""
+        assert error is None
 
     def test_ends_with(self):
         parsed = Expression.parse('endsWith("hello", "o")')
@@ -742,33 +746,33 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert error is None
 
         # TODO: the following four cases
-        # parsed = Expression.parse('endsWith(hello, "o")')
-        # assert parsed is not None
+        parsed = Expression.parse('endsWith(hello, "o")')
+        assert parsed is not None
 
-        # value, error = parsed.try_evaluate({})
-        # assert value is True
-        # assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value is True
+        assert error is None
 
-        # parsed = Expression.parse('endsWith(hello, "a")')
-        # assert parsed is not None
+        parsed = Expression.parse('endsWith(hello, "a")')
+        assert parsed is not None
 
-        # value, error = parsed.try_evaluate({})
-        # assert value is False
-        # assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value is False
+        assert error is None
 
-        # parsed = Expression.parse('endsWith(nullObj, "o")')
-        # assert parsed is not None
+        parsed = Expression.parse('endsWith(nullObj, "o")')
+        assert parsed is not None
 
-        # value, error = parsed.try_evaluate({})
-        # assert value is False
-        # assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value is False
+        assert error is None
 
-        # parsed = Expression.parse('endsWith(hello, nullObj)')
-        # assert parsed is not None
+        parsed = Expression.parse("endsWith(hello, nullObj)")
+        assert parsed is not None
 
-        # value, error = parsed.try_evaluate({})
-        # assert value is True
-        # assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value is True
+        assert error is None
 
     def test_starts_with(self):
         parsed = Expression.parse('startsWith("hello", "h")')
@@ -785,20 +789,19 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert value is False
         assert error is None
 
-        # TODO: the following two cases
-        # parsed = Expression.parse('startsWith(nullObj, "o")')
-        # assert parsed is not None
+        parsed = Expression.parse('startsWith(nullObj, "o")')
+        assert parsed is not None
 
-        # value, error = parsed.try_evaluate({})
-        # assert value is False
-        # assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value is False
+        assert error is None
 
-        # parsed = Expression.parse('endsWith("hello", nullObj)')
-        # assert parsed is not None
+        parsed = Expression.parse('endsWith("hello", nullObj)')
+        assert parsed is not None
 
-        # value, error = parsed.try_evaluate({})
-        # assert value is True
-        # assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value is True
+        assert error is None
 
     def test_count_word(self):
         parsed = Expression.parse('countWord("hello")')
@@ -815,13 +818,12 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert value == 2
         assert error is None
 
-        # TODO: the following case
-        # parsed = Expression.parse('countWord(nullObj)')
-        # assert parsed is not None
+        parsed = Expression.parse("countWord(nullObj)")
+        assert parsed is not None
 
-        # value, error = parsed.try_evaluate({})
-        # assert value == 0
-        # assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == 0
+        assert error is None
 
     def test_add_ordinal(self):
         parsed = Expression.parse("addOrdinal(11)")

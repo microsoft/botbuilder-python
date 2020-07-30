@@ -405,13 +405,15 @@ class FunctionUtils:
         return result
 
     @staticmethod
-    def try_accumulate_path(expression: object, state: MemoryInterface, options: Options):
-        path: str = ''
+    def try_accumulate_path(
+        expression: object, state: MemoryInterface, options: Options
+    ):
+        path: str = ""
         error: str = None
         left = expression
         while left is not None:
             if left.expr_type == ACCESSOR:
-                path = str(left.children[0].get_value()) + '.' + path
+                path = str(left.children[0].get_value()) + "." + path
                 left = left.children[1] if len(left.children) == 2 else None
             elif left.expr_type == ELEMENT:
                 value, error = left.children[1].try_evaluate(state, options)
@@ -428,15 +430,18 @@ class FunctionUtils:
                 else:
                     path = None
                     left = None
-                    error = left.children[1].to_string() + " doesn't return an int or string"
+                    error = (
+                        left.children[1].to_string()
+                        + " doesn't return an int or string"
+                    )
                     return path, left, error
 
                 left = left.children[0]
             else:
                 break
 
-        path = path.rstrip('.').replace(".[", "[")
-        if path == '':
+        path = path.rstrip(".").replace(".[", "[")
+        if path == "":
             path = None
 
         return path, left, error

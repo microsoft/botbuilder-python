@@ -18,7 +18,9 @@ class Accessor(ExpressionEvaluator):
         value: object = None
         error: str = None
 
-        path, left, error = FunctionUtils.try_accumulate_path(expression, state, options)
+        path, left, error = FunctionUtils.try_accumulate_path(
+            expression, state, options
+        )
 
         if error is not None:
             return value, error
@@ -34,7 +36,9 @@ class Accessor(ExpressionEvaluator):
             if error is not None:
                 return value, error
 
-            value = FunctionUtils.wrap_get_value(SimpleObjectMemory(new_scope), path, options)
+            value = FunctionUtils.wrap_get_value(
+                SimpleObjectMemory(new_scope), path, options
+            )
 
             return value, error
 
@@ -44,7 +48,11 @@ class Accessor(ExpressionEvaluator):
         from ..constant import Constant
 
         children = expression.children
-        if len(children) == 0 or not isinstance(children[0], Constant) or children[0].return_type != ReturnType.String:
+        if (
+            len(children) == 0
+            or not isinstance(children[0], Constant)
+            or children[0].return_type != ReturnType.String
+        ):
             raise Exception(expression + " must have a string as first argument.")
 
         if len(children) > 2:

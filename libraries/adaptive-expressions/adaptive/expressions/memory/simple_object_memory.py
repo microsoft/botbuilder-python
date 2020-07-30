@@ -31,7 +31,12 @@ class SimpleObjectMemory(MemoryInterface):
                 or x.startswith("'")
                 and x.endswith("'")
                 else x,
-                list(filter(lambda x: (x is not None and x != ''), re.split(r"[.\[\]]+", path))),
+                list(
+                    filter(
+                        lambda x: (x is not None and x != ""),
+                        re.split(r"[.\[\]]+", path),
+                    )
+                ),
             )
         )
 
