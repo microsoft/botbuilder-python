@@ -49,7 +49,7 @@ class ComparisonEvaluator(ExpressionEvaluator):
                         ):
                             error = (
                                 "Arguments must either all be numbers or strings in "
-                                + str(expression)
+                                + expression.to_string()
                                 + "}"
                             )
                             break

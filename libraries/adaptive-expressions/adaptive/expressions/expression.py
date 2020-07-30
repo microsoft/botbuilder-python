@@ -241,4 +241,53 @@ class Expression:
 
         return self.evaluator.try_evaluate(self, state, options)
 
-    # TODO: toString
+    def to_string(self):
+        from .constant import Constant
+
+        builder = ""
+        valid = False
+        # Special support for memory paths
+        if self.expr_type == ACCESSOR and len(self.children) >= 1:
+            # pylint: disable=line-too-long
+            if isinstance(self.children[0], Constant) and isinstance(
+                Constant(self.children[0]).get_value(), str
+            ):
+                prop = self.children[0].get_value()
+                if len(self.children) == 1:
+                    valid = True
+                    builder += prop
+                elif len(self.children) == 2:
+                    valid = True
+                    builder += self.children[1].to_string()
+                    builder += "."
+                    builder += prop
+        elif self.expr_type == ELEMENT and len(self.children) == 2:
+            valid = True
+            builder += self.children[0].to_string()
+            builder += "["
+            builder += self.children[1].to_string()
+            builder += "]"
+
+        if valid is False:
+            infix = (
+                len(self.expr_type) > 0
+                and not self.expr_type[0].isalpha()
+                and len(self.children) >= 2
+            )
+            if infix is False:
+                builder += self.expr_type
+            builder += "("
+            first = True
+            for child in self.children:
+                if first:
+                    first = False
+                else:
+                    if infix:
+                        builder += " "
+                        builder += self.expr_type
+                        builder += " "
+                    else:
+                        builder += ", "
+                builder += child.to_string()
+            builder += ")"
+        return builder

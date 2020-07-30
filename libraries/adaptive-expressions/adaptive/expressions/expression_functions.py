@@ -47,6 +47,19 @@ from .builtin_functions.length import Length
 from .builtin_functions.replace import Replace
 from .builtin_functions.replace_ignore_case import ReplaceIgnoreCase
 from .builtin_functions.split import Split
+from .builtin_functions.to_lower import ToLower
+from .builtin_functions.to_upper import ToUpper
+from .builtin_functions.trim import Trim
+from .builtin_functions.ends_with import EndsWith
+from .builtin_functions.starts_with import StartsWith
+from .builtin_functions.count_word import CountWord
+from .builtin_functions.add_ordinal import AddOrdinal
+from .builtin_functions.new_guid import NewGuid
+from .builtin_functions.index_of import IndexOf
+from .builtin_functions.last_index_of import LastIndexOf
+from .builtin_functions.eol import Eol
+from .builtin_functions.sentence_case import SentenceCase
+from .builtin_functions.title_case import TitleCase
 
 # Colleaction
 from .builtin_functions.count import Count
@@ -66,7 +79,7 @@ from .builtin_functions.create_array import CreateArray
 # Regular expression
 # Type Checking
 
-
+# pylint: disable=too-many-statements
 def get_standard_functions() -> dict:
     functions = []
 
@@ -107,6 +120,19 @@ def get_standard_functions() -> dict:
     functions.append(ReplaceIgnoreCase())
     functions.append(Split())
     # TODO: substring, skipped
+    functions.append(ToLower())
+    functions.append(ToUpper())
+    functions.append(Trim())
+    functions.append(EndsWith())
+    functions.append(StartsWith())
+    functions.append(CountWord())
+    functions.append(AddOrdinal())
+    functions.append(NewGuid())
+    functions.append(IndexOf())
+    functions.append(LastIndexOf())
+    functions.append(Eol())
+    functions.append(SentenceCase())
+    functions.append(TitleCase())
 
     # Colleaction
     functions.append(Count())
