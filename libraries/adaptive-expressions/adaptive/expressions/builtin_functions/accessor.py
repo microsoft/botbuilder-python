@@ -28,19 +28,19 @@ class Accessor(ExpressionEvaluator):
         if left is None:
             value = FunctionUtils.wrap_get_value(state, path, options)
             return value, error
-        else:
-            res = left.try_evaluate(state, options)
-            new_scope = res.value
-            error = res.error
 
-            if error is not None:
-                return value, error
+        res = left.try_evaluate(state, options)
+        new_scope = res.value
+        error = res.error
 
-            value = FunctionUtils.wrap_get_value(
-                SimpleObjectMemory(new_scope), path, options
-            )
-
+        if error is not None:
             return value, error
+
+        value = FunctionUtils.wrap_get_value(
+            SimpleObjectMemory(new_scope), path, options
+        )
+
+        return value, error
 
     @staticmethod
     def validator(expression: object):
