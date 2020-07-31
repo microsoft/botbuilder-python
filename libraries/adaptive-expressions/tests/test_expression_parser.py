@@ -11,6 +11,7 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         "nullObj": None,
         "bag": {"three": 3.0},
         "items": ["zero", "one", "two"],
+        "nestedItems": [{"x": 1}, {"x": 2}, {"x": 3},],
     }
 
     # Math
@@ -1087,4 +1088,143 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
 
         value, error = parsed.try_evaluate({})
         assert value == ["h", "e", "l", "l", "o"]
+        assert error is None
+
+    def test_empty(self):
+        parsed = Expression.parse("empty('')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value
+        assert error is None
+
+        parsed = Expression.parse("empty('a')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert not value
+        assert error is None
+
+        parsed = Expression.parse("empty(bag)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert not value
+        assert error is None
+
+        parsed = Expression.parse("empty(items)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert not value
+        assert error is None
+
+    def test_join(self):
+        parsed = Expression.parse("join(items, ',')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "zero,one,two"
+        assert error is None
+
+        parsed = Expression.parse("join(createArray('a', 'b', 'c'), '.')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == "a.b.c"
+        assert error is None
+
+        parsed = Expression.parse("join(createArray('a', 'b', 'c'), ',', ' and ')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == "a,b and c"
+        assert error is None
+
+        parsed = Expression.parse("join(createArray('a', 'b'), ',', ' and ')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == "a and b"
+        assert error is None
+
+        parsed = Expression.parse(
+            "join(createArray(\r\n'a',\r\n 'b'), ','\r\n,\r\n ' and ')"
+        )
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == "a and b"
+        assert error is None
+
+    def test_first(self):
+        parsed = Expression.parse("first(items)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "zero"
+        assert error is None
+
+        parsed = Expression.parse("first('hello')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == "h"
+        assert error is None
+
+        parsed = Expression.parse("first(createArray(0, 1, 2))")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 0
+        assert error is None
+
+        parsed = Expression.parse("first(1)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is None
+        assert error is None
+
+        parsed = Expression.parse("first(nestedItems).x")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == 1
+        assert error is None
+
+    def test_last(self):
+        parsed = Expression.parse("last(items)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "two"
+        assert error is None
+
+        parsed = Expression.parse("last('hello')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == "o"
+        assert error is None
+
+        parsed = Expression.parse("last(createArray(0, 1, 2))")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 2
+        assert error is None
+
+        parsed = Expression.parse("last(1)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value is None
+        assert error is None
+
+        parsed = Expression.parse("last(nestedItems).x")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == 3
         assert error is None

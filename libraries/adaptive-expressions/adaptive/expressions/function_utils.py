@@ -118,7 +118,7 @@ class FunctionUtils:
             if i_c >= len(expression.children):
                 break
             child = expression.children[i_c]
-            child_return_type = child.return_type()
+            child_return_type = child.return_type
 
             if (
                 child_type & ReturnType.Object == 0
