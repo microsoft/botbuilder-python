@@ -7,6 +7,7 @@ from adaptive.expressions import Expression
 
 class ExpressionParserTests(aiounittest.AsyncTestCase):
     scope = {
+        "one": 1.0,
         "hello": "hello",
         "nullObj": None,
         "bag": {"three": 3.0},
@@ -544,7 +545,27 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert value is True
         assert error is None
 
-    # TODO: add exists test
+    def test_exists(self):
+        parsed = Expression.parse("exists(one)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value
+        assert error is None
+
+        parsed = Expression.parse("exists(xxx)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert not value
+        assert error is None
+
+        parsed = Expression.parse("exists(one.xxx)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert not value
+        assert error is None
 
     # Logic
     def test_not(self):
@@ -1288,9 +1309,44 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert value == "2,3,4"
         assert error is None
 
-        # parsed = Expression.parse("join(foreach(items, item, concat(item, string(count(items)))), ',')")
-        # assert parsed is not None
+        parsed = Expression.parse(
+            "join(foreach(items, item, concat(item, string(count(items)))), ',')"
+        )
+        assert parsed is not None
 
-        # value, error = parsed.try_evaluate(self.scope)
-        # assert value == "zero3,one3,two3"
-        # assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "zero3,one3,two3"
+        assert error is None
+
+    def test_select(self):
+        parsed = Expression.parse("join(select(items, item, item), ',')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "zero,one,two"
+        assert error is None
+
+        parsed = Expression.parse("join(select(items, item=> item), ',')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "zero,one,two"
+        assert error is None
+
+        parsed = Expression.parse(
+            "join(select(nestedItems, i, i.x + first(nestedItems).x), ',')"
+        )
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "2,3,4"
+        assert error is None
+
+        parsed = Expression.parse(
+            "join(select(items, item, concat(item, string(count(items)))), ',')"
+        )
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "zero3,one3,two3"
+        assert error is None

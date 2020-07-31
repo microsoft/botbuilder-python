@@ -1,4 +1,4 @@
-"Math"
+# Math
 ADD = "+"
 SUBTRACT = "-"
 MULTIPLY = "*"
@@ -14,21 +14,21 @@ FLOOR = "floor"
 CEILING = "ceiling"
 ROUND = "round"
 
-"Comparisons"
+# Comparisons
 NOTEQUAL = "!="
 EQUAL = "=="
 LESSTHAN = "<"
 LESSTHANOREQUAL = "<="
 GREATERTHAN = ">"
 GREATERTHANOREQUAL = ">="
-EXIST = "exists"
+EXISTS = "exists"
 
-"Logic"
+# Logic
 AND = "&&"
 OR = "||"
 NOT = "!"
 
-"String"
+# String
 CONCAT = "concat"
 LENGTH = "length"
 REPLACE = "replace"
@@ -50,7 +50,7 @@ SENTENCECASE = "sentenceCase"
 TITLECASE = "titleCase"
 
 
-"Collection"
+# Collection
 COUNT = "count"
 CONTAINS = "contains"
 EMPTY = "empty"
@@ -71,21 +71,27 @@ INDICESANDVALUES = "indicesAndValues"
 FLATTEN = "flatten"
 UNIQUE = "unique"
 
-"Memory"
+# DateTime
+# Timex
+
+# Conversions
+STRING = "string"
+
+# URI Parsing Functions
+
+# Memory
 ACCESSOR = "Accessor"
 ELEMENT = "Element"
 CREATEARRAY = "createArray"
 
-"Collection"
-FOREACH = "foreach"
-WHERE = "where"
-SELECT = "select"
-
-"Misc"
+# Misc
 CONSTANT = "Constant"
 LAMBDA = "Lambda"
 
-"Object manipulation and construction functions"
+# Object manipulation and construction functions
 JSON = "json"
 SETPROPERTY = "setProperty"
 SETPATHTOVALUE = "setPathToValue"
+
+# Regular expression
+# Type checking

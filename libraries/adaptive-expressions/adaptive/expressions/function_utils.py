@@ -227,7 +227,7 @@ class FunctionUtils:
     @staticmethod
     def verify_not_null(value: object, expression, number: int):
         error: str = None
-        if value is not None:
+        if value is None:
             error = expression.to_string() + " is null."
         return error
 
@@ -379,14 +379,14 @@ class FunctionUtils:
         if instance is None:
             return value, error
 
-        instance_dict = dict(instance)
-        value = instance_dict.get(property)
-        if value is None:
-            prop = list(
-                filter(lambda x: (x.lower() == property.lower()), instance_dict.keys())
-            )
-            if len(prop) > 0:
-                value = instance_dict.get(prop[0])
+        if isinstance(instance, dict):
+            value = instance.get(property)
+            if value is None:
+                prop = list(
+                    filter(lambda x: (x.lower() == property.lower()), instance.keys())
+                )
+                if len(prop) > 0:
+                    value = instance.get(prop[0])
 
         return value, error
 

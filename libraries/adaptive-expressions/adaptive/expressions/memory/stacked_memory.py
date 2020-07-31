@@ -15,12 +15,12 @@ class StackedMemory(MemoryInterface, list):
     def get_value(self, path: str) -> object:
         if len(self) == 0:
             return None
-        else:
-            for memory in self[::-1]:
-                if memory.get_value(path) is not None:
-                    return memory.get_value(path)
 
-            return None
+        for memory in self[::-1]:
+            if memory.get_value(path) is not None:
+                return memory.get_value(path)
+
+        return None
 
     def set_value(self, path: str, input: object):
         raise Exception("Can't set value to " + path + ", stacked memory is read-only")

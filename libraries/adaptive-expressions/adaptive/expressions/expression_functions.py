@@ -34,7 +34,7 @@ from .builtin_functions.less_than_or_equal import LessThanOrEqual
 from .builtin_functions.greater_than import GreaterThan
 from .builtin_functions.greater_than_or_equal import GreaterThanOrEqual
 from .builtin_functions.not_equal import NotEqual
-from .builtin_functions.exist import Exist
+from .builtin_functions.exists import Exists
 
 # Logic
 from .builtin_functions.not_function import Not
@@ -69,10 +69,14 @@ from .builtin_functions.join import Join
 from .builtin_functions.first import First
 from .builtin_functions.last import Last
 from .builtin_functions.foreach import Foreach
+from .builtin_functions.select import Select
 
 # DataTime
 # Timex
+
 # Conversions
+from .builtin_functions.string import String
+
 # URI Parsing Functions
 
 # Memory
@@ -112,7 +116,7 @@ def get_standard_functions() -> dict:
     functions.append(GreaterThan())
     functions.append(GreaterThanOrEqual())
     functions.append(NotEqual())
-    functions.append(Exist())
+    functions.append(Exists())
 
     # Logic
     functions.append(Not())
@@ -148,10 +152,14 @@ def get_standard_functions() -> dict:
     functions.append(First())
     functions.append(Last())
     functions.append(Foreach())
+    functions.append(Select())
 
     # DataTime
     # Timex
+
     # Conversions
+    functions.append(String())
+
     # URI Parsing Functions
 
     # Memory
