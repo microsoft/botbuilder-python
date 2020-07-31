@@ -64,6 +64,10 @@ from .builtin_functions.title_case import TitleCase
 # Colleaction
 from .builtin_functions.count import Count
 from .builtin_functions.contains import Contains
+from .builtin_functions.empty import Empty
+from .builtin_functions.join import Join
+from .builtin_functions.first import First
+from .builtin_functions.last import Last
 
 # DataTime
 from .builtin_functions.add_days import AddDays
@@ -149,6 +153,10 @@ def get_standard_functions() -> dict:
     # Colleaction
     functions.append(Count())
     functions.append(Contains())
+    functions.append(Empty())
+    functions.append(Join())
+    functions.append(First())
+    functions.append(Last())
 
     # DataTime
     functions.append(AddDays())

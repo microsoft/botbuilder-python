@@ -30,8 +30,8 @@ class Accessor(ExpressionEvaluator):
             return value, error
 
         res = left.try_evaluate(state, options)
-        new_scope = res.value
-        error = res.error
+        new_scope = res[0]
+        error = res[1]
 
         if error is not None:
             return value, error
