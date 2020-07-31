@@ -23,7 +23,7 @@ class TimeTransformEvaluator(ExpressionEvaluator):
         )
     @staticmethod
     def validator(expression: object):
-        FunctionUtils.validator_order(expression, [ReturnType.String], [ReturnType.String, ReturnType.Number])
+        FunctionUtils.validate_order(expression, [ReturnType.String], ReturnType.String, ReturnType.Number)
 
     @staticmethod
     def evaluator(func: Callable[[datetime, int], datetime]) -> EvaluateExpressionDelegate:
@@ -44,7 +44,7 @@ class TimeTransformEvaluator(ExpressionEvaluator):
                         return result, err
                     value, error = FunctionUtils.normalize_to_date_time(args[0], anonymous_func)
                     if error is None:
-                        value = value.strftime(format_string)
+                        value = value.strftime(format_string)[:-4] + "Z"
                 else:
                     error = "{" + expression.to_string() + \
                          "} should contain an ISO format timestamp and a time interval integer."

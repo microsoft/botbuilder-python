@@ -62,18 +62,28 @@ from .builtin_functions.sentence_case import SentenceCase
 from .builtin_functions.title_case import TitleCase
 
 # Colleaction
+from .builtin_functions.count import Count
+from .builtin_functions.contains import Contains
 
 # DataTime
 from .builtin_functions.add_days import AddDays
 from .builtin_functions.add_hours import AddHours
 from .builtin_functions.add_minutes import AddMinutes
 from .builtin_functions.add_seconds import AddSeconds
+from .builtin_functions.day_of_month import DayOfMonth
+from .builtin_functions.day_of_week import DayOfWeek
+from .builtin_functions.day_of_year import DayOfYear
+from .builtin_functions.month import Month
+from .builtin_functions.date import Date
+from .builtin_functions.year import Year
+from .builtin_functions.utc_now import UtcNow
 
 # Timex
 # Conversions
 # URI Parsing Functions
 
 # Memory
+from .builtin_functions.accessor import Accessor
 from .builtin_functions.create_array import CreateArray
 
 # Misc
@@ -137,18 +147,28 @@ def get_standard_functions() -> dict:
     functions.append(TitleCase())
 
     # Colleaction
+    functions.append(Count())
+    functions.append(Contains())
 
     # DataTime
     functions.append(AddDays())
     functions.append(AddHours())
     functions.append(AddMinutes())
     functions.append(AddSeconds())
+    functions.append(DayOfMonth())
+    functions.append(DayOfWeek())
+    functions.append(DayOfYear())
+    functions.append(Month())
+    functions.append(Date())
+    functions.append(Year())
+    functions.append(UtcNow())
 
     # Timex
     # Conversions
     # URI Parsing Functions
 
     # Memory
+    functions.append(Accessor())
     functions.append(CreateArray())
 
     # Misc

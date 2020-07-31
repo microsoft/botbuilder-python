@@ -1,17 +1,18 @@
 import numbers
 import sys
 from datetime import datetime
+from collections.abc import Iterable
 from typing import Callable, NewType
 from .memory_interface import MemoryInterface
 from .options import Options
 from .return_type import ReturnType
+from .expression_type import ACCESSOR, ELEMENT
 
 VerifyExpression = NewType("VerifyExpression", Callable[[object, object, int], str])
 
 # pylint: disable=unused-argument
 class FunctionUtils:
     verify_expression = VerifyExpression
-    # default_date_time_format = "yyyy-MM-ddTHH:mm:ss.fffZ"
     default_date_time_format = "%Y-%m-%dT%H:%M:%S.%fZ"
 
     @staticmethod
@@ -23,12 +24,12 @@ class FunctionUtils:
     ):
         if len(expression.children) < min_arity:
             raise Exception(
-                expression + " should have at least " + str(min_arity) + " children."
+                expression.to_string() + " should have at least " + str(min_arity) + " children."
             )
 
         if len(expression.children) > max_arity:
             raise Exception(
-                expression + " can't have more than " + str(max_arity) + " children."
+                expression.to_string() + " can't have more than " + str(max_arity) + " children."
             )
 
         if return_type & ReturnType.Object == 0:
@@ -73,7 +74,7 @@ class FunctionUtils:
         )
 
     @staticmethod
-    def validator_order(expression: object, optional: list, types: list):
+    def validate_order(expression: object, optional: list, *types: object):
         if optional is None:
             optional = []
         if len(expression.children) < len(types) or len(expression.children) > len(
@@ -119,7 +120,7 @@ class FunctionUtils:
             if i_c >= len(expression.children):
                 break
             child = expression.children[i_c]
-            child_return_type = child.return_type()
+            child_return_type = child.return_type
 
             if (
                 child_type & ReturnType.Object == 0
@@ -162,7 +163,7 @@ class FunctionUtils:
     def verify_number_or_string_or_null(value: object, expression: object, number: int):
         error: str = None
         if not isinstance(value, numbers.Number) and not isinstance(value, str):
-            error = expression + " is not string or number"
+            error = expression.to_string() + " is not string or number"
 
         return error
 
@@ -170,7 +171,7 @@ class FunctionUtils:
     def verify_number(value: object, expression: object, pos: int):
         error: str = None
         if not isinstance(value, numbers.Number):
-            error = expression + " is not a number."
+            error = expression.to_string() + " is not a number."
 
         return error
 
@@ -181,7 +182,7 @@ class FunctionUtils:
             return error
 
         if not isinstance(value, list):
-            error = expression + " is neither a list nor a number."
+            error = expression.to_string() + " is neither a list nor a number."
         else:
             for elt in value:
                 if not isinstance(elt, numbers.Number):
@@ -194,7 +195,7 @@ class FunctionUtils:
     def verify_integer(value: object, expression: object, number: int):
         error: str = None
         if isinstance(value, int):
-            error = expression + " is not an integer."
+            error = expression.to_string() + " is not an integer."
 
         return error
 
@@ -202,7 +203,7 @@ class FunctionUtils:
     def verify_numeric_list(value: object, expression: object, number: int):
         error: str = None
         if not isinstance(value, list):
-            error = expression + " is not a list."
+            error = expression.to_string() + " is not a list."
         else:
             for elt in value:
                 if not isinstance(elt, numbers.Number):
@@ -216,6 +217,14 @@ class FunctionUtils:
         error: str = None
         if value is not None:
             error = expression.to_string() + " is null."
+        return error
+
+    @staticmethod
+    def verify_container(value: object, expression: object, number: int):
+        error: str = None
+        if not isinstance(value, str) and not isinstance(value, Iterable):
+            error = expression.to_string() + " must be a string or list."
+
         return error
 
     @staticmethod
@@ -416,7 +425,7 @@ class FunctionUtils:
         parsed = None
         try:
             parsed = datetime.strptime(timestamp, FunctionUtils.default_date_time_format)
-            if parsed.strftime(FunctionUtils.default_date_time_format).upper() == timestamp.upper():
+            if parsed.strftime(FunctionUtils.default_date_time_format).upper() == (timestamp[:-1]+"000Z").upper():
                 if transform is not None:
                     result, error = transform(parsed)
                 else:
@@ -428,7 +437,58 @@ class FunctionUtils:
             error = "Could not parse {" + timestamp + "}"
         return result, error
 
+    @staticmethod
+    def try_accumulate_path(
+        expression: object, state: MemoryInterface, options: Options
+    ):
+        path: str = ""
+        error: str = None
+        left = expression
+        while left is not None:
+            if left.expr_type == ACCESSOR:
+                path = str(left.children[0].get_value()) + "." + path
+                left = left.children[1] if len(left.children) == 2 else None
+            elif left.expr_type == ELEMENT:
+                value, error = left.children[1].try_evaluate(state, options)
 
+                if error is not None:
+                    path = None
+                    left = None
+                    return path, left, error
+
+                if isinstance(value, numbers.Number) and value.is_integer():
+                    path = "[" + len(int(value)) + "]." + path
+                elif isinstance(value, str):
+                    path = "['" + value + "']." + path
+                else:
+                    path = None
+                    left = None
+                    error = (
+                        left.children[1].to_string()
+                        + " doesn't return an int or string"
+                    )
+                    return path, left, error
+
+                left = left.children[0]
+            else:
+                break
+
+        path = path.rstrip(".").replace(".[", "[")
+        if path == "":
+            path = None
+
+        return path, left, error
+
+    @staticmethod
+    def wrap_get_value(state: MemoryInterface, path: str, options: Options):
+        result = state.get_value(path)
+        if result is not None:
+            return result
+
+        if options.null_substitution is not None:
+            return options.null_substitution(path)
+
+        return None
 
     @staticmethod
     def build_type_validator_error(

@@ -35,6 +35,6 @@ class LastIndexOf(ExpressionEvaluator):
 
     @staticmethod
     def validator(expression: object):
-        FunctionUtils.validator_order(
-            expression, None, [ReturnType.Array | ReturnType.String, ReturnType.Object]
+        FunctionUtils.validate_order(
+            expression, None, ReturnType.Array | ReturnType.String, ReturnType.Object
         )
