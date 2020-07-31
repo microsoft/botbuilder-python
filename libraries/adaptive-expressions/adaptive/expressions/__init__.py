@@ -12,7 +12,7 @@ from .expression_type import *
 from .return_type import ReturnType
 from .options import Options
 from .function_utils import FunctionUtils
-from .memory import SimpleObjectMemory
+from .memory import SimpleObjectMemory, StackedMemory
 from .expression_parser_interface import ExpresssionParserInterface
 from .expression_evaluator import (
     ExpressionEvaluator,
@@ -45,4 +45,5 @@ __all__ = [
     "ReturnType",
     "ExpressionParser",
     "SimpleObjectMemory",
+    "StackedMemory",
 ]

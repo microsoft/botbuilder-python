@@ -68,6 +68,7 @@ from .builtin_functions.empty import Empty
 from .builtin_functions.join import Join
 from .builtin_functions.first import First
 from .builtin_functions.last import Last
+from .builtin_functions.foreach import Foreach
 
 # DataTime
 # Timex
@@ -76,6 +77,7 @@ from .builtin_functions.last import Last
 
 # Memory
 from .builtin_functions.accessor import Accessor
+from .builtin_functions.element import Element
 from .builtin_functions.create_array import CreateArray
 
 # Misc
@@ -145,6 +147,7 @@ def get_standard_functions() -> dict:
     functions.append(Join())
     functions.append(First())
     functions.append(Last())
+    functions.append(Foreach())
 
     # DataTime
     # Timex
@@ -153,6 +156,7 @@ def get_standard_functions() -> dict:
 
     # Memory
     functions.append(Accessor())
+    functions.append(Element())
     functions.append(CreateArray())
 
     # Misc

@@ -12,6 +12,13 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         "bag": {"three": 3.0},
         "items": ["zero", "one", "two"],
         "nestedItems": [{"x": 1}, {"x": 2}, {"x": 3},],
+        "dialog": {
+            "x": 3,
+            "instance": {"xxx": "instance", "yyy": {"instanceY": "instanceY"}},
+            "options": {"xxx": "options", "yyy": ["optionY1", "optionY2"]},
+            "title": "Dialog Title",
+            "subTitle": "Dialog Sub Title",
+        },
     }
 
     # Math
@@ -1228,3 +1235,62 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         value, error = parsed.try_evaluate(self.scope)
         assert value == 3
         assert error is None
+
+    def test_foreach(self):
+        parsed = Expression.parse("join(foreach(dialog, item, item.key), ',')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "x,instance,options,title,subTitle"
+        assert error is None
+
+        parsed = Expression.parse("join(foreach(dialog, item => item.key), ',')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "x,instance,options,title,subTitle"
+        assert error is None
+
+        parsed = Expression.parse("foreach(dialog, item, item.value)[1].xxx")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "instance"
+        assert error is None
+
+        parsed = Expression.parse("foreach(dialog, item=>item.value)[1].xxx")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "instance"
+        assert error is None
+
+        parsed = Expression.parse("join(foreach(items, item, item), ',')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "zero,one,two"
+        assert error is None
+
+        parsed = Expression.parse("join(foreach(items, item=>item), ',')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "zero,one,two"
+        assert error is None
+
+        parsed = Expression.parse(
+            "join(foreach(nestedItems, i, i.x + first(nestedItems).x), ',')"
+        )
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "2,3,4"
+        assert error is None
+
+        # parsed = Expression.parse("join(foreach(items, item, concat(item, string(count(items)))), ',')")
+        # assert parsed is not None
+
+        # value, error = parsed.try_evaluate(self.scope)
+        # assert value == "zero3,one3,two3"
+        # assert error is None
