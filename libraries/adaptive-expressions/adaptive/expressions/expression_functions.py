@@ -60,6 +60,7 @@ from .builtin_functions.last_index_of import LastIndexOf
 from .builtin_functions.eol import Eol
 from .builtin_functions.sentence_case import SentenceCase
 from .builtin_functions.title_case import TitleCase
+from .builtin_functions.substring import SubString
 
 # Colleaction
 from .builtin_functions.count import Count
@@ -68,6 +69,7 @@ from .builtin_functions.empty import Empty
 from .builtin_functions.join import Join
 from .builtin_functions.first import First
 from .builtin_functions.last import Last
+from .builtin_functions.foreach import Foreach
 
 # DataTime
 from .builtin_functions.add_days import AddDays
@@ -81,6 +83,7 @@ from .builtin_functions.month import Month
 from .builtin_functions.date import Date
 from .builtin_functions.year import Year
 from .builtin_functions.utc_now import UtcNow
+from .builtin_functions.format_date_time import FormatDateTime
 
 # Timex
 # Conversions
@@ -88,6 +91,7 @@ from .builtin_functions.utc_now import UtcNow
 
 # Memory
 from .builtin_functions.accessor import Accessor
+from .builtin_functions.element import Element
 from .builtin_functions.create_array import CreateArray
 
 # Misc
@@ -135,7 +139,7 @@ def get_standard_functions() -> dict:
     functions.append(Replace())
     functions.append(ReplaceIgnoreCase())
     functions.append(Split())
-    # TODO: substring, skipped
+    functions.append(SubString())
     functions.append(ToLower())
     functions.append(ToUpper())
     functions.append(Trim())
@@ -157,6 +161,7 @@ def get_standard_functions() -> dict:
     functions.append(Join())
     functions.append(First())
     functions.append(Last())
+    functions.append(Foreach())
 
     # DataTime
     functions.append(AddDays())
@@ -170,6 +175,7 @@ def get_standard_functions() -> dict:
     functions.append(Date())
     functions.append(Year())
     functions.append(UtcNow())
+    functions.append(FormatDateTime())
 
     # Timex
     # Conversions
@@ -177,6 +183,7 @@ def get_standard_functions() -> dict:
 
     # Memory
     functions.append(Accessor())
+    functions.append(Element())
     functions.append(CreateArray())
 
     # Misc

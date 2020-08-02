@@ -1,6 +1,7 @@
 import numbers
 import sys
 from datetime import datetime
+from dateutil.parser import parse
 from collections.abc import Iterable
 from typing import Callable, NewType
 from .memory_interface import MemoryInterface
@@ -153,6 +154,20 @@ class FunctionUtils:
         )
 
     @staticmethod
+    def validate_foreach(expression: object):
+        if len(expression.children) != 3:
+            raise Exception(
+                "foreach expect 3 parameters, found " + str(len(expression.children))
+            )
+
+        second = expression.children[1]
+        if not (second.expr_type == ACCESSOR and len(second.children) == 1):
+            raise Exception(
+                "Second parameter of foreach is not an identifier: "
+                + second.to_string()
+            )
+
+    @staticmethod
     def verify_string_or_null(value: object, expression: object, number: int):
         error: str = None
         if not isinstance(value, str) and value is not None:
@@ -215,7 +230,7 @@ class FunctionUtils:
     @staticmethod
     def verify_not_null(value: object, expression, number: int):
         error: str = None
-        if value is not None:
+        if value is None:
             error = expression.to_string() + " is null."
         return error
 
@@ -353,7 +368,7 @@ class FunctionUtils:
             if 0 <= index < len(instance):
                 value = instance[index]
             else:
-                error = str(index) + " is out of range for " + instance
+                error = str(index) + " is out of range for " + str(instance)
         else:
             error = instance + " is not a collection."
 
@@ -424,7 +439,7 @@ class FunctionUtils:
         error: str = None
         parsed = None
         try:
-            parsed = datetime.strptime(timestamp, FunctionUtils.default_date_time_format)
+            parsed = parse(timestamp)
             if parsed.strftime(FunctionUtils.default_date_time_format).upper() == (timestamp[:-1]+"000Z").upper():
                 if transform is not None:
                     result, error = transform(parsed)
@@ -457,7 +472,7 @@ class FunctionUtils:
                     return path, left, error
 
                 if isinstance(value, numbers.Number) and value.is_integer():
-                    path = "[" + len(int(value)) + "]." + path
+                    path = "[" + str(int(value)) + "]." + path
                 elif isinstance(value, str):
                     path = "['" + value + "']." + path
                 else:
@@ -527,3 +542,54 @@ class FunctionUtils:
                 + "}]."
             )
         return result
+
+    @staticmethod
+    # pylint: disable=import-outside-toplevel
+    def foreach(expression: object, state: MemoryInterface, options: Options):
+        result: list
+        error: str = None
+        instance: object
+
+        res = expression.children[0].try_evaluate(state, options)
+        instance = res[0]
+        error = res[1]
+        if instance is None:
+            error = expression.children[0].to_string() + " evaluated to null."
+
+        if error is None:
+            iterator_name = str(expression.children[1].children[0].get_value())
+            arr = []
+            if isinstance(instance, (list, set)):
+                arr = list(instance)
+            elif isinstance(instance, dict):
+                for ele in instance:
+                    arr.append({"key": ele, "value": instance[ele]})
+            else:
+                error = (
+                    expression.children[0].to_string()
+                    + " is not a collection or structure object to run foreach"
+                )
+
+            if error is None:
+                from .memory.stacked_memory import StackedMemory
+
+                stacked_memory = StackedMemory.wrap(state)
+                result = []
+                for item in arr:
+                    local = {iterator_name: item}
+
+                    from .memory.simple_object_memory import SimpleObjectMemory
+
+                    stacked_memory.append(SimpleObjectMemory.wrap(local))
+                    res = expression.children[2].try_evaluate(stacked_memory, options)
+                    stacked_memory.pop()
+                    if res[1] is not None:
+                        value = None
+                        error = res[1]
+                        return value, error
+
+                    result.append(res[0])
+
+        value = result
+
+        return value, error

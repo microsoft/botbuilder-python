@@ -6,5 +6,6 @@
 # --------------------------------------------------------------------------
 
 from .simple_object_memory import SimpleObjectMemory
+from .stacked_memory import StackedMemory
 
-__all__ = ["SimpleObjectMemory"]
+__all__ = ["SimpleObjectMemory", "StackedMemory"]

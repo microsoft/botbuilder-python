@@ -88,6 +88,7 @@ MONTH = "month"
 DATE = "date"
 YEAR = "year"
 UTCNOW = "utcNow"
+FORMATDATETIME = "formatDateTime"
 
 "Misc"
 CONSTANT = "Constant"

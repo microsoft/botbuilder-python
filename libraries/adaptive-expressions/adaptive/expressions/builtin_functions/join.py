@@ -26,13 +26,13 @@ class Join(ExpressionEvaluator):
                 )
             else:
                 if len(args) == 2:
-                    value = str(args[1]).join(args[0])
+                    value = str(args[1]).join(map(str, args[0]))
                 else:
                     if len(args[0]) < 3:
-                        value = str(args[2]).join(args[0])
+                        value = str(args[2]).join(map(str, args[0]))
                     else:
-                        first_part = str(args[1]).join(args[0][0:-1])
-                        value = first_part + args[2] + args[0][-1]
+                        first_part = str(args[1]).join(map(str, args[0][0:-1]))
+                        value = first_part + str(args[2]) + str(args[0][-1])
 
         return value, error
 
