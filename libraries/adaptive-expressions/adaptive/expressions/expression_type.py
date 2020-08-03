@@ -95,3 +95,4 @@ SETPATHTOVALUE = "setPathToValue"
 
 # Regular expression
 # Type checking
+ISBOOLEAN = "isBoolean"

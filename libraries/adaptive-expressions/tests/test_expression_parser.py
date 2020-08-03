@@ -1350,3 +1350,11 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         value, error = parsed.try_evaluate(self.scope)
         assert value == "zero3,one3,two3"
         assert error is None
+
+    def test_is_boolean(self):
+        parsed = Expression.parse("isBoolean(None)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == False
+        assert error is None
