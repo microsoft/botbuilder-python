@@ -96,3 +96,8 @@ SETPATHTOVALUE = "setPathToValue"
 # Regular expression
 # Type checking
 ISBOOLEAN = "isBoolean"
+ISSTRING = "isString"
+ISINTEGER = "isInteger"
+ISARRAY = "isArray"
+ISOBJECT = "isObject"
+ISDATETIME = "isDateTime"

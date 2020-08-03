@@ -89,6 +89,7 @@ from .builtin_functions.create_array import CreateArray
 # Regular expression
 # Type Checking
 from .builtin_functions.is_boolean import IsBoolean
+from .builtin_functions.is_string import IsString
 
 # pylint: disable=too-many-statements
 def get_standard_functions() -> dict:
@@ -173,6 +174,7 @@ def get_standard_functions() -> dict:
     # Regular expression
     # Type Checking
     functions.append(IsBoolean())
+    functions.append(IsString())
 
     lookup = dict()
     for function in functions:
