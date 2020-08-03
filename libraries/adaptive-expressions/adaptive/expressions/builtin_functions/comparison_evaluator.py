@@ -39,22 +39,18 @@ class ComparisonEvaluator(ExpressionEvaluator):
                 expression, state, options, verify
             )
             if error is None:
-                is_number: bool = None
+                is_number: bool = args and len(args) > 0 and isinstance(
+                    args[0], numbers.Number
+                )
                 for arg in args:
-                    obj = arg
-                    if is_number is not None:
-                        if (
-                            obj is not None
-                            and isinstance(obj, numbers.Number) != is_number
-                        ):
-                            error = (
-                                "Arguments must either all be numbers or strings in "
-                                + expression.to_string()
-                                + "}"
-                            )
-                            break
-                    else:
-                        is_number = isinstance(obj, numbers.Number)
+                    if arg is not None and isinstance(arg, numbers.Number) != is_number:
+                        error = (
+                            "Arguments must either all be numbers or strings in "
+                            + expression.to_string()
+                            + "}"
+                        )
+                        break
+
                 if error is None:
                     try:
                         result = func(args)
@@ -63,6 +59,7 @@ class ComparisonEvaluator(ExpressionEvaluator):
 
             else:
                 error = None
+
             return result, error
 
         return anonymous_function

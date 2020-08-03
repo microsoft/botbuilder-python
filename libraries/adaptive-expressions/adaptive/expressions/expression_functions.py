@@ -70,6 +70,12 @@ from .builtin_functions.first import First
 from .builtin_functions.last import Last
 from .builtin_functions.foreach import Foreach
 from .builtin_functions.select import Select
+from .builtin_functions.where import Where
+from .builtin_functions.union import Union
+from .builtin_functions.intersection import Intersection
+from .builtin_functions.skip import Skip
+from .builtin_functions.take import Take
+from .builtin_functions.sub_array import SubArray
 
 # DataTime
 # Timex
@@ -153,6 +159,12 @@ def get_standard_functions() -> dict:
     functions.append(Last())
     functions.append(Foreach())
     functions.append(Select())
+    functions.append(Where())
+    functions.append(Union())
+    functions.append(Intersection())
+    functions.append(Skip())
+    functions.append(Take())
+    functions.append(SubArray())
 
     # DataTime
     # Timex

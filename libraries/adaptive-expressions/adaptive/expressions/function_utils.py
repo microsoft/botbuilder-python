@@ -212,6 +212,14 @@ class FunctionUtils:
         return error
 
     @staticmethod
+    def verify_list(value: object, expression: object, number: int):
+        error: str = None
+        if not isinstance(value, list):
+            error = expression.to_string() + " is not a list."
+
+        return error
+
+    @staticmethod
     def verify_numeric_list(value: object, expression: object, number: int):
         error: str = None
         if not isinstance(value, list):
