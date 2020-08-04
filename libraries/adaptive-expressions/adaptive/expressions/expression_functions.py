@@ -76,6 +76,11 @@ from .builtin_functions.intersection import Intersection
 from .builtin_functions.skip import Skip
 from .builtin_functions.take import Take
 from .builtin_functions.sub_array import SubArray
+from .builtin_functions.sort_by import SortBy
+from .builtin_functions.sort_by_descending import SortByDescending
+from .builtin_functions.indices_and_values import IndicesAndValues
+from .builtin_functions.flatten import Flatten
+from .builtin_functions.unique import Unique
 
 # DataTime
 # Timex
@@ -165,6 +170,11 @@ def get_standard_functions() -> dict:
     functions.append(Skip())
     functions.append(Take())
     functions.append(SubArray())
+    functions.append(SortBy())
+    functions.append(SortByDescending())
+    functions.append(IndicesAndValues())
+    functions.append(Flatten())
+    functions.append(Unique())
 
     # DataTime
     # Timex
