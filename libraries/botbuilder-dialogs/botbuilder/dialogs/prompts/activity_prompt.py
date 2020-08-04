@@ -1,7 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from abc import ABC
 from typing import Callable, Dict
 
 from botbuilder.core import TurnContext
