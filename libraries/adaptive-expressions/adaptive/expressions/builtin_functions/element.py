@@ -32,7 +32,7 @@ class Element(ExpressionEvaluator):
             idx_value = res[0]
             error = res[1]
             if error is None:
-                if idx_value.is_integer():
+                if FunctionUtils.is_integer(idx_value):
                     value, error = FunctionUtils.access_index(inst, int(idx_value))
                 elif isinstance(idx_value, str):
                     value, error = FunctionUtils.access_property(inst, idx_value)

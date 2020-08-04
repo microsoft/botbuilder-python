@@ -18,7 +18,7 @@ class Round(ExpressionEvaluator):
         def anonymous_function(args: []):
             error: str = None
             result: object = None
-            if len(args) == 2 and not args[1].is_integer():
+            if len(args) == 2 and not FunctionUtils.is_integer(args[1]):
                 error = "The second " + args[1] + " parameter must be an integer."
 
             if error is None:

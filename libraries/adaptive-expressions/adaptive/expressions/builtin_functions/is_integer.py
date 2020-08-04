@@ -13,6 +13,6 @@ class IsInteger(ExpressionEvaluator):
     @staticmethod
     def evaluator() -> EvaluateExpressionDelegate:
         def anonymous_function(args: []):
-            return isinstance(args[0], int)
+            return FunctionUtils.is_integer(args[0])
 
         return FunctionUtils.apply(anonymous_function)

@@ -227,13 +227,6 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert value == 1
         assert error is None
 
-        parsed = Expression.parse("(4+1.5) % 2")
-        assert parsed is not None
-
-        value, error = parsed.try_evaluate({})
-        assert value == 1.5
-        assert error is None
-
         parsed = Expression.parse("mod(8, 3)")
         assert parsed is not None
 
