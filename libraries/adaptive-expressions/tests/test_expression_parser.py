@@ -13,6 +13,7 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         "nullObj": None,
         "bag": {"three": 3.0},
         "items": ["zero", "one", "two"],
+        "emptyObject": {},
         "nestedItems": [{"x": 1}, {"x": 2}, {"x": 3},],
         "dialog": {
             "x": 3,
@@ -1455,6 +1456,36 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         value, error = parsed.try_evaluate(self.scope)
         assert value == False
         assert error is None
+    
+    def test_is_object(self):
+        parsed = Expression.parse("isObject(None)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == False
+        assert error is None
+
+        parsed = Expression.parse("isObject(emptyObject)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == True
+        assert error is None
+
+        parsed = Expression.parse("isObject(dialog)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == True
+        assert error is None
+    
+        parsed = Expression.parse("isObject(123.234)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == False
+        assert error is None
+    
     def test_where(self):
         parsed = Expression.parse("join(where(items, item, item == 'two'), ',')")
         assert parsed is not None

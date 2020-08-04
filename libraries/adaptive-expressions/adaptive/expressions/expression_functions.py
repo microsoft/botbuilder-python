@@ -104,6 +104,7 @@ from .builtin_functions.is_string import IsString
 from .builtin_functions.is_array import IsArray
 from .builtin_functions.is_float import IsFloat
 from .builtin_functions.is_integer import IsInteger
+from .builtin_functions.is_object import IsObject
 
 # pylint: disable=too-many-statements
 def get_standard_functions() -> dict:
@@ -203,6 +204,7 @@ def get_standard_functions() -> dict:
     functions.append(IsArray())
     functions.append(IsInteger())
     functions.append(IsFloat())
+    functions.append(IsObject())
 
     lookup = dict()
     for function in functions:
