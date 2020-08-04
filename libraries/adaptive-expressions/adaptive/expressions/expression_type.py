@@ -73,6 +73,13 @@ UNIQUE = "unique"
 
 # DateTime
 # Timex
+ISDEFINITE = "isDefinite"
+ISTIME = "isTime"
+ISDURATION = "isDuration"
+ISDATE = "isDate"
+ISTIMERANGE = "isTimeRange"
+ISDATERANGE = "isDateRange"
+ISPRESENT = "isPresent"
 
 # Conversions
 STRING = "string"

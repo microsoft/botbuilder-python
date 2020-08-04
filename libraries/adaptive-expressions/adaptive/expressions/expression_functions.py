@@ -79,6 +79,13 @@ from .builtin_functions.sub_array import SubArray
 
 # DataTime
 # Timex
+from .builtin_functions.is_definite import IsDefinite
+from .builtin_functions.is_time import IsTime
+from .builtin_functions.is_duration import IsDuration
+from .builtin_functions.is_date import IsDate
+from .builtin_functions.is_timerange import IsTimeRange
+from .builtin_functions.is_daterange import IsDateRange
+from .builtin_functions.is_present import ISPRESENT, IsPresent
 
 # Conversions
 from .builtin_functions.string import String
@@ -168,6 +175,13 @@ def get_standard_functions() -> dict:
 
     # DataTime
     # Timex
+    functions.append(IsDefinite())
+    functions.append(IsTime())
+    functions.append(IsDuration())
+    functions.append(IsDate())
+    functions.append(IsTimeRange())
+    functions.append(IsDateRange())
+    functions.append(IsPresent())
 
     # Conversions
     functions.append(String())

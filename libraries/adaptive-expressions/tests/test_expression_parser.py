@@ -2,6 +2,7 @@
 import math
 import platform
 import aiounittest
+from datatypes_timex_expression import Timex
 from adaptive.expressions import Expression
 
 
@@ -22,6 +23,10 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
             "subTitle": "Dialog Sub Title",
         },
         "doubleNestedItems": [[{"x": 1}, {"x: 2"}], [{"x": 3}]],
+        "timex": "2020-08-04",
+        "validHourTimex" : Timex(timex="2012-12-20T13:40"),
+        "validTimeRange": Timex(timex="TEV"),
+        "validNow": Timex(timex="PRESENT_REF")
     }
 
     # Math
@@ -1490,4 +1495,109 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
 
         value, error = parsed.try_evaluate(self.scope)
         assert value == ["b", "c", "d"]
+        assert error is None
+
+    def test_is_definite(self):
+        parsed = Expression.parse("isDefinite(timex)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == True
+        assert error is None
+
+        parsed = Expression.parse("isDefinite('XXXX-12-20')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == False
+        assert error is None
+
+    def test_is_time(self):
+        parsed = Expression.parse("isTime(validHourTimex)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == True
+        assert error is None
+
+        parsed = Expression.parse("isTime('2012-12-20')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == False
+        assert error is None
+
+    def test_is_duration(self):
+        parsed = Expression.parse("isDuration('PT30M')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == True
+        assert error is None
+
+        parsed = Expression.parse("isDuration('2012-12-20')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == False
+        assert error is None
+
+    def test_is_date(self):
+        parsed = Expression.parse("isDate('XXXX-12-21')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == True
+        assert error is None
+
+        parsed = Expression.parse("isDate('PT30M')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == False
+        assert error is None
+
+    def test_is_timerange(self):
+        parsed = Expression.parse("isTimeRange(validTimeRange)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == True
+        assert error is None
+
+        parsed = Expression.parse("isTimeRange('PT30M')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == False
+        assert error is None
+
+    def test_is_daterange(self):
+        parsed = Expression.parse("isDateRange('2012-02')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == True
+        assert error is None
+
+        parsed = Expression.parse("isDateRange('PT30M')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == False
+        assert error is None
+
+    def test_is_present(self):
+        parsed = Expression.parse("isPresent(validNow)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == True
+        assert error is None
+
+        parsed = Expression.parse("isPresent('PT30M')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == False
         assert error is None
