@@ -90,7 +90,7 @@ from .builtin_functions.is_duration import IsDuration
 from .builtin_functions.is_date import IsDate
 from .builtin_functions.is_timerange import IsTimeRange
 from .builtin_functions.is_daterange import IsDateRange
-from .builtin_functions.is_present import ISPRESENT, IsPresent
+from .builtin_functions.is_present import IsPresent
 
 # Conversions
 from .builtin_functions.string import String

@@ -578,10 +578,13 @@ class FunctionUtils:
             parsed = Timex(timex=timex_expr)
         else:
             parsed = Timex(timex=timex_expr)
-            if ((parsed is None) or len(vars(timex_expr).iteritems()) == 0):
-                return parsed, "${timexExpr} requires a TimexProperty or a string as a argument"
+            if (parsed is None) or len(vars(timex_expr).iteritems()) == 0:
+                return (
+                    parsed,
+                    "${timexExpr} requires a TimexProperty or a string as a argument",
+                )
         return parsed, None
-    
+
     @staticmethod
     def sort_by(is_descending: bool):
         def anonymous_function(
