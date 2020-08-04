@@ -2,6 +2,8 @@
 import math
 import platform
 from datetime import datetime
+from dateutil import tz
+from dateutil.parser import parse
 import aiounittest
 from adaptive.expressions import Expression
 
@@ -20,7 +22,13 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
             "title": "Dialog Title",
             "subTitle": "Dialog Sub Title",
         },
-        "one": 1
+        "one": 1,
+        "timestamp": "2018-03-15T13:00:00.000Z",
+        "notISOTimestamp": "2018/03/15 13:00:00",
+        "timestampObj": parse("2018-03-15T13:00:00.000Z").replace(tzinfo=tz.gettz("UTC")),
+        "unixTimestamp": 1521118800,
+        "unixTimestampFraction": 1521118800.5,
+        "ticks": 637243624200000000
     }
 
     # Math
@@ -686,7 +694,6 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert value == [""]
         assert error is None
 
-    # TODO: test of substring
     def test_substring(self):
         parsed = Expression.parse("substring(concat('na','me','more'), 0, length('name'))")
         assert parsed is not None
@@ -1332,7 +1339,6 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         # assert error is None
 
     # Datetime
-    # TODO: test of add days
     def test_add_days(self):
         parsed = Expression.parse("addDays('2018-03-15T13:00:00.000Z', 1)")
         assert parsed is not None
@@ -1341,28 +1347,27 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert value == "2018-03-16T13:00:00.000Z"
         assert error is None
 
-        # parsed = Expression.parse("addDays(timestamp, 1)")
-        # assert parsed is not None
+        parsed = Expression.parse("addDays(timestamp, 1)")
+        assert parsed is not None
 
-        # value, error = parsed.try_evaluate({})
-        # assert value == "2018-03-16T13:00:00.000Z"
-        # assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "2018-03-16T13:00:00.000Z"
+        assert error is None
 
-        # parsed = Expression.parse("addDays(timestampObj, 1)")
-        # assert parsed is not None
+        parsed = Expression.parse("addDays(timestampObj, 1)")
+        assert parsed is not None
 
-        # value, error = parsed.try_evaluate({})
-        # assert value == "2018-03-16T13:00:00.000Z"
-        # assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "2018-03-16T13:00:00.000Z"
+        assert error is None
 
-    #     parsed = Expression.parse("addDays(timestamp, 1,'MM-dd-yy')")
-    #     assert parsed is not None
+        parsed = Expression.parse("addDays(timestamp, 1,'%m-%d-%y')")
+        assert parsed is not None
 
-    #     value, error = parsed.try_evaluate({})
-    #     assert value == "03-16-18"
-    #     assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "03-16-18"
+        assert error is None
 
-    # TODO: test of add hours
     def test_add_hours(self):
         parsed = Expression.parse("addHours('2018-03-15T13:00:00.000Z', 1)")
         assert parsed is not None
@@ -1371,28 +1376,27 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert value == "2018-03-15T14:00:00.000Z"
         assert error is None
 
-    #     parsed = Expression.parse("addHours(timestamp, 1)")
-    #     assert parsed is not None
+        parsed = Expression.parse("addHours(timestamp, 1)")
+        assert parsed is not None
 
-    #     value, error = parsed.try_evaluate({})
-    #     assert value == "2018-03-15T14:00:00.000Z"
-    #     assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "2018-03-15T14:00:00.000Z"
+        assert error is None
 
-    #     parsed = Expression.parse("addHours(timestampObj, 1)")
-    #     assert parsed is not None
+        parsed = Expression.parse("addHours(timestampObj, 1)")
+        assert parsed is not None
 
-    #     value, error = parsed.try_evaluate({})
-    #     assert value == "2018-03-15T14:00:00.000Z"
-    #     assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "2018-03-15T14:00:00.000Z"
+        assert error is None
 
-    #     parsed = Expression.parse("addHours(timestamp, 1,'MM-dd-yy hh-mm')")
-    #     assert parsed is not None
+        parsed = Expression.parse("addHours(timestamp, 1,'%m-%d-%y %I-%M')")
+        assert parsed is not None
 
-    #     value, error = parsed.try_evaluate({})
-    #     assert value == "03-15-18 02-00"
-    #     assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "03-15-18 02-00"
+        assert error is None
 
-    # TODO: test of add minutes
     def test_add_minutes(self):
         parsed = Expression.parse("addMinutes('2018-03-15T13:00:00.000Z', 1)")
         assert parsed is not None
@@ -1401,28 +1405,27 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert value == "2018-03-15T13:01:00.000Z"
         assert error is None
 
-    #     parsed = Expression.parse("addMinutes(timestamp, 1)")
-    #     assert parsed is not None
+        parsed = Expression.parse("addMinutes(timestamp, 1)")
+        assert parsed is not None
 
-    #     value, error = parsed.try_evaluate({})
-    #     assert value == "2018-03-15T13:01:00.000Z"
-    #     assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "2018-03-15T13:01:00.000Z"
+        assert error is None
 
-    #     parsed = Expression.parse("addMinutes(timestampObj, 1)")
-    #     assert parsed is not None
+        parsed = Expression.parse("addMinutes(timestampObj, 1)")
+        assert parsed is not None
 
-    #     value, error = parsed.try_evaluate({})
-    #     assert value == "2018-03-15T13:01:00.000Z"
-    #     assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "2018-03-15T13:01:00.000Z"
+        assert error is None
 
-    #     parsed = Expression.parse("addMinutes(timestamp, 1,'MM-dd-yy hh-mm')")
-    #     assert parsed is not None
+        parsed = Expression.parse("addMinutes(timestamp, 1,'%m-%d-%y %I-%M')")
+        assert parsed is not None
 
-    #     value, error = parsed.try_evaluate({})
-    #     assert value == "03-15-18 01-01"
-    #     assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "03-15-18 01-01"
+        assert error is None
 
-    # TODO: test of add seconds
     def test_add_seconds(self):
         parsed = Expression.parse("addSeconds('2018-03-15T13:00:00.000Z', 1)")
         assert parsed is not None
@@ -1431,26 +1434,26 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert value == "2018-03-15T13:00:01.000Z"
         assert error is None
 
-    #     parsed = Expression.parse("addSeconds(timestamp, 1)")
-    #     assert parsed is not None
+        parsed = Expression.parse("addSeconds(timestamp, 1)")
+        assert parsed is not None
 
-    #     value, error = parsed.try_evaluate({})
-    #     assert value == "2018-03-15T13:00:01.000Z"
-    #     assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "2018-03-15T13:00:01.000Z"
+        assert error is None
 
-    #     parsed = Expression.parse("addSeconds(timestampObj, 1)")
-    #     assert parsed is not None
+        parsed = Expression.parse("addSeconds(timestampObj, 1)")
+        assert parsed is not None
 
-    #     value, error = parsed.try_evaluate({})
-    #     assert value == "2018-03-15T13:00:01.000Z"
-    #     assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "2018-03-15T13:00:01.000Z"
+        assert error is None
 
-    #     parsed = Expression.parse("addSeconds(timestamp, 1,'MM-dd-yy hh-mm-ss')")
-    #     assert parsed is not None
+        parsed = Expression.parse("addSeconds(timestamp, 1,'%m-%d-%y %I-%M-%S')")
+        assert parsed is not None
 
-    #     value, error = parsed.try_evaluate({})
-    #     assert value == "03-15-18 01-00-01"
-    #     assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "03-15-18 01-00-01"
+        assert error is None
 
     def test_day_of_month(self):
         parsed = Expression.parse("dayOfMonth('2018-03-15T13:00:00.000Z')")
@@ -1460,20 +1463,19 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert value == 15
         assert error is None
 
-        # TODO: the following two tests
-    #     parsed = Expression.parse("dayOfMonth(timestamp)")
-    #     assert parsed is not None
+        parsed = Expression.parse("dayOfMonth(timestamp)")
+        assert parsed is not None
 
-    #     value, error = parsed.try_evaluate({})
-    #     assert value == 15
-    #     assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == 15
+        assert error is None
 
-    #     parsed = Expression.parse("dayOfMonth(timestampObj)")
-    #     assert parsed is not None
+        parsed = Expression.parse("dayOfMonth(timestampObj)")
+        assert parsed is not None
 
-    #     value, error = parsed.try_evaluate({})
-    #     assert value == 15
-    #     assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == 15
+        assert error is None
 
     def test_day_of_week(self):
         parsed = Expression.parse("dayOfWeek('2018-03-15T13:00:00.000Z')")
@@ -1483,20 +1485,19 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert value == 4
         assert error is None
 
-        # TODO: the following two tests
-    #     parsed = Expression.parse("dayOfWeek(timestamp)")
-    #     assert parsed is not None
+        parsed = Expression.parse("dayOfWeek(timestamp)")
+        assert parsed is not None
 
-    #     value, error = parsed.try_evaluate({})
-    #     assert value == 4
-    #     assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == 4
+        assert error is None
 
-    #     parsed = Expression.parse("dayOfWeek(timestampObj)")
-    #     assert parsed is not None
+        parsed = Expression.parse("dayOfWeek(timestampObj)")
+        assert parsed is not None
 
-    #     value, error = parsed.try_evaluate({})
-    #     assert value == 4
-    #     assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == 4
+        assert error is None
 
     def test_day_of_year(self):
         parsed = Expression.parse("dayOfYear('2018-03-15T13:00:00.000Z')")
@@ -1506,20 +1507,19 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert value == 74
         assert error is None
 
-        # TODO: the following two tests
-    #     parsed = Expression.parse("dayOfYear(timestamp)")
-    #     assert parsed is not None
+        parsed = Expression.parse("dayOfYear(timestamp)")
+        assert parsed is not None
 
-    #     value, error = parsed.try_evaluate({})
-    #     assert value == 74
-    #     assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == 74
+        assert error is None
 
-    #     parsed = Expression.parse("dayOfYear(timestampObj)")
-    #     assert parsed is not None
+        parsed = Expression.parse("dayOfYear(timestampObj)")
+        assert parsed is not None
 
-    #     value, error = parsed.try_evaluate({})
-    #     assert value == 74
-    #     assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == 74
+        assert error is None
 
     def test_month(self):
         parsed = Expression.parse("month('2018-03-15T13:00:00.000Z')")
@@ -1529,20 +1529,19 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert error is None
         assert value == 3
 
-        # TODO: the following two tests
-    #     parsed = Expression.parse("month(timestamp)")
-    #     assert parsed is not None
+        parsed = Expression.parse("month(timestamp)")
+        assert parsed is not None
 
-    #     value, error = parsed.try_evaluate({})
-    #     assert value == 3
-    #     assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == 3
+        assert error is None
 
-    #     parsed = Expression.parse("month(timestampObj)")
-    #     assert parsed is not None
+        parsed = Expression.parse("month(timestampObj)")
+        assert parsed is not None
 
-    #     value, error = parsed.try_evaluate({})
-    #     assert value == 3
-    #     assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == 3
+        assert error is None
 
     def test_date(self):
         parsed = Expression.parse("date('2018-03-15T13:00:00.000Z')")
@@ -1552,20 +1551,19 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert error is None
         assert value == "3/15/2018"
 
-        # TODO: the following two tests
-    #     parsed = Expression.parse("date(timestamp)")
-    #     assert parsed is not None
+        parsed = Expression.parse("date(timestamp)")
+        assert parsed is not None
 
-    #     value, error = parsed.try_evaluate({})
-    #     assert value == "3/15/2018"
-    #     assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "3/15/2018"
+        assert error is None
 
-    #     parsed = Expression.parse("date(timestampObj)")
-    #     assert parsed is not None
+        parsed = Expression.parse("date(timestampObj)")
+        assert parsed is not None
 
-    #     value, error = parsed.try_evaluate({})
-    #     assert value == "3/15/2018"
-    #     assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "3/15/2018"
+        assert error is None
 
     def test_year(self):
         parsed = Expression.parse("year('2018-03-15T13:00:00.000Z')")
@@ -1575,20 +1573,19 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert error is None
         assert value == 2018
 
-        # TODO: the following two tests
-    #     parsed = Expression.parse("year(timestamp)")
-    #     assert parsed is not None
+        parsed = Expression.parse("year(timestamp)")
+        assert parsed is not None
 
-    #     value, error = parsed.try_evaluate({})
-    #     assert value == 2018
-    #     assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == 2018
+        assert error is None
 
-    #     parsed = Expression.parse("year(timestampObj)")
-    #     assert parsed is not None
+        parsed = Expression.parse("year(timestampObj)")
+        assert parsed is not None
 
-    #     value, error = parsed.try_evaluate({})
-    #     assert value == 2018
-    #     assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == 2018
+        assert error is None
 
     def test_utc_now(self):
         parsed = Expression.parse("length(utcNow())")
@@ -1612,23 +1609,125 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert error is None
         assert value == "2018-03-15T00:00:00.000Z"
 
-        # parsed = Expression.parse("formatDateTime(notISOTimestamp)")
-        # assert parsed is not None
+        parsed = Expression.parse("formatDateTime(notISOTimestamp)")
+        assert parsed is not None
 
-        # value, error = parsed.try_evaluate({})
-        # assert error is None
-        # assert value == "2018-03-15T13:00:00.000Z"
+        value, error = parsed.try_evaluate(self.scope)
+        assert error is None
+        assert value == "2018-03-15T13:00:00.000Z"
 
-        # parsed = Expression.parse("formatDateTime(notISOTimestamp, '%m-%d-%y')")
-        # assert parsed is not None
+        parsed = Expression.parse("formatDateTime(notISOTimestamp, '%m-%d-%y')")
+        assert parsed is not None
 
-        # value, error = parsed.try_evaluate({})
-        # assert error is None
-        # assert value == "03-15-18"
+        value, error = parsed.try_evaluate(self.scope)
+        assert error is None
+        assert value == "03-15-18"
 
-        # parsed = Expression.parse("formatDateTime(timestampObj)")
-        # assert parsed is not None
+        parsed = Expression.parse("formatDateTime(timestampObj)")
+        assert parsed is not None
 
-        # value, error = parsed.try_evaluate({})
-        # assert error is None
-        # assert value == "2018-03-15T13:00:00.000Z"
+        value, error = parsed.try_evaluate(self.scope)
+        assert error is None
+        assert value == "2018-03-15T13:00:00.000Z"
+
+    def test_format_epoch(self):
+        parsed = Expression.parse("formatEpoch(unixTimestamp)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert error is None
+        assert value == "2018-03-15T13:00:00.000Z"
+
+        parsed = Expression.parse("formatEpoch(unixTimestampFraction)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert error is None
+        assert value == "2018-03-15T13:00:00.500Z"
+
+    def test_format_ticks(self):
+        parsed = Expression.parse("formatTicks(ticks)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert error is None
+        assert value == "2020-05-06T11:47:00.000Z"
+
+    def test_subtract_from_time(self):
+        parsed = Expression.parse("subtractFromTime(timestamp, 1, 'Year')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert error is None
+        assert value == "2017-03-15T13:00:00.000Z"
+
+        parsed = Expression.parse("subtractFromTime(timestampObj, 1, 'Year')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert error is None
+        assert value == "2017-03-15T13:00:00.000Z"
+
+        parsed = Expression.parse("subtractFromTime(timestamp, 1, 'Month')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert error is None
+        assert value == "2018-02-15T13:00:00.000Z"
+
+        parsed = Expression.parse("subtractFromTime(timestamp, 1, 'Week')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert error is None
+        assert value == "2018-03-08T13:00:00.000Z"
+
+        parsed = Expression.parse("subtractFromTime(timestamp, 1, 'Day')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert error is None
+        assert value == "2018-03-14T13:00:00.000Z"
+
+        parsed = Expression.parse("subtractFromTime(timestamp, 1, 'Hour')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert error is None
+        assert value == "2018-03-15T12:00:00.000Z"
+
+        parsed = Expression.parse("subtractFromTime(timestamp, 1, 'Minute')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert error is None
+        assert value == "2018-03-15T12:59:00.000Z"
+
+        parsed = Expression.parse("subtractFromTime(timestamp, 1, 'Second')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert error is None
+        assert value == "2018-03-15T12:59:59.000Z"
+
+    def test_date_read_back(self):
+        parsed = Expression.parse("dateReadBack(timestamp, addDays(timestamp, 1))")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert error is None
+        assert value == "tomorrow"
+
+        parsed = Expression.parse("dateReadBack(timestampObj, addDays(timestamp, 1))")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert error is None
+        assert value == "tomorrow"
+
+        parsed = Expression.parse("dateReadBack(addDays(timestamp, 1),timestamp)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert error is None
+        assert value == "yesterday"

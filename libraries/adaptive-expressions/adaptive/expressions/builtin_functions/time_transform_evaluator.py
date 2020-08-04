@@ -44,7 +44,10 @@ class TimeTransformEvaluator(ExpressionEvaluator):
                         return result, err
                     value, error = FunctionUtils.normalize_to_date_time(args[0], anonymous_func)
                     if error is None:
-                        value = value.strftime(format_string)[:-4] + "Z"
+                        if len(args) == 3 and isinstance(args[2], str):
+                            value = value.strftime(format_string)
+                        else:
+                            value = value.strftime(format_string)[:-4] + "Z"
                 else:
                     error = "{" + expression.to_string() + \
                          "} should contain an ISO format timestamp and a time interval integer."

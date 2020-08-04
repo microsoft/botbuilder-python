@@ -84,6 +84,10 @@ from .builtin_functions.date import Date
 from .builtin_functions.year import Year
 from .builtin_functions.utc_now import UtcNow
 from .builtin_functions.format_date_time import FormatDateTime
+from .builtin_functions.format_epoch import FormatEpoch
+from .builtin_functions.format_ticks import FormatTicks
+from .builtin_functions.subtract_from_time import SubtractFromTime
+from .builtin_functions.date_read_back import DateReadBack
 
 # Timex
 # Conversions
@@ -176,6 +180,10 @@ def get_standard_functions() -> dict:
     functions.append(Year())
     functions.append(UtcNow())
     functions.append(FormatDateTime())
+    functions.append(FormatEpoch())
+    functions.append(FormatTicks())
+    functions.append(SubtractFromTime())
+    functions.append(DateReadBack())
 
     # Timex
     # Conversions

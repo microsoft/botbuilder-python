@@ -1,9 +1,10 @@
 import numbers
 import sys
-from datetime import datetime
-from dateutil.parser import parse
+from datetime import datetime, timedelta
 from collections.abc import Iterable
 from typing import Callable, NewType
+from dateutil.relativedelta import relativedelta
+from dateutil.parser import parse
 from .memory_interface import MemoryInterface
 from .options import Options
 from .return_type import ReturnType
@@ -273,8 +274,8 @@ class FunctionUtils:
         def anonymous_function(
             expression: object, state: MemoryInterface, options: Options
         ):
-            value: object
-            error: str
+            value: object = None
+            error: str = None
             args: []
             args, error = FunctionUtils.evaluate_children(
                 expression, state, options, verify
@@ -422,13 +423,54 @@ class FunctionUtils:
         return result
 
     @staticmethod
+    def date_time_converter(interval: int, time_unit: str, is_past: bool = True):
+        converter: Callable[[datetime], datetime] = None
+        error: str = None
+        multi_flag = -1 if is_past else 1
+        if time_unit.lower() == "second":
+            def anonymous_function(date_time: datetime):
+                return date_time + timedelta(seconds=multi_flag * interval)
+            converter = anonymous_function
+        elif time_unit.lower() == "minute":
+            def anonymous_function(date_time: datetime):
+                return date_time + timedelta(minutes=multi_flag * interval)
+            converter = anonymous_function
+        elif time_unit.lower() == "hour":
+            def anonymous_function(date_time: datetime):
+                return date_time + timedelta(hours=multi_flag * interval)
+            converter = anonymous_function
+        elif time_unit.lower() == "day":
+            def anonymous_function(date_time: datetime):
+                return date_time + timedelta(days=multi_flag * interval)
+            converter = anonymous_function
+        elif time_unit.lower() == "week":
+            def anonymous_function(date_time: datetime):
+                return date_time + timedelta(weeks=multi_flag * interval)
+            converter = anonymous_function
+        elif time_unit.lower() == "month":
+            def anonymous_function(date_time: datetime):
+                return date_time + relativedelta(months=multi_flag * interval)
+            converter = anonymous_function
+        elif time_unit.lower() == "year":
+            def anonymous_function(date_time: datetime):
+                return date_time + relativedelta(years=multi_flag * interval)
+            converter = anonymous_function
+        else:
+            error = "{" + time_unit + "} is not a valid time unit."
+
+        return converter, error
+
+    @staticmethod
     def normalize_to_date_time(timestamp: object, transform: Callable[[datetime], object] = None):
         result: object = None
         error: str = None
         if isinstance(timestamp, str):
             result, error = FunctionUtils.parse_iso_timestamp(timestamp, transform)
         elif isinstance(timestamp, datetime):
-            result, error = transform(timestamp) if transform is not None else timestamp, None
+            if transform is not None:
+                result, error = transform(timestamp)
+            else:
+                result, error = timestamp, None
         else:
             error = "{" + timestamp + "} should be a standard ISO format string or a DateTime object."
         return result, error
