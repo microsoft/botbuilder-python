@@ -5,6 +5,7 @@ from ..return_type import ReturnType
 from ..memory_interface import MemoryInterface
 from ..options import Options
 
+
 class IsPresent(ExpressionEvaluator):
     def __init__(self):
         super().__init__(

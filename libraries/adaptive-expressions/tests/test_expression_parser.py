@@ -24,9 +24,9 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         },
         "doubleNestedItems": [[{"x": 1}, {"x: 2"}], [{"x": 3}]],
         "timex": "2020-08-04",
-        "validHourTimex" : Timex(timex="2012-12-20T13:40"),
+        "validHourTimex": Timex(timex="2012-12-20T13:40"),
         "validTimeRange": Timex(timex="TEV"),
-        "validNow": Timex(timex="PRESENT_REF")
+        "validNow": Timex(timex="PRESENT_REF"),
     }
 
     # Math
@@ -1601,6 +1601,7 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         value, error = parsed.try_evaluate({})
         assert value is False
         assert error is None
+
     def test_sort_by(self):
         parsed = Expression.parse("sortBy(items)")
         assert parsed is not None

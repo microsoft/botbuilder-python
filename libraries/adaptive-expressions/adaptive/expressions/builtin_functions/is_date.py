@@ -5,6 +5,7 @@ from ..return_type import ReturnType
 from ..memory_interface import MemoryInterface
 from ..options import Options
 
+
 class IsDate(ExpressionEvaluator):
     def __init__(self):
         super().__init__(
@@ -21,8 +22,8 @@ class IsDate(ExpressionEvaluator):
             parsed, error = FunctionUtils.parse_timex_property(args[0])
 
         if parsed is not None and error is None:
-            value = (parsed.month is not None \
-                and parsed.day_of_month is not None) \
-                or parsed.day_of_week is not None
+            value = (
+                parsed.month is not None and parsed.day_of_month is not None
+            ) or parsed.day_of_week is not None
 
         return value, error

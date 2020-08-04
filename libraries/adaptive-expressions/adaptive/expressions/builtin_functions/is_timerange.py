@@ -5,10 +5,14 @@ from ..return_type import ReturnType
 from ..memory_interface import MemoryInterface
 from ..options import Options
 
+
 class IsTimeRange(ExpressionEvaluator):
     def __init__(self):
         super().__init__(
-            ISTIMERANGE, IsTimeRange.eval, ReturnType.String, FunctionUtils.validate_unary,
+            ISTIMERANGE,
+            IsTimeRange.eval,
+            ReturnType.String,
+            FunctionUtils.validate_unary,
         )
 
     @staticmethod
