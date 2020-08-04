@@ -1174,39 +1174,43 @@ class BotFrameworkAdapter(
     ) -> SignInUrlResponse:
         if not connection_name:
             raise TypeError(
-                "BotFrameworkAdapter.get_sign_in_resource_from_user(): missing connection_name"
+                "BotFrameworkAdapter.get_sign_in_resource_from_user_and_credentials(): missing connection_name"
             )
-        if (
-            not turn_context.activity.from_property
-            or not turn_context.activity.from_property.id
-        ):
+        if not user_id:
             raise TypeError(
-                "BotFrameworkAdapter.get_sign_in_resource_from_user(): missing activity id"
+                "BotFrameworkAdapter.get_sign_in_resource_from_user_and_credentials(): missing user_id"
             )
-        if user_id and turn_context.activity.from_property.id != user_id:
-            raise TypeError(
-                "BotFrameworkAdapter.get_sign_in_resource_from_user(): cannot get signin resource"
-                " for a user that is different from the conversation"
+
+        activity = turn_context.activity
+
+        app_id = self.__get_app_id(turn_context)
+        token_exchange_state = TokenExchangeState(
+            connection_name=connection_name,
+            conversation=ConversationReference(
+                activity_id=activity.id,
+                bot=activity.recipient,
+                channel_id=activity.channel_id,
+                conversation=activity.conversation,
+                locale=activity.locale,
+                service_url=activity.service_url,
+                user=activity.from_property,
+            ),
+            relates_to=activity.relates_to,
+            ms_app_id=app_id,
+        )
+
+        state = base64.b64encode(
+            json.dumps(token_exchange_state.serialize()).encode(
+                encoding="UTF-8", errors="strict"
             )
+        ).decode()
 
         client = await self._create_token_api_client(
             turn_context, oauth_app_credentials
         )
-        conversation = TurnContext.get_conversation_reference(turn_context.activity)
-
-        state = TokenExchangeState(
-            connection_name=connection_name,
-            conversation=conversation,
-            relates_to=turn_context.activity.relates_to,
-            ms_app_id=client.config.credentials.microsoft_app_id,
-        )
-
-        final_state = base64.b64encode(
-            json.dumps(state.serialize()).encode(encoding="UTF-8", errors="strict")
-        ).decode()
 
         return client.bot_sign_in.get_sign_in_resource(
-            final_state, final_redirect=final_redirect
+            state, final_redirect=final_redirect
         )
 
     async def exchange_token(
