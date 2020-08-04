@@ -8,6 +8,7 @@ from adaptive.expressions import Expression
 class ExpressionParserTests(aiounittest.AsyncTestCase):
     scope = {
         "one": 1.0,
+        "two": 2.0,
         "hello": "hello",
         "nullObj": None,
         "bag": {"three": 3.0},
@@ -20,6 +21,7 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
             "title": "Dialog Title",
             "subTitle": "Dialog Sub Title",
         },
+        "doubleNestedItems": [[{"x": 1}, {"x: 2"}], [{"x": 3}]],
     }
 
     # Math
@@ -1452,4 +1454,243 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
 
         value, error = parsed.try_evaluate(self.scope)
         assert value == False
+        assert error is None
+    def test_where(self):
+        parsed = Expression.parse("join(where(items, item, item == 'two'), ',')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "two"
+        assert error is None
+
+        parsed = Expression.parse("join(where(items, item => item == 'two'), ',')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "two"
+        assert error is None
+
+        parsed = Expression.parse(
+            "string(where(dialog, item, item.value=='Dialog Title'))"
+        )
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "{'title': 'Dialog Title'}"
+        assert error is None
+
+        parsed = Expression.parse(
+            "join(foreach(where(nestedItems, item, item.x > 1), result, result.x), ',')"
+        )
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "2,3"
+        assert error is None
+
+        parsed = Expression.parse(
+            "count(where(doubleNestedItems, items, count(where(items, item, item.x == 1)) == 1))"
+        )
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == 1
+        assert error is None
+
+        parsed = Expression.parse(
+            "count(where(doubleNestedItems, items, count(where(items, item, count(items) == 1)) == 1))"
+        )
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == 1
+        assert error is None
+
+    def test_union(self):
+        parsed = Expression.parse('union(["a", "b", "c"], ["d", ["e", "f"], "g"][1])')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == ["a", "b", "c", "e", "f"]
+        assert error is None
+
+        parsed = Expression.parse(
+            'union(["a", "b", "c"], ["d", ["e", "f"], "g"][1])[1]'
+        )
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == "b"
+        assert error is None
+
+        parsed = Expression.parse("count(union(createArray('a', 'b')))")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 2
+        assert error is None
+
+        parsed = Expression.parse(
+            "count(union(createArray('a', 'b'), createArray('b', 'c'), createArray('b', 'd')))"
+        )
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 4
+        assert error is None
+
+    def test_intersection(self):
+        parsed = Expression.parse('count(intersection(createArray("a", "b")))')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 2
+        assert error is None
+
+        parsed = Expression.parse(
+            'count(intersection(createArray("a", "b"), createArray("b", "c"), createArray("b", "d")))'
+        )
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 1
+        assert error is None
+
+    def test_skip(self):
+        parsed = Expression.parse("skip(createArray('H','e','l','l','0'),2)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == ["l", "l", "0"]
+        assert error is None
+
+    def test_take(self):
+        parsed = Expression.parse("take(hello, two)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "he"
+        assert error is None
+
+        parsed = Expression.parse("take(createArray('a', 'b', 'c', 'd'), one)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == ["a"]
+        assert error is None
+
+    def test_sub_array(self):
+        parsed = Expression.parse("subArray(createArray('a', 'b', 'c', 'd'), 1, 3)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == ["b", "c"]
+        assert error is None
+
+        parsed = Expression.parse("subArray(createArray('a', 'b', 'c', 'd'), 1)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == ["b", "c", "d"]
+        assert error is None
+
+    def test_sort_by(self):
+        parsed = Expression.parse("sortBy(items)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == ["one", "two", "zero"]
+        assert error is None
+
+        parsed = Expression.parse("sortBy(nestedItems, 'x')[0].x")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == 1
+        assert error is None
+
+    def test_sort_by_descending(self):
+        parsed = Expression.parse("sortByDescending(items)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == ["zero", "two", "one"]
+        assert error is None
+
+        parsed = Expression.parse("sortByDescending(nestedItems, 'x')[0].x")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == 3
+        assert error is None
+
+    def test_indices_and_values(self):
+        parsed = Expression.parse(
+            "first(where(indicesAndValues(items), elt, elt.index > 1)).value"
+        )
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "two"
+        assert error is None
+
+        parsed = Expression.parse(
+            'first(where(indicesAndValues(bag), elt, elt.index == "three")).value'
+        )
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == 3
+        assert error is None
+
+        parsed = Expression.parse(
+            'join(foreach(indicesAndValues(items), item, item.value), ",")'
+        )
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "zero,one,two"
+        assert error is None
+
+        parsed = Expression.parse(
+            'join(foreach(indicesAndValues(items), item=>item.value), ",")'
+        )
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "zero,one,two"
+        assert error is None
+
+    def test_flatten(self):
+        parsed = Expression.parse(
+            "flatten(createArray(1,createArray(2),createArray(createArray(3, 4), createArray(5,6))))"
+        )
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == [1, 2, 3, 4, 5, 6]
+        assert error is None
+
+        parsed = Expression.parse(
+            "flatten(createArray(1,createArray(2),createArray(createArray(3, 4), createArray(5,6))), 1)"
+        )
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == [1, 2, [3, 4], [5, 6]]
+        assert error is None
+
+    def test_unique(self):
+        parsed = Expression.parse("unique(createArray(1, 5, 1))")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == [1, 5]
+        assert error is None
+
+        parsed = Expression.parse("unique(createArray(5, 5, 1, 2))")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == [1, 2, 5]
         assert error is None

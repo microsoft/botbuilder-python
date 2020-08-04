@@ -212,6 +212,14 @@ class FunctionUtils:
         return error
 
     @staticmethod
+    def verify_list(value: object, expression: object, number: int):
+        error: str = None
+        if not isinstance(value, list):
+            error = expression.to_string() + " is not a list."
+
+        return error
+
+    @staticmethod
     def verify_numeric_list(value: object, expression: object, number: int):
         error: str = None
         if not isinstance(value, list):
@@ -411,7 +419,7 @@ class FunctionUtils:
 
     @staticmethod
     def is_integer(obj: object):
-        if (obj is not None) and (isinstance(obj, int) or (isinstance(obj, float) and FunctionUtils.is_integer(obj))):
+        if (obj is not None) and (isinstance(obj, int) or (isinstance(obj, float) and obj.is_integer())):
             return True
         else:
             return False
@@ -566,3 +574,48 @@ class FunctionUtils:
         value = result
 
         return value, error
+
+    @staticmethod
+    def sort_by(is_descending: bool):
+        def anonymous_function(
+            expression: object, state: MemoryInterface, options: Options
+        ):
+            result: object = None
+            error: str = None
+
+            res = expression.children[0].try_evaluate(state, options)
+            arr = res[0]
+            error = res[1]
+
+            if error is None:
+                if isinstance(arr, list):
+                    if len(expression.children) == 1:
+                        if is_descending:
+                            result = sorted(arr, key=str, reverse=True)
+                        else:
+                            result = sorted(arr, key=str)
+                    else:
+                        property_name: str = None
+                        res = expression.children[1].try_evaluate(state, options)
+                        property_name = res[0]
+                        error = res[1]
+
+                        if error is None:
+                            property_name = (
+                                "" if property_name is None else property_name
+                            )
+
+                        if is_descending:
+                            result = sorted(
+                                arr, key=lambda x: x[property_name], reverse=True
+                            )
+                        else:
+                            result = sorted(arr, key=lambda x: x[property_name])
+                else:
+                    error = expression.children[0].to_string() + " is not an array"
+
+            value = result
+
+            return value, error
+
+        return anonymous_function
