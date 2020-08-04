@@ -13,6 +13,6 @@ class IsString(ExpressionEvaluator):
     @staticmethod
     def evaluator() -> EvaluateExpressionDelegate:
         def anonymous_function(args: []):
-            return type(args[0]) is str
+            return isinstance(args[0], str)
 
         return FunctionUtils.apply(anonymous_function)

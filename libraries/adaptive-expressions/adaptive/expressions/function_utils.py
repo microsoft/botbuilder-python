@@ -206,7 +206,7 @@ class FunctionUtils:
     @staticmethod
     def verify_integer(value: object, expression: object, number: int):
         error: str = None
-        if isinstance(value, int):
+        if not isinstance(value, int):
             error = expression + " is not an integer."
 
         return error

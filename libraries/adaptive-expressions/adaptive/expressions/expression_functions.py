@@ -90,6 +90,9 @@ from .builtin_functions.create_array import CreateArray
 # Type Checking
 from .builtin_functions.is_boolean import IsBoolean
 from .builtin_functions.is_string import IsString
+from .builtin_functions.is_array import IsArray
+from .builtin_functions.is_float import IsFloat
+from .builtin_functions.is_integer import IsInteger
 
 # pylint: disable=too-many-statements
 def get_standard_functions() -> dict:
@@ -175,6 +178,9 @@ def get_standard_functions() -> dict:
     # Type Checking
     functions.append(IsBoolean())
     functions.append(IsString())
+    functions.append(IsArray())
+    functions.append(IsInteger())
+    functions.append(IsFloat())
 
     lookup = dict()
     for function in functions:

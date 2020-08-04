@@ -1,18 +1,18 @@
 from ..expression_evaluator import ExpressionEvaluator, EvaluateExpressionDelegate
-from ..expression_type import ISBOOLEAN
+from ..expression_type import ISINTEGER
 from ..function_utils import FunctionUtils
 from ..return_type import ReturnType
 
 
-class IsBoolean(ExpressionEvaluator):
+class IsInteger(ExpressionEvaluator):
     def __init__(self):
         super().__init__(
-            ISBOOLEAN, IsBoolean.evaluator(), ReturnType.Boolean, FunctionUtils.validate_unary
+            ISINTEGER, IsInteger.evaluator(), ReturnType.Boolean, FunctionUtils.validate_unary
         )
 
     @staticmethod
     def evaluator() -> EvaluateExpressionDelegate:
         def anonymous_function(args: []):
-            return isinstance(args[0], bool)
+            return isinstance(args[0], int)
 
         return FunctionUtils.apply(anonymous_function)

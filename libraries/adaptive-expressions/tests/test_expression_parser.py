@@ -1394,3 +1394,69 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         value, error = parsed.try_evaluate(self.scope)
         assert value == False
         assert error is None
+
+    def test_is_integer(self):
+        parsed = Expression.parse("isInteger('abc')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == False
+        assert error is None
+
+        parsed = Expression.parse("isInteger(123)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == True
+        assert error is None
+
+        parsed = Expression.parse("isInteger(None)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == False
+        assert error is None
+    
+    def test_is_float(self):
+        parsed = Expression.parse("isFloat('abc')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == False
+        assert error is None
+
+        parsed = Expression.parse("isFloat(123.234)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == True
+        assert error is None
+
+        parsed = Expression.parse("isFloat(None)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == False
+        assert error is None
+    
+    def test_is_array(self):
+        parsed = Expression.parse("isArray(createArray(1,2,3))")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == True
+        assert error is None
+
+        parsed = Expression.parse("isArray(123.234)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == False
+        assert error is None
+
+        parsed = Expression.parse("isArray(None)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == False
+        assert error is None
