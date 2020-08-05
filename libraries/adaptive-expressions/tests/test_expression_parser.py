@@ -348,7 +348,7 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         ["unique(createArray(5, 5, 1, 2))", [1, 2, 5]],
     ]
 
-    def test_expression_parser_functional(self):
+    def test_expression_parser_functions(self):
         for data in self.data_source:
             input = str(data[0])
             parsed = Expression.parse(input)
