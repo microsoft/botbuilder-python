@@ -77,6 +77,11 @@ from .builtin_functions.intersection import Intersection
 from .builtin_functions.skip import Skip
 from .builtin_functions.take import Take
 from .builtin_functions.sub_array import SubArray
+from .builtin_functions.sort_by import SortBy
+from .builtin_functions.sort_by_descending import SortByDescending
+from .builtin_functions.indices_and_values import IndicesAndValues
+from .builtin_functions.flatten import Flatten
+from .builtin_functions.unique import Unique
 
 # DataTime
 from .builtin_functions.add_days import AddDays
@@ -120,7 +125,9 @@ from .builtin_functions.create_array import CreateArray
 # Misc
 # Object manipulation and construction functions
 # Regular expression
+
 # Type Checking
+from .builtin_functions.is_datetime import IsDateTime
 
 # pylint: disable=too-many-statements
 def get_standard_functions() -> dict:
@@ -192,6 +199,11 @@ def get_standard_functions() -> dict:
     functions.append(Skip())
     functions.append(Take())
     functions.append(SubArray())
+    functions.append(SortBy())
+    functions.append(SortByDescending())
+    functions.append(IndicesAndValues())
+    functions.append(Flatten())
+    functions.append(Unique())
 
     # DataTime
     functions.append(AddDays())
@@ -235,7 +247,9 @@ def get_standard_functions() -> dict:
     # Misc
     # Object manipulation and construction functions
     # Regular expression
+
     # Type Checking
+    functions.append(IsDateTime())
 
     lookup = dict()
     for function in functions:

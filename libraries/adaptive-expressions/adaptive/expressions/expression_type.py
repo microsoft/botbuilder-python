@@ -121,3 +121,4 @@ SETPATHTOVALUE = "setPathToValue"
 
 # Regular expression
 # Type checking
+ISDATETIME = "isDateTime"
