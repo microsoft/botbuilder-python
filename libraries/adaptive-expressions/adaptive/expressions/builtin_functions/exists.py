@@ -1,13 +1,13 @@
 from .comparison_evaluator import ComparisonEvaluator
-from ..expression_type import EXIST
+from ..expression_type import EXISTS
 from ..function_utils import FunctionUtils
 
 
-class Exist(ComparisonEvaluator):
+class Exists(ComparisonEvaluator):
     def __init__(self):
         super().__init__(
-            EXIST,
-            Exist.func,
+            EXISTS,
+            Exists.func,
             FunctionUtils.validate_unary,
             FunctionUtils.verify_not_null,
         )

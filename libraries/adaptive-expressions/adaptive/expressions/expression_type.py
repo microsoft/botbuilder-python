@@ -1,4 +1,4 @@
-"Math"
+# Math
 ADD = "+"
 SUBTRACT = "-"
 MULTIPLY = "*"
@@ -14,21 +14,21 @@ FLOOR = "floor"
 CEILING = "ceiling"
 ROUND = "round"
 
-"Comparisons"
+# Comparisons
 NOTEQUAL = "!="
 EQUAL = "=="
 LESSTHAN = "<"
 LESSTHANOREQUAL = "<="
 GREATERTHAN = ">"
 GREATERTHANOREQUAL = ">="
-EXIST = "exists"
+EXISTS = "exists"
 
-"Logic"
+# Logic
 AND = "&&"
 OR = "||"
 NOT = "!"
 
-"String"
+# String
 CONCAT = "concat"
 LENGTH = "length"
 REPLACE = "replace"
@@ -50,7 +50,7 @@ SENTENCECASE = "sentenceCase"
 TITLECASE = "titleCase"
 
 
-"Collection"
+# Collection
 COUNT = "count"
 CONTAINS = "contains"
 EMPTY = "empty"
@@ -71,12 +71,7 @@ INDICESANDVALUES = "indicesAndValues"
 FLATTEN = "flatten"
 UNIQUE = "unique"
 
-"Memory"
-ACCESSOR = "Accessor"
-ELEMENT = "Element"
-CREATEARRAY = "createArray"
-
-"DateTime"
+# DateTime
 ADDDAYS = "addDays"
 ADDHOURS = "addHours"
 ADDMINUTES = "addMinutes"
@@ -93,12 +88,36 @@ FORMATEPOCH = "formatEpoch"
 FORMATTICKS = "formatTicks"
 SUBTRACTFROMTIME = "subtractFromTime"
 DATEREADBACK = "dateReadBack"
+GETTIMEOFDAY = "getTimeOfDay"
+GETFUTURETIME = "getFutureTime"
+GETPASTTIME = "getPastTime"
+CONVERTFROMUTC = "convertFromUTC"
+CONVERTTOUTC = "convertToUTC"
+ADDTOTIME = "addToTime"
+STARTOFDAY = "startOfDay"
+STARTOFHOUR = "startOfHour"
+STARTOFMONTH = "startOfMonth"
 
-"Misc"
+# Timex
+
+# Conversions
+STRING = "string"
+
+# URI Parsing Functions
+
+# Memory
+ACCESSOR = "Accessor"
+ELEMENT = "Element"
+CREATEARRAY = "createArray"
+
+# Misc
 CONSTANT = "Constant"
 LAMBDA = "Lambda"
 
-"Object manipulation and construction functions"
+# Object manipulation and construction functions
 JSON = "json"
 SETPROPERTY = "setProperty"
 SETPATHTOVALUE = "setPathToValue"
+
+# Regular expression
+# Type checking

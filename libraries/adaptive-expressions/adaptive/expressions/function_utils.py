@@ -216,6 +216,14 @@ class FunctionUtils:
         return error
 
     @staticmethod
+    def verify_list(value: object, expression: object, number: int):
+        error: str = None
+        if not isinstance(value, list):
+            error = expression.to_string() + " is not a list."
+
+        return error
+
+    @staticmethod
     def verify_numeric_list(value: object, expression: object, number: int):
         error: str = None
         if not isinstance(value, list):
@@ -383,14 +391,14 @@ class FunctionUtils:
         if instance is None:
             return value, error
 
-        instance_dict = dict(instance)
-        value = instance_dict.get(property)
-        if value is None:
-            prop = list(
-                filter(lambda x: (x.lower() == property.lower()), instance_dict.keys())
-            )
-            if len(prop) > 0:
-                value = instance_dict.get(prop[0])
+        if isinstance(instance, dict):
+            value = instance.get(property)
+            if value is None:
+                prop = list(
+                    filter(lambda x: (x.lower() == property.lower()), instance.keys())
+                )
+                if len(prop) > 0:
+                    value = instance.get(prop[0])
 
         return value, error
 

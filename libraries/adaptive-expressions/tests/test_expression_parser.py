@@ -4,12 +4,15 @@ import platform
 from datetime import datetime
 from dateutil import tz
 from dateutil.parser import parse
+from dateutil.relativedelta import relativedelta
 import aiounittest
 from adaptive.expressions import Expression
 
 
 class ExpressionParserTests(aiounittest.AsyncTestCase):
     scope = {
+        "one": 1.0,
+        "two": 2.0,
         "hello": "hello",
         "nullObj": None,
         "bag": {"three": 3.0},
@@ -22,13 +25,14 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
             "title": "Dialog Title",
             "subTitle": "Dialog Sub Title",
         },
-        "one": 1,
         "timestamp": "2018-03-15T13:00:00.000Z",
         "notISOTimestamp": "2018/03/15 13:00:00",
         "timestampObj": parse("2018-03-15T13:00:00.000Z").replace(tzinfo=tz.gettz("UTC")),
+        "timestampObj2": parse("2018-01-02T02:00:00.000Z").replace(tzinfo=tz.gettz("UTC")),
         "unixTimestamp": 1521118800,
         "unixTimestampFraction": 1521118800.5,
-        "ticks": 637243624200000000
+        "ticks": 637243624200000000,
+        "doubleNestedItems": [[{"x": 1}, {"x: 2"}], [{"x": 3}]],
     }
 
     # Math
@@ -554,7 +558,27 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert value is True
         assert error is None
 
-    # TODO: add exists test
+    def test_exists(self):
+        parsed = Expression.parse("exists(one)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value
+        assert error is None
+
+        parsed = Expression.parse("exists(xxx)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert not value
+        assert error is None
+
+        parsed = Expression.parse("exists(one.xxx)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert not value
+        assert error is None
 
     # Logic
     def test_not(self):
@@ -1331,12 +1355,186 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         assert value == "2,3,4"
         assert error is None
 
-        # parsed = Expression.parse("join(foreach(items, item, concat(item, string(count(items)))), ',')")
-        # assert parsed is not None
+        parsed = Expression.parse(
+            "join(foreach(items, item, concat(item, string(count(items)))), ',')"
+        )
+        assert parsed is not None
 
-        # value, error = parsed.try_evaluate(self.scope)
-        # assert value == "zero3,one3,two3"
-        # assert error is None
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "zero3,one3,two3"
+        assert error is None
+
+    def test_select(self):
+        parsed = Expression.parse("join(select(items, item, item), ',')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "zero,one,two"
+        assert error is None
+
+        parsed = Expression.parse("join(select(items, item=> item), ',')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "zero,one,two"
+        assert error is None
+
+        parsed = Expression.parse(
+            "join(select(nestedItems, i, i.x + first(nestedItems).x), ',')"
+        )
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "2,3,4"
+        assert error is None
+
+        parsed = Expression.parse(
+            "join(select(items, item, concat(item, string(count(items)))), ',')"
+        )
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "zero3,one3,two3"
+        assert error is None
+
+    def test_where(self):
+        parsed = Expression.parse("join(where(items, item, item == 'two'), ',')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "two"
+        assert error is None
+
+        parsed = Expression.parse("join(where(items, item => item == 'two'), ',')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "two"
+        assert error is None
+
+        parsed = Expression.parse(
+            "string(where(dialog, item, item.value=='Dialog Title'))"
+        )
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "{'title': 'Dialog Title'}"
+        assert error is None
+
+        parsed = Expression.parse(
+            "join(foreach(where(nestedItems, item, item.x > 1), result, result.x), ',')"
+        )
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "2,3"
+        assert error is None
+
+        parsed = Expression.parse(
+            "count(where(doubleNestedItems, items, count(where(items, item, item.x == 1)) == 1))"
+        )
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == 1
+        assert error is None
+
+        parsed = Expression.parse(
+            "count(where(doubleNestedItems, items, count(where(items, item, count(items) == 1)) == 1))"
+        )
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == 1
+        assert error is None
+
+    def test_union(self):
+        parsed = Expression.parse('union(["a", "b", "c"], ["d", ["e", "f"], "g"][1])')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == ["a", "b", "c", "e", "f"]
+        assert error is None
+
+        parsed = Expression.parse(
+            'union(["a", "b", "c"], ["d", ["e", "f"], "g"][1])[1]'
+        )
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == "b"
+        assert error is None
+
+        parsed = Expression.parse("count(union(createArray('a', 'b')))")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 2
+        assert error is None
+
+        parsed = Expression.parse(
+            "count(union(createArray('a', 'b'), createArray('b', 'c'), createArray('b', 'd')))"
+        )
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 4
+        assert error is None
+
+    def test_intersection(self):
+        parsed = Expression.parse('count(intersection(createArray("a", "b")))')
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 2
+        assert error is None
+
+        parsed = Expression.parse(
+            'count(intersection(createArray("a", "b"), createArray("b", "c"), createArray("b", "d")))'
+        )
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == 1
+        assert error is None
+
+    def test_skip(self):
+        parsed = Expression.parse("skip(createArray('H','e','l','l','0'),2)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == ["l", "l", "0"]
+        assert error is None
+
+    def test_take(self):
+        parsed = Expression.parse("take(hello, two)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == "he"
+        assert error is None
+
+        parsed = Expression.parse("take(createArray('a', 'b', 'c', 'd'), one)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == ["a"]
+        assert error is None
+
+    def test_sub_array(self):
+        parsed = Expression.parse("subArray(createArray('a', 'b', 'c', 'd'), 1, 3)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert value == ["b", "c"]
+        assert error is None
+
+        parsed = Expression.parse("subArray(createArray('a', 'b', 'c', 'd'), 1)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert value == ["b", "c", "d"]
+        assert error is None
 
     # Datetime
     def test_add_days(self):
@@ -1731,3 +1929,186 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         value, error = parsed.try_evaluate(self.scope)
         assert error is None
         assert value == "yesterday"
+
+    def test_get_time_of_day(self):
+        parsed = Expression.parse("getTimeOfDay('2018-03-15T00:00:00.000Z')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert error is None
+        assert value == "midnight"
+
+        parsed = Expression.parse("getTimeOfDay(timestampObj)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert error is None
+        assert value == "afternoon"
+
+        parsed = Expression.parse("getTimeOfDay('2018-03-15T08:00:00.000Z')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert error is None
+        assert value == "morning"
+
+        parsed = Expression.parse("getTimeOfDay('2018-03-15T12:00:00.000Z')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert error is None
+        assert value == "noon"
+
+        parsed = Expression.parse("getTimeOfDay('2018-03-15T13:00:00.000Z')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert error is None
+        assert value == "afternoon"
+
+        parsed = Expression.parse("getTimeOfDay('2018-03-15T18:00:00.000Z')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert error is None
+        assert value == "evening"
+
+        parsed = Expression.parse("getTimeOfDay('2018-03-15T22:00:00.000Z')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert error is None
+        assert value == "evening"
+
+        parsed = Expression.parse("getTimeOfDay('2018-03-15T23:00:00.000Z')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert error is None
+        assert value == "night"
+
+    def test_get_past_time(self):
+        parsed = Expression.parse("getPastTime(1,'Year','%m-%d-%y')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert error is None
+        assert value == (datetime.utcnow() + relativedelta(years=-1)).strftime("%m-%d-%y")
+
+        parsed = Expression.parse("getPastTime(1,'Month','%m-%d-%y')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert error is None
+        assert value == (datetime.utcnow() + relativedelta(months=-1)).strftime("%m-%d-%y")
+
+        parsed = Expression.parse("getPastTime(1,'Week','%m-%d-%y')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert error is None
+        assert value == (datetime.utcnow() + relativedelta(weeks=-1)).strftime("%m-%d-%y")
+
+        parsed = Expression.parse("getPastTime(1,'Day','%m-%d-%y')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert error is None
+        assert value == (datetime.utcnow() + relativedelta(days=-1)).strftime("%m-%d-%y")
+
+    def test_convert_from_utc(self):
+        parsed = Expression.parse("convertFromUTC('2018-01-02T02:00:00.000Z', 'Pacific Standard Time', '%A, %d %B %Y')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert error is None
+        assert value == "Monday, 01 January 2018"
+
+        parsed = Expression.parse("convertFromUTC('2018-01-02T01:00:00.000Z', 'America/Los_Angeles', '%A, %d %B %Y')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert error is None
+        assert value == "Monday, 01 January 2018"
+
+        parsed = Expression.parse("convertFromUTC(timestampObj2, 'Pacific Standard Time', '%A, %d %B %Y')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert error is None
+        assert value == "Monday, 01 January 2018"
+
+    def test_convert_to_utc(self):
+        parsed = Expression.parse("convertToUTC('01/01/2018 00:00:00', 'Pacific Standard Time')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert error is None
+        assert value == "2018-01-01T08:00:00.000Z"
+
+    def test_add_to_time(self):
+        parsed = Expression.parse("addToTime('2018-01-01T08:00:00.000Z', 1, 'Day', '%A, %d %B %Y')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert error is None
+        assert value == "Tuesday, 02 January 2018"
+
+        parsed = Expression.parse("addToTime('2018-01-01T00:00:00.000Z', 1, 'Week')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert error is None
+        assert value == "2018-01-08T00:00:00.000Z"
+
+        parsed = Expression.parse("addToTime(timestampObj2, 1, 'Week')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert error is None
+        assert value == "2018-01-09T02:00:00.000Z"
+
+    def test_start_of_day(self):
+        parsed = Expression.parse("startOfDay('2018-03-15T13:30:30.000Z')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert error is None
+        assert value == "2018-03-15T00:00:00.000Z"
+
+        parsed = Expression.parse("startOfDay(timestampObj2)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert error is None
+        assert value == "2018-01-02T00:00:00.000Z"
+
+    def test_start_of_hour(self):
+        parsed = Expression.parse("startOfHour('2018-03-15T13:30:30.000Z')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert error is None
+        assert value == "2018-03-15T13:00:00.000Z"
+
+        parsed = Expression.parse("startOfHour(timestampObj)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert error is None
+        assert value == "2018-03-15T13:00:00.000Z"
+
+    def test_start_of_month(self):
+        parsed = Expression.parse("startOfMonth('2018-03-15T13:30:30.000Z')")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate({})
+        assert error is None
+        assert value == "2018-03-01T00:00:00.000Z"
+
+        parsed = Expression.parse("startOfMonth(timestampObj)")
+        assert parsed is not None
+
+        value, error = parsed.try_evaluate(self.scope)
+        assert error is None
+        assert value == "2018-03-01T00:00:00.000Z"

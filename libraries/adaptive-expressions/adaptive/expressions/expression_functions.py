@@ -34,7 +34,7 @@ from .builtin_functions.less_than_or_equal import LessThanOrEqual
 from .builtin_functions.greater_than import GreaterThan
 from .builtin_functions.greater_than_or_equal import GreaterThanOrEqual
 from .builtin_functions.not_equal import NotEqual
-from .builtin_functions.exist import Exist
+from .builtin_functions.exists import Exists
 
 # Logic
 from .builtin_functions.not_function import Not
@@ -70,6 +70,13 @@ from .builtin_functions.join import Join
 from .builtin_functions.first import First
 from .builtin_functions.last import Last
 from .builtin_functions.foreach import Foreach
+from .builtin_functions.select import Select
+from .builtin_functions.where import Where
+from .builtin_functions.union import Union
+from .builtin_functions.intersection import Intersection
+from .builtin_functions.skip import Skip
+from .builtin_functions.take import Take
+from .builtin_functions.sub_array import SubArray
 
 # DataTime
 from .builtin_functions.add_days import AddDays
@@ -88,9 +95,21 @@ from .builtin_functions.format_epoch import FormatEpoch
 from .builtin_functions.format_ticks import FormatTicks
 from .builtin_functions.subtract_from_time import SubtractFromTime
 from .builtin_functions.date_read_back import DateReadBack
+from .builtin_functions.get_time_of_day import GetTimeOfDay
+from .builtin_functions.get_future_time import GetFutureTime
+from .builtin_functions.get_past_time import GetPastTime
+from .builtin_functions.convert_from_utc import ConvertFromUtc
+from .builtin_functions.convert_to_utc import ConvertToUtc
+from .builtin_functions.add_to_time import AddToTime
+from .builtin_functions.start_of_day import StartOfDay
+from .builtin_functions.start_of_hour import StartOfHour
+from .builtin_functions.start_of_month import StartOfMonth
 
 # Timex
+
 # Conversions
+from .builtin_functions.string import String
+
 # URI Parsing Functions
 
 # Memory
@@ -130,7 +149,7 @@ def get_standard_functions() -> dict:
     functions.append(GreaterThan())
     functions.append(GreaterThanOrEqual())
     functions.append(NotEqual())
-    functions.append(Exist())
+    functions.append(Exists())
 
     # Logic
     functions.append(Not())
@@ -166,6 +185,13 @@ def get_standard_functions() -> dict:
     functions.append(First())
     functions.append(Last())
     functions.append(Foreach())
+    functions.append(Select())
+    functions.append(Where())
+    functions.append(Union())
+    functions.append(Intersection())
+    functions.append(Skip())
+    functions.append(Take())
+    functions.append(SubArray())
 
     # DataTime
     functions.append(AddDays())
@@ -184,9 +210,21 @@ def get_standard_functions() -> dict:
     functions.append(FormatTicks())
     functions.append(SubtractFromTime())
     functions.append(DateReadBack())
+    functions.append(GetTimeOfDay())
+    functions.append(GetFutureTime())
+    functions.append(GetPastTime())
+    functions.append(ConvertFromUtc())
+    functions.append(ConvertToUtc())
+    functions.append(AddToTime())
+    functions.append(StartOfDay())
+    functions.append(StartOfHour())
+    functions.append(StartOfMonth())
 
     # Timex
+
     # Conversions
+    functions.append(String())
+
     # URI Parsing Functions
 
     # Memory
