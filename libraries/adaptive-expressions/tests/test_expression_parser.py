@@ -29,8 +29,15 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         },
         "timestamp": "2018-03-15T13:00:00.000Z",
         "notISOTimestamp": "2018/03/15 13:00:00",
-        "timestampObj": parse("2018-03-15T13:00:00.000Z").replace(tzinfo=tz.gettz("UTC")),
-        "timestampObj2": parse("2018-01-02T02:00:00.000Z").replace(tzinfo=tz.gettz("UTC")),
+        "timestampObj": parse("2018-03-15T13:00:00.000Z").replace(
+            tzinfo=tz.gettz("UTC")
+        ),
+        "timestampObj2": parse("2018-01-02T02:00:00.000Z").replace(
+            tzinfo=tz.gettz("UTC")
+        ),
+        "timestampObj3": parse("2018-01-01T08:00:00.000Z").replace(
+            tzinfo=tz.gettz("UTC")
+        ),
         "unixTimestamp": 1521118800,
         "unixTimestampFraction": 1521118800.5,
         "ticks": 637243624200000000,
@@ -363,7 +370,7 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         # unique
         ["unique(createArray(1, 5, 1))", [1, 5]],
         ["unique(createArray(5, 5, 1, 2))", [1, 2, 5]],
-        #type checking functions
+        # type checking functions
         # isDateTime
         ["isDateTime(2)", False],
         ["isDateTime(null)", False],
@@ -416,7 +423,7 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         ["year(timestampObj)", 2018],
         # utcNow
         ["length(utcNow())", 24],
-        ["utcNow('%m-%d-%Y')", datetime.utcnow().strftime('%m-%d-%Y')],
+        ["utcNow('%m-%d-%Y')", datetime.utcnow().strftime("%m-%d-%Y")],
         # formatDateTime
         ["formatDateTime('2018-03-15')", "2018-03-15T00:00:00.000Z"],
         ["formatDateTime(notISOTimestamp)", "2018-03-15T13:00:00.000Z"],
@@ -450,23 +457,51 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         ["getTimeOfDay('2018-03-15T22:00:00.000Z')", "evening"],
         ["getTimeOfDay('2018-03-15T23:00:00.000Z')", "night"],
         # getPastTime
-        ["getPastTime(1,'Year','%m-%d-%y')", (datetime.utcnow() + relativedelta(years=-1)).strftime("%m-%d-%y")],
-        ["getPastTime(1,'Month','%m-%d-%y')", (datetime.utcnow() + relativedelta(months=-1)).strftime("%m-%d-%y")],
-        ["getPastTime(1,'Week','%m-%d-%y')", (datetime.utcnow() + relativedelta(weeks=-1)).strftime("%m-%d-%y")],
-        ["getPastTime(1,'Day','%m-%d-%y')", (datetime.utcnow() + relativedelta(days=-1)).strftime("%m-%d-%y")],
+        [
+            "getPastTime(1,'Year','%m-%d-%y')",
+            (datetime.utcnow() + relativedelta(years=-1)).strftime("%m-%d-%y"),
+        ],
+        [
+            "getPastTime(1,'Month','%m-%d-%y')",
+            (datetime.utcnow() + relativedelta(months=-1)).strftime("%m-%d-%y"),
+        ],
+        [
+            "getPastTime(1,'Week','%m-%d-%y')",
+            (datetime.utcnow() + relativedelta(weeks=-1)).strftime("%m-%d-%y"),
+        ],
+        [
+            "getPastTime(1,'Day','%m-%d-%y')",
+            (datetime.utcnow() + relativedelta(days=-1)).strftime("%m-%d-%y"),
+        ],
         # convertFromUTC
-        ["convertFromUTC('2018-01-02T02:00:00.000Z',\
-           'Pacific Standard Time', '%A, %d %B %Y')", "Monday, 01 January 2018"],
-
-        ["convertFromUTC('2018-01-02T01:00:00.000Z',\
-           'America/Los_Angeles', '%A, %d %B %Y')", "Monday, 01 January 2018"],
-
-        ["convertFromUTC(timestampObj2, 'Pacific Standard Time', '%A, %d %B %Y')", "Monday, 01 January 2018"],
-        #convertToUTC
-        ["convertToUTC('01/01/2018 00:00:00', 'Pacific Standard Time')", "2018-01-01T08:00:00.000Z"],
+        [
+            "convertFromUTC('2018-01-02T02:00:00.000Z',\
+           'Pacific Standard Time', '%A, %d %B %Y')",
+            "Monday, 01 January 2018",
+        ],
+        [
+            "convertFromUTC('2018-01-02T01:00:00.000Z',\
+           'America/Los_Angeles', '%A, %d %B %Y')",
+            "Monday, 01 January 2018",
+        ],
+        [
+            "convertFromUTC(timestampObj2, 'Pacific Standard Time', '%A, %d %B %Y')",
+            "Monday, 01 January 2018",
+        ],
+        # convertToUTC
+        [
+            "convertToUTC('01/01/2018 00:00:00', 'Pacific Standard Time')",
+            "2018-01-01T08:00:00.000Z",
+        ],
         # addToTime
-        ["addToTime('2018-01-01T08:00:00.000Z', 1, 'Day', '%A, %d %B %Y')", "Tuesday, 02 January 2018"],
-        ["addToTime('2018-01-01T00:00:00.000Z', 1, 'Week')", "2018-01-08T00:00:00.000Z"],
+        [
+            "addToTime('2018-01-01T08:00:00.000Z', 1, 'Day', '%A, %d %B %Y')",
+            "Tuesday, 02 January 2018",
+        ],
+        [
+            "addToTime('2018-01-01T00:00:00.000Z', 1, 'Week')",
+            "2018-01-08T00:00:00.000Z",
+        ],
         ["addToTime(timestampObj2, 1, 'Week')", "2018-01-09T02:00:00.000Z"],
         # startOfDay
         ["startOfDay('2018-03-15T13:30:30.000Z')", "2018-03-15T00:00:00.000Z"],
@@ -474,9 +509,28 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         # startOfHour
         ["startOfHour('2018-03-15T13:30:30.000Z')", "2018-03-15T13:00:00.000Z"],
         ["startOfHour(timestampObj)", "2018-03-15T13:00:00.000Z"],
-        #startOfMonth
+        # startOfMonth
         ["startOfMonth('2018-03-15T13:30:30.000Z')", "2018-03-01T00:00:00.000Z"],
         ["startOfMonth(timestampObj)", "2018-03-01T00:00:00.000Z"],
+        # ticks
+        ["ticks('2018-01-01T08:00:00.000Z')", 636503904000000000],
+        ["ticks(timestampObj3)", 636503904000000000],
+        # ticksToDays
+        ["ticksToDays(2193385800000000)", 2538.64097222],
+        # ticksToHours
+        ["ticksToHours(2193385800000000)", 60927.383333333331],
+        # ticksToMinutes
+        ["ticksToMinutes(2193385811100000)", 3655643.0185],
+        # dateTimeDiff
+        [
+            "dateTimeDiff('2019-01-01T08:00:00.000Z','2018-01-01T08:00:00.000Z')",
+            315360000000000,
+        ],
+        [
+            "dateTimeDiff('2017-01-01T08:00:00.000Z','2018-01-01T08:00:00.000Z')",
+            -315360000000000,
+        ],
+        ["dateTimeDiff(timestampObj,timestampObj2)", 62604000000000],
     ]
 
     def test_expression_parser_functional(self):

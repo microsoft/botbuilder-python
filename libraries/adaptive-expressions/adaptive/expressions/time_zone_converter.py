@@ -1,9 +1,9 @@
-class TimeZoneConverter():
+class TimeZoneConverter:
     iana_to_windowsMap: dict = dict()
     windows_to_lana_map: dict = dict()
     validTimezonStr: list = []
-    seperator: str = '    '
-    mappingString: str = 'AUS Central Standard Time,001,Australia/Darwin\
+    seperator: str = "    "
+    mappingString: str = "AUS Central Standard Time,001,Australia/Darwin\
     AUS Central Standard Time,AU,Australia/Darwin\
     AUS Eastern Standard Time,001,Australia/Sydney\
     AUS Eastern Standard Time,AU,Australia/Sydney Australia/Melbourne\
@@ -511,7 +511,7 @@ class TimeZoneConverter():
     West Pacific Standard Time,PG,Pacific/Port_Moresby\
     West Pacific Standard Time,ZZ,Etc/GMT-10\
     Yakutsk Standard Time,001,Asia/Yakutsk\
-    Yakutsk Standard Time,RU,Asia/Yakutsk Asia/Khandyga'
+    Yakutsk Standard Time,RU,Asia/Yakutsk Asia/Khandyga"
 
     @staticmethod
     def iana_to_windows(iana_time_zone_id: str):
@@ -524,7 +524,9 @@ class TimeZoneConverter():
     def windows_to_lana(windows_time_zone_id: str):
         TimeZoneConverter.load_data()
         if "001|" + windows_time_zone_id in TimeZoneConverter.windows_to_lana_map:
-            return TimeZoneConverter.windows_to_lana_map.get("001|" + windows_time_zone_id)
+            return TimeZoneConverter.windows_to_lana_map.get(
+                "001|" + windows_time_zone_id
+            )
         return windows_time_zone_id
 
     @staticmethod
@@ -537,10 +539,10 @@ class TimeZoneConverter():
         data: str = TimeZoneConverter.mappingString
         lines: list = data.split(TimeZoneConverter.seperator)
         for line in lines:
-            tokens = line.split(',')
+            tokens = line.split(",")
             windows_id = tokens[0]
             territory = tokens[1]
-            iana_ids = tokens[2].split(' ')
+            iana_ids = tokens[2].split(" ")
             for iana_id in iana_ids:
                 if not iana_id in TimeZoneConverter.iana_to_windowsMap:
                     TimeZoneConverter.iana_to_windowsMap[iana_id] = windows_id
@@ -548,8 +550,13 @@ class TimeZoneConverter():
                 if not iana_id in TimeZoneConverter.validTimezonStr:
                     TimeZoneConverter.validTimezonStr.append(iana_id)
 
-            if not territory + "|" + windows_id in TimeZoneConverter.windows_to_lana_map:
-                TimeZoneConverter.windows_to_lana_map[territory + "|" + windows_id] = iana_ids[0]
+            if (
+                not territory + "|" + windows_id
+                in TimeZoneConverter.windows_to_lana_map
+            ):
+                TimeZoneConverter.windows_to_lana_map[
+                    territory + "|" + windows_id
+                ] = iana_ids[0]
 
             if not windows_id in TimeZoneConverter.validTimezonStr:
                 TimeZoneConverter.validTimezonStr.append(windows_id)

@@ -7,10 +7,14 @@ from ..function_utils import FunctionUtils
 from ..return_type import ReturnType
 from ..expression_evaluator import ExpressionEvaluator
 
+
 class ConvertToUtc(ExpressionEvaluator):
     def __init__(self):
         super().__init__(
-            CONVERTTOUTC, ConvertToUtc.evaluator, ReturnType.String, ConvertToUtc.validator
+            CONVERTTOUTC,
+            ConvertToUtc.evaluator,
+            ReturnType.String,
+            ConvertToUtc.validator,
         )
 
     @staticmethod
@@ -20,12 +24,20 @@ class ConvertToUtc(ExpressionEvaluator):
         args: list = []
         args, error = FunctionUtils.evaluate_children(expression, state, options)
         if error is None:
-            time_format = args[2] if len(args) == 3 else FunctionUtils.default_date_time_format
+            time_format = (
+                args[2] if len(args) == 3 else FunctionUtils.default_date_time_format
+            )
             if isinstance(args[1], str):
-                value, error = ConvertToUtc.eval_convert_to_utc(args[0], args[1], time_format)
+                value, error = ConvertToUtc.eval_convert_to_utc(
+                    args[0], args[1], time_format
+                )
             else:
-                error = "{" + expression.to_string() + "} should contain an ISO format timestamp," + \
-                    " a origin time zone string and an optional output format string."
+                error = (
+                    "{"
+                    + expression.to_string()
+                    + "} should contain an ISO format timestamp,"
+                    + " a origin time zone string and an optional output format string."
+                )
         return value, error
 
     @staticmethod
@@ -46,7 +58,9 @@ class ConvertToUtc(ExpressionEvaluator):
                 error = "{" + source_timezone + "} is an illegal timezone."
             converted_datetime = parsed.replace(tzinfo=tz.gettz(source_timezone))
             if error is None:
-                result = converted_datetime.astimezone(tz.gettz("UTC")).strftime(time_format)
+                result = converted_datetime.astimezone(tz.gettz("UTC")).strftime(
+                    time_format
+                )
                 if time_format == FunctionUtils.default_date_time_format:
                     result = result[:-4] + "Z"
         return result, error

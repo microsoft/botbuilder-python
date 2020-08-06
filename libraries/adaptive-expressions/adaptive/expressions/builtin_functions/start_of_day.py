@@ -4,6 +4,7 @@ from ..function_utils import FunctionUtils
 from ..return_type import ReturnType
 from ..expression_evaluator import ExpressionEvaluator
 
+
 class StartOfDay(ExpressionEvaluator):
     def __init__(self):
         super().__init__(
@@ -17,7 +18,9 @@ class StartOfDay(ExpressionEvaluator):
         args: list
         args, error = FunctionUtils.evaluate_children(expression, state, options)
         if error is None:
-            time_format = args[1] if len(args) == 2 else FunctionUtils.default_date_time_format
+            time_format = (
+                args[1] if len(args) == 2 else FunctionUtils.default_date_time_format
+            )
             value, error = StartOfDay.start_of_day_with_error(args[0], time_format)
             if len(args) != 2:
                 value = value[:-4] + "Z"

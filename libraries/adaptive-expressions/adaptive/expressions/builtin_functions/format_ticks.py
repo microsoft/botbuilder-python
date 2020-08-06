@@ -4,10 +4,14 @@ from ..expression_type import FORMATTICKS
 from ..function_utils import FunctionUtils
 from ..return_type import ReturnType
 
+
 class FormatTicks(ExpressionEvaluator):
     def __init__(self):
         super().__init__(
-            FORMATTICKS, FormatTicks.evaluator(), ReturnType.String, FormatTicks.validator
+            FORMATTICKS,
+            FormatTicks.evaluator(),
+            ReturnType.String,
+            FormatTicks.validator,
         )
 
     @staticmethod
@@ -17,14 +21,24 @@ class FormatTicks(ExpressionEvaluator):
             error: str = None
             timestamp = args[0]
             if isinstance(timestamp, int):
-                date_time = datetime.fromtimestamp((timestamp - 621356256000000000) / 10000000)
+                date_time = datetime.fromtimestamp(
+                    (timestamp - 621356256000000000) / 10000000
+                )
                 if len(args) == 2:
                     result = date_time.strftime(args[1])
                 else:
-                    result = date_time.strftime(FunctionUtils.default_date_time_format)[:-4] + "Z"
+                    result = (
+                        date_time.strftime(FunctionUtils.default_date_time_format)[:-4]
+                        + "Z"
+                    )
             else:
-                error = "formatTicks first argument {" + str(timestamp) + "} is not a number"
+                error = (
+                    "formatTicks first argument {"
+                    + str(timestamp)
+                    + "} is not a number"
+                )
             return result, error
+
         return FunctionUtils.apply_with_error(anonymous_function)
 
     @staticmethod

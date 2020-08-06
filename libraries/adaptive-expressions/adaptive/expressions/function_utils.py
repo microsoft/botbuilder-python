@@ -26,12 +26,18 @@ class FunctionUtils:
     ):
         if len(expression.children) < min_arity:
             raise Exception(
-                expression.to_string() + " should have at least " + str(min_arity) + " children."
+                expression.to_string()
+                + " should have at least "
+                + str(min_arity)
+                + " children."
             )
 
         if len(expression.children) > max_arity:
             raise Exception(
-                expression.to_string() + " can't have more than " + str(max_arity) + " children."
+                expression.to_string()
+                + " can't have more than "
+                + str(max_arity)
+                + " children."
             )
 
         if return_type & ReturnType.Object == 0:
@@ -436,32 +442,46 @@ class FunctionUtils:
         error: str = None
         multi_flag = -1 if is_past else 1
         if time_unit.lower() == "second":
+
             def anonymous_function(date_time: datetime):
                 return date_time + timedelta(seconds=multi_flag * interval)
+
             converter = anonymous_function
         elif time_unit.lower() == "minute":
+
             def anonymous_function(date_time: datetime):
                 return date_time + timedelta(minutes=multi_flag * interval)
+
             converter = anonymous_function
         elif time_unit.lower() == "hour":
+
             def anonymous_function(date_time: datetime):
                 return date_time + timedelta(hours=multi_flag * interval)
+
             converter = anonymous_function
         elif time_unit.lower() == "day":
+
             def anonymous_function(date_time: datetime):
                 return date_time + timedelta(days=multi_flag * interval)
+
             converter = anonymous_function
         elif time_unit.lower() == "week":
+
             def anonymous_function(date_time: datetime):
                 return date_time + timedelta(weeks=multi_flag * interval)
+
             converter = anonymous_function
         elif time_unit.lower() == "month":
+
             def anonymous_function(date_time: datetime):
                 return date_time + relativedelta(months=multi_flag * interval)
+
             converter = anonymous_function
         elif time_unit.lower() == "year":
+
             def anonymous_function(date_time: datetime):
                 return date_time + relativedelta(years=multi_flag * interval)
+
             converter = anonymous_function
         else:
             error = "{" + time_unit + "} is not a valid time unit."
@@ -469,7 +489,9 @@ class FunctionUtils:
         return converter, error
 
     @staticmethod
-    def normalize_to_date_time(timestamp: object, transform: Callable[[datetime], object] = None):
+    def normalize_to_date_time(
+        timestamp: object, transform: Callable[[datetime], object] = None
+    ):
         result: object = None
         error: str = None
         if isinstance(timestamp, str):
@@ -480,17 +502,26 @@ class FunctionUtils:
             else:
                 result, error = timestamp, None
         else:
-            error = "{" + str(timestamp) + "} should be a standard ISO format string or a DateTime object."
+            error = (
+                "{"
+                + str(timestamp)
+                + "} should be a standard ISO format string or a DateTime object."
+            )
         return result, error
 
     @staticmethod
-    def parse_iso_timestamp(timestamp: str, transform: Callable[[datetime], object] = None):
+    def parse_iso_timestamp(
+        timestamp: str, transform: Callable[[datetime], object] = None
+    ):
         result: object = None
         error: str = None
         parsed = None
         try:
             parsed = parse(timestamp)
-            if parsed.strftime(FunctionUtils.default_date_time_format).upper() == (timestamp[:-1]+"000Z").upper():
+            if (
+                parsed.strftime(FunctionUtils.default_date_time_format).upper()
+                == (timestamp[:-1] + "000Z").upper()
+            ):
                 if transform is not None:
                     result, error = transform(parsed)
                 else:
@@ -688,3 +719,15 @@ class FunctionUtils:
             return value, error
 
         return anonymous_function
+
+    @staticmethod
+    def ticks_with_error(timestamp: object):
+        result: object = None
+        parsed: object = None
+        error: str = None
+        parsed, error = FunctionUtils.normalize_to_date_time(timestamp)
+        if error is None:
+            result = (
+                parsed.replace(tzinfo=None) - parsed.utcoffset()
+            ).timestamp() * 10000000 + 621356256000000000
+        return result, error

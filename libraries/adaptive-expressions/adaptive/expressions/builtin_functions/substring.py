@@ -4,6 +4,7 @@ from ..expression_type import SUBSTRING
 from ..function_utils import FunctionUtils
 from ..return_type import ReturnType
 
+
 class SubString(ExpressionEvaluator):
     def __init__(self):
         super().__init__(
@@ -24,7 +25,15 @@ class SubString(ExpressionEvaluator):
                 start_expr = expression.children[1]
                 start, error = start_expr.try_evaluate(state, options)
                 if error is None and (start < 0 or start >= len(result)):
-                    error = "{" + start_expr + "}={" + start + "} which is out of range for {" + result + "}."
+                    error = (
+                        "{"
+                        + start_expr
+                        + "}={"
+                        + start
+                        + "} which is out of range for {"
+                        + result
+                        + "}."
+                    )
                 if error is None:
                     length: int
                     if len(expression.children) == 2:
@@ -33,12 +42,24 @@ class SubString(ExpressionEvaluator):
                     else:
                         length_expr = expression.children[2]
                         length, error = length_expr.try_evaluate(state, options)
-                        if error is None and (length < 0 or start + length > len(result)):
-                            error = "{" + length_expr + "}={" + length + "} which is out of range for {" + result + "}."
+                        if error is None and (
+                            length < 0 or start + length > len(result)
+                        ):
+                            error = (
+                                "{"
+                                + length_expr
+                                + "}={"
+                                + length
+                                + "} which is out of range for {"
+                                + result
+                                + "}."
+                            )
                     if error is None:
-                        result = result[int(start): int(start + length)]
+                        result = result[int(start) : int(start + length)]
         return result, error
 
     @staticmethod
     def validator(expression: object):
-        FunctionUtils.validate_order(expression, [ReturnType.Number], ReturnType.String, ReturnType.Number)
+        FunctionUtils.validate_order(
+            expression, [ReturnType.Number], ReturnType.String, ReturnType.Number
+        )

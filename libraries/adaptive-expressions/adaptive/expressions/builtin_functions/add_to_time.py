@@ -5,6 +5,7 @@ from ..function_utils import FunctionUtils
 from ..return_type import ReturnType
 from ..expression_evaluator import ExpressionEvaluator
 
+
 class AddToTime(ExpressionEvaluator):
     def __init__(self):
         super().__init__(
@@ -18,24 +19,36 @@ class AddToTime(ExpressionEvaluator):
         args: list
         args, error = FunctionUtils.evaluate_children(expression, state, options)
         if error is None:
-            time_format = args[3] if len(args) == 4 else FunctionUtils.default_date_time_format
+            time_format = (
+                args[3] if len(args) == 4 else FunctionUtils.default_date_time_format
+            )
             if isinstance(args[1], numbers.Number) and isinstance(args[2], str):
-                value, error = AddToTime.eval_add_to_time(args[0], args[1], args[2], time_format)
+                value, error = AddToTime.eval_add_to_time(
+                    args[0], args[1], args[2], time_format
+                )
                 if time_format == FunctionUtils.default_date_time_format:
                     value = value[:-4] + "Z"
             else:
-                error = "{" + expression.to_string() + "} should contain an ISO format timestamp,\
+                error = (
+                    "{"
+                    + expression.to_string()
+                    + "} should contain an ISO format timestamp,\
                      a time interval integer, a string unit of time and an optional output format string."
+                )
         return value, error
 
     @staticmethod
-    def eval_add_to_time(timestamp: object, interval: int, time_unit: str, time_format: str):
+    def eval_add_to_time(
+        timestamp: object, interval: int, time_unit: str, time_format: str
+    ):
         result: str = None
         error: str = None
         parsed: object = None
         parsed, error = FunctionUtils.normalize_to_date_time(timestamp)
         if error is None:
-            converter, error = FunctionUtils.date_time_converter(interval, time_unit, False)
+            converter, error = FunctionUtils.date_time_converter(
+                interval, time_unit, False
+            )
             if error is None:
                 added_timestamp = converter(parsed)
                 result = added_timestamp.strftime(time_format)
@@ -43,5 +56,10 @@ class AddToTime(ExpressionEvaluator):
 
     @staticmethod
     def validator(expression: object):
-        FunctionUtils.validate_order(expression, [ReturnType.String],\
-             ReturnType.Object, ReturnType.Number, ReturnType.String)
+        FunctionUtils.validate_order(
+            expression,
+            [ReturnType.String],
+            ReturnType.Object,
+            ReturnType.Number,
+            ReturnType.String,
+        )

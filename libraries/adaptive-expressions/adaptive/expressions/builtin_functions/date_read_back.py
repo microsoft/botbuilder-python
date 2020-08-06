@@ -4,10 +4,14 @@ from ..function_utils import FunctionUtils
 from ..return_type import ReturnType
 from ..expression_evaluator import ExpressionEvaluator
 
+
 class DateReadBack(ExpressionEvaluator):
     def __init__(self):
         super().__init__(
-            DATEREADBACK, DateReadBack.evaluator(), ReturnType.String, DateReadBack.validator
+            DATEREADBACK,
+            DateReadBack.evaluator(),
+            ReturnType.String,
+            DateReadBack.validator,
         )
 
     @staticmethod
@@ -22,10 +26,15 @@ class DateReadBack(ExpressionEvaluator):
                 if error is None:
                     timestamp2 = result
                     timex = Timex(timex=timestamp2.strftime("%Y-%m-%d"))
-                    result = TimexRelativeConvert.convert_timex_to_string_relative(timex, timestamp1)
+                    result = TimexRelativeConvert.convert_timex_to_string_relative(
+                        timex, timestamp1
+                    )
             return result, error
+
         return FunctionUtils.apply_with_error(anonymous_function)
 
     @staticmethod
     def validator(expression: object):
-        FunctionUtils.validate_order(expression, None, ReturnType.String, ReturnType.String)
+        FunctionUtils.validate_order(
+            expression, None, ReturnType.String, ReturnType.String
+        )

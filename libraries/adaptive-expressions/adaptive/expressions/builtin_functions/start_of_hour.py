@@ -5,6 +5,7 @@ from ..function_utils import FunctionUtils
 from ..return_type import ReturnType
 from ..expression_evaluator import ExpressionEvaluator
 
+
 class StartOfHour(ExpressionEvaluator):
     def __init__(self):
         super().__init__(
@@ -18,7 +19,9 @@ class StartOfHour(ExpressionEvaluator):
         args: list
         args, error = FunctionUtils.evaluate_children(expression, state, options)
         if error is None:
-            time_format = args[1] if len(args) == 2 else FunctionUtils.default_date_time_format
+            time_format = (
+                args[1] if len(args) == 2 else FunctionUtils.default_date_time_format
+            )
             value, error = StartOfHour.start_of_hour_with_error(args[0], time_format)
             if len(args) != 2:
                 value = value[:-4] + "Z"
@@ -31,7 +34,9 @@ class StartOfHour(ExpressionEvaluator):
         parsed: object = None
         parsed, error = FunctionUtils.normalize_to_date_time(timestamp)
         if error is None:
-            start_of_hour = datetime(year=parsed.year, month=parsed.month, day=parsed.day, hour=parsed.hour)
+            start_of_hour = datetime(
+                year=parsed.year, month=parsed.month, day=parsed.day, hour=parsed.hour
+            )
             result = start_of_hour.strftime(time_format)
         return result, error
 

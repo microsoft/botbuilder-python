@@ -5,10 +5,14 @@ from ..function_utils import FunctionUtils
 from ..return_type import ReturnType
 from ..expression_evaluator import ExpressionEvaluator
 
+
 class StartOfMonth(ExpressionEvaluator):
     def __init__(self):
         super().__init__(
-            STARTOFMONTH, StartOfMonth.evaluator, ReturnType.String, StartOfMonth.validator
+            STARTOFMONTH,
+            StartOfMonth.evaluator,
+            ReturnType.String,
+            StartOfMonth.validator,
         )
 
     @staticmethod
@@ -18,7 +22,9 @@ class StartOfMonth(ExpressionEvaluator):
         args: list
         args, error = FunctionUtils.evaluate_children(expression, state, options)
         if error is None:
-            time_format = args[1] if len(args) == 2 else FunctionUtils.default_date_time_format
+            time_format = (
+                args[1] if len(args) == 2 else FunctionUtils.default_date_time_format
+            )
             value, error = StartOfMonth.start_of_month_with_error(args[0], time_format)
             if len(args) != 2:
                 value = value[:-4] + "Z"

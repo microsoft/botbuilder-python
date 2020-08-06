@@ -109,6 +109,11 @@ from .builtin_functions.add_to_time import AddToTime
 from .builtin_functions.start_of_day import StartOfDay
 from .builtin_functions.start_of_hour import StartOfHour
 from .builtin_functions.start_of_month import StartOfMonth
+from .builtin_functions.ticks import Ticks
+from .builtin_functions.ticks_to_days import TicksToDays
+from .builtin_functions.ticks_to_hours import TicksToHours
+from .builtin_functions.ticks_to_minutes import TicksToMinutes
+from .builtin_functions.date_time_diff import DateTimeDiff
 
 # Timex
 
@@ -231,6 +236,11 @@ def get_standard_functions() -> dict:
     functions.append(StartOfDay())
     functions.append(StartOfHour())
     functions.append(StartOfMonth())
+    functions.append(Ticks())
+    functions.append(TicksToDays())
+    functions.append(TicksToHours())
+    functions.append(TicksToMinutes())
+    functions.append(DateTimeDiff())
 
     # Timex
 

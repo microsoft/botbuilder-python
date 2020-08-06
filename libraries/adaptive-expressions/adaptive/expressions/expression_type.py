@@ -97,6 +97,11 @@ ADDTOTIME = "addToTime"
 STARTOFDAY = "startOfDay"
 STARTOFHOUR = "startOfHour"
 STARTOFMONTH = "startOfMonth"
+TICKS = "ticks"
+TICKSTODAYS = "ticksToDays"
+TICKSTOHOURS = "ticksToHours"
+TICKSTOMINUTES = "ticksToMinutes"
+DATETIMEDIFF = "dateTimeDiff"
 
 # Timex
 

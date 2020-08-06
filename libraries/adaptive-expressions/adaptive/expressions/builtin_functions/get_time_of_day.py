@@ -3,10 +3,14 @@ from ..function_utils import FunctionUtils
 from ..return_type import ReturnType
 from ..expression_evaluator import ExpressionEvaluator, EvaluateExpressionDelegate
 
+
 class GetTimeOfDay(ExpressionEvaluator):
     def __init__(self):
         super().__init__(
-            GETTIMEOFDAY, GetTimeOfDay.evaluator(), ReturnType.String, FunctionUtils.validate_unary
+            GETTIMEOFDAY,
+            GetTimeOfDay.evaluator(),
+            ReturnType.String,
+            FunctionUtils.validate_unary,
         )
 
     @staticmethod
@@ -25,9 +29,12 @@ class GetTimeOfDay(ExpressionEvaluator):
                     value = "noon"
                 elif timestamp.hour < 18:
                     value = "afternoon"
-                elif timestamp.hour < 22 or (timestamp.hour == 22 and timestamp.minute == 0):
+                elif timestamp.hour < 22 or (
+                    timestamp.hour == 22 and timestamp.minute == 0
+                ):
                     value = "evening"
                 else:
                     value = "night"
             return value, error
+
         return FunctionUtils.apply_with_error(anonymous_function)

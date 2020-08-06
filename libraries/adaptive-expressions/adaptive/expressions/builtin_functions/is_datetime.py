@@ -3,10 +3,14 @@ from ..expression_type import ISDATETIME
 from ..function_utils import FunctionUtils
 from ..return_type import ReturnType
 
+
 class IsDateTime(ExpressionEvaluator):
     def __init__(self):
         super().__init__(
-            ISDATETIME, IsDateTime.evaluator(), ReturnType.Boolean, FunctionUtils.validate_unary
+            ISDATETIME,
+            IsDateTime.evaluator(),
+            ReturnType.Boolean,
+            FunctionUtils.validate_unary,
         )
 
     @staticmethod
@@ -16,4 +20,5 @@ class IsDateTime(ExpressionEvaluator):
             if error is None:
                 return True
             return False
+
         return FunctionUtils.apply(anonymous_function)
