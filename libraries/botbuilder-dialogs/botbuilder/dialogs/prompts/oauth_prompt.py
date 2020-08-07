@@ -362,7 +362,9 @@ class OAuthPrompt(Dialog):
                 ):
                     if context.activity.channel_id == Channels.emulator:
                         card_action_type = ActionTypes.open_url
-                else:
+                elif not OAuthPrompt._channel_requires_sign_in_link(
+                    context.activity.channel_id
+                ):
                     link = None
 
                 json_token_ex_resource = (
@@ -546,7 +548,7 @@ class OAuthPrompt(Dialog):
                 if not token_exchange_response or not token_exchange_response.token:
                     await context.send_activity(
                         self._get_token_exchange_invoke_response(
-                            int(HTTPStatus.CONFLICT),
+                            int(HTTPStatus.PRECONDITION_FAILED),
                             "The bot is unable to exchange token. Proceed with regular login.",
                         )
                     )
@@ -609,7 +611,6 @@ class OAuthPrompt(Dialog):
     @staticmethod
     def _channel_suppports_oauth_card(channel_id: str) -> bool:
         if channel_id in [
-            Channels.ms_teams,
             Channels.cortana,
             Channels.skype,
             Channels.skype_for_business,
@@ -617,6 +618,13 @@ class OAuthPrompt(Dialog):
             return False
 
         return True
+
+    @staticmethod
+    def _channel_requires_sign_in_link(channel_id: str) -> bool:
+        if channel_id in [Channels.ms_teams]:
+            return True
+
+        return False
 
     @staticmethod
     def _is_token_exchange_request_invoke(context: TurnContext) -> bool:

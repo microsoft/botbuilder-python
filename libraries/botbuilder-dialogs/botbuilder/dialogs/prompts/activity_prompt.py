@@ -1,7 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from abc import ABC
 from typing import Callable, Dict
 
 from botbuilder.core import TurnContext
@@ -20,7 +19,7 @@ from .prompt_recognizer_result import PromptRecognizerResult
 from .prompt_validator_context import PromptValidatorContext
 
 
-class ActivityPrompt(Dialog, ABC):
+class ActivityPrompt(Dialog):
     """
     Waits for an activity to be received.
 
