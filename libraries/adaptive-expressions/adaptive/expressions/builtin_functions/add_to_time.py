@@ -21,8 +21,10 @@ class AddToTime(ExpressionEvaluator):
             time_format = (
                 args[3] if len(args) == 4 else FunctionUtils.default_date_time_format
             )
-            if (isinstance(args[1], int) or (isinstance(args[1], float) and args[1].is_integer())) and \
-                isinstance(args[2], str):
+            if (
+                isinstance(args[1], int)
+                or (isinstance(args[1], float) and args[1].is_integer())
+            ) and isinstance(args[2], str):
 
                 value, error = AddToTime.eval_add_to_time(
                     args[0], args[1], args[2], time_format

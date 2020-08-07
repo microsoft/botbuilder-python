@@ -23,7 +23,9 @@ class TicksToMinutes(ExpressionEvaluator):
         args: list
         args, error = FunctionUtils.evaluate_children(expression, state, options)
         if error is None:
-            if isinstance(args[0], int) or (isinstance(args[0], float) and args[0].is_integer()):
+            if isinstance(args[0], int) or (
+                isinstance(args[0], float) and args[0].is_integer()
+            ):
                 value = args[0] / TicksToMinutes.ticks_per_minute
             else:
                 error = (

@@ -25,7 +25,10 @@ class SubString(ExpressionEvaluator):
                 start: numbers.Number
                 start_expr = expression.children[1]
                 start, error = start_expr.try_evaluate(state, options)
-                if error is None and not (isinstance(start, int) or (isinstance(start, float) and start.is_integer())):
+                if error is None and not (
+                    isinstance(start, int)
+                    or (isinstance(start, float) and start.is_integer())
+                ):
                     error = "{" + start_expr + "} is not an integer."
                 if error is None and (start < 0 or start >= len(result)):
                     error = (

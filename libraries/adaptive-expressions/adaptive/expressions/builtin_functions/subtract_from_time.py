@@ -23,8 +23,10 @@ class SubtractFromTime(ExpressionEvaluator):
         args: list = []
         args, error = FunctionUtils.evaluate_children(expression, state, options)
         if error is None:
-            if (isinstance(args[1], int) or (isinstance(args[1], float) and args[1].is_integer())) and \
-                isinstance(args[2], str):
+            if (
+                isinstance(args[1], int)
+                or (isinstance(args[1], float) and args[1].is_integer())
+            ) and isinstance(args[2], str):
 
                 time_format = (
                     args[3]
