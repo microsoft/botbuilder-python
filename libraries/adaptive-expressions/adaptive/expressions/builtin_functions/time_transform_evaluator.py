@@ -1,6 +1,5 @@
 from datetime import datetime
 from typing import Callable
-import numbers
 from ..expression_evaluator import (
     ExpressionEvaluator,
     EvaluateExpressionDelegate,
@@ -35,7 +34,7 @@ class TimeTransformEvaluator(ExpressionEvaluator):
             args: list
             args, error = FunctionUtils.evaluate_children(expression, state, options)
             if error is None:
-                if isinstance(args[1], numbers.Number):
+                if isinstance(args[1], int) or (isinstance(args[1], float) and args[1].is_integer()):
                     format_string = (
                         args[2]
                         if len(args) == 3 and isinstance(args[2], str)

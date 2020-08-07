@@ -1,4 +1,3 @@
-import numbers
 from datetime import datetime
 from ..options import Options
 from ..expression_type import GETFUTURETIME
@@ -23,7 +22,9 @@ class GetFutureTime(ExpressionEvaluator):
         args: list = []
         args, error = FunctionUtils.evaluate_children(expression, state, options)
         if error is None:
-            if isinstance(args[0], numbers.Number) and isinstance(args[1], str):
+            if (isinstance(args[0], int) or (isinstance(args[0], float) and args[0].is_integer())) and\
+                 isinstance(args[1], str):
+
                 time_format = (
                     args[2]
                     if len(args) == 3

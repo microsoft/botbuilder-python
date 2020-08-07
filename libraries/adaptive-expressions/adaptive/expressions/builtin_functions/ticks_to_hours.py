@@ -1,4 +1,3 @@
-import numbers
 from ..options import Options
 from ..expression_type import TICKSTOHOURS
 from ..function_utils import FunctionUtils
@@ -24,7 +23,7 @@ class TicksToHours(ExpressionEvaluator):
         args: list
         args, error = FunctionUtils.evaluate_children(expression, state, options)
         if error is None:
-            if isinstance(args[0], numbers.Number):
+            if isinstance(args[0], int) or (isinstance(args[0], float) and args[0].is_integer()):
                 value = args[0] / TicksToHours.ticks_per_hour
             else:
                 error = (

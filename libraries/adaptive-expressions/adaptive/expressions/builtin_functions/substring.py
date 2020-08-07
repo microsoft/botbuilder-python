@@ -1,3 +1,4 @@
+import numbers
 from ..options import Options
 from ..expression_evaluator import ExpressionEvaluator
 from ..expression_type import SUBSTRING
@@ -21,9 +22,11 @@ class SubString(ExpressionEvaluator):
             if result is None:
                 result = ""
             else:
-                start: int
+                start: numbers.Number
                 start_expr = expression.children[1]
                 start, error = start_expr.try_evaluate(state, options)
+                if error is None and not (isinstance(start, int) or (isinstance(start, float) and start.is_integer())):
+                    error = "{" + start_expr + "} is not an integer."
                 if error is None and (start < 0 or start >= len(result)):
                     error = (
                         "{"

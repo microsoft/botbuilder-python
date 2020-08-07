@@ -1,4 +1,3 @@
-import numbers
 from typing import Callable
 from datetime import datetime
 from ..expression_type import SUBTRACTFROMTIME
@@ -24,7 +23,9 @@ class SubtractFromTime(ExpressionEvaluator):
         args: list = []
         args, error = FunctionUtils.evaluate_children(expression, state, options)
         if error is None:
-            if isinstance(args[1], numbers.Number) and isinstance(args[2], str):
+            if (isinstance(args[1], int) or (isinstance(args[1], float) and args[1].is_integer())) and \
+                isinstance(args[2], str):
+
                 time_format = (
                     args[3]
                     if len(args) == 4
