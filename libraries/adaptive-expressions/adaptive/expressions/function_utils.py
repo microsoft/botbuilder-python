@@ -3,6 +3,7 @@ import sys
 from datetime import datetime, timedelta
 from collections.abc import Iterable
 from typing import Callable, NewType
+from dateutil import tz
 from dateutil.relativedelta import relativedelta
 from dateutil.parser import parse
 from .memory_interface import MemoryInterface
@@ -728,6 +729,6 @@ class FunctionUtils:
         parsed, error = FunctionUtils.normalize_to_date_time(timestamp)
         if error is None:
             result = (
-                parsed.replace(tzinfo=None) - parsed.utcoffset()
-            ).timestamp() * 10000000 + 621356256000000000
+                parsed.astimezone(tz.gettz("UTC"))
+            ).timestamp() * 10000000 + 621355968000000000
         return result, error

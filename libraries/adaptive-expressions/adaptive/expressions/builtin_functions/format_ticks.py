@@ -23,9 +23,7 @@ class FormatTicks(ExpressionEvaluator):
             timestamp = args[0]
             if isinstance(timestamp, int):
                 date_time = datetime.fromtimestamp(
-                    # (timestamp - 621356256000000000) / 10000000
-                    (timestamp - 621355968000000000)
-                    / 10000000
+                    (timestamp - 621355968000000000) / 10000000
                 ).astimezone(tz.gettz("UTC"))
                 if len(args) == 2:
                     result = date_time.strftime(args[1])
