@@ -533,7 +533,7 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         ["dateTimeDiff(timestampObj,timestampObj2)", 62604000000000],
     ]
 
-    def test_expression_parser_functional(self):
+    def test_expression_parser_functions(self):
         for data in self.data_source:
             input = str(data[0])
             parsed = Expression.parse(input)
