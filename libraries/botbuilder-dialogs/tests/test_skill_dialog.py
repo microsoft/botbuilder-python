@@ -6,6 +6,7 @@ from typing import Callable, Union
 from unittest.mock import Mock
 
 import aiounittest
+from botframework.connector.token_api.models import TokenExchangeResource
 from botbuilder.core import (
     ConversationState,
     MemoryStorage,
@@ -40,7 +41,6 @@ from botbuilder.dialogs import (
     BeginSkillDialogOptions,
     DialogTurnStatus,
 )
-from botframework.connector.token_api.models import TokenExchangeResource
 
 
 class SimpleConversationIdFactory(ConversationIdFactoryBase):
@@ -148,10 +148,13 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
             conversation_state=conversation_state,
         )
 
+        assert len(dialog_options.conversation_id_factory.conversation_refs) == 0
+
         # Send something to the dialog to start it
         await client.send_activity(MessageFactory.text("irrelevant"))
 
         # Assert results and data sent to the SkillClient for fist turn
+        assert len(dialog_options.conversation_id_factory.conversation_refs) == 1
         assert dialog_options.bot_id == from_bot_id_sent
         assert dialog_options.skill.app_id == to_bot_id_sent
         assert dialog_options.skill.skill_endpoint == to_url_sent
@@ -162,6 +165,7 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
         await client.send_activity(MessageFactory.text("Second message"))
 
         # Assert results for second turn
+        assert len(dialog_options.conversation_id_factory.conversation_refs) == 1
         assert activity_sent.text == "Second message"
         assert DialogTurnStatus.Waiting == client.dialog_turn_result.status
 
