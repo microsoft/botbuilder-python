@@ -39,13 +39,13 @@ class GetFutureTime(ExpressionEvaluator):
                     value = time_converter(datetime.utcnow()).strftime(time_format)
                     if len(args) != 3:
                         value = value[:-4] + "Z"
-                else:
-                    error = (
-                        "{"
-                        + expression.to_string()
-                        + "} should contain a time interval integer"
-                        + ", a string unit of time and an optional output format string."
-                    )
+            else:
+                error = (
+                    "{"
+                    + expression.to_string()
+                    + "} should contain a time interval integer"
+                    + ", a string unit of time and an optional output format string."
+                )
         return value, error
 
     @staticmethod
