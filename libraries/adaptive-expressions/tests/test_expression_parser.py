@@ -1,7 +1,11 @@
 # pylint: disable=too-many-lines
 import math
 import platform
+from datetime import datetime
 import numbers
+from dateutil import tz
+from dateutil.parser import parse
+from dateutil.relativedelta import relativedelta
 import aiounittest
 from adaptive.expressions import Expression
 
@@ -12,6 +16,7 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         "two": 2.0,
         "hello": "hello",
         "nullObj": None,
+        "null": None,
         "bag": {"three": 3.0},
         "items": ["zero", "one", "two"],
         "nestedItems": [{"x": 1}, {"x": 2}, {"x": 3},],
@@ -22,6 +27,20 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
             "title": "Dialog Title",
             "subTitle": "Dialog Sub Title",
         },
+        "timestamp": "2018-03-15T13:00:00.000Z",
+        "notISOTimestamp": "2018/03/15 13:00:00",
+        "timestampObj": parse("2018-03-15T13:00:00.000Z").replace(
+            tzinfo=tz.gettz("UTC")
+        ),
+        "timestampObj2": parse("2018-01-02T02:00:00.000Z").replace(
+            tzinfo=tz.gettz("UTC")
+        ),
+        "timestampObj3": parse("2018-01-01T08:00:00.000Z").replace(
+            tzinfo=tz.gettz("UTC")
+        ),
+        "unixTimestamp": 1521118800,
+        "unixTimestampFraction": 1521118800.5,
+        "ticks": 637243624200000000,
         "doubleNestedItems": [[{"x": 1}, {"x: 2"}], [{"x": 3}]],
     }
 
@@ -153,7 +172,12 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         ['split("", "e")', [""]],
         ['split("", "")', []],
         ['split("hello", "")', ["h", "e", "l", "l", "o"]],
-        # TODO: test of substring function
+        # substring
+        ["substring(concat('na','me','more'), 0, length('name'))", "name"],
+        ["substring('hello', 0, 5)", "hello"],
+        ["substring('hello', 0, 3)", "hel"],
+        ["substring('hello', 3)", "lo"],
+        ["substring(nullObj, 0, 3)", ""],
         # lower
         ['toLower("UpCase")', "upcase"],
         # upper
@@ -346,6 +370,167 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         # unique
         ["unique(createArray(1, 5, 1))", [1, 5]],
         ["unique(createArray(5, 5, 1, 2))", [1, 2, 5]],
+        # type checking functions
+        # isDateTime
+        ["isDateTime(2)", False],
+        ["isDateTime(null)", False],
+        ["isDateTime(timestamp)", True],
+        ["isDateTime(timestampObj)", True],
+        # Datetime functions
+        # addDays
+        ["addDays('2018-03-15T13:00:00.000Z', 1)", "2018-03-16T13:00:00.000Z"],
+        ["addDays(timestamp, 1)", "2018-03-16T13:00:00.000Z"],
+        ["addDays(timestampObj, 1)", "2018-03-16T13:00:00.000Z"],
+        ["addDays(timestamp, 1,'%m-%d-%y')", "03-16-18"],
+        # addHours
+        ["addHours('2018-03-15T13:00:00.000Z', 1)", "2018-03-15T14:00:00.000Z"],
+        ["addHours(timestamp, 1)", "2018-03-15T14:00:00.000Z"],
+        ["addHours(timestampObj, 1)", "2018-03-15T14:00:00.000Z"],
+        ["addHours(timestamp, 1,'%m-%d-%y %I-%M')", "03-15-18 02-00"],
+        # AddMinutes
+        ["addMinutes('2018-03-15T13:00:00.000Z', 1)", "2018-03-15T13:01:00.000Z"],
+        ["addMinutes(timestamp, 1)", "2018-03-15T13:01:00.000Z"],
+        ["addMinutes(timestampObj, 1)", "2018-03-15T13:01:00.000Z"],
+        ["addMinutes(timestamp, 1,'%m-%d-%y %I-%M')", "03-15-18 01-01"],
+        # addSeconds
+        ["addSeconds('2018-03-15T13:00:00.000Z', 1)", "2018-03-15T13:00:01.000Z"],
+        ["addSeconds(timestamp, 1)", "2018-03-15T13:00:01.000Z"],
+        ["addSeconds(timestampObj, 1)", "2018-03-15T13:00:01.000Z"],
+        ["addSeconds(timestamp, 1,'%m-%d-%y %I-%M-%S')", "03-15-18 01-00-01"],
+        # dayOfMonth
+        ["dayOfMonth('2018-03-15T13:00:00.000Z')", 15],
+        ["dayOfMonth(timestamp)", 15],
+        ["dayOfMonth(timestampObj)", 15],
+        # dayOfWeek
+        ["dayOfWeek('2018-03-15T13:00:00.000Z')", 4],
+        ["dayOfWeek(timestamp)", 4],
+        ["dayOfWeek(timestampObj)", 4],
+        # dayOfYear
+        ["dayOfYear('2018-03-15T13:00:00.000Z')", 74],
+        ["dayOfYear(timestamp)", 74],
+        ["dayOfYear(timestampObj)", 74],
+        # month
+        ["month('2018-03-15T13:00:00.000Z')", 3],
+        ["month(timestamp)", 3],
+        ["month(timestampObj)", 3],
+        # date
+        ["date('2018-03-15T13:00:00.000Z')", "3/15/2018"],
+        ["date(timestamp)", "3/15/2018"],
+        ["date(timestampObj)", "3/15/2018"],
+        # year
+        ["year('2018-03-15T13:00:00.000Z')", 2018],
+        ["year(timestamp)", 2018],
+        ["year(timestampObj)", 2018],
+        # utcNow
+        ["length(utcNow())", 24],
+        ["utcNow('%m-%d-%Y')", datetime.utcnow().strftime("%m-%d-%Y")],
+        # formatDateTime
+        ["formatDateTime('2018-03-15')", "2018-03-15T00:00:00.000Z"],
+        ["formatDateTime(notISOTimestamp)", "2018-03-15T13:00:00.000Z"],
+        ["formatDateTime(notISOTimestamp, '%m-%d-%y')", "03-15-18"],
+        ["formatDateTime(timestampObj)", "2018-03-15T13:00:00.000Z"],
+        # formatEpoch
+        ["formatEpoch(unixTimestamp)", "2018-03-15T13:00:00.000Z"],
+        ["formatEpoch(unixTimestampFraction)", "2018-03-15T13:00:00.500Z"],
+        # formatTicks
+        ["formatTicks(ticks)", "2020-05-06T11:47:00.000Z"],
+        # subtractFromTime
+        ["subtractFromTime(timestamp, 1, 'Year')", "2017-03-15T13:00:00.000Z"],
+        ["subtractFromTime(timestampObj, 1, 'Year')", "2017-03-15T13:00:00.000Z"],
+        ["subtractFromTime(timestamp, 1, 'Month')", "2018-02-15T13:00:00.000Z"],
+        ["subtractFromTime(timestamp, 1, 'Week')", "2018-03-08T13:00:00.000Z"],
+        ["subtractFromTime(timestamp, 1, 'Day')", "2018-03-14T13:00:00.000Z"],
+        ["subtractFromTime(timestamp, 1, 'Hour')", "2018-03-15T12:00:00.000Z"],
+        ["subtractFromTime(timestamp, 1, 'Minute')", "2018-03-15T12:59:00.000Z"],
+        ["subtractFromTime(timestamp, 1, 'Second')", "2018-03-15T12:59:59.000Z"],
+        # dateReadBack
+        ["dateReadBack(timestamp, addDays(timestamp, 1))", "tomorrow"],
+        ["dateReadBack(timestampObj, addDays(timestamp, 1))", "tomorrow"],
+        ["dateReadBack(addDays(timestamp, 1),timestamp)", "yesterday"],
+        # getTimeOfDay
+        ["getTimeOfDay('2018-03-15T00:00:00.000Z')", "midnight"],
+        ["getTimeOfDay(timestampObj)", "afternoon"],
+        ["getTimeOfDay('2018-03-15T08:00:00.000Z')", "morning"],
+        ["getTimeOfDay('2018-03-15T12:00:00.000Z')", "noon"],
+        ["getTimeOfDay('2018-03-15T13:00:00.000Z')", "afternoon"],
+        ["getTimeOfDay('2018-03-15T18:00:00.000Z')", "evening"],
+        ["getTimeOfDay('2018-03-15T22:00:00.000Z')", "evening"],
+        ["getTimeOfDay('2018-03-15T23:00:00.000Z')", "night"],
+        # getPastTime
+        [
+            "getPastTime(1,'Year','%m-%d-%y')",
+            (datetime.utcnow() + relativedelta(years=-1)).strftime("%m-%d-%y"),
+        ],
+        [
+            "getPastTime(1,'Month','%m-%d-%y')",
+            (datetime.utcnow() + relativedelta(months=-1)).strftime("%m-%d-%y"),
+        ],
+        [
+            "getPastTime(1,'Week','%m-%d-%y')",
+            (datetime.utcnow() + relativedelta(weeks=-1)).strftime("%m-%d-%y"),
+        ],
+        [
+            "getPastTime(1,'Day','%m-%d-%y')",
+            (datetime.utcnow() + relativedelta(days=-1)).strftime("%m-%d-%y"),
+        ],
+        # convertFromUTC
+        [
+            "convertFromUTC('2018-01-02T02:00:00.000Z',\
+           'Pacific Standard Time', '%A, %d %B %Y')",
+            "Monday, 01 January 2018",
+        ],
+        [
+            "convertFromUTC('2018-01-02T01:00:00.000Z',\
+           'America/Los_Angeles', '%A, %d %B %Y')",
+            "Monday, 01 January 2018",
+        ],
+        [
+            "convertFromUTC(timestampObj2, 'Pacific Standard Time', '%A, %d %B %Y')",
+            "Monday, 01 January 2018",
+        ],
+        # convertToUTC
+        [
+            "convertToUTC('01/01/2018 00:00:00', 'Pacific Standard Time')",
+            "2018-01-01T08:00:00.000Z",
+        ],
+        # addToTime
+        [
+            "addToTime('2018-01-01T08:00:00.000Z', 1, 'Day', '%A, %d %B %Y')",
+            "Tuesday, 02 January 2018",
+        ],
+        [
+            "addToTime('2018-01-01T00:00:00.000Z', 1, 'Week')",
+            "2018-01-08T00:00:00.000Z",
+        ],
+        ["addToTime(timestampObj2, 1, 'Week')", "2018-01-09T02:00:00.000Z"],
+        # startOfDay
+        ["startOfDay('2018-03-15T13:30:30.000Z')", "2018-03-15T00:00:00.000Z"],
+        ["startOfDay(timestampObj2)", "2018-01-02T00:00:00.000Z"],
+        # startOfHour
+        ["startOfHour('2018-03-15T13:30:30.000Z')", "2018-03-15T13:00:00.000Z"],
+        ["startOfHour(timestampObj)", "2018-03-15T13:00:00.000Z"],
+        # startOfMonth
+        ["startOfMonth('2018-03-15T13:30:30.000Z')", "2018-03-01T00:00:00.000Z"],
+        ["startOfMonth(timestampObj)", "2018-03-01T00:00:00.000Z"],
+        # ticks
+        ["ticks('2018-01-01T08:00:00.000Z')", 636503904000000000],
+        ["ticks(timestampObj3)", 636503904000000000],
+        # ticksToDays
+        ["ticksToDays(2193385800000000)", 2538.64097222],
+        # ticksToHours
+        ["ticksToHours(2193385800000000)", 60927.383333333331],
+        # ticksToMinutes
+        ["ticksToMinutes(2193385811100000)", 3655643.0185],
+        # dateTimeDiff
+        [
+            "dateTimeDiff('2019-01-01T08:00:00.000Z','2018-01-01T08:00:00.000Z')",
+            315360000000000,
+        ],
+        [
+            "dateTimeDiff('2017-01-01T08:00:00.000Z','2018-01-01T08:00:00.000Z')",
+            -315360000000000,
+        ],
+        ["dateTimeDiff(timestampObj,timestampObj2)", 62604000000000],
     ]
 
     def test_expression_parser_functions(self):

@@ -4,7 +4,7 @@
 import os
 from setuptools import setup
 
-REQUIRES = ["antlr4-python3-runtime==4.8.0"]
+REQUIRES = ["antlr4-python3-runtime==4.8.0", "datatypes-timex-expression==1.0.2a2"]
 
 TEST_REQUIRES = ["aiounittest==1.3.0"]
 

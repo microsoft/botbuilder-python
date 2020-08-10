@@ -60,6 +60,7 @@ from .builtin_functions.last_index_of import LastIndexOf
 from .builtin_functions.eol import Eol
 from .builtin_functions.sentence_case import SentenceCase
 from .builtin_functions.title_case import TitleCase
+from .builtin_functions.substring import SubString
 
 # Colleaction
 from .builtin_functions.count import Count
@@ -83,6 +84,37 @@ from .builtin_functions.flatten import Flatten
 from .builtin_functions.unique import Unique
 
 # DataTime
+from .builtin_functions.add_days import AddDays
+from .builtin_functions.add_hours import AddHours
+from .builtin_functions.add_minutes import AddMinutes
+from .builtin_functions.add_seconds import AddSeconds
+from .builtin_functions.day_of_month import DayOfMonth
+from .builtin_functions.day_of_week import DayOfWeek
+from .builtin_functions.day_of_year import DayOfYear
+from .builtin_functions.month import Month
+from .builtin_functions.date import Date
+from .builtin_functions.year import Year
+from .builtin_functions.utc_now import UtcNow
+from .builtin_functions.format_date_time import FormatDateTime
+from .builtin_functions.format_epoch import FormatEpoch
+from .builtin_functions.format_ticks import FormatTicks
+from .builtin_functions.subtract_from_time import SubtractFromTime
+from .builtin_functions.date_read_back import DateReadBack
+from .builtin_functions.get_time_of_day import GetTimeOfDay
+from .builtin_functions.get_future_time import GetFutureTime
+from .builtin_functions.get_past_time import GetPastTime
+from .builtin_functions.convert_from_utc import ConvertFromUtc
+from .builtin_functions.convert_to_utc import ConvertToUtc
+from .builtin_functions.add_to_time import AddToTime
+from .builtin_functions.start_of_day import StartOfDay
+from .builtin_functions.start_of_hour import StartOfHour
+from .builtin_functions.start_of_month import StartOfMonth
+from .builtin_functions.ticks import Ticks
+from .builtin_functions.ticks_to_days import TicksToDays
+from .builtin_functions.ticks_to_hours import TicksToHours
+from .builtin_functions.ticks_to_minutes import TicksToMinutes
+from .builtin_functions.date_time_diff import DateTimeDiff
+
 # Timex
 
 # Conversions
@@ -98,7 +130,9 @@ from .builtin_functions.create_array import CreateArray
 # Misc
 # Object manipulation and construction functions
 # Regular expression
+
 # Type Checking
+from .builtin_functions.is_datetime import IsDateTime
 
 # pylint: disable=too-many-statements
 def get_standard_functions() -> dict:
@@ -140,7 +174,7 @@ def get_standard_functions() -> dict:
     functions.append(Replace())
     functions.append(ReplaceIgnoreCase())
     functions.append(Split())
-    # TODO: substring, skipped
+    functions.append(SubString())
     functions.append(ToLower())
     functions.append(ToUpper())
     functions.append(Trim())
@@ -177,6 +211,37 @@ def get_standard_functions() -> dict:
     functions.append(Unique())
 
     # DataTime
+    functions.append(AddDays())
+    functions.append(AddHours())
+    functions.append(AddMinutes())
+    functions.append(AddSeconds())
+    functions.append(DayOfMonth())
+    functions.append(DayOfWeek())
+    functions.append(DayOfYear())
+    functions.append(Month())
+    functions.append(Date())
+    functions.append(Year())
+    functions.append(UtcNow())
+    functions.append(FormatDateTime())
+    functions.append(FormatEpoch())
+    functions.append(FormatTicks())
+    functions.append(SubtractFromTime())
+    functions.append(DateReadBack())
+    functions.append(GetTimeOfDay())
+    functions.append(GetFutureTime())
+    functions.append(GetPastTime())
+    functions.append(ConvertFromUtc())
+    functions.append(ConvertToUtc())
+    functions.append(AddToTime())
+    functions.append(StartOfDay())
+    functions.append(StartOfHour())
+    functions.append(StartOfMonth())
+    functions.append(Ticks())
+    functions.append(TicksToDays())
+    functions.append(TicksToHours())
+    functions.append(TicksToMinutes())
+    functions.append(DateTimeDiff())
+
     # Timex
 
     # Conversions
@@ -192,7 +257,9 @@ def get_standard_functions() -> dict:
     # Misc
     # Object manipulation and construction functions
     # Regular expression
+
     # Type Checking
+    functions.append(IsDateTime())
 
     lookup = dict()
     for function in functions:
