@@ -53,9 +53,7 @@ class Where(ExpressionEvaluator):
                     )
                     stacked_memory.pop()
                     if res[1] is not None:
-                        value = None
-                        error = res[1]
-                        return value, error
+                        return None, res
                     if FunctionUtils.is_logic_true(res[0]):
                         arr_result.append(local.get(iterator_name))
 
