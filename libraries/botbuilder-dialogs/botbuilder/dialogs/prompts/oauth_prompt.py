@@ -245,7 +245,7 @@ class OAuthPrompt(Dialog):
         # Return recognized value or re-prompt
         if is_valid:
             return await dialog_context.end_dialog(recognized.value)
-        elif is_message and self._settings.end_on_invalid_message:
+        if is_message and self._settings.end_on_invalid_message:
             # If EndOnInvalidMessage is set, complete the prompt with no result.
             return await dialog_context.end_dialog(None)
 
