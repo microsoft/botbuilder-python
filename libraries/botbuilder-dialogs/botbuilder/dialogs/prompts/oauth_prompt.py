@@ -203,13 +203,17 @@ class OAuthPrompt(Dialog):
             The prompt generally continues to receive the user's replies until it accepts the
             user's reply as valid input for the prompt.
         """
-        # Recognize token
-        recognized = await self._recognize_token(dialog_context)
-
         # Check for timeout
         state = dialog_context.active_dialog.state
         is_message = dialog_context.context.activity.type == ActivityTypes.message
-        has_timed_out = is_message and (
+        is_timeout_activity_type = (
+            is_message
+            or OAuthPrompt._is_token_response_event(dialog_context.context)
+            or OAuthPrompt._is_teams_verification_invoke(dialog_context.context)
+            or OAuthPrompt._is_token_exchange_request_invoke(dialog_context.context)
+        )
+
+        has_timed_out = is_timeout_activity_type and (
             datetime.now() > state[OAuthPrompt.PERSISTED_EXPIRES]
         )
 
@@ -220,6 +224,9 @@ class OAuthPrompt(Dialog):
             state["state"]["attemptCount"] = 1
         else:
             state["state"]["attemptCount"] += 1
+
+        # Recognize token
+        recognized = await self._recognize_token(dialog_context)
 
         # Validate the return value
         is_valid = False
@@ -238,6 +245,9 @@ class OAuthPrompt(Dialog):
         # Return recognized value or re-prompt
         if is_valid:
             return await dialog_context.end_dialog(recognized.value)
+        elif is_message and self._settings.end_on_invalid_message:
+            # If EndOnInvalidMessage is set, complete the prompt with no result.
+            return await dialog_context.end_dialog(None)
 
         # Send retry prompt
         if (
