@@ -52,8 +52,11 @@ class Where(ExpressionEvaluator):
                         stacked_memory, new_options
                     )
                     stacked_memory.pop()
-
-                    if FunctionUtils.is_logic_true(res[0]) and res[1] is None:
+                    if res[1] is not None:
+                        value = None
+                        error = res[1]
+                        return value, error
+                    if FunctionUtils.is_logic_true(res[0]):
                         arr_result.append(local.get(iterator_name))
 
                 if not is_instance_array:
