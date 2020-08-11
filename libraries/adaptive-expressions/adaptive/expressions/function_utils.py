@@ -442,7 +442,6 @@ class FunctionUtils:
         converter: Callable[[datetime], datetime] = None
         error: str = None
         multi_flag = -1 if is_past else 1
-        print(time_unit.lower())
         if time_unit.lower() == "second":
 
             def anonymous_function(date_time: datetime):

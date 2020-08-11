@@ -18,7 +18,6 @@ class CountWord(ExpressionEvaluator):
     def evaluator() -> EvaluateExpressionDelegate:
         def anonymous_function(args: list):
             if isinstance(args[0], str):
-                print(len(str(args[0]).strip()))
                 return len(re.split(r"\s{1,}", str(args[0]).strip()))
             return 0
 

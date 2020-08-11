@@ -128,7 +128,13 @@ from .builtin_functions.element import Element
 from .builtin_functions.create_array import CreateArray
 
 # Misc
+
 # Object manipulation and construction functions
+from .builtin_functions.json import Json
+from .builtin_functions.get_property import GetProperty
+from .builtin_functions.add_property import AddProperty
+from .builtin_functions.remove_property import RemoveProperty
+
 # Regular expression
 
 # Type Checking
@@ -255,7 +261,13 @@ def get_standard_functions() -> dict:
     functions.append(CreateArray())
 
     # Misc
+
     # Object manipulation and construction functions
+    functions.append(Json())
+    functions.append(GetProperty())
+    functions.append(AddProperty())
+    functions.append(RemoveProperty())
+
     # Regular expression
 
     # Type Checking

@@ -121,6 +121,9 @@ LAMBDA = "Lambda"
 
 # Object manipulation and construction functions
 JSON = "json"
+GETPROPERTY = "getProperty"
+ADDPROPERTY = "addProperty"
+REMOVEPROPERTY = "removeProperty"
 SETPROPERTY = "setProperty"
 SETPATHTOVALUE = "setPathToValue"
 

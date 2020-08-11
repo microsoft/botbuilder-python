@@ -12,12 +12,13 @@ from adaptive.expressions import Expression
 
 class ExpressionParserTests(aiounittest.AsyncTestCase):
     scope = {
+        "a:b": "stringa:b",
         "one": 1.0,
         "two": 2.0,
         "hello": "hello",
         "nullObj": None,
         "null": None,
-        "bag": {"three": 3.0},
+        "bag": {"three": 3.0, "name": "mybag", "index": 3,},
         "items": ["zero", "one", "two"],
         "nestedItems": [{"x": 1}, {"x": 2}, {"x": 3},],
         "dialog": {
@@ -531,6 +532,34 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
             -315360000000000,
         ],
         ["dateTimeDiff(timestampObj,timestampObj2)", 62604000000000],
+        # Object manipulation and construction functions
+        # json
+        ['indexOf(json(\'["a", "b"]\'), "a")', 0],
+        ["indexOf(json('[\"a\", \"b\"]'), 'c')", -1],
+        ['lastIndexOf(json(\'["a", "b", "a"]\'), "a")', 2],
+        ["lastIndexOf(json('[\"a\", \"b\"]'), 'c')", -1],
+        # TODO: the follow case
+        # ['json(`{"foo":"${hello}","item":"${world}"}`).foo', 'hello'],
+        # getProperty
+        ["getProperty(bag, concat('na','me'))", "mybag"],
+        ["getProperty('bag').index", 3],
+        ["getProperty('a:b')", "stringa:b"],
+        ["getProperty(concat('he', 'llo'))", "hello"],
+        # addProperty
+        [
+            "addProperty(json('{\"key1\":\"value1\"}'), 'key2','value2')",
+            {"key1": "value1", "key2": "value2"},
+        ],
+        ['foreach(items, x, addProperty({}, "a", x))[0].a', "zero"],
+        ['foreach(items, x => addProperty({}, "a", x))[0].a', "zero"],
+        # TODO: the follow case
+        # ['addProperty({"key1":"value1"}, \'key2\',\'value2\')', {"key1":"value1","key2":"value2"}],
+        # removeProperty
+        [
+            'removeProperty(json(\'{"key1":"value1","key2":"value2"}\'), \'key2\')',
+            {"key1": "value1"},
+        ],
+        # Memory access tests
     ]
 
     def test_expression_parser_functions(self):
