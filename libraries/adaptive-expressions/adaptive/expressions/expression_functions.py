@@ -134,6 +134,9 @@ from .builtin_functions.json import Json
 from .builtin_functions.get_property import GetProperty
 from .builtin_functions.add_property import AddProperty
 from .builtin_functions.remove_property import RemoveProperty
+from .builtin_functions.set_property import SetProperty
+from .builtin_functions.coalesce import Coalesce
+from .builtin_functions.xpath import XPath
 
 # Regular expression
 
@@ -267,6 +270,9 @@ def get_standard_functions() -> dict:
     functions.append(GetProperty())
     functions.append(AddProperty())
     functions.append(RemoveProperty())
+    functions.append(SetProperty())
+    functions.append(Coalesce())
+    functions.append(XPath())
 
     # Regular expression
 

@@ -38,7 +38,6 @@ class GetProperty(ExpressionEvaluator):
             else:
                 # get the property value from the instance
                 prop, error = children[1].try_evaluate(state, options)
-                print(SimpleObjectMemory(first_item))
                 if error is None:
                     value = FunctionUtils.wrap_get_value(
                         SimpleObjectMemory(first_item), str(prop), options

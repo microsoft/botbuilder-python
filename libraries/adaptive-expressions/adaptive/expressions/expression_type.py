@@ -125,6 +125,8 @@ GETPROPERTY = "getProperty"
 ADDPROPERTY = "addProperty"
 REMOVEPROPERTY = "removeProperty"
 SETPROPERTY = "setProperty"
+COALESCE = "coalesce"
+XPATH = "xPath"
 SETPATHTOVALUE = "setPathToValue"
 
 # Regular expression

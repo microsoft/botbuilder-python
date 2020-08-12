@@ -43,6 +43,9 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         "unixTimestampFraction": 1521118800.5,
         "ticks": 637243624200000000,
         "doubleNestedItems": [[{"x": 1}, {"x: 2"}], [{"x": 3}]],
+        "xmlStr": "<?xml version='1.0'?> <produce> \
+             <item> <name>Gala</name> <type>apple</type> <count>20</count> </item> \
+             <item> <name>Honeycrisp</name> <type>apple</type> <count>10</count> </item> </produce>",
     }
 
     data_source = [
@@ -552,13 +555,29 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         ],
         ['foreach(items, x, addProperty({}, "a", x))[0].a', "zero"],
         ['foreach(items, x => addProperty({}, "a", x))[0].a', "zero"],
-        # TODO: the follow case
-        # ['addProperty({"key1":"value1"}, \'key2\',\'value2\')', {"key1":"value1","key2":"value2"}],
+        [
+            "addProperty({\"key1\":\"value1\"}, 'key2','value2')",
+            {"key1": "value1", "key2": "value2"},
+        ],
         # removeProperty
         [
             'removeProperty(json(\'{"key1":"value1","key2":"value2"}\'), \'key2\')',
             {"key1": "value1"},
         ],
+        # setProperty
+        [
+            "setProperty(json('{\"key1\":\"value1\"}'), 'key1','value2')",
+            {"key1": "value2"},
+        ],
+        ["setProperty({\"key1\":\"value1\"}, 'key1','value2')", {"key1": "value2"}],
+        ["setProperty({}, 'key1','value2')", {"key1": "value2"}],
+        ["setProperty({}, 'key1','value2{}')", {"key1": "value2{}"}],
+        # coalesce
+        ["coalesce(nullObj,'hello',nullObj)", "hello"],
+        ["coalesce(nullObj, false, 'hello')", False],
+        # xPath
+        ["xPath(xmlStr,'//produce//item//name')", ["<name>Gala</name>", "<name>Honeycrisp</name>"]],
+        ["xPath(xmlStr,'sum(//produce//item//count)')", 30],
         # Memory access tests
     ]
 
