@@ -30,7 +30,7 @@ class SubArray(ExpressionEvaluator):
                 res = start_expr.try_evaluate(state, options)
                 start = res[0]
                 error = res[1]
-                if error is None and not start.is_integer():
+                if error is None and not FunctionUtils.is_integer(start):
                     error = start_expr.to_string() + " is not an integer."
                 elif start < 0 or start >= len(arr):
                     error = (
@@ -50,7 +50,7 @@ class SubArray(ExpressionEvaluator):
                         res = end_expr.try_evaluate(state, options)
                         end = res[0]
                         error = res[1]
-                        if error is None and not end.is_integer():
+                        if error is None and not FunctionUtils.is_integer(end):
                             error = end_expr.to_string() + " is not an integer."
                         elif end < 0 or end > len(arr):
                             error = (

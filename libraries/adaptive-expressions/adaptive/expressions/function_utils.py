@@ -217,7 +217,7 @@ class FunctionUtils:
     @staticmethod
     def verify_integer(value: object, expression: object, number: int):
         error: str = None
-        if isinstance(value, int):
+        if not FunctionUtils.is_integer(value):
             error = expression.to_string() + " is not an integer."
 
         return error
@@ -421,12 +421,20 @@ class FunctionUtils:
     def parse_int(obj: object):
         result: int = 0
         error: str = None
-        if not obj.is_integer():
-            error = str(obj) + " must be a integer."
-        else:
+        if FunctionUtils.is_integer(obj):
             result = int(obj)
+        else:
+            error = str(obj) + " must be a integer."
 
         return result, error
+
+    @staticmethod
+    def is_integer(obj: object):
+        if (obj is not None) and (
+            isinstance(obj, int) or (isinstance(obj, float) and obj.is_integer())
+        ):
+            return True
+        return False
 
     @staticmethod
     def is_logic_true(instance: object):
@@ -555,7 +563,9 @@ class FunctionUtils:
                     left = None
                     return path, left, error
 
-                if isinstance(value, numbers.Number) and value.is_integer():
+                if isinstance(value, numbers.Number) and FunctionUtils.is_integer(
+                    value
+                ):
                     path = "[" + str(int(value)) + "]." + path
                 elif isinstance(value, str):
                     path = "['" + value + "']." + path

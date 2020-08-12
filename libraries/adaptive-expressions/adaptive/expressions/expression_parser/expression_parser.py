@@ -87,11 +87,16 @@ class ExpressionTransformer(expression_antlr_parserVisitor):
 
     def visitNumericAtom(self, ctx: ep_parser.NumericAtomContext) -> Expression:
         try:
-            number_value = float(ctx.getText())
+            int_number_value = int(ctx.getText())
 
-            return Constant(number_value)
+            return Constant(int_number_value)
         except:
-            raise Exception(ctx.getText() + " is not a number")
+            try:
+                float_number_value = float(ctx.getText())
+
+                return Constant(float_number_value)
+            except:
+                raise Exception(ctx.getText() + " is not a number")
 
     def visitParenthesisExp(self, ctx: ep_parser.ParenthesisExpContext) -> Expression:
         return self.visit(ctx.expression())
