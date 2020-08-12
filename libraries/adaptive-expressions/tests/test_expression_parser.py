@@ -12,14 +12,24 @@ from adaptive.expressions import Expression
 
 class ExpressionParserTests(aiounittest.AsyncTestCase):
     scope = {
+        "$index": "index",
+        "alist": [{"Name": "item1"}, {"Name": "item2"}],
         "one": 1.0,
         "two": 2.0,
         "hello": "hello",
+        "world": "world",
         "nullObj": None,
         "null": None,
         "bag": {"three": 3.0},
         "items": ["zero", "one", "two"],
         "nestedItems": [{"x": 1}, {"x": 2}, {"x": 3},],
+        "user": {
+            "income": 110.0,
+            "outcome": 120.0,
+            "nickname": "John",
+            "lists": {"todo": ["todo1", "todo2", "todo3"]},
+            "listType": "todo",
+        },
         "dialog": {
             "x": 3,
             "instance": {"xxx": "instance", "yyy": {"instanceY": "instanceY"}},
@@ -45,6 +55,40 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
     }
 
     data_source = [
+        # Accessor and element
+        ["$index", "index"],
+        ["`hi\\``", "hi`"],  # `hi\`` -> hi`
+        ["`hi\\y`", "hi\\y"],  # `hi\y` -> hi\y
+        ["`\\${a}`", "${a}"],  # `\${a}` -> ${a}
+        ['"ab\\"cd"', 'ab"cd'],  # "ab\"cd" -> ab"cd
+        ['"ab`cd"', "ab`cd"],  # "ab`cd" -> ab`cd
+        ['"ab\\ncd"', "ab\ncd"],  # "ab\ncd" -> ab[newline] cd
+        ['"ab\\ycd"', "ab\\ycd"],  # "ab\ycd" -> ab\ycd
+        ["'ab\\'cd'", "ab'cd"],  # 'ab\'cd' -> ab'cd
+        ["alist[0].Name", "item1"],
+        # String interpolation test
+        ["`hi`", "hi"],
+        ["`hi\\``", "hi`"],
+        ["`${world}`", "world"],
+        ["`hi ${string('jack`')}`", "hi jack`"],
+        ["`\\${world}`", "${world}"],
+        ["length(`hello ${world}`)", 11],
+        # TODO: ['json(`{"foo":"${hello}","item":"${world}"}`).foo', 'hello'],
+        ["`{expr: hello all}`", "{expr: hello all}"],
+        # TODO: ['json(`{"foo":${{text:"hello"}},"item": "${world}"}`).foo.text', 'hello'],
+        # TODO: ['json(`{"foo":${{text:"hello", cool: "hot", obj:{new: 123}}},"item": "${world}"}`).foo.text', 'hello'],
+        ["`hi\\`[1,2,3]`", "hi`[1,2,3]"],
+        ["`hi ${join(['jack\\`', 'queen', 'king'], ',')}`", "hi jack\\`,queen,king"],
+        ['`abc ${concat("[", "]")}`', "abc []"],
+        ['`[] ${concat("[]")}`', "[] []"],
+        ['`hi ${count(["a", "b", "c"])}`', "hi 3"],
+        ["`hello ${world}` == 'hello world'", True],
+        ["`hello ${world}` != 'hello hello'", True],
+        ["`hello ${user.nickname}` == 'hello John'", True],
+        ["`hello ${user.nickname}` != 'hello Dong'", True],
+        # TODO: ["`hello ${string({obj:  1})}`", 'hello {"obj":1}'],
+        # TODO: ['`hello ${string({obj:  "${not expr}"})}`', 'hello {"obj":"${not expr}"}'],
+        # TODO: ["`hello ${string({obj:  {a: 1}})}`", 'hello {"obj":{"a":1}}'],
         # Math functions
         # add
         ["1+1.5", 2.5],
@@ -159,13 +203,19 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         ["length(concat('[]', 'abc'))", 5],
         ['length("hello")', 5],
         # replace
-        ['replace("hello", "l", "k")', "hekko"],
-        ['replace("hello", "L", "k")', "hello"],
-        ['replace("hello", "l", "")', "heo"],
-        ["replace('hello\n', '\n', '\\\\')", r"hello\\"],
-        [r"replace('hello\\', '\\', '\\\\')", r"hello\\\\"],
+        ["replace('hello', 'l', 'k')", "hekko"],
+        ["replace('hello', 'L', 'k')", "hello"],
+        ["replace(nullObj, 'L', 'k')", ""],
+        ["replace('hello', 'L', nullObj)", "hello"],
+        ['replace("hello\'", "\'", \'"\')', 'hello"'],
+        ["replace('hello\"', '\"', \"'\")", "hello'"],
+        ["replace('hello\"', '\"', '\n')", "hello\n"],
+        ["replace('hello\n', '\n', '\\\\')", "hello\\"],
+        ["replace('hello\\\\', '\\\\', '\\\\\\\\')", "hello\\\\"],
         # replaceIgnoreCase
-        ['replaceIgnoreCase("hello", "L", "K")', "hekko"],
+        ["replaceIgnoreCase('hello', 'L', 'k')", "hekko"],
+        ["replaceIgnoreCase(nullObj, 'L', 'k')", ""],
+        ["replaceIgnoreCase('hello', 'L', nullObj)", "heo"],
         # split
         ['split("hello", "e")', ["h", "llo"]],
         ['split("hello")', ["h", "e", "l", "l", "o"]],

@@ -1,3 +1,4 @@
+import re
 from antlr4 import InputStream
 from antlr4 import CommonTokenStream
 from antlr4 import TerminalNode
@@ -21,8 +22,7 @@ from .generated import expression_antlr_parserVisitor
 
 
 class ExpressionTransformer(expression_antlr_parserVisitor):
-    # TODO: implement regex: escapeRegex = new RegExp(/\\[^\r\n]?/g)
-    escape_regex = ""
+    escape_regex = r"\\[^\r\n]?"
 
     lookup_function: EvaluatorLookup
 
@@ -106,10 +106,9 @@ class ExpressionTransformer(expression_antlr_parserVisitor):
     def visitStringAtom(self, ctx: ep_parser.StringAtomContext):
         text = ctx.getText()
         if text.startswith("'") and text.endswith("'"):
-            # TODO: need to align with js to replace sth
-            text = text[1:-1]
+            text = re.sub(r"\\'", "'", text[1:-1])
         elif text.startswith('"') and text.endswith('"'):
-            text = text[1:-1]
+            text = re.sub(r'\\"', '"', text[1:-1])
         else:
             raise Exception("Invalid string " + text)
 
@@ -145,13 +144,15 @@ class ExpressionTransformer(expression_antlr_parserVisitor):
                     children.append(
                         Expression.parse(expression_string, self.lookup_function)
                     )
-                    break
 
                 if node_type == ep_parser.ESCAPE_CHARACTER:
-                    # TODO: align with js to replace ` and $
-                    children.append(Constant(self.eval_escape(node.getText())))
-                else:
-                    break
+                    children.append(
+                        Constant(
+                            self.eval_escape(
+                                node.getText().replace("\\`", "`").replace("\\$", "$")
+                            )
+                        )
+                    )
             else:
                 text = self.eval_escape(node.getText())
                 children.append(Constant(text))
@@ -201,12 +202,21 @@ class ExpressionTransformer(expression_antlr_parserVisitor):
         result = result.strip()
 
         if result.startswith("{") and result.endswith("}"):
-            result = result[1, -1]
+            result = result[1:-1]
 
         return result.strip()
 
     def eval_escape(self, text: str) -> str:
-        # TODO: eval escape use regex
+        valid_characters_dict = {"\\r": "\r", "\\n": "\n", "\\t": "\t", "\\\\": "\\"}
+
+        text = re.sub(
+            self.escape_regex,
+            lambda x: valid_characters_dict.get(x.group())
+            if x.group() in valid_characters_dict
+            else x.group(),
+            text,
+        )
+
         return text
 
 
