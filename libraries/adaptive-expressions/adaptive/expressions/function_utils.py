@@ -430,9 +430,7 @@ class FunctionUtils:
 
     @staticmethod
     def is_integer(obj: object):
-        if (obj is not None) and (
-            isinstance(obj, int) or (isinstance(obj, float) and obj.is_integer())
-        ):
+        if (obj is not None) and (isinstance(obj, int) or (isinstance(obj, float) and obj.is_integer())):
             return True
         else:
             return False
