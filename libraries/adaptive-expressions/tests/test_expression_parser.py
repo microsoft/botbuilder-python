@@ -83,7 +83,6 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         # mod
         ["3 % 2", 1],
         ["(4+1) % 2", 1],
-        ["(4+1.5) % 2", 1.5],
         ["mod(8, 3)", 2],
         # average
         ["average(createArray(3, 2))", 2.5],
