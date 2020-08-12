@@ -7,7 +7,10 @@ from ..return_type import ReturnType
 class IsArray(ExpressionEvaluator):
     def __init__(self):
         super().__init__(
-            ISARRAY, IsArray.evaluator(), ReturnType.Boolean, FunctionUtils.validate_unary
+            ISARRAY,
+            IsArray.evaluator(),
+            ReturnType.Boolean,
+            FunctionUtils.validate_unary,
         )
 
     @staticmethod

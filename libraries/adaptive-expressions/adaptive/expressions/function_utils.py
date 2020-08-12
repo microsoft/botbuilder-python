@@ -430,7 +430,9 @@ class FunctionUtils:
 
     @staticmethod
     def is_integer(obj: object):
-        if (obj is not None) and (isinstance(obj, int) or (isinstance(obj, float) and obj.is_integer())):
+        if (obj is not None) and (
+            isinstance(obj, int) or (isinstance(obj, float) and obj.is_integer())
+        ):
             return True
         else:
             return False
@@ -562,7 +564,9 @@ class FunctionUtils:
                     left = None
                     return path, left, error
 
-                if isinstance(value, numbers.Number) and FunctionUtils.is_integer(value):
+                if isinstance(value, numbers.Number) and FunctionUtils.is_integer(
+                    value
+                ):
                     path = "[" + str(int(value)) + "]." + path
                 elif isinstance(value, str):
                     path = "['" + value + "']." + path

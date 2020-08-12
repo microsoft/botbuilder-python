@@ -7,7 +7,10 @@ from ..return_type import ReturnType
 class IsBoolean(ExpressionEvaluator):
     def __init__(self):
         super().__init__(
-            ISBOOLEAN, IsBoolean.evaluator(), ReturnType.Boolean, FunctionUtils.validate_unary
+            ISBOOLEAN,
+            IsBoolean.evaluator(),
+            ReturnType.Boolean,
+            FunctionUtils.validate_unary,
         )
 
     @staticmethod

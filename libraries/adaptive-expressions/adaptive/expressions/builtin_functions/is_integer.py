@@ -7,7 +7,10 @@ from ..return_type import ReturnType
 class IsInteger(ExpressionEvaluator):
     def __init__(self):
         super().__init__(
-            ISINTEGER, IsInteger.evaluator(), ReturnType.Boolean, FunctionUtils.validate_unary
+            ISINTEGER,
+            IsInteger.evaluator(),
+            ReturnType.Boolean,
+            FunctionUtils.validate_unary,
         )
 
     @staticmethod

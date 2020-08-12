@@ -7,7 +7,10 @@ from ..return_type import ReturnType
 class IsFloat(ExpressionEvaluator):
     def __init__(self):
         super().__init__(
-            ISFLOAT, IsFloat.evaluator(), ReturnType.Boolean, FunctionUtils.validate_unary
+            ISFLOAT,
+            IsFloat.evaluator(),
+            ReturnType.Boolean,
+            FunctionUtils.validate_unary,
         )
 
     @staticmethod
