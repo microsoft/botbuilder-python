@@ -20,7 +20,13 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         "world": "world",
         "nullObj": None,
         "null": None,
-        "bag": {"three": 3.0},
+        "bag": {
+            "three": 3.0,
+            "set": {"four":4.0},
+            "list":["red", "blue"],
+            "index":3,
+            "name":"mybag"
+        },
         "items": ["zero", "one", "two"],
         "emptyObject": {},
         "nestedItems": [{"x": 1}, {"x": 2}, {"x": 3},],
@@ -289,6 +295,26 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         # int
         ["int('10')", 10],
         ["int(12345678912345678 + 1)", 12345678912345679],
+        # float
+        ["float('10.333')", 10.333],
+        ["float('10')", 10.0],
+        # string
+        ["string('str')", "str"],
+        ["string(one)", "1.0"],
+        ["string(bool(1))", "True"],
+        ["string(bag.set)", "{'four': 4.0}"],
+        # bool
+        ["bool(1)", True],
+        ["bool(0)", True],
+        ["bool(None)", False],
+        ["bool(hello*5)", False],
+        ["bool('False')", True],
+        ["bool('hi')", True],
+        ["[1, 2, 3]", [1, 2, 3]],
+        ["[1, 2, 3, [4, 5]]", [1, 2, 3, [4, 5]]],
+        ["\"[1, 2, 3]\"", "[1, 2, 3]"],
+        ["[1, bool(0), string(bool(1)), float('10')]", [1, True, "True", 10.0]],
+        ["binary(hello)", b"hello"],
         # Collection functions
         # count
         ["count('hello')", 5],
