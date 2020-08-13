@@ -111,6 +111,14 @@ INT = "int"
 FLOAT = "float"
 BOOL = "bool"
 BINARY = "binary"
+BASE64 = "base64"
+BASE64TOBINARY = "base64ToBinary"
+BASE64TOSTRING = "base64ToString"
+DATAURI = "dataUri"
+DATAURITOBINARY = "DataUriToBinary"
+DATAURITOSTRING = "dataUriToString"
+URICOMPONENT = "uriComponent"
+URICOMPONENTTOSTRING = "uriComponentToString"
 
 # URI Parsing Functions
 

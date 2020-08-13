@@ -123,6 +123,14 @@ from .builtin_functions.float import Float
 from .builtin_functions.int import Int
 from .builtin_functions.bool import Bool
 from .builtin_functions.binary import Binary
+from .builtin_functions.base64 import Base64
+from .builtin_functions.base64_to_string import Base64ToString
+from .builtin_functions.base64_to_binary import Base64ToBinary
+from .builtin_functions.data_uri import DataUri
+from .builtin_functions.data_uri_to_binary import DataUriToBinary
+from .builtin_functions.data_uri_to_string import DataUriToString
+from .builtin_functions.uri_component import UriComponent
+from .builtin_functions.uri_component_to_string import UriComponentToString
 
 # URI Parsing Functions
 
@@ -260,6 +268,14 @@ def get_standard_functions() -> dict:
     functions.append(Float())
     functions.append(Bool())
     functions.append(Binary())
+    functions.append(Base64())
+    functions.append(Base64ToBinary())
+    functions.append(Base64ToString())
+    functions.append(DataUri())
+    functions.append(DataUriToBinary())
+    functions.append(DataUriToString())
+    functions.append(UriComponent())
+    functions.append(UriComponentToString())
 
     # URI Parsing Functions
 

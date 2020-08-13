@@ -176,6 +176,13 @@ class FunctionUtils:
             )
 
     @staticmethod
+    def verify_string(value: object, expression: object, number: int):
+        error: str = None
+        if not isinstance(value, str):
+            error = expression.to_string() + " is not a string."
+        return error
+
+    @staticmethod
     def verify_string_or_null(value: object, expression: object, number: int):
         error: str = None
         if not isinstance(value, str) and value is not None:

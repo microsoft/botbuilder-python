@@ -1,18 +1,19 @@
 from ..expression_evaluator import ExpressionEvaluator, EvaluateExpressionDelegate
-from ..expression_type import BINARY
+from ..expression_type import DATAURITOSTRING
 from ..function_utils import FunctionUtils
 from ..return_type import ReturnType
+import base64
 
 
-class Binary(ExpressionEvaluator):
+class DataUriToString(ExpressionEvaluator):
     def __init__(self):
         super().__init__(
-            BINARY, Binary.evaluator(), ReturnType.Object, FunctionUtils.validate_unary
+            DATAURITOSTRING, DataUriToString.evaluator(), ReturnType.String, FunctionUtils.validate_unary
         )
 
     @staticmethod
     def evaluator() -> EvaluateExpressionDelegate:
         def anonymous_function(args: []):
-            return bytes(args[0], encoding='UTF-8')
+            # TODO
 
-        return FunctionUtils.apply(anonymous_function)
+        return FunctionUtils.apply(anonymous_function, FunctionUtils.verify_string)
