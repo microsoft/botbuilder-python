@@ -119,6 +119,10 @@ from .builtin_functions.date_time_diff import DateTimeDiff
 
 # Conversions
 from .builtin_functions.string import String
+from .builtin_functions.float import Float
+from .builtin_functions.int import Int
+from .builtin_functions.bool import Bool
+from .builtin_functions.binary import Binary
 
 # URI Parsing Functions
 
@@ -252,6 +256,10 @@ def get_standard_functions() -> dict:
 
     # Conversions
     functions.append(String())
+    functions.append(Int())
+    functions.append(Float())
+    functions.append(Bool())
+    functions.append(Binary())
 
     # URI Parsing Functions
 

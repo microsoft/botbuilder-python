@@ -285,6 +285,10 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         # titleCase
         ["titleCase('a')", "A"],
         ["titleCase('abc dEF')", "Abc Def"],
+        # Conversion functions
+        # int
+        ["int('10')", 10],
+        ["int(12345678912345678 + 1)", 12345678912345679],
         # Collection functions
         # count
         ["count('hello')", 5],

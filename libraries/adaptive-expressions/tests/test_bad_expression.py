@@ -347,6 +347,9 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         "isObejct(emptyJObject, hello)",  # should have 1 parameter
         "isDateTime('2018-03-15T13:00:00.000Z', hello)",  # should have 1 parameter
         "isBoolean(false, false)",  # should have 1 parameter
+        # Conversion functions
+        "int(hello)", # param shoud be int format string
+        "int(1, 1)", # shold have 1 param
     ]
 
     def test_exception_for_bad_expressions(self):

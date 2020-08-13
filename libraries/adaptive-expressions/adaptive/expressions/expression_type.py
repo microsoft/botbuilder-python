@@ -107,6 +107,10 @@ DATETIMEDIFF = "dateTimeDiff"
 
 # Conversions
 STRING = "string"
+INT = "int"
+FLOAT = "float"
+BOOL = "bool"
+BINARY = "binary"
 
 # URI Parsing Functions
 
