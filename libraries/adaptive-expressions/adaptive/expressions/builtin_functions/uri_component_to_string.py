@@ -13,6 +13,6 @@ class DataUriToString(ExpressionEvaluator):
     @staticmethod
     def evaluator() -> EvaluateExpressionDelegate:
         def anonymous_function(args: []):
-            return parse.quote_plus(args[0])
+            return parse.unquote_plus(args[0])
 
         return FunctionUtils.apply(anonymous_function, FunctionUtils.verify_string)

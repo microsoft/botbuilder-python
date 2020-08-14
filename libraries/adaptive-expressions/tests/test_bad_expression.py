@@ -8,6 +8,7 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         "one": 1.0,
         "two": 2.0,
         "hello": "hello",
+        "world": "world",
         "nullObj": None,
         "bag": {"three": 3.0},
         "items": ["zero", "one", "two"],
@@ -356,6 +357,25 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         "bool(false, 1)", # shold have 1 param
         "binary(hello, world)",  # shoule have 1 param
         "binary(one)", # should have string param
+        "DataUri(hello, world)", # shoule have 1 param
+        "DataUri(false)", # should have string param
+        "uriComponent(hello, world)", # shoule have 1 param
+        "uriComponent(false)", # should have string param
+        "uriComponentToString(hello, world)", # shoule have 1 param
+        "uriComponentToString(false)", # should have string param
+        "dataUriToBinary(hello, world)", # shoule have 1 param
+        "dataUriToBinary(false)", # should have string param
+        "dataUriToString(hello, world)", # shoule have 1 param
+        "dataUriToString(false)", # should have string param
+        "binary(hello, world)",   # shoule have 1 param
+        "binary(one)", # should have string param
+        "base64(hello, world)",  # shoule have 1 param
+        "base64(createArray('a', 'b')", # should have string param or byte array
+        "base64ToBinary(hello, world)", # shoule have 1 param
+        "base64ToBinary(one)", # should have string param
+        "base64ToString(hello, world)", # shoule have 1 param
+        "base64ToString(false)", # should have string param
+
 
     ]
 
