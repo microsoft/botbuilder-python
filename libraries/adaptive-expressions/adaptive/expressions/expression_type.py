@@ -128,6 +128,8 @@ SETPROPERTY = "setProperty"
 COALESCE = "coalesce"
 XPATH = "xPath"
 SETPATHTOVALUE = "setPathToValue"
+JPATH = "jPath"
+MERGE = "merge"
 
 # Regular expression
 # Type checking

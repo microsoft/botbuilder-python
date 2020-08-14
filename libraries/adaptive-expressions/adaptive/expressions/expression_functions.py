@@ -137,6 +137,9 @@ from .builtin_functions.remove_property import RemoveProperty
 from .builtin_functions.set_property import SetProperty
 from .builtin_functions.coalesce import Coalesce
 from .builtin_functions.xpath import XPath
+from .builtin_functions.set_path_to_value import SetPathToValue
+from .builtin_functions.jpath import JPath
+from .builtin_functions.merge import Merge
 
 # Regular expression
 
@@ -273,6 +276,9 @@ def get_standard_functions() -> dict:
     functions.append(SetProperty())
     functions.append(Coalesce())
     functions.append(XPath())
+    functions.append(SetPathToValue())
+    functions.append(JPath())
+    functions.append(Merge())
 
     # Regular expression
 
