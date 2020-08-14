@@ -1,4 +1,4 @@
-import json
+import demjson
 from ..expression_type import JSON
 from ..function_utils import FunctionUtils
 from ..return_type import ReturnType
@@ -14,7 +14,7 @@ class Json(ExpressionEvaluator):
     @staticmethod
     def evaluator() -> EvaluateExpressionDelegate:
         def anonymous_function(args: list):
-            return json.loads(args[0])
+            return demjson.decode(args[0])
 
         return FunctionUtils.apply(anonymous_function)
 

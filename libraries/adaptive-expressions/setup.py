@@ -10,6 +10,7 @@ REQUIRES = [
     "lxml==4.5.2",
     "jsonpath==0.82",
     "jsonmerge==1.7.0",
+    "demjson==2.2.4",
 ]
 
 TEST_REQUIRES = ["aiounittest==1.3.0"]
