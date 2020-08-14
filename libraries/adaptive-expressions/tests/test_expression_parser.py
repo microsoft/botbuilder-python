@@ -58,13 +58,31 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
              <item> <name>Gala</name> <type>apple</type> <count>20</count> </item> \
              <item> <name>Honeycrisp</name> <type>apple</type> <count>10</count> </item> </produce>",
         "path": {"array": [1]},
-        "jsonStr": json.dumps({'Stores': ['Lambton Quay', 'Willis Street'], 'Manufacturers': [ \
-            {'Name': 'Acme Co', 'Products': [{'Name': 'Anvil', 'Price': 50}]}, \
-            {'Name': 'Contoso', 'Products': [{'Name': 'Elbow Grease', 'Price': 99.95}, \
-            {'Name': 'Headlight Fluid', 'Price': 4}]}]}),
-        "json1": json.dumps({'FirstName': 'John', 'LastName': 'Smith', 'Enabled': False, 'Roles': ['User']}),
-        "json2": json.dumps({'Enabled': True, 'Roles': ['Customer', 'Admin']}),
-        "json3": json.dumps({'Age': 36}),
+        "jsonStr": json.dumps(
+            {
+                "Stores": ["Lambton Quay", "Willis Street"],
+                "Manufacturers": [
+                    {"Name": "Acme Co", "Products": [{"Name": "Anvil", "Price": 50}]},
+                    {
+                        "Name": "Contoso",
+                        "Products": [
+                            {"Name": "Elbow Grease", "Price": 99.95},
+                            {"Name": "Headlight Fluid", "Price": 4},
+                        ],
+                    },
+                ],
+            }
+        ),
+        "json1": json.dumps(
+            {
+                "FirstName": "John",
+                "LastName": "Smith",
+                "Enabled": False,
+                "Roles": ["User"],
+            }
+        ),
+        "json2": json.dumps({"Enabled": True, "Roles": ["Customer", "Admin"]}),
+        "json3": json.dumps({"Age": 36}),
     }
 
     data_source = [
@@ -600,7 +618,7 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         ["indexOf(json('[\"a\", \"b\"]'), 'c')", -1],
         ['lastIndexOf(json(\'["a", "b", "a"]\'), "a")', 2],
         ["lastIndexOf(json('[\"a\", \"b\"]'), 'c')", -1],
-        ['json(`{"foo":"${hello}","item":"${world}"}`).foo', 'hello'],
+        ['json(`{"foo":"${hello}","item":"${world}"}`).foo', "hello"],
         # getProperty
         ["getProperty(bag, concat('na','me'))", "mybag"],
         ["getProperty('bag').index", 3],
@@ -634,7 +652,10 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         ["coalesce(nullObj,'hello',nullObj)", "hello"],
         ["coalesce(nullObj, false, 'hello')", False],
         # xPath
-        ["xPath(xmlStr,'//produce//item//name')", ["<name>Gala</name>", "<name>Honeycrisp</name>"]],
+        [
+            "xPath(xmlStr,'//produce//item//name')",
+            ["<name>Gala</name>", "<name>Honeycrisp</name>"],
+        ],
         ["xPath(xmlStr,'sum(//produce//item//count)')", 30],
         # setPathToValue
         ["setPathToValue(path.simple, 3) + path.simple", 6],
@@ -643,13 +664,30 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         ["setPathToValue(path.array[1], 9) + path.array[1]", 18],
         # jPath
         ["jPath(jsonStr,'Manufacturers[0].Products[0].Price')", 50],
-        ["jPath(jsonStr,'$..Products[?(@.Price >= 50)].Name')", ["Anvil", "Elbow Grease"]],
+        [
+            "jPath(jsonStr,'$..Products[?(@.Price >= 50)].Name')",
+            ["Anvil", "Elbow Grease"],
+        ],
         # merge
-        ["merge(json(json1), json(json2))", \
-        {"FirstName":"John", "LastName":"Smith", "Enabled":True, "Roles":["Customer", "Admin"]}],
-        ["merge(json(json1), json(json2), json(json3))", \
-        {"FirstName":"John", "LastName":"Smith", "Enabled": True, \
-            "Roles":["Customer", "Admin"], "Age":36}],
+        [
+            "merge(json(json1), json(json2))",
+            {
+                "FirstName": "John",
+                "LastName": "Smith",
+                "Enabled": True,
+                "Roles": ["Customer", "Admin"],
+            },
+        ],
+        [
+            "merge(json(json1), json(json2), json(json3))",
+            {
+                "FirstName": "John",
+                "LastName": "Smith",
+                "Enabled": True,
+                "Roles": ["Customer", "Admin"],
+                "Age": 36,
+            },
+        ],
         # Memory access tests
     ]
 

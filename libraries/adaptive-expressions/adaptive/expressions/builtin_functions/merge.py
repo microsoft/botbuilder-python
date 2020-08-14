@@ -20,7 +20,13 @@ class Merge(ExpressionEvaluator):
             try:
                 result = jsonmerge.merge(args[0], args[1])
             except:
-                error = "The arguments {" + args[0] + "} and {" + args[1] + "} must be a JSON objects."
+                error = (
+                    "The arguments {"
+                    + args[0]
+                    + "} and {"
+                    + args[1]
+                    + "} must be a JSON objects."
+                )
             return result, error
 
         return FunctionUtils.apply_sequence_with_error(anonymous_function)

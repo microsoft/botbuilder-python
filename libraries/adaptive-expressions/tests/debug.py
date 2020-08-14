@@ -24,10 +24,21 @@ scope = {
     "ticks": 637243624200000000,
     "doubleNestedItems": [[{"x": 1}, {"x: 2"}], [{"x": 3}]],
     "path": {"array": [1]},
-    "jsonStr": json.dumps({'Stores': ['Lambton Quay', 'Willis Street'], 'Manufacturers': [ \
-        {'Name': 'Acme Co', 'Products': [{'Name': 'Anvil', 'Price': 50}]}, \
-        {'Name': 'Contoso', 'Products': [{'Name': 'Elbow Grease', 'Price': 99.95}, \
-        {'Name': 'Headlight Fluid', 'Price': 4}]}]}),
+    "jsonStr": json.dumps(
+        {
+            "Stores": ["Lambton Quay", "Willis Street"],
+            "Manufacturers": [
+                {"Name": "Acme Co", "Products": [{"Name": "Anvil", "Price": 50}]},
+                {
+                    "Name": "Contoso",
+                    "Products": [
+                        {"Name": "Elbow Grease", "Price": 99.95},
+                        {"Name": "Headlight Fluid", "Price": 4},
+                    ],
+                },
+            ],
+        }
+    ),
 }
 print("syp, debug")
 parsed = Expression.parse("jPath(jsonStr,'Manufacturers[0].Products[0].Price')")

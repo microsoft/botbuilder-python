@@ -9,16 +9,14 @@ from ..expression_evaluator import ExpressionEvaluator, EvaluateExpressionDelega
 class JPath(ExpressionEvaluator):
     def __init__(self):
         super().__init__(
-            JPATH,
-            JPath.evaluator(),
-            ReturnType.Object,
-            JPath.validator,
+            JPATH, JPath.evaluator(), ReturnType.Object, JPath.validator,
         )
 
     @staticmethod
     def evaluator() -> EvaluateExpressionDelegate:
         def anonymous_function(args: list):
             return JPath.eval_jpath(args[0], args[1])
+
         return FunctionUtils.apply_with_error(anonymous_function)
 
     @staticmethod
@@ -46,4 +44,6 @@ class JPath(ExpressionEvaluator):
 
     @staticmethod
     def validator(expression: object):
-        FunctionUtils.validate_order(expression, None, ReturnType.Object, ReturnType.String)
+        FunctionUtils.validate_order(
+            expression, None, ReturnType.Object, ReturnType.String
+        )

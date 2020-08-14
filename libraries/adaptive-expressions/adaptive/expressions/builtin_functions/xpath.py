@@ -8,16 +8,14 @@ from ..expression_evaluator import ExpressionEvaluator, EvaluateExpressionDelega
 class XPath(ExpressionEvaluator):
     def __init__(self):
         super().__init__(
-            XPATH,
-            XPath.evaluator(),
-            ReturnType.Object,
-            XPath.validator,
+            XPATH, XPath.evaluator(), ReturnType.Object, XPath.validator,
         )
 
     @staticmethod
     def evaluator() -> EvaluateExpressionDelegate:
         def anonymous_function(args: list):
             return XPath.eval_xpath(args[0], args[1])
+
         return FunctionUtils.apply_with_error(anonymous_function)
 
     @staticmethod
