@@ -1,14 +1,17 @@
+import base64
 from ..expression_evaluator import ExpressionEvaluator, EvaluateExpressionDelegate
 from ..expression_type import BASE64TOBINARY
 from ..function_utils import FunctionUtils
 from ..return_type import ReturnType
-import base64
 
 
 class Base64ToBinary(ExpressionEvaluator):
     def __init__(self):
         super().__init__(
-            BASE64TOBINARY, Base64ToBinary.evaluator(), ReturnType.Object, FunctionUtils.validate_unary
+            BASE64TOBINARY,
+            Base64ToBinary.evaluator(),
+            ReturnType.Object,
+            FunctionUtils.validate_unary,
         )
 
     @staticmethod

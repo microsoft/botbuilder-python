@@ -1,13 +1,17 @@
 from urllib import parse
 from ..expression_evaluator import ExpressionEvaluator, EvaluateExpressionDelegate
-from ..expression_type import DATAURITOSTRING
+from ..expression_type import URICOMPONENT
 from ..function_utils import FunctionUtils
 from ..return_type import ReturnType
 
-class DataUriToString(ExpressionEvaluator):
+
+class UriComponent(ExpressionEvaluator):
     def __init__(self):
         super().__init__(
-            DATAURITOSTRING, DataUriToString.evaluator(), ReturnType.String, FunctionUtils.validate_unary
+            URICOMPONENT,
+            UriComponent.evaluator(),
+            ReturnType.String,
+            FunctionUtils.validate_unary,
         )
 
     @staticmethod

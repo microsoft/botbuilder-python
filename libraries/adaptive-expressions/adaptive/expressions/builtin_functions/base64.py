@@ -1,8 +1,8 @@
+import base64
 from ..expression_evaluator import ExpressionEvaluator, EvaluateExpressionDelegate
 from ..expression_type import BASE64
 from ..function_utils import FunctionUtils
 from ..return_type import ReturnType
-import base64
 
 
 class Base64(ExpressionEvaluator):
@@ -14,11 +14,11 @@ class Base64(ExpressionEvaluator):
     @staticmethod
     def evaluator() -> EvaluateExpressionDelegate:
         def anonymous_function(args: []):
-            bytesString: str = None
+            bytes_string: str = None
             if isinstance(args[0], bytes):
-                bytesString = args[0]
+                bytes_string = args[0]
             else:
-                bytesString = str(args[0]).encode(encoding="utf-8")
-            return base64.b64encode(bytesString).decode()
+                bytes_string = str(args[0]).encode(encoding="utf-8")
+            return base64.b64encode(bytes_string).decode()
 
         return FunctionUtils.apply(anonymous_function)

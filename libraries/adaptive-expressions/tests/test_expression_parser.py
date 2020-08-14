@@ -22,10 +22,10 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         "null": None,
         "bag": {
             "three": 3.0,
-            "set": {"four":4.0},
-            "list":["red", "blue"],
-            "index":3,
-            "name":"mybag"
+            "set": {"four": 4.0},
+            "list": ["red", "blue"],
+            "index": 3,
+            "name": "mybag",
         },
         "items": ["zero", "one", "two"],
         "emptyObject": {},
@@ -59,7 +59,7 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         "unixTimestampFraction": 1521118800.5,
         "ticks": 637243624200000000,
         "doubleNestedItems": [[{"x": 1}, {"x: 2"}], [{"x": 3}]],
-        "byteArr": b'hello'
+        "byteArr": b"hello",
     }
 
     data_source = [
@@ -313,20 +313,19 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         ["bool('hi')", True],
         ["[1, 2, 3]", [1, 2, 3]],
         ["[1, 2, 3, [4, 5]]", [1, 2, 3, [4, 5]]],
-        ["\"[1, 2, 3]\"", "[1, 2, 3]"],
+        ['"[1, 2, 3]"', "[1, 2, 3]"],
         ["[1, bool(0), string(bool(1)), float('10')]", [1, True, "True", 10.0]],
         ["binary(hello)", b"hello"],
         ["base64(hello)", "aGVsbG8="],
-        ["base64(byteArr)", "AwUBDA=="],
+        ["base64(byteArr)", "aGVsbG8="],
         ["base64ToBinary(base64(byteArr))", b"hello"],
         ["base64ToString(base64(hello))", "hello"],
-        ["base64(base64ToBinary(\"AwUBDA==\"))", "AwUBDA=="],
+        ['base64(base64ToBinary("AwUBDA=="))', "AwUBDA=="],
         ["dataUri(hello)", "data:text/plain;charset=utf-8;base64,aGVsbG8="],
         ["dataUriToBinary(base64(hello))", b"aGVsbG8="],
         ["dataUriToString(dataUri(hello))", "hello"],
         ["uriComponent('http://contoso.com')", "http%3A%2F%2Fcontoso.com"],
         ["uriComponentToString('http%3A%2F%2Fcontoso.com')", "http://contoso.com"],
-
         # Collection functions
         # count
         ["count('hello')", 5],
