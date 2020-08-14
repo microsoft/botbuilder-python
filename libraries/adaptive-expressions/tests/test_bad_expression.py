@@ -347,7 +347,8 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         "ticksToMinutes(timestamp)",  # not an integer
         "dateTimeDiff(notValidTimeStamp,'2018-01-01T08:00:00.000Z')",  # the first parameter is not a valid timestamp
         "dateTimeDiff('2017-01-01T08:00:00.000Z',notValidTimeStamp)",  # the second parameter is not a valid timestamp
-        "dateTimeDiff('2017-01-01T08:00:00.000Z','2018-01-01T08:00:00.000Z', 'years')",  # should only have 2 parameters
+        "dateTimeDiff('2017-01-01T08:00:00.000Z','2018-01-01T08:00:00.000Z', 'years')",  # should only have 2 parametes
+        # Object manipulation and construction functions
         "json(1,2)",  # should have 1 parameter
         "json(1)",  # should be string parameter
         'json(\'{"key1":value1"}\')',  # invalid json format string
@@ -368,6 +369,14 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         "merge(json(json1))",  # should have at least two arguments
         "merge(json(json1), json(jarray1))",  # arguments should all be JSON objects
         "merge(json(jarray1), json(json1))",  # arguments should all be JSON objects
+        # type checking
+        "isString(hello, hello)",  # should have 1 parameter
+        "isInteger(2, 3)",  # should have 1 parameter
+        "isFloat(1.2, 3.1)",  # should have 1 parameter
+        "isArray(createArray(1,2,3), 1)",  # should have 1 parameter
+        "isObejct(emptyJObject, hello)",  # should have 1 parameter
+        "isDateTime('2018-03-15T13:00:00.000Z', hello)",  # should have 1 parameter
+        "isBoolean(false, false)",  # should have 1 parameter
     ]
 
     def test_exception_for_bad_expressions(self):
