@@ -24,7 +24,7 @@ class XPath(ExpressionEvaluator):
         result: object = None
         error: str = None
         try:
-            # pylint:disable = c-extension-no-member)
+            # pylint:disable = c-extension-no-member
             selector = etree.HTML(xml_obj)
         except:
             error = "not valid xml input"
@@ -35,7 +35,7 @@ class XPath(ExpressionEvaluator):
                 value = selector.xpath(xpath)
                 if isinstance(value, list):
                     for i in value:
-                        # pylint:disable = c-extension-no-member)
+                        # pylint:disable = c-extension-no-member
                         node_list.append(bytes.decode(etree.tostring(i)).strip())
                     if len(node_list) == 0:
                         error = "there is no matched nodes in the xml."
