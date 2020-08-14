@@ -120,9 +120,9 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         ["`hello ${world}` != 'hello hello'", True],
         ["`hello ${user.nickname}` == 'hello John'", True],
         ["`hello ${user.nickname}` != 'hello Dong'", True],
-        # TODO: ["`hello ${string({obj:  1})}`", 'hello {"obj":1}'],
-        # TODO: ['`hello ${string({obj:  "${not expr}"})}`', 'hello {"obj":"${not expr}"}'],
-        # TODO: ["`hello ${string({obj:  {a: 1}})}`", 'hello {"obj":{"a":1}}'],
+        ["`hello ${string({obj:  1})}`", "hello {'obj': 1.0}"],
+        ['`hello ${string({obj:  "${not expr}"})}`', "hello {'obj': '${not expr}'}"],
+        ["`hello ${string({obj:  {a: 1}})}`", "hello {'obj': {'a': 1.0}}"],
         # Math functions
         # add
         ["1+1.5", 2.5],
