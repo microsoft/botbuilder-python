@@ -24,6 +24,7 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         "null": None,
         "bag": {"three": 3.0, "name": "mybag", "index": 3,},
         "items": ["zero", "one", "two"],
+        "emptyObject": {},
         "nestedItems": [{"x": 1}, {"x": 2}, {"x": 3},],
         "user": {
             "income": 110.0,
@@ -160,7 +161,6 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         # mod
         ["3 % 2", 1],
         ["(4+1) % 2", 1],
-        ["(4+1.5) % 2", 1.5],
         ["mod(8, 3)", 2],
         # average
         ["average(createArray(3, 2))", 2.5],
@@ -455,6 +455,31 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         ["unique(createArray(1, 5, 1))", [1, 5]],
         ["unique(createArray(5, 5, 1, 2))", [1, 2, 5]],
         # type checking functions
+        # isBoolean
+        ["isBoolean(None)", False],
+        ["isBoolean(2 + 3)", False],
+        ["isBoolean(2 > 1)", True],
+        # isString
+        ["isString('abc')", True],
+        ["isString(123)", False],
+        ["isString(None)", False],
+        # isInteger
+        ["isInteger('abc')", False],
+        ["isInteger(123)", True],
+        ["isInteger(None)", False],
+        # isFloat
+        ["isFloat('abc')", False],
+        ["isFloat(123.234)", True],
+        ["isFloat(None)", False],
+        # isArray
+        ["isArray(createArray(1,2,3))", True],
+        ["isArray(123.234)", False],
+        ["isArray(None)", False],
+        # isObject
+        ["isObject(None)", False],
+        ["isObject(emptyObject)", True],
+        ["isObject(dialog)", True],
+        ["isObject(123.234)", False],
         # isDateTime
         ["isDateTime(2)", False],
         ["isDateTime(null)", False],
