@@ -6,9 +6,9 @@ variables:
   COVERALLS_GIT_COMMIT: $(Build.SourceVersion)
   COVERALLS_SERVICE_JOB_ID: $(Build.BuildId)
   COVERALLS_SERVICE_NAME: python-ci
-  python.36: 3.6.10
-  python.37: 3.7.7
-  python.38: 3.8.3
+  python.36: 3.6.x
+  python.37: 3.7.x
+  python.38: 3.8.x
   # PythonCoverallsToken: get this from Azure
 
 jobs:
@@ -68,6 +68,13 @@ jobs:
       pip install coveralls
       pytest --junitxml=junit/test-results.$(PYTHON_VERSION).xml --cov-config=.coveragerc --cov --cov-report=xml --cov-report=html
     displayName: Pytest
+
+  - task: PublishCodeCoverageResults@1
+    displayName: 'Publish Test Coverage'
+    inputs:
+      codeCoverageTool: Cobertura
+      summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
+      reportDirectory: '$(System.DefaultWorkingDirectory)/**/htmlcov'
 
   - task: PublishTestResults@2
     displayName: 'Publish Test Results **/test-results.$(PYTHON_VERSION).xml'
