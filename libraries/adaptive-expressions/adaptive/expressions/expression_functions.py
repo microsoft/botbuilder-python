@@ -128,7 +128,19 @@ from .builtin_functions.element import Element
 from .builtin_functions.create_array import CreateArray
 
 # Misc
+
 # Object manipulation and construction functions
+from .builtin_functions.json import Json
+from .builtin_functions.get_property import GetProperty
+from .builtin_functions.add_property import AddProperty
+from .builtin_functions.remove_property import RemoveProperty
+from .builtin_functions.set_property import SetProperty
+from .builtin_functions.coalesce import Coalesce
+from .builtin_functions.xpath import XPath
+from .builtin_functions.set_path_to_value import SetPathToValue
+from .builtin_functions.jpath import JPath
+from .builtin_functions.merge import Merge
+
 # Regular expression
 
 # Type Checking
@@ -261,7 +273,19 @@ def get_standard_functions() -> dict:
     functions.append(CreateArray())
 
     # Misc
+
     # Object manipulation and construction functions
+    functions.append(Json())
+    functions.append(GetProperty())
+    functions.append(AddProperty())
+    functions.append(RemoveProperty())
+    functions.append(SetProperty())
+    functions.append(Coalesce())
+    functions.append(XPath())
+    functions.append(SetPathToValue())
+    functions.append(JPath())
+    functions.append(Merge())
+
     # Regular expression
 
     # Type Checking

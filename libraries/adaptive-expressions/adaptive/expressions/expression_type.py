@@ -121,8 +121,15 @@ LAMBDA = "Lambda"
 
 # Object manipulation and construction functions
 JSON = "json"
+GETPROPERTY = "getProperty"
+ADDPROPERTY = "addProperty"
+REMOVEPROPERTY = "removeProperty"
 SETPROPERTY = "setProperty"
+COALESCE = "coalesce"
+XPATH = "xPath"
 SETPATHTOVALUE = "setPathToValue"
+JPATH = "jPath"
+MERGE = "merge"
 
 # Regular expression
 # Type checking

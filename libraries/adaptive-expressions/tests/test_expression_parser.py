@@ -1,5 +1,6 @@
 # pylint: disable=too-many-lines
 import math
+import json
 import platform
 from datetime import datetime
 import numbers
@@ -12,6 +13,7 @@ from adaptive.expressions import Expression
 
 class ExpressionParserTests(aiounittest.AsyncTestCase):
     scope = {
+        "a:b": "stringa:b",
         "$index": "index",
         "alist": [{"Name": "item1"}, {"Name": "item2"}],
         "one": 1.0,
@@ -20,7 +22,7 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         "world": "world",
         "nullObj": None,
         "null": None,
-        "bag": {"three": 3.0},
+        "bag": {"three": 3.0, "name": "mybag", "index": 3,},
         "items": ["zero", "one", "two"],
         "emptyObject": {},
         "nestedItems": [{"x": 1}, {"x": 2}, {"x": 3},],
@@ -53,6 +55,35 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         "unixTimestampFraction": 1521118800.5,
         "ticks": 637243624200000000,
         "doubleNestedItems": [[{"x": 1}, {"x: 2"}], [{"x": 3}]],
+        "xmlStr": "<?xml version='1.0'?> <produce> \
+             <item> <name>Gala</name> <type>apple</type> <count>20</count> </item> \
+             <item> <name>Honeycrisp</name> <type>apple</type> <count>10</count> </item> </produce>",
+        "path": {"array": [1]},
+        "jsonStr": json.dumps(
+            {
+                "Stores": ["Lambton Quay", "Willis Street"],
+                "Manufacturers": [
+                    {"Name": "Acme Co", "Products": [{"Name": "Anvil", "Price": 50}]},
+                    {
+                        "Name": "Contoso",
+                        "Products": [
+                            {"Name": "Elbow Grease", "Price": 99.95},
+                            {"Name": "Headlight Fluid", "Price": 4},
+                        ],
+                    },
+                ],
+            }
+        ),
+        "json1": json.dumps(
+            {
+                "FirstName": "John",
+                "LastName": "Smith",
+                "Enabled": False,
+                "Roles": ["User"],
+            }
+        ),
+        "json2": json.dumps({"Enabled": True, "Roles": ["Customer", "Admin"]}),
+        "json3": json.dumps({"Age": 36}),
     }
 
     data_source = [
@@ -74,10 +105,13 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         ["`hi ${string('jack`')}`", "hi jack`"],
         ["`\\${world}`", "${world}"],
         ["length(`hello ${world}`)", 11],
-        # TODO: ['json(`{"foo":"${hello}","item":"${world}"}`).foo', 'hello'],
+        ['json(`{"foo":"${hello}","item":"${world}"}`).foo', "hello"],
         ["`{expr: hello all}`", "{expr: hello all}"],
-        # TODO: ['json(`{"foo":${{text:"hello"}},"item": "${world}"}`).foo.text', 'hello'],
-        # TODO: ['json(`{"foo":${{text:"hello", cool: "hot", obj:{new: 123}}},"item": "${world}"}`).foo.text', 'hello'],
+        ['json(`{"foo":${{text:"hello"}},"item": "${world}"}`).foo.text', "hello"],
+        [
+            'json(`{"foo":${{text:"hello", cool: "hot", obj:{new: 123}}},"item": "${world}"}`).foo.text',
+            "hello",
+        ],
         ["`hi\\`[1,2,3]`", "hi`[1,2,3]"],
         ["`hi ${join(['jack\\`', 'queen', 'king'], ',')}`", "hi jack\\`,queen,king"],
         ['`abc ${concat("[", "]")}`', "abc []"],
@@ -87,9 +121,9 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         ["`hello ${world}` != 'hello hello'", True],
         ["`hello ${user.nickname}` == 'hello John'", True],
         ["`hello ${user.nickname}` != 'hello Dong'", True],
-        # TODO: ["`hello ${string({obj:  1})}`", 'hello {"obj":1}'],
-        # TODO: ['`hello ${string({obj:  "${not expr}"})}`', 'hello {"obj":"${not expr}"}'],
-        # TODO: ["`hello ${string({obj:  {a: 1}})}`", 'hello {"obj":{"a":1}}'],
+        ["`hello ${string({obj:  1})}`", "hello {'obj': 1}"],
+        ['`hello ${string({obj:  "${not expr}"})}`', "hello {'obj': '${not expr}'}"],
+        ["`hello ${string({obj:  {a: 1}})}`", "hello {'obj': {'a': 1}}"],
         # Math functions
         # add
         ["1+1.5", 2.5],
@@ -606,6 +640,83 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
             -315360000000000,
         ],
         ["dateTimeDiff(timestampObj,timestampObj2)", 62604000000000],
+        # Object manipulation and construction functions
+        # json
+        ['indexOf(json(\'["a", "b"]\'), "a")', 0],
+        ["indexOf(json('[\"a\", \"b\"]'), 'c')", -1],
+        ['lastIndexOf(json(\'["a", "b", "a"]\'), "a")', 2],
+        ["lastIndexOf(json('[\"a\", \"b\"]'), 'c')", -1],
+        ['json(`{"foo":"${hello}","item":"${world}"}`).foo', "hello"],
+        # getProperty
+        ["getProperty(bag, concat('na','me'))", "mybag"],
+        ["getProperty('bag').index", 3],
+        ["getProperty('a:b')", "stringa:b"],
+        ["getProperty(concat('he', 'llo'))", "hello"],
+        # addProperty
+        [
+            "addProperty(json('{\"key1\":\"value1\"}'), 'key2','value2')",
+            {"key1": "value1", "key2": "value2"},
+        ],
+        ['foreach(items, x, addProperty({}, "a", x))[0].a', "zero"],
+        ['foreach(items, x => addProperty({}, "a", x))[0].a', "zero"],
+        [
+            "addProperty({\"key1\":\"value1\"}, 'key2','value2')",
+            {"key1": "value1", "key2": "value2"},
+        ],
+        # removeProperty
+        [
+            'removeProperty(json(\'{"key1":"value1","key2":"value2"}\'), \'key2\')',
+            {"key1": "value1"},
+        ],
+        # setProperty
+        [
+            "setProperty(json('{\"key1\":\"value1\"}'), 'key1','value2')",
+            {"key1": "value2"},
+        ],
+        ["setProperty({\"key1\":\"value1\"}, 'key1','value2')", {"key1": "value2"}],
+        ["setProperty({}, 'key1','value2')", {"key1": "value2"}],
+        ["setProperty({}, 'key1','value2{}')", {"key1": "value2{}"}],
+        # coalesce
+        ["coalesce(nullObj,'hello',nullObj)", "hello"],
+        ["coalesce(nullObj, false, 'hello')", False],
+        # xPath
+        [
+            "xPath(xmlStr,'//produce//item//name')",
+            ["<name>Gala</name>", "<name>Honeycrisp</name>"],
+        ],
+        ["xPath(xmlStr,'sum(//produce//item//count)')", 30],
+        # setPathToValue
+        ["setPathToValue(path.simple, 3) + path.simple", 6],
+        ["setPathToValue(path.simple, 5) + path.simple", 10],
+        ["setPathToValue(path.array[0], 7) + path.array[0]", 14],
+        ["setPathToValue(path.array[1], 9) + path.array[1]", 18],
+        # jPath
+        ["jPath(jsonStr,'Manufacturers[0].Products[0].Price')", 50],
+        [
+            "jPath(jsonStr,'$..Products[?(@.Price >= 50)].Name')",
+            ["Anvil", "Elbow Grease"],
+        ],
+        # merge
+        [
+            "merge(json(json1), json(json2))",
+            {
+                "FirstName": "John",
+                "LastName": "Smith",
+                "Enabled": True,
+                "Roles": ["Customer", "Admin"],
+            },
+        ],
+        [
+            "merge(json(json1), json(json2), json(json3))",
+            {
+                "FirstName": "John",
+                "LastName": "Smith",
+                "Enabled": True,
+                "Roles": ["Customer", "Admin"],
+                "Age": 36,
+            },
+        ],
+        # Memory access tests
     ]
 
     def test_expression_parser_functions(self):
