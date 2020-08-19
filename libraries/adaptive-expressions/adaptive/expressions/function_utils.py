@@ -1,8 +1,12 @@
 import numbers
 import sys
+from datetime import datetime, timedelta
 from collections.abc import Iterable
 from typing import Callable, NewType
 from datatypes_timex_expression import Timex
+from dateutil import tz
+from dateutil.relativedelta import relativedelta
+from dateutil.parser import parse
 from .memory_interface import MemoryInterface
 from .options import Options
 from .return_type import ReturnType
@@ -13,6 +17,7 @@ VerifyExpression = NewType("VerifyExpression", Callable[[object, object, int], s
 # pylint: disable=unused-argument
 class FunctionUtils:
     verify_expression = VerifyExpression
+    default_date_time_format = "%Y-%m-%dT%H:%M:%S.%fZ"
 
     @staticmethod
     def validate_arity_and_any_type(
@@ -23,12 +28,18 @@ class FunctionUtils:
     ):
         if len(expression.children) < min_arity:
             raise Exception(
-                expression + " should have at least " + str(min_arity) + " children."
+                expression.to_string()
+                + " should have at least "
+                + str(min_arity)
+                + " children."
             )
 
         if len(expression.children) > max_arity:
             raise Exception(
-                expression + " can't have more than " + str(max_arity) + " children."
+                expression.to_string()
+                + " can't have more than "
+                + str(max_arity)
+                + " children."
             )
 
         if return_type & ReturnType.Object == 0:
@@ -176,7 +187,7 @@ class FunctionUtils:
     def verify_number_or_string_or_null(value: object, expression: object, number: int):
         error: str = None
         if not isinstance(value, numbers.Number) and not isinstance(value, str):
-            error = expression + " is not string or number"
+            error = expression.to_string() + " is not string or number"
 
         return error
 
@@ -184,7 +195,7 @@ class FunctionUtils:
     def verify_number(value: object, expression: object, pos: int):
         error: str = None
         if not isinstance(value, numbers.Number):
-            error = expression + " is not a number."
+            error = expression.to_string() + " is not a number."
 
         return error
 
@@ -195,7 +206,7 @@ class FunctionUtils:
             return error
 
         if not isinstance(value, list):
-            error = expression + " is neither a list nor a number."
+            error = expression.to_string() + " is neither a list nor a number."
         else:
             for elt in value:
                 if not isinstance(elt, numbers.Number):
@@ -207,8 +218,8 @@ class FunctionUtils:
     @staticmethod
     def verify_integer(value: object, expression: object, number: int):
         error: str = None
-        if isinstance(value, int):
-            error = expression + " is not an integer."
+        if not FunctionUtils.is_integer(value):
+            error = expression.to_string() + " is not an integer."
 
         return error
 
@@ -224,7 +235,7 @@ class FunctionUtils:
     def verify_numeric_list(value: object, expression: object, number: int):
         error: str = None
         if not isinstance(value, list):
-            error = expression + " is not a list."
+            error = expression.to_string() + " is not a list."
         else:
             for elt in value:
                 if not isinstance(elt, numbers.Number):
@@ -244,7 +255,7 @@ class FunctionUtils:
     def verify_container(value: object, expression: object, number: int):
         error: str = None
         if not isinstance(value, str) and not isinstance(value, Iterable):
-            error = expression + " must be a string or list."
+            error = expression.to_string() + " must be a string or list."
 
         return error
 
@@ -279,8 +290,8 @@ class FunctionUtils:
         def anonymous_function(
             expression: object, state: MemoryInterface, options: Options
         ):
-            value: object
-            error: str
+            value: object = None
+            error: str = None
             args: []
             args, error = FunctionUtils.evaluate_children(
                 expression, state, options, verify
@@ -411,12 +422,20 @@ class FunctionUtils:
     def parse_int(obj: object):
         result: int = 0
         error: str = None
-        if not obj.is_integer():
-            error = str(obj) + " must be a integer."
-        else:
+        if FunctionUtils.is_integer(obj):
             result = int(obj)
+        else:
+            error = str(obj) + " must be a integer."
 
         return result, error
+
+    @staticmethod
+    def is_integer(obj: object):
+        if (obj is not None) and (
+            isinstance(obj, int) or (isinstance(obj, float) and obj.is_integer())
+        ):
+            return True
+        return False
 
     @staticmethod
     def is_logic_true(instance: object):
@@ -426,6 +445,104 @@ class FunctionUtils:
         elif instance is None:
             result = False
         return result
+
+    @staticmethod
+    def date_time_converter(interval: int, time_unit: str, is_past: bool = True):
+        converter: Callable[[datetime], datetime] = None
+        error: str = None
+        multi_flag = -1 if is_past else 1
+        if time_unit.lower() == "second":
+
+            def anonymous_function(date_time: datetime):
+                return date_time + timedelta(seconds=multi_flag * interval)
+
+            converter = anonymous_function
+        elif time_unit.lower() == "minute":
+
+            def anonymous_function(date_time: datetime):
+                return date_time + timedelta(minutes=multi_flag * interval)
+
+            converter = anonymous_function
+        elif time_unit.lower() == "hour":
+
+            def anonymous_function(date_time: datetime):
+                return date_time + timedelta(hours=multi_flag * interval)
+
+            converter = anonymous_function
+        elif time_unit.lower() == "day":
+
+            def anonymous_function(date_time: datetime):
+                return date_time + timedelta(days=multi_flag * interval)
+
+            converter = anonymous_function
+        elif time_unit.lower() == "week":
+
+            def anonymous_function(date_time: datetime):
+                return date_time + timedelta(weeks=multi_flag * interval)
+
+            converter = anonymous_function
+        elif time_unit.lower() == "month":
+
+            def anonymous_function(date_time: datetime):
+                return date_time + relativedelta(months=multi_flag * interval)
+
+            converter = anonymous_function
+        elif time_unit.lower() == "year":
+
+            def anonymous_function(date_time: datetime):
+                return date_time + relativedelta(years=multi_flag * interval)
+
+            converter = anonymous_function
+        else:
+            error = "{" + time_unit + "} is not a valid time unit."
+            print(error)
+
+        return converter, error
+
+    @staticmethod
+    def normalize_to_date_time(
+        timestamp: object, transform: Callable[[datetime], object] = None
+    ):
+        result: object = None
+        error: str = None
+        if isinstance(timestamp, str):
+            result, error = FunctionUtils.parse_iso_timestamp(timestamp, transform)
+        elif isinstance(timestamp, datetime):
+            if transform is not None:
+                result, error = transform(timestamp)
+            else:
+                result, error = timestamp, None
+        else:
+            error = (
+                "{"
+                + str(timestamp)
+                + "} should be a standard ISO format string or a DateTime object."
+            )
+        return result, error
+
+    @staticmethod
+    def parse_iso_timestamp(
+        timestamp: str, transform: Callable[[datetime], object] = None
+    ):
+        result: object = None
+        error: str = None
+        parsed = None
+        try:
+            parsed = parse(timestamp)
+            if (
+                parsed.strftime(FunctionUtils.default_date_time_format).upper()
+                == (timestamp[:-1] + "000Z").upper()
+            ):
+                if transform is not None:
+                    result, error = transform(parsed)
+                else:
+                    result = parsed
+                    error = None
+            else:
+                error = "{" + timestamp + "} is not standard ISO format."
+        except:
+            error = "Could not parse {" + timestamp + "}"
+        return result, error
 
     @staticmethod
     def try_accumulate_path(
@@ -446,7 +563,9 @@ class FunctionUtils:
                     left = None
                     return path, left, error
 
-                if isinstance(value, numbers.Number) and value.is_integer():
+                if isinstance(value, numbers.Number) and FunctionUtils.is_integer(
+                    value
+                ):
                     path = "[" + str(int(value)) + "]." + path
                 elif isinstance(value, str):
                     path = "['" + value + "']." + path
@@ -629,3 +748,15 @@ class FunctionUtils:
             return value, error
 
         return anonymous_function
+
+    @staticmethod
+    def ticks_with_error(timestamp: object):
+        result: object = None
+        parsed: object = None
+        error: str = None
+        parsed, error = FunctionUtils.normalize_to_date_time(timestamp)
+        if error is None:
+            result = (
+                parsed.astimezone(tz.gettz("UTC"))
+            ).timestamp() * 10000000 + 621355968000000000
+        return result, error

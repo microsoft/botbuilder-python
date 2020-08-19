@@ -63,7 +63,7 @@ class SimpleObjectMemory(MemoryInterface):
         if self.memory is None:
             return
 
-        parts = re.findall(r"\[([^[\]]*)\]", path)
+        parts = re.split(r"[.\[\]]", path)
         parts = list(
             map(
                 lambda x: x[1:-1]
