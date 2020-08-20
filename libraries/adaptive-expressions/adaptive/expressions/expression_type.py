@@ -112,10 +112,16 @@ ISTIMERANGE = "isTimeRange"
 ISDATERANGE = "isDateRange"
 ISPRESENT = "isPresent"
 
+# URI Parsing Functions
+URIHOST = "uriHost"
+URIPATH = "uriPath"
+URIPATHANDQUERY = "uriPathAndQuery"
+URIQUERY = "uriQuery"
+URIPORT = "uriPort"
+URISCHEME = "uriScheme"
+
 # Conversions
 STRING = "string"
-
-# URI Parsing Functions
 
 # Memory
 ACCESSOR = "Accessor"

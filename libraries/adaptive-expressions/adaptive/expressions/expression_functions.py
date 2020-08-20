@@ -128,6 +128,12 @@ from .builtin_functions.is_present import IsPresent
 from .builtin_functions.string import String
 
 # URI Parsing Functions
+from .builtin_functions.uri_host import UriHost
+from .builtin_functions.uri_path import UriPath
+from .builtin_functions.uri_path_and_query import UriPathAndQuery
+from .builtin_functions.uri_query import UriQuery
+from .builtin_functions.uri_port import UriPort
+from .builtin_functions.uri_scheme import UriScheme
 
 # Memory
 from .builtin_functions.accessor import Accessor
@@ -280,6 +286,12 @@ def get_standard_functions() -> dict:
     functions.append(String())
 
     # URI Parsing Functions
+    functions.append(UriHost())
+    functions.append(UriPath())
+    functions.append(UriPathAndQuery())
+    functions.append(UriQuery())
+    functions.append(UriPort())
+    functions.append(UriScheme())
 
     # Memory
     functions.append(Accessor())

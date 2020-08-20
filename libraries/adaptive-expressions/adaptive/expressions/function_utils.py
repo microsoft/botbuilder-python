@@ -696,12 +696,10 @@ class FunctionUtils:
         elif isinstance(timex_expr, str):
             parsed = Timex(timex=timex_expr)
         else:
-            parsed = Timex(timex=timex_expr)
-            if (parsed is None) or len(vars(timex_expr).iteritems()) == 0:
-                return (
-                    parsed,
-                    "${timexExpr} requires a TimexProperty or a string as a argument",
-                )
+            return (
+                None,
+                "${timexExpr} requires a TimexProperty or a string as a argument.",
+            )
         return parsed, None
 
     @staticmethod

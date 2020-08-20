@@ -6,3 +6,5 @@ lxml==4.5.2
 jsonpath==0.82
 jsonmerge==1.7.0
 demjson==2.2.4
+python-dateutil==2.8.1
+pytz==2020.1

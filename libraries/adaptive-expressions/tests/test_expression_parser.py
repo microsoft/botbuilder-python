@@ -55,6 +55,13 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         "unixTimestamp": 1521118800,
         "unixTimestampFraction": 1521118800.5,
         "ticks": 637243624200000000,
+        "timex": "2020-08-04",
+        "validFullDateTimex": Timex("2020-02-20"),
+        "invalidFullDateTimex": Timex("xxxx-02-20"),
+        "validHourTimex": Timex(timex="2012-12-20T13:40"),
+        "invalidHourTimex": Timex("2001-02-20"),
+        "validTimeRange": Timex(timex="TEV"),
+        "validNow": Timex(timex="PRESENT_REF"),
         "doubleNestedItems": [[{"x": 1}, {"x: 2"}], [{"x": 3}]],
         "xmlStr": "<?xml version='1.0'?> <produce> \
              <item> <name>Gala</name> <type>apple</type> <count>20</count> </item> \
@@ -641,6 +648,48 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
             -315360000000000,
         ],
         ["dateTimeDiff(timestampObj,timestampObj2)", 62604000000000],
+        # Timex functions
+        # isDefinite
+        ["isDefinite('helloworld')", False],
+        ["isDefinite('2012-12-21')", True],
+        ["isDefinite('xxxx-12-21')", False],
+        ["isDefinite(validFullDateTimex)", True],
+        ["isDefinite(invalidFullDateTimex)", False],
+        # isTime
+        ["isTime(validHourTimex)", True],
+        ["isTime(invalidHourTimex)", False],
+        # isDuration
+        ["isDuration('PT30M')", True],
+        ["isDuration('2012-12-21T12:30')", False],
+        # isDate
+        ["isDate('PT30M')", False],
+        ["isDate('2012-12-21T12:30')", True],
+        # isTimeRange
+        ["isTimeRange('PT30M')", False],
+        ["isTimeRange(validTimeRange)", True],
+        # isDateRange
+        ["isDateRange('PT30M')", False],
+        ["isDateRange('2012-02')", True],
+        # isPresent
+        ["isPresent('PT30M')", False],
+        ["isPresent(validNow)", True],
+        # URI parsing functions
+        # uriHost
+        ["uriHost('https://www.localhost.com:8080')", "www.localhost.com"],
+        [
+            "uriPath('http://www.contoso.com/catalog/shownew.htm?date=today')",
+            "/catalog/shownew.htm",
+        ],
+        [
+            "uriPathAndQuery('http://www.contoso.com/catalog/shownew.htm?date=today')",
+            "/catalog/shownew.htm?date=today",
+        ],
+        ["uriPort('http://www.localhost:8080')", 8080],
+        [
+            "uriQuery('http://www.contoso.com/catalog/shownew.htm?date=today')",
+            "?date=today",
+        ],
+        ["uriScheme('http://www.contoso.com/catalog/shownew.htm?date=today')", "http"],
         # Object manipulation and construction functions
         # json
         ['indexOf(json(\'["a", "b"]\'), "a")', 0],
