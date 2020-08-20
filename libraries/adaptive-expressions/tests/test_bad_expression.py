@@ -29,6 +29,7 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
              <item> <name>Honeycrisp</name> <type>apple</type> <count>10</count>",
         "json1": json.dumps({"Enabled": True, "Roles": ["User", "Admin"]}),
         "jarray1": "['a', 'b']",
+        "relativeUri": "../catalog/shownew.htm?date=today",
     }
 
     # Invalid expressions
@@ -348,6 +349,19 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         "dateTimeDiff(notValidTimeStamp,'2018-01-01T08:00:00.000Z')",  # the first parameter is not a valid timestamp
         "dateTimeDiff('2017-01-01T08:00:00.000Z',notValidTimeStamp)",  # the second parameter is not a valid timestamp
         "dateTimeDiff('2017-01-01T08:00:00.000Z','2018-01-01T08:00:00.000Z', 'years')",  # should only have 2 parametes
+        # URI parsing functions
+        "uriHost(12345)",  # should have 1 string parameter
+        "uriHost('aaa', 12345)",  # should have 1 string parameter
+        "uriPath(12345)",  # should have 1 string parameter
+        "uriPath('acdc', 12345)",  # should have 1 string parameter
+        "uriPathAndQuery(12345)",  # should have 1 string parameter
+        "uriPathAndQuery('wsad', 12345)",  # should have 1 string parameter
+        "uriPort(12345)",  # should have 1 string parameter
+        "uriPort('wqq', 12345)",  # should have 1 string parameter
+        "uriQuery(12345)",  # should have 1 string parameter
+        "uriQuery('qwww', 12345)",  # should have 1 string parameter
+        "uriScheme(12345)",  # should have 1 string parameter
+        "uriScheme('pqq', 12345)",  # should have 1 string parameter
         # Object manipulation and construction functions
         "json(1,2)",  # should have 1 parameter
         "json(1)",  # should be string parameter

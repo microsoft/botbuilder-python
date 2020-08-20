@@ -116,11 +116,24 @@ from .builtin_functions.ticks_to_minutes import TicksToMinutes
 from .builtin_functions.date_time_diff import DateTimeDiff
 
 # Timex
+from .builtin_functions.is_definite import IsDefinite
+from .builtin_functions.is_time import IsTime
+from .builtin_functions.is_duration import IsDuration
+from .builtin_functions.is_date import IsDate
+from .builtin_functions.is_timerange import IsTimeRange
+from .builtin_functions.is_daterange import IsDateRange
+from .builtin_functions.is_present import IsPresent
 
 # Conversions
 from .builtin_functions.string import String
 
 # URI Parsing Functions
+from .builtin_functions.uri_host import UriHost
+from .builtin_functions.uri_path import UriPath
+from .builtin_functions.uri_path_and_query import UriPathAndQuery
+from .builtin_functions.uri_query import UriQuery
+from .builtin_functions.uri_port import UriPort
+from .builtin_functions.uri_scheme import UriScheme
 
 # Memory
 from .builtin_functions.accessor import Accessor
@@ -261,11 +274,24 @@ def get_standard_functions() -> dict:
     functions.append(DateTimeDiff())
 
     # Timex
+    functions.append(IsDefinite())
+    functions.append(IsTime())
+    functions.append(IsDuration())
+    functions.append(IsDate())
+    functions.append(IsTimeRange())
+    functions.append(IsDateRange())
+    functions.append(IsPresent())
 
     # Conversions
     functions.append(String())
 
     # URI Parsing Functions
+    functions.append(UriHost())
+    functions.append(UriPath())
+    functions.append(UriPathAndQuery())
+    functions.append(UriQuery())
+    functions.append(UriPort())
+    functions.append(UriScheme())
 
     # Memory
     functions.append(Accessor())

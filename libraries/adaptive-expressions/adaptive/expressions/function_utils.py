@@ -3,6 +3,7 @@ import sys
 from datetime import datetime, timedelta
 from collections.abc import Iterable
 from typing import Callable, NewType
+from datatypes_timex_expression import Timex
 from dateutil import tz
 from dateutil.relativedelta import relativedelta
 from dateutil.parser import parse
@@ -686,6 +687,20 @@ class FunctionUtils:
         value = result
 
         return value, error
+
+    @staticmethod
+    def parse_timex_property(timex_expr):
+        parsed: object = None
+        if isinstance(timex_expr, Timex):
+            parsed = timex_expr
+        elif isinstance(timex_expr, str):
+            parsed = Timex(timex=timex_expr)
+        else:
+            return (
+                None,
+                "${timexExpr} requires a TimexProperty or a string as a argument.",
+            )
+        return parsed, None
 
     @staticmethod
     def sort_by(is_descending: bool):

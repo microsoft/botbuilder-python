@@ -104,11 +104,24 @@ TICKSTOMINUTES = "ticksToMinutes"
 DATETIMEDIFF = "dateTimeDiff"
 
 # Timex
+ISDEFINITE = "isDefinite"
+ISTIME = "isTime"
+ISDURATION = "isDuration"
+ISDATE = "isDate"
+ISTIMERANGE = "isTimeRange"
+ISDATERANGE = "isDateRange"
+ISPRESENT = "isPresent"
+
+# URI Parsing Functions
+URIHOST = "uriHost"
+URIPATH = "uriPath"
+URIPATHANDQUERY = "uriPathAndQuery"
+URIQUERY = "uriQuery"
+URIPORT = "uriPort"
+URISCHEME = "uriScheme"
 
 # Conversions
 STRING = "string"
-
-# URI Parsing Functions
 
 # Memory
 ACCESSOR = "Accessor"
