@@ -414,7 +414,6 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         "binary(hello, world)",  # shoule have 1 param
         "binary(one)",  # should have string param
         "base64(hello, world)",  # shoule have 1 param
-        "base64(createArray('a', 'b')",  # should have string param or byte array
         "base64ToBinary(hello, world)",  # shoule have 1 param
         "base64ToBinary(one)",  # should have string param
         "base64ToString(hello, world)",  # shoule have 1 param
