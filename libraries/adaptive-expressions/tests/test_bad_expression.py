@@ -1,4 +1,5 @@
 # pylint: disable=too-many-lines
+import json
 import aiounittest
 from adaptive.expressions import Expression
 
@@ -21,6 +22,15 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
             "subTitle": "Dialog Sub Title",
         },
         "doubleNestedItems": [[{"x": 1}, {"x: 2"}], [{"x": 3}]],
+        "xmlStr": "<?xml version='1.0'?> <produce> <item>\
+             <name>Gala</name> <type>apple</type> <count>20</count> </item>\
+             <item> <name>Honeycrisp</name> <type>apple</type> <count>10</count> </item> </produce>",
+        "invalidXml": "<?xml version='1.0'?> <produce> <item>\
+             <name>Gala</name> <type>apple</type> <count>20</count> </item>\
+             <item> <name>Honeycrisp</name> <type>apple</type> <count>10</count>",
+        "json1": json.dumps({"Enabled": True, "Roles": ["User", "Admin"]}),
+        "jarray1": "['a', 'b']",
+        "relativeUri": "../catalog/shownew.htm?date=today",
     }
 
     # Invalid expressions
@@ -339,7 +349,41 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         "ticksToMinutes(timestamp)",  # not an integer
         "dateTimeDiff(notValidTimeStamp,'2018-01-01T08:00:00.000Z')",  # the first parameter is not a valid timestamp
         "dateTimeDiff('2017-01-01T08:00:00.000Z',notValidTimeStamp)",  # the second parameter is not a valid timestamp
-        "dateTimeDiff('2017-01-01T08:00:00.000Z','2018-01-01T08:00:00.000Z', 'years')",  # should only have 2 parameters
+        "dateTimeDiff('2017-01-01T08:00:00.000Z','2018-01-01T08:00:00.000Z', 'years')",  # should only have 2 parametes
+        # URI parsing functions
+        "uriHost(12345)",  # should have 1 string parameter
+        "uriHost('aaa', 12345)",  # should have 1 string parameter
+        "uriPath(12345)",  # should have 1 string parameter
+        "uriPath('acdc', 12345)",  # should have 1 string parameter
+        "uriPathAndQuery(12345)",  # should have 1 string parameter
+        "uriPathAndQuery('wsad', 12345)",  # should have 1 string parameter
+        "uriPort(12345)",  # should have 1 string parameter
+        "uriPort('wqq', 12345)",  # should have 1 string parameter
+        "uriQuery(12345)",  # should have 1 string parameter
+        "uriQuery('qwww', 12345)",  # should have 1 string parameter
+        "uriScheme(12345)",  # should have 1 string parameter
+        "uriScheme('pqq', 12345)",  # should have 1 string parameter
+        # Object manipulation and construction functions
+        "json(1,2)",  # should have 1 parameter
+        "json(1)",  # should be string parameter
+        'json(\'{"key1":value1"}\')',  # invalid json format string
+        "addProperty(json('{\"key1\":\"value1\"}'), 'key2','value2','key3')",  # should have 3 parameter
+        "addProperty(json('{\"key1\":\"value1\"}'), 1,'value2')",  # second param should be string
+        "addProperty(json('{\"key1\":\"value1\"}'), 'key1', 3)",  # cannot add existing property
+        "setProperty(json('{\"key1\":\"value1\"}'), 'key2','value2','key3')",  # should have 3 parameter
+        "setProperty(json('{\"key1\":\"value1\"}'), 1,'value2')",  # second param should be string
+        'removeProperty(json(\'{"key1":"value1","key2":"value2"}\'), 1))',  # second param should be string
+        'removeProperty(json(\'{"key1":"value1","key2":"value2"}\'), \'1\', \'2\'))',  # should have 2 parameters
+        "coalesce()",  # should have at least 1 parameter
+        "xPath(invalidXml, ''sum(/produce/item/count)')",  # not a valid xml
+        "xPath(xmlStr)",  # should have two params
+        "xPath(xmlStr, 'getTotal')",  # invalid xpath query
+        "jPath(hello,'Manufacturers[0].Products[0].Price')",  # not a valid json
+        "jPath(hello,'Manufacturers[0]/Products[0]/Price')",  # not a valid path
+        "jPath(jsonStr,'$..Products[?(@.Price >= 100)].Name')",  # no matched node
+        "merge(json(json1))",  # should have at least two arguments
+        "merge(json(json1), json(jarray1))",  # arguments should all be JSON objects
+        "merge(json(jarray1), json(json1))",  # arguments should all be JSON objects
         # type checking
         "isString(hello, hello)",  # should have 1 parameter
         "isInteger(2, 3)",  # should have 1 parameter

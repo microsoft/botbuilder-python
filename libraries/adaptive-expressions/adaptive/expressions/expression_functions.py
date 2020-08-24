@@ -116,6 +116,13 @@ from .builtin_functions.ticks_to_minutes import TicksToMinutes
 from .builtin_functions.date_time_diff import DateTimeDiff
 
 # Timex
+from .builtin_functions.is_definite import IsDefinite
+from .builtin_functions.is_time import IsTime
+from .builtin_functions.is_duration import IsDuration
+from .builtin_functions.is_date import IsDate
+from .builtin_functions.is_timerange import IsTimeRange
+from .builtin_functions.is_daterange import IsDateRange
+from .builtin_functions.is_present import IsPresent
 
 # Conversions
 from .builtin_functions.string import String
@@ -133,6 +140,12 @@ from .builtin_functions.uri_component import UriComponent
 from .builtin_functions.uri_component_to_string import UriComponentToString
 
 # URI Parsing Functions
+from .builtin_functions.uri_host import UriHost
+from .builtin_functions.uri_path import UriPath
+from .builtin_functions.uri_path_and_query import UriPathAndQuery
+from .builtin_functions.uri_query import UriQuery
+from .builtin_functions.uri_port import UriPort
+from .builtin_functions.uri_scheme import UriScheme
 
 # Memory
 from .builtin_functions.accessor import Accessor
@@ -140,7 +153,19 @@ from .builtin_functions.element import Element
 from .builtin_functions.create_array import CreateArray
 
 # Misc
+
 # Object manipulation and construction functions
+from .builtin_functions.json import Json
+from .builtin_functions.get_property import GetProperty
+from .builtin_functions.add_property import AddProperty
+from .builtin_functions.remove_property import RemoveProperty
+from .builtin_functions.set_property import SetProperty
+from .builtin_functions.coalesce import Coalesce
+from .builtin_functions.xpath import XPath
+from .builtin_functions.set_path_to_value import SetPathToValue
+from .builtin_functions.jpath import JPath
+from .builtin_functions.merge import Merge
+
 # Regular expression
 
 # Type Checking
@@ -261,6 +286,13 @@ def get_standard_functions() -> dict:
     functions.append(DateTimeDiff())
 
     # Timex
+    functions.append(IsDefinite())
+    functions.append(IsTime())
+    functions.append(IsDuration())
+    functions.append(IsDate())
+    functions.append(IsTimeRange())
+    functions.append(IsDateRange())
+    functions.append(IsPresent())
 
     # Conversions
     functions.append(String())
@@ -278,6 +310,12 @@ def get_standard_functions() -> dict:
     functions.append(UriComponentToString())
 
     # URI Parsing Functions
+    functions.append(UriHost())
+    functions.append(UriPath())
+    functions.append(UriPathAndQuery())
+    functions.append(UriQuery())
+    functions.append(UriPort())
+    functions.append(UriScheme())
 
     # Memory
     functions.append(Accessor())
@@ -285,7 +323,19 @@ def get_standard_functions() -> dict:
     functions.append(CreateArray())
 
     # Misc
+
     # Object manipulation and construction functions
+    functions.append(Json())
+    functions.append(GetProperty())
+    functions.append(AddProperty())
+    functions.append(RemoveProperty())
+    functions.append(SetProperty())
+    functions.append(Coalesce())
+    functions.append(XPath())
+    functions.append(SetPathToValue())
+    functions.append(JPath())
+    functions.append(Merge())
+
     # Regular expression
 
     # Type Checking

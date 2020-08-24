@@ -104,6 +104,21 @@ TICKSTOMINUTES = "ticksToMinutes"
 DATETIMEDIFF = "dateTimeDiff"
 
 # Timex
+ISDEFINITE = "isDefinite"
+ISTIME = "isTime"
+ISDURATION = "isDuration"
+ISDATE = "isDate"
+ISTIMERANGE = "isTimeRange"
+ISDATERANGE = "isDateRange"
+ISPRESENT = "isPresent"
+
+# URI Parsing Functions
+URIHOST = "uriHost"
+URIPATH = "uriPath"
+URIPATHANDQUERY = "uriPathAndQuery"
+URIQUERY = "uriQuery"
+URIPORT = "uriPort"
+URISCHEME = "uriScheme"
 
 # Conversions
 STRING = "string"
@@ -120,8 +135,6 @@ DATAURITOSTRING = "dataUriToString"
 URICOMPONENT = "uriComponent"
 URICOMPONENTTOSTRING = "uriComponentToString"
 
-# URI Parsing Functions
-
 # Memory
 ACCESSOR = "Accessor"
 ELEMENT = "Element"
@@ -133,8 +146,15 @@ LAMBDA = "Lambda"
 
 # Object manipulation and construction functions
 JSON = "json"
+GETPROPERTY = "getProperty"
+ADDPROPERTY = "addProperty"
+REMOVEPROPERTY = "removeProperty"
 SETPROPERTY = "setProperty"
+COALESCE = "coalesce"
+XPATH = "xPath"
 SETPATHTOVALUE = "setPathToValue"
+JPATH = "jPath"
+MERGE = "merge"
 
 # Regular expression
 # Type checking
