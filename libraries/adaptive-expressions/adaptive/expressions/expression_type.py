@@ -134,6 +134,7 @@ DATAURITOBINARY = "dataUriToBinary"
 DATAURITOSTRING = "dataUriToString"
 URICOMPONENT = "uriComponent"
 URICOMPONENTTOSTRING = "uriComponentToString"
+XML = "xml"
 
 # Memory
 ACCESSOR = "Accessor"

@@ -368,6 +368,7 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         ["dataUriToString(dataUri(hello))", "hello"],
         ["uriComponent('http://contoso.com')", "http%3A%2F%2Fcontoso.com"],
         ["uriComponentToString('http%3A%2F%2Fcontoso.com')", "http://contoso.com"],
+        ["xml('{\"person\": {\"name\": \"Sophia Owen\", \"city\": \"Seattle\"}}')", "<?xml version=\"1.0\" encoding=\"utf-8\"?><person><name>Sophia Owen</name><city>Seattle</city></person>"],
         # Collection functions
         # count
         ["count('hello')", 5],

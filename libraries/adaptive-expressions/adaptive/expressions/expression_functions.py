@@ -138,6 +138,7 @@ from .builtin_functions.data_uri_to_binary import DataUriToBinary
 from .builtin_functions.data_uri_to_string import DataUriToString
 from .builtin_functions.uri_component import UriComponent
 from .builtin_functions.uri_component_to_string import UriComponentToString
+from .builtin_functions.xml import Xml
 
 # URI Parsing Functions
 from .builtin_functions.uri_host import UriHost
@@ -308,6 +309,7 @@ def get_standard_functions() -> dict:
     functions.append(DataUriToString())
     functions.append(UriComponent())
     functions.append(UriComponentToString())
+    functions.append(Xml())
 
     # URI Parsing Functions
     functions.append(UriHost())
