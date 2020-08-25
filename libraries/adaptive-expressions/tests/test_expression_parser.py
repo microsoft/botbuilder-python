@@ -23,7 +23,13 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         "world": "world",
         "nullObj": None,
         "null": None,
-        "bag": {"three": 3.0, "name": "mybag", "index": 3,},
+        "bag": {
+            "three": 3.0,
+            "set": {"four": 4.0},
+            "list": ["red", "blue"],
+            "index": 3,
+            "name": "mybag",
+        },
         "items": ["zero", "one", "two"],
         "emptyObject": {},
         "nestedItems": [{"x": 1}, {"x": 2}, {"x": 3},],
@@ -63,6 +69,7 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         "validTimeRange": Timex(timex="TEV"),
         "validNow": Timex(timex="PRESENT_REF"),
         "doubleNestedItems": [[{"x": 1}, {"x: 2"}], [{"x": 3}]],
+        "byteArr": b"hello",
         "xmlStr": "<?xml version='1.0'?> <produce> \
              <item> <name>Gala</name> <type>apple</type> <count>20</count> </item> \
              <item> <name>Honeycrisp</name> <type>apple</type> <count>10</count> </item> </produce>",
@@ -327,6 +334,41 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         # titleCase
         ["titleCase('a')", "A"],
         ["titleCase('abc dEF')", "Abc Def"],
+        # Conversion functions
+        # int
+        ["int('10')", 10],
+        ["int(12345678912345678 + 1)", 12345678912345679],
+        # float
+        ["float('10.333')", 10.333],
+        ["float('10')", 10.0],
+        # string
+        ["string('str')", "str"],
+        ["string(one)", "1.0"],
+        ["string(bool(1))", "True"],
+        ["string(bag.set)", "{'four': 4.0}"],
+        # bool
+        ["bool(1)", True],
+        ["bool(0)", True],
+        ["bool(None)", False],
+        ["bool(hello*5)", False],
+        ["bool('False')", True],
+        ["bool('hi')", True],
+        ["[1, 2, 3]", [1, 2, 3]],
+        ["[1, 2, 3, [4, 5]]", [1, 2, 3, [4, 5]]],
+        ['"[1, 2, 3]"', "[1, 2, 3]"],
+        ["[1, bool(0), string(bool(1)), float('10')]", [1, True, "True", 10.0]],
+        ["binary(hello)", b"hello"],
+        ["base64(hello)", "aGVsbG8="],
+        ["base64(byteArr)", "aGVsbG8="],
+        ["base64ToBinary(base64(byteArr))", b"hello"],
+        ["base64ToString(base64(hello))", "hello"],
+        ['base64(base64ToBinary("AwUBDA=="))', "AwUBDA=="],
+        ["dataUri(hello)", "data:text/plain;charset=utf-8;base64,aGVsbG8="],
+        ["dataUriToBinary(base64(hello))", b"aGVsbG8="],
+        ["dataUriToString(dataUri(hello))", "hello"],
+        ["uriComponent('http://contoso.com')", "http%3A%2F%2Fcontoso.com"],
+        ["uriComponentToString('http%3A%2F%2Fcontoso.com')", "http://contoso.com"],
+        ["xml('{\"person\": {\"name\": \"Sophia Owen\", \"city\": \"Seattle\"}}')", "<?xml version=\"1.0\" encoding=\"utf-8\"?><person><name>Sophia Owen</name><city>Seattle</city></person>"],
         # Collection functions
         # count
         ["count('hello')", 5],
