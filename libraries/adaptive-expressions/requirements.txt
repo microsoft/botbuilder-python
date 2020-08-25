@@ -8,3 +8,4 @@ jsonmerge==1.7.0
 demjson==2.2.4
 python-dateutil==2.8.1
 pytz==2020.1
+xmltodict==0.12.0

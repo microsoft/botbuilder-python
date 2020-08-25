@@ -122,6 +122,19 @@ URISCHEME = "uriScheme"
 
 # Conversions
 STRING = "string"
+INT = "int"
+FLOAT = "float"
+BOOL = "bool"
+BINARY = "binary"
+BASE64 = "base64"
+BASE64TOBINARY = "base64ToBinary"
+BASE64TOSTRING = "base64ToString"
+DATAURI = "dataUri"
+DATAURITOBINARY = "dataUriToBinary"
+DATAURITOSTRING = "dataUriToString"
+URICOMPONENT = "uriComponent"
+URICOMPONENTTOSTRING = "uriComponentToString"
+XML = "xml"
 
 # Memory
 ACCESSOR = "Accessor"
@@ -131,6 +144,8 @@ CREATEARRAY = "createArray"
 # Misc
 CONSTANT = "Constant"
 LAMBDA = "Lambda"
+IF = "if"
+RAND = "rand"
 
 # Object manipulation and construction functions
 JSON = "json"

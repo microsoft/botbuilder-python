@@ -9,6 +9,7 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         "one": 1.0,
         "two": 2.0,
         "hello": "hello",
+        "world": "world",
         "nullObj": None,
         "bag": {"three": 3.0},
         "items": ["zero", "one", "two"],
@@ -391,6 +392,32 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         "isObejct(emptyJObject, hello)",  # should have 1 parameter
         "isDateTime('2018-03-15T13:00:00.000Z', hello)",  # should have 1 parameter
         "isBoolean(false, false)",  # should have 1 parameter
+        # Conversion functions
+        "float(hello)",  # param shoud be float format string
+        "float(hello, 1)",  # shold have 1 param
+        "int(hello)",  # param shoud be int format string
+        "int(1, 1)",  # shold have 1 param
+        "string(hello, 1)",  # shold have 1 param
+        "bool(false, 1)",  # shold have 1 param
+        "binary(hello, world)",  # shoule have 1 param
+        "binary(one)",  # should have string param
+        "DataUri(hello, world)",  # shoule have 1 param
+        "DataUri(false)",  # should have string param
+        "uriComponent(hello, world)",  # shoule have 1 param
+        "uriComponent(false)",  # should have string param
+        "uriComponentToString(hello, world)",  # shoule have 1 param
+        "uriComponentToString(false)",  # should have string param
+        "dataUriToBinary(hello, world)",  # shoule have 1 param
+        "dataUriToBinary(false)",  # should have string param
+        "dataUriToString(hello, world)",  # shoule have 1 param
+        "dataUriToString(false)",  # should have string param
+        "binary(hello, world)",  # shoule have 1 param
+        "binary(one)",  # should have string param
+        "base64(hello, world)",  # shoule have 1 param
+        "base64ToBinary(hello, world)",  # shoule have 1 param
+        "base64ToBinary(one)",  # should have string param
+        "base64ToString(hello, world)",  # shoule have 1 param
+        "base64ToString(false)",  # should have string param
     ]
 
     def test_exception_for_bad_expressions(self):

@@ -189,7 +189,19 @@ class Expression:
     def lambda_expression(func: EvaluateExpressionDelegate):
         return Expression(LAMBDA, ExpressionEvaluator(LAMBDA, func))
 
-    # TODO: lamda function
+    @staticmethod
+    def lambda_func(func: object):
+        def anonymous_function(_expression: object, state: object, _: Options):
+            value: object = None
+            error: str = None
+            try:
+                value = func(state)
+            except Exception as err:
+                error = str(err)
+
+            return value, error
+
+        return Expression(LAMBDA, ExpressionEvaluator(LAMBDA, anonymous_function))
 
     @staticmethod
     def set_path_to_value(property: object, value: object):
