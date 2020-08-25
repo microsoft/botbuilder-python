@@ -18,6 +18,6 @@ class Xml(ExpressionEvaluator):
             json_date: object = args[0]
             if isinstance(args[0], str):
                 json_date = json.loads(args[0])
-            return xmltodict.unparse(json_date).replace('\n', '').replace('\r', '')
+            return xmltodict.unparse(json_date).replace("\n", "").replace("\r", "")
 
         return FunctionUtils.apply(anonymous_function)

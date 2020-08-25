@@ -154,6 +154,8 @@ from .builtin_functions.element import Element
 from .builtin_functions.create_array import CreateArray
 
 # Misc
+from .builtin_functions.if_func import If
+from .builtin_functions.rand import Rand
 
 # Object manipulation and construction functions
 from .builtin_functions.json import Json
@@ -325,6 +327,8 @@ def get_standard_functions() -> dict:
     functions.append(CreateArray())
 
     # Misc
+    functions.append(If())
+    functions.append(Rand())
 
     # Object manipulation and construction functions
     functions.append(Json())

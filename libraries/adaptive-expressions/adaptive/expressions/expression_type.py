@@ -144,6 +144,8 @@ CREATEARRAY = "createArray"
 # Misc
 CONSTANT = "Constant"
 LAMBDA = "Lambda"
+IF = "if"
+RAND = "rand"
 
 # Object manipulation and construction functions
 JSON = "json"

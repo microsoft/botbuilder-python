@@ -21,6 +21,7 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         "two": 2.0,
         "hello": "hello",
         "world": "world",
+        "istrue": True,
         "nullObj": None,
         "null": None,
         "bag": {
@@ -368,7 +369,10 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         ["dataUriToString(dataUri(hello))", "hello"],
         ["uriComponent('http://contoso.com')", "http%3A%2F%2Fcontoso.com"],
         ["uriComponentToString('http%3A%2F%2Fcontoso.com')", "http://contoso.com"],
-        ["xml('{\"person\": {\"name\": \"Sophia Owen\", \"city\": \"Seattle\"}}')", "<?xml version=\"1.0\" encoding=\"utf-8\"?><person><name>Sophia Owen</name><city>Seattle</city></person>"],
+        [
+            'xml(\'{"person": {"name": "Sophia Owen", "city": "Seattle"}}\')',
+            '<?xml version="1.0" encoding="utf-8"?><person><name>Sophia Owen</name><city>Seattle</city></person>',
+        ],
         # Collection functions
         # count
         ["count('hello')", 5],
@@ -809,6 +813,16 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
             },
         ],
         # Memory access tests
+        # Misc
+        # If
+        ["if(!exists(one), 'r1', 'r2')", "r2"],
+        ["if(!!exists(one), 'r1', 'r2')", "r1"],
+        ["if(0, 'r1', 'r2')", "r1"],
+        ["if(bool('true'), 'r1', 'r2')", "r1"],
+        ["if(istrue, 'r1', 'r2')", "r1"],
+        # Rand
+        ["rand(1, 2)", 1],
+        ["rand(2, 3)", 2],
     ]
 
     def test_expression_parser_functions(self):
