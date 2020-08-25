@@ -155,6 +155,7 @@ from .builtin_functions.jpath import JPath
 from .builtin_functions.merge import Merge
 
 # Regular expression
+from .builtin_functions.is_match import IsMatch
 
 # Type Checking
 from .builtin_functions.is_boolean import IsBoolean
@@ -313,6 +314,7 @@ def get_standard_functions() -> dict:
     functions.append(Merge())
 
     # Regular expression
+    functions.append(IsMatch())
 
     # Type Checking
     functions.append(IsBoolean())

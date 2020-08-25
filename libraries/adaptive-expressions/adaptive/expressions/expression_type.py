@@ -145,6 +145,8 @@ JPATH = "jPath"
 MERGE = "merge"
 
 # Regular expression
+ISMATCH = "isMatch"
+
 # Type checking
 ISBOOLEAN = "isBoolean"
 ISSTRING = "isString"
