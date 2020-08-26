@@ -813,6 +813,58 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
             },
         ],
         # Memory access tests
+        # Regular expression
+        # isMatch
+        [
+            "isMatch('abc', '^[ab]+$')",
+            False,
+        ],  # simple character classes ([abc]), "+" (one or more)
+        ["isMatch('abb', '^[ab]+$')", True],  # simple character classes ([abc])
+        [
+            "isMatch('123', '^[^abc]+$')",
+            True,
+        ],  # complemented character classes ([^abc])
+        [
+            "isMatch('12a', '^[^abc]+$')",
+            False,
+        ],  # complemented character classes ([^abc])
+        [
+            "isMatch('123', '^[^a-z]+$')",
+            True,
+        ],  # complemented character classes ([^a-z])
+        [
+            "isMatch('12a', '^[^a-z]+$')",
+            False,
+        ],  # complemented character classes ([^a-z])
+        ["isMatch('a1', '^[a-z]?[0-9]$')", True],  # "?" (zero or one)
+        ["isMatch('1', '^[a-z]?[0-9]$')", True],  # "?" (zero or one)
+        ["isMatch('1', '^[a-z]*[0-9]$')", True],  # "*" (zero or more)
+        ["isMatch('abc1', '^[a-z]*[0-9]$')", True],  # "*" (zero or more)
+        ["isMatch('ab', '^[a-z]{1}$')", False],  # "{x}" (exactly x occurrences)
+        [
+            "isMatch('ab', '^[a-z]{1,2}$')",
+            True,
+        ],  # "{x,y}" (at least x, at most y, occurrences)
+        ["isMatch('abc', '^[a-z]{1,}$')", True],  # "{x,}" (x occurrences or more)
+        ["isMatch('Name', '^(?i)name$')", True],  # "(?i)x" (x ignore case)
+        ["isMatch('FORTUNE', '(?i)fortune|future')", True],  # "x|y" (alternation)
+        ["isMatch('FUTURE', '(?i)fortune|future')", True],  # "x|y" (alternation)
+        ["isMatch('A', '(?i)fortune|future')", False],  # "x|y" (alternation)
+        ["isMatch('abacaxc', 'ab.+?c')", True],  # "+?" (lazy versions)
+        ["isMatch('abacaxc', 'ab.*?c')", True],  # "*?" (lazy versions)
+        ["isMatch('abacaxc', 'ab.??c')", True],  # "??" (lazy versions)
+        [
+            "isMatch('12abc34', '([0-9]+)([a-z]+)([0-9]+)')",
+            True,
+        ],  # "(...)" (simple group)
+        [
+            "isMatch('12abc', '([0-9]+)([a-z]+)([0-9]+)')",
+            False,
+        ],  # "(...)" (simple group)
+        ["isMatch('a', '\\w{1}')", True],  # "\w" (match [a-zA-Z0-9_])
+        ["isMatch('1', '\\d{1}')", True],  # "\d" (match [0-9])
+        ["isMatch('12.5', '[0-9]+(\\.5)')", True],  # "\." (match .)
+        ["isMatch('12x5', '[0-9]+(\\.5)')", False],  # "\." (match .)
         # Misc
         # If
         ["if(!exists(one), 'r1', 'r2')", "r2"],

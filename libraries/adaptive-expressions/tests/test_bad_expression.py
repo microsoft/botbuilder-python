@@ -392,6 +392,11 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         "isObejct(emptyJObject, hello)",  # should have 1 parameter
         "isDateTime('2018-03-15T13:00:00.000Z', hello)",  # should have 1 parameter
         "isBoolean(false, false)",  # should have 1 parameter
+        # isMatch
+        "isMatch('^[a-z]+$')",  # should have 2 parameter
+        "isMatch('abC', one)",  # second param should be string
+        "isMatch(1, '^[a-z]+$')",  # first param should be string
+        "isMatch('abC', '^[a-z+$')",  # bad regular expression
         # Conversion functions
         "float(hello)",  # param shoud be float format string
         "float(hello, 1)",  # shold have 1 param
