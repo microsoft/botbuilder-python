@@ -1,4 +1,5 @@
 import numbers
+import re
 from .expression import Expression
 from .expression_evaluator import ExpressionEvaluator
 from .expression_type import CONSTANT
@@ -6,6 +7,7 @@ from .return_type import ReturnType
 
 
 class Constant(Expression):
+    _single_quote_regex = r"(?<!\\)'"
     _value = None
 
     def __init__(self, value):
@@ -45,5 +47,19 @@ class Constant(Expression):
 
         return equal
 
-    # TODO: toString
-    # TODO: reverseString
+    def to_string(self) -> str:
+        if self._value is None:
+            return "null"
+
+        if isinstance(self._value, str):
+            result: str = self._value
+
+            result = result.replace("\\", "\\\\")
+            result = re.sub(self._single_quote_regex, "\\'", result)
+
+            return "'{}'".format(result)
+
+        if isinstance(self._value, numbers.Number):
+            return self._value.to_string()
+
+        return str(self._value)
