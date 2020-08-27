@@ -105,22 +105,6 @@ class HttpRequestUtils:
             self._http_client.__name__ == "requests"
         )
 
-    def _make_request_with_requests(
-        self, request_url: str, payload_body: str, headers: dict, timeout: float
-    ) -> requests.Response:
-        if timeout:
-            # requests' timeouts are in seconds
-            timeout_in_seconds = timeout / 1000
-
-            return self._http_client.post(
-                request_url,
-                data=payload_body,
-                headers=headers,
-                timeout=timeout_in_seconds,
-            )
-
-        return self._http_client.post(request_url, data=payload_body, headers=headers)
-
     async def _make_request_with_aiohttp(
         self, request_url: str, payload_body: str, headers: dict, timeout: float
     ) -> ClientResponse:
@@ -138,3 +122,19 @@ class HttpRequestUtils:
         return await self._http_client.post(
             request_url, data=payload_body, headers=headers
         )
+
+    def _make_request_with_requests(
+        self, request_url: str, payload_body: str, headers: dict, timeout: float
+    ) -> requests.Response:
+        if timeout:
+            # requests' timeouts are in seconds
+            timeout_in_seconds = timeout / 1000
+
+            return self._http_client.post(
+                request_url,
+                data=payload_body,
+                headers=headers,
+                timeout=timeout_in_seconds,
+            )
+
+        return self._http_client.post(request_url, data=payload_body, headers=headers)
