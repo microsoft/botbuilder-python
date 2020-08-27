@@ -3,6 +3,8 @@
 
 from copy import copy
 from typing import List, Union
+import json
+import requests
 
 from aiohttp import ClientResponse, ClientSession
 
@@ -109,7 +111,8 @@ class GenerateAnswerUtils:
         with the options passed as arguments into get_answers().
         Return:
         -------
-        QnAMakerOptions with options passed into constructor overwritten by new options passed into get_answers()
+        QnAMakerOptions with options passed into constructor overwritten
+        by new options passed into get_answers()
 
         rtype:
         ------
@@ -162,7 +165,7 @@ class GenerateAnswerUtils:
 
         http_request_helper = HttpRequestUtils(self._http_client)
 
-        response: ClientResponse = await http_request_helper.execute_http_request(
+        response: Union[ClientResponse, requests.Response] = await http_request_helper.execute_http_request(
             url, question, self._endpoint, options.timeout
         )
 
@@ -200,14 +203,19 @@ class GenerateAnswerUtils:
         self, result, options: QnAMakerOptions
     ) -> QueryResults:
         json_res = result
+
         if isinstance(result, ClientResponse):
             json_res = await result.json()
+
+        if isinstance(result, requests.Response):
+            json_res = json.loads(result.text)
 
         answers_within_threshold = [
             {**answer, "score": answer["score"] / 100}
             for answer in json_res["answers"]
             if answer["score"] / 100 > options.score_threshold
         ]
+
         sorted_answers = sorted(
             answers_within_threshold, key=lambda ans: ans["score"], reverse=True
         )

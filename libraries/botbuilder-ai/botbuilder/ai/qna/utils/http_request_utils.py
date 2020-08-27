@@ -3,6 +3,7 @@
 
 import json
 import platform
+import requests
 
 from aiohttp import ClientResponse, ClientSession, ClientTimeout
 
@@ -12,7 +13,7 @@ from ..qnamaker_endpoint import QnAMakerEndpoint
 
 
 class HttpRequestUtils:
-    """ HTTP request utils class. """
+    """ HTTP request utils class. Execute HTTP requests using `QnAMaker._http_client`. """
 
     def __init__(self, http_client: ClientSession):
         self._http_client = http_client
@@ -23,7 +24,7 @@ class HttpRequestUtils:
         payload_body: object,
         endpoint: QnAMakerEndpoint,
         timeout: float = None,
-    ) -> ClientResponse:
+    ) -> Any:
         """
         Execute HTTP request.
 
@@ -57,19 +58,16 @@ class HttpRequestUtils:
 
         headers = self._get_headers(endpoint)
 
-        if timeout:
-            # Convert miliseconds to seconds (as other BotBuilder SDKs accept timeout value in miliseconds)
-            # aiohttp.ClientSession units are in seconds
-            request_timeout = ClientTimeout(total=timeout / 1000)
-
-            response: ClientResponse = await self._http_client.post(
-                request_url,
-                data=serialized_payload_body,
-                headers=headers,
-                timeout=request_timeout,
+        if isinstance(self._http_client, ClientSession):
+            response: ClientResponse = await self._make_request_with_aiohttp(
+                request_url, serialized_payload_body, headers, timeout
+            )
+        elif self._is_using_requests_module():
+            response: requests.Response = self._make_request_with_requests(
+                request_url, serialized_payload_body, headers, timeout
             )
         else:
-            response: ClientResponse = await self._http_client.post(
+            response = await self._http_client.post(
                 request_url, data=serialized_payload_body, headers=headers
             )
 
@@ -94,3 +92,42 @@ class HttpRequestUtils:
         user_agent = f"{package_user_agent} {platform_user_agent}"
 
         return user_agent
+
+    def _is_using_requests_module(self) -> bool:
+        return (type(self._http_client).__name__ == "module") and (
+            self._http_client.__name__ == "requests"
+        )
+
+    def _make_request_with_requests(
+        self, request_url: str, payload_body: str, headers: dict, timeout: float
+    ) -> requests.Response:
+        if timeout:
+            # requests' timeouts are in seconds
+            timeout_in_seconds = timeout / 1000
+
+            return self._http_client.post(
+                request_url,
+                data=payload_body,
+                headers=headers,
+                timeout=timeout_in_seconds,
+            )
+
+        return self._http_client.post(request_url, data=payload_body, headers=headers)
+
+    async def _make_request_with_aiohttp(
+        self, request_url: str, payload_body: str, headers: dict, timeout: float
+    ) -> ClientResponse:
+        if timeout:
+            # aiohttp.ClientSession's timeouts are in seconds
+            timeout_in_seconds = ClientTimeout(total=timeout / 1000)
+
+            return await self._http_client.post(
+                request_url,
+                data=payload_body,
+                headers=headers,
+                timeout=timeout_in_seconds,
+            )
+
+        return await self._http_client.post(
+            request_url, data=payload_body, headers=headers
+        )

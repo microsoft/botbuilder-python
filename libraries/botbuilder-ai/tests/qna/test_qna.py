@@ -5,6 +5,7 @@
 # pylint: disable=too-many-lines
 
 import json
+import requests
 from os import path
 from typing import List, Dict
 import unittest
@@ -163,6 +164,27 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         self.assertIsNotNone(result)
         self.assertEqual(1, len(result.answers))
         self.assertFalse(result.active_learning_enabled)
+    
+    async def test_returns_answer_using_requests_module(self):
+        question: str = "how do I clean the stove?"
+        response_path: str = "ReturnsAnswer.json"
+        response_json = QnaApplicationTest._get_json_for_file(response_path)
+
+        qna = QnAMaker(
+            endpoint=QnaApplicationTest.tests_endpoint, http_client=requests
+        )
+        context = QnaApplicationTest._get_context(question, TestAdapter())
+
+        with patch("requests.post", return_value=response_json):
+            result = await qna.get_answers_raw(context)
+            answers = result.answers
+
+            self.assertIsNotNone(result)
+            self.assertEqual(1, len(answers))
+            self.assertEqual(
+                "BaseCamp: You can use a damp rag to clean around the Power Pack",
+                answers[0].answer,
+        )
 
     async def test_returns_answer_using_options(self):
         # Arrange
