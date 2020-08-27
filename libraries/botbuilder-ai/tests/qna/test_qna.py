@@ -20,7 +20,8 @@ from botbuilder.ai.qna.models import (
     QueryResult,
     QnARequestContext,
 )
-from botbuilder.ai.qna.utils import QnATelemetryConstants
+from botbuilder.ai.qna.utils import HttpRequestUtils, QnATelemetryConstants
+from botbuilder.ai.qna.models import GenerateAnswerRequestBody
 from botbuilder.core import BotAdapter, BotTelemetryClient, TurnContext
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.schema import (
@@ -164,7 +165,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         self.assertIsNotNone(result)
         self.assertEqual(1, len(result.answers))
         self.assertFalse(result.active_learning_enabled)
-    
+
     async def test_returns_answer_using_requests_module(self):
         question: str = "how do I clean the stove?"
         response_path: str = "ReturnsAnswer.json"
@@ -275,6 +276,39 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
             self.assertEqual(
                 options.timeout, qna._generate_answer_helper.options.timeout
             )
+
+    async def test_returns_answer_using_requests_module_with_no_timeout(self):
+        url = f"{QnaApplicationTest._host}/knowledgebases/{QnaApplicationTest._knowledge_base_id}/generateAnswer"
+        question = GenerateAnswerRequestBody(
+            question="how do I clean the stove?",
+            top=1,
+            score_threshold=0.3,
+            strict_filters=[],
+            context=None,
+            qna_id=None,
+            is_test=False,
+            ranker_type="Default"
+        )
+        response_path = "ReturnsAnswer.json"
+        response_json = QnaApplicationTest._get_json_for_file(response_path)
+
+        http_request_helper = HttpRequestUtils(requests)
+
+        with patch("requests.post", return_value=response_json):
+            result = await http_request_helper.execute_http_request(
+                url,
+                question,
+                QnaApplicationTest.tests_endpoint,
+                timeout=None
+            )
+            answers = result["answers"]
+
+            self.assertIsNotNone(result)
+            self.assertEqual(1, len(answers))
+            self.assertEqual(
+                "BaseCamp: You can use a damp rag to clean around the Power Pack",
+                answers[0]["answer"],
+        )
 
     async def test_telemetry_returns_answer(self):
         # Arrange

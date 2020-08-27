@@ -3,6 +3,7 @@
 
 import json
 import platform
+from typing import Any
 import requests
 
 from aiohttp import ClientResponse, ClientSession, ClientTimeout
@@ -13,9 +14,15 @@ from ..qnamaker_endpoint import QnAMakerEndpoint
 
 
 class HttpRequestUtils:
-    """ HTTP request utils class. Execute HTTP requests using `QnAMaker._http_client`. """
+    """ HTTP request utils class. 
 
-    def __init__(self, http_client: ClientSession):
+    Parameters:
+    -----------
+
+    http_client: Client to make HTTP requests with. Default client used in the SDK is `aiohttp.ClientSession`.
+    """
+
+    def __init__(self, http_client: Any):
         self._http_client = http_client
 
     async def execute_http_request(

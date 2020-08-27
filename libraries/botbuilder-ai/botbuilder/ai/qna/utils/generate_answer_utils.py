@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 from copy import copy
-from typing import List, Union
+from typing import Any, List, Union
 import json
 import requests
 
@@ -165,7 +165,7 @@ class GenerateAnswerUtils:
 
         http_request_helper = HttpRequestUtils(self._http_client)
 
-        response: Union[ClientResponse, requests.Response] = await http_request_helper.execute_http_request(
+        response: Any = await http_request_helper.execute_http_request(
             url, question, self._endpoint, options.timeout
         )
 
