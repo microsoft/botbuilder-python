@@ -21,7 +21,7 @@ For more information jump to a section below.
 
 | Branch | Description        | Build Status | Coverage Status | Code Style |
  |----|---------------|--------------|-----------------|--|
-| Master | 4.11.* Preview Builds | [![Build Status](https://fuselabs.visualstudio.com/SDK_v4/_apis/build/status/Python/Python-CI-PR-yaml?branchName=master)](https://fuselabs.visualstudio.com/SDK_v4/_build/latest?definitionId=771&branchName=master) | [![Coverage Status](https://coveralls.io/repos/github/microsoft/botbuilder-python/badge.svg?branch=HEAD)](https://coveralls.io/github/microsoft/botbuilder-python?branch=HEAD) | [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) |
+| Main | 4.11.* Preview Builds | [![Build Status](https://fuselabs.visualstudio.com/SDK_v4/_apis/build/status/Python/Python-CI-PR-yaml?branchName=main)](https://fuselabs.visualstudio.com/SDK_v4/_build/latest?definitionId=771&branchName=main) | [![Coverage Status](https://coveralls.io/repos/github/microsoft/botbuilder-python/badge.svg?branch=HEAD)](https://coveralls.io/github/microsoft/botbuilder-python?branch=HEAD) | [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) |
 
 ## Packages
 
