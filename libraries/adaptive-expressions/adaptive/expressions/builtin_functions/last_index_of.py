@@ -18,6 +18,8 @@ class LastIndexOf(ExpressionEvaluator):
         if error is None:
             if isinstance(args[0], str) or args[0] is None:
                 if isinstance(args[1], str) or args[1] is None:
+                    args[0] = args[0] if isinstance(args[0], str) else ""
+                    args[1] = args[1] if isinstance(args[1], str) else ""
                     result = str(args[0][::-1]).find(args[1])
                     result = -1 if result == -1 else len(args[0]) - result - 1
                 else:

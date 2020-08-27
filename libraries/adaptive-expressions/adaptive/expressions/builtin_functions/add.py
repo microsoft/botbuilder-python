@@ -32,6 +32,15 @@ class Add(ExpressionEvaluator):
                 error = "Operator '+' or add cannot be applied to operands of type 'number' and null object."
             else:
                 if string_concat:
+                    if isinstance(
+                        first_item, numbers.Number
+                    ) and FunctionUtils.is_integer(first_item):
+                        first_item = int(first_item)
+                    if isinstance(
+                        second_item, numbers.Number
+                    ) and FunctionUtils.is_integer(second_item):
+                        second_item = int(second_item)
+
                     result = (str(first_item) if first_item else "") + (
                         str(second_item) if second_item else ""
                     )

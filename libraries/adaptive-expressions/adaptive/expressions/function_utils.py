@@ -1,3 +1,4 @@
+import operator
 import numbers
 import sys
 from datetime import datetime, timedelta
@@ -193,7 +194,21 @@ class FunctionUtils:
     @staticmethod
     def verify_number_or_string_or_null(value: object, expression: object, number: int):
         error: str = None
-        if not isinstance(value, numbers.Number) and not isinstance(value, str):
+        if (
+            value is not None
+            and (isinstance(value, bool) or not isinstance(value, numbers.Number))
+            and not isinstance(value, str)
+        ):
+            error = expression.to_string() + " is neither a number nor string."
+
+        return error
+
+    @staticmethod
+    def verify_number_or_string(value: object, expression: object, number: int):
+        error: str = None
+        if value is None or (
+            not isinstance(value, numbers.Number) and not isinstance(value, str)
+        ):
             error = expression.to_string() + " is not string or number"
 
         return error
@@ -765,3 +780,22 @@ class FunctionUtils:
                 parsed.astimezone(tz.gettz("UTC"))
             ).timestamp() * 10000000 + 621355968000000000
         return result, error
+
+    @staticmethod
+    def is_equal(args: list) -> bool:
+        if len(args) == 0:
+            return False
+        if args[0] is None or args[1] is None:
+            return args[0] is None and args[1] is None
+        if (isinstance(args[0], list) and len(args[0]) == 0) and (
+            isinstance(args[1], list) and len(args[1]) == 0
+        ):
+            return True
+        if (isinstance(args[0], dict) and len(args[0]) == 0) and (
+            isinstance(args[1], dict) and len(args[1]) == 0
+        ):
+            return True
+        if isinstance(args[0], numbers.Number) and isinstance(args[1], numbers.Number):
+            if abs(float(args[0]) - float(args[1])) < 0.00000001:
+                return True
+        return operator.eq(args[0], args[1])

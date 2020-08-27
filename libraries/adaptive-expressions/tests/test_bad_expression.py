@@ -10,8 +10,15 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         "two": 2.0,
         "hello": "hello",
         "world": "world",
+        "istrue": True,
         "nullObj": None,
-        "bag": {"three": 3.0},
+        "bag": {
+            "three": 3.0,
+            "set": {"four": 4.0},
+            "list": ["red", "blue"],
+            "index": 3,
+            "name": "mybag",
+        },
         "items": ["zero", "one", "two"],
         "nestedItems": [{"x": 1}, {"x": 2}, {"x": 3},],
         "dialog": {
@@ -21,7 +28,6 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
             "title": "Dialog Title",
             "subTitle": "Dialog Sub Title",
         },
-        "doubleNestedItems": [[{"x": 1}, {"x: 2"}], [{"x": 3}]],
         "xmlStr": "<?xml version='1.0'?> <produce> <item>\
              <name>Gala</name> <type>apple</type> <count>20</count> </item>\
              <item> <name>Honeycrisp</name> <type>apple</type> <count>10</count> </item> </produce>",
@@ -31,6 +37,19 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         "json1": json.dumps({"Enabled": True, "Roles": ["User", "Admin"]}),
         "jarray1": "['a', 'b']",
         "relativeUri": "../catalog/shownew.htm?date=today",
+        "timestamp": "2018-03-15T13:00:00.111Z",
+        "timestamp2": "2018-01-01T03:00:00.000Z",
+        "timezone": "Pacific Standard Time",
+        "invalidTimeZone": "Local",
+        "noISOTimestamp": "2018-03-15T13:00:00Z",
+        "notValidTimestamp": "2018timestmap",
+        "notValidTimestamp2": "1521118800",
+        "turn": {
+            "recognized": {
+                "entities": {"city": "Seattle"},
+                "intents": {"BookFlight": "BookFlight"},
+            }
+        },
     }
 
     # Invalid expressions
@@ -129,6 +148,44 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         "exists(1, 2)",  # function need one parameter
         # "if(!exists(one), one, hello)", # the second and third parameters of if must the same type
         "not(false, one)",  # function need one parameter
+        # Conversion functions test
+        "float(hello)",  # param shoud be float format string
+        "float(hello, 1)",  # shold have 1 param
+        "int(hello)",  # param shoud be int format string
+        "int(1, 1)",  # shold have 1 param
+        "string(hello, 1)",  # shold have 1 param
+        "bool(false, 1)",  # shold have 1 param
+        "array()",  # should have 1 param
+        "array(hello, world)",  # should have 1 param
+        "array(false)",  # param should be string
+        "binary()",  # should have 1 param
+        "binary(hello, world)",  # should have 1 param
+        "binary(false)",  # param should be string
+        "dataUri()",  # should have 1 param
+        "dataUri(hello, world)",  # should have 1 param
+        "dataUri(false)",  # param should be string
+        "dataUriToBinary()",  # should have 1 param
+        "dataUriToBinary(hello, world)",  # should have 1 param
+        "dataUriToBinary(false)",  # param should be string
+        "dataUriToString()",  # should have 1 param
+        "dataUriToString(hello, world)",  # should have 1 param
+        "dataUriToString(false)",  # param should be string
+        "uriComponentToString()",  # should have 1 param
+        "uriComponentToString(hello, world)",  # should have 1 param
+        "uriComponentToString(false)",  # param should be string
+        "base64()",  # should have 1 param
+        "base64(hello, world)",  # should have 1 param
+        "base64ToBinary()",  # should have 1 param
+        "base64ToBinary(hello, world)",  # should have 1 param
+        "base64ToBinary(false)",  # param should be string
+        "base64ToString()",  # should have 1 param
+        "base64ToString(hello, world)",  # should have 1 param
+        "base64ToString(false)",  # param should be string
+        "formatNumber(1,2,3)",  # invalid locale type
+        "formatNumber(hello,2.0)",  # the first parameter should be a number
+        "uriComponent()",  # should have 1 param
+        "uriComponent(hello, world)",  # should have 1 param
+        "uriComponent(false)",  # param should be string
         # Math functions test
         "max(hello, one)",  # param should be number
         "max()",  # function need 1 or more than 1 parameters
@@ -168,6 +225,131 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         "ceiling(1.2, -2)",  # the second parameter should be integer not less than 0
         "ceiling(1.2, 16)",  # the second parameter should be integer not greater than 15
         "ceiling(1.2, 12, 7)",  # should have one or two numeric parameters
+        # Date and time function test
+        "isDefinite(12345)",  # should hava a string or a TimexProperty parameter
+        "isDefinite('world', 123445)",  # should have only one parameter
+        "isTime(123445)",  # should hava a string or a TimexProperty parameter
+        "isTime('world', 123445)",  # should have only one parameter
+        "isDuration(123445)",  # should hava a string or a TimexProperty parameter
+        "isDuration('world', 123445)",  # should have only one parameter
+        "isDate(123445)",  # should hava a string or a TimexProperty parameter
+        "isDate('world', 123445)",  # should have only one parameter
+        "isTimeRange(123445)",  # should hava a string or a TimexProperty parameter
+        "isTimeRange('world', 123445)",  # should have only one parameter
+        "isDateRange(123445)",  # should hava a string or a TimexProperty parameter
+        "isDateRange('world', 123445)",  # should have only one parameter
+        "isPresent(123445)",  # should hava a string or a TimexProperty parameter
+        "isPresent('world', 123445)",  # should have only one parameter
+        "addDays('errortime', 1)",  # error datetime format
+        "addDays(timestamp, 'hi')",  # second param should be integer
+        "addDays(timestamp)",  # should have 2 or 3 params
+        "addDays(timestamp, 1,'yyyy', 2)",  # should have 2 or 3 params
+        "addDays(timestamp, 12345678901234)",  # the second parameter should be a 32-bit signed integer
+        "addDays(notISOTimestamp, 1)",  # not ISO datetime format
+        "addHours('errortime', 1)",  # error datetime format
+        "addHours(timestamp, 'hi')",  # second param should be integer
+        "addHours(timestamp)",  # should have 2 or 3 params
+        "addHours(timestamp, 1,'yyyy', 2)",  # should have 2 or 3 params
+        "addHours(timestamp, 12345678901234)",  # the second parameter should be a 32-bit signed integer
+        "addHours(notISOTimestamp, 1)",  # not ISO datetime format
+        "addMinutes('errortime', 1)",  # error datetime format
+        "addMinutes(timestamp, 'hi')",  # second param should be integer
+        "addMinutes(timestamp)",  # should have 2 or 3 params
+        "addMinutes(timestamp, 1,'yyyy', 2)",  # should have 2 or 3 params
+        "addMinutes(timestamp, 12345678901234)",  # the second parameter should be a 32-bit signed integer
+        "addMinutes(notISOTimestamp, 1)",  # not ISO datetime format
+        "addSeconds('errortime', 1)",  # error datetime format
+        "addSeconds(timestamp, 'hi')",  # second param should be integer
+        "addSeconds(timestamp)",  # should have 2 or 3 params
+        "addSeconds(timestamp, 1,'yyyy', 2)",  # should have 2 or 3 params
+        "addSeconds(notISOTimestamp, 1)",  # not ISO datetime format
+        "addSeconds(timestamp, 12345678901234)",  # the second parameter should be a 32-bit signed integer
+        "dayOfMonth('errortime')",  # error datetime format
+        "dayOfMonth(timestamp, 1)",  # should have 1 param
+        "dayOfMonth(notISOTimestamp)",  # not ISO datetime format
+        "dayOfWeek('errortime')",  # error datetime format
+        "dayOfWeek(timestamp, 1)",  # should have 1 param
+        "dayOfWeek(notISOTimestamp)",  # not ISO datetime format
+        "dayOfYear('errortime')",  # error datetime format
+        "dayOfYear(timestamp, 1)",  # should have 1 param
+        "dayOfYear(notISOTimestamp)",  # not ISO datetime format
+        "month('errortime')",  # error datetime format
+        "month(timestamp, 1)",  # should have 1 param
+        "month(noISOTimestamp)",  # not ISO datetime format
+        "date('errortime')",  # error datetime format
+        "date(timestamp, 1)",  # should have 1 param
+        "date(noISOTimestamp)",  # not ISO datetime format
+        "year('errortime')",  # error datetime format
+        "year(timestamp, 1)",  # should have 1 param
+        "year(noISOTimestamp)",  # not ISO datetime format
+        "formatDateTime('errortime')",  # error datetime format
+        "formatDateTime(timestamp, 'yyyy', 1)",  # should have 2 or 3 params
+        "formatDateTime(notValidTimestamp)",  # not valid timestamp
+        "formatDateTime(notValidTimestamp2)",  # not valid timestamp
+        "formatDateTime({})",  # error valid datetime
+        "formatDateTime(timestamp, 1)",  # invalid format string
+        "formatEpoch('time')",  # error string
+        "formatEpoch(timestamp, 'yyyy', 1)",  # should have 1 or 2 params
+        "formatTicks('string')",  # String is not valid
+        "formatTicks(2.3)",  # float is not valid
+        "formatTicks({})",  # object is not valid
+        "subtractFromTime('errortime', 1, 'yyyy')",  # error datetime format
+        "subtractFromTime(timestamp, 1, 'W')",  # error time unit
+        "subtractFromTime(timestamp, timestamp, 'W')",  # error parameters format
+        "subtractFromTime(timestamp, '1', 'yyyy')",  # second param should be integer
+        "subtractFromTime(timestamp, 'yyyy')",  # should have 3 or 4 params
+        "subtractFromTime(noISOTimestamp, 1, 'Year')",
+        "dateReadBack('errortime', 'errortime')",  # error datetime format
+        "dateReadBack(timestamp)",  # shold have two params
+        "dateReadBack(timestamp, 'errortime')",  # second param is invalid timestamp format
+        "dateReadBack(notISOTimestamp, addDays(timestamp, 1))",  # not ISO datetime format
+        "getTimeOfDay('errortime')",  # error datetime format
+        "getTimeOfDay(timestamp, timestamp)",  # should have 1 param
+        "getTimeOfDay(notISOTimestamp)",  # not ISO datetime format
+        "getPastTime(1, 'W')",  # error time unit
+        "getPastTime(timestamp, 'W')",  # error parameters format
+        "getPastTime('yyyy', '1')",  # second param should be integer
+        "getPastTime('yyyy')",  # should have 2 or 3 params
+        "getFutureTime(1, 'W')",  # error time unit
+        "getFutureTime(timestamp, 'W')",  # error parameters format
+        "getFutureTime('yyyy', '1')",  # second param should be integer
+        "getFutureTime('yyyy')",  # should have 2 or 3 params
+        "convertFromUTC(notValidTimestamp, 'Pacific Standard Time')",  # invalid timestamp
+        "convertFromUTC('2018-02-02T02:00:00.000Z', 'Pacific Time')",  # invalid timezone
+        "convertToUTC(notValidTimestamp, 'Pacific Standard Time')",  # invalid timestamp
+        "convertToUTC('2018-02-02T02:00:00.000', 'Pacific Time')",  # invalid timezone
+        "addToTime(notValidTimeStamp, one, 'day')",  # not valid timestamp
+        "addToTime(timeStamp, hello, 'day')",  # interval should be integer
+        "addToTime(timeStamp, one, 'decade', 'D')",  # not valid time unit
+        # "addToTime(timeStamp, one, 'week', 'A')",  # not valid format
+        "addToTime(timeStamp, one, 'week', 'A', one)",  # should have 3 or 4 params
+        "convertTimeZone(notValidTimeStamp, 'UTC', timezone)",  # not valid timestamp
+        "convertTimeZone(timestamp2, invalidTimezone, timezone, 'D')",  # not valid source timezone
+        "convertTimeZone(timestamp2, timezone, invalidTimezone, 'D')",  # not valid destination timezone
+        "convertTimeZone(timestamp2, timezone, 'UTC', 'A')",  # not valid destination timezone
+        "startOfDay(notValidTimeStamp)",  # invalid timestamp
+        "startOfHour(notValidTimeStamp)",  # invalid timestamp
+        "startOfMonth(notValidTimeStamp)",  # invalid timestamp
+        "ticks(notValidTimeStamp)",  # not valid timestamp
+        "ticks()",  # should have one parameters
+        'dateTimeDiff(notValidTimeStamp,"2018-01-01T08:00:00.000Z")',  # the first parameter is not a valid timestamp
+        'dateTimeDiff("2017-01-01T08:00:00.000Z",notValidTimeStamp)',  # the second parameter is not a valid timestamp
+        'dateTimeDiff("2017-01-01T08:00:00.000Z","2018-01-01T08:00:00.000Z", "years")',  # should only have 2 parameters
+        "ticksToDays(12.12)",  # should have an integer parameter
+        "ticksToHours(12.12)",  # should have an integer parameter
+        "ticksToMinutes(12.12)",  # should have an integer parameter
+        "getNextViableDate(hello)",  # should have a "XXXX-MM-DD" format string
+        "getNextViableDate(one)",  # should have a string parameter
+        "getNextViableDate('XXXX-10-10', 20)",  # should only have 1 parameter
+        "getPreviousViableDate(hello)",  # should have a "XXXX-MM-DD" format string
+        "getPreviousViableDate(one)",  # should have a string parameter
+        "getPreviousViableDate('XXXX-10-10', 20)",  # should only have 1 parameter
+        "getNextViableTime(hello)",  # should have a "XX:mm:ss" format string
+        "getNextViableTime(one)",  # should have a string parameter
+        "getNextViableTime('XX:12:12', 20)",  # should only have 1 parameter
+        "getPreviousViableTime(hello)",  # should have a "XX:mm:ss" format string
+        "getPreviousViableTime(one)",  # should have a string parameter
+        "getPreviousViableTime('XX:12:12', 20)",  # should only have 1 parameter
         # collection functions test
         "sum(items, 'hello')",  # should have 1 parameter
         "sum('hello')",  # first param should be list
@@ -224,133 +406,13 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         "sortBy(hello, 'x')",  # first param should be list
         "sortBy(createArray('H','e','l','l','o'), 1)",  # second param should be string
         "sortBy(createArray('H','e','l','l','o'), 'x', hi)",  # second param should be string
-        # Memory access test
-        "getProperty(bag, 1)",  # second param should be string
-        "getProperty(1)",  # if getProperty contains only one parameter, the parameter should be string
-        "Accessor(1)",  # first param should be string
-        "Accessor(bag, 1)",  # second should be object
-        "one[0]",  # one is not list
-        "items[3]",  # index out of range
-        "items[one+0.5]",  # index is not integer
-        # Date and time function test
-        "isDefinite(12345)",  # should hava a string or a TimexProperty parameter
-        "isDefinite('world', 123445)",  # should have only one parameter
-        "isTime(123445)",  # should hava a string or a TimexProperty parameter
-        "isTime('world', 123445)",  # should have only one parameter
-        "isDuration(123445)",  # should hava a string or a TimexProperty parameter
-        "isDuration('world', 123445)",  # should have only one parameter
-        "isDate(123445)",  # should hava a string or a TimexProperty parameter
-        "isDate('world', 123445)",  # should have only one parameter
-        "isTimeRange(123445)",  # should hava a string or a TimexProperty parameter
-        "isTimeRange('world', 123445)",  # should have only one parameter
-        "isDateRange(123445)",  # should hava a string or a TimexProperty parameter
-        "isDateRange('world', 123445)",  # should have only one parameter
-        "isPresent(123445)",  # should hava a string or a TimexProperty parameter
-        "isPresent('world', 123445)",  # should have only one parameter
-        "addDays('errortime', 1)",  # error datetime format
-        "addDays(timestamp, 'hi')",  # second param should be integer
-        "addDays(timestamp)",  # should have 2 or 3 params
-        "addDays(timestamp, 1,'yyyy', 2)",  # should have 2 or 3 params
-        "addDays(timestamp, 12345678901234)",  # the second parameter should be a 32-bit signed integer
-        "addDays(notISOTimestamp, 1)",  # not ISO datetime format
-        "addHours('errortime', 1)",  # error datetime format
-        "addHours(timestamp, 'hi')",  # second param should be integer
-        "addHours(timestamp)",  # should have 2 or 3 params
-        "addHours(timestamp, 1,'yyyy', 2)",  # should have 2 or 3 params
-        "addHours(timestamp, 12345678901234)",  # the second parameter should be a 32-bit signed integer
-        "addHours(notISOTimestamp, 1)",  # not ISO datetime format
-        "addMinutes('errortime', 1)",  # error datetime format
-        "addMinutes(timestamp, 'hi')",  # second param should be integer
-        "addMinutes(timestamp)",  # should have 2 or 3 params
-        "addMinutes(timestamp, 1,'yyyy', 2)",  # should have 2 or 3 params
-        "addMinutes(timestamp, 12345678901234)",  # the second parameter should be a 32-bit signed integer
-        "addMinutes(notISOTimestamp, 1)",  # not ISO datetime format
-        "addSeconds('errortime', 1)",  # error datetime format
-        "addSeconds(timestamp, 'hi')",  # second param should be integer
-        "addSeconds(timestamp)",  # should have 2 or 3 params
-        "addSeconds(timestamp, 1,'yyyy', 2)",  # should have 2 or 3 params
-        "addSeconds(notISOTimestamp, 1)",  # not ISO datetime format
-        "addSeconds(timestamp, 12345678901234)",  # the second parameter should be a 32-bit signed integer
-        "dayOfMonth('errortime')",  # error datetime format
-        "dayOfMonth(timestamp, 1)",  # should have 1 param
-        "dayOfMonth(notISOTimestamp)",  # not ISO datetime format
-        "dayOfWeek('errortime')",  # error datetime format
-        "dayOfWeek(timestamp, 1)",  # should have 1 param
-        "dayOfWeek(notISOTimestamp)",  # not ISO datetime format
-        "dayOfYear('errortime')",  # error datetime format
-        "dayOfYear(timestamp, 1)",  # should have 1 param
-        "dayOfYear(notISOTimestamp)",  # not ISO datetime format
-        "month('errortime')",  # error datetime format
-        "month(timestamp, 1)",  # should have 1 param
-        "month(notISOTimestamp)",  # not ISO datetime format
-        "date('errortime')",  # error datetime format
-        "date(timestamp, 1)",  # should have 1 param
-        "date(notISOTimestamp)",  # not ISO datetime format
-        "year('errortime')",  # error datetime format
-        "year(timestamp, 1)",  # should have 1 param
-        "year(notISOTimestamp)",  # not ISO datetime format
-        "formatDateTime('errortime')",  # error datetime format
-        "formatDateTime(notValidTimestamp)",  # error datetime format
-        "formatDateTime(notValidTimestamp2)",  # error datetime format
-        "formatDateTime(notValidTimestamp3)",  # error datetime format
-        "formatDateTime({})",  # error valid datetime
-        "formatDateTime(timestamp, 1)",  # invalid format string
-        "formatEpoch('time')",  # error string
-        "formatEpoch(timestamp, 'yyyy', 1)",  # should have 1 or 2 params
-        "formatTicks('string')",  # String is not valid
-        "formatTicks(2.3)",  # float is not valid
-        "formatTicks({})",  # object is not valid
-        "subtractFromTime('errortime', 'yyyy', 1)",  # error datetime format
-        "subtractFromTime(timestamp, 1, 'W')",  # error time unit
-        "subtractFromTime(timestamp, timestamp, 'W')",  # error parameters format
-        "subtractFromTime(timestamp, '1', 'Year')",  # second param should be integer
-        "subtractFromTime(timestamp, 'yyyy')",  # should have 3 or 4 params
-        "subtractFromTime(notISOTimestamp, 1, 'Year')",  # not ISO datetime format
-        "dateReadBack('errortime', 'errortime')",  # error datetime format
-        "dateReadBack(timestamp)",  # shold have two params
-        "dateReadBack(notISOTimestamp, addDays(timestamp, 1))",  # not ISO datetime format
-        "getTimeOfDay('errortime')",  # error datetime format
-        "getTimeOfDay(timestamp, timestamp)",  # should have 1 param
-        "getTimeOfDay(notISOTimestamp)",  # not ISO datetime format
-        "getPastTime(1, 'W')",  # error time unit
-        "getPastTime(timestamp, 'W')",  # error parameters format
-        "getPastTime('yyyy', '1')",  # second param should be integer
-        "getPastTime('yyyy')",  # should have 2 or 3 params
-        "getFutureTime(1, 'W')",  # error time unit
-        "getFutureTime(timestamp, 'W')",  # error parameters format
-        "getFutureTime('yyyy', '1')",  # second param should be integer
-        "getFutureTime('yyyy')",  # should have 2 or 3 params
-        "convertFromUTC(notValidTimestamp, timezone)",  # not valid iso timestamp
-        "convertFromUTC(timestamp, invalidTimezone,'D')",  # not valid timezone
-        "convertFromUTC(timestamp, timezone, 'a')",  # not valid format
-        "convertFromUTC(timestamp, timezone, 'D', hello)",  # should have 2 or 3 params
-        "convertToUTC(notValidTimestamp, timezone)",  # not valid timestamp
-        "convertToUTC(timestamp, invalidTimezone, 'D')",  # not valid timezone
-        "convertToUTC(timestamp, timezone, 'a')",  # not valid format
-        "convertToUTC(timestamp, timezone, 'D', hello)",  # should have 2 or 3 params
-        "addToTime(notValidTimeStamp, one, 'day')",  # not valid timestamp
-        "addToTime(timeStamp, hello, 'day')",  # interval should be integer
-        "addToTime(timeStamp, one, 'decade', 'D')",  # not valid time unit
-        "addToTime(timeStamp, one, 'week', 'A')",  # not valid format
-        "addToTime(timeStamp, one, 'week', 'A', one)",  # should have 3 or 4 params
-        "convertTimeZone(notValidTimeStamp, 'UTC', timezone)",  # not valid timestamp
-        "convertTimeZone(timestamp2, invalidTimezone, timezone, 'D')",  # not valid source timezone
-        "convertTimeZone(timestamp2, timezone, invalidTimezone, 'D')",  # not valid destination timezone
-        "convertTimeZone(timestamp2, timezone, 'UTC', 'A')",  # not valid destination timezone
-        "startOfDay(notValidTimeStamp)",  # not valid timestamp
-        "startOfDay(timeStamp, 'A')",  # not valid format
-        "startOfHour(notValidTimeStamp)",  # not valid timestamp
-        "startOfHour(timeStamp, 'A')",  # not valid format
-        "startOfMonth(notValidTimeStamp)",  # not valid timestamp
-        "startOfMonth(timeStamp, 'A')",  # not valid format
-        "ticks(notValidTimeStamp)",  # not valid timestamp
-        "ticksToDays(12.12)",  # not an integer
-        "ticksToHours(timestamp)",  # not an integer
-        "ticksToMinutes(timestamp)",  # not an integer
-        "dateTimeDiff(notValidTimeStamp,'2018-01-01T08:00:00.000Z')",  # the first parameter is not a valid timestamp
-        "dateTimeDiff('2017-01-01T08:00:00.000Z',notValidTimeStamp)",  # the second parameter is not a valid timestamp
-        "dateTimeDiff('2017-01-01T08:00:00.000Z','2018-01-01T08:00:00.000Z', 'years')",  # should only have 2 parametes
-        # URI parsing functions
+        # uri parsing functions
+        "uriHost(relativeUri)",
+        "uriPath(relativeUri)",
+        "uriPathAndQuery(relativeUri)",
+        "uriPort(relativeUri)",
+        "uriQuery(relativeUri)",
+        "uriScheme(relativeUri)",
         "uriHost(12345)",  # should have 1 string parameter
         "uriHost('aaa', 12345)",  # should have 1 string parameter
         "uriPath(12345)",  # should have 1 string parameter
@@ -363,7 +425,7 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         "uriQuery('qwww', 12345)",  # should have 1 string parameter
         "uriScheme(12345)",  # should have 1 string parameter
         "uriScheme('pqq', 12345)",  # should have 1 string parameter
-        # Object manipulation and construction functions
+        # Object manipulation and construction functions test
         "json(1,2)",  # should have 1 parameter
         "json(1)",  # should be string parameter
         'json(\'{"key1":value1"}\')',  # invalid json format string
@@ -384,45 +446,30 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         "merge(json(json1))",  # should have at least two arguments
         "merge(json(json1), json(jarray1))",  # arguments should all be JSON objects
         "merge(json(jarray1), json(json1))",  # arguments should all be JSON objects
-        # type checking
-        "isString(hello, hello)",  # should have 1 parameter
-        "isInteger(2, 3)",  # should have 1 parameter
-        "isFloat(1.2, 3.1)",  # should have 1 parameter
-        "isArray(createArray(1,2,3), 1)",  # should have 1 parameter
-        "isObejct(emptyJObject, hello)",  # should have 1 parameter
-        "isDateTime('2018-03-15T13:00:00.000Z', hello)",  # should have 1 parameter
-        "isBoolean(false, false)",  # should have 1 parameter
-        # isMatch
+        # Memory access test
+        "getProperty(bag, 1)",  # second param should be string
+        "getProperty(1)",  # if getProperty contains only one parameter, the parameter should be string
+        "Accessor(1)",  # first param should be string
+        "Accessor(bag, 1)",  # second should be object
+        "one[0]",  # one is not list
+        "items[3]",  # index out of range
+        "items[one+0.5]",  # index is not integer
+        # regex test
         "isMatch('^[a-z]+$')",  # should have 2 parameter
         "isMatch('abC', one)",  # second param should be string
         "isMatch(1, '^[a-z]+$')",  # first param should be string
         "isMatch('abC', '^[a-z+$')",  # bad regular expression
-        # Conversion functions
-        "float(hello)",  # param shoud be float format string
-        "float(hello, 1)",  # shold have 1 param
-        "int(hello)",  # param shoud be int format string
-        "int(1, 1)",  # shold have 1 param
-        "string(hello, 1)",  # shold have 1 param
-        "bool(false, 1)",  # shold have 1 param
-        "binary(hello, world)",  # shoule have 1 param
-        "binary(one)",  # should have string param
-        "DataUri(hello, world)",  # shoule have 1 param
-        "DataUri(false)",  # should have string param
-        "uriComponent(hello, world)",  # shoule have 1 param
-        "uriComponent(false)",  # should have string param
-        "uriComponentToString(hello, world)",  # shoule have 1 param
-        "uriComponentToString(false)",  # should have string param
-        "dataUriToBinary(hello, world)",  # shoule have 1 param
-        "dataUriToBinary(false)",  # should have string param
-        "dataUriToString(hello, world)",  # shoule have 1 param
-        "dataUriToString(false)",  # should have string param
-        "binary(hello, world)",  # shoule have 1 param
-        "binary(one)",  # should have string param
-        "base64(hello, world)",  # shoule have 1 param
-        "base64ToBinary(hello, world)",  # shoule have 1 param
-        "base64ToBinary(one)",  # should have string param
-        "base64ToString(hello, world)",  # shoule have 1 param
-        "base64ToString(false)",  # should have string param
+        # SetPathToValue tests
+        "setPathToValue(2+3, 4)",  # Not a real path
+        "setPathToValue(a)",  # Missing value
+        # Type Checking
+        "isString(hello, hello)",  # should have one parameter
+        "isInteger(one, hello)",  # should have one parameter
+        "isFloat(1.324, hello)",  # should have one parameter
+        "isArray(createArray(1,2,3), hello)",  # should have one parameter
+        "isBoolean(true, false)",  # should have one parameter
+        'isDateTime("2018-03-15T13:00:00.111Z", hello)',  # should have one parameter
+        "isObject({}, false)",  # should have one parameter
     ]
 
     def test_exception_for_bad_expressions(self):

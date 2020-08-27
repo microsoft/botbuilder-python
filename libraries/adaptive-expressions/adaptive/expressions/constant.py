@@ -59,7 +59,4 @@ class Constant(Expression):
 
             return "'{}'".format(result)
 
-        if isinstance(self._value, numbers.Number):
-            return self._value.to_string()
-
         return str(self._value)

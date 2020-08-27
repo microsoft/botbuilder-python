@@ -1,4 +1,4 @@
-from .expression_type import ADD, SUBTRACT, MULTIPLY, DIVIDE, MOD
+from .expression_type import ADD, SUBTRACT, MULTIPLY, DIVIDE, MOD, POWER
 from .expression_type import (
     EQUAL,
     LESSTHAN,
@@ -365,11 +365,12 @@ def get_standard_functions() -> dict:
     lookup["mul"] = lookup[MULTIPLY]
     lookup["div"] = lookup[DIVIDE]
     lookup["mod"] = lookup[MOD]
+    lookup["exp"] = lookup[POWER]
 
     # Comparison aliases
     lookup["equals"] = lookup[EQUAL]
     lookup["less"] = lookup[LESSTHAN]
-    lookup["lessOrEuqals"] = lookup[LESSTHANOREQUAL]
+    lookup["lessOrEquals"] = lookup[LESSTHANOREQUAL]
     lookup["greater"] = lookup[GREATERTHAN]
     lookup["greaterOrEquals"] = lookup[GREATERTHANOREQUAL]
 

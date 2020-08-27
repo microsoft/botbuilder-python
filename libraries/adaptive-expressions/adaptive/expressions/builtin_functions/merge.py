@@ -18,7 +18,7 @@ class Merge(ExpressionEvaluator):
             result: object = None
             error: str = None
             try:
-                result = jsonmerge.merge(args[1], args[0])
+                jsonmerge.merge(args[1], args[0])
                 result = jsonmerge.merge(args[0], args[1])
             except:
                 error = (

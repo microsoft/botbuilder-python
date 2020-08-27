@@ -25,6 +25,8 @@ class UriHost(ExpressionEvaluator):
             if isinstance(args[0], str):
                 parsed = urlparse(args[0])
                 value = parsed.hostname
+                if not bool(parsed.netloc):
+                    error = "invalid operation, input uri should be an absolute URI"
             else:
-                error = "${args[0]} should be a string."
+                error = "{} should be a string.".format(str(args[0]))
         return value, error
