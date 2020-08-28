@@ -14,7 +14,7 @@ from ..qnamaker_endpoint import QnAMakerEndpoint
 
 
 class HttpRequestUtils:
-    """ HTTP request utils class. 
+    """ HTTP request utils class.
 
     Parameters:
     -----------
