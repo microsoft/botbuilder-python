@@ -102,6 +102,10 @@ TICKSTODAYS = "ticksToDays"
 TICKSTOHOURS = "ticksToHours"
 TICKSTOMINUTES = "ticksToMinutes"
 DATETIMEDIFF = "dateTimeDiff"
+GETNEXTVIABLEDATE = "getNextViableDate"
+GETNEXTVIABLETIME = "getNextViableTime"
+GETPREVIOUSVIABLEDATE = "getPreviousViableDate"
+GETPREVIOUSVIABLETIME = "getPreviousViableTime"
 
 # Timex
 ISDEFINITE = "isDefinite"

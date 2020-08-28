@@ -950,42 +950,44 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
             -315360000000000,
         ],
         ["dateTimeDiff(timestampObj,timestampObj2)", 62604000000000],
+        # getPreviousViableDate
+        ["isMatch(getPreviousViableDate('XXXX-07-10'), '20[0-9]{2}-07-10')", True],
+        [
+            "isMatch(getPreviousViableDate('XXXX-07-10', 'Asia/Shanghai'), '20[0-9]{2}-07-10')",
+            True,
+        ],
+        ["getPreviousViableDate('XXXX-02-29')", "2020-02-29"],
+        ["getPreviousViableDate('XXXX-02-29', 'Pacific Standard Time')", "2020-02-29"],
         # getPreviousViableTime
-        # ["isMatch(getPreviousViableDate('XXXX-07-10'), '20[0-9]{2}-07-10')", True],
-        # [
-        #     "isMatch(getPreviousViableDate('XXXX-07-10', 'Asia/Shanghai'), '20[0-9]{2}-07-10')",
-        #     True,
-        # ],
-        # ["getPreviousViableDate('XXXX-02-29')", "2020-02-29"],
-        # ["getPreviousViableDate('XXXX-02-29', 'Pacific Standard Time')", "2020-02-29"],
-        # ["isMatch(getPreviousViableTime('TXX:40:20'), 'T[0-2][0-9]:40:20')", True],
-        # [
-        #     "isMatch(getPreviousViableTime('TXX:40:20', 'Eastern Standard Time'), 'T[0-2][0-9]:40:20')",
-        #     True,
-        # ],
-        # ["isMatch(getPreviousViableTime('TXX:05:10'), 'T[0-2][0-9]:05:10')", True],
-        # [
-        #     "isMatch(getPreviousViableTime('TXX:05:10', 'Central Standard Time'), 'T[0-2][0-9]:05:10')",
-        #     True,
-        # ],
-        # getNextViable
-        # ["isMatch(getNextViableDate('XXXX-07-10'), '202[0-9]-07-10')", True],
-        # [
-        #     "isMatch(getNextViableDate('XXXX-07-10', 'Europe/London'), '202[0-9]-07-10')",
-        #     True,
-        # ],
-        # ["getNextViableDate('XXXX-02-29')", "2024-02-29"],
-        # ["getNextViableDate('XXXX-02-29', 'America/Los_Angeles')", "2024-02-29"],
-        # ["isMatch(getNextViableTime('TXX:40:20'), 'T[0-2][0-9]:40:20')", True],
-        # [
-        #     "isMatch(getNextViableTime('TXX:40:20', 'Asia/Tokyo'), 'T[0-2][0-9]:40:20')",
-        #     True,
-        # ],
-        # ["isMatch(getNextViableTime('TXX:05:10'), 'T[0-2][0-9]:05:10')", True],
-        # [
-        #     "isMatch(getNextViableTime('TXX:05:10', 'Europe/Paris'), 'T[0-2][0-9]:05:10')",
-        #     True,
-        # ],
+        ["isMatch(getPreviousViableTime('TXX:40:20'), 'T[0-2][0-9]:40:20')", True],
+        [
+            "isMatch(getPreviousViableTime('TXX:40:20', 'Eastern Standard Time'), 'T[0-2][0-9]:40:20')",
+            True,
+        ],
+        ["isMatch(getPreviousViableTime('TXX:05:10'), 'T[0-2][0-9]:05:10')", True],
+        [
+            "isMatch(getPreviousViableTime('TXX:05:10', 'Central Standard Time'), 'T[0-2][0-9]:05:10')",
+            True,
+        ],
+        # getNextViableDate
+        ["isMatch(getNextViableDate('XXXX-07-10'), '202[0-9]-07-10')", True],
+        [
+            "isMatch(getNextViableDate('XXXX-07-10', 'Europe/London'), '202[0-9]-07-10')",
+            True,
+        ],
+        ["getNextViableDate('XXXX-02-29')", "2024-02-29"],
+        ["getNextViableDate('XXXX-02-29', 'America/Los_Angeles')", "2024-02-29"],
+        # getNextViableTime
+        ["isMatch(getNextViableTime('TXX:40:20'), 'T[0-2][0-9]:40:20')", True],
+        [
+            "isMatch(getNextViableTime('TXX:40:20', 'Asia/Tokyo'), 'T[0-2][0-9]:40:20')",
+            True,
+        ],
+        ["isMatch(getNextViableTime('TXX:05:10'), 'T[0-2][0-9]:05:10')", True],
+        [
+            "isMatch(getNextViableTime('TXX:05:10', 'Europe/Paris'), 'T[0-2][0-9]:05:10')",
+            True,
+        ],
         # Timex functions
         # isDefinite
         ["isDefinite('helloworld')", False],

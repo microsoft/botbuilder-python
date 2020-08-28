@@ -158,6 +158,12 @@ class FunctionUtils:
         )
 
     @staticmethod
+    def validate_unary_or_binary_string(expression: object):
+        return FunctionUtils.validate_arity_and_any_type(
+            expression, 1, 2, ReturnType.String
+        )
+
+    @staticmethod
     def validate_unary_string(expression: object):
         return FunctionUtils.validate_arity_and_any_type(
             expression, 1, 1, ReturnType.String

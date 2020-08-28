@@ -114,6 +114,10 @@ from .builtin_functions.ticks_to_days import TicksToDays
 from .builtin_functions.ticks_to_hours import TicksToHours
 from .builtin_functions.ticks_to_minutes import TicksToMinutes
 from .builtin_functions.date_time_diff import DateTimeDiff
+from .builtin_functions.get_next_viable_date import GetNextViableDate
+from .builtin_functions.get_next_viable_time import GetNextViableTime
+from .builtin_functions.get_previous_viable_date import GetPreviousViableDate
+from .builtin_functions.get_previous_viable_time import GetPreviousViableTime
 
 # Timex
 from .builtin_functions.is_definite import IsDefinite
@@ -288,6 +292,10 @@ def get_standard_functions() -> dict:
     functions.append(TicksToHours())
     functions.append(TicksToMinutes())
     functions.append(DateTimeDiff())
+    functions.append(GetNextViableDate())
+    functions.append(GetNextViableTime())
+    functions.append(GetPreviousViableDate())
+    functions.append(GetPreviousViableTime())
 
     # Timex
     functions.append(IsDefinite())
