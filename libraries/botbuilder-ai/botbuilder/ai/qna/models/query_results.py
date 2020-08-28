@@ -25,6 +25,6 @@ class QueryResults(Model):
 
         active_learning_enabled: The active learning enable flag.
         """
-        super(QueryResults, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.answers = answers
         self.active_learning_enabled = active_learning_enabled
