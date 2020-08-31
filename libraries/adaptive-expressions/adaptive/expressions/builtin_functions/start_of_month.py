@@ -4,6 +4,7 @@ from ..expression_type import STARTOFMONTH
 from ..function_utils import FunctionUtils
 from ..return_type import ReturnType
 from ..expression_evaluator import ExpressionEvaluator
+from ..convert_format import FormatDatetime
 
 
 class StartOfMonth(ExpressionEvaluator):
@@ -26,8 +27,6 @@ class StartOfMonth(ExpressionEvaluator):
                 args[1] if len(args) == 2 else FunctionUtils.default_date_time_format
             )
             value, error = StartOfMonth.start_of_month_with_error(args[0], time_format)
-            if len(args) != 2:
-                value = value[:-4] + "Z"
         return value, error
 
     @staticmethod
@@ -37,8 +36,8 @@ class StartOfMonth(ExpressionEvaluator):
         parsed: object = None
         parsed, error = FunctionUtils.normalize_to_date_time(timestamp)
         if error is None:
-            start_of_hour = datetime(year=parsed.year, month=parsed.month, day=1)
-            result = start_of_hour.strftime(time_format)
+            start_of_month = datetime(year=parsed.year, month=parsed.month, day=1)
+            result = FormatDatetime.format(start_of_month, time_format)
         return result, error
 
     @staticmethod

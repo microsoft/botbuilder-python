@@ -4,6 +4,7 @@ from ..expression_type import STARTOFHOUR
 from ..function_utils import FunctionUtils
 from ..return_type import ReturnType
 from ..expression_evaluator import ExpressionEvaluator
+from ..convert_format import FormatDatetime
 
 
 class StartOfHour(ExpressionEvaluator):
@@ -23,8 +24,6 @@ class StartOfHour(ExpressionEvaluator):
                 args[1] if len(args) == 2 else FunctionUtils.default_date_time_format
             )
             value, error = StartOfHour.start_of_hour_with_error(args[0], time_format)
-            if len(args) != 2:
-                value = value[:-4] + "Z"
         return value, error
 
     @staticmethod
@@ -37,7 +36,7 @@ class StartOfHour(ExpressionEvaluator):
             start_of_hour = datetime(
                 year=parsed.year, month=parsed.month, day=parsed.day, hour=parsed.hour
             )
-            result = start_of_hour.strftime(time_format)
+            result = FormatDatetime.format(start_of_hour, time_format)
         return result, error
 
     @staticmethod

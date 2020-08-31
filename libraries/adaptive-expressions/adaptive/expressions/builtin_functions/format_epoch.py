@@ -5,6 +5,7 @@ from ..expression_evaluator import ExpressionEvaluator, EvaluateExpressionDelega
 from ..expression_type import FORMATEPOCH
 from ..function_utils import FunctionUtils
 from ..return_type import ReturnType
+from ..convert_format import FormatDatetime
 
 
 class FormatEpoch(ExpressionEvaluator):
@@ -26,11 +27,10 @@ class FormatEpoch(ExpressionEvaluator):
                 date_time = datetime(1970, 1, 1, 0, 0, 0, 0, pytz.timezone("UTC"))
                 date_time = date_time + timedelta(seconds=timestamp)
                 if len(args) == 2:
-                    result = date_time.strftime(args[1])
+                    result = FormatDatetime.format(date_time, args[1])
                 else:
-                    result = (
-                        date_time.strftime(FunctionUtils.default_date_time_format)[:-4]
-                        + "Z"
+                    result = FormatDatetime.format(
+                        date_time, FunctionUtils.default_date_time_format
                     )
             else:
                 error = (

@@ -4,6 +4,7 @@ from ..expression_type import GETFUTURETIME
 from ..function_utils import FunctionUtils
 from ..return_type import ReturnType
 from ..expression_evaluator import ExpressionEvaluator
+from ..convert_format import FormatDatetime
 
 
 class GetFutureTime(ExpressionEvaluator):
@@ -36,9 +37,9 @@ class GetFutureTime(ExpressionEvaluator):
                     args[0], args[1], False
                 )
                 if error is None:
-                    value = time_converter(datetime.utcnow()).strftime(time_format)
-                    if len(args) != 3:
-                        value = value[:-4] + "Z"
+                    value = FormatDatetime.format(
+                        time_converter(datetime.utcnow()), time_format
+                    )
             else:
                 error = (
                     "{"

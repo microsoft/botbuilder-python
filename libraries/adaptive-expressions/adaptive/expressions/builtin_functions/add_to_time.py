@@ -3,6 +3,7 @@ from ..expression_type import ADDTOTIME
 from ..function_utils import FunctionUtils
 from ..return_type import ReturnType
 from ..expression_evaluator import ExpressionEvaluator
+from ..convert_format import FormatDatetime
 
 
 class AddToTime(ExpressionEvaluator):
@@ -29,8 +30,6 @@ class AddToTime(ExpressionEvaluator):
                 value, error = AddToTime.eval_add_to_time(
                     args[0], args[1], args[2], time_format
                 )
-                if time_format == FunctionUtils.default_date_time_format:
-                    value = value[:-4] + "Z"
             else:
                 error = (
                     "{"
@@ -54,7 +53,7 @@ class AddToTime(ExpressionEvaluator):
             )
             if error is None:
                 added_timestamp = converter(parsed)
-                result = added_timestamp.strftime(time_format)
+                result = FormatDatetime.format(added_timestamp, time_format)
         return result, error
 
     @staticmethod
