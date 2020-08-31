@@ -16,7 +16,7 @@ class Divide(MultivariateNumericEvaluator):
     def verify(val: object, expression: object, pos: int):
         error = FunctionUtils.verify_number(val, expression, pos)
         if error is None and pos > 0 and val == 0:
-            error = "Cannot divide by 0 from " + expression
+            error = "Cannot divide by 0 from " + expression.to_string()
 
         return error
 
@@ -24,5 +24,8 @@ class Divide(MultivariateNumericEvaluator):
     def eval_divide(num_a: numbers.Number, num_b: numbers.Number):
         if num_a is None or num_b is None:
             raise Exception("Argument null exception.")
+
+        if isinstance(num_a, int) and isinstance(num_b, int):
+            return num_a // num_b
 
         return num_a / num_b

@@ -28,6 +28,8 @@ class Concat(ExpressionEvaluator):
                 return first_item
             if is_first_list and is_second_list:
                 return first_item + second_item
-            return str(first_item) + str(second_item)
+            return (str(first_item) if first_item else "") + (
+                str(second_item) if second_item else ""
+            )
 
         return FunctionUtils.apply_sequence(anonymous_function)

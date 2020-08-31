@@ -19,6 +19,7 @@ from ..constant import Constant
 from .generated import expression_antlr_lexer
 from .generated import expression_antlr_parser as ep_parser
 from .generated import expression_antlr_parserVisitor
+from .expression_parser_error_listener import ParseErrorListener
 
 
 class ExpressionTransformer(expression_antlr_parserVisitor):
@@ -240,10 +241,11 @@ class ExpressionParser(ExpresssionParserInterface):
 
         input_stream = InputStream(expression)
         lexer = expression_antlr_lexer(input_stream)
+        lexer.removeErrorListeners()
         token_stream = CommonTokenStream(lexer)
         parser = ep_parser(token_stream)
-
-        # TODO: add error listener
+        parser.removeErrorListeners()
+        parser.addErrorListener(ParseErrorListener())
         parser.buildParseTrees = True
         exp = parser.exp()
         expression_context = None

@@ -9,7 +9,7 @@ class GreaterThan(ComparisonEvaluator):
             GREATERTHAN,
             GreaterThan.function,
             FunctionUtils.validate_binary_number_or_string,
-            FunctionUtils.verify_number_or_string_or_null,
+            FunctionUtils.verify_number_or_string,
         )
 
     @staticmethod

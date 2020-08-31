@@ -26,6 +26,7 @@ from .function_table import FunctionTable
 from .expression import Expression
 from .constant import Constant
 from .expression_parser import ExpressionParser
+from .common_regex import CommonRegex
 
 __all__ = [
     "__version__",
@@ -46,4 +47,5 @@ __all__ = [
     "ExpressionParser",
     "SimpleObjectMemory",
     "StackedMemory",
+    "CommonRegex",
 ]

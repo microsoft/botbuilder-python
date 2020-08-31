@@ -4,6 +4,7 @@ from antlr4 import InputStream
 from antlr4 import CommonTokenStream
 from .generated.common_regexLexer import common_regexLexer
 from .generated.common_regexParser import common_regexParser
+from .regex_error_listener import RegexErrorListener
 
 
 class CommonRegex:
@@ -13,7 +14,7 @@ class CommonRegex:
         if (pattern is None and len(pattern) == 0) or not CommonRegex.is_common_regex(
             pattern
         ):
-            raise Exception("'{" + pattern + "}' is not a valid regex.")
+            raise Exception("'{}' is not a valid regex.".format(pattern))
         return re.compile(pattern)
 
     @staticmethod
@@ -28,9 +29,11 @@ class CommonRegex:
     def antlr_parse(pattern: str):
         input_stream = InputStream(pattern)
         lexer = common_regexLexer(input_stream)
-        # TODO: RemoveErrorListeners()
+        lexer.removeErrorListeners()
         token_stream = CommonTokenStream(lexer)
         parser = common_regexParser(token_stream)
-        # TODO: RemoveErrorListeners() and AddErrorListener()
+        parser.removeErrorListeners()
+        parser.addErrorListener(RegexErrorListener())
         parser.buildParseTrees = True
+
         return parser.parse()

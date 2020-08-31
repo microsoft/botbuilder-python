@@ -1,4 +1,4 @@
-from .expression_type import ADD, SUBTRACT, MULTIPLY, DIVIDE, MOD
+from .expression_type import ADD, SUBTRACT, MULTIPLY, DIVIDE, MOD, POWER
 from .expression_type import (
     EQUAL,
     LESSTHAN,
@@ -114,6 +114,10 @@ from .builtin_functions.ticks_to_days import TicksToDays
 from .builtin_functions.ticks_to_hours import TicksToHours
 from .builtin_functions.ticks_to_minutes import TicksToMinutes
 from .builtin_functions.date_time_diff import DateTimeDiff
+from .builtin_functions.get_next_viable_date import GetNextViableDate
+from .builtin_functions.get_next_viable_time import GetNextViableTime
+from .builtin_functions.get_previous_viable_date import GetPreviousViableDate
+from .builtin_functions.get_previous_viable_time import GetPreviousViableTime
 
 # Timex
 from .builtin_functions.is_definite import IsDefinite
@@ -288,6 +292,10 @@ def get_standard_functions() -> dict:
     functions.append(TicksToHours())
     functions.append(TicksToMinutes())
     functions.append(DateTimeDiff())
+    functions.append(GetNextViableDate())
+    functions.append(GetNextViableTime())
+    functions.append(GetPreviousViableDate())
+    functions.append(GetPreviousViableTime())
 
     # Timex
     functions.append(IsDefinite())
@@ -365,11 +373,12 @@ def get_standard_functions() -> dict:
     lookup["mul"] = lookup[MULTIPLY]
     lookup["div"] = lookup[DIVIDE]
     lookup["mod"] = lookup[MOD]
+    lookup["exp"] = lookup[POWER]
 
     # Comparison aliases
     lookup["equals"] = lookup[EQUAL]
     lookup["less"] = lookup[LESSTHAN]
-    lookup["lessOrEuqals"] = lookup[LESSTHANOREQUAL]
+    lookup["lessOrEquals"] = lookup[LESSTHANOREQUAL]
     lookup["greater"] = lookup[GREATERTHAN]
     lookup["greaterOrEquals"] = lookup[GREATERTHANOREQUAL]
 
