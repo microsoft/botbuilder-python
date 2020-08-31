@@ -3,6 +3,7 @@ from ..expression_type import STARTOFDAY
 from ..function_utils import FunctionUtils
 from ..return_type import ReturnType
 from ..expression_evaluator import ExpressionEvaluator
+from ..convert_format import FormatDatetime
 
 
 class StartOfDay(ExpressionEvaluator):
@@ -22,8 +23,6 @@ class StartOfDay(ExpressionEvaluator):
                 args[1] if len(args) == 2 else FunctionUtils.default_date_time_format
             )
             value, error = StartOfDay.start_of_day_with_error(args[0], time_format)
-            if len(args) != 2:
-                value = value[:-4] + "Z"
         return value, error
 
     @staticmethod
@@ -34,7 +33,7 @@ class StartOfDay(ExpressionEvaluator):
         parsed, error = FunctionUtils.normalize_to_date_time(timestamp)
         if error is None:
             start_of_day = parsed.date()
-            result = start_of_day.strftime(time_format)
+            result = FormatDatetime.format(start_of_day, time_format)
         return result, error
 
     @staticmethod

@@ -7,6 +7,7 @@ from ..expression_evaluator import (
 from ..options import Options
 from ..function_utils import FunctionUtils
 from ..return_type import ReturnType
+from ..convert_format import FormatDatetime
 
 
 class TimeTransformEvaluator(ExpressionEvaluator):
@@ -54,10 +55,7 @@ class TimeTransformEvaluator(ExpressionEvaluator):
                         args[0], anonymous_func
                     )
                     if error is None:
-                        if len(args) == 3 and isinstance(args[2], str):
-                            value = value.strftime(format_string)
-                        else:
-                            value = value.strftime(format_string)[:-4] + "Z"
+                        value = FormatDatetime.format(value, format_string)
                 else:
                     error = (
                         "{"

@@ -11,13 +11,14 @@ from .memory_interface import MemoryInterface
 from .options import Options
 from .return_type import ReturnType
 from .expression_type import ACCESSOR, ELEMENT
+from .convert_format import FormatDatetime
 
 VerifyExpression = NewType("VerifyExpression", Callable[[object, object, int], str])
 
 # pylint: disable=unused-argument
 class FunctionUtils:
     verify_expression = VerifyExpression
-    default_date_time_format = "%Y-%m-%dT%H:%M:%S.%fZ"
+    default_date_time_format = "yyyy-MM-ddTHH:mm:ss.fffZ"
 
     @staticmethod
     def validate_arity_and_any_type(
@@ -537,8 +538,10 @@ class FunctionUtils:
         try:
             parsed = parse(timestamp)
             if (
-                parsed.strftime(FunctionUtils.default_date_time_format).upper()
-                == (timestamp[:-1] + "000Z").upper()
+                FormatDatetime.format(
+                    parsed, FunctionUtils.default_date_time_format
+                ).upper()
+                == timestamp
             ):
                 if transform is not None:
                     result, error = transform(parsed)

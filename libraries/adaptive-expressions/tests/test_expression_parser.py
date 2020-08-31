@@ -544,22 +544,22 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         ["addDays('2018-03-15T13:00:00.000Z', 1)", "2018-03-16T13:00:00.000Z"],
         ["addDays(timestamp, 1)", "2018-03-16T13:00:00.000Z"],
         ["addDays(timestampObj, 1)", "2018-03-16T13:00:00.000Z"],
-        ["addDays(timestamp, 1,'%m-%d-%y')", "03-16-18"],
+        ["addDays(timestamp, 1,'MM-dd-yy')", "03-16-18"],
         # addHours
         ["addHours('2018-03-15T13:00:00.000Z', 1)", "2018-03-15T14:00:00.000Z"],
         ["addHours(timestamp, 1)", "2018-03-15T14:00:00.000Z"],
         ["addHours(timestampObj, 1)", "2018-03-15T14:00:00.000Z"],
-        ["addHours(timestamp, 1,'%m-%d-%y %I-%M')", "03-15-18 02-00"],
+        ["addHours(timestamp, 1, 'MM-dd-yy hh-mm')", "03-15-18 02-00"],
         # AddMinutes
         ["addMinutes('2018-03-15T13:00:00.000Z', 1)", "2018-03-15T13:01:00.000Z"],
         ["addMinutes(timestamp, 1)", "2018-03-15T13:01:00.000Z"],
         ["addMinutes(timestampObj, 1)", "2018-03-15T13:01:00.000Z"],
-        ["addMinutes(timestamp, 1,'%m-%d-%y %I-%M')", "03-15-18 01-01"],
+        ["addMinutes(timestamp, 1,'MM-dd-yy hh-mm')", "03-15-18 01-01"],
         # addSeconds
         ["addSeconds('2018-03-15T13:00:00.000Z', 1)", "2018-03-15T13:00:01.000Z"],
         ["addSeconds(timestamp, 1)", "2018-03-15T13:00:01.000Z"],
         ["addSeconds(timestampObj, 1)", "2018-03-15T13:00:01.000Z"],
-        ["addSeconds(timestamp, 1,'%m-%d-%y %I-%M-%S')", "03-15-18 01-00-01"],
+        ["addSeconds(timestamp, 1,'MM-dd-yy hh-mm-ss')", "03-15-18 01-00-01"],
         # dayOfMonth
         ["dayOfMonth('2018-03-15T13:00:00.000Z')", 15],
         ["dayOfMonth(timestamp)", 15],
@@ -586,11 +586,14 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         ["year(timestampObj)", 2018],
         # utcNow
         ["length(utcNow())", 24],
-        ["utcNow('%m-%d-%Y')", datetime.utcnow().strftime("%m-%d-%Y")],
+        [
+            "utcNow('MM-dd-yy')",
+            datetime.utcnow().strftime("%m-%d-") + datetime.utcnow().strftime("%Y")[2:],
+        ],
         # formatDateTime
         ["formatDateTime('2018-03-15')", "2018-03-15T00:00:00.000Z"],
         ["formatDateTime(notISOTimestamp)", "2018-03-15T13:00:00.000Z"],
-        ["formatDateTime(notISOTimestamp, '%m-%d-%y')", "03-15-18"],
+        ["formatDateTime(notISOTimestamp, 'MM-dd-yy')", "03-15-18"],
         ["formatDateTime(timestampObj)", "2018-03-15T13:00:00.000Z"],
         # formatEpoch
         ["formatEpoch(unixTimestamp)", "2018-03-15T13:00:00.000Z"],
@@ -621,35 +624,31 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         ["getTimeOfDay('2018-03-15T23:00:00.000Z')", "night"],
         # getPastTime
         [
-            "getPastTime(1,'Year','%m-%d-%y')",
+            "getPastTime(1,'Year','MM-dd-yy')",
             (datetime.utcnow() + relativedelta(years=-1)).strftime("%m-%d-%y"),
         ],
         [
-            "getPastTime(1,'Month','%m-%d-%y')",
+            "getPastTime(1,'Month','MM-dd-yy')",
             (datetime.utcnow() + relativedelta(months=-1)).strftime("%m-%d-%y"),
         ],
         [
-            "getPastTime(1,'Week','%m-%d-%y')",
+            "getPastTime(1,'Week','MM-dd-yy')",
             (datetime.utcnow() + relativedelta(weeks=-1)).strftime("%m-%d-%y"),
         ],
         [
-            "getPastTime(1,'Day','%m-%d-%y')",
+            "getPastTime(1,'Day','MM-dd-yy')",
             (datetime.utcnow() + relativedelta(days=-1)).strftime("%m-%d-%y"),
         ],
         # convertFromUTC
         [
             "convertFromUTC('2018-01-02T02:00:00.000Z',\
-           'Pacific Standard Time', '%A, %d %B %Y')",
-            "Monday, 01 January 2018",
+           'Pacific Standard Time', 'D')",
+            "Monday, January 1, 2018",
         ],
         [
-            "convertFromUTC('2018-01-02T01:00:00.000Z',\
-           'America/Los_Angeles', '%A, %d %B %Y')",
-            "Monday, 01 January 2018",
-        ],
-        [
-            "convertFromUTC(timestampObj2, 'Pacific Standard Time', '%A, %d %B %Y')",
-            "Monday, 01 January 2018",
+            "convertFromUTC('2018-02-02T02:00:00.000Z',\
+           'Pacific Standard Time', 'MM-dd-yy')",
+            "02-01-18",
         ],
         # convertToUTC
         [
@@ -657,10 +656,7 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
             "2018-01-01T08:00:00.000Z",
         ],
         # addToTime
-        [
-            "addToTime('2018-01-01T08:00:00.000Z', 1, 'Day', '%A, %d %B %Y')",
-            "Tuesday, 02 January 2018",
-        ],
+        ["addToTime('2018-01-01T08:00:00.000Z', 1, 'Day', 'MM-DD-YY')", "01-02-18",],
         [
             "addToTime('2018-01-01T00:00:00.000Z', 1, 'Week')",
             "2018-01-08T00:00:00.000Z",

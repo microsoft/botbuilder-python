@@ -3,6 +3,7 @@ from ..expression_evaluator import ExpressionEvaluator, EvaluateExpressionDelega
 from ..expression_type import UTCNOW
 from ..function_utils import FunctionUtils
 from ..return_type import ReturnType
+from ..convert_format import FormatDatetime
 
 
 class UtcNow(ExpressionEvaluator):
@@ -16,8 +17,10 @@ class UtcNow(ExpressionEvaluator):
         def anonymous_function(args: list):
             date_time = datetime.utcnow()
             if len(args) == 1:
-                return date_time.strftime(args[0])
-            return date_time.strftime(FunctionUtils.default_date_time_format)[:-4] + "Z"
+                return FormatDatetime.format(date_time, args[0])
+            return FormatDatetime.format(
+                date_time, FunctionUtils.default_date_time_format
+            )
 
         return FunctionUtils.apply(anonymous_function)
 

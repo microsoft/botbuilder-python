@@ -6,6 +6,7 @@ from ..expression_type import CONVERTFROMUTC
 from ..function_utils import FunctionUtils
 from ..return_type import ReturnType
 from ..expression_evaluator import ExpressionEvaluator
+from ..convert_format import FormatDatetime
 
 
 class ConvertFromUtc(ExpressionEvaluator):
@@ -54,11 +55,9 @@ class ConvertFromUtc(ExpressionEvaluator):
             if not TimeZoneConverter.verify_time_zone_str(des_timezone):
                 error = "{" + des_timezone + "} is an illegal timezone."
             else:
-                result = utc_datetime.astimezone(tz.gettz(des_timezone)).strftime(
-                    time_format
+                result = FormatDatetime.format(
+                    utc_datetime.astimezone(tz.gettz(des_timezone)), time_format
                 )
-                if time_format == FunctionUtils.default_date_time_format:
-                    result = result[:-4] + "Z"
         return result, error
 
     @staticmethod

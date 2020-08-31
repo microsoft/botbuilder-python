@@ -5,6 +5,7 @@ from ..expression_evaluator import ExpressionEvaluator, EvaluateExpressionDelega
 from ..expression_type import FORMATDATETIME
 from ..function_utils import FunctionUtils
 from ..return_type import ReturnType
+from ..convert_format import FormatDatetime
 
 
 class FormatDateTime(ExpressionEvaluator):
@@ -26,10 +27,9 @@ class FormatDateTime(ExpressionEvaluator):
 
                 def anonymous_func(date_time: datetime):
                     if len(args) == 2:
-                        return date_time.strftime(args[1])
-                    return (
-                        date_time.strftime(FunctionUtils.default_date_time_format)[:-4]
-                        + "Z"
+                        return FormatDatetime.format(date_time, args[1])
+                    return FormatDatetime.format(
+                        date_time, FunctionUtils.default_date_time_format
                     )
 
                 result, error = FormatDateTime.parse_time_stamp(
@@ -37,11 +37,10 @@ class FormatDateTime(ExpressionEvaluator):
                 )
             elif isinstance(timestamp, datetime):
                 if len(args) == 2:
-                    result = timestamp.strftime(args[1])
+                    result = FormatDatetime.format(timestamp, args[1])
                 else:
-                    result = (
-                        timestamp.strftime(FunctionUtils.default_date_time_format)[:-4]
-                        + "Z"
+                    result = FormatDatetime.format(
+                        timestamp, FunctionUtils.default_date_time_format
                     )
             else:
                 error = (

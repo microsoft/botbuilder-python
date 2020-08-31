@@ -5,6 +5,7 @@ from ..function_utils import FunctionUtils
 from ..return_type import ReturnType
 from ..options import Options
 from ..expression_evaluator import ExpressionEvaluator
+from ..convert_format import FormatDatetime
 
 
 class SubtractFromTime(ExpressionEvaluator):
@@ -41,7 +42,9 @@ class SubtractFromTime(ExpressionEvaluator):
 
                     def anonymous_function(date_time: datetime):
                         return (
-                            time_converter(date_time).strftime(time_format)[:-4] + "Z",
+                            FormatDatetime.format(
+                                time_converter(date_time), time_format
+                            ),
                             None,
                         )
 

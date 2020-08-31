@@ -6,6 +6,7 @@ from ..expression_type import CONVERTTOUTC
 from ..function_utils import FunctionUtils
 from ..return_type import ReturnType
 from ..expression_evaluator import ExpressionEvaluator
+from ..convert_format import FormatDatetime
 
 
 class ConvertToUtc(ExpressionEvaluator):
@@ -58,11 +59,9 @@ class ConvertToUtc(ExpressionEvaluator):
                 error = "{" + source_timezone + "} is an illegal timezone."
             converted_datetime = parsed.replace(tzinfo=tz.gettz(source_timezone))
             if error is None:
-                result = converted_datetime.astimezone(tz.gettz("UTC")).strftime(
-                    time_format
+                result = FormatDatetime.format(
+                    converted_datetime.astimezone(tz.gettz("UTC")), time_format
                 )
-                if time_format == FunctionUtils.default_date_time_format:
-                    result = result[:-4] + "Z"
         return result, error
 
     @staticmethod
