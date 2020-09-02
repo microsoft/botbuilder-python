@@ -141,7 +141,7 @@ class ExpressionTransformer(expression_antlr_parserVisitor):
     def visitStringInterpolationAtom(
         self, ctx: ep_parser.StringInterpolationAtomContext
     ) -> Expression:
-        children = []
+        children = [Constant("")]
         for node in ctx.stringInterpolation().children:
             if isinstance(node, TerminalNode):
                 node_type = node.symbol.type

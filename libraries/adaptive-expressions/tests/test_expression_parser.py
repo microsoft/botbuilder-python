@@ -118,6 +118,7 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         ["'ab\\'cd'", "ab'cd"],  # 'ab\'cd' -> ab'cd
         ["alist[0].Name", "item1"],
         # String interpolation test
+        ["``", ""],
         ["`hi`", "hi"],
         ["`hi\\``", "hi`"],
         ["`${world}`", "world"],
@@ -143,6 +144,12 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         ["`hello ${string({obj:  1})}`", "hello {'obj': 1}"],
         ['`hello ${string({obj:  "${not expr}"})}`', "hello {'obj': '${not expr}'}"],
         ["`hello ${string({obj:  {a: 1}})}`", "hello {'obj': {'a': 1}}"],
+        ["`${hello}\n\n${world}`", "hello\n\nworld"],
+        ["`${hello}\r\n${world}`", "hello\r\nworld"],
+        ["`\n\n${world}`", "\n\nworld"],
+        ["`\r\n${world}`", "\r\nworld"],
+        ["`${hello}\n\n`", "hello\n\n"],
+        ["`${hello}\r\n`", "hello\r\n"],
         # Operators tests
         ["user.income-user.outcome", -10.0],
         ["user.income - user.outcome", -10.0],
