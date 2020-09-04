@@ -80,7 +80,7 @@ class LuisRecognizer(Recognizer):
         :param default_intent: Intent name to return should a top intent be found, defaults to None.
         :type default_intent: str, optional
         :param min_score: Minimum score needed for an intent to be considered as a top intent. If all intents in
-        the set are below this threshold then the `defaultIntent` will be returned, defaults to 0.0.
+         the set are below this threshold then the `defaultIntent` will be returned, defaults to 0.0.
         :type min_score: float, optional
         :raises TypeError:
         :return: The top scoring intent name.
@@ -191,7 +191,7 @@ class LuisRecognizer(Recognizer):
          defaults to None
         :param telemetry_properties: :class:`typing.Dict[str, str]`, optional
         :return: A dictionary that is sent as "Properties" to :func:`botbuilder.core.BotTelemetryClient.track_event`
-        method for the BotMessageSend event.
+         method for the BotMessageSend event.
         :rtype: `typing.Dict[str, str]`
         """
 

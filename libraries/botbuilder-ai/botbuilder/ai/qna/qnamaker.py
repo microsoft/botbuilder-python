@@ -166,14 +166,16 @@ class QnAMaker(QnAMakerTelemetryClient):
         """
         Fills the event properties and metrics for the QnaMessage event for telemetry.
 
-        :return: A tuple of event data properties and metrics that will be sent to the
-        :func:`botbuilder.core.BotTelemetryClient.track_event` method for the QnAMessage event.
-        The properties and metrics returned the standard properties logged
-        with any properties passed from the :func:`get_answers` method.
+        :param query_results: QnA service results.
+        :type quert_results: :class:`QueryResult`
+        :param turn_context: Context object containing information for a single turn of conversation with a user.
+        :type turn_context: :class:`botbuilder.core.TurnContext`
+        :param telemetry_properties: Properties to add/override for the event.
+        :type telemetry_properties: :class:`Typing.Dict`
+        :param telemetry_metrics: Metrics to add/override for the event.
+        :type telemetry_metrics: :class:`Typing.Dict`
         :return: Event properties and metrics for the QnaMessage event for telemetry.
         :rtype: :class:`EventData`
-        ------
-        EventData
         """
 
         properties: Dict[str, str] = dict()
