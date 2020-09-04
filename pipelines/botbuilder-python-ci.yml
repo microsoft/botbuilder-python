@@ -57,8 +57,8 @@ jobs:
       pip install -r ./libraries/botframework-connector/tests/requirements.txt
       pip install -r ./libraries/botbuilder-core/tests/requirements.txt
       pip install coveralls
-      pip install pylint
-      pip install black
+      pip install pylint==2.4.4
+      pip install black==19.10b0
     displayName: 'Install dependencies'
 
   - script: |
