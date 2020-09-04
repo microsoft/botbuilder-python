@@ -165,6 +165,9 @@ class JwtTokenValidation:
     ):
         if auth_config and auth_config.claims_validator:
             await auth_config.claims_validator(claims)
+        elif SkillValidation.is_skill_claim(claims):
+            # Skill claims must be validated using AuthenticationConfiguration claims_validator
+            raise PermissionError("Unauthorized Access. Request is not authorized. Skill Claims require validation.")
 
     @staticmethod
     def is_government(channel_service: str) -> bool:
