@@ -4,12 +4,13 @@
 # pylint: disable=protected-access
 # pylint: disable=too-many-lines
 
-import json
-import requests
+import unittest
 from os import path
 from typing import List, Dict
-import unittest
 from unittest.mock import patch
+
+import json
+import requests
 from aiohttp import ClientSession
 
 import aiounittest
