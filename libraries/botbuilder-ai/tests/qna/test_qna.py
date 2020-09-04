@@ -171,9 +171,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         response_path: str = "ReturnsAnswer.json"
         response_json = QnaApplicationTest._get_json_for_file(response_path)
 
-        qna = QnAMaker(
-            endpoint=QnaApplicationTest.tests_endpoint, http_client=requests
-        )
+        qna = QnAMaker(endpoint=QnaApplicationTest.tests_endpoint, http_client=requests)
         context = QnaApplicationTest._get_context(question, TestAdapter())
 
         with patch("requests.post", return_value=response_json):
@@ -185,7 +183,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
             self.assertEqual(
                 "BaseCamp: You can use a damp rag to clean around the Power Pack",
                 answers[0].answer,
-        )
+            )
 
     async def test_returns_answer_using_options(self):
         # Arrange
@@ -287,7 +285,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
             context=None,
             qna_id=None,
             is_test=False,
-            ranker_type="Default"
+            ranker_type="Default",
         )
         response_path = "ReturnsAnswer.json"
         response_json = QnaApplicationTest._get_json_for_file(response_path)
@@ -296,10 +294,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
 
         with patch("requests.post", return_value=response_json):
             result = await http_request_helper.execute_http_request(
-                url,
-                question,
-                QnaApplicationTest.tests_endpoint,
-                timeout=None
+                url, question, QnaApplicationTest.tests_endpoint, timeout=None
             )
             answers = result["answers"]
 
@@ -308,7 +303,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
             self.assertEqual(
                 "BaseCamp: You can use a damp rag to clean around the Power Pack",
                 answers[0]["answer"],
-        )
+            )
 
     async def test_telemetry_returns_answer(self):
         # Arrange
