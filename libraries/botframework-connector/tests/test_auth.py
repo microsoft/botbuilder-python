@@ -62,7 +62,6 @@ class TestAuth:
         # No validator should pass.
         await JwtTokenValidation.validate_claims(default_auth_config, claims)
 
-        # ClaimsValidator configured but no exception should pass.
         mock_validator = Mock()
         auth_with_validator = AuthenticationConfiguration(
             claims_validator=mock_validator
@@ -74,6 +73,26 @@ class TestAuth:
             await JwtTokenValidation.validate_claims(auth_with_validator, claims)
 
         assert "Invalid claims." in str(excinfo.value)
+
+        # No validator with skill cliams should pass.
+        claims: List[Dict] = {
+                AuthenticationConstants.AUDIENCE_CLAIM: "this_bot_id",
+                AuthenticationConstants.APP_ID_CLAIM: "not_this_bot_id",
+            }
+
+        await JwtTokenValidation.validate_claims(default_auth_config, claims)
+
+        # No validator with NOT skill cliams should fail.
+        claims: List[Dict] = {
+                AuthenticationConstants.AUDIENCE_CLAIM: "this_bot_id",
+                AuthenticationConstants.APP_ID_CLAIM: "this_bot_id",
+            }
+
+        mock_validator.side_effect = PermissionError("Unauthorized Access. Request is not authorized. Skill Claims require validation.")
+        with pytest.raises(PermissionError) as excinfo_skill:
+            await JwtTokenValidation.validate_claims(auth_with_validator, claims)
+
+        assert "Unauthorized Access. Request is not authorized. Skill Claims require validation." in str(excinfo_skill.value)
 
     @pytest.mark.asyncio
     async def test_connector_auth_header_correct_app_id_and_service_url_should_validate(
