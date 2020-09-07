@@ -74,25 +74,33 @@ class TestAuth:
 
         assert "Invalid claims." in str(excinfo.value)
 
-        # No validator with skill cliams should pass.
+        # No validator with not skill cliams should pass.
+        default_auth_config.claims_validator = None
         claims: List[Dict] = {
-                AuthenticationConstants.AUDIENCE_CLAIM: "this_bot_id",
-                AuthenticationConstants.APP_ID_CLAIM: "not_this_bot_id",
-            }
+            AuthenticationConstants.VERSION_CLAIM: "1.0",
+            AuthenticationConstants.AUDIENCE_CLAIM: "this_bot_id",
+            AuthenticationConstants.APP_ID_CLAIM: "this_bot_id",  # Skill claims aud!=azp
+        }
 
         await JwtTokenValidation.validate_claims(default_auth_config, claims)
 
-        # No validator with NOT skill cliams should fail.
+        # No validator with skill cliams should fail.
         claims: List[Dict] = {
-                AuthenticationConstants.AUDIENCE_CLAIM: "this_bot_id",
-                AuthenticationConstants.APP_ID_CLAIM: "this_bot_id",
-            }
+            AuthenticationConstants.VERSION_CLAIM: "1.0",
+            AuthenticationConstants.AUDIENCE_CLAIM: "this_bot_id",
+            AuthenticationConstants.APP_ID_CLAIM: "not_this_bot_id",  # Skill claims aud!=azp
+        }
 
-        mock_validator.side_effect = PermissionError("Unauthorized Access. Request is not authorized. Skill Claims require validation.")
+        mock_validator.side_effect = PermissionError(
+            "Unauthorized Access. Request is not authorized. Skill Claims require validation."
+        )
         with pytest.raises(PermissionError) as excinfo_skill:
             await JwtTokenValidation.validate_claims(auth_with_validator, claims)
 
-        assert "Unauthorized Access. Request is not authorized. Skill Claims require validation." in str(excinfo_skill.value)
+        assert (
+            "Unauthorized Access. Request is not authorized. Skill Claims require validation."
+            in str(excinfo_skill.value)
+        )
 
     @pytest.mark.asyncio
     async def test_connector_auth_header_correct_app_id_and_service_url_should_validate(
