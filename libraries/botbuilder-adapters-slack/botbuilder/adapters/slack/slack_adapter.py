@@ -24,8 +24,7 @@ from .slack_helper import SlackHelper
 
 class SlackAdapter(BotAdapter, ABC):
     """
-    BotAdapter that can handle incoming slack events.  Incoming slack events are deserialized to an Activity
-    that is dispatch through the middleware and bot pipeline.
+    BotAdapter that can handle incoming Slack events. Incoming Slack events are deserialized to an Activity that is dispatched through the middleware and bot pipeline.
     """
 
     def __init__(
@@ -41,11 +40,14 @@ class SlackAdapter(BotAdapter, ABC):
         self, context: TurnContext, activities: List[Activity]
     ) -> List[ResourceResponse]:
         """
-        Standard BotBuilder adapter method to send a message from the bot to the messaging API.
+        Send a message from the bot to the messaging API.
 
         :param context: A TurnContext representing the current incoming message and environment.
+        :type context: :class:`botbuilder.core.TurnContext`
         :param activities: An array of outgoing activities to be sent back to the messaging API.
+        :type activities: :class:`typing.List`
         :return: An array of ResourceResponse objects containing the IDs that Slack assigned to the sent messages.
+        :rtype: :class:`typing.List`
         """
 
         if not context:
@@ -76,11 +78,14 @@ class SlackAdapter(BotAdapter, ABC):
 
     async def update_activity(self, context: TurnContext, activity: Activity):
         """
-        Standard BotBuilder adapter method to update a previous message with new content.
+        Update a previous message with new content.
 
         :param context: A TurnContext representing the current incoming message and environment.
+        :type context: :class:`botbuilder.core.TurnContext`
         :param activity: The updated activity in the form '{id: `id of activity to update`, ...}'.
-        :return: A resource response with the Id of the updated activity.
+        :type activity: :class:`botbuilder.schema.Activity`
+        :return: A resource response with the ID of the updated activity.
+        :rtype: :class:`botbuilder.schema.ResourceResponse`
         """
 
         if not context:
@@ -106,11 +111,13 @@ class SlackAdapter(BotAdapter, ABC):
         self, context: TurnContext, reference: ConversationReference
     ):
         """
-        Standard BotBuilder adapter method to delete a previous message.
+        Delete a previous message.
 
         :param context: A TurnContext representing the current incoming message and environment.
+        :type context: :class:`botbuilder.core.TurnContext`
         :param reference: An object in the form "{activityId: `id of message to delete`,
-        conversation: { id: `id of slack channel`}}".
+         conversation: { id: `id of Slack channel`}}".
+        :type reference: :class:`botbuilder.schema.ConversationReference`
         """
 
         if not context:
@@ -135,15 +142,22 @@ class SlackAdapter(BotAdapter, ABC):
         audience: str = None,
     ):
         """
-        Sends a proactive message to a conversation. Call this method to proactively send a message to a conversation.
-        Most _channels require a user to initiate a conversation with a bot before the bot can send activities
-        to the user.
+        Send a proactive message to a conversation.
+        
+        .. remarks::
+        
+            Most channels require a user to initiate a conversation with a bot before the bot can send activities to the user.
 
-        :param bot_id: Unused for this override.
         :param reference: A reference to the conversation to continue.
+        :type reference: :class:`botbuilder.schema.ConversationReference`
         :param callback: The method to call for the resulting bot turn.
+        :type callback: :class:`typing.Callable`
+        :param bot_id: Unused for this override.
+        :type bot_id: str
         :param claims_identity: A ClaimsIdentity for the conversation.
+        :type claims_identity: :class:`botframework.connector.auth.ClaimsIdentity`
         :param audience: Unused for this override.
+        :type audience: str
         """
 
         if not reference:
@@ -171,10 +185,14 @@ class SlackAdapter(BotAdapter, ABC):
         """
         Accept an incoming webhook request and convert it into a TurnContext which can be processed by the bot's logic.
 
-        :param req: The aoihttp Request object
+        :param req: The aiohttp Request object.
+        :type req: :class:`aiohttp.web_request.Request`
         :param logic: The method to call for the resulting bot turn.
-        :return: The aoihttp Response
+        :type logic: :class:`typing.List`
+        :return: The aiohttp Response. 
+        :rtype: :class:`aiohttp.web_response.Response`
         """
+
         if not req:
             raise Exception("Request is required")
 
