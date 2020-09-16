@@ -115,8 +115,7 @@ class SlackAdapter(BotAdapter, ABC):
 
         :param context: A TurnContext representing the current incoming message and environment.
         :type context: :class:`botbuilder.core.TurnContext`
-        :param reference: An object in the form "{activityId: `id of message to delete`,
-         conversation: { id: `id of Slack channel`}}".
+        :param reference: An object in the form "{activityId: `id of message to delete`,conversation: { id: `id of Slack channel`}}".
         :type reference: :class:`botbuilder.schema.ConversationReference`
         """
 
