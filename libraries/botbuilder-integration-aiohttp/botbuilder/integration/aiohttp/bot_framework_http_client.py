@@ -28,8 +28,8 @@ from botframework.connector.auth import (
 class BotFrameworkHttpClient(BotFrameworkClient):
 
     """
-    A skill host adapter implements API to forward activity to a skill and
-    implements routing ChannelAPI calls from the Skill up through the bot/adapter.
+    A skill host adapter that implements the API to forward activity to a skill and
+    implements routing ChannelAPI calls from the skill up through the bot/adapter.
     """
 
     INVOKE_ACTIVITY_NAME = "SkillEvents.ChannelApiInvoke"
