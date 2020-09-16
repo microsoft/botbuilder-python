@@ -79,10 +79,9 @@ class LuisRecognizer(Recognizer):
         :type results: :class:`botbuilder.core.RecognizerResult`
         :param default_intent: Intent name to return should a top intent be found, defaults to None.
         :type default_intent: str, optional
-        :param min_score: Minimum score needed for an intent to be considered as a top intent. If all 
-         intents in the set are below this threshold then the `defaultIntent` is returned, defaults to 0.0.
+        :param min_score: Minimum score needed for an intent to be considered as a top intent. If all intents in the set are below this threshold then the `defaultIntent` is returned, defaults to 0.0.
         :type min_score: float, optional
-        :raises:  TypeError
+        :raises: TypeError
         :return: The top scoring intent name.
         :rtype: str
         """
