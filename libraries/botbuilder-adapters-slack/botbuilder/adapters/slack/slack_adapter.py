@@ -188,7 +188,7 @@ class SlackAdapter(BotAdapter, ABC):
         :param req: The aiohttp Request object.
         :type req: :class:`aiohttp.web_request.Request`
         :param logic: The method to call for the resulting bot turn.
-        :type logic: :class:`Callable`
+        :type logic: :class:`tying.Callable`
         :return: The aiohttp Response. 
         :rtype: :class:`aiohttp.web_response.Response`
         """
