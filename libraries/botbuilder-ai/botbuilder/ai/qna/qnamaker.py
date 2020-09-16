@@ -126,6 +126,7 @@ class QnAMaker(QnAMakerTelemetryClient):
         :param query_result: User query output.
         :type query_result: :class:`QueryResult`
         :return: Filtered array of ambiguous questions.
+        :rtype: :class:`typing.List[QueryResult]`
         """
         return ActiveLearningUtils.get_low_score_variation(query_result)
 
@@ -171,9 +172,9 @@ class QnAMaker(QnAMakerTelemetryClient):
         :param turn_context: Context object containing information for a single turn of conversation with a user.
         :type turn_context: :class:`botbuilder.core.TurnContext`
         :param telemetry_properties: Properties to add/override for the event.
-        :type telemetry_properties: :class:`Typing.Dict`
+        :type telemetry_properties: :class:`typing.Dict[str, str]`
         :param telemetry_metrics: Metrics to add/override for the event.
-        :type telemetry_metrics: :class:`Typing.Dict`
+        :type telemetry_metrics: :class:`typing.Dict[str, float]`
         :return: Event properties and metrics for the QnaMessage event for telemetry.
         :rtype: :class:`EventData`
         """
