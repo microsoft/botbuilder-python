@@ -45,9 +45,9 @@ class SlackAdapter(BotAdapter, ABC):
         :param context: A TurnContext representing the current incoming message and environment.
         :type context: :class:`botbuilder.core.TurnContext`
         :param activities: An array of outgoing activities to be sent back to the messaging API.
-        :type activities: :class:`typing.List`
+        :type activities: :class:`typing.List[Activity]`
         :return: An array of ResourceResponse objects containing the IDs that Slack assigned to the sent messages.
-        :rtype: :class:`typing.List`
+        :rtype: :class:`typing.List[ResourceResponse]`
         """
 
         if not context:
@@ -188,7 +188,7 @@ class SlackAdapter(BotAdapter, ABC):
         :param req: The aiohttp Request object.
         :type req: :class:`aiohttp.web_request.Request`
         :param logic: The method to call for the resulting bot turn.
-        :type logic: :class:`typing.List`
+        :type logic: :class:`Callable`
         :return: The aiohttp Response. 
         :rtype: :class:`aiohttp.web_response.Response`
         """
