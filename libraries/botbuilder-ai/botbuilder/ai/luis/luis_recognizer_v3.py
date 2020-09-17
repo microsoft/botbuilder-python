@@ -85,6 +85,9 @@ class LuisRecognizerV3(LuisRecognizerInternal):
                         else {}
                     )
 
+                if self.luis_recognizer_options_v3.include_api_results:
+                    recognizer_result.properties['luisResult'] = luis_result
+
                 if "sentiment" in luis_result["prediction"]:
                     recognizer_result.properties["sentiment"] = self._get_sentiment(
                         luis_result["prediction"]
