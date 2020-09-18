@@ -13,7 +13,7 @@ def retrieve_bot_body():
     """ 
     Retrieve the POST body text from temporary cache.
     
-    The POST body corresponds to the thread ID and should reside in cache just for the lifetime of a request.
+    The POST body corresponds to the thread ID and must reside in the cache just for the lifetime of the request.
     """
 
     result = _REQUEST_BODIES.get(current_thread().ident, None)
