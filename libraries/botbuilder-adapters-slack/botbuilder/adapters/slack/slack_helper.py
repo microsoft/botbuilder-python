@@ -27,10 +27,12 @@ class SlackHelper:
     @staticmethod
     def activity_to_slack(activity: Activity) -> SlackMessage:
         """
-        Formats a BotBuilder activity into an outgoing Slack message.
+        Formats a BotBuilder Activity into an outgoing Slack message.
+        
         :param activity: A BotBuilder Activity object.
-        :return: A Slack message object with {text, attachments, channel, thread ts} as well
-        as any fields found in activity.channelData
+        :type activity: :class:`botbuilder.schema.Activity`
+        :return: A Slack message object with {text, attachments, channel, thread ts} and any fields found in activity.channelData.
+        :rtype: :class:`SlackMessage`
         """
 
         if not activity:
@@ -83,13 +85,18 @@ class SlackHelper:
         req: Request, code: int, text: str = None, encoding: str = None
     ) -> Response:
         """
-        Formats an aiohttp Response
+        Formats an aiohttp Response.
 
-        :param req: The original aoihttp Request
-        :param code: The HTTP result code to return
-        :param text: The text to return
-        :param encoding: The text encoding.  Defaults to utf-8
+        :param req: The original aiohttp Request.
+        :type req: :class:`aiohttp.web_request.Request`
+        :param code: The HTTP result code to return.
+        :type code: int
+        :param text: The text to return.
+        :type text: str
+        :param encoding: The text encoding. Defaults to UTF-8.
+        :type encoding: str
         :return: The aoihttp Response
+        :rtype: :class:`aiohttp.web_response.Response`
         """
 
         response = Response(status=code)
@@ -103,10 +110,12 @@ class SlackHelper:
     @staticmethod
     def payload_to_activity(payload: SlackPayload) -> Activity:
         """
-        Creates an activity based on the slack event payload.
+        Creates an activity based on the Slack event payload.
 
-        :param payload: The payload of the slack event.
+        :param payload: The payload of the Slack event.
+        :type payload: :class:`SlackPayload`
         :return: An activity containing the event data.
+        :rtype: :class:`botbuilder.schema.Activity`
         """
 
         if not payload:
@@ -138,11 +147,14 @@ class SlackHelper:
     @staticmethod
     async def event_to_activity(event: SlackEvent, client: SlackClient) -> Activity:
         """
-        Creates an activity based on the slack event data.
+        Creates an activity based on the Slack event data.
 
-        :param event: The data of the slack event.
+        :param event: The data of the Slack event.
+        :type event: :class:`SlackEvent`
         :param client: The Slack client.
+        :type client: :class:`SlackClient`
         :return: An activity containing the event data.
+        :rtype: :class:`botbuilder.schema.Activity`
         """
 
         if not event:
@@ -191,11 +203,14 @@ class SlackHelper:
         body: SlackRequestBody, client: SlackClient
     ) -> Activity:
         """
-        Creates an activity based on a slack event related to a slash command.
+        Creates an activity based on a Slack event related to a slash command.
 
-        :param body: The data of the slack event.
+        :param body: The data of the Slack event.
+        :type body: :class:`SlackRequestBody`
         :param client: The Slack client.
+        :type client: :class:`SlackClient`
         :return: An activity containing the event data.
+        :rtype: :class:`botbuilder.schema.Activity`
         """
 
         if not body:
@@ -223,7 +238,9 @@ class SlackHelper:
         Converts a query string to a dictionary with key-value pairs.
 
         :param query: The query string to convert.
+        :type query: str
         :return: A dictionary with the query values.
+        :rtype: :class:`typing.Dict`
         """
 
         values = {}
@@ -247,9 +264,12 @@ class SlackHelper:
         """
         Deserializes the request's body as a SlackRequestBody object.
 
-        :param content_type: The content type of the body
-        :param request_body: The body of the request
-        :return: A SlackRequestBody object
+        :param content_type: The content type of the body.
+        :type content_type: str
+        :param request_body: The body of the request.
+        :type request_body: str
+        :return: A SlackRequestBody object.
+        :rtype: :class:`SlackRequestBody`
         """
 
         if not request_body:

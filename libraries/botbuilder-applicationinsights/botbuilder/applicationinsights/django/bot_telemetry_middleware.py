@@ -10,10 +10,10 @@ _REQUEST_BODIES = {}
 
 
 def retrieve_bot_body():
-    """ retrieve_bot_body
+    """ 
     Retrieve the POST body text from temporary cache.
-    The POST body corresponds with the thread id and should resides in
-    cache just for lifetime of request.
+    
+    The POST body corresponds to the thread ID and must reside in the cache just for the lifetime of the request.
     """
 
     result = _REQUEST_BODIES.get(current_thread().ident, None)
@@ -22,15 +22,17 @@ def retrieve_bot_body():
 
 class BotTelemetryMiddleware:
     """
-    Save off the POST body to later populate bot-specific properties to
-    add to Application Insights.
+    Save off the POST body to later populate bot-specific properties to add to Application Insights.
 
     Example activating MIDDLEWARE in Django settings:
-    MIDDLEWARE = [
-        # Ideally add somewhere near top
-        'botbuilder.applicationinsights.django.BotTelemetryMiddleware',
-        ...
-        ]
+    
+    .. code-block:: python
+    
+        MIDDLEWARE = [
+            # Ideally add somewhere near top
+            'botbuilder.applicationinsights.django.BotTelemetryMiddleware',
+            ...
+            ]
     """
 
     def __init__(self, get_response):

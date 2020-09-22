@@ -20,7 +20,7 @@ from .luis_recognizer_options_v3 import LuisRecognizerOptionsV3
 
 class LuisRecognizer(Recognizer):
     """
-    A LUIS based implementation of <see cref="IRecognizer"/>.
+    A LUIS based implementation of :class:`botbuilder.core.Recognizer`.
     """
 
     # The value type for a LUIS trace activity.
@@ -45,7 +45,7 @@ class LuisRecognizer(Recognizer):
         :type prediction_options: :class:`LuisPredictionOptions`, optional
         :param include_api_results: True to include raw LUIS API response, defaults to False.
         :type include_api_results: bool, optional
-        :raises TypeError:
+        :raises: TypeError
         """
 
         if isinstance(application, LuisApplication):
@@ -79,10 +79,9 @@ class LuisRecognizer(Recognizer):
         :type results: :class:`botbuilder.core.RecognizerResult`
         :param default_intent: Intent name to return should a top intent be found, defaults to None.
         :type default_intent: str, optional
-        :param min_score: Minimum score needed for an intent to be considered as a top intent. If all intents in
-        the set are below this threshold then the `defaultIntent` will be returned, defaults to 0.0.
+        :param min_score: Minimum score needed for an intent to be considered as a top intent. If all intents in the set are below this threshold then the `defaultIntent` is returned, defaults to 0.0.
         :type min_score: float, optional
-        :raises TypeError:
+        :raises: TypeError
         :return: The top scoring intent name.
         :rtype: str
         """
@@ -108,9 +107,9 @@ class LuisRecognizer(Recognizer):
         telemetry_metrics: Dict[str, float] = None,
         luis_prediction_options: LuisPredictionOptions = None,
     ) -> RecognizerResult:
-        """Return results of the analysis (Suggested actions and intents).
+        """Return results of the analysis (suggested actions and intents).
 
-        :param turn_context: Context object containing information for a single turn of conversation with a user.
+        :param turn_context: Context object containing information for a single conversation turn with a user.
         :type turn_context: :class:`botbuilder.core.TurnContext`
         :param telemetry_properties: Additional properties to be logged to telemetry with the LuisResult event, defaults
          to None.
@@ -138,7 +137,7 @@ class LuisRecognizer(Recognizer):
     ):
         """Invoked prior to a LuisResult being logged.
 
-        :param recognizer_result: The Luis Results for the call.
+        :param recognizer_result: The LuisResult for the call.
         :type recognizer_result: :class:`botbuilder.core.RecognizerResult`
         :param turn_context: Context object containing information for a single turn of conversation with a user.
         :type turn_context: :class:`botbuilder.core.TurnContext`
@@ -187,11 +186,9 @@ class LuisRecognizer(Recognizer):
         :type recognizer_result: :class:`botbuilder.core.RecognizerResult`
         :param turn_context: Context object containing information for a single turn of conversation with a user.
         :type turn_context: :class:`botbuilder.core.TurnContext`
-        :param telemetry_properties: Additional properties to be logged to telemetry with the LuisResult event,
-         defaults to None
-        :param telemetry_properties: :class:`typing.Dict[str, str]`, optional
-        :return: A dictionary that is sent as "Properties" to :func:`botbuilder.core.BotTelemetryClient.track_event`
-        method for the BotMessageSend event.
+        :param telemetry_properties: Additional properties to be logged to telemetry with the LuisResult event, defaults to None.
+        :type telemetry_properties: :class:`typing.Dict[str, str]`, optional
+        :return: A dictionary sent as "Properties" to :func:`botbuilder.core.BotTelemetryClient.track_event` for the BotMessageSend event.
         :rtype: `typing.Dict[str, str]`
         """
 
