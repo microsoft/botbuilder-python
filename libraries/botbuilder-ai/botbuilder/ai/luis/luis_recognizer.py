@@ -272,7 +272,7 @@ class LuisRecognizer(Recognizer):
 
         if not utterance or utterance.isspace():
             recognizer_result = RecognizerResult(
-                text=utterance, intents={"": IntentScore(score=1.0)}, entities={}
+                text=utterance
             )
         else:
 
