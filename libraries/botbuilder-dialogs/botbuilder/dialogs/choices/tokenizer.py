@@ -16,12 +16,12 @@ class Tokenizer:
         """
         Simple tokenizer that breaks on spaces and punctuation. The only normalization is to lowercase.
 
-        Parameter:
-        ---------
-
-        text: The input text.
-
-        locale: (Optional) Identifies the locale of the input text.
+        :parameter text: The input text.
+        :type text: str
+        :param locale: (Optional) Identifies the locale of the input text.
+        :type locale: str
+        :return: A list of tokens.
+        :rtype: list
         """
         tokens: [Token] = []
         token: Union[Token, None] = None
@@ -75,14 +75,14 @@ class Tokenizer:
     @staticmethod
     def _is_between(value: int, from_val: int, to_val: int) -> bool:
         """
-        Parameters:
-        -----------
-
-        value: number value
-
-        from: low range
-
-        to: high range
+        :param value: A nuumber value.
+        :type value: int
+        :param from_val: The low range value.
+        :type from_val: int
+        :param to_val: The high range value.
+        :type to_val: int
+        :return: True if from_val <= value <= to_val.
+        :rtype: bool
         """
         return from_val <= value <= to_val
 

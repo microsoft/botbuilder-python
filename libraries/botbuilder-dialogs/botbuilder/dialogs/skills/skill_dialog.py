@@ -44,6 +44,7 @@ class SkillDialog(Dialog):
     async def begin_dialog(self, dialog_context: DialogContext, options: object = None):
         """
         Method called when a new dialog has been pushed onto the stack and is being activated.
+        
         :param dialog_context: The dialog context for the current turn of conversation.
         :param options: (Optional) additional argument(s) to pass to the dialog being started.
         """

@@ -265,7 +265,7 @@ class OAuthPrompt(Dialog):
         self, context: TurnContext, code: str = None
     ) -> TokenResponse:
         """
-        Gets the user's tokeN.
+        Gets the user's token.
 
         :param context: Context for the current turn of conversation with the user
         :type context:  :class:`TurnContext`

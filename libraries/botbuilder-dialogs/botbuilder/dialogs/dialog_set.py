@@ -37,7 +37,9 @@ class DialogSet:
     def add(self, dialog: Dialog):
         """
         Adds a new dialog to the set and returns the added dialog.
+        
         :param dialog: The dialog to add.
+        :type dialog: :class:`Dialog`
         """
         if dialog is None or not isinstance(dialog, Dialog):
             raise TypeError(
@@ -71,7 +73,9 @@ class DialogSet:
     async def find(self, dialog_id: str) -> Dialog:
         """
         Finds a dialog that was previously added to the set using add(dialog)
+        
         :param dialog_id: ID of the dialog/prompt to look up.
+        :type dialog_id: str
         :return: The dialog if found, otherwise null.
         """
         if not dialog_id:

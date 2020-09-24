@@ -46,19 +46,26 @@ class Dialog(ABC):
     ):
         """
         Method called when a new dialog has been pushed onto the stack and is being activated.
+        
         :param dialog_context: The dialog context for the current turn of conversation.
+        :type dialog_context: :class:`DialogContext`
         :param options: (Optional) additional argument(s) to pass to the dialog being started.
+        :type options: object
+        :raise: :func:`NotImplementedError`
         """
         raise NotImplementedError()
 
     async def continue_dialog(self, dialog_context: "DialogContext"):
         """
         Method called when an instance of the dialog is the "current" dialog and the
-        user replies with a new activity. The dialog will generally continue to receive the user's
-        replies until it calls either `end_dialog()` or `begin_dialog()`.
-        If this method is NOT implemented then the dialog will automatically be ended when the user replies.
+        user replies with a new activity.
+
+        .. remarks::
+            The dialog will generally continue to receive the user's replies until it calls either :meth:`end_dialog` or :meth:`begin_dialog`.
+            If this method is NOT implemented then the dialog will automatically be ended when the user replies.
+        
         :param dialog_context: The dialog context for the current turn of conversation.
-        :return:
+        :type dialog_context: :class:`DialogContext`
         """
         # By default just end the current dialog.
         return await dialog_context.end_dialog(None)
@@ -68,15 +75,19 @@ class Dialog(ABC):
     ):
         """
         Method called when an instance of the dialog is being returned to from another
-        dialog that was started by the current instance using `begin_dialog()`.
-        If this method is NOT implemented then the dialog will be automatically ended with a call
-        to `end_dialog()`. Any result passed from the called dialog will be passed
-        to the current dialog's parent.
+        dialog that was started by the current instance using :meth:`begin_dialog`.
+        
+        .. remarks::
+            If this method is NOT implemented then the dialog will be automatically ended with a call to :meth:`end_dialog`. 
+            Any result passed from the called dialog will be passed to the current dialog's parent.
+        
         :param dialog_context: The dialog context for the current turn of conversation.
+        :type dialog_context: :class:`DialogContext`
         :param reason: Reason why the dialog resumed.
-        :param result: (Optional) value returned from the dialog that was called. The type of the value returned is
-        dependent on the dialog that was called.
-        :return:
+        :type reason: :class:`DialogReason`
+        :param result: (Optional) value returned from the dialog that was called. The type of the value returned is dependent on the dialog that was called.
+        :type result: object
+        :return: :class:`DialogTurnResult`
         """
         # By default just end the current dialog and return result to parent.
         return await dialog_context.end_dialog(result)
@@ -86,9 +97,10 @@ class Dialog(ABC):
         self, context: TurnContext, instance: DialogInstance
     ):
         """
-        :param context:
-        :param instance:
-        :return:
+        :param context: The context object for the turn.
+        :type context: :class:`botbuilder.core.TurnContext`
+        :param instance: Current state information for this dialog.
+        :type instance: :class:`DialogInstance`
         """
         # No-op by default
         return
@@ -98,10 +110,12 @@ class Dialog(ABC):
         self, context: TurnContext, instance: DialogInstance, reason: DialogReason
     ):
         """
-        :param context:
-        :param instance:
-        :param reason:
-        :return:
+        :param context: The context object for the turn.
+        :type context: :class:`botbuilder.core.TurnContext`
+        :param instance: Current state information for this dialog.
+        :type instance: :class:`DialogInstance`
+        :param reason: The reason the dialog is resuming.
+        :type reason: :class:`DialogReason`
         """
         # No-op by default
         return

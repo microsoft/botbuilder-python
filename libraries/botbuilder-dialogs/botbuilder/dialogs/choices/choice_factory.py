@@ -23,15 +23,18 @@ class ChoiceFactory:
         options: ChoiceFactoryOptions = None,
     ) -> Activity:
         """
-        Creates a message activity that includes a list of choices formatted based on the
-         capabilities of a given channel.
-
-        Parameters:
-        ----------
-        channel_id: A channel ID.
-        choices: List of choices to render
-        text: (Optional) Text of the message to send.
-        speak (Optional) SSML. Text to be spoken by your bot on a speech-enabled channel.
+        Creates a message activity that includes a list of choices formatted based on the capabilities of a given channel.
+        
+        :param channel_id: A channel ID.
+        :type channel_id: str
+        :param choices: List of choices to render
+        :type choices: :class:`typing.List[Union[str, Choice]]`
+        :param text: (Optional) Text of the message to send.
+        :type text: str
+        :param speak (Optional) SSML. Text to be spoken by your bot on a speech-enabled channel.
+        :type speak: str
+        :return: The message activity with formatted choices. 
+        :rtype: :class:`botbuilder.schema.Activity`
         """
         if channel_id is None:
             channel_id = ""
@@ -80,13 +83,17 @@ class ChoiceFactory:
     ) -> Activity:
         """
         Creates a message activity that includes a list of choices formatted as an inline list.
-
-        Parameters:
-        ----------
-        choices: The list of choices to render.
-        text: (Optional) The text of the message to send.
-        speak: (Optional) SSML. Text to be spoken by your bot on a speech-enabled channel.
-        options: (Optional) The formatting options to use to tweak rendering of list.
+ 
+        :param choices: The list of choices to render.
+        :type choices: :class:`typing.List[Union[str, Choice]]`
+        :param text: (Optional) The text of the message to send.
+        :type text: str
+        :param speak: (Optional) SSML. Text to be spoken by your bot on a speech-enabled channel.
+        :type speak: str
+        :param options: (Optional) The formatting options to use to tweak rendering of list.
+        :type options: :class:`ChoiceFactoryOptions`
+        :return: The message activity with formatted choices.
+        :rtype: :rtype: :class:`botbuilder.schema.Activity`
         """
         choices = ChoiceFactory._to_choices(choices)
 
@@ -140,16 +147,16 @@ class ChoiceFactory:
         """
         Creates a message activity that includes a list of choices formatted as a numbered or bulleted list.
 
-        Parameters:
-        ----------
-
-        choices: The list of choices to render.
-
-        text: (Optional) The text of the message to send.
-
-        speak: (Optional) SSML. Text to be spoken by your bot on a speech-enabled channel.
-
-        options: (Optional) The formatting options to use to tweak rendering of list.
+        :param choices: The list of choices to render.
+        :type choices: :class:`typing.List[Union[str, Choice]]`
+        :param text: (Optional) The text of the message to send.
+        :type text: str
+        :param speak: (Optional) SSML. Text to be spoken by your bot on a speech-enabled channel.
+        :type speak: str
+        :param options: (Optional) The formatting options to use to tweak rendering of list.
+        :type options: :class:`ChoiceFactoryOptions`
+        :return: A message activity with formatted choices.
+        :rtype: :class:`botbuilder.schema.Activity`
         """
         choices = ChoiceFactory._to_choices(choices)
         if options is None:
@@ -206,7 +213,7 @@ class ChoiceFactory:
         choices: List[Union[Choice, str]], text: str = None, speak: str = None
     ) -> Activity:
         """
-        Creates a message activity that includes a lsit of coices that have been added as `HeroCard`'s
+        Creates a message activity that includes a list of coices that have been added as HeroCards.
         """
         attachment = CardFactory.hero_card(
             HeroCard(text=text, buttons=ChoiceFactory._extract_actions(choices))
@@ -220,7 +227,7 @@ class ChoiceFactory:
     @staticmethod
     def _to_choices(choices: List[Union[str, Choice]]) -> List[Choice]:
         """
-        Takes a list of strings and returns them as [`Choice`].
+        Takes a list of strings and returns them as :class:`choices.Choice`.
         """
         if choices is None:
             return []

@@ -24,28 +24,25 @@ class ChoiceRecognizers:
     ) -> List[ModelResult]:
         """
         Matches user input against a list of choices.
+        
+        .. remarks::
+        
+            This is layered above the :func:`Find.find_choices` function, and adds logic to let the user specify their choice by index (they can say "one" to pick `choice[0]`) or ordinal position (they can say "the second one" to pick `choice[1]`.)
+            
+            The user's utterance is recognized in the following order:
 
-        This is layered above the `Find.find_choices()` function, and adds logic to let the user specify
-        their choice by index (they can say "one" to pick `choice[0]`) or ordinal position
-         (they can say "the second one" to pick `choice[1]`.)
-        The user's utterance is recognized in the following order:
+            - By name using :meth:`Find.find_choices`
+            - By 1's based ordinal position
+            - By 1's based index position
 
-        - By name using `find_choices()`
-        - By 1's based ordinal position.
-        - By 1's based index position.
-
-        Parameters:
-        -----------
-
-        utterance: The input.
-
-        choices: The list of choices.
-
-        options: (Optional) Options to control the recognition strategy.
-
-        Returns:
-        --------
-        A list of found choices, sorted by most relevant first.
+        :param utterance: The input.
+        :type utterance: str
+        :param choices: The list of choices.
+        :type choices: :class:`typing.List[Union[str, Choice]]`
+        :param options: (Optional) Options to control the recognition strategy.
+        :type options: :class:`FindChoiceOptions`
+        :return: A list of found choices, sorted by most relevant first.
+        :rtype: :class:`typing.List[ModelResult]`
         """
         if utterance is None:
             utterance = ""

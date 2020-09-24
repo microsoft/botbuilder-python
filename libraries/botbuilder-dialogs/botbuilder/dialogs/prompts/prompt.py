@@ -25,15 +25,15 @@ from ..dialog_context import DialogContext
 class Prompt(Dialog):
     """
 
-    Defines the core behavior of prompt dialogs. Extends the :class:`Dialog` base class.
+    Defines the core behavior of prompt dialogs. Extends the :class:`botbuilder.dialogs.Dialog` base class.
 
     .. remarks::
         When the prompt ends, it returns an object that represents the value it was prompted for.
-        Use :meth:`DialogSet.add()` or :meth:`ComponentDialog.add_dialog()` to add a prompt to
+        Use :meth:`botbuilder.dialogs.DialogSet.add()` or :meth:`botbuilder.dialogs.ComponentDialog.add_dialog()` to add a prompt to
         a dialog set or component dialog, respectively.
 
-        Use :meth:`DialogContext.prompt()` or :meth:`DialogContext.begin_dialog()` to start the prompt.
-        If you start a prompt from a :class:`WaterfallStep` in a :class:`WaterfallDialog`, then the
+        Use :meth:`botbuilder.dialogs.DialogContext.prompt()` or :meth:`botbuilder.dialogs.DialogContext.begin_dialog()` to start the prompt.
+        If you start a prompt from a :class:`botbuilder.dialogs.WaterfallStep` in a :class:`botbuilder.dialogs.WaterfallDialog`, then the
         prompt result will be available in the next step of the waterfall.
     """
 
@@ -62,11 +62,11 @@ class Prompt(Dialog):
         Starts a prompt dialog. Called when a prompt dialog is pushed onto the dialog stack and is being activated.
 
         :param dialog_context: The dialog context for the current turn of the conversation
-        :type dialog_context:  :class:`DialogContext`
+        :type dialog_context:  :class:`botbuilder.dialogs.DialogContext`
         :param options: Optional, additional information to pass to the prompt being started
         :type options: Object
         :return: The dialog turn result
-        :rtype: :class:`DialogTurnResult`
+        :rtype: :class:`botbuilder.dialogs.DialogTurnResult`
 
         .. note::
             The result indicates whether the prompt is still active after the turn has been processed.
@@ -102,9 +102,9 @@ class Prompt(Dialog):
         Continues a dialog.
 
         :param dialog_context: The dialog context for the current turn of the conversation
-        :type dialog_context:  :class:`DialogContext`
+        :type dialog_context:  :class:`botbuilder.dialogs.DialogContext`
         :return: The dialog turn result
-        :rtype: :class:`DialogTurnResult`
+        :rtype: :class:`botbuilder.dialogs.DialogTurnResult`
 
         .. remarks::
             Called when a prompt dialog is the active dialog and the user replied with a new activity.
@@ -156,13 +156,13 @@ class Prompt(Dialog):
         Resumes a dialog.
 
         :param dialog_context: The dialog context for the current turn of the conversation.
-        :type dialog_context:  :class:`DialogContext`
+        :type dialog_context:  :class:`botbuilder.dialogs.DialogContext`
         :param reason: An enum indicating why the dialog resumed.
-        :type reason:  :class:`DialogReason`
+        :type reason:  :class:`botbuilder.dialogs.DialogReason`
         :param result: Optional, value returned from the previous dialog on the stack.
         :type result:  object
         :return: The dialog turn result
-        :rtype: :class:`DialogTurnResult`
+        :rtype: :class:`botbuilder.dialogs.DialogTurnResult`
 
         .. remarks::
             Called when a prompt dialog resumes being the active dialog on the dialog stack,
@@ -172,8 +172,8 @@ class Prompt(Dialog):
             active after the turn has been processed by the dialog.
 
             Prompts are typically leaf nodes on the stack but the dev is free to push other dialogs
-            on top of the stack which will result in the prompt receiving an unexpected call to
-            :meth:resume_dialog() when the pushed on dialog ends.
+            on top of the stack. This will result in the prompt receiving an unexpected call to
+            this method when the pushed on dialog ends.
 
             Simply re-prompt the user to avoid that the prompt ends prematurely.
 
@@ -188,7 +188,7 @@ class Prompt(Dialog):
         :param context: Context for the current turn of conversation with the user
         :type context:  :class:`botbuilder.core.TurnContext`
         :param instance: The instance of the dialog on the stack
-        :type instance:  :class:`DialogInstance`
+        :type instance:  :class:`botbuilder.dialogs.DialogInstance`
         :return: A task representing the asynchronous operation
 
         """
@@ -212,7 +212,7 @@ class Prompt(Dialog):
         :param state: Contains state for the current instance of the prompt on the dialog stack
         :type state:  :class:`Dict`
         :param options: A prompt options object constructed from:meth:`DialogContext.prompt()`
-        :type options:  :class:`PromptOptions`
+        :type options:  :class:`botbuilder.dialogs.PromptOptions`
         :param is_retry: Determines whether `prompt` or `retry_prompt` should be used
         :type is_retry:  bool
 
@@ -234,8 +234,8 @@ class Prompt(Dialog):
         :type turn_context:  :class:`botbuilder.core.TurnContext`
         :param state: Contains state for the current instance of the prompt on the dialog stack
         :type state:  :class:`Dict`
-        :param options: A prompt options object constructed from :meth:`DialogContext.prompt()`
-        :type options:  :class:`PromptOptions`
+        :param options: A prompt options object constructed from :meth:`botbuilder.dialogs.DialogContext.prompt()`
+        :type options:  :class:`botbuilder.dialogs.PromptOptions`
 
         :return: A task representing the asynchronous operation.
 
@@ -255,15 +255,15 @@ class Prompt(Dialog):
         Composes an output activity containing a set of choices.
 
         :param prompt: The prompt to append the user's choice to
-        :type prompt:
+        :type prompt: :class:`botbuilder.schema.Activity`
         :param channel_id: Id of the channel the prompt is being sent to
         :type channel_id: str
         :param: choices: List of choices to append
-        :type choices:  :class:`List`
+        :type choices: :class:`typing.List`
         :param: style: Configured style for the list of choices
-        :type style:  :class:`ListStyle`
+        :type style: :class:`typing.ListStyle`
         :param: options: Optional formatting options to use when presenting the choices
-        :type style: :class:`ChoiceFactoryOptions`
+        :type style: :class:`botbuilder.dialogs.choces.ChoiceFactoryOptions`
 
         :return: A task representing the asynchronous operation
 

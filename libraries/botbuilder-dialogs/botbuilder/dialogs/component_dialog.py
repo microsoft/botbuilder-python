@@ -266,10 +266,10 @@ class ComponentDialog(Dialog):
             turn was processed by the dialog.
 
         :param outer_dc: The parent dialog context for the current turn of conversation.
-        :type outer_dc: class:`botbuilder.dialogs.DialogContext`
+        :type outer_dc: class:`DialogContext`
         :param result: Optional, value to return from the dialog component to the parent context.
         :type result: object
         :return: Value to return.
-        :rtype: :class:`botbuilder.dialogs.DialogTurnResult.result`
+        :rtype: :class:`DialogTurnResult.result`
         """
         return await outer_dc.end_dialog(result)
