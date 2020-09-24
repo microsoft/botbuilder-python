@@ -75,7 +75,7 @@ class Tokenizer:
     @staticmethod
     def _is_between(value: int, from_val: int, to_val: int) -> bool:
         """
-        :param value: A nuumber value.
+        :param value: A number value.
         :type value: int
         :param from_val: The low range value.
         :type from_val: int

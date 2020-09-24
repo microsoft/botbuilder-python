@@ -27,7 +27,8 @@ class DialogContext:
 
     @property
     def dialogs(self):
-        """Gets the set of dialogs that can be called from this context.
+        """
+        Gets the set of dialogs that can be called from this context.
 
         :rtype: str
         """
@@ -35,7 +36,8 @@ class DialogContext:
 
     @property
     def context(self) -> TurnContext:
-        """Gets the context for the current turn of conversation.
+        """
+        Gets the context for the current turn of conversation.
 
         :rtype: str
         """
@@ -43,7 +45,8 @@ class DialogContext:
 
     @property
     def stack(self):
-        """Gets the current dialog stack.
+        """
+        Gets the current dialog stack.
 
         :rtype: str
         """
@@ -51,7 +54,8 @@ class DialogContext:
 
     @property
     def active_dialog(self):
-        """Return the container link in the database.
+        """
+        Return the container link in the database.
         
         :rtype: str
         """

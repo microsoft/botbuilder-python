@@ -61,8 +61,9 @@ class Dialog(ABC):
         user replies with a new activity.
 
         .. remarks::
-            The dialog will generally continue to receive the user's replies until it calls either :meth:`end_dialog` or :meth:`begin_dialog`.
-            If this method is NOT implemented then the dialog will automatically be ended when the user replies.
+            The dialog will generally continue to receive the user's replies until it calls either :meth:`end_dialog or :meth:`begin_dialog`.
+            
+            If this method is not implemented then the dialog will automatically be ended when the user replies.
         
         :param dialog_context: The dialog context for the current turn of conversation.
         :type dialog_context: :class:`DialogContext`
@@ -78,14 +79,15 @@ class Dialog(ABC):
         dialog that was started by the current instance using :meth:`begin_dialog`.
         
         .. remarks::
-            If this method is NOT implemented then the dialog will be automatically ended with a call to :meth:`end_dialog`. 
+            If this method is NOT implemented then the dialog will be automatically ended 
+            with a call to :meth:`end_dialog`. 
             Any result passed from the called dialog will be passed to the current dialog's parent.
         
         :param dialog_context: The dialog context for the current turn of conversation.
         :type dialog_context: :class:`DialogContext`
         :param reason: Reason why the dialog resumed.
         :type reason: :class:`DialogReason`
-        :param result: (Optional) value returned from the dialog that was called. The type of the value returned is dependent on the dialog that was called.
+        :param result: (Optional) value returned from the dialog that was called. The value type returned is dependent on the dialog that was called.
         :type result: object
         :return: :class:`DialogTurnResult`
         """

@@ -27,13 +27,14 @@ class ChoiceRecognizers:
         
         .. remarks::
         
-            This is layered above the :func:`Find.find_choices` function, and adds logic to let the user specify their choice by index (they can say "one" to pick `choice[0]`) or ordinal position (they can say "the second one" to pick `choice[1]`.)
+            This is layered above the :func:`Find.find_choices` function, and adds logic to let the user specify 
+            their choice by index (they can say "one" to pick `choice[0]`) or ordinal position (they can say "the second one" to pick `choice[1]`.)
             
             The user's utterance is recognized in the following order:
 
-            - By name using :meth:`Find.find_choices`
-            - By 1's based ordinal position
-            - By 1's based index position
+            * By name using :meth:`Find.find_choices`
+            * By 1's based ordinal position
+            * By 1's based index position
 
         :param utterance: The input.
         :type utterance: str
