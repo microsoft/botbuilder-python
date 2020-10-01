@@ -152,7 +152,7 @@ class ApplicationInsightsTelemetryClient(BotTelemetryClient):
         :type std_dev: float
         :param properties: the set of custom properties the client wants attached to this data item. (defaults to: None)
         :type properties: :class:`typing.Dict[str, object]`
-        """ 
+        """
         self._client.track_metric(
             name, value, tel_type, count, min_val, max_val, std_dev, properties
         )

@@ -268,9 +268,7 @@ class LuisRecognizer(Recognizer):
             options = self._options
 
         if not utterance or utterance.isspace():
-            recognizer_result = RecognizerResult(
-                text=utterance
-            )
+            recognizer_result = RecognizerResult(text=utterance)
         else:
 
             luis_recognizer = self._build_recognizer(options)
