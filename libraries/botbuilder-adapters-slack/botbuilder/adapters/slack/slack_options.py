@@ -15,7 +15,7 @@ class SlackAdapterOptions:
     ):
         """
         Initializes a new instance of SlackAdapterOptions.
-        
+
         :param slack_verification_token: A token for validating the origin of incoming webhooks.
         :type slack_verification_token: str
         :param slack_bot_token: A token for a bot to work on a single workspace.
@@ -34,7 +34,7 @@ class SlackAdapterOptions:
     async def get_token_for_team(self, team_id: str) -> str:
         """
         Receives a Slack team ID and returns the bot token associated with that team. Required for multi-team apps.
-        
+
         :param team_id: The team ID.
         :type team_id: str
         :raises: :func:`NotImplementedError`
@@ -43,8 +43,9 @@ class SlackAdapterOptions:
 
     async def get_bot_user_by_team(self, team_id: str) -> str:
         """
-        A method that receives a Slack team ID and returns the bot user ID associated with that team. Required for multi-team apps.
-        
+        A method that receives a Slack team ID and returns the bot user ID associated with that team. Required for
+         multi-team apps.
+
         :param team_id: The team ID.
         :type team_id: str
         :raises: :func:`NotImplementedError`
