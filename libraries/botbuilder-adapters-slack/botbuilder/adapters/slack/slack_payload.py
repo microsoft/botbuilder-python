@@ -2,8 +2,8 @@
 # Licensed under the MIT License.
 
 from typing import Optional, List
-from botbuilder.adapters.slack.slack_message import SlackMessage
 from slack.web.classes.actions import Action
+from botbuilder.adapters.slack.slack_message import SlackMessage
 
 
 class SlackPayload:
