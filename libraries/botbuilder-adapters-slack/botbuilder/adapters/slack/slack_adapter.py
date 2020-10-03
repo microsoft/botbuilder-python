@@ -24,7 +24,8 @@ from .slack_helper import SlackHelper
 
 class SlackAdapter(BotAdapter, ABC):
     """
-    BotAdapter that can handle incoming Slack events. Incoming Slack events are deserialized to an Activity that is dispatched through the middleware and bot pipeline.
+    BotAdapter that can handle incoming Slack events. Incoming Slack events are deserialized to an Activity that is
+     dispatched through the middleware and bot pipeline.
     """
 
     def __init__(
@@ -115,7 +116,8 @@ class SlackAdapter(BotAdapter, ABC):
 
         :param context: A TurnContext representing the current incoming message and environment.
         :type context: :class:`botbuilder.core.TurnContext`
-        :param reference: An object in the form "{activityId: `id of message to delete`,conversation: { id: `id of Slack channel`}}".
+        :param reference: An object in the form "{activityId: `id of message to delete`,conversation: { id: `id of Slack
+         channel`}}".
         :type reference: :class:`botbuilder.schema.ConversationReference`
         """
 
@@ -142,10 +144,11 @@ class SlackAdapter(BotAdapter, ABC):
     ):
         """
         Send a proactive message to a conversation.
-        
+
         .. remarks::
-        
-            Most channels require a user to initiate a conversation with a bot before the bot can send activities to the user.
+
+            Most channels require a user to initiate a conversation with a bot before the bot can send activities to the
+             user.
 
         :param reference: A reference to the conversation to continue.
         :type reference: :class:`botbuilder.schema.ConversationReference`
@@ -188,7 +191,7 @@ class SlackAdapter(BotAdapter, ABC):
         :type req: :class:`aiohttp.web_request.Request`
         :param logic: The method to call for the resulting bot turn.
         :type logic: :class:`tying.Callable`
-        :return: The aiohttp Response. 
+        :return: The aiohttp Response.
         :rtype: :class:`aiohttp.web_response.Response`
         """
 

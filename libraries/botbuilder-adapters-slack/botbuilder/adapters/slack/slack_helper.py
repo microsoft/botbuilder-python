@@ -28,10 +28,11 @@ class SlackHelper:
     def activity_to_slack(activity: Activity) -> SlackMessage:
         """
         Formats a BotBuilder Activity into an outgoing Slack message.
-        
+
         :param activity: A BotBuilder Activity object.
         :type activity: :class:`botbuilder.schema.Activity`
-        :return: A Slack message object with {text, attachments, channel, thread ts} and any fields found in activity.channelData.
+        :return: A Slack message object with {text, attachments, channel, thread ts} and any fields found in
+         activity.channelData.
         :rtype: :class:`SlackMessage`
         """
 

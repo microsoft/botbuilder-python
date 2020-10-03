@@ -6,9 +6,9 @@ _REQUEST_BODIES = {}
 
 
 def retrieve_aiohttp_body():
-    """ 
+    """
     Retrieve the POST body text from temporary cache.
-    
+
     The POST body corresponds with the thread id and should resides in
     cache just for lifetime of request.
     """
