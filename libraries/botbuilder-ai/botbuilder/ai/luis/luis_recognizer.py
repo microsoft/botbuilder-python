@@ -79,7 +79,8 @@ class LuisRecognizer(Recognizer):
         :type results: :class:`botbuilder.core.RecognizerResult`
         :param default_intent: Intent name to return should a top intent be found, defaults to None.
         :type default_intent: str, optional
-        :param min_score: Minimum score needed for an intent to be considered as a top intent. If all intents in the set are below this threshold then the `defaultIntent` is returned, defaults to 0.0.
+        :param min_score: Minimum score needed for an intent to be considered as a top intent. If all intents in the set
+         are below this threshold then the `defaultIntent` is returned, defaults to 0.0.
         :type min_score: float, optional
         :raises: TypeError
         :return: The top scoring intent name.
@@ -186,9 +187,11 @@ class LuisRecognizer(Recognizer):
         :type recognizer_result: :class:`botbuilder.core.RecognizerResult`
         :param turn_context: Context object containing information for a single turn of conversation with a user.
         :type turn_context: :class:`botbuilder.core.TurnContext`
-        :param telemetry_properties: Additional properties to be logged to telemetry with the LuisResult event, defaults to None.
+        :param telemetry_properties: Additional properties to be logged to telemetry with the LuisResult event, defaults
+         to None.
         :type telemetry_properties: :class:`typing.Dict[str, str]`, optional
-        :return: A dictionary sent as "Properties" to :func:`botbuilder.core.BotTelemetryClient.track_event` for the BotMessageSend event.
+        :return: A dictionary sent as "Properties" to :func:`botbuilder.core.BotTelemetryClient.track_event` for the
+         BotMessageSend event.
         :rtype: `typing.Dict[str, str]`
         """
 
@@ -268,7 +271,9 @@ class LuisRecognizer(Recognizer):
             options = self._options
 
         if not utterance or utterance.isspace():
-            recognizer_result = RecognizerResult(text=utterance)
+            recognizer_result = RecognizerResult(
+                text=utterance, intents={"": IntentScore(score=1.0)}, entities={}
+            )
         else:
 
             luis_recognizer = self._build_recognizer(options)
