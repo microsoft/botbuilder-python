@@ -7,6 +7,7 @@ import uuid
 
 import aiounittest
 
+from botframework.connector.auth import ClaimsIdentity, AuthenticationConstants
 from botbuilder.core import (
     TurnContext,
     MessageFactory,
@@ -28,8 +29,7 @@ from botbuilder.core.transcript_logger import (
     TranscriptLoggerMiddleware,
     ConsoleTranscriptLogger,
 )
-from botbuilder.schema import ActivityTypes, Activity
-from botframework.connector.auth import ClaimsIdentity, AuthenticationConstants
+from botbuilder.schema import ActivityTypes, Activity, EndOfConversationCodes
 from botbuilder.dialogs import (
     ComponentDialog,
     TextPrompt,
@@ -111,6 +111,7 @@ class DialogExtensionsTests(aiounittest.AsyncTestCase):
                 self.eoc_sent, "Skills should send EndConversation to channel"
             )
             assert ActivityTypes.end_of_conversation == self.eoc_sent.type
+            assert EndOfConversationCodes.completed_successfully == self.eoc_sent.code
             assert self.eoc_sent.value == "SomeName"
         else:
             self.assertIsNone(
