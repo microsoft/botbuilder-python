@@ -153,7 +153,7 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
             self._conversation_lock.release()
 
         activity.timestamp = activity.timestamp or datetime.utcnow()
-        await self.run_pipeline(TurnContext(self, activity), logic)
+        await self.run_pipeline(self.create_turn_context(activity), logic)
 
     async def send_activities(
         self, context, activities: List[Activity]
@@ -227,7 +227,7 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
             members_removed=[],
             conversation=ConversationAccount(id=str(uuid.uuid4())),
         )
-        context = TurnContext(self, update)
+        context = self.create_turn_context(update)
         return await callback(context)
 
     async def receive_activity(self, activity):
@@ -252,7 +252,7 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
             request.id = str(self._next_id)
 
         # Create context object and run middleware.
-        context = TurnContext(self, request)
+        context = self.create_turn_context(request)
         return await self.run_pipeline(context, self.logic)
 
     def get_next_activity(self) -> Activity:
@@ -533,6 +533,9 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
             )
 
         return None
+
+    def create_turn_context(self, activity: Activity) -> TurnContext:
+        return TurnContext(self, activity)
 
 
 class TestFlow:
