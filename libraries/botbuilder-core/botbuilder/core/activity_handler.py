@@ -379,12 +379,12 @@ class ActivityHandler:
         :returns: A task that represents the work queued to execute
         """
         if turn_context.activity.action == "add":
-            return await self.on_installation_update_add_activity(turn_context)
+            return await self.on_installation_update_add(turn_context)
         if turn_context.activity.action == "remove":
-            return await self.on_installation_update_remove_activity(turn_context)
+            return await self.on_installation_update_remove(turn_context)
         return
 
-    async def on_installation_update_add_activity(  # pylint: disable=unused-argument
+    async def on_installation_update_add(  # pylint: disable=unused-argument
         self, turn_context: TurnContext
     ):
         """
@@ -397,7 +397,7 @@ class ActivityHandler:
         """
         return
 
-    async def on_installation_update_remove_activity(  # pylint: disable=unused-argument
+    async def on_installation_update_remove(  # pylint: disable=unused-argument
         self, turn_context: TurnContext
     ):
         """
