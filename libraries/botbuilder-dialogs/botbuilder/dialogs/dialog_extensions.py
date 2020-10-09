@@ -1,22 +1,21 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from botbuilder.core import BotAdapter, StatePropertyAccessor, TurnContext
-from botbuilder.core.skills import SkillHandler, SkillConversationReference
-
-from botbuilder.dialogs import (
-    Dialog,
-    DialogEvents,
-    DialogSet,
-    DialogTurnStatus,
-)
-from botbuilder.schema import Activity, ActivityTypes
 from botframework.connector.auth import (
     ClaimsIdentity,
     SkillValidation,
     AuthenticationConstants,
     GovernmentConstants,
 )
+from botbuilder.core import BotAdapter, StatePropertyAccessor, TurnContext
+from botbuilder.core.skills import SkillHandler, SkillConversationReference
+from botbuilder.dialogs import (
+    Dialog,
+    DialogEvents,
+    DialogSet,
+    DialogTurnStatus,
+)
+from botbuilder.schema import Activity, ActivityTypes, EndOfConversationCodes
 
 
 class DialogExtensions:
@@ -87,6 +86,9 @@ class DialogExtensions:
                     type=ActivityTypes.end_of_conversation,
                     value=result.result,
                     locale=turn_context.activity.locale,
+                    code=EndOfConversationCodes.completed_successfully
+                    if result.status == DialogTurnStatus.Complete
+                    else EndOfConversationCodes.user_cancelled,
                 )
                 await turn_context.send_activity(activity)
 

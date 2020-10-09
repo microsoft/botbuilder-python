@@ -249,6 +249,11 @@ class SkillDialog(Dialog):
                 if from_skill_activity.type == ActivityTypes.end_of_conversation:
                     # Capture the EndOfConversation activity if it was sent from skill
                     eoc_activity = from_skill_activity
+
+                    # The conversation has ended, so cleanup the conversation id
+                    await self.dialog_options.conversation_id_factory.delete_conversation_reference(
+                        skill_conversation_id
+                    )
                 elif await self._intercept_oauth_cards(
                     context, from_skill_activity, self.dialog_options.connection_name
                 ):

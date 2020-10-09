@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 import uuid
 from http import HTTPStatus
-from typing import Callable, Union
+from typing import Callable, Union, List
 from unittest.mock import Mock
 
 import aiounittest
@@ -46,6 +46,7 @@ from botbuilder.dialogs import (
 class SimpleConversationIdFactory(ConversationIdFactoryBase):
     def __init__(self):
         self.conversation_refs = {}
+        self.create_count = 0
 
     async def create_skill_conversation_id(
         self,
@@ -53,6 +54,7 @@ class SimpleConversationIdFactory(ConversationIdFactoryBase):
             SkillConversationIdFactoryOptions, ConversationReference
         ],
     ) -> str:
+        self.create_count += 1
         key = (
             options_or_conversation_reference.activity.conversation.id
             + options_or_conversation_reference.activity.service_url
@@ -72,7 +74,8 @@ class SimpleConversationIdFactory(ConversationIdFactoryBase):
         return self.conversation_refs[skill_conversation_id]
 
     async def delete_conversation_reference(self, skill_conversation_id: str):
-        raise NotImplementedError()
+        self.conversation_refs.pop(skill_conversation_id, None)
+        return
 
 
 class SkillDialogTests(aiounittest.AsyncTestCase):
@@ -506,6 +509,57 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
         self.assertIsNotNone(final_activity)
         self.assertEqual(len(final_activity.attachments), 1)
 
+    async def test_end_of_conversation_from_expect_replies_calls_delete_conversation_reference(
+        self,
+    ):
+        activity_sent: Activity = None
+
+        # Callback to capture the parameters sent to the skill
+        async def capture_action(
+            from_bot_id: str,  # pylint: disable=unused-argument
+            to_bot_id: str,  # pylint: disable=unused-argument
+            to_uri: str,  # pylint: disable=unused-argument
+            service_url: str,  # pylint: disable=unused-argument
+            conversation_id: str,  # pylint: disable=unused-argument
+            activity: Activity,
+        ):
+            # Capture values sent to the skill so we can assert the right parameters were used.
+            nonlocal activity_sent
+            activity_sent = activity
+
+        eoc = Activity.create_end_of_conversation_activity()
+        expected_replies = list([eoc])
+
+        # Create a mock skill client to intercept calls and capture what is sent.
+        mock_skill_client = self._create_mock_skill_client(
+            capture_action, expected_replies=expected_replies
+        )
+
+        # Use Memory for conversation state
+        conversation_state = ConversationState(MemoryStorage())
+        dialog_options = self.create_skill_dialog_options(
+            conversation_state, mock_skill_client
+        )
+
+        # Create the SkillDialogInstance and the activity to send.
+        sut = SkillDialog(dialog_options, dialog_id="dialog")
+        activity_to_send = Activity.create_message_activity()
+        activity_to_send.delivery_mode = DeliveryModes.expect_replies
+        activity_to_send.text = str(uuid.uuid4())
+        client = DialogTestClient(
+            "test",
+            sut,
+            BeginSkillDialogOptions(activity_to_send),
+            conversation_state=conversation_state,
+        )
+
+        # Send something to the dialog to start it
+        await client.send_activity("hello")
+
+        simple_id_factory: SimpleConversationIdFactory = dialog_options.conversation_id_factory
+        self.assertEqual(0, len(simple_id_factory.conversation_refs))
+        self.assertEqual(1, simple_id_factory.create_count)
+
     @staticmethod
     def create_skill_dialog_options(
         conversation_state: ConversationState,
@@ -547,9 +601,15 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
         return attachment_activity
 
     def _create_mock_skill_client(
-        self, callback: Callable, return_status: Union[Callable, int] = 200
+        self,
+        callback: Callable,
+        return_status: Union[Callable, int] = 200,
+        expected_replies: List[Activity] = None,
     ) -> BotFrameworkClient:
         mock_client = Mock()
+        activity_list = ExpectedReplies(
+            activities=expected_replies or [MessageFactory.text("dummy activity")]
+        )
 
         async def mock_post_activity(
             from_bot_id: str,
@@ -572,7 +632,7 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
 
             if isinstance(return_status, Callable):
                 return await return_status()
-            return InvokeResponse(status=return_status)
+            return InvokeResponse(status=return_status, body=activity_list)
 
         mock_client.post_activity.side_effect = mock_post_activity
 
