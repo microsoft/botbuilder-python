@@ -4,6 +4,7 @@ from typing import Dict, List, Union
 
 from botbuilder.schema import Activity
 
+from ..channels import Channels
 from .authentication_configuration import AuthenticationConfiguration
 from .authentication_constants import AuthenticationConstants
 from .emulator_validation import EmulatorValidation
@@ -43,14 +44,29 @@ class JwtTokenValidation:
         """
         if not auth_header:
             # No auth header was sent. We might be on the anonymous code path.
-            is_auth_disabled = await credentials.is_authentication_disabled()
-            if is_auth_disabled:
-                # We are on the anonymous code path.
-                return ClaimsIdentity({}, True)
+            auth_is_disabled = await credentials.is_authentication_disabled()
+            if not auth_is_disabled:
+                # No Auth Header. Auth is required. Request is not authorized.
+                raise PermissionError("Unauthorized Access. Request is not authorized")
 
-            # No Auth Header. Auth is required. Request is not authorized.
-            raise PermissionError("Unauthorized Access. Request is not authorized")
+            # Check if the activity is for a skill call and is coming from the Emulator.
+            if (
+                activity.channel_id == Channels.emulator
+            ):  # TODO: UPDATE MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE https://github.com/microsoft/botbuilder-dotnet/pull/4757/files#r500646769
+                # Return an anonymous claim with an anonymous skill AppId
+                return ClaimsIdentity(
+                    {
+                        AuthenticationConstants.APP_ID_CLAIM: AuthenticationConstants.ANONYMOUS_SKILL_APP_ID
+                    },
+                    True,
+                )
 
+            # In the scenario where Auth is disabled, we still want to have the
+            # IsAuthenticated flag set in the ClaimsIdentity. To do this requires
+            # adding in an empty claim.
+            return ClaimsIdentity({}, True)
+
+        # Validate the header and extract claims.
         claims_identity = await JwtTokenValidation.validate_auth_header(
             auth_header,
             credentials,

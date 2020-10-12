@@ -66,6 +66,12 @@ class SkillValidation:
         if AuthenticationConstants.VERSION_CLAIM not in claims:
             return False
 
+        if (
+            claims.get(AuthenticationConstants.ANONYMOUS_SKILL_APP_ID, None)
+            == AuthenticationConstants.ANONYMOUS_SKILL_APP_ID
+        ):
+            return True
+
         audience = claims.get(AuthenticationConstants.AUDIENCE_CLAIM)
 
         # The audience is https://api.botframework.com and not an appId.

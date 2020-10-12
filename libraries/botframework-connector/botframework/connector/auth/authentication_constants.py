@@ -113,3 +113,5 @@ class AuthenticationConstants(ABC):
 
     # Service URL claim name. As used in Microsoft Bot Framework v3.1 auth.
     SERVICE_URL_CLAIM = "serviceurl"
+
+    ANONYMOUS_SKILL_APP_ID = "AnonymousSkill"

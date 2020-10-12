@@ -17,6 +17,7 @@ from botbuilder.schema import (
 
 from botframework.connector.auth import (
     AuthenticationConfiguration,
+    AuthenticationConstants,
     ChannelProvider,
     ClaimsIdentity,
     CredentialProvider,
@@ -469,17 +470,30 @@ class ChannelServiceHandler:
         raise BotActionNotImplementedError()
 
     async def _authenticate(self, auth_header: str) -> ClaimsIdentity:
+        """
+        Helper to authenticate the header.
+
+        This code is very similar to the code in JwtTokenValidation.authenticate_request,
+        we should move this code somewhere in that library when we refactor auth, for now we keep it private to avoid adding
+        more public static functions that we will need to deprecate later.
+        """
         if not auth_header:
             is_auth_disabled = (
                 await self._credential_provider.is_authentication_disabled()
             )
-            if is_auth_disabled:
-                # In the scenario where Auth is disabled, we still want to have the
-                # IsAuthenticated flag set in the ClaimsIdentity. To do this requires
-                # adding in an empty claim.
-                return ClaimsIdentity({}, True)
+            if not is_auth_disabled:
+                # No auth header. Auth is required. Request is not authorized.
+                raise PermissionError()
 
-            raise PermissionError()
+            # In the scenario where Auth is disabled, we still want to have the
+            # IsAuthenticated flag set in the ClaimsIdentity. To do this requires
+            # adding in an empty claim.
+            return ClaimsIdentity(
+                {
+                    AuthenticationConstants.APP_ID_CLAIM: AuthenticationConstants.ANONYMOUS_SKILL_APP_ID
+                },
+                True,
+            )
 
         return await JwtTokenValidation.validate_auth_header(
             auth_header,
