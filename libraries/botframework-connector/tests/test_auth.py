@@ -6,7 +6,8 @@ from unittest.mock import Mock
 
 import pytest
 
-from botbuilder.schema import Activity
+from botbuilder.schema import Activity, ConversationReference
+from botframework.connector import Channels
 from botframework.connector.auth import (
     AuthenticationConfiguration,
     AuthenticationConstants,
@@ -20,7 +21,7 @@ from botframework.connector.auth import (
     GovernmentConstants,
     GovernmentChannelValidation,
     SimpleChannelProvider,
-    ChannelProvider,
+    ChannelProvider, AppCredentials,
 )
 
 
@@ -262,7 +263,7 @@ class TestAuth:
 
         await JwtTokenValidation.authenticate_request(activity, header, credentials)
 
-        assert MicrosoftAppCredentials.is_trusted_service(
+        assert AppCredentials.is_trusted_service(
             "https://smba.trafficmanager.net/amer-client-ss.msg/"
         )
 
@@ -288,6 +289,35 @@ class TestAuth:
         assert not MicrosoftAppCredentials.is_trusted_service(
             "https://webchat.botframework.com/"
         )
+
+    @pytest.mark.asyncio
+    # Tests with a valid Token and invalid service url and ensures that Service url is NOT added to
+    # Trusted service url list.
+    async def test_channel_authentication_disabled_should_be_anonymous(self):
+        activity = Activity(service_url="https://webchat.botframework.com/")
+        header = ""
+        credentials = SimpleCredentialProvider("", "")
+
+        claims_principal = await JwtTokenValidation.authenticate_request(activity, header, credentials)
+
+        assert claims_principal.authentication_type == AuthenticationConstants.ANONYMOUS_AUTH_TYPE
+
+    @pytest.mark.asyncio
+    # Tests with a valid Token and invalid service url and ensures that Service url is NOT added to
+    # Trusted service url list.
+    async def test_channel_authentication_disabled_and_skill_should_be_anonymous(self):
+        activity = Activity(
+            channel_id=Channels.emulator,
+            service_url="https://webchat.botframework.com/",
+            relates_to=ConversationReference()
+        )
+        header = ""
+        credentials = SimpleCredentialProvider("", "")
+
+        claims_principal = await JwtTokenValidation.authenticate_request(activity, header, credentials)
+
+        assert claims_principal.authentication_type == AuthenticationConstants.ANONYMOUS_AUTH_TYPE
+        assert JwtTokenValidation.get_app_id_from_claims(claims_principal.claims) == AuthenticationConstants.ANONYMOUS_SKILL_APP_ID
 
     @pytest.mark.asyncio
     async def test_channel_msa_header_from_user_specified_tenant(self):

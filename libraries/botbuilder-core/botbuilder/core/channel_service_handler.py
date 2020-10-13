@@ -427,7 +427,10 @@ class ChannelServiceHandler:
         raise BotActionNotImplementedError()
 
     async def on_get_activity_members(
-        self, claims_identity: ClaimsIdentity, conversation_id: str, activity_id: str,
+        self,
+        claims_identity: ClaimsIdentity,
+        conversation_id: str,
+        activity_id: str,
     ) -> List[ChannelAccount]:
         """
         get_activity_members() API for Skill.
@@ -493,6 +496,7 @@ class ChannelServiceHandler:
                     AuthenticationConstants.APP_ID_CLAIM: AuthenticationConstants.ANONYMOUS_SKILL_APP_ID
                 },
                 True,
+                AuthenticationConstants.ANONYMOUS_AUTH_TYPE
             )
 
         return await JwtTokenValidation.validate_auth_header(

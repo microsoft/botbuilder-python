@@ -59,12 +59,13 @@ class JwtTokenValidation:
                         AuthenticationConstants.APP_ID_CLAIM: AuthenticationConstants.ANONYMOUS_SKILL_APP_ID
                     },
                     True,
+                    AuthenticationConstants.ANONYMOUS_AUTH_TYPE
                 )
 
             # In the scenario where Auth is disabled, we still want to have the
             # IsAuthenticated flag set in the ClaimsIdentity. To do this requires
             # adding in an empty claim.
-            return ClaimsIdentity({}, True)
+            return ClaimsIdentity({}, True, AuthenticationConstants.ANONYMOUS_AUTH_TYPE)
 
         # Validate the header and extract claims.
         claims_identity = await JwtTokenValidation.validate_auth_header(

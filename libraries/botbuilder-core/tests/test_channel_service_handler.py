@@ -7,7 +7,7 @@ from botframework.connector.auth import (
     AuthenticationConfiguration,
     ClaimsIdentity,
     SimpleCredentialProvider,
-    JwtTokenValidation,
+    JwtTokenValidation, AuthenticationConstants,
 )
 from botbuilder.schema import Activity, ResourceResponse
 
@@ -35,6 +35,5 @@ class ChannelServiceHandlerTests(aiounittest.AsyncTestCase):
         sut = TestChannelServiceHandler()
         await sut.handle_reply_to_activity(None, "123", "456", {})
 
-        assert "AnonymousSkill" == JwtTokenValidation.get_app_id_from_claims(
-            sut.claims_identity.claims
-        )
+        assert sut.claims_identity.authentication_type == AuthenticationConstants.ANONYMOUS_AUTH_TYPE
+        assert JwtTokenValidation.get_app_id_from_claims(sut.claims_identity.claims) == "AnonymousSkill"
