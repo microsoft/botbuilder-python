@@ -150,9 +150,7 @@ class ChannelServiceHandler:
         )
 
     async def on_get_conversations(
-        self,
-        claims_identity: ClaimsIdentity,
-        continuation_token: str = "",
+        self, claims_identity: ClaimsIdentity, continuation_token: str = "",
     ) -> ConversationsResult:
         """
         get_conversations() API for Skill
@@ -177,9 +175,7 @@ class ChannelServiceHandler:
         raise BotActionNotImplementedError()
 
     async def on_create_conversation(
-        self,
-        claims_identity: ClaimsIdentity,
-        parameters: ConversationParameters,
+        self, claims_identity: ClaimsIdentity, parameters: ConversationParameters,
     ) -> ConversationResourceResponse:
         """
         create_conversation() API for Skill
@@ -213,10 +209,7 @@ class ChannelServiceHandler:
         raise BotActionNotImplementedError()
 
     async def on_send_to_conversation(
-        self,
-        claims_identity: ClaimsIdentity,
-        conversation_id: str,
-        activity: Activity,
+        self, claims_identity: ClaimsIdentity, conversation_id: str, activity: Activity,
     ) -> ResourceResponse:
         """
         send_to_conversation() API for Skill
@@ -325,10 +318,7 @@ class ChannelServiceHandler:
         raise BotActionNotImplementedError()
 
     async def on_delete_activity(
-        self,
-        claims_identity: ClaimsIdentity,
-        conversation_id: str,
-        activity_id: str,
+        self, claims_identity: ClaimsIdentity, conversation_id: str, activity_id: str,
     ):
         """
         delete_activity() API for Skill.
@@ -346,9 +336,7 @@ class ChannelServiceHandler:
         raise BotActionNotImplementedError()
 
     async def on_get_conversation_members(
-        self,
-        claims_identity: ClaimsIdentity,
-        conversation_id: str,
+        self, claims_identity: ClaimsIdentity, conversation_id: str,
     ) -> List[ChannelAccount]:
         """
         get_conversation_members() API for Skill.
@@ -365,10 +353,7 @@ class ChannelServiceHandler:
         raise BotActionNotImplementedError()
 
     async def on_get_conversation_member(
-        self,
-        claims_identity: ClaimsIdentity,
-        conversation_id: str,
-        member_id: str,
+        self, claims_identity: ClaimsIdentity, conversation_id: str, member_id: str,
     ) -> ChannelAccount:
         """
         get_conversation_member() API for Skill.
@@ -422,10 +407,7 @@ class ChannelServiceHandler:
         raise BotActionNotImplementedError()
 
     async def on_delete_conversation_member(
-        self,
-        claims_identity: ClaimsIdentity,
-        conversation_id: str,
-        member_id: str,
+        self, claims_identity: ClaimsIdentity, conversation_id: str, member_id: str,
     ):
         """
         delete_conversation_member() API for Skill.
@@ -445,10 +427,7 @@ class ChannelServiceHandler:
         raise BotActionNotImplementedError()
 
     async def on_get_activity_members(
-        self,
-        claims_identity: ClaimsIdentity,
-        conversation_id: str,
-        activity_id: str,
+        self, claims_identity: ClaimsIdentity, conversation_id: str, activity_id: str,
     ) -> List[ChannelAccount]:
         """
         get_activity_members() API for Skill.
