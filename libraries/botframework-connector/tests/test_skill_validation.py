@@ -46,10 +46,12 @@ class TestSkillValidation(aiounittest.AsyncTestCase):
         # AppId != Audience
         claims[AuthenticationConstants.APP_ID_CLAIM] = audience
         assert not SkillValidation.is_skill_claim(claims)
-        
+
         # Anonymous skill app id
         del claims[AuthenticationConstants.APP_ID_CLAIM]
-        claims[AuthenticationConstants.APP_ID_CLAIM] = AuthenticationConstants.ANONYMOUS_SKILL_APP_ID
+        claims[
+            AuthenticationConstants.APP_ID_CLAIM
+        ] = AuthenticationConstants.ANONYMOUS_SKILL_APP_ID
         assert SkillValidation.is_skill_claim(claims)
 
         # All checks pass, should be good now

@@ -150,7 +150,9 @@ class ChannelServiceHandler:
         )
 
     async def on_get_conversations(
-        self, claims_identity: ClaimsIdentity, continuation_token: str = "",
+        self,
+        claims_identity: ClaimsIdentity,
+        continuation_token: str = "",
     ) -> ConversationsResult:
         """
         get_conversations() API for Skill
@@ -175,7 +177,9 @@ class ChannelServiceHandler:
         raise BotActionNotImplementedError()
 
     async def on_create_conversation(
-        self, claims_identity: ClaimsIdentity, parameters: ConversationParameters,
+        self,
+        claims_identity: ClaimsIdentity,
+        parameters: ConversationParameters,
     ) -> ConversationResourceResponse:
         """
         create_conversation() API for Skill
@@ -209,7 +213,10 @@ class ChannelServiceHandler:
         raise BotActionNotImplementedError()
 
     async def on_send_to_conversation(
-        self, claims_identity: ClaimsIdentity, conversation_id: str, activity: Activity,
+        self,
+        claims_identity: ClaimsIdentity,
+        conversation_id: str,
+        activity: Activity,
     ) -> ResourceResponse:
         """
         send_to_conversation() API for Skill
@@ -318,7 +325,10 @@ class ChannelServiceHandler:
         raise BotActionNotImplementedError()
 
     async def on_delete_activity(
-        self, claims_identity: ClaimsIdentity, conversation_id: str, activity_id: str,
+        self,
+        claims_identity: ClaimsIdentity,
+        conversation_id: str,
+        activity_id: str,
     ):
         """
         delete_activity() API for Skill.
@@ -336,7 +346,9 @@ class ChannelServiceHandler:
         raise BotActionNotImplementedError()
 
     async def on_get_conversation_members(
-        self, claims_identity: ClaimsIdentity, conversation_id: str,
+        self,
+        claims_identity: ClaimsIdentity,
+        conversation_id: str,
     ) -> List[ChannelAccount]:
         """
         get_conversation_members() API for Skill.
@@ -353,7 +365,10 @@ class ChannelServiceHandler:
         raise BotActionNotImplementedError()
 
     async def on_get_conversation_member(
-        self, claims_identity: ClaimsIdentity, conversation_id: str, member_id: str,
+        self,
+        claims_identity: ClaimsIdentity,
+        conversation_id: str,
+        member_id: str,
     ) -> ChannelAccount:
         """
         get_conversation_member() API for Skill.
@@ -407,7 +422,10 @@ class ChannelServiceHandler:
         raise BotActionNotImplementedError()
 
     async def on_delete_conversation_member(
-        self, claims_identity: ClaimsIdentity, conversation_id: str, member_id: str,
+        self,
+        claims_identity: ClaimsIdentity,
+        conversation_id: str,
+        member_id: str,
     ):
         """
         delete_conversation_member() API for Skill.
@@ -477,8 +495,8 @@ class ChannelServiceHandler:
         Helper to authenticate the header.
 
         This code is very similar to the code in JwtTokenValidation.authenticate_request,
-        we should move this code somewhere in that library when we refactor auth, for now we keep it private to avoid adding
-        more public static functions that we will need to deprecate later.
+        we should move this code somewhere in that library when we refactor auth,
+        for now we keep it private to avoid adding more public static functions that we will need to deprecate later.
         """
         if not auth_header:
             is_auth_disabled = (
@@ -491,14 +509,16 @@ class ChannelServiceHandler:
             # In the scenario where Auth is disabled, we still want to have the
             # IsAuthenticated flag set in the ClaimsIdentity. To do this requires
             # adding in an empty claim.
+            # Since ChannelServiceHandler calls are always a skill callback call, we set the skill claim too.
             return ClaimsIdentity(
                 {
                     AuthenticationConstants.APP_ID_CLAIM: AuthenticationConstants.ANONYMOUS_SKILL_APP_ID
                 },
                 True,
-                AuthenticationConstants.ANONYMOUS_AUTH_TYPE
+                AuthenticationConstants.ANONYMOUS_AUTH_TYPE,
             )
 
+        # Validate the header and extract claims.
         return await JwtTokenValidation.validate_auth_header(
             auth_header,
             self._credential_provider,

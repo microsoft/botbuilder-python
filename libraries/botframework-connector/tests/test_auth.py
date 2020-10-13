@@ -21,7 +21,8 @@ from botframework.connector.auth import (
     GovernmentConstants,
     GovernmentChannelValidation,
     SimpleChannelProvider,
-    ChannelProvider, AppCredentials,
+    ChannelProvider,
+    AppCredentials,
 )
 
 
@@ -293,31 +294,27 @@ class TestAuth:
     @pytest.mark.asyncio
     # Tests with a valid Token and invalid service url and ensures that Service url is NOT added to
     # Trusted service url list.
-    async def test_channel_authentication_disabled_should_be_anonymous(self):
-        activity = Activity(service_url="https://webchat.botframework.com/")
-        header = ""
-        credentials = SimpleCredentialProvider("", "")
-
-        claims_principal = await JwtTokenValidation.authenticate_request(activity, header, credentials)
-
-        assert claims_principal.authentication_type == AuthenticationConstants.ANONYMOUS_AUTH_TYPE
-
-    @pytest.mark.asyncio
-    # Tests with a valid Token and invalid service url and ensures that Service url is NOT added to
-    # Trusted service url list.
     async def test_channel_authentication_disabled_and_skill_should_be_anonymous(self):
         activity = Activity(
             channel_id=Channels.emulator,
             service_url="https://webchat.botframework.com/",
-            relates_to=ConversationReference()
+            relates_to=ConversationReference(),
         )
         header = ""
         credentials = SimpleCredentialProvider("", "")
 
-        claims_principal = await JwtTokenValidation.authenticate_request(activity, header, credentials)
+        claims_principal = await JwtTokenValidation.authenticate_request(
+            activity, header, credentials
+        )
 
-        assert claims_principal.authentication_type == AuthenticationConstants.ANONYMOUS_AUTH_TYPE
-        assert JwtTokenValidation.get_app_id_from_claims(claims_principal.claims) == AuthenticationConstants.ANONYMOUS_SKILL_APP_ID
+        assert (
+            claims_principal.authentication_type
+            == AuthenticationConstants.ANONYMOUS_AUTH_TYPE
+        )
+        assert (
+            JwtTokenValidation.get_app_id_from_claims(claims_principal.claims)
+            == AuthenticationConstants.ANONYMOUS_SKILL_APP_ID
+        )
 
     @pytest.mark.asyncio
     async def test_channel_msa_header_from_user_specified_tenant(self):
@@ -350,6 +347,10 @@ class TestAuth:
 
         assert claims_principal.is_authenticated
         assert not claims_principal.claims
+        assert (
+            claims_principal.authentication_type
+            == AuthenticationConstants.ANONYMOUS_AUTH_TYPE
+        )
 
     @pytest.mark.asyncio
     # Tests with no authentication header and makes sure the service URL is not added to the trusted list.

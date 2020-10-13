@@ -52,14 +52,16 @@ class JwtTokenValidation:
             # Check if the activity is for a skill call and is coming from the Emulator.
             if (
                 activity.channel_id == Channels.emulator
-            ):  # TODO: UPDATE MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE https://github.com/microsoft/botbuilder-dotnet/pull/4757/files#r500646769
+                and isinstance(activity, Activity)
+                and activity.relates_to is not None
+            ):  # TODO: UPDATE ME https://github.com/microsoft/botbuilder-dotnet/pull/4757/files#r500646769
                 # Return an anonymous claim with an anonymous skill AppId
                 return ClaimsIdentity(
                     {
                         AuthenticationConstants.APP_ID_CLAIM: AuthenticationConstants.ANONYMOUS_SKILL_APP_ID
                     },
                     True,
-                    AuthenticationConstants.ANONYMOUS_AUTH_TYPE
+                    AuthenticationConstants.ANONYMOUS_AUTH_TYPE,
                 )
 
             # In the scenario where Auth is disabled, we still want to have the
