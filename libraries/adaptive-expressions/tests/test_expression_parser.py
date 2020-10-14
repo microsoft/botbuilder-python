@@ -857,6 +857,8 @@ class ExpressionParserTests(aiounittest.AsyncTestCase):
         ["formatDateTime('2018-03-15')", "2018-03-15T00:00:00.000Z"],
         ["formatDateTime(notISOTimestamp)", "2018-03-15T13:00:00.000Z"],
         ["formatDateTime(notISOTimestamp, 'MM-dd-yy')", "03-15-18"],
+        ["formatDateTime(notISOTimestamp, 'MM/dd/yy')", "03/15/18"],
+        ["formatDateTime(notISOTimestamp, 'MM/dd/yyy')", "03/15/2018"],
         ["formatDateTime(timestampObj)", "2018-03-15T13:00:00.000Z"],
         # formatEpoch
         ["formatEpoch(unixTimestamp)", "2018-03-15T13:00:00.000Z"],

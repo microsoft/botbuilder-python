@@ -341,7 +341,7 @@ class FormatDatetime:
                     fmt_state = State.none
                     ltoken_buffer = ""
                 elif character == "/":
-                    result += change_state(timestamp, fmt_state, ltoken_buffer) + ":"
+                    result += change_state(timestamp, fmt_state, ltoken_buffer) + "/"
                     fmt_state = State.none
                     ltoken_buffer = ""
                 elif character == r"\`":

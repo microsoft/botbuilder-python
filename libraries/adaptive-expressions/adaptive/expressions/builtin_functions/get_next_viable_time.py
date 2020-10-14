@@ -71,6 +71,9 @@ class GetNextViableTime(ExpressionEvaluator):
             else:
                 valid_hour = hour + 1
 
+            if valid_hour > 24:
+                valid_hour -= 24
+
             valid_minute = parsed.minute
             valid_second = parsed.second
 
