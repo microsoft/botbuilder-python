@@ -17,7 +17,6 @@ from botbuilder.schema import (
 
 from botframework.connector.auth import (
     AuthenticationConfiguration,
-    AuthenticationConstants,
     ChannelProvider,
     ClaimsIdentity,
     CredentialProvider,
