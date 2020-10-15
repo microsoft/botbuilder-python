@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 import inspect
+from hashlib import sha256
 from typing import Dict
 
 from botbuilder.core import TurnContext, BotAssert, StatePropertyAccessor
@@ -32,7 +33,24 @@ class DialogSet:
         self._dialog_state = dialog_state
         # self.__telemetry_client = NullBotTelemetryClient.Instance;
 
-        self._dialogs: Dict[str, object] = {}
+        self._dialogs: Dict[str, Dialog] = {}
+        self._version: str = None
+
+    def get_version(self) -> str:
+        """
+        Gets a unique string which represents the combined versions of all dialogs in this this dialogset.  
+        <returns>Version will change when any of the child dialogs version changes.</returns>
+        """
+        if not self._version:
+            version = ""
+            for _, dialog in self._dialogs.items():
+                aux_version = dialog.get_version()
+                if aux_version:
+                    version += aux_version
+
+            self._version = sha256(version)
+
+        return self._version
 
     def add(self, dialog: Dialog):
         """
@@ -64,11 +82,27 @@ class DialogSet:
                 "DialogSet.CreateContextAsync(): DialogSet created with a null IStatePropertyAccessor."
             )
 
-        state = await self._dialog_state.get(turn_context, lambda: DialogState())
+        state: DialogState = await self._dialog_state.get(
+            turn_context, lambda: DialogState()
+        )
 
         return DialogContext(self, turn_context, state)
 
     async def find(self, dialog_id: str) -> Dialog:
+        """
+        Finds a dialog that was previously added to the set using add(dialog)
+        :param dialog_id: ID of the dialog/prompt to look up.
+        :return: The dialog if found, otherwise null.
+        """
+        if not dialog_id:
+            raise TypeError("DialogContext.find(): dialog_id cannot be None.")
+
+        if dialog_id in self._dialogs:
+            return self._dialogs[dialog_id]
+
+        return None
+
+    def find_dialog(self, dialog_id: str) -> Dialog:
         """
         Finds a dialog that was previously added to the set using add(dialog)
         :param dialog_id: ID of the dialog/prompt to look up.

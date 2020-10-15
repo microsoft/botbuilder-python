@@ -1,18 +1,25 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from typing import List, Optional
+
 from botbuilder.core.turn_context import TurnContext
+from botbuilder.dialogs.memory import DialogStateManager
+
+from .dialog_event import DialogEvent
+from .dialog_set import DialogSet
 from .dialog_state import DialogState
 from .dialog_turn_status import DialogTurnStatus
 from .dialog_turn_result import DialogTurnResult
 from .dialog_reason import DialogReason
 from .dialog_instance import DialogInstance
 from .dialog import Dialog
+from .dialog_container import DialogContainer
 
 
 class DialogContext:
     def __init__(
-        self, dialog_set: object, turn_context: TurnContext, state: DialogState
+        self, dialog_set: DialogSet, turn_context: TurnContext, state: DialogState
     ):
         if dialog_set is None:
             raise TypeError("DialogContext(): dialog_set cannot be None.")
@@ -21,16 +28,17 @@ class DialogContext:
             raise TypeError("DialogContext(): turn_context cannot be None.")
         self._turn_context = turn_context
         self._dialogs = dialog_set
-        # self._id = dialog_id;
         self._stack = state.dialog_stack
-        self.parent = None
+        self.services = {}
+        self.parent: DialogContext = None
+        self.state = DialogStateManager(self)
 
     @property
-    def dialogs(self):
+    def dialogs(self) -> DialogSet:
         """Gets the set of dialogs that can be called from this context.
 
         :param:
-        :return str:
+        :return DialogSet:
         """
         return self._dialogs
 
@@ -39,16 +47,16 @@ class DialogContext:
         """Gets the context for the current turn of conversation.
 
         :param:
-        :return str:
+        :return TurnContext:
         """
         return self._turn_context
 
     @property
-    def stack(self):
+    def stack(self) -> List:
         """Gets the current dialog stack.
 
         :param:
-        :return str:
+        :return list:
         """
         return self._stack
 
@@ -57,10 +65,27 @@ class DialogContext:
         """Return the container link in the database.
 
         :param:
-        :return str:
+        :return:
         """
         if self._stack:
             return self._stack[0]
+        return None
+
+    @property
+    def child(self) -> Optional["DialogContext"]:
+        """Return the container link in the database.
+
+        :param:
+        :return DialogContext:
+        """
+        instance = self.active_dialog
+
+        if instance:
+            dialog = self.find_dialog(instance.id)
+
+            if isinstance(dialog, DialogContainer):
+                return dialog.create_child_context(self)
+
         return None
 
     async def begin_dialog(self, dialog_id: str, options: object = None):
@@ -230,3 +255,81 @@ class DialogContext:
 
             # Pop dialog off stack
             self._stack.pop(0)
+
+    async def emit_event(
+        self,
+        name: str,
+        value: object = None,
+        bubble: bool = True,
+        from_leaf: bool = False,
+    ) -> bool:
+        """
+        Searches for a dialog with a given ID.
+        Emits a named event for the current dialog, or someone who started it, to handle.
+        <param name="name">Name of the event to raise.</param>
+        <param name="value">Value to send along with the event.</param>
+        <param name="bubble">Flag to control whether the event should be bubbled to its parent if not handled locally. Defaults to a value of `true`.</param>
+        <param name="from_leaf">Whether the event is emitted from a leaf node.</param>
+        <param name="cancellationToken">The cancellation token.</param>
+        <returns>True if the event was handled.</returns>
+        """
+        try:
+            # Initialize event
+            dialog_event = DialogEvent(bubble=bubble, name=name, value=value,)
+
+            dialog_context = self
+
+            # Find starting dialog
+            if from_leaf:
+                while True:
+                    child_dc = dialog_context.child
+
+                    if child_dc:
+                        dialog_context = child_dc
+                    else:
+                        break
+
+            # Dispatch to active dialog first
+            instance = dialog_context.active_dialog
+
+            if instance:
+                dialog = await dialog_context.find_dialog(instance.id)
+
+                if dialog:
+                    return await dialog.on_dialog_event(dialog_context, dialog_event)
+
+            return False
+        except Exception as err:
+            self.set_exception_context_data(err)
+            raise
+
+    def set_exception_context_data(self, exception: Exception) -> Exception:
+        if DialogContext.__class__.__name__ not in str(exception):
+            stack = list([])
+            current_dc = self
+
+            while current_dc:
+                # (PORTERS NOTE: javascript stack is reversed with top of stack on end)
+                for item in current_dc.stack:
+                    # filter out ActionScope items because they are internal bookkeeping.
+                    if not item.id.startswith("ActionScope["):
+                        stack.append(item.id)
+
+                current_dc: DialogContext = current_dc.parent
+
+            return type(exception)(
+                exception.message
+                + "DialogContext: "
+                + str(
+                    {
+                        "ActiveDialog": self.active_dialog.id
+                        if self.active_dialog
+                        else None,
+                        "Parent": self.parent.active_dialog.id
+                        if self.parent and self.parent.active_dialog
+                        else None,
+                        "Stack": str(stack),
+                        "State": self.state.get_memory_snapshot(),
+                    }
+                )
+            )
