@@ -8,7 +8,7 @@ from botframework.connector.auth import (
     AuthenticationConstants,
     ClaimsIdentity,
     CredentialProvider,
-    SkillValidation,
+    SkillValidation, JwtTokenValidation,
 )
 
 
@@ -164,3 +164,9 @@ class TestSkillValidation(aiounittest.AsyncTestCase):
         # All checks pass (no exception)
         claims[AuthenticationConstants.APP_ID_CLAIM] = app_id
         await SkillValidation._validate_identity(mock_identity, mock_credentials)
+
+    @staticmethod
+    def test_create_anonymous_skill_claim():
+        sut = SkillValidation.create_anonymous_skill_claim()
+        assert JwtTokenValidation.get_app_id_from_claims(sut.claims) == AuthenticationConstants.ANONYMOUS_SKILL_APP_ID
+        assert sut.authentication_type == AuthenticationConstants.ANONYMOUS_AUTH_TYPE

@@ -15,6 +15,7 @@ from botbuilder.schema import (
     ConversationReference,
     ConversationAccount,
     ChannelAccount,
+    RoleTypes,
 )
 from botframework.connector.auth import (
     ChannelProvider,
@@ -97,7 +98,9 @@ class BotFrameworkHttpClient(BotFrameworkClient):
             activity.conversation.id = conversation_id
             activity.service_url = service_url
             if not activity.recipient:
-                activity.recipient = ChannelAccount()
+                activity.recipient = ChannelAccount(role=RoleTypes.skill)
+            else:
+                activity.recipient.role = RoleTypes.skill
 
             status, content = await self._post_content(to_url, token, activity)
 

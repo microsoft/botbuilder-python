@@ -42,5 +42,5 @@ class ChannelServiceHandlerTests(aiounittest.AsyncTestCase):
         )
         assert (
             JwtTokenValidation.get_app_id_from_claims(sut.claims_identity.claims)
-            == "AnonymousSkill"
+            == AuthenticationConstants.ANONYMOUS_SKILL_APP_ID
         )

@@ -22,6 +22,7 @@ from botframework.connector.auth import (
     ClaimsIdentity,
     CredentialProvider,
     JwtTokenValidation,
+    SkillValidation,
 )
 
 
@@ -489,13 +490,7 @@ class ChannelServiceHandler:
             # IsAuthenticated flag set in the ClaimsIdentity. To do this requires
             # adding in an empty claim.
             # Since ChannelServiceHandler calls are always a skill callback call, we set the skill claim too.
-            return ClaimsIdentity(
-                {
-                    AuthenticationConstants.APP_ID_CLAIM: AuthenticationConstants.ANONYMOUS_SKILL_APP_ID
-                },
-                True,
-                AuthenticationConstants.ANONYMOUS_AUTH_TYPE,
-            )
+            return SkillValidation.create_anonymous_skill_claim()
 
         # Validate the header and extract claims.
         return await JwtTokenValidation.validate_auth_header(

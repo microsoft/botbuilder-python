@@ -6,7 +6,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from botbuilder.schema import Activity, ConversationReference
+from botbuilder.schema import Activity, ConversationReference, ChannelAccount, RoleTypes
 from botframework.connector import Channels
 from botframework.connector.auth import (
     AuthenticationConfiguration,
@@ -299,6 +299,7 @@ class TestAuth:
             channel_id=Channels.emulator,
             service_url="https://webchat.botframework.com/",
             relates_to=ConversationReference(),
+            recipient=ChannelAccount(role=RoleTypes.skill),
         )
         header = ""
         credentials = SimpleCredentialProvider("", "")
@@ -345,8 +346,6 @@ class TestAuth:
             activity, header, credentials
         )
 
-        assert claims_principal.is_authenticated
-        assert not claims_principal.claims
         assert (
             claims_principal.authentication_type
             == AuthenticationConstants.ANONYMOUS_AUTH_TYPE

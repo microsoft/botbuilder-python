@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 from typing import Dict, List, Union
 
-from botbuilder.schema import Activity
+from botbuilder.schema import Activity, RoleTypes
 
 from ..channels import Channels
 from .authentication_configuration import AuthenticationConfiguration
@@ -50,19 +50,16 @@ class JwtTokenValidation:
                 raise PermissionError("Unauthorized Access. Request is not authorized")
 
             # Check if the activity is for a skill call and is coming from the Emulator.
-            if (
-                activity.channel_id == Channels.emulator
-                and isinstance(activity, Activity)
-                and activity.relates_to is not None
-            ):  # TODO: UPDATE ME https://github.com/microsoft/botbuilder-dotnet/pull/4757/files#r500646769
-                # Return an anonymous claim with an anonymous skill AppId
-                return ClaimsIdentity(
-                    {
-                        AuthenticationConstants.APP_ID_CLAIM: AuthenticationConstants.ANONYMOUS_SKILL_APP_ID
-                    },
-                    True,
-                    AuthenticationConstants.ANONYMOUS_AUTH_TYPE,
-                )
+            try:
+                if (
+                    activity.channel_id == Channels.emulator
+                    and activity.recipient.role == RoleTypes.skill
+                    and activity.relates_to is not None
+                ):
+                    # Return an anonymous claim with an anonymous skill AppId
+                    return SkillValidation.create_anonymous_skill_claim()
+            except AttributeError:
+                pass
 
             # In the scenario where Auth is disabled, we still want to have the
             # IsAuthenticated flag set in the ClaimsIdentity. To do this requires
