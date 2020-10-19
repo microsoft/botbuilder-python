@@ -946,11 +946,22 @@ class NotificationInfo(Model):
 
     _attribute_map = {
         "alert": {"key": "alert", "type": "bool"},
+        "alert_in_meeting": {"key": "alertInMeeting", "type": "bool"},
+        "external_resource_url": {"key": "externalResourceUrl", "type": "str"},
     }
 
-    def __init__(self, *, alert: bool = None, **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        alert: bool = None,
+        alert_in_meeting: bool = None,
+        external_resource_url: str = None,
+        **kwargs
+    ) -> None:
         super(NotificationInfo, self).__init__(**kwargs)
         self.alert = alert
+        self.alert_in_meeting = alert_in_meeting
+        self.external_resource_url = external_resource_url
 
 
 class O365ConnectorCard(Model):
