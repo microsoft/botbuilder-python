@@ -378,6 +378,36 @@ class ActivityHandler:
         :type turn_context: :class:`botbuilder.core.TurnContext`
         :returns: A task that represents the work queued to execute
         """
+        if turn_context.activity.action == "add":
+            return await self.on_installation_update_add(turn_context)
+        if turn_context.activity.action == "remove":
+            return await self.on_installation_update_remove(turn_context)
+        return
+
+    async def on_installation_update_add(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext
+    ):
+        """
+        Override this in a derived class to provide logic specific to
+        ActivityTypes.InstallationUpdate activities with 'action' set to 'add'.
+
+        :param turn_context: The context object for this turn
+        :type turn_context: :class:`botbuilder.core.TurnContext`
+        :returns: A task that represents the work queued to execute
+        """
+        return
+
+    async def on_installation_update_remove(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext
+    ):
+        """
+        Override this in a derived class to provide logic specific to
+        ActivityTypes.InstallationUpdate activities with 'action' set to 'remove'.
+
+        :param turn_context: The context object for this turn
+        :type turn_context: :class:`botbuilder.core.TurnContext`
+        :returns: A task that represents the work queued to execute
+        """
         return
 
     async def on_unrecognized_activity_type(  # pylint: disable=unused-argument

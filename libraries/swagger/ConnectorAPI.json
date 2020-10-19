@@ -919,7 +919,7 @@
           },
           "role": {
             "$ref": "#/definitions/RoleTypes",
-            "description": "Role of the entity behind the account (Example: User, Bot, etc.)"
+            "description": "Role of the entity behind the account (Example: User, Bot, Skill, etc.)"
           }
         }
       },
@@ -1154,7 +1154,7 @@
           },
           "role": {
             "$ref": "#/definitions/RoleTypes",
-            "description": "Role of the entity behind the account (Example: User, Bot, etc.)"
+            "description": "Role of the entity behind the account (Example: User, Bot, Skill, etc.)"
           }
         }
       },
@@ -2277,10 +2277,11 @@
         }
       },
       "RoleTypes": {
-        "description": "Role of the entity behind the account (Example: User, Bot, etc.)",
+        "description": "Role of the entity behind the account (Example: User, Bot, Skill, etc.)",
         "enum": [
           "user",
-          "bot"
+          "bot",
+          "skill"
         ],
         "type": "string",
         "properties": {},

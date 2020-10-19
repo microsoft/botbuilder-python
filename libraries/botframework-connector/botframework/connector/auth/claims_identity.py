@@ -5,9 +5,12 @@ class Claim:
 
 
 class ClaimsIdentity:
-    def __init__(self, claims: dict, is_authenticated: bool):
+    def __init__(
+        self, claims: dict, is_authenticated: bool, authentication_type: str = None
+    ):
         self.claims = claims
         self.is_authenticated = is_authenticated
+        self.authentication_type = authentication_type
 
     def get_claim_value(self, claim_type: str):
         return self.claims.get(claim_type)
