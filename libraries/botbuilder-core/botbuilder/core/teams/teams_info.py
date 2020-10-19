@@ -2,8 +2,10 @@
 # Licensed under the MIT License.
 
 from typing import List, Tuple
-from botbuilder.schema import ConversationParameters, ConversationReference
 
+from botframework.connector.aio import ConnectorClient
+from botframework.connector.teams.teams_connector_client import TeamsConnectorClient
+from botbuilder.schema import ConversationParameters, ConversationReference
 from botbuilder.core.teams.teams_activity_extensions import (
     teams_get_meeting_info,
     teams_get_channel_data,
@@ -17,8 +19,6 @@ from botbuilder.schema.teams import (
     TeamsPagedMembersResult,
     TeamsParticipantChannelAccount,
 )
-from botframework.connector.aio import ConnectorClient
-from botframework.connector.teams.teams_connector_client import TeamsConnectorClient
 
 
 class TeamsInfo:
