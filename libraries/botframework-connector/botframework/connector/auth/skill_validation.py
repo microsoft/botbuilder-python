@@ -66,6 +66,12 @@ class SkillValidation:
         if AuthenticationConstants.VERSION_CLAIM not in claims:
             return False
 
+        if (
+            claims.get(AuthenticationConstants.APP_ID_CLAIM, None)
+            == AuthenticationConstants.ANONYMOUS_SKILL_APP_ID
+        ):
+            return True
+
         audience = claims.get(AuthenticationConstants.AUDIENCE_CLAIM)
 
         # The audience is https://api.botframework.com and not an appId.
@@ -123,6 +129,20 @@ class SkillValidation:
         await SkillValidation._validate_identity(identity, credentials)
 
         return identity
+
+    @staticmethod
+    def create_anonymous_skill_claim():
+        """
+        Creates a ClaimsIdentity for an anonymous (unauthenticated) skill.
+        :return ClaimsIdentity:
+        """
+        return ClaimsIdentity(
+            {
+                AuthenticationConstants.APP_ID_CLAIM: AuthenticationConstants.ANONYMOUS_SKILL_APP_ID
+            },
+            True,
+            AuthenticationConstants.ANONYMOUS_AUTH_TYPE,
+        )
 
     @staticmethod
     async def _validate_identity(

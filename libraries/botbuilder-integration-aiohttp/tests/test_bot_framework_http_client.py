@@ -1,7 +1,7 @@
 from unittest.mock import Mock
 
 import aiounittest
-from botbuilder.schema import ConversationAccount, ChannelAccount
+from botbuilder.schema import ConversationAccount, ChannelAccount, RoleTypes
 from botbuilder.integration.aiohttp import BotFrameworkHttpClient
 from botframework.connector.auth import CredentialProvider, Activity
 
@@ -69,3 +69,4 @@ class TestBotFrameworkHttpClient(aiounittest.AsyncTestCase):
         )
 
         assert activity.recipient.id == skill_recipient_id
+        assert activity.recipient.role is RoleTypes.skill

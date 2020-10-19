@@ -8,6 +8,7 @@ class RoleTypes(str, Enum):
 
     user = "user"
     bot = "bot"
+    skill = "skill"
 
 
 class ActivityTypes(str, Enum):
