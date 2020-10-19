@@ -42,7 +42,9 @@ def teams_get_team_info(activity: Activity) -> TeamInfo:
     return None
 
 
-def teams_notify_user(activity: Activity):
+def teams_notify_user(
+    activity: Activity, alert_in_meeting: bool = None, external_resource_url: str = None
+):
     if not activity:
         return
 
@@ -51,6 +53,8 @@ def teams_notify_user(activity: Activity):
 
     channel_data = TeamsChannelData().deserialize(activity.channel_data)
     channel_data.notification = NotificationInfo(alert=True)
+    channel_data.notification.alert_in_meeting = alert_in_meeting
+    channel_data.notification.external_resource_url = external_resource_url
     activity.channel_data = channel_data
 
 
