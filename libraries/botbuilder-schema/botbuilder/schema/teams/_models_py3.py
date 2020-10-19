@@ -944,7 +944,14 @@ class NotificationInfo(Model):
         "external_resource_url": {"key": "externalResourceUrl", "type": "str"},
     }
 
-    def __init__(self, *, alert: bool = None, alert_in_meeting: bool = None, external_resource_url: str = None, **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        alert: bool = None,
+        alert_in_meeting: bool = None,
+        external_resource_url: str = None,
+        **kwargs
+    ) -> None:
         super(NotificationInfo, self).__init__(**kwargs)
         self.alert = alert
         self.alert_in_meeting = alert_in_meeting
