@@ -2,7 +2,8 @@
 # Licensed under the MIT License.
 
 import aiounittest
-
+from botbuilder.schema.teams import TeamsChannelData, TeamsMeetingInfo, TenantInfo
+from botframework.connector import Channels
 
 from botbuilder.core import TurnContext, MessageFactory
 from botbuilder.core.teams import TeamsInfo, TeamsActivityHandler
@@ -198,6 +199,24 @@ class TestTeamsInfo(aiounittest.AsyncTestCase):
             pass
         else:
             assert False, "should have raise TypeError"
+
+    async def test_get_participant(self):
+        adapter = SimpleAdapterWithCreateConversation()
+
+        activity = Activity(
+            type="message",
+            text="Test-get_participant",
+            channel_id=Channels.ms_teams,
+            from_property=ChannelAccount(
+                aad_object_id="participantId-1"
+            ),
+            channel_data={"meeting": {"id": "meetingId-1"}, "tenant": {"id": "tenantId-1"}},
+            service_url="https://test.coffee"
+        )
+
+        turn_context = TurnContext(adapter, activity)
+        handler = TeamsActivityHandler()
+        await handler.on_turn(turn_context)
 
 
 class TestTeamsActivityHandler(TeamsActivityHandler):
