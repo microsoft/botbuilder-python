@@ -2,7 +2,6 @@
 # Licensed under the MIT License.
 
 import aiounittest
-from botbuilder.schema.teams import TeamsChannelData, TeamsMeetingInfo, TenantInfo
 from botframework.connector import Channels
 
 from botbuilder.core import TurnContext, MessageFactory
