@@ -77,6 +77,14 @@ class TestingActivityHandler(ActivityHandler):
         self.record.append("on_installation_update")
         return await super().on_installation_update(turn_context)
 
+    async def on_installation_update_add(self, turn_context: TurnContext):
+        self.record.append("on_installation_update_add")
+        return await super().on_installation_update_add(turn_context)
+
+    async def on_installation_update_remove(self, turn_context: TurnContext):
+        self.record.append("on_installation_update_remove")
+        return await super().on_installation_update_remove(turn_context)
+
     async def on_unrecognized_activity_type(self, turn_context: TurnContext):
         self.record.append("on_unrecognized_activity_type")
         return await super().on_unrecognized_activity_type(turn_context)
@@ -245,6 +253,34 @@ class TestActivityHandler(aiounittest.AsyncTestCase):
 
         assert len(bot.record) == 1
         assert bot.record[0] == "on_installation_update"
+
+    async def test_on_installation_update_add(self):
+        activity = Activity(type=ActivityTypes.installation_update, action="add")
+
+        adapter = TestInvokeAdapter()
+        turn_context = TurnContext(adapter, activity)
+
+        # Act
+        bot = TestingActivityHandler()
+        await bot.on_turn(turn_context)
+
+        assert len(bot.record) == 2
+        assert bot.record[0] == "on_installation_update"
+        assert bot.record[1] == "on_installation_update_add"
+
+    async def test_on_installation_update_add_remove(self):
+        activity = Activity(type=ActivityTypes.installation_update, action="remove")
+
+        adapter = TestInvokeAdapter()
+        turn_context = TurnContext(adapter, activity)
+
+        # Act
+        bot = TestingActivityHandler()
+        await bot.on_turn(turn_context)
+
+        assert len(bot.record) == 2
+        assert bot.record[0] == "on_installation_update"
+        assert bot.record[1] == "on_installation_update_remove"
 
     async def test_healthcheck(self):
         activity = Activity(type=ActivityTypes.invoke, name="healthcheck",)
