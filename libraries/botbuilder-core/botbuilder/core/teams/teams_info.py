@@ -221,7 +221,9 @@ class TeamsInfo:
             )
 
         connector_client = await TeamsInfo.get_teams_connector_client(turn_context)
-        return connector_client.teams.fetch_participant(meeting_id, participant_id, tenant_id)
+        return connector_client.teams.fetch_participant(
+            meeting_id, participant_id, tenant_id
+        )
 
     @staticmethod
     async def get_teams_connector_client(

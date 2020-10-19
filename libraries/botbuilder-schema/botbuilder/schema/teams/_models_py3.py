@@ -2,7 +2,13 @@
 # Licensed under the MIT License.
 
 from msrest.serialization import Model
-from botbuilder.schema import Activity, Attachment, ChannelAccount, PagedMembersResult, ConversationAccount
+from botbuilder.schema import (
+    Activity,
+    Attachment,
+    ChannelAccount,
+    PagedMembersResult,
+    ConversationAccount,
+)
 
 
 class TaskModuleRequest(Model):

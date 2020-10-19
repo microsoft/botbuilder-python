@@ -2,7 +2,12 @@
 # Licensed under the MIT License.
 
 from botbuilder.schema import Activity
-from botbuilder.schema.teams import NotificationInfo, TeamsChannelData, TeamInfo, TeamsMeetingInfo
+from botbuilder.schema.teams import (
+    NotificationInfo,
+    TeamsChannelData,
+    TeamInfo,
+    TeamsMeetingInfo,
+)
 
 
 def teams_get_channel_data(activity: Activity) -> TeamsChannelData:
