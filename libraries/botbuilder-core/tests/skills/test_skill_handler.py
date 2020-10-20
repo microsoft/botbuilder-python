@@ -2,11 +2,16 @@ import hashlib
 import json
 from uuid import uuid4
 from asyncio import Future
-from typing import Dict, List
+from typing import Dict, List, Callable
 
 from unittest.mock import Mock, MagicMock
 import aiounittest
 
+from botframework.connector.auth import (
+    AuthenticationConfiguration,
+    AuthenticationConstants,
+    ClaimsIdentity,
+)
 from botbuilder.core import (
     TurnContext,
     BotActionNotImplementedError,
@@ -27,11 +32,6 @@ from botbuilder.schema import (
     ResourceResponse,
     Transcript,
     CallerIdConstants,
-)
-from botframework.connector.auth import (
-    AuthenticationConfiguration,
-    AuthenticationConstants,
-    ClaimsIdentity,
 )
 
 
@@ -206,10 +206,30 @@ class TestSkillHandler(aiounittest.AsyncTestCase):
         )
 
         mock_adapter = Mock()
-        mock_adapter.continue_conversation = MagicMock(return_value=Future())
-        mock_adapter.continue_conversation.return_value.set_result(Mock())
-        mock_adapter.send_activities = MagicMock(return_value=Future())
-        mock_adapter.send_activities.return_value.set_result([])
+
+        async def continue_conversation(
+            reference: ConversationReference,
+            callback: Callable,
+            bot_id: str = None,
+            claims_identity: ClaimsIdentity = None,
+            audience: str = None,
+        ):  # pylint: disable=unused-argument
+            await callback(
+                TurnContext(
+                    mock_adapter,
+                    conversation_reference_extension.get_continuation_activity(
+                        self._conversation_reference
+                    ),
+                )
+            )
+
+        async def send_activities(
+            context: TurnContext, activities: List[Activity]
+        ):  # pylint: disable=unused-argument
+            return [ResourceResponse(id="resourceId")]
+
+        mock_adapter.continue_conversation = continue_conversation
+        mock_adapter.send_activities = send_activities
 
         sut = self.create_skill_handler_for_testing(mock_adapter)
 
@@ -218,25 +238,12 @@ class TestSkillHandler(aiounittest.AsyncTestCase):
 
         assert not activity.caller_id
 
-        await sut.test_on_send_to_conversation(
+        resource_response = await sut.test_on_send_to_conversation(
             self._claims_identity, self._conversation_id, activity
         )
 
-        args, kwargs = mock_adapter.continue_conversation.call_args_list[0]
-
-        assert isinstance(args[0], ConversationReference)
-        assert callable(args[1])
-        assert isinstance(kwargs["claims_identity"], ClaimsIdentity)
-
-        await args[1](
-            TurnContext(
-                mock_adapter,
-                conversation_reference_extension.get_continuation_activity(
-                    self._conversation_reference
-                ),
-            )
-        )
         assert activity.caller_id is None
+        assert resource_response.id == "resourceId"
 
     async def test_forwarding_on_send_to_conversation(self):
         self._conversation_id = await self._test_id_factory.create_skill_conversation_id(

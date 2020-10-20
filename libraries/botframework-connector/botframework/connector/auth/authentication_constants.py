@@ -113,3 +113,9 @@ class AuthenticationConstants(ABC):
 
     # Service URL claim name. As used in Microsoft Bot Framework v3.1 auth.
     SERVICE_URL_CLAIM = "serviceurl"
+
+    # AppId used for creating skill claims when there is no appId and password configured.
+    ANONYMOUS_SKILL_APP_ID = "AnonymousSkill"
+
+    # Indicates that ClaimsIdentity.authentication_type is anonymous (no app Id and password were provided).
+    ANONYMOUS_AUTH_TYPE = "anonymous"
