@@ -6,6 +6,7 @@ from typing import List, Dict
 from botbuilder.schema import Activity
 from .transcript_logger import PagedResult, TranscriptInfo, TranscriptStore
 
+
 # pylint: disable=line-too-long
 class MemoryTranscriptStore(TranscriptStore):
     """This provider is most useful for simulating production storage when running locally against the
@@ -59,7 +60,9 @@ class MemoryTranscriptStore(TranscriptStore):
                         [
                             x
                             for x in sorted(
-                                transcript, key=lambda x: x.timestamp, reverse=False
+                                transcript,
+                                key=lambda x: x.timestamp or str(datetime.datetime.min),
+                                reverse=False,
                             )
                             if x.timestamp >= start_date
                         ]
@@ -72,9 +75,11 @@ class MemoryTranscriptStore(TranscriptStore):
                     paged_result.items = [
                         x
                         for x in sorted(
-                            transcript, key=lambda x: x.timestamp, reverse=False
+                            transcript,
+                            key=lambda x: x.timestamp or datetime.datetime.min,
+                            reverse=False,
                         )
-                        if x.timestamp >= start_date
+                        if (x.timestamp or datetime.datetime.min) >= start_date
                     ][:20]
                     if paged_result.items.count == 20:
                         paged_result.continuation_token = paged_result.items[-1].id
