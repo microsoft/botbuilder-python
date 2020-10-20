@@ -52,6 +52,7 @@ class State(Enum):
 
 
 class FormatDatetime:
+    # pylint: disable=too-many-statements
     @staticmethod
     def format(timestamp: datetime, fmt_string: str):
         result = ""
@@ -71,7 +72,6 @@ class FormatDatetime:
             elif fmt_string == "D":
                 fmt_string = "dddd, MMMM d, YYYY"
 
-        # pylint:disable=too-many-statements
         def change_state(timestamp: datetime, fmt_state, ltoken_buffer):
             result = ""
             if fmt_state == State.lower_d1:
