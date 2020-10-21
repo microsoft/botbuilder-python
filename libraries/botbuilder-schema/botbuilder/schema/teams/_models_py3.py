@@ -3,7 +3,6 @@
 
 from msrest.serialization import Model
 from botbuilder.schema import (
-    Activity,
     Attachment,
     ChannelAccount,
     PagedMembersResult,
@@ -1970,75 +1969,52 @@ class TeamsMeetingInfo(Model):
         self.id = id
 
 
-class TeamsParticipantChannelAccount(TeamsChannelAccount):
-    """Teams participant channel account detailing user Azure Active Directory and meeting participant details.
+class MeetingParticipantInfo(Model):
+    """Teams meeting participant details.
 
-    :param id: Channel id for the user or bot on this channel.
-    :type id: str
-    :param name: Display friendly name.
-    :type name: str
-    :param given_name: Given name part of the user name.
-    :type given_name: str
-    :param surname: Surname part of the user name.
-    :type surname: str
-    :param email: Email of the user.
-    :type email: str
-    :param user_principal_name: Unique user principal name.
-    :type user_principal_name: str
-    :param tenant_id: TenantId of the user.
-    :type tenant_id: str
-    :param user_role: UserRole of the user.
-    :type user_role: str
-    :param meeting_role: Role of the participant in the current meeting.
-    :type meeting_role: str
+    :param role: Role of the participant in the current meeting.
+    :type role: str
     :param in_meeting: True, if the participant is in the meeting.
-    :type in_meeting: str
-    :param conversation: Conversation Account for the meeting.
-    :type conversation: str
+    :type in_meeting: bool
     """
 
     _attribute_map = {
-        "id": {"key": "id", "type": "str"},
-        "name": {"key": "name", "type": "str"},
-        "given_name": {"key": "givenName", "type": "str"},
-        "surname": {"key": "surname", "type": "str"},
-        "email": {"key": "email", "type": "str"},
-        "aad_object_id": {"key": "objectId", "type": "str"},
-        "user_principal_name": {"key": "userPrincipalName", "type": "str"},
-        "tenant_id": {"key": "tenantId", "type": "str"},
-        "user_role": {"key": "userRole", "type": "str"},
-        "meeting_role": {"key": "meetingRole", "type": "str"},
+        "role": {"key": "role", "type": "str"},
         "in_meeting": {"key": "inMeeting", "type": "bool"},
+    }
+
+    def __init__(self, *, role: str = None, in_meeting: bool = None, **kwargs) -> None:
+        super(MeetingParticipantInfo, self).__init__(**kwargs)
+        self.role = role
+        self.in_meeting = in_meeting
+
+
+class TeamsMeetingParticipant(Model):
+    """Teams participant channel account detailing user Azure Active Directory and meeting participant details.
+
+    :param user: Teams Channel Account information for this meeting participant
+    :type user: TeamsChannelAccount
+    :param meeting: >Information specific to this participant in the specific meeting.
+    :type meeting: MeetingParticipantInfo
+    :param conversation: Conversation Account for the meeting.
+    :type conversation: ConversationAccount
+    """
+
+    _attribute_map = {
+        "user": {"key": "user", "type": "TeamsChannelAccount"},
+        "meeting": {"key": "meeting", "type": "MeetingParticipantInfo"},
         "conversation": {"key": "conversation", "type": "ConversationAccount"},
     }
 
     def __init__(
         self,
         *,
-        id: str = None,
-        name: str = None,
-        given_name: str = None,
-        surname: str = None,
-        email: str = None,
-        aad_object_id: str = None,
-        user_principal_name: str = None,
-        tenant_id: str = None,
-        user_role: str = None,
-        meeting_role: str = None,
-        in_meeting: bool = None,
+        user: TeamsChannelAccount = None,
+        meeting: MeetingParticipantInfo = None,
         conversation: ConversationAccount = None,
         **kwargs
     ) -> None:
-        super(TeamsParticipantChannelAccount, self).__init__(**kwargs)
-        self.id = id
-        self.name = name
-        self.given_name = given_name
-        self.surname = surname
-        self.email = email
-        self.aad_object_id = aad_object_id
-        self.user_principal_name = user_principal_name
-        self.tenant_id = tenant_id
-        self.user_role = user_role
-        self.meeting_role = meeting_role
-        self.in_meeting = in_meeting
+        super(TeamsMeetingParticipant, self).__init__(**kwargs)
+        self.user = user
+        self.meeting = meeting
         self.conversation = conversation

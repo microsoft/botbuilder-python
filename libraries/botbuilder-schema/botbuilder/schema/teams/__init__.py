@@ -59,7 +59,8 @@ from ._models_py3 import TeamsChannelData
 from ._models_py3 import TeamsPagedMembersResult
 from ._models_py3 import TenantInfo
 from ._models_py3 import TeamsMeetingInfo
-from ._models_py3 import TeamsParticipantChannelAccount
+from ._models_py3 import TeamsMeetingParticipant
+from ._models_py3 import MeetingParticipantInfo
 
 __all__ = [
     "AppBasedLinkQuery",
@@ -120,5 +121,6 @@ __all__ = [
     "TeamsPagedMembersResult",
     "TenantInfo",
     "TeamsMeetingInfo",
-    "TeamsParticipantChannelAccount",
+    "TeamsMeetingParticipant",
+    "MeetingParticipantInfo",
 ]

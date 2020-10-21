@@ -168,7 +168,7 @@ class TeamsOperations(object):
          deserialized response
         :param operation_config: :ref:`Operation configuration
          overrides<msrest:optionsforoperations>`.
-        :return: TeamsParticipantChannelAccount or ClientRawResponse if raw=true
+        :return: TeamsMeetingParticipant or ClientRawResponse if raw=true
         :rtype: ~botframework.connector.teams.models.TeamsParticipantChannelAccount or
          ~msrest.pipeline.ClientRawResponse
         :raises:
@@ -205,7 +205,7 @@ class TeamsOperations(object):
         deserialized = None
 
         if response.status_code == 200:
-            deserialized = self._deserialize("TeamsParticipantChannelAccount", response)
+            deserialized = self._deserialize("TeamsMeetingParticipant", response)
 
         if raw:
             client_raw_response = ClientRawResponse(deserialized, response)

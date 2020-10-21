@@ -17,7 +17,7 @@ from botbuilder.schema.teams import (
     TeamsChannelData,
     TeamsChannelAccount,
     TeamsPagedMembersResult,
-    TeamsParticipantChannelAccount,
+    TeamsMeetingParticipant,
 )
 
 
@@ -189,7 +189,7 @@ class TeamsInfo:
         meeting_id: str = None,
         participant_id: str = None,
         tenant_id: str = None,
-    ) -> TeamsParticipantChannelAccount:
+    ) -> TeamsMeetingParticipant:
         meeting_id = (
             meeting_id
             if meeting_id
