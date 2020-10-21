@@ -225,6 +225,7 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
             type=ActivityTypes.conversation_update,
             members_added=[],
             members_removed=[],
+            channel_id=channel_id,
             conversation=ConversationAccount(id=str(uuid.uuid4())),
         )
         context = self.create_turn_context(update)
