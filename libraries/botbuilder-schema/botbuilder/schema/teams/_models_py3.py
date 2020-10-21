@@ -71,6 +71,28 @@ class ChannelInfo(Model):
         self.name = name
 
 
+class CacheInfo(Model):
+    """A cache info object which notifies Teams how long an object should be cached for.
+
+    :param cache_type: Type of Cache Info
+    :type cache_type: str
+    :param cache_duration: Duration of the Cached Info.
+    :type cache_duration: int
+    """
+
+    _attribute_map = {
+        "cache_type": {"key": "cacheType", "type": "str"},
+        "cache_duration": {"key": "cacheDuration", "type": "int"},
+    }
+
+    def __init__(
+        self, *, cache_type: str = None, cache_duration: int = None, **kwargs
+    ) -> None:
+        super(CacheInfo, self).__init__(**kwargs)
+        self.cache_type = cache_type
+        self.cache_duration = cache_duration
+
+
 class ConversationList(Model):
     """List of channels under a team.
 
@@ -699,6 +721,8 @@ class MessagingExtensionActionResponse(Model):
     :param compose_extension:
     :type compose_extension:
      ~botframework.connector.teams.models.MessagingExtensionResult
+    :param cache_info: CacheInfo for this MessagingExtensionActionResponse.
+    :type cache_info: ~botframework.connector.teams.models.CacheInfo
     """
 
     _attribute_map = {
@@ -707,12 +731,16 @@ class MessagingExtensionActionResponse(Model):
             "key": "composeExtension",
             "type": "MessagingExtensionResult",
         },
+        "cache_info": {"key": "cacheInfo", "type": "CacheInfo"},
     }
 
-    def __init__(self, *, task=None, compose_extension=None, **kwargs) -> None:
+    def __init__(
+        self, *, task=None, compose_extension=None, cache_info: CacheInfo, **kwargs
+    ) -> None:
         super(MessagingExtensionActionResponse, self).__init__(**kwargs)
         self.task = task
         self.compose_extension = compose_extension
+        self.cache_info = cache_info
 
 
 class MessagingExtensionAttachment(Attachment):
@@ -849,8 +877,9 @@ class MessagingExtensionResponse(Model):
     """Messaging extension response.
 
     :param compose_extension:
-    :type compose_extension:
-     ~botframework.connector.teams.models.MessagingExtensionResult
+    :type compose_extension: ~botframework.connector.teams.models.MessagingExtensionResult
+    :param cache_info: CacheInfo for this MessagingExtensionResponse.
+    :type cache_info: ~botframework.connector.teams.models.CacheInfo
     """
 
     _attribute_map = {
@@ -858,11 +887,13 @@ class MessagingExtensionResponse(Model):
             "key": "composeExtension",
             "type": "MessagingExtensionResult",
         },
+        "cache_info": {"key": "cacheInfo", "type": CacheInfo},
     }
 
-    def __init__(self, *, compose_extension=None, **kwargs) -> None:
+    def __init__(self, *, compose_extension=None, cache_info=None, **kwargs) -> None:
         super(MessagingExtensionResponse, self).__init__(**kwargs)
         self.compose_extension = compose_extension
+        self.cache_info = cache_info
 
 
 class MessagingExtensionResult(Model):
@@ -1671,15 +1702,19 @@ class TaskModuleResponse(Model):
 
     :param task: The JSON for the Adaptive card to appear in the task module.
     :type task: ~botframework.connector.teams.models.TaskModuleResponseBase
+    :param cache_info: CacheInfo for this TaskModuleResponse.
+    :type cache_info: ~botframework.connector.teams.models.CacheInfo
     """
 
     _attribute_map = {
         "task": {"key": "task", "type": "TaskModuleResponseBase"},
+        "cache_info": {"key": "cacheInfo", "type": "CacheInfo"},
     }
 
-    def __init__(self, *, task=None, **kwargs) -> None:
+    def __init__(self, *, task=None, cache_info=None, **kwargs) -> None:
         super(TaskModuleResponse, self).__init__(**kwargs)
         self.task = task
+        self.cache_info = cache_info
 
 
 class TaskModuleTaskInfo(Model):
