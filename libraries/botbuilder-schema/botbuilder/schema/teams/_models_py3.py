@@ -2,7 +2,12 @@
 # Licensed under the MIT License.
 
 from msrest.serialization import Model
-from botbuilder.schema import Activity, Attachment, ChannelAccount, PagedMembersResult
+from botbuilder.schema import (
+    Attachment,
+    ChannelAccount,
+    PagedMembersResult,
+    ConversationAccount,
+)
 
 
 class TaskModuleRequest(Model):
@@ -1898,6 +1903,8 @@ class TeamsChannelData(Model):
     :type notification: ~botframework.connector.teams.models.NotificationInfo
     :param tenant: Information about the tenant in which the message was sent
     :type tenant: ~botframework.connector.teams.models.TenantInfo
+    :param meeting: Information about the meeting in which the message was sent
+    :type meeting: ~botframework.connector.teams.models.TeamsMeetingInfo
     """
 
     _attribute_map = {
@@ -1906,6 +1913,7 @@ class TeamsChannelData(Model):
         "team": {"key": "team", "type": "TeamInfo"},
         "notification": {"key": "notification", "type": "NotificationInfo"},
         "tenant": {"key": "tenant", "type": "TenantInfo"},
+        "meeting": {"key": "meeting", "type": "TeamsMeetingInfo"},
     }
 
     def __init__(
@@ -1916,6 +1924,7 @@ class TeamsChannelData(Model):
         team=None,
         notification=None,
         tenant=None,
+        meeting=None,
         **kwargs
     ) -> None:
         super(TeamsChannelData, self).__init__(**kwargs)
@@ -1925,6 +1934,7 @@ class TeamsChannelData(Model):
         self.team = team
         self.notification = notification
         self.tenant = tenant
+        self.meeting = meeting
 
 
 class TenantInfo(Model):
@@ -1941,3 +1951,70 @@ class TenantInfo(Model):
     def __init__(self, *, id: str = None, **kwargs) -> None:
         super(TenantInfo, self).__init__(**kwargs)
         self.id = id
+
+
+class TeamsMeetingInfo(Model):
+    """Describes a Teams Meeting.
+
+    :param id: Unique identifier representing a meeting
+    :type id: str
+    """
+
+    _attribute_map = {
+        "id": {"key": "id", "type": "str"},
+    }
+
+    def __init__(self, *, id: str = None, **kwargs) -> None:
+        super(TeamsMeetingInfo, self).__init__(**kwargs)
+        self.id = id
+
+
+class MeetingParticipantInfo(Model):
+    """Teams meeting participant details.
+
+    :param role: Role of the participant in the current meeting.
+    :type role: str
+    :param in_meeting: True, if the participant is in the meeting.
+    :type in_meeting: bool
+    """
+
+    _attribute_map = {
+        "role": {"key": "role", "type": "str"},
+        "in_meeting": {"key": "inMeeting", "type": "bool"},
+    }
+
+    def __init__(self, *, role: str = None, in_meeting: bool = None, **kwargs) -> None:
+        super(MeetingParticipantInfo, self).__init__(**kwargs)
+        self.role = role
+        self.in_meeting = in_meeting
+
+
+class TeamsMeetingParticipant(Model):
+    """Teams participant channel account detailing user Azure Active Directory and meeting participant details.
+
+    :param user: Teams Channel Account information for this meeting participant
+    :type user: TeamsChannelAccount
+    :param meeting: >Information specific to this participant in the specific meeting.
+    :type meeting: MeetingParticipantInfo
+    :param conversation: Conversation Account for the meeting.
+    :type conversation: ConversationAccount
+    """
+
+    _attribute_map = {
+        "user": {"key": "user", "type": "TeamsChannelAccount"},
+        "meeting": {"key": "meeting", "type": "MeetingParticipantInfo"},
+        "conversation": {"key": "conversation", "type": "ConversationAccount"},
+    }
+
+    def __init__(
+        self,
+        *,
+        user: TeamsChannelAccount = None,
+        meeting: MeetingParticipantInfo = None,
+        conversation: ConversationAccount = None,
+        **kwargs
+    ) -> None:
+        super(TeamsMeetingParticipant, self).__init__(**kwargs)
+        self.user = user
+        self.meeting = meeting
+        self.conversation = conversation

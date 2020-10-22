@@ -3,8 +3,14 @@
 
 from botbuilder.schema._connector_client_enums import ActivityTypes
 from datetime import datetime
+from enum import Enum
 from msrest.serialization import Model
 from msrest.exceptions import HttpOperationError
+
+
+class ActivityEventNames(str, Enum):
+    continue_conversation = "ContinueConversation"
+    create_conversation = "CreateConversation"
 
 
 class ConversationReference(Model):

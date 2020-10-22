@@ -39,6 +39,7 @@ from botframework.connector.token_api.models import (
 )
 from botbuilder.schema import (
     Activity,
+    ActivityEventNames,
     ActivityTypes,
     ChannelAccount,
     ConversationAccount,
@@ -390,7 +391,7 @@ class BotFrameworkAdapter(
 
             event_activity = Activity(
                 type=ActivityTypes.event,
-                name="CreateConversation",
+                name=ActivityEventNames.create_conversation,
                 channel_id=channel_id,
                 service_url=service_url,
                 id=resource_response.activity_id
