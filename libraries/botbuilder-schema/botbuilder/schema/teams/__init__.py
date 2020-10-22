@@ -61,6 +61,7 @@ from ._models_py3 import TenantInfo
 from ._models_py3 import TeamsMeetingInfo
 from ._models_py3 import TeamsMeetingParticipant
 from ._models_py3 import MeetingParticipantInfo
+from ._models_py3 import CacheInfo
 
 __all__ = [
     "AppBasedLinkQuery",
@@ -123,4 +124,5 @@ __all__ = [
     "TeamsMeetingInfo",
     "TeamsMeetingParticipant",
     "MeetingParticipantInfo",
+    "CacheInfo",
 ]
