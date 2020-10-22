@@ -735,7 +735,12 @@ class MessagingExtensionActionResponse(Model):
     }
 
     def __init__(
-        self, *, task=None, compose_extension=None, cache_info: CacheInfo=None, **kwargs
+        self,
+        *,
+        task=None,
+        compose_extension=None,
+        cache_info: CacheInfo = None,
+        **kwargs
     ) -> None:
         super(MessagingExtensionActionResponse, self).__init__(**kwargs)
         self.task = task
