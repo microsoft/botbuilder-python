@@ -33,7 +33,7 @@ class SkillValidation:
             "https://sts.windows.net/cab8a31a-1906-4287-a0d8-4eef66b95f6e/",  # Auth for US Gov, 1.0 token
             "https://login.microsoftonline.us/cab8a31a-1906-4287-a0d8-4eef66b95f6e/v2.0",  # Auth for US Gov, 2.0 token
             "https://login.microsoftonline.us/f8cdef31-a31e-4b4a-93e4-5f571e91255a/",  # Auth for US Gov, 1.0 token
-            "https://login.microsoftonline.us/f8cdef31-a31e-4b4a-93e4-5f571e91255a/v2.0", # Auth for US Gov, 2.0 token
+            "https://login.microsoftonline.us/f8cdef31-a31e-4b4a-93e4-5f571e91255a/v2.0",  # Auth for US Gov, 2.0 token
         ],
         audience=None,
         clock_tolerance=timedelta(minutes=5),
