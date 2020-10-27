@@ -2,5 +2,5 @@ msrest==0.6.10
 botbuilder-schema==4.10.0
 requests==2.23.0
 PyJWT==1.5.3
-cryptography==2.8.0
+cryptography==3.2
 msal==1.2.0

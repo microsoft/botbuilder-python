@@ -8,7 +8,7 @@ VERSION = os.environ["packageVersion"] if "packageVersion" in os.environ else "4
 REQUIRES = [
     "msrest==0.6.10",
     "requests==2.23.0",
-    "cryptography==2.8.0",
+    "cryptography==3.2",
     "PyJWT==1.5.3",
     "botbuilder-schema==4.10.0",
     "adal==1.2.1",
