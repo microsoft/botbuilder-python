@@ -1,7 +1,16 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from typing import Collection
+
 from botbuilder.core import ComponentRegistration
+
+from botbuilder.dialogs import DialogContext, DialogsComponentRegistration
+from botbuilder.dialogs.memory.scopes import MemoryScope
+
+from .component_memory_scopes_base import ComponentMemoryScopesBase
+from .component_path_resolvers_base import ComponentPathResolversBase
+from .dialog_state_manager_configuration import DialogStateManagerConfiguration
 
 # <summary>
 # The DialogStateManager manages memory scopes and pathresolvers
@@ -10,129 +19,145 @@ from botbuilder.core import ComponentRegistration
 # </summary>
 class DialogStateManager:
 
-    separators = [',', '[']
+    SEPARATORS = [',', '[']
 
     # <summary>
     # Initializes a new instance of the <see cref="DialogStateManager"/> class.
     # </summary>
     # <param name="dialog_context">The dialog context for the current turn of the conversation.</param>
     # <param name="configuration">Configuration for the dialog state manager. Default is <c>null</c>.</param>
-    def __init__(self, dialog_context: DialogContext, configuration: DialogStateManagerConfiguration = null)
+    def __init__(self, dialog_context: DialogContext, configuration: DialogStateManagerConfiguration = None):
         # <summary>
         # Information for tracking when path was last modified.
         # </summary>
         self.path_tracker = "dialog._tracker.paths"
 
-        self._dialogContext = dialog_context 
+        self._dialog_context = dialog_context
         self._version: int = None
 
         ComponentRegistration.add(DialogsComponentRegistration())
 
-        _dialogContext = dialog_context ?? throw new ArgumentNullException(nameof(dialog_context))
-        Configuration = configuration ?? dialog_context.Context.TurnState.Get<DialogStateManagerConfiguration>()
-        if (Configuration == null)
-        {
-            Configuration = new DialogStateManagerConfiguration()
+        if not dialog_context:
+            raise TypeError(f"Expecting: {DialogContext.__name__}, but received None")
+
+        self._configuration = configuration or dialog_context.context.turn_state[DialogStateManagerConfiguration.__name__]
+        if not self._configuration:
+            self._configuration = DialogStateManagerConfiguration()
 
             # get all of the component memory scopes
-            foreach (var component in ComponentRegistration.Components.OfType<IComponentMemoryScopes>())
-            {
-                foreach (var memoryScope in component.GetMemoryScopes())
-                {
-                    Configuration.MemoryScopes.Add(memoryScope)
-                }
-            }
+            memory_component: ComponentMemoryScopesBase
+            for memory_component in filter(lambda comp: isinstance(comp, ComponentMemoryScopesBase), ComponentRegistration.get_components()):
+                for memory_scope in memory_component.get_memory_scopes():
+                    self._configuration.memory_scopes.append(memory_scope)
 
             # get all of the component path resolvers
-            foreach (var component in ComponentRegistration.Components.OfType<IComponentPathResolvers>())
-            {
-                foreach (var pathResolver in component.GetPathResolvers())
-                {
-                    Configuration.PathResolvers.Add(pathResolver)
-                }
-            }
-        }
+            path_component: ComponentPathResolversBase
+            for path_component in filter(lambda comp: isinstance(comp, ComponentPathResolversBase), ComponentRegistration.get_components()):
+                for path_resolver in path_component.get_path_resolvers():
+                    self._configuration.path_resolvers.append(path_resolver)
 
-        # cache for any other new dialogStatemanager instances in this turn.
-        dialog_context.Context.TurnState.Set(Configuration)
-    }
+        # cache for any other new dialog_state_manager instances in this turn.
+        dialog_context.context.turn_state[self._configuration.__class__.__name__] = self._configuration
 
-    # <summary>
-    # Gets or sets the configured path resolvers and memory scopes for the dialog state manager.
-    # </summary>
-    # <value>A <see cref="DialogStateManagerConfiguration"/> with the configuration.</value>
-    DialogStateManagerConfiguration Configuration { get set }
+    def __len__(self) -> int:
+        """
+        Gets the number of memory scopes in the dialog state manager.
+        :return: Number of memory scopes in the configuration.
+        """
+        return len(self._configuration.memory_scopes)
 
-    # <summary>
-    # Gets an <see cref="ICollection{T}"/> containing the keys of the memory scopes.
-    # </summary>
-    # <value>Keys of the memory scopes.</value>
-    ICollection<string> Keys => Configuration.MemoryScopes.Select(ms => ms.Name).ToList()
+    @property
+    def configuration(self) -> DialogStateManagerConfiguration:
+        """
+        Gets or sets the configured path resolvers and memory scopes for the dialog state manager.
+        :return: The configuration object.
+        """
+        return self._configuration
 
-    # <summary>
-    # Gets an <see cref="ICollection{T}"/> containing the values of the memory scopes.
-    # </summary>
-    # <value>Values of the memory scopes.</value>
-    ICollection<object> Values => Configuration.MemoryScopes.Select(ms => ms.GetMemory(_dialogContext)).ToList()
+    @property
+    def keys(self) -> Collection[str]:
+        """
+        Gets a Collection containing the keys of the memory scopes
+        :return: Keys of the memory scopes.
+        """
+        return [memory_scope.name for memory_scope in self.configuration.memory_scopes]
 
-    # <summary>
-    # Gets the number of memory scopes in the dialog state manager.
-    # </summary>
-    # <value>Number of memory scopes in the configuration.</value>
-    int Count => Configuration.MemoryScopes.Count
+    @property
+    def values(self) -> Collection[object]:
+        """
+        Gets a Collection containing the values of the memory scopes.
+        :return: Values of the memory scopes.
+        """
+        return [memory_scope.get_memory(self._dialog_context) for memory_scope in self.configuration.memory_scopes]
 
     # <summary>
     # Gets a value indicating whether the dialog state manager is read-only.
     # </summary>
     # <value><c>true</c>.</value>
-    bool IsReadOnly => true
+    @property
+    def is_read_only(self) -> bool:
+        """
+        Gets a value indicating whether the dialog state manager is read-only.
+        :return: True.
+        """
+        return True
 
     # <summary>
     # Gets or sets the elements with the specified key.
     # </summary>
     # <param name="key">Key to get or set the element.</param>
     # <returns>The element with the specified key.</returns>
-    object this[string key]
-    {
-        get => GetValue<object>(key, () => null)
-        set
-        {
-            if (key.IndexOfAny(Separators) == -1)
-            {
-                # Root is handled by SetMemory rather than SetValue
-                var scope = GetMemoryScope(key) ?? throw new ArgumentOutOfRangeException(nameof(key), GetBadScopeMessage(key))
-                scope.SetMemory(_dialogContext, JToken.FromObject(value))
-            }
-            else
-            {
-                SetValue(key, value)
-            }
-        }
-    }
+    def __getitem__(self, key):
+        """
+        :param key:
+        :return The value stored at key's position:
+        """
+        return self.get_value(key, lambda: None)
 
-    # <summary>
-    # Get MemoryScope by name.
-    # </summary>
-    # <param name="name">Name of scope.</param>
-    # <returns>A memory scope.</returns>
-    MemoryScope GetMemoryScope(string name)
-    {
-        if (name == null)
-        {
-            throw new ArgumentNullException(nameof(name))
-        }
+    def __setitem__(self, key, value):
+        if self._index_of_any(key, self.SEPARATORS) == -1:
+            # Root is handled by SetMemory rather than SetValue
+            scope = self.get_memory_scope(key)
+            if not scope:
+                raise IndexError(self._get_bad_scope_message(key))
+            # TODO: C# transforms value to JToken
+            scope.set_memory(self._dialog_context, value)
+        else:
+            self.set_value(key, value)
 
-        return Configuration.MemoryScopes.FirstOrDefault(ms => string.Compare(ms.Name, name, StringComparison.OrdinalIgnoreCase) == 0)
-    }
+    def _get_bad_scope_message(self, path: str) -> str:
+        return f"'{path}' does not match memory scopes:[{', '.join((memory_scope.name for memory_scope in self.configuration.memory_scopes))}]"
+
+    @staticmethod
+    def _index_of_any(string: str, elements_to_search_for) -> int:
+        for element in elements_to_search_for:
+            index = string.find(element)
+            if index != -1:
+                return index
+
+        return -1
+
+    def get_memory_scope(self, name: str) -> MemoryScope:
+        """
+        Get MemoryScope by name.
+        :param name:
+        :return: A memory scope.
+        """
+        if not name:
+            raise TypeError(f"Expecting: {str.__name__}, but received None")
+
+        return next((memory_scope for memory_scope in self.configuration.memory_scopes if memory_scope.name.lower() == name.lower()), None)
 
     # <summary>
     # Version help caller to identify the updates and decide cache or not.
     # </summary>
     # <returns>Current version.</returns>
-    string Version()
-    {
-        return _version.ToString(CultureInfo.InvariantCulture)
-    }
+    def version(self) -> str:
+        """
+        Version help caller to identify the updates and decide cache or not.
+        :return: Current version.
+        """
+        return str(self._version)
 
     # <summary>
     # ResolveMemoryScope will find the MemoryScope for and return the remaining path.

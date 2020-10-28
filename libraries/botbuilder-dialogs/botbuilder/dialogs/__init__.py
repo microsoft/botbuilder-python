@@ -19,6 +19,7 @@ from .dialog_turn_result import DialogTurnResult
 from .dialog_turn_status import DialogTurnStatus
 from .dialog_manager_result import DialogManagerResult
 from .dialog import Dialog
+from .dialogs_component_registration import DialogsComponentRegistration
 from .persisted_state_keys import PersistedStateKeys
 from .persisted_state import PersistedState
 from .waterfall_dialog import WaterfallDialog
@@ -43,6 +44,7 @@ __all__ = [
     "DialogTurnStatus",
     "DialogManagerResult",
     "Dialog",
+    "DialogsComponentRegistration",
     "WaterfallDialog",
     "WaterfallStepContext",
     "ConfirmPrompt",
