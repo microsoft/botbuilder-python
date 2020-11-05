@@ -1,16 +1,19 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from typing import Collection
+from traceback import print_tb
+from typing import Callable, Collection, Generic, Tuple, Type, TypeVar
 
 from botbuilder.core import ComponentRegistration
 
-from botbuilder.dialogs import DialogContext, DialogsComponentRegistration
+from botbuilder.dialogs import DialogContext, DialogsComponentRegistration, ObjectPath
 from botbuilder.dialogs.memory.scopes import MemoryScope
 
 from .component_memory_scopes_base import ComponentMemoryScopesBase
 from .component_path_resolvers_base import ComponentPathResolversBase
 from .dialog_state_manager_configuration import DialogStateManagerConfiguration
+
+T = TypeVar('T')      # Declare type variable
 
 # <summary>
 # The DialogStateManager manages memory scopes and pathresolvers
@@ -148,10 +151,6 @@ class DialogStateManager:
 
         return next((memory_scope for memory_scope in self.configuration.memory_scopes if memory_scope.name.lower() == name.lower()), None)
 
-    # <summary>
-    # Version help caller to identify the updates and decide cache or not.
-    # </summary>
-    # <returns>Current version.</returns>
     def version(self) -> str:
         """
         Version help caller to identify the updates and decide cache or not.
@@ -159,131 +158,98 @@ class DialogStateManager:
         """
         return str(self._version)
 
-    # <summary>
-    # ResolveMemoryScope will find the MemoryScope for and return the remaining path.
-    # </summary>
-    # <param name="path">Incoming path to resolve to scope and remaining path.</param>
-    # <param name="remainingPath">Remaining subpath in scope.</param>
-    # <returns>The memory scope.</returns>
-    virtual MemoryScope ResolveMemoryScope(string path, out string remainingPath)
-    {
-        var scope = path
-        var sepIndex = -1
-        var dot = path.IndexOf(".", StringComparison.OrdinalIgnoreCase)
-        var openSquareBracket = path.IndexOf("[", StringComparison.OrdinalIgnoreCase)
+    def resolve_memory_scope(self, path: str) -> Tuple[MemoryScope, str]:
+        """
+        Will find the MemoryScope for and return the remaining path.
+        :param path:
+        :return: The memory scope and remaining subpath in scope.
+        """
+        scope = path
+        sep_index = -1
+        dot = path.find(".")
+        open_square_bracket = path.find("[")
 
-        if (dot > 0 && openSquareBracket > 0)
-        {
-            sepIndex = Math.Min(dot, openSquareBracket)
-        }
-        else if (dot > 0)
-        {
-            sepIndex = dot
-        }
-        else if (openSquareBracket > 0)
-        {
-            sepIndex = openSquareBracket
-        }
+        if dot > 0 and open_square_bracket > 0:
+            sep_index = min(dot, open_square_bracket)
 
-        if (sepIndex > 0)
-        {
-            scope = path.Substring(0, sepIndex)
-            var memoryScope = GetMemoryScope(scope)
-            if (memoryScope != null)
-            {
-                remainingPath = path.Substring(sepIndex + 1)
-                return memoryScope
-            }
-        }
+        elif dot > 0:
+            sep_index = dot
 
-        remainingPath = string.Empty
-        return GetMemoryScope(scope) ?? throw new ArgumentOutOfRangeException(GetBadScopeMessage(path))
-    }
+        elif open_square_bracket > 0:
+            sep_index = open_square_bracket
 
-    # <summary>
-    # Transform the path using the registered PathTransformers.
-    # </summary>
-    # <param name="path">Path to transform.</param>
-    # <returns>The transformed path.</returns>
-    virtual string TransformPath(string path)
-    {
-        foreach (var pathResolver in Configuration.PathResolvers)
-        {
-            path = pathResolver.TransformPath(path)
-        }
+        if sep_index > 0:
+            scope = path[0:sep_index]
+            memory_scope = self.get_memory_scope(scope)
+            if memory_scope:
+                remaining_path = path[sep_index + 1:]
+                return memory_scope, remaining_path
+
+        memory_scope = self.get_memory_scope(scope)
+        if not scope:
+            raise IndexError(self._get_bad_scope_message(scope))
+        return memory_scope, ""
+
+    def transform_path(self, path: str) -> str:
+        """
+        Transform the path using the registered PathTransformers.
+        :param path: Path to transform.
+        :return: The transformed path.
+        """
+        for path_resolver in self.configuration.path_resolvers:
+            path = path_resolver.transform_path(path)
 
         return path
-    }
 
-    # <summary>
-    # Get the value from memory using path expression (NOTE: This always returns clone of value).
-    # </summary>
-    # <remarks>This always returns a CLONE of the memory, any modifications to the result of this will not be affect memory.</remarks>
-    # <typeparam name="T">the value type to return.</typeparam>
-    # <param name="path">path expression to use.</param>
-    # <param name="value">Value out parameter.</param>
-    # <returns>True if found, false if not.</returns>
-    bool TryGetValue<T>(string path, out T value)
-    {
-        value = default
-        path = TransformPath(path ?? throw new ArgumentNullException(nameof(path)))
+    def _is_primitive(self, cls: Type) -> bool:
+        return cls in (int, float, bool, str, complex, float, list, tuple, range, dict, bytes, bytearray, memoryview, set, frozenset, map)
 
-        MemoryScope memoryScope = null
-        string remainingPath
+    def try_get_value(self, path: str, class_type: Type) -> Tuple[bool, object]:
+        """
+        Get the value from memory using path expression (NOTE: This always returns clone of value).
+        :param path:
+        :param class_type:
+        :return: True if found, false if not and the value.
+        """
+        if not path:
+            raise TypeError(f"Expecting: {str.__name__}, but received None")
+        return_value = class_type() if self._is_primitive(class_type) else None
+        path = self.transform_path(path)
 
-        try
-        {
-            memoryScope = ResolveMemoryScope(path, out remainingPath)
-        }
-#pragma warning disable CA1031 # Do not catch general exception types (Unable to get the value for some reason, catch, log and return false, ignoring exception)
-        catch (Exception err)
-#pragma warning restore CA1031 # Do not catch general exception types
-        {
-            Trace.TraceError(err.Message)
-            return false
-        }
+        try:
+            memory_scope, remaining_path = self.resolve_memory_scope(path)
+        except Exception as error:
+            print_tb(error.__traceback__)
+            return False, return_value
 
-        if (memoryScope == null)
-        {
-            return false
-        }
+        if not memory_scope:
+            return False, return_value
 
-        if (string.IsNullOrEmpty(remainingPath))
-        {
-            var memory = memoryScope.GetMemory(_dialogContext)
-            if (memory == null)
-            {
-                return false
-            }
+        if not remaining_path:
+            memory = memory_scope.get_memory(self._dialog_context)
+            if not memory:
+                return False, return_value
 
-            value = ObjectPath.MapValueTo<T>(memory)
-            return true
-        }
+            return True, memory
 
         # TODO: HACK to support .First() retrieval on turn.recognized.entities.foo, replace with Expressions once expression ship
-        string first = ".FIRST()"
-        var iFirst = path.ToUpperInvariant().LastIndexOf(first, StringComparison.Ordinal)
-        if (iFirst >= 0)
-        {
-            object entity = null
-            remainingPath = path.Substring(iFirst + first.Length)
-            path = path.Substring(0, iFirst)
-            if (TryGetFirstNestedValue(ref entity, ref path, this))
-            {
-                if (string.IsNullOrEmpty(remainingPath))
-                {
-                    value = ObjectPath.MapValueTo<T>(entity)
-                    return true
-                }
+        first = ".FIRST()"
+        i_first = path.upper().rindex(first)
+        if i_first >= 0:
+            remaining_path = path[i_first + len(first):]
+            path = path[0:i_first]
+            success, first_value = self.try_get_first_nested_value(path, self)
+            if success:
+                if not remaining_path:
+                    return True, first_value
 
-                return ObjectPath.TryGetPathValue(entity, remainingPath, out value)
-            }
+                path_value = ObjectPath.try_get_path_value(first_value, remaining_path)
+                return bool(path_value), path_value
 
-            return false
-        }
+            return False, return_value
 
-        return ObjectPath.TryGetPathValue(this, path, out value)
-    }
+        path_value = ObjectPath.try_get_path_value(self, path)
+        return bool(path_value), path_value
 
     # <summary>
     # Get the value from memory using path expression (NOTE: This always returns clone of value).
@@ -293,9 +259,8 @@ class DialogStateManager:
     # <param name="pathExpression">Path expression to use.</param>
     # <param name="defaultValue">Function to give default value if there is none (OPTIONAL).</param>
     # <returns>Result or null if the path is not valid.</returns>
-    T GetValue<T>(string pathExpression, Func<T> defaultValue = null)
-    {
-        if (TryGetValue<T>(pathExpression ?? throw new ArgumentNullException(nameof(pathExpression)), out var value))
+    def get_value(self, path_expression: str, default_value: Callable[[],Generic[T]] = None) -> T:
+        if (TryGetValue<T>(pathExpression ?? throw new ArgumentNullException(nameof(pathExpression)), out value))
         {
             return value
         }
@@ -311,7 +276,7 @@ class DialogStateManager:
     # <returns>Value or null if path is not valid.</returns>
     int GetIntValue(string pathExpression, int defaultValue = 0)
     {
-        if (TryGetValue<int>(pathExpression ?? throw new ArgumentNullException(nameof(pathExpression)), out var value))
+        if (TryGetValue<int>(pathExpression ?? throw new ArgumentNullException(nameof(pathExpression)), out value))
         {
             return value
         }
@@ -327,7 +292,7 @@ class DialogStateManager:
     # <returns>Bool or null if path is not valid.</returns>
     bool GetBoolValue(string pathExpression, bool defaultValue = false)
     {
-        if (TryGetValue<bool>(pathExpression ?? throw new ArgumentNullException(nameof(pathExpression)), out var value))
+        if (TryGetValue<bool>(pathExpression ?? throw new ArgumentNullException(nameof(pathExpression)), out value))
         {
             return value
         }
@@ -392,11 +357,11 @@ class DialogStateManager:
     # <returns>object which represents all memory scopes.</returns>
     JObject GetMemorySnapshot()
     {
-        var result = new JObject()
+        result = new JObject()
 
-        foreach (var scope in Configuration.MemoryScopes.Where(ms => ms.IncludeInSnapshot))
+        foreach (scope in Configuration.MemoryScopes.Where(ms => ms.IncludeInSnapshot))
         {
-            var memory = scope.GetMemory(_dialogContext)
+            memory = scope.GetMemory(_dialogContext)
             if (memory != null)
             {
                 result[scope.Name] = JToken.FromObject(memory)
@@ -413,7 +378,7 @@ class DialogStateManager:
     # <returns>Task.</returns>
     async Task LoadAllScopesAsync(CancellationToken cancellationToken = default)
     {
-        foreach (var scope in Configuration.MemoryScopes)
+        foreach (scope in Configuration.MemoryScopes)
         {
             await scope.LoadAsync(_dialogContext, cancellationToken: cancellationToken).ConfigureAwait(false)
         }
@@ -426,7 +391,7 @@ class DialogStateManager:
     # <returns>Task.</returns>
     async Task SaveAllChangesAsync(CancellationToken cancellationToken = default)
     {
-        foreach (var scope in Configuration.MemoryScopes)
+        foreach (scope in Configuration.MemoryScopes)
         {
             await scope.SaveChangesAsync(_dialogContext, cancellationToken: cancellationToken).ConfigureAwait(false)
         }
@@ -441,7 +406,7 @@ class DialogStateManager:
     async Task DeleteScopesMemoryAsync(string name, CancellationToken cancellationToken = default)
     {
         name = name.ToUpperInvariant()
-        var scope = Configuration.MemoryScopes.SingleOrDefault(s => s.Name.ToUpperInvariant() == name)
+        scope = Configuration.MemoryScopes.SingleOrDefault(s => s.Name.ToUpperInvariant() == name)
         if (scope != null)
         {
             await scope.DeleteAsync(_dialogContext, cancellationToken).ConfigureAwait(false)
@@ -534,7 +499,7 @@ class DialogStateManager:
     # <param name="arrayIndex">The zero-based index in array at which copying begins.</param>
     void CopyTo(KeyValuePair<string, object>[] array, int arrayIndex)
     {
-        foreach (var ms in Configuration.MemoryScopes)
+        foreach (ms in Configuration.MemoryScopes)
         {
             array[arrayIndex++] = new KeyValuePair<string, object>(ms.Name, ms.GetMemory(_dialogContext))
         }
@@ -558,7 +523,7 @@ class DialogStateManager:
     # <returns>An enumerator that can be used to iterate through the collection.</returns>
     IEnumerator<KeyValuePair<string, object>> GetEnumerator()
     {
-        foreach (var ms in Configuration.MemoryScopes)
+        foreach (ms in Configuration.MemoryScopes)
         {
             yield return new KeyValuePair<string, object>(ms.Name, ms.GetMemory(_dialogContext))
         }
@@ -571,15 +536,15 @@ class DialogStateManager:
     # <returns>Normalized paths to pass to <see cref="AnyPathChanged"/>.</returns>
     List<string> TrackPaths(IEnumerable<string> paths)
     {
-        var allPaths = new List<string>()
-        foreach (var path in paths)
+        allPaths = new List<string>()
+        foreach (path in paths)
         {
-            var tpath = TransformPath(path)
+            tpath = TransformPath(path)
 
             # Track any path that resolves to a constant path
-            if (ObjectPath.TryResolvePath(this, tpath, out var segments))
+            if (ObjectPath.TryResolvePath(this, tpath, out segments))
             {
-                var npath = string.Join("_", segments)
+                npath = string.Join("_", segments)
                 SetValue(PathTracker + "." + npath, 0)
                 allPaths.Add(npath)
             }
@@ -596,10 +561,10 @@ class DialogStateManager:
     # <returns>True if any path has changed since counter.</returns>
     bool AnyPathChanged(uint counter, IEnumerable<string> paths)
     {
-        var found = false
+        found = false
         if (paths != null)
         {
-            foreach (var path in paths)
+            foreach (path in paths)
             {
                 if (GetValue<uint>(PathTracker + "." + path) > counter)
                 {
@@ -614,7 +579,7 @@ class DialogStateManager:
 
     IEnumerator IEnumerable.GetEnumerator()
     {
-        foreach (var ms in Configuration.MemoryScopes)
+        foreach (ms in Configuration.MemoryScopes)
         {
             yield return new KeyValuePair<string, object>(ms.Name, ms.GetMemory(_dialogContext))
         }
@@ -622,7 +587,7 @@ class DialogStateManager:
 
     static bool TryGetFirstNestedValue<T>(ref T value, ref string remainingPath, object memory)
     {
-        if (ObjectPath.TryGetPathValue<JArray>(memory, remainingPath, out var array))
+        if (ObjectPath.TryGetPathValue < JArray > (memory, remaining_path, out array))
         {
             if (array != null && array.Count > 0)
             {
@@ -630,7 +595,7 @@ class DialogStateManager:
                 {
                     if (first.Count > 0)
                     {
-                        var second = first[0]
+                        second = first[0]
                         value = ObjectPath.MapValueTo<T>(second)
                         return true
                     }
@@ -653,22 +618,22 @@ class DialogStateManager:
 
     bool TrackChange(string path, object value)
     {
-        var hasPath = false
-        if (ObjectPath.TryResolvePath(this, path, out var segments))
+        hasPath = false
+        if (ObjectPath.TryResolvePath(this, path, out segments))
         {
-            var root = segments.Count > 1 ? segments[1] as string : string.Empty
+            root = segments.Count > 1 ? segments[1] as string : string.Empty
 
             # Skip _* as first scope, i.e. _adaptive, _tracker, ...
             if (!root.StartsWith("_", StringComparison.Ordinal))
             {
                 # Convert to a simple path with _ between segments
-                var pathName = string.Join("_", segments)
-                var trackedPath = $"{PathTracker}.{pathName}"
+                pathName = string.Join("_", segments)
+                trackedPath = $"{PathTracker}.{pathName}"
                 uint? counter = null
 
                 void Update()
                 {
-                    if (TryGetValue<uint>(trackedPath, out var lastChanged))
+                    if (TryGetValue<uint>(trackedPath, out lastChanged))
                     {
                         if (!counter.HasValue)
                         {
