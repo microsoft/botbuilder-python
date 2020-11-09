@@ -268,6 +268,15 @@ class ObjectPath:
         return so_far
 
     @staticmethod
+    def for_each_property(obj: object, action: Callable[[str, object], None]):
+        if isinstance(obj, dict):
+            for key, value in obj.items():
+                action(key, value)
+        elif hasattr(obj, "__dict__"):
+            for key, value in vars(obj).items():
+                action(key, value)
+
+    @staticmethod
     def __resolve_segments(current, segments: []) -> object:
         result = current
 

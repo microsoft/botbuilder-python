@@ -5,6 +5,7 @@
 # license information.
 # --------------------------------------------------------------------------
 
+from .dialog_path import DialogPath
 from .dialog_state_manager import DialogStateManager
 from .dialog_state_manager_configuration import DialogStateManagerConfiguration
 from .component_memory_scopes_base import ComponentMemoryScopesBase
@@ -13,6 +14,7 @@ from .path_resolver_base import PathResolverBase
 from . import scope_path
 
 __all__ = [
+    "DialogPath",
     "DialogStateManager",
     "DialogStateManagerConfiguration",
     "ComponentMemoryScopesBase",

@@ -1,8 +1,20 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+import builtins
 
+from inspect import isawaitable
 from traceback import print_tb
-from typing import Callable, Collection, Generic, Tuple, Type, TypeVar
+from typing import (
+    Callable,
+    Collection,
+    Dict,
+    Generic,
+    Iterator,
+    List,
+    Tuple,
+    Type,
+    TypeVar,
+)
 
 from botbuilder.core import ComponentRegistration
 
@@ -11,9 +23,12 @@ from botbuilder.dialogs.memory.scopes import MemoryScope
 
 from .component_memory_scopes_base import ComponentMemoryScopesBase
 from .component_path_resolvers_base import ComponentPathResolversBase
+from .dialog_path import DialogPath
 from .dialog_state_manager_configuration import DialogStateManagerConfiguration
 
-T = TypeVar('T')      # Declare type variable
+T = TypeVar("T")  # Declare type variable
+
+builtin_types = list(filter(lambda x: not x.startswith("_"), dir(builtins)))
 
 # <summary>
 # The DialogStateManager manages memory scopes and pathresolvers
@@ -22,45 +37,62 @@ T = TypeVar('T')      # Declare type variable
 # </summary>
 class DialogStateManager:
 
-    SEPARATORS = [',', '[']
+    SEPARATORS = [",", "["]
 
     # <summary>
     # Initializes a new instance of the <see cref="DialogStateManager"/> class.
     # </summary>
     # <param name="dialog_context">The dialog context for the current turn of the conversation.</param>
     # <param name="configuration">Configuration for the dialog state manager. Default is <c>null</c>.</param>
-    def __init__(self, dialog_context: DialogContext, configuration: DialogStateManagerConfiguration = None):
+    def __init__(
+        self,
+        dialog_context: DialogContext,
+        configuration: DialogStateManagerConfiguration = None,
+    ):
         # <summary>
         # Information for tracking when path was last modified.
         # </summary>
         self.path_tracker = "dialog._tracker.paths"
 
         self._dialog_context = dialog_context
-        self._version: int = None
+        self._version: int = 0
 
         ComponentRegistration.add(DialogsComponentRegistration())
 
         if not dialog_context:
             raise TypeError(f"Expecting: {DialogContext.__name__}, but received None")
 
-        self._configuration = configuration or dialog_context.context.turn_state[DialogStateManagerConfiguration.__name__]
+        self._configuration = (
+            configuration
+            or dialog_context.context.turn_state[
+                DialogStateManagerConfiguration.__name__
+            ]
+        )
         if not self._configuration:
             self._configuration = DialogStateManagerConfiguration()
 
             # get all of the component memory scopes
             memory_component: ComponentMemoryScopesBase
-            for memory_component in filter(lambda comp: isinstance(comp, ComponentMemoryScopesBase), ComponentRegistration.get_components()):
+            for memory_component in filter(
+                lambda comp: isinstance(comp, ComponentMemoryScopesBase),
+                ComponentRegistration.get_components(),
+            ):
                 for memory_scope in memory_component.get_memory_scopes():
                     self._configuration.memory_scopes.append(memory_scope)
 
             # get all of the component path resolvers
             path_component: ComponentPathResolversBase
-            for path_component in filter(lambda comp: isinstance(comp, ComponentPathResolversBase), ComponentRegistration.get_components()):
+            for path_component in filter(
+                lambda comp: isinstance(comp, ComponentPathResolversBase),
+                ComponentRegistration.get_components(),
+            ):
                 for path_resolver in path_component.get_path_resolvers():
                     self._configuration.path_resolvers.append(path_resolver)
 
         # cache for any other new dialog_state_manager instances in this turn.
-        dialog_context.context.turn_state[self._configuration.__class__.__name__] = self._configuration
+        dialog_context.context.turn_state[
+            self._configuration.__class__.__name__
+        ] = self._configuration
 
     def __len__(self) -> int:
         """
@@ -91,7 +123,10 @@ class DialogStateManager:
         Gets a Collection containing the values of the memory scopes.
         :return: Values of the memory scopes.
         """
-        return [memory_scope.get_memory(self._dialog_context) for memory_scope in self.configuration.memory_scopes]
+        return [
+            memory_scope.get_memory(self._dialog_context)
+            for memory_scope in self.configuration.memory_scopes
+        ]
 
     # <summary>
     # Gets a value indicating whether the dialog state manager is read-only.
@@ -149,7 +184,14 @@ class DialogStateManager:
         if not name:
             raise TypeError(f"Expecting: {str.__name__}, but received None")
 
-        return next((memory_scope for memory_scope in self.configuration.memory_scopes if memory_scope.name.lower() == name.lower()), None)
+        return next(
+            (
+                memory_scope
+                for memory_scope in self.configuration.memory_scopes
+                if memory_scope.name.lower() == name.lower()
+            ),
+            None,
+        )
 
     def version(self) -> str:
         """
@@ -182,7 +224,7 @@ class DialogStateManager:
             scope = path[0:sep_index]
             memory_scope = self.get_memory_scope(scope)
             if memory_scope:
-                remaining_path = path[sep_index + 1:]
+                remaining_path = path[sep_index + 1 :]
                 return memory_scope, remaining_path
 
         memory_scope = self.get_memory_scope(scope)
@@ -201,19 +243,24 @@ class DialogStateManager:
 
         return path
 
-    def _is_primitive(self, cls: Type) -> bool:
-        return cls in (int, float, bool, str, complex, float, list, tuple, range, dict, bytes, bytearray, memoryview, set, frozenset, map)
+    @staticmethod
+    def _is_primitive(cls: Type) -> bool:
+        return cls.__name__ in builtin_types
 
-    def try_get_value(self, path: str, class_type: Type) -> Tuple[bool, object]:
+    def try_get_value(
+        self, path: str, class_type: Type = object
+    ) -> Tuple[bool, object]:
         """
         Get the value from memory using path expression (NOTE: This always returns clone of value).
-        :param path:
-        :param class_type:
+        :param class_type: The value type to return.
+        :param path: Path expression to use.
         :return: True if found, false if not and the value.
         """
         if not path:
             raise TypeError(f"Expecting: {str.__name__}, but received None")
-        return_value = class_type() if self._is_primitive(class_type) else None
+        return_value = (
+            class_type() if DialogStateManager._is_primitive(class_type) else None
+        )
         path = self.transform_path(path)
 
         try:
@@ -236,7 +283,7 @@ class DialogStateManager:
         first = ".FIRST()"
         i_first = path.upper().rindex(first)
         if i_first >= 0:
-            remaining_path = path[i_first + len(first):]
+            remaining_path = path[i_first + len(first) :]
             path = path[0:i_first]
             success, first_value = self.try_get_first_nested_value(path, self)
             if success:
@@ -251,151 +298,142 @@ class DialogStateManager:
         path_value = ObjectPath.try_get_path_value(self, path)
         return bool(path_value), path_value
 
-    # <summary>
-    # Get the value from memory using path expression (NOTE: This always returns clone of value).
-    # </summary>
-    # <remarks>This always returns a CLONE of the memory, any modifications to the result of this will not be affect memory.</remarks>
-    # <typeparam name="T">The value type to return.</typeparam>
-    # <param name="pathExpression">Path expression to use.</param>
-    # <param name="defaultValue">Function to give default value if there is none (OPTIONAL).</param>
-    # <returns>Result or null if the path is not valid.</returns>
-    def get_value(self, path_expression: str, default_value: Callable[[],Generic[T]] = None) -> T:
-        if (TryGetValue<T>(pathExpression ?? throw new ArgumentNullException(nameof(pathExpression)), out value))
-        {
+    def get_value(
+        self,
+        class_type: Type,
+        path_expression: str,
+        default_value: Callable[[], Generic[T]] = None,
+    ) -> T:
+        """
+        Get the value from memory using path expression (NOTE: This always returns clone of value).
+        :param class_type: The value type to return.
+        :param path_expression: Path expression to use.
+        :param default_value: Function to give default value if there is none (OPTIONAL).
+        :return: Result or null if the path is not valid.
+        """
+        if not path_expression:
+            raise TypeError(f"Expecting: {str.__name__}, but received None")
+
+        success, value = self.try_get_value(path_expression, class_type)
+        if success:
             return value
-        }
 
-        return defaultValue != null ? defaultValue() : default
-    }
+        return default_value() if default_value else None
 
-    # <summary>
-    # Get a int value from memory using a path expression.
-    # </summary>
-    # <param name="pathExpression">Path expression.</param>
-    # <param name="defaultValue">Default value if the value doesn't exist.</param>
-    # <returns>Value or null if path is not valid.</returns>
-    int GetIntValue(string pathExpression, int defaultValue = 0)
-    {
-        if (TryGetValue<int>(pathExpression ?? throw new ArgumentNullException(nameof(pathExpression)), out value))
-        {
+    def get_int_value(self, path_expression: str, default_value: int = 0) -> int:
+        """
+        Get an int value from memory using a path expression.
+        :param path_expression: Path expression to use.
+        :param default_value: Default value if there is none (OPTIONAL).
+        :return:
+        """
+        if not path_expression:
+            raise TypeError(f"Expecting: {str.__name__}, but received None")
+        success, value = self.try_get_value(path_expression, int)
+        if success:
             return value
-        }
 
-        return defaultValue
-    }
+        return default_value
 
-    # <summary>
-    # Get a bool value from memory using a path expression.
-    # </summary>
-    # <param name="pathExpression">The path expression.</param>
-    # <param name="defaultValue">Default value if the value doesn't exist.</param>
-    # <returns>Bool or null if path is not valid.</returns>
-    bool GetBoolValue(string pathExpression, bool defaultValue = false)
-    {
-        if (TryGetValue<bool>(pathExpression ?? throw new ArgumentNullException(nameof(pathExpression)), out value))
-        {
+    def get_bool_value(self, path_expression: str, default_value: bool = False) -> bool:
+        """
+        Get a bool value from memory using a path expression.
+        :param path_expression: Path expression to use.
+        :param default_value: Default value if there is none (OPTIONAL).
+        :return:
+        """
+        if not path_expression:
+            raise TypeError(f"Expecting: {str.__name__}, but received None")
+        success, value = self.try_get_value(path_expression, bool)
+        if success:
             return value
-        }
 
-        return defaultValue
-    }
+        return default_value
 
-    # <summary>
-    # Get a string value from memory using a path expression.
-    # </summary>
-    # <param name="pathExpression">The path expression.</param>
-    # <param name="defaultValue">Default value if the value doesn't exist.</param>
-    # <returns>string or null if path is not valid.</returns>
-    string GetStringValue(string pathExpression, string defaultValue = default)
-    {
-        return GetValue(pathExpression, () => defaultValue)
-    }
+    def get_string_value(self, path_expression: str, default_value: str = "") -> str:
+        """
+        Get a string value from memory using a path expression.
+        :param path_expression: Path expression to use.
+        :param default_value: Default value if there is none (OPTIONAL).
+        :return:
+        """
+        if not path_expression:
+            raise TypeError(f"Expecting: {str.__name__}, but received None")
+        success, value = self.try_get_value(path_expression, str)
+        if success:
+            return value
 
-    # <summary>
-    # Set memory to value.
-    # </summary>
-    # <param name="path">Path to memory.</param>
-    # <param name="value">Object to set.</param>
-    void SetValue(string path, object value)
-    {
-        if (value is Task)
-        {
-            throw new Exception($"{path} = You can't pass an unresolved Task to SetValue")
-        }
+        return default_value
 
-        if (value != null)
-        {
-            value = JToken.FromObject(value)
-        }
+    def set_value(self, path: str, value: object):
+        """
+        Set memory to value.
+        :param path: Path to memory.
+        :param value: Object to set.
+        :return:
+        """
+        if isawaitable(value):
+            raise Exception(f"{path} = You can't pass an awaitable to set_value")
 
-        path = TransformPath(path ?? throw new ArgumentNullException(nameof(path)))
-        if (TrackChange(path, value))
-        {
-            ObjectPath.SetPathValue(this, path, value)
-        }
+        if not path:
+            raise TypeError(f"Expecting: {str.__name__}, but received None")
+
+        path = self.transform_path(path)
+        if self._track_change(path, value):
+            ObjectPath.set_path_value(self, path, value)
 
         # Every set will increase version
-        _version++
-    }
+        self._version += 1
 
     # <summary>
     # Remove property from memory.
     # </summary>
     # <param name="path">Path to remove the leaf property.</param>
-    void RemoveValue(string path)
-    {
-        path = TransformPath(path ?? throw new ArgumentNullException(nameof(path)))
-        if (TrackChange(path, null))
-        {
-            ObjectPath.RemovePathValue(this, path)
-        }
-    }
+    def remove_value(self, path: str):
+        """
+        Set memory to value.
+        :param path: Path to memory.
+        :param value: Object to set.
+        :return:
+        """
+        if not path:
+            raise TypeError(f"Expecting: {str.__name__}, but received None")
 
-    # <summary>
-    # Gets all memoryscopes suitable for logging.
-    # </summary>
-    # <returns>object which represents all memory scopes.</returns>
-    JObject GetMemorySnapshot()
-    {
-        result = new JObject()
+        path = self.transform_path(path)
+        if self._track_change(path, None):
+            ObjectPath.remove_path_value(self, path)
 
-        foreach (scope in Configuration.MemoryScopes.Where(ms => ms.IncludeInSnapshot))
-        {
-            memory = scope.GetMemory(_dialogContext)
-            if (memory != null)
-            {
-                result[scope.Name] = JToken.FromObject(memory)
-            }
-        }
+    def get_memory_snapshot(self) -> Dict[str, object]:
+        """
+        Gets all memoryscopes suitable for logging.
+        :return: object which represents all memory scopes.
+        """
+        result = {}
+
+        for scope in [
+            ms for ms in self.configuration.memory_scopes if ms.include_in_snapshot
+        ]:
+            memory = scope.get_memory(self._dialog_context)
+            if memory:
+                result[scope.name] = memory
 
         return result
-    }
 
-    # <summary>
-    # Load all of the scopes.
-    # </summary>
-    # <param name="cancellationToken">cancellationToken.</param>
-    # <returns>Task.</returns>
-    async Task LoadAllScopesAsync(CancellationToken cancellationToken = default)
-    {
-        foreach (scope in Configuration.MemoryScopes)
-        {
-            await scope.LoadAsync(_dialogContext, cancellationToken: cancellationToken).ConfigureAwait(false)
-        }
-    }
+    async def load_all_scopes(self):
+        """
+        Load all of the scopes.
+        :return:
+        """
+        for scope in self.configuration.memory_scopes:
+            await scope.load(self._dialog_context)
 
-    # <summary>
-    # Save all changes for all scopes.
-    # </summary>
-    # <param name="cancellationToken">cancellationToken.</param>
-    # <returns>Task.</returns>
-    async Task SaveAllChangesAsync(CancellationToken cancellationToken = default)
-    {
-        foreach (scope in Configuration.MemoryScopes)
-        {
-            await scope.SaveChangesAsync(_dialogContext, cancellationToken: cancellationToken).ConfigureAwait(false)
-        }
-    }
+    async def save_all_changes(self):
+        """
+        Save all changes for all scopes.
+        :return:
+        """
+        for scope in self.configuration.memory_scopes:
+            await scope.save_changes(self._dialog_context)
 
     # <summary>
     # Delete the memory for a scope.
@@ -403,272 +441,217 @@ class DialogStateManager:
     # <param name="name">name of the scope.</param>
     # <param name="cancellationToken">cancellationToken.</param>
     # <returns>Task.</returns>
-    async Task DeleteScopesMemoryAsync(string name, CancellationToken cancellationToken = default)
-    {
-        name = name.ToUpperInvariant()
-        scope = Configuration.MemoryScopes.SingleOrDefault(s => s.Name.ToUpperInvariant() == name)
-        if (scope != null)
-        {
-            await scope.DeleteAsync(_dialogContext, cancellationToken).ConfigureAwait(false)
-        }
-    }
+    async def delete_scopes_memory_async(self, name: str):
+        """
+        Delete the memory for a scope.
+        :param name: name of the scope.
+        :return:
+        """
+        name = name.upper()
+        scope_list = [
+            ms for ms in self.configuration.memory_scopes if ms.name.upper == name
+        ]
+        if len(scope_list) > 1:
+            raise RuntimeError(f"More than 1 scopes found with the name '{name}'")
+        scope = scope_list[0] if scope_list else None
+        if scope:
+            await scope.delete(self._dialog_context)
 
-    # <summary>
-    # Adds an element to the dialog state manager.
-    # </summary>
-    # <param name="key">Key of the element to add.</param>
-    # <param name="value">Value of the element to add.</param>
-    void Add(string key, object value)
-    {
-        throw new NotSupportedException()
-    }
+    def add(self, key: str, value: object):
+        """
+        Adds an element to the dialog state manager.
+        :param key: Key of the element to add.
+        :param value: Value of the element to add.
+        :return:
+        """
+        raise RuntimeError("Not supported")
 
-    # <summary>
-    # Determines whether the dialog state manager contains an element with the specified key.
-    # </summary>
-    # <param name="key">The key to locate in the dialog state manager.</param>
-    # <returns><c>true</c> if the dialog state manager contains an element with
-    # the key otherwise, <c>false</c>.</returns>
-    bool ContainsKey(string key)
-    {
-        return Configuration.MemoryScopes.Any(ms => ms.Name.ToUpperInvariant() == key.ToUpperInvariant())
-    }
+    def contains_key(self, key: str) -> bool:
+        """
+        Determines whether the dialog state manager contains an element with the specified key.
+        :param key: The key to locate in the dialog state manager.
+        :return: True if the dialog state manager contains an element with the key otherwise, False.
+        """
+        scopes_with_key = [
+            ms
+            for ms in self.configuration.memory_scopes
+            if ms.name.upper == key.upper()
+        ]
+        return bool(scopes_with_key)
 
-    # <summary>
-    # Removes the element with the specified key from the dialog state manager.
-    # </summary>
-    # <param name="key">The key of the element to remove.</param>
-    # <returns><c>true</c> if the element is succesfully removed otherwise, false.</returns>
-    # <remarks>This method is not supported.</remarks>
-    bool Remove(string key)
-    {
-        throw new NotSupportedException()
-    }
-
-    # <summary>
-    # Gets the value associated with the specified key.
-    # </summary>
-    # <param name="key">The key whose value to get.</param>
-    # <param name="value">When this method returns, the value associated with the specified key, if the
-    # key is found otherwise, the default value for the type of the value parameter.
-    # This parameter is passed uninitialized.</param>
-    # <returns><c>true</c> if the dialog state manager contains an element with the specified key
-    # otherwise, <c>false</c>.</returns>
-    bool TryGetValue(string key, out object value)
-    {
-        return TryGetValue<object>(key, out value)
-    }
-
-    # <summary>
-    # Adds an item to the dialog state manager.
-    # </summary>
-    # <param name="item">The <see cref="KeyValuePair{TKey, TValue}"/> with the key and object of
-    # the item to add.</param>
-    # <remarks>This method is not supported.</remarks>
-    void Add(KeyValuePair<string, object> item)
-    {
-        throw new NotSupportedException()
-    }
+    def remove(self, key: str):
+        """
+        Removes the element with the specified key from the dialog state manager.
+        :param key: Key of the element to remove.
+        :return:
+        """
+        raise RuntimeError("Not supported")
 
     # <summary>
     # Removes all items from the dialog state manager.
     # </summary>
     # <remarks>This method is not supported.</remarks>
-    void Clear()
-    {
-        throw new NotSupportedException()
-    }
+    def clear(self, key: str):
+        """
+        Removes all items from the dialog state manager.
+        :param key: Key of the element to remove.
+        :return:
+        """
+        raise RuntimeError("Not supported")
 
-    # <summary>
-    # Determines whether the dialog state manager contains a specific value.
-    # </summary>
-    # <param name="item">The <see cref="KeyValuePair{TKey, TValue}"/> of the item to locate.</param>
-    # <returns><c>true</c> if item is found in the dialog state manager otherwise,
-    # <c>false</c>.</returns>
-    # <remarks>This method is not supported.</remarks>
-    bool Contains(KeyValuePair<string, object> item)
-    {
-        throw new NotSupportedException()
-    }
+    def contains(self, item: Tuple[str, object]) -> bool:
+        """
+        Determines whether the dialog state manager contains a specific value (should use __contains__).
+        :param item: The tuple of the item to locate.
+        :return bool: True if item is found in the dialog state manager otherwise, False
+        """
+        raise RuntimeError("Not supported")
 
-    # <summary>
-    # Copies the elements of the dialog state manager to an array starting at a particular index.
-    # </summary>
-    # <param name="array">The one-dimensional array that is the destination of the elements copied
-    # from the dialog state manager. The array must have zero-based indexing.</param>
-    # <param name="arrayIndex">The zero-based index in array at which copying begins.</param>
-    void CopyTo(KeyValuePair<string, object>[] array, int arrayIndex)
-    {
-        foreach (ms in Configuration.MemoryScopes)
-        {
-            array[arrayIndex++] = new KeyValuePair<string, object>(ms.Name, ms.GetMemory(_dialogContext))
-        }
-    }
+    def __contains__(self, item: Tuple[str, object]) -> bool:
+        """
+        Determines whether the dialog state manager contains a specific value.
+        :param item: The tuple of the item to locate.
+        :return bool: True if item is found in the dialog state manager otherwise, False
+        """
+        raise RuntimeError("Not supported")
 
-    # <summary>
-    # Removes the first occurrence of a specific object from the dialog state manager.
-    # </summary>
-    # <param name="item">The object to remove from the dialog state manager.</param>
-    # <returns><c>true</c> if the item was successfully removed from the dialog state manager
-    # otherwise, <c>false</c>.</returns>
-    # <remarks>This method is not supported.</remarks>
-    bool Remove(KeyValuePair<string, object> item)
-    {
-        throw new NotSupportedException()
-    }
+    def copy_to(self, array: List[Tuple[str, object]], array_index: int):
+        """
+        Copies the elements of the dialog state manager to an array starting at a particular index.
+        :param array: The one-dimensional array that is the destination of the elements copied
+         from the dialog state manager. The array must have zero-based indexing.
+        :param array_index:
+        :return:
+        """
+        for memory_scope in self.configuration.memory_scopes:
+            array[array_index] = (
+                memory_scope.name,
+                memory_scope.get_memory(self._dialog_context),
+            )
+            array_index += 1
+
+    def remove_item(self, item: Tuple[str, object]) -> bool:
+        """
+        Determines whether the dialog state manager contains a specific value (should use __contains__).
+        :param item: The tuple of the item to locate.
+        :return bool: True if item is found in the dialog state manager otherwise, False
+        """
+        raise RuntimeError("Not supported")
 
     # <summary>
     # Returns an enumerator that iterates through the collection.
     # </summary>
     # <returns>An enumerator that can be used to iterate through the collection.</returns>
-    IEnumerator<KeyValuePair<string, object>> GetEnumerator()
-    {
-        foreach (ms in Configuration.MemoryScopes)
-        {
-            yield return new KeyValuePair<string, object>(ms.Name, ms.GetMemory(_dialogContext))
-        }
-    }
+    def get_enumerator(self) -> Iterator[Tuple[str, object]]:
+        """
+        Returns an enumerator that iterates through the collection.
+        :return: An enumerator that can be used to iterate through the collection.
+        """
+        for memory_scope in self.configuration.memory_scopes:
+            yield (memory_scope.name, memory_scope.get_memory(self._dialog_context))
 
     # <summary>
     # Track when specific paths are changed.
     # </summary>
     # <param name="paths">Paths to track.</param>
     # <returns>Normalized paths to pass to <see cref="AnyPathChanged"/>.</returns>
-    List<string> TrackPaths(IEnumerable<string> paths)
-    {
-        allPaths = new List<string>()
-        foreach (path in paths)
-        {
-            tpath = TransformPath(path)
+    def track_paths(self, paths: Collection[str]) -> List[str]:
+        """
+        Track when specific paths are changed.
+        :param paths: Paths to track.
+        :return: Normalized paths to pass to any_path_changed.
+        """
+        all_paths = []
+        for path in paths:
+            t_path = self.transform_path(path)
 
             # Track any path that resolves to a constant path
-            if (ObjectPath.TryResolvePath(this, tpath, out segments))
-            {
-                npath = string.Join("_", segments)
-                SetValue(PathTracker + "." + npath, 0)
-                allPaths.Add(npath)
-            }
-        }
+            segments = ObjectPath.try_resolve_path(self, t_path)
+            if segments:
+                n_path = "_".join(segments)
+                self.set_value(self.path_tracker + "." + n_path, 0)
+                all_paths.append(n_path)
 
-        return allPaths
-    }
+        return all_paths
 
-    # <summary>
-    # Check to see if any path has changed since watermark.
-    # </summary>
-    # <param name="counter">Time counter to compare to.</param>
-    # <param name="paths">Paths from <see cref="TrackPaths"/> to check.</param>
-    # <returns>True if any path has changed since counter.</returns>
-    bool AnyPathChanged(uint counter, IEnumerable<string> paths)
-    {
-        found = false
-        if (paths != null)
-        {
-            foreach (path in paths)
-            {
-                if (GetValue<uint>(PathTracker + "." + path) > counter)
-                {
-                    found = true
+    def any_path_changed(self, counter: int, paths: Collection[str]) -> bool:
+        """
+        Check to see if any path has changed since watermark.
+        :param counter: Time counter to compare to.
+        :param paths: Paths from track_paths to check.
+        :return: True if any path has changed since counter.
+        """
+        found = False
+        if paths:
+            for path in paths:
+                if self.get_value(int, self.path_tracker + "." + path) > counter:
+                    found = True
                     break
-                }
-            }
-        }
 
         return found
-    }
 
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        foreach (ms in Configuration.MemoryScopes)
-        {
-            yield return new KeyValuePair<string, object>(ms.Name, ms.GetMemory(_dialogContext))
-        }
-    }
+    def __iter__(self):
+        for memory_scope in self.configuration.memory_scopes:
+            yield (memory_scope.name, memory_scope.get_memory(self._dialog_context))
 
-    static bool TryGetFirstNestedValue<T>(ref T value, ref string remainingPath, object memory)
-    {
-        if (ObjectPath.TryGetPathValue < JArray > (memory, remaining_path, out array))
-        {
-            if (array != null && array.Count > 0)
-            {
-                if (array[0] is JArray first)
-                {
-                    if (first.Count > 0)
-                    {
-                        second = first[0]
-                        value = ObjectPath.MapValueTo<T>(second)
-                        return true
-                    }
+    @staticmethod
+    def _try_get_first_nested_value(
+        remaining_path: str, memory: object
+    ) -> Tuple[bool, object]:
+        array = ObjectPath.try_get_path_value(memory, remaining_path)
+        if array:
+            if isinstance(array[0], list):
+                first = array[0]
+                if first:
+                    second = first[0]
+                    return True, second
 
-                    return false
-                }
+                return False, None
 
-                value = ObjectPath.MapValueTo<T>(array[0])
-                return true
-            }
-        }
+            return True, array[0]
 
-        return false
-    }
+        return False, None
 
-    string GetBadScopeMessage(string path)
-    {
-        return $"'{path}' does not match memory scopes:[{string.Join(",", Configuration.MemoryScopes.Select(ms => ms.Name))}]"
-    }
-
-    bool TrackChange(string path, object value)
-    {
-        hasPath = false
-        if (ObjectPath.TryResolvePath(this, path, out segments))
-        {
-            root = segments.Count > 1 ? segments[1] as string : string.Empty
+    def _track_change(self, path: str, value: object) -> bool:
+        has_path = False
+        segments = ObjectPath.try_resolve_path(self, path)
+        if segments:
+            root = segments[1] if len(segments) > 1 else ""
 
             # Skip _* as first scope, i.e. _adaptive, _tracker, ...
-            if (!root.StartsWith("_", StringComparison.Ordinal))
-            {
+            if not root.startswith("_"):
                 # Convert to a simple path with _ between segments
-                pathName = string.Join("_", segments)
-                trackedPath = $"{PathTracker}.{pathName}"
-                uint? counter = null
+                path_name = "_".join(segments)
+                tracked_path = f"{self.path_tracker}.{path_name}"
+                counter = None
 
-                void Update()
-                {
-                    if (TryGetValue<uint>(trackedPath, out lastChanged))
-                    {
-                        if (!counter.HasValue)
-                        {
-                            counter = GetValue<uint>(DialogPath.EventCounter)
-                        }
+                def update():
+                    nonlocal counter
+                    last_changed = self.try_get_value(tracked_path, int)
+                    if last_changed:
+                        if counter is not None:
+                            counter = self.get_value(int, DialogPath.EVENT_COUNTER)
 
-                        SetValue(trackedPath, counter.Value)
-                    }
-                }
+                        self.set_value(tracked_path, counter)
 
-                Update()
-                if (value is object obj)
-                {
+                update()
+                if not self._is_primitive(type(value)):
                     # For an object we need to see if any children path are being tracked
-                    void CheckChildren(string property, object instance)
-                    {
+                    def check_children(property: str, instance: object):
+                        nonlocal tracked_path
                         # Add new child segment
-                        trackedPath += "_" + property.ToLowerInvariant()
-                        Update()
-                        if (instance is object child)
-                        {
-                            ObjectPath.ForEachProperty(child, CheckChildren)
-                        }
+                        tracked_path += "_" + property.lower()
+                        update()
+                        if not self._is_primitive(type(instance)):
+                            ObjectPath.for_each_property(property, check_children)
 
                         # Remove added child segment
-                        trackedPath = trackedPath.Substring(0, trackedPath.LastIndexOf('_'))
-                    }
+                        tracked_path = tracked_path.Substring(
+                            0, tracked_path.LastIndexOf("_")
+                        )
 
-                    ObjectPath.ForEachProperty(obj, CheckChildren)
-                }
-            }
+                    ObjectPath.for_each_property(value, check_children)
 
-            hasPath = true
-        }
+            has_path = True
 
-        return hasPath
-    }
-}
+        return has_path
