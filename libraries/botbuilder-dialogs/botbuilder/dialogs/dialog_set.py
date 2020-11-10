@@ -7,7 +7,6 @@ from typing import Dict
 from botbuilder.core import TurnContext, BotAssert, StatePropertyAccessor
 from .dialog import Dialog
 from .dialog_state import DialogState
-from .dialog_context import DialogContext
 
 
 class DialogSet:
@@ -73,7 +72,10 @@ class DialogSet:
 
         return self
 
-    async def create_context(self, turn_context: TurnContext) -> DialogContext:
+    async def create_context(self, turn_context: TurnContext) -> "DialogContext":
+        # This import prevents circular dependency issues
+        from .dialog_context import DialogContext
+
         # pylint: disable=unnecessary-lambda
         BotAssert.context_not_none(turn_context)
 

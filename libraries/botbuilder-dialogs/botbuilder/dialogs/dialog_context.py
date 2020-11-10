@@ -15,7 +15,6 @@ from .dialog_turn_result import DialogTurnResult
 from .dialog_reason import DialogReason
 from .dialog_instance import DialogInstance
 from .dialog import Dialog
-from .dialog_container import DialogContainer
 
 
 class DialogContext:
@@ -83,6 +82,9 @@ class DialogContext:
 
         if instance:
             dialog = self.find_dialog(instance.id)
+
+            # This import prevents circular dependency issues
+            from .dialog_container import DialogContainer
 
             if isinstance(dialog, DialogContainer):
                 return dialog.create_child_context(self)

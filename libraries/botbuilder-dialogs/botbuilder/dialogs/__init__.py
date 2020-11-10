@@ -17,6 +17,7 @@ from .dialog_set import DialogSet
 from .dialog_state import DialogState
 from .dialog_turn_result import DialogTurnResult
 from .dialog_turn_status import DialogTurnStatus
+from .dialog_manager import DialogManager
 from .dialog_manager_result import DialogManagerResult
 from .dialog import Dialog
 from .dialogs_component_registration import DialogsComponentRegistration
@@ -42,6 +43,7 @@ __all__ = [
     "DialogState",
     "DialogTurnResult",
     "DialogTurnStatus",
+    "DialogManager",
     "DialogManagerResult",
     "Dialog",
     "DialogsComponentRegistration",

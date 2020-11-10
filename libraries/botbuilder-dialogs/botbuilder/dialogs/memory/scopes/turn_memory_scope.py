@@ -1,7 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from botbuilder.dialogs import DialogContext
 from botbuilder.dialogs.memory import scope_path
 
 from .memory_scope import MemoryScope
@@ -59,9 +58,9 @@ class TurnMemoryScope(MemoryScope):
     def __init__(self):
         super().__init__(scope_path.TURN)
 
-    def get_memory(self, dialog_context: DialogContext) -> object:
+    def get_memory(self, dialog_context: "DialogContext") -> object:
         if not dialog_context:
-            raise TypeError(f"Expecting: {DialogContext.__name__}, but received None")
+            raise TypeError(f"Expecting: DialogContext, but received None")
 
         turn_value = dialog_context.context.turn_state.get(scope_path.TURN, None)
 
@@ -71,8 +70,8 @@ class TurnMemoryScope(MemoryScope):
 
         return turn_value
 
-    def set_memory(self, dialog_context: DialogContext, memory: object):
+    def set_memory(self, dialog_context: "DialogContext", memory: object):
         if not dialog_context:
-            raise TypeError(f"Expecting: {DialogContext.__name__}, but received None")
+            raise TypeError(f"Expecting: DialogContext, but received None")
 
         dialog_context.context.turn_state[scope_path.TURN] = memory

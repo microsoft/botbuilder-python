@@ -23,7 +23,6 @@ from botbuilder.dialogs.memory.scopes import (
 )
 
 from botbuilder.dialogs.memory.path_resolvers import (
-    AliasPathResolver,
     AtAtPathResolver,
     AtPathResolver,
     DollarPathResolver,
@@ -47,7 +46,6 @@ class DialogsComponentRegistration(
         yield UserMemoryScope()
 
     def get_path_resolvers(self) -> Iterable[PathResolverBase]:
-        yield AliasPathResolver()
         yield AtAtPathResolver()
         yield AtPathResolver()
         yield DollarPathResolver()

@@ -8,7 +8,6 @@ from typing import (
     Callable,
     Collection,
     Dict,
-    Generic,
     Iterator,
     List,
     Tuple,
@@ -18,7 +17,6 @@ from typing import (
 
 from botbuilder.core import ComponentRegistration
 
-from botbuilder.dialogs import DialogContext, DialogsComponentRegistration, ObjectPath
 from botbuilder.dialogs.memory.scopes import MemoryScope
 
 from .component_memory_scopes_base import ComponentMemoryScopesBase
@@ -30,6 +28,7 @@ T = TypeVar("T")  # Declare type variable
 
 builtin_types = list(filter(lambda x: not x.startswith("_"), dir(builtins)))
 
+
 # <summary>
 # The DialogStateManager manages memory scopes and pathresolvers
 # MemoryScopes are named root level objects, which can exist either in the dialogcontext or off of turn state
@@ -39,34 +38,35 @@ class DialogStateManager:
 
     SEPARATORS = [",", "["]
 
-    # <summary>
-    # Initializes a new instance of the <see cref="DialogStateManager"/> class.
-    # </summary>
-    # <param name="dialog_context">The dialog context for the current turn of the conversation.</param>
-    # <param name="configuration">Configuration for the dialog state manager. Default is <c>null</c>.</param>
     def __init__(
         self,
-        dialog_context: DialogContext,
+        dialog_context: "DialogContext",
         configuration: DialogStateManagerConfiguration = None,
     ):
-        # <summary>
+        """
+        Initializes a new instance of the DialogStateManager class.
+        :param dialog_context: The dialog context for the current turn of the conversation.
+        :param configuration: Configuration for the dialog state manager. Default is None.
+        """
+        # These modules are imported at static level to avoid circular dependency problems
+        from botbuilder.dialogs import DialogsComponentRegistration, ObjectPath
+
+        self._object_path_cls = ObjectPath
+        self._dialog_component_registration_cls = DialogsComponentRegistration
+
         # Information for tracking when path was last modified.
-        # </summary>
         self.path_tracker = "dialog._tracker.paths"
 
         self._dialog_context = dialog_context
         self._version: int = 0
 
-        ComponentRegistration.add(DialogsComponentRegistration())
+        ComponentRegistration.add(self._dialog_component_registration_cls())
 
         if not dialog_context:
-            raise TypeError(f"Expecting: {DialogContext.__name__}, but received None")
+            raise TypeError(f"Expecting: DialogContext, but received None")
 
-        self._configuration = (
-            configuration
-            or dialog_context.context.turn_state[
-                DialogStateManagerConfiguration.__name__
-            ]
+        self._configuration = configuration or dialog_context.context.turn_state.get(
+            DialogStateManagerConfiguration.__name__, None
         )
         if not self._configuration:
             self._configuration = DialogStateManagerConfiguration()
@@ -290,19 +290,21 @@ class DialogStateManager:
                 if not remaining_path:
                     return True, first_value
 
-                path_value = ObjectPath.try_get_path_value(first_value, remaining_path)
+                path_value = self._object_path_cls.try_get_path_value(
+                    first_value, remaining_path
+                )
                 return bool(path_value), path_value
 
             return False, return_value
 
-        path_value = ObjectPath.try_get_path_value(self, path)
+        path_value = self._object_path_cls.try_get_path_value(self, path)
         return bool(path_value), path_value
 
     def get_value(
         self,
         class_type: Type,
         path_expression: str,
-        default_value: Callable[[], Generic[T]] = None,
+        default_value: Callable[[], T] = None,
     ) -> T:
         """
         Get the value from memory using path expression (NOTE: This always returns clone of value).
@@ -380,15 +382,11 @@ class DialogStateManager:
 
         path = self.transform_path(path)
         if self._track_change(path, value):
-            ObjectPath.set_path_value(self, path, value)
+            self._object_path_cls.set_path_value(self, path, value)
 
         # Every set will increase version
         self._version += 1
 
-    # <summary>
-    # Remove property from memory.
-    # </summary>
-    # <param name="path">Path to remove the leaf property.</param>
     def remove_value(self, path: str):
         """
         Set memory to value.
@@ -401,7 +399,7 @@ class DialogStateManager:
 
         path = self.transform_path(path)
         if self._track_change(path, None):
-            ObjectPath.remove_path_value(self, path)
+            self._object_path_cls.remove_path_value(self, path)
 
     def get_memory_snapshot(self) -> Dict[str, object]:
         """
@@ -435,12 +433,6 @@ class DialogStateManager:
         for scope in self.configuration.memory_scopes:
             await scope.save_changes(self._dialog_context)
 
-    # <summary>
-    # Delete the memory for a scope.
-    # </summary>
-    # <param name="name">name of the scope.</param>
-    # <param name="cancellationToken">cancellationToken.</param>
-    # <returns>Task.</returns>
     async def delete_scopes_memory_async(self, name: str):
         """
         Delete the memory for a scope.
@@ -550,11 +542,6 @@ class DialogStateManager:
         for memory_scope in self.configuration.memory_scopes:
             yield (memory_scope.name, memory_scope.get_memory(self._dialog_context))
 
-    # <summary>
-    # Track when specific paths are changed.
-    # </summary>
-    # <param name="paths">Paths to track.</param>
-    # <returns>Normalized paths to pass to <see cref="AnyPathChanged"/>.</returns>
     def track_paths(self, paths: Collection[str]) -> List[str]:
         """
         Track when specific paths are changed.
@@ -566,7 +553,7 @@ class DialogStateManager:
             t_path = self.transform_path(path)
 
             # Track any path that resolves to a constant path
-            segments = ObjectPath.try_resolve_path(self, t_path)
+            segments = self._object_path_cls.try_resolve_path(self, t_path)
             if segments:
                 n_path = "_".join(segments)
                 self.set_value(self.path_tracker + "." + n_path, 0)
@@ -598,6 +585,9 @@ class DialogStateManager:
     def _try_get_first_nested_value(
         remaining_path: str, memory: object
     ) -> Tuple[bool, object]:
+        # These modules are imported at static level to avoid circular dependency problems
+        from botbuilder.dialogs import ObjectPath
+
         array = ObjectPath.try_get_path_value(memory, remaining_path)
         if array:
             if isinstance(array[0], list):
@@ -614,7 +604,7 @@ class DialogStateManager:
 
     def _track_change(self, path: str, value: object) -> bool:
         has_path = False
-        segments = ObjectPath.try_resolve_path(self, path)
+        segments = self._object_path_cls.try_resolve_path(self, path)
         if segments:
             root = segments[1] if len(segments) > 1 else ""
 
@@ -643,14 +633,16 @@ class DialogStateManager:
                         tracked_path += "_" + property.lower()
                         update()
                         if not self._is_primitive(type(instance)):
-                            ObjectPath.for_each_property(property, check_children)
+                            self._object_path_cls.for_each_property(
+                                property, check_children
+                            )
 
                         # Remove added child segment
                         tracked_path = tracked_path.Substring(
                             0, tracked_path.LastIndexOf("_")
                         )
 
-                    ObjectPath.for_each_property(value, check_children)
+                    self._object_path_cls.for_each_property(value, check_children)
 
             has_path = True
 

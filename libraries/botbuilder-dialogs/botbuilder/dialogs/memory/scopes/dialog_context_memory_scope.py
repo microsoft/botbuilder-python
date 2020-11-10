@@ -1,7 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from botbuilder.dialogs import DialogContext
 from botbuilder.dialogs.memory import scope_path
 
 from .memory_scope import MemoryScope
@@ -19,14 +18,14 @@ class DialogContextMemoryScope(MemoryScope):
         # Parent name.
         self.PARENT = "parent"
 
-    def get_memory(self, dialog_context: DialogContext) -> object:
+    def get_memory(self, dialog_context: "DialogContext") -> object:
         """
         Gets the backing memory for this scope.
         <param name="dc">The <see cref="DialogContext"/> object for this turn.</param>
         <returns>Memory for the scope.</returns>
         """
         if not dialog_context:
-            raise TypeError(f"Expecting: {DialogContext.__name__}, but received None")
+            raise TypeError(f"Expecting: DialogContext, but received None")
 
         # TODO: make sure that every object in the dict is serializable
         memory = {}
@@ -58,7 +57,7 @@ class DialogContextMemoryScope(MemoryScope):
         )
         return memory
 
-    def set_memory(self, dialog_context: DialogContext, memory: object):
+    def set_memory(self, dialog_context: "DialogContext", memory: object):
         raise Exception(
             f"{self.__class__.__name__}.set_memory not supported (read only)"
         )

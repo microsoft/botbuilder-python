@@ -11,7 +11,7 @@ from .dialog_events import DialogEvents
 from .dialog_set import DialogSet
 
 
-class DialogContainer(ABC, Dialog):
+class DialogContainer(Dialog, ABC):
     def __init__(self, dialog_id: str = None):
         super().__init__(dialog_id)
 
