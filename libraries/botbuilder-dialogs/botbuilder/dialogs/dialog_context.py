@@ -7,6 +7,7 @@ from botbuilder.core.turn_context import TurnContext
 from botbuilder.dialogs.memory import DialogStateManager
 
 from .dialog_event import DialogEvent
+from .dialog_events import DialogEvents
 from .dialog_set import DialogSet
 from .dialog_state import DialogState
 from .dialog_turn_status import DialogTurnStatus
@@ -184,12 +185,61 @@ class DialogContext:
 
         return DialogTurnResult(DialogTurnStatus.Complete, result)
 
-    async def cancel_all_dialogs(self):
+    async def cancel_all_dialogs(
+        self,
+        cancel_parents: bool = None,
+        event_name: str = None,
+        event_value: object = None,
+    ):
         """
         Deletes any existing dialog stack thus cancelling all dialogs on the stack.
-        :param result: (Optional) result to pass to the parent dialogs.
+        :param cancel_parents:
+        :param event_name:
+        :param event_value:
         :return:
         """
+        if cancel_parents is None:
+            try:
+                event_name = event_name or DialogEvents.cancel_dialog
+
+                if self.stack or self.parent:
+                    # Cancel all local and parent dialogs while checking for interception
+                    notify = False
+                    dialog_context = self
+
+                    while dialog_context:
+                        if dialog_context.stack:
+                            # Check to see if the dialog wants to handle the event
+                            if notify:
+                                event_handled = await dialog_context.emit_event(
+                                    event_name,
+                                    event_value,
+                                    bubble=False,
+                                    from_leaf=False,
+                                )
+
+                                if event_handled:
+                                    break
+
+                            # End the active dialog
+                            await dialog_context.end_active_dialog(
+                                DialogReason.CancelCalled
+                            )
+                        else:
+                            dialog_context = (
+                                dialog_context.parent if cancel_parents else None
+                            )
+
+                        notify = True
+
+                    return DialogTurnResult(DialogTurnStatus.Cancelled)
+                else:
+                    # Stack was empty and no parent
+                    return DialogTurnResult(DialogTurnStatus.Empty)
+            except Exception as err:
+                self.set_exception_context_data(err)
+                raise
+
         if self.stack:
             while self.stack:
                 await self.end_active_dialog(DialogReason.CancelCalled)

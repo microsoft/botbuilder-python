@@ -10,7 +10,12 @@ from .persisted_state import PersistedState
 
 
 class DialogManagerResult:
-    def __init__(self):
-        self.turn_result: DialogTurnResult = None
-        self.activities: List[Activity] = None
-        self.persisted_state: PersistedState = None
+    def __init__(
+        self,
+        turn_result: DialogTurnResult = None,
+        activities: List[Activity] = None,
+        persisted_state: PersistedState = None,
+    ):
+        self.turn_result = turn_result
+        self.activities = activities
+        self.persisted_state = persisted_state
