@@ -166,7 +166,12 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         self.assertIsNotNone(result)
         self.assertEqual(1, len(result.answers))
         self.assertFalse(result.active_learning_enabled)
-
+    
+    async def test_returns_answer_with_strict_filters_with_or_operator(self):
+        # Arrange
+        question: str = "is this about"
+        # TODO finish writing test
+        
     async def test_returns_answer_using_requests_module(self):
         question: str = "how do I clean the stove?"
         response_path: str = "ReturnsAnswer.json"
