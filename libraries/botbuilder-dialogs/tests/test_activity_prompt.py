@@ -241,9 +241,13 @@ class ActivityPromptTests(aiounittest.AsyncTestCase):
                     await dialog_context.prompt("EventActivityPrompt", options)
                     await dialog_context.prompt("Non existent id", options)
                 except Exception as err:
-                    self.assertIsNotNone(err.data["DialogContext"]) # pylint: disable=no-member
+                    self.assertIsNotNone(
+                        err.data["DialogContext"]  # pylint: disable=no-member
+                    )
                     self.assertEqual(
-                        err.data["DialogContext"]["active_dialog"], # pylint: disable=no-member
+                        err.data["DialogContext"][  # pylint: disable=no-member
+                            "active_dialog"
+                        ],
                         "EventActivityPrompt",
                     )
                 else:
@@ -284,7 +288,9 @@ class ActivityPromptTests(aiounittest.AsyncTestCase):
                     await dialog_context.prompt("EventActivityPrompt", options)
                     await dialog_context.replace_dialog("Non existent id", options)
                 except Exception as err:
-                    self.assertIsNotNone(err.data["DialogContext"]) # pylint: disable=no-member
+                    self.assertIsNotNone(
+                        err.data["DialogContext"]  # pylint: disable=no-member
+                    )
                 else:
                     raise Exception("Should have thrown an error.")
 
