@@ -193,7 +193,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         ) as mock_http_client:
             result = await qna.get_answers_raw(context, options)
 
-            serialized_http_req_args = mock_http_client.call_args.kwargs["data"]
+            serialized_http_req_args = mock_http_client.call_args[1]["data"]
             req_args = json.loads(serialized_http_req_args)
 
             # Assert
@@ -238,7 +238,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         ) as mock_http_client:
             result = await qna.get_answers_raw(context, options)
 
-            serialized_http_req_args = mock_http_client.call_args.kwargs["data"]
+            serialized_http_req_args = mock_http_client.call_args[1]["data"]
             req_args = json.loads(serialized_http_req_args)
 
             # Assert
