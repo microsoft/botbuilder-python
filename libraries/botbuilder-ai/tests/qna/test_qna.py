@@ -171,7 +171,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
     async def test_returns_answer_with_strict_filters_with_OR_operator(self):
         # Arrange
         question: str = "Where can you find"
-        response_path: str = "RetrunsAnswer_WithStrictFilter_OR_Operator.json"
+        response_path: str = "RetrunsAnswer_WithStrictFilter_Or_Operator.json"
         response_json = QnaApplicationTest._get_json_for_file(response_path)
 
         strict_filters = [
@@ -216,7 +216,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
     async def test_returns_answer_with_strict_filters_with_AND_operator(self):
         # Arrange
         question: str = "Where can you find"
-        response_path: str = "RetrunsAnswer_WithStrictFilter_AND_Operator.json"
+        response_path: str = "RetrunsAnswer_WithStrictFilter_And_Operator.json"
         response_json = QnaApplicationTest._get_json_for_file(response_path)
 
         strict_filters = [
