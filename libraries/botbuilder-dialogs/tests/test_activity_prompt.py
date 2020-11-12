@@ -245,7 +245,7 @@ class ActivityPromptTests(aiounittest.AsyncTestCase):
                     self.assertEqual(
                         err.data["DialogContext"]["active_dialog"], # pylint: disable=no-member
                         "EventActivityPrompt",
-                    ) 
+                    )
                 else:
                     raise Exception("Should have thrown an error.")
 
