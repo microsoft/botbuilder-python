@@ -10,11 +10,12 @@ class JoinOperator(str, Enum):
 
     remarks:
     --------
-    For example, using multiple filters in a query, if you want results that have
-    metadata that matches all filters, then use `"AND"` operator.
+    For example, when using multiple filters in a query, if you want results that
+    have metadata that matches all filters, then use `AND` operator.
 
-    If instead you only wish that the results from querying a QnA knowledge base
-    match at least one of the filters, then use `"OR"` operator.
+    If instead you only wish that the results from knowledge base match
+    at least one of the filters, then use `OR` operator.
     """
+
     AND = "AND"
     OR = "OR"

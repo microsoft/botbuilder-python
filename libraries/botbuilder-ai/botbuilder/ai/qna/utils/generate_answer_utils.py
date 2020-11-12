@@ -144,6 +144,9 @@ class GenerateAnswerUtils:
             hydrated_options.qna_id = query_options.qna_id
             hydrated_options.is_test = query_options.is_test
             hydrated_options.ranker_type = query_options.ranker_type
+            hydrated_options.strict_filters_join_operator = (
+                query_options.strict_filters_join_operator
+            )
 
         return hydrated_options
 
@@ -161,6 +164,7 @@ class GenerateAnswerUtils:
             qna_id=options.qna_id,
             is_test=options.is_test,
             ranker_type=options.ranker_type,
+            strict_filters_join_operator=options.strict_filters_join_operator,
         )
 
         http_request_helper = HttpRequestUtils(self._http_client)

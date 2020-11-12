@@ -1,0 +1,76 @@
+{
+    "answers": [
+        {
+            "questions": [
+                "Where can you find Squirtle"
+            ],
+            "answer": "Did you not see him in the first three balls?",
+            "score": 80.22,
+            "id": 28,
+            "source": "Editorial",
+            "metadata": [
+                {
+                    "name": "species",
+                    "value": "turtle"
+                },
+                {
+                    "name": "type",
+                    "value": "water"
+                }
+            ],
+            "context": {
+                "isContextOnly": false,
+                "prompts": []
+            }
+        },
+        {
+            "questions": [
+                "Where can you find Ash",
+                "Ash"
+            ],
+            "answer": "I don't know. Maybe ask your little electric mouse friend?",
+            "score": 63.74,
+            "id": 26,
+            "source": "Editorial",
+            "metadata": [
+                {
+                    "name": "species",
+                    "value": "human"
+                },
+                {
+                    "name": "type",
+                    "value": "miscellaneous"
+                }
+            ],
+            "context": {
+                "isContextOnly": false,
+                "prompts": []
+            }
+        },
+        {
+            "questions": [
+                "Where can you find Misty",
+                "Misty"
+            ],
+            "answer": "Wherever people are having a swimming good time",
+            "score": 31.13,
+            "id": 27,
+            "source": "Editorial",
+            "metadata": [
+                {
+                    "name": "species",
+                    "value": "human"
+                },
+                {
+                    "name": "type",
+                    "value": "water"
+                }
+            ],
+            "context": {
+                "isContextOnly": false,
+                "prompts": []
+            }
+        }
+    ],
+    "activeLearningEnabled": true
+}
