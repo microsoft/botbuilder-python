@@ -168,7 +168,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         self.assertEqual(1, len(result.answers))
         self.assertFalse(result.active_learning_enabled)
 
-    async def test_returns_answer_with_strict_filters_with_OR_operator(self):
+    async def test_returns_answer_with_strict_filters_with_or_operator(self):
         # Arrange
         question: str = "Where can you find"
         response_path: str = "RetrunsAnswer_WithStrictFilter_Or_Operator.json"
@@ -213,7 +213,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
             self.assertEqual(second_filter.name, req_args_strict_filters[1]["name"])
             self.assertEqual(second_filter.value, req_args_strict_filters[1]["value"])
 
-    async def test_returns_answer_with_strict_filters_with_AND_operator(self):
+    async def test_returns_answer_with_strict_filters_with_and_operator(self):
         # Arrange
         question: str = "Where can you find"
         response_path: str = "RetrunsAnswer_WithStrictFilter_And_Operator.json"
