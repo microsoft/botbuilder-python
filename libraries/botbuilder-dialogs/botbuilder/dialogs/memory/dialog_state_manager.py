@@ -6,8 +6,8 @@ from inspect import isawaitable
 from traceback import print_tb
 from typing import (
     Callable,
-    Collection,
     Dict,
+    Iterable,
     Iterator,
     List,
     Tuple,
@@ -115,17 +115,17 @@ class DialogStateManager:
         return self._configuration
 
     @property
-    def keys(self) -> Collection[str]:
+    def keys(self) -> Iterable[str]:
         """
-        Gets a Collection containing the keys of the memory scopes
+        Gets a Iterable containing the keys of the memory scopes
         :return: Keys of the memory scopes.
         """
         return [memory_scope.name for memory_scope in self.configuration.memory_scopes]
 
     @property
-    def values(self) -> Collection[object]:
+    def values(self) -> Iterable[object]:
         """
-        Gets a Collection containing the values of the memory scopes.
+        Gets a Iterable containing the values of the memory scopes.
         :return: Values of the memory scopes.
         """
         return [
@@ -551,7 +551,7 @@ class DialogStateManager:
         for memory_scope in self.configuration.memory_scopes:
             yield (memory_scope.name, memory_scope.get_memory(self._dialog_context))
 
-    def track_paths(self, paths: Collection[str]) -> List[str]:
+    def track_paths(self, paths: Iterable[str]) -> List[str]:
         """
         Track when specific paths are changed.
         :param paths: Paths to track.
@@ -570,7 +570,7 @@ class DialogStateManager:
 
         return all_paths
 
-    def any_path_changed(self, counter: int, paths: Collection[str]) -> bool:
+    def any_path_changed(self, counter: int, paths: Iterable[str]) -> bool:
         """
         Check to see if any path has changed since watermark.
         :param counter: Time counter to compare to.
