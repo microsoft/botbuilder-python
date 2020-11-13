@@ -2,7 +2,14 @@
 # Licensed under the MIT License.
 
 from typing import List, Tuple
+
+from botframework.connector.aio import ConnectorClient
+from botframework.connector.teams.teams_connector_client import TeamsConnectorClient
 from botbuilder.schema import ConversationParameters, ConversationReference
+from botbuilder.core.teams.teams_activity_extensions import (
+    teams_get_meeting_info,
+    teams_get_channel_data,
+)
 from botbuilder.core.turn_context import Activity, TurnContext
 from botbuilder.schema.teams import (
     ChannelInfo,
@@ -10,9 +17,8 @@ from botbuilder.schema.teams import (
     TeamsChannelData,
     TeamsChannelAccount,
     TeamsPagedMembersResult,
+    TeamsMeetingParticipant,
 )
-from botframework.connector.aio import ConnectorClient
-from botframework.connector.teams.teams_connector_client import TeamsConnectorClient
 
 
 class TeamsInfo:
@@ -176,6 +182,48 @@ class TeamsInfo:
             )
 
         return await TeamsInfo.get_team_member(turn_context, team_id, member_id)
+
+    @staticmethod
+    async def get_meeting_participant(
+        turn_context: TurnContext,
+        meeting_id: str = None,
+        participant_id: str = None,
+        tenant_id: str = None,
+    ) -> TeamsMeetingParticipant:
+        meeting_id = (
+            meeting_id
+            if meeting_id
+            else teams_get_meeting_info(turn_context.activity).id
+        )
+        if meeting_id is None:
+            raise TypeError(
+                "TeamsInfo._get_meeting_participant: method requires a meeting_id"
+            )
+
+        participant_id = (
+            participant_id
+            if participant_id
+            else turn_context.activity.from_property.aad_object_id
+        )
+        if participant_id is None:
+            raise TypeError(
+                "TeamsInfo._get_meeting_participant: method requires a participant_id"
+            )
+
+        tenant_id = (
+            tenant_id
+            if tenant_id
+            else teams_get_channel_data(turn_context.activity).tenant.id
+        )
+        if tenant_id is None:
+            raise TypeError(
+                "TeamsInfo._get_meeting_participant: method requires a tenant_id"
+            )
+
+        connector_client = await TeamsInfo.get_teams_connector_client(turn_context)
+        return connector_client.teams.fetch_participant(
+            meeting_id, participant_id, tenant_id
+        )
 
     @staticmethod
     async def get_teams_connector_client(

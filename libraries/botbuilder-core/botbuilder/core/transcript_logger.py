@@ -9,7 +9,13 @@ import string
 from queue import Queue
 from abc import ABC, abstractmethod
 from typing import Awaitable, Callable, List
-from botbuilder.schema import Activity, ActivityTypes, ConversationReference
+from botbuilder.schema import (
+    Activity,
+    ActivityEventNames,
+    ActivityTypes,
+    ChannelAccount,
+    ConversationReference,
+)
 from .middleware_set import Middleware
 from .turn_context import TurnContext
 
@@ -46,9 +52,17 @@ class TranscriptLoggerMiddleware(Middleware):
         activity = context.activity
         # Log incoming activity at beginning of turn
         if activity:
+            if not activity.from_property:
+                activity.from_property = ChannelAccount()
             if not activity.from_property.role:
                 activity.from_property.role = "user"
-            await self.log_activity(transcript, copy.copy(activity))
+
+            # We should not log ContinueConversation events used by skills to initialize the middleware.
+            if not (
+                context.activity.type == ActivityTypes.event
+                and context.activity.name == ActivityEventNames.continue_conversation
+            ):
+                await self.log_activity(transcript, copy.copy(activity))
 
         # hook up onSend pipeline
         # pylint: disable=unused-argument

@@ -529,7 +529,7 @@ class TeamsActivityHandler(ActivityHandler):
                         channel_data.channel, channel_data.team, turn_context
                     )
                 if channel_data.event_type == "teamRenamed":
-                    return await self.on_teams_team_renamed_activity(
+                    return await self.on_teams_team_renamed(
                         channel_data.team, turn_context
                     )
                 if channel_data.event_type == "teamRestored":
@@ -600,10 +600,27 @@ class TeamsActivityHandler(ActivityHandler):
         """
         return
 
+    async def on_teams_team_renamed(  # pylint: disable=unused-argument
+        self, team_info: TeamInfo, turn_context: TurnContext
+    ):
+        """
+        Invoked when a Team Renamed event activity is received from the connector.
+        Team Renamed correspond to the user renaming an existing team.
+
+        :param team_info: The team info object representing the team.
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
+        return await self.on_teams_team_renamed_activity(team_info, turn_context)
+
     async def on_teams_team_renamed_activity(  # pylint: disable=unused-argument
         self, team_info: TeamInfo, turn_context: TurnContext
     ):
         """
+        DEPRECATED. Please use on_teams_team_renamed(). This method will remain in place throughout
+        v4 so as not to break existing bots.
+
         Invoked when a Team Renamed event activity is received from the connector.
         Team Renamed correspond to the user renaming an existing team.
 

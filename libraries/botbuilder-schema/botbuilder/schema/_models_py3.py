@@ -3,8 +3,14 @@
 
 from botbuilder.schema._connector_client_enums import ActivityTypes
 from datetime import datetime
+from enum import Enum
 from msrest.serialization import Model
 from msrest.exceptions import HttpOperationError
+
+
+class ActivityEventNames(str, Enum):
+    continue_conversation = "ContinueConversation"
+    create_conversation = "CreateConversation"
 
 
 class ConversationReference(Model):
@@ -1307,8 +1313,8 @@ class ConversationAccount(Model):
     :param aad_object_id: This account's object ID within Azure Active
      Directory (AAD)
     :type aad_object_id: str
-    :param role: Role of the entity behind the account (Example: User, Bot,
-     etc.). Possible values include: 'user', 'bot'
+    :param role: Role of the entity behind the account (Example: User, Bot, Skill
+     etc.). Possible values include: 'user', 'bot', 'skill'
     :type role: str or ~botframework.connector.models.RoleTypes
     :param tenant_id: This conversation's tenant ID
     :type tenant_id: str

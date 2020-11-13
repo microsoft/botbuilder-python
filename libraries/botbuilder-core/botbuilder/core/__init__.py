@@ -40,6 +40,7 @@ from .telemetry_constants import TelemetryConstants
 from .telemetry_logger_constants import TelemetryLoggerConstants
 from .telemetry_logger_middleware import TelemetryLoggerMiddleware
 from .turn_context import TurnContext
+from .transcript_logger import TranscriptLogger, TranscriptLoggerMiddleware
 from .user_state import UserState
 from .register_class_middleware import RegisterClassMiddleware
 from .adapter_extensions import AdapterExtensions
@@ -89,6 +90,8 @@ __all__ = [
     "TelemetryLoggerConstants",
     "TelemetryLoggerMiddleware",
     "TopIntent",
+    "TranscriptLogger",
+    "TranscriptLoggerMiddleware",
     "TurnContext",
     "UserState",
     "UserTokenProvider",
