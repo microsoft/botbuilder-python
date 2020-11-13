@@ -87,7 +87,7 @@ class DialogManager:
                     # self.dialogs = self.root_dialog.telemetry_client
                     self.dialogs.add(self.root_dialog)
 
-        bot_state_set = BotStateSet()
+        bot_state_set = BotStateSet([])
 
         # Preload TurnState with DM TurnState.
         for key, val in self.initial_turn_state:
