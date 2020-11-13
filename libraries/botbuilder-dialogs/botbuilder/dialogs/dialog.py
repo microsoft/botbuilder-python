@@ -114,13 +114,13 @@ class Dialog(ABC):
         self, dialog_context: "DialogContext", dialog_event: DialogEvent
     ) -> bool:
         """
-        # Called when an event has been raised, using `DialogContext.emitEvent()`, by either the current dialog or a dialog that the current dialog started.
-        # <param name="dialog_context">The dialog context for the current turn of conversation.</param>
-        # <param name="dialog_event">The event being raised.</param>
-        # <param name="cancellationToken">The cancellation token.</param>
-        # <returns>True if the event is handled by the current dialog and bubbling should stop.</returns>
-        # Before bubble
+        Called when an event has been raised, using `DialogContext.emitEvent()`, by either the current dialog or a
+         dialog that the current dialog started.
+        :param dialog_context: The dialog context for the current turn of conversation.
+        :param dialog_event: The event being raised.
+        :return: True if the event is handled by the current dialog and bubbling should stop.
         """
+        # Before bubble
         handled = await self._on_pre_bubble_event(dialog_context, dialog_event)
 
         # Bubble as needed
@@ -135,55 +135,54 @@ class Dialog(ABC):
 
         return handled
 
-    async def _on_pre_bubble_event(
+    async def _on_pre_bubble_event(  # pylint: disable=unused-argument
         self, dialog_context: "DialogContext", dialog_event: DialogEvent
     ) -> bool:
         """
-        # Called before an event is bubbled to its parent.
-        # This is a good place to perform interception of an event as returning `true` will prevent
-        # any further bubbling of the event to the dialogs parents and will also prevent any child
-        # dialogs from performing their default processing.
-        # <param name="dialog_context">The dialog context for the current turn of conversation.</param>
-        # <param name="dialog_event">The event being raised.</param>
-        # <param name="cancellationToken">Cancellation token.</param>
-        # <returns> Whether the event is handled by the current dialog and further processing should stop.</returns>
+        Called before an event is bubbled to its parent.
+        This is a good place to perform interception of an event as returning `true` will prevent
+        any further bubbling of the event to the dialogs parents and will also prevent any child
+        dialogs from performing their default processing.
+        :param dialog_context: The dialog context for the current turn of conversation.
+        :param dialog_event: The event being raised.
+        :return: Whether the event is handled by the current dialog and further processing should stop.
         """
         return False
 
-    async def _on_post_bubble_event(
+    async def _on_post_bubble_event(  # pylint: disable=unused-argument
         self, dialog_context: "DialogContext", dialog_event: DialogEvent
     ) -> bool:
         """
-        # Called after an event was bubbled to all parents and wasn't handled.
-        # This is a good place to perform default processing logic for an event. Returning `true` will
-        # prevent any processing of the event by child dialogs.
-        # <param name="dialog_context">The dialog context for the current turn of conversation.</param>
-        # <param name="dialog_event">The event being raised.</param>
-        # <param name="cancellationToken">Cancellation token.</param>
-        # <returns> Whether the event is handled by the current dialog and further processing should stop.</returns>
+        Called after an event was bubbled to all parents and wasn't handled.
+        This is a good place to perform default processing logic for an event. Returning `true` will
+        prevent any processing of the event by child dialogs.
+        :param dialog_context: The dialog context for the current turn of conversation.
+        :param dialog_event: The event being raised.
+        :return: Whether the event is handled by the current dialog and further processing should stop.
         """
         return False
 
     def _on_compute_id(self) -> str:
         """
-        # Computes an unique ID for a dialog.
-        # <returns>An unique ID.</returns>
+        Computes an unique ID for a dialog.
+        :return: An unique ID for a dialog
         """
         return self.__class__.__name__
 
-    def _register_source_location(self, path: str, line_number: int):
+    def _register_source_location(
+        self, path: str, line_number: int
+    ):  # pylint: disable=unused-argument
         """
-        # Registers a cref="SourceRange"/> in the provided location.
-        # <param name="path">The path to the source file.</param>
-        # <param name="line_number">The line number where the source will be located on the file.</param>
+        Registers a SourceRange in the provided location.
+        :param path: The path to the source file.
+        :param line_number: The line number where the source will be located on the file.
+        :return:
         """
         if path:
-            """
-            This will be added when debbuging support is ported.
-            DebugSupport.source_map.add(self, SourceRange(
-                path = path,
-                start_point = SourcePoint(line_index = line_number, char_index = 0 ),
-                end_point = SourcePoint(line_index = line_number + 1, char_index = 0 ),
-            )
-            """
+            # This will be added when debbuging support is ported.
+            # DebugSupport.source_map.add(self, SourceRange(
+            #     path = path,
+            #     start_point = SourcePoint(line_index = line_number, char_index = 0 ),
+            #     end_point = SourcePoint(line_index = line_number + 1, char_index = 0 ),
+            # )
             return

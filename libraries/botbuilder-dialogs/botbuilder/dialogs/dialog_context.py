@@ -78,6 +78,7 @@ class DialogContext:
         :param:
         :return DialogContext:
         """
+        # pylint: disable=import-outside-toplevel
         instance = self.active_dialog
 
         if instance:
@@ -200,6 +201,7 @@ class DialogContext:
         :param event_value:
         :return:
         """
+        # pylint: disable=too-many-nested-blocks
         if cancel_parents is None:
             try:
                 event_name = event_name or DialogEvents.cancel_dialog
@@ -235,12 +237,11 @@ class DialogContext:
                         notify = True
 
                     return DialogTurnResult(DialogTurnStatus.Cancelled)
-                else:
-                    # Stack was empty and no parent
-                    return DialogTurnResult(DialogTurnStatus.Empty)
+                # Stack was empty and no parent
+                return DialogTurnResult(DialogTurnStatus.Empty)
             except Exception as err:
-                self.set_exception_context_data(err)
-                raise
+                err = self.set_exception_context_data(err)
+                raise err
 
         if self.stack:
             while self.stack:
@@ -320,7 +321,8 @@ class DialogContext:
         Emits a named event for the current dialog, or someone who started it, to handle.
         <param name="name">Name of the event to raise.</param>
         <param name="value">Value to send along with the event.</param>
-        <param name="bubble">Flag to control whether the event should be bubbled to its parent if not handled locally. Defaults to a value of `true`.</param>
+        <param name="bubble">Flag to control whether the event should be bubbled to its parent if not handled locally.
+        Defaults to a value of `true`.</param>
         <param name="from_leaf">Whether the event is emitted from a leaf node.</param>
         <param name="cancellationToken">The cancellation token.</param>
         <returns>True if the event was handled.</returns>
@@ -352,8 +354,8 @@ class DialogContext:
 
             return False
         except Exception as err:
-            self.set_exception_context_data(err)
-            raise
+            err = self.set_exception_context_data(err)
+            raise err
 
     def set_exception_context_data(self, exception: Exception) -> Exception:
         if DialogContext.__class__.__name__ not in str(exception):
@@ -370,7 +372,7 @@ class DialogContext:
                 current_dc: DialogContext = current_dc.parent
 
             return type(exception)(
-                exception.message
+                str(exception)
                 + "DialogContext: "
                 + str(
                     {
@@ -385,3 +387,5 @@ class DialogContext:
                     }
                 )
             )
+
+        return exception

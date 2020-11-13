@@ -7,6 +7,8 @@ from .memory_scope import MemoryScope
 
 
 class CaseInsensitiveDict(dict):
+    # pylint: disable=protected-access
+
     @classmethod
     def _k(cls, key):
         return key.lower() if isinstance(key, str) else key
@@ -50,8 +52,8 @@ class CaseInsensitiveDict(dict):
 
     def _convert_keys(self):
         for k in list(self.keys()):
-            v = super(CaseInsensitiveDict, self).pop(k)
-            self.__setitem__(k, v)
+            val = super(CaseInsensitiveDict, self).pop(k)
+            self.__setitem__(k, val)
 
 
 class TurnMemoryScope(MemoryScope):

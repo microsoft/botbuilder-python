@@ -11,6 +11,7 @@ from .dialog_state import DialogState
 
 class DialogSet:
     def __init__(self, dialog_state: StatePropertyAccessor = None):
+        # pylint: disable=import-outside-toplevel
         if dialog_state is None:
             frame = inspect.currentframe().f_back
             try:
@@ -20,7 +21,6 @@ class DialogSet:
                 except KeyError:
                     raise TypeError("DialogSet(): dialog_state cannot be None.")
                 # Only ComponentDialog can initialize with None dialog_state
-                # pylint: disable=import-outside-toplevel
                 from .component_dialog import ComponentDialog
 
                 if not isinstance(self_obj, ComponentDialog):
@@ -37,7 +37,7 @@ class DialogSet:
 
     def get_version(self) -> str:
         """
-        Gets a unique string which represents the combined versions of all dialogs in this this dialogset.  
+        Gets a unique string which represents the combined versions of all dialogs in this this dialogset.
         <returns>Version will change when any of the child dialogs version changes.</returns>
         """
         if not self._version:
@@ -74,6 +74,7 @@ class DialogSet:
 
     async def create_context(self, turn_context: TurnContext) -> "DialogContext":
         # This import prevents circular dependency issues
+        # pylint: disable=import-outside-toplevel
         from .dialog_context import DialogContext
 
         # pylint: disable=unnecessary-lambda

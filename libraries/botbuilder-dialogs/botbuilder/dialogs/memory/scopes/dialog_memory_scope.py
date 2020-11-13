@@ -8,6 +8,7 @@ from .memory_scope import MemoryScope
 
 class DialogMemoryScope(MemoryScope):
     def __init__(self):
+        # pylint: disable=import-outside-toplevel
         super().__init__(scope_path.DIALOG)
 
         # This import is to avoid circular dependency issues

@@ -78,6 +78,7 @@ class DialogManager:
         :param context: turn context.
         :return:
         """
+        # pylint: disable=too-many-statements
         # Lazy initialize RootDialog so it can refer to assets like LG function templates
         if self._root_dialog_id is None:
             with self._lock:
@@ -121,9 +122,7 @@ class DialogManager:
         # create property accessors
         # DateTime(last_access)
         last_access_property = self.conversation_state.create_property(self.last_access)
-        last_access: datetime = await last_access_property.get(
-            context, lambda: datetime.now()
-        )
+        last_access: datetime = await last_access_property.get(context, datetime.now)
 
         # Check for expired conversation
         if self.expire_after is not None and (
@@ -139,9 +138,7 @@ class DialogManager:
         dialogs_property = self.conversation_state.create_property(
             self._dialog_state_property
         )
-        dialog_state: DialogState = await dialogs_property.get(
-            context, lambda: DialogState()
-        )
+        dialog_state: DialogState = await dialogs_property.get(context, DialogState)
 
         # Create DialogContext
         dialog_context = DialogContext(self.dialogs, context, dialog_state)
@@ -190,7 +187,7 @@ class DialogManager:
             except Exception as err:
                 # fire error event, bubbling from the leaf.
                 handled = await dialog_context.emit_event(
-                    DialogEvents.Error, err, bubble=True, from_leaf=True
+                    DialogEvents.error, err, bubble=True, from_leaf=True
                 )
 
                 if not handled:

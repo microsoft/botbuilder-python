@@ -8,6 +8,8 @@ from .memory_scope import MemoryScope
 
 class DialogContextMemoryScope(MemoryScope):
     def __init__(self):
+        # pylint: disable=invalid-name
+
         super().__init__(scope_path.SETTINGS, include_in_snapshot=False)
         # Stack name.
         self.STACK = "stack"

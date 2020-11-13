@@ -29,7 +29,8 @@ class DialogContainer(Dialog, ABC):
         self, dialog_context: DialogContext, dialog_event: DialogEvent
     ) -> bool:
         """
-        Called when an event has been raised, using `DialogContext.emitEvent()`, by either the current dialog or a dialog that the current dialog started.
+        Called when an event has been raised, using `DialogContext.emitEvent()`, by either the current dialog or a
+         dialog that the current dialog started.
         <param name="dialog_context">The dialog context for the current turn of conversation.</param>
         <param name="e">The event being raised.</param>
         <param name="cancellationToken">The cancellation token.</param>
@@ -40,7 +41,10 @@ class DialogContainer(Dialog, ABC):
         # Trace unhandled "versionChanged" events.
         if not handled and dialog_event.name == DialogEvents.version_changed:
 
-            trace_message = f"Unhandled dialog event: {dialog_event.name}. Active Dialog: {dialog_context.active_dialog.id}"
+            trace_message = (
+                f"Unhandled dialog event: {dialog_event.name}. Active Dialog: "
+                f"{dialog_context.active_dialog.id}"
+            )
 
             # dialog_context.dialogs.telemetry_client.TrackTrace(trace_message, Severity.Warning, null)
 
@@ -58,7 +62,7 @@ class DialogContainer(Dialog, ABC):
         which is then examined via calls to check_for_version_change_async().
         <returns>version which represents the change of the internals of this container.</returns>
         """
-        return self.dialogs.get_internal_version()
+        return self.dialogs.get_version()
 
     async def check_for_version_change_async(self, dialog_context: DialogContext):
         """
@@ -67,7 +71,7 @@ class DialogContainer(Dialog, ABC):
         <returns>task.</returns>
         Checks to see if a containers child dialogs have changed since the current dialog instance
         was started.
-        
+
         This should be called at the start of `beginDialog()`, `continueDialog()`, and `resumeDialog()`.
         """
         current = dialog_context.active_dialog.version

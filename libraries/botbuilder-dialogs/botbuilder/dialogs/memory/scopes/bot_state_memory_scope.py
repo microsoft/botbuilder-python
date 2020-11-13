@@ -17,7 +17,7 @@ class BotStateMemoryScope(MemoryScope):
         if not dialog_context:
             raise TypeError(f"Expecting: DialogContext, but received None")
 
-        bot_state: BotState = BotStateMemoryScope._get_bot_state(dialog_context)
+        bot_state: BotState = self._get_bot_state(dialog_context)
         cached_state = (
             bot_state.get_cached_state(dialog_context.context) if bot_state else None
         )

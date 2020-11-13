@@ -24,9 +24,10 @@ from .component_path_resolvers_base import ComponentPathResolversBase
 from .dialog_path import DialogPath
 from .dialog_state_manager_configuration import DialogStateManagerConfiguration
 
-T = TypeVar("T")  # Declare type variable
+# Declare type variable
+T = TypeVar("T")  # pylint: disable=invalid-name
 
-builtin_types = list(filter(lambda x: not x.startswith("_"), dir(builtins)))
+BUILTIN_TYPES = list(filter(lambda x: not x.startswith("_"), dir(builtins)))
 
 
 # <summary>
@@ -48,8 +49,12 @@ class DialogStateManager:
         :param dialog_context: The dialog context for the current turn of the conversation.
         :param configuration: Configuration for the dialog state manager. Default is None.
         """
+        # pylint: disable=import-outside-toplevel
         # These modules are imported at static level to avoid circular dependency problems
-        from botbuilder.dialogs import DialogsComponentRegistration, ObjectPath
+        from botbuilder.dialogs import (
+            DialogsComponentRegistration,
+            ObjectPath,
+        )
 
         self._object_path_cls = ObjectPath
         self._dialog_component_registration_cls = DialogsComponentRegistration
@@ -150,7 +155,7 @@ class DialogStateManager:
         :param key:
         :return The value stored at key's position:
         """
-        return self.get_value(key, lambda: None)
+        return self.get_value(object, key, default_value=lambda: None)
 
     def __setitem__(self, key, value):
         if self._index_of_any(key, self.SEPARATORS) == -1:
@@ -164,7 +169,10 @@ class DialogStateManager:
             self.set_value(key, value)
 
     def _get_bad_scope_message(self, path: str) -> str:
-        return f"'{path}' does not match memory scopes:[{', '.join((memory_scope.name for memory_scope in self.configuration.memory_scopes))}]"
+        return (
+            f"'{path}' does not match memory scopes:["
+            f"{', '.join((memory_scope.name for memory_scope in self.configuration.memory_scopes))}]"
+        )
 
     @staticmethod
     def _index_of_any(string: str, elements_to_search_for) -> int:
@@ -244,8 +252,8 @@ class DialogStateManager:
         return path
 
     @staticmethod
-    def _is_primitive(cls: Type) -> bool:
-        return cls.__name__ in builtin_types
+    def _is_primitive(type_to_check: Type) -> bool:
+        return type_to_check.__name__ in BUILTIN_TYPES
 
     def try_get_value(
         self, path: str, class_type: Type = object
@@ -279,13 +287,14 @@ class DialogStateManager:
 
             return True, memory
 
-        # TODO: HACK to support .First() retrieval on turn.recognized.entities.foo, replace with Expressions once expression ship
+        # TODO: HACK to support .First() retrieval on turn.recognized.entities.foo, replace with Expressions once
+        #  expressions ship
         first = ".FIRST()"
         i_first = path.upper().rindex(first)
         if i_first >= 0:
             remaining_path = path[i_first + len(first) :]
             path = path[0:i_first]
-            success, first_value = self.try_get_first_nested_value(path, self)
+            success, first_value = self._try_get_first_nested_value(path, self)
             if success:
                 if not remaining_path:
                     return True, first_value
@@ -586,6 +595,8 @@ class DialogStateManager:
         remaining_path: str, memory: object
     ) -> Tuple[bool, object]:
         # These modules are imported at static level to avoid circular dependency problems
+        # pylint: disable=import-outside-toplevel
+
         from botbuilder.dialogs import ObjectPath
 
         array = ObjectPath.try_get_path_value(memory, remaining_path)

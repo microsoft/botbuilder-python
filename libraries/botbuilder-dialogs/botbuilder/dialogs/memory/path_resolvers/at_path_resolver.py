@@ -11,7 +11,7 @@ class AtPathResolver(AliasPathResolver):
     def __init__(self):
         super().__init__(alias="@", prefix="")
 
-        self._PREFIX = "turn.recognized.entities."
+        self._PREFIX = "turn.recognized.entities."  # pylint: disable=invalid-name
 
     def transform_path(self, path: str):
         if not path:
