@@ -25,7 +25,7 @@ class SlackClient(aiounittest.AsyncTestCase):
         # Assert
         self.assertEqual(f"Echo: {echo_guid}", response)
 
-    async def _receive_message_async(self):
+    async def _receive_message_async(self) -> str:
         last_message = ""
         i = 0
 
@@ -42,7 +42,7 @@ class SlackClient(aiounittest.AsyncTestCase):
 
         return last_message
 
-    async def _send_message_async(self, echo_guid: str):
+    async def _send_message_async(self, echo_guid: str) -> None:
         timestamp = str(int(datetime.datetime.utcnow().timestamp()))
         message = self._create_message(echo_guid)
         hub_signature = self._create_hub_signature(message, timestamp)
@@ -55,7 +55,7 @@ class SlackClient(aiounittest.AsyncTestCase):
 
         requests.post(url, headers=headers, data=message)
 
-    def _create_message(self, echo_guid: str):
+    def _create_message(self, echo_guid: str) -> str:
         slack_event = {
             "client_msg_id": "client_msg_id",
             "type": "message",
@@ -75,7 +75,7 @@ class SlackClient(aiounittest.AsyncTestCase):
 
         return json.dumps(message)
 
-    def _create_hub_signature(self, message: str, timestamp: str):
+    def _create_hub_signature(self, message: str, timestamp: str) -> str:
         signature = ["v0", timestamp, message]
         base_string = ":".join(signature)
 
