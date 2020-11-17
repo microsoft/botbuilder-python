@@ -15,7 +15,6 @@ import requests
 class SlackClient(aiounittest.AsyncTestCase):
     async def test_send_and_receive_slack_message(self):
         # Arrange
-        # self._get_environment_vars()
         echo_guid = str(uuid.uuid4())
 
         # Act
