@@ -42,8 +42,6 @@ class EchoBot(ActivityHandler):
                 await turn_context.send_activity("Echo: I received a link share")
 
     def __create_interactive_message(self, file_path: str) -> Attachment:
-        # interactive_message_json = open(file_path).read()
-        # adaptive_card_attachment = json.loads(interactive_message_json, cls=Block)
         with open(file_path, "rb") as in_file:
             adaptive_card_attachment = json.load(in_file)
 

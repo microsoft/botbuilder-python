@@ -48,6 +48,7 @@ variables:
 #  SlackTestBotSlackChannel: define this in Azure
 #  SlackTestBotSlackClientSigningSecret: define this in Azure
 #  SlackTestBotSlackVerificationToken: define this in Azure
+#  DeleteResourceGroup: (optional) define in Azure
 
 steps:
 - powershell: 'gci env:* | sort-object name | Format-Table -AutoSize -Wrap'
