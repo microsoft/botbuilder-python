@@ -28,6 +28,7 @@ BEGIN_MESSAGE.type = "message"
 
 MOCK_TELEMETRY = "botbuilder.applicationinsights.ApplicationInsightsTelemetryClient"
 
+
 class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
     def test_none_telemetry_client(self):
         # arrange
@@ -163,24 +164,22 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
 
         dialog_instance = DialogInstance()
         dialog_instance.id = dialog_id
-        dialog_instance.state = { "instanceId": guid, "stepIndex": index }
+        dialog_instance.state = {"instanceId": guid, "stepIndex": index}
 
         # Act
         await dialog.end_dialog(
             TurnContext(TestAdapter(), Activity()),
             dialog_instance,
-            DialogReason.CancelCalled
+            DialogReason.CancelCalled,
         )
 
         # Assert
         telemetry_props = telemetry_client.track_event.call_args_list[0][0][1]
 
         self.assertEqual(3, len(telemetry_props))
-        self.assertEqual(dialog_id, telemetry_props['DialogId'])
-        self.assertEqual(
-            my_waterfall_step.__qualname__, telemetry_props['StepName']
-        )
-        self.assertEqual(guid, telemetry_props['InstanceId'])
+        self.assertEqual(dialog_id, telemetry_props["DialogId"])
+        self.assertEqual(my_waterfall_step.__qualname__, telemetry_props["StepName"])
+        self.assertEqual(guid, telemetry_props["InstanceId"])
         telemetry_client.track_event.assert_called_once()
 
     def assert_telemetry_call(
