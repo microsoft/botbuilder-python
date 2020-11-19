@@ -22,7 +22,7 @@ class DialogMemoryScope(MemoryScope):
 
         # if active dialog is a container dialog then "dialog" binds to it.
         if dialog_context.active_dialog:
-            dialog = dialog_context.find_dialog(dialog_context.active_dialog.id)
+            dialog = dialog_context.find_dialog_sync(dialog_context.active_dialog.id)
             if isinstance(dialog, self._dialog_container_cls):
                 return dialog_context.active_dialog.state
 
@@ -46,7 +46,7 @@ class DialogMemoryScope(MemoryScope):
 
         # if active dialog is a container dialog then "dialog" binds to it
         if dialog_context.active_dialog:
-            dialog = dialog_context.find_dialog(dialog_context.active_dialog.id)
+            dialog = dialog_context.find_dialog_sync(dialog_context.active_dialog.id)
             if isinstance(dialog, self._dialog_container_cls):
                 dialog_context.active_dialog.state = memory
                 return

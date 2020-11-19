@@ -82,7 +82,7 @@ class DialogContext:
         instance = self.active_dialog
 
         if instance:
-            dialog = self.find_dialog(instance.id)
+            dialog = self.find_dialog_sync(instance.id)
 
             # This import prevents circular dependency issues
             from .dialog_container import DialogContainer
@@ -99,7 +99,7 @@ class DialogContext:
         :param options: (Optional) additional argument(s) to pass to the dialog being started.
         """
         if not dialog_id:
-            raise TypeError("Dialog(): dialogId cannot be None.")
+            raise TypeError("Dialog(): dialog_id cannot be None.")
         # Look up dialog
         dialog = await self.find_dialog(dialog_id)
         if dialog is None:
@@ -263,6 +263,19 @@ class DialogContext:
             dialog = await self.parent.find_dialog(dialog_id)
         return dialog
 
+    def find_dialog_sync(self, dialog_id: str) -> Dialog:
+        """
+        If the dialog cannot be found within the current `DialogSet`, the parent `DialogContext`
+        will be searched if there is one.
+        :param dialog_id: ID of the dialog to search for.
+        :return:
+        """
+        dialog = self.dialogs.find_dialog(dialog_id)
+
+        if dialog is None and self.parent is not None:
+            dialog = self.parent.find_dialog_sync(dialog_id)
+        return dialog
+
     async def replace_dialog(
         self, dialog_id: str, options: object = None
     ) -> DialogTurnResult:
@@ -358,7 +371,7 @@ class DialogContext:
             raise err
 
     def set_exception_context_data(self, exception: Exception) -> Exception:
-        if DialogContext.__class__.__name__ not in str(exception):
+        if DialogContext.__name__ not in str(exception):
             stack = list([])
             current_dc = self
 

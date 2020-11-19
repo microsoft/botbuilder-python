@@ -49,6 +49,8 @@ class DialogManager:
         self._root_dialog_id = ""
         self._dialog_state_property = dialog_state_property or "DialogState"
         self._lock = Lock()
+
+        # Gets or sets root dialog to use to start conversation.
         self.root_dialog = root_dialog
 
         # Gets or sets the ConversationState.
@@ -59,9 +61,6 @@ class DialogManager:
 
         # Gets InitialTurnState collection to copy into the TurnState on every turn.
         self.initial_turn_state = {}
-
-        # Gets or sets root dialog to use to start conversation.
-        self.root_dialog: Dialog = None
 
         # Gets or sets global dialogs that you want to have be callable.
         self.dialogs = DialogSet()
@@ -80,9 +79,9 @@ class DialogManager:
         """
         # pylint: disable=too-many-statements
         # Lazy initialize RootDialog so it can refer to assets like LG function templates
-        if self._root_dialog_id is None:
+        if not self._root_dialog_id:
             with self._lock:
-                if self._root_dialog_id is None:
+                if not self._root_dialog_id:
                     self._root_dialog_id = self.root_dialog.id
                     # self.dialogs = self.root_dialog.telemetry_client
                     self.dialogs.add(self.root_dialog)
@@ -90,12 +89,12 @@ class DialogManager:
         bot_state_set = BotStateSet([])
 
         # Preload TurnState with DM TurnState.
-        for key, val in self.initial_turn_state:
+        for key, val in self.initial_turn_state.items():
             context.turn_state[key] = val
 
         # register DialogManager with TurnState.
-        context.turn_state[DialogManager.__class__.__name__] = self
-        conversation_state_name = ConversationState.__class__.__name__
+        context.turn_state[DialogManager.__name__] = self
+        conversation_state_name = ConversationState.__name__
         if self.conversation_state is None:
             if conversation_state_name not in context.turn_state:
                 raise Exception(
@@ -109,7 +108,7 @@ class DialogManager:
 
         bot_state_set.add(self.conversation_state)
 
-        user_state_name = UserState.__class__.__name__
+        user_state_name = UserState.__name__
         if self.user_state is None:
             self.user_state = context.turn_state.get(user_state_name, None)
         else:
@@ -144,11 +143,11 @@ class DialogManager:
         dialog_context = DialogContext(self.dialogs, context, dialog_state)
 
         # promote initial TurnState into dialog_context.services for contextual services
-        for key, service in dialog_context.services:
+        for key, service in dialog_context.services.items():
             dialog_context.services[key] = service
 
         # map TurnState into root dialog context.services
-        for key, service in context.turn_state:
+        for key, service in context.turn_state.items():
             dialog_context.services[key] = service
 
         # get the DialogStateManager configuration
@@ -283,11 +282,9 @@ class DialogManager:
             if skill_conversation_reference:
                 # If the skill_conversation_reference.OAuthScope is for one of the supported channels, we are at the
                 # root and we should not send an EoC.
-                return (
-                    skill_conversation_reference.oauth_scope
-                    != AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
-                    and skill_conversation_reference.oauth_scope
-                    != GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
+                return skill_conversation_reference.oauth_scope not in (
+                    AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE,
+                    GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE,
                 )
 
             return True

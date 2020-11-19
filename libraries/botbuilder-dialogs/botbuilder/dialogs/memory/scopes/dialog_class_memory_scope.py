@@ -24,7 +24,7 @@ class DialogClassMemoryScope(MemoryScope):
 
         # if active dialog is a container dialog then "dialogclass" binds to it.
         if dialog_context.active_dialog:
-            dialog = dialog_context.find_dialog(dialog_context.active_dialog.id)
+            dialog = dialog_context.find_dialog_sync(dialog_context.active_dialog.id)
             if isinstance(dialog, self._dialog_container_cls):
                 return deepcopy(dialog)
 
@@ -37,7 +37,7 @@ class DialogClassMemoryScope(MemoryScope):
         active_id = (
             dialog_context.active_dialog.id if dialog_context.active_dialog else None
         )
-        return deepcopy(dialog_context.find_dialog(parent_id or active_id))
+        return deepcopy(dialog_context.find_dialog_sync(parent_id or active_id))
 
     def set_memory(self, dialog_context: "DialogContext", memory: object):
         raise Exception(
