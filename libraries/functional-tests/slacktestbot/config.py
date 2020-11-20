@@ -10,12 +10,6 @@ class DefaultConfig:
 
     PORT = 3978
 
-    SLACK_VERIFICATION_TOKEN = os.environ.get(
-        "SlackVerificationToken", ""
-    )
-    SLACK_BOT_TOKEN = os.environ.get(
-        "SlackBotToken", ""
-    )
-    SLACK_CLIENT_SIGNING_SECRET = os.environ.get(
-        "SlackClientSigningSecret", ""
-    )
+    SLACK_VERIFICATION_TOKEN = os.environ.get("SlackVerificationToken", "")
+    SLACK_BOT_TOKEN = os.environ.get("SlackBotToken", "")
+    SLACK_CLIENT_SIGNING_SECRET = os.environ.get("SlackClientSigningSecret", "")
