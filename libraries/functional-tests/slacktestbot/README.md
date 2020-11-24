@@ -55,7 +55,7 @@ We'll need to create a Slack application to connect with the bot.
 
     ![ChannelID](./media/SlackChannelID.png)
 
-    The link will look something like *https://workspace.slack.com/archives/**N074R34L1D***.
+    The link will look something like https://workspace.slack.com/archives/N074R34L1D.
 
     The last segment of the URL represents the channel ID, in this case, **N074R34L1D**.
 
