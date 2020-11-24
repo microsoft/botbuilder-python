@@ -22,6 +22,7 @@ from botbuilder.dialogs import (
     ComponentDialog,
     Dialog,
     DialogContext,
+    DialogEvents,
     DialogInstance,
     DialogReason,
     TextPrompt,
@@ -243,87 +244,109 @@ class DialogManagerTests(aiounittest.AsyncTestCase):
                         "Root bot should not send EndConversation to channel",
                     )
 
-    """
-    it("SkillHandlesEoCFromParent", async () => {
+    async def test_skill_handles_eoc_from_parent(self):
+        SimpleComponentDialog.dm_turn_result = None
         dialog = SimpleComponentDialog()
-        testFlow = createTestFlow(dialog, SkillFlowTestCase.LeafSkill)
-        await testFlow.send("Hi")
-            .assertReply("Hello, what is your name?")
-            .send({ type= ActivityTypes.EndOfConversation })
-            .startTest()
-        strictEqual(_dmTurnResult.turnResult.status, DialogTurnStatus.cancelled)
-    })
+        test_flow = await SimpleComponentDialog.create_test_flow(
+            dialog, SkillFlowTestCase.leaf_skill
+        )
 
-    it("SkillHandlesRepromptFromParent", async () => {
+        step1 = await test_flow.send("Hi")
+        step2 = await step1.assert_reply("Hello, what is your name?")
+        await step2.send(Activity(type=ActivityTypes.end_of_conversation))
+
+        self.assertEqual(
+            SimpleComponentDialog.dm_turn_result.turn_result.status,
+            DialogTurnStatus.Cancelled,
+        )
+
+    async def test_skill_handles_reprompt_from_parent(self):
+        SimpleComponentDialog.dm_turn_result = None
         dialog = SimpleComponentDialog()
-        testFlow = createTestFlow(dialog, SkillFlowTestCase.LeafSkill)
-        await testFlow.send("Hi")
-            .assertReply("Hello, what is your name?")
-            .send({ type= ActivityTypes.Event, name= DialogEvents.repromptDialog })
-            .assertReply("Hello, what is your name?")
-            .startTest()
-        strictEqual(_dmTurnResult.turnResult.status, DialogTurnStatus.waiting)
-    })
+        test_flow = await SimpleComponentDialog.create_test_flow(
+            dialog, SkillFlowTestCase.leaf_skill
+        )
 
-    it("SkillShouldReturnEmptyOnRepromptWithNoDialog", async () => {
+        step1 = await test_flow.send("Hi")
+        step2 = await step1.assert_reply("Hello, what is your name?")
+        step3 = await step2.send(
+            Activity(type=ActivityTypes.event, name=DialogEvents.reprompt_dialog)
+        )
+        await step3.assert_reply("Hello, what is your name?")
+
+        self.assertEqual(
+            SimpleComponentDialog.dm_turn_result.turn_result.status,
+            DialogTurnStatus.Waiting,
+        )
+
+    async def test_skill_should_return_empty_on_reprompt_with_no_dialog(self):
+        SimpleComponentDialog.dm_turn_result = None
         dialog = SimpleComponentDialog()
-        testFlow = createTestFlow(dialog, SkillFlowTestCase.LeafSkill)
-        await testFlow.send({ type= ActivityTypes.Event, name= DialogEvents.repromptDialog })
-            .startTest()
-        strictEqual(_dmTurnResult.turnResult.status, DialogTurnStatus.empty)
-    })
+        test_flow = await SimpleComponentDialog.create_test_flow(
+            dialog, SkillFlowTestCase.leaf_skill
+        )
 
-    it("Trace skill state", async () => {
+        await test_flow.send(
+            Activity(type=ActivityTypes.event, name=DialogEvents.reprompt_dialog)
+        )
+
+        self.assertEqual(
+            SimpleComponentDialog.dm_turn_result.turn_result.status,
+            DialogTurnStatus.Empty,
+        )
+
+    async def test_trace_skill_state(self):
+        SimpleComponentDialog.dm_turn_result = None
         dialog = SimpleComponentDialog()
-        testFlow = createTestFlow(dialog, SkillFlowTestCase.LeafSkill, True)
-        await testFlow.send("Hi")
-            .assertReply(reply => {
-                strictEqual(reply.type, ActivityTypes.Trace)
-            })
-            .assertReply("Hello, what is your name?")
-            .assertReply(reply => {
-                strictEqual(reply.type, ActivityTypes.Trace)
-                strictEqual(reply.label, "Skill State")
-            })
-            .send("SomeName")
-            .assertReply("Hello SomeName, nice to meet you!")
-            .assertReply(reply => {
-                strictEqual(reply.type, ActivityTypes.Trace)
-                strictEqual(reply.label, "Skill State")
-            })
-            .assertReply(reply => {
-                strictEqual(reply.type, ActivityTypes.Trace)
-            })
-            .startTest()
-        strictEqual(_dmTurnResult.turnResult.status, DialogTurnStatus.complete)
-    })
 
-    it("Trace bot state", async () => {
+        def assert_is_trace(activity, description):  # pylint: disable=unused-argument
+            assert activity.type == ActivityTypes.trace
+
+        def assert_is_trace_and_label(activity, description):
+            assert_is_trace(activity, description)
+            assert activity.label == "Skill State"
+
+        test_flow = await SimpleComponentDialog.create_test_flow(
+            dialog, SkillFlowTestCase.leaf_skill, True
+        )
+
+        step1 = await test_flow.send("Hi")
+        step2 = await step1.assert_reply(assert_is_trace)
+        step2 = await step2.assert_reply("Hello, what is your name?")
+        step3 = await step2.assert_reply(assert_is_trace_and_label)
+        step4 = await step3.send("SomeName")
+        step5 = await step4.assert_reply("Hello SomeName, nice to meet you!")
+        step6 = await step5.assert_reply(assert_is_trace_and_label)
+        await step6.assert_reply(assert_is_trace)
+
+        self.assertEqual(
+            SimpleComponentDialog.dm_turn_result.turn_result.status,
+            DialogTurnStatus.Complete,
+        )
+
+    async def test_trace_bot_state(self):
+        SimpleComponentDialog.dm_turn_result = None
         dialog = SimpleComponentDialog()
-        testFlow = createTestFlow(dialog, SkillFlowTestCase.RootBotOnly, True)
-        await testFlow.send("Hi")
-            .assertReply("Hello, what is your name?")
-            .assertReply(reply => {
-                strictEqual(reply.type, ActivityTypes.Trace)
-                strictEqual(reply.label, "Bot State")
-            })
-            .send("SomeName")
-            .assertReply("Hello SomeName, nice to meet you!")
-            .assertReply(reply => {
-                strictEqual(reply.type, ActivityTypes.Trace)
-                strictEqual(reply.label, "Bot State")
-            })
-            .startTest()
-        strictEqual(_dmTurnResult.turnResult.status, DialogTurnStatus.complete)
-    })
 
-    it("Gets or sets root dialog", () => {
-        dialog_manager = DialogManager()
-        rootDialog = SimpleComponentDialog()
-        dialog_manager.rootDialog = rootDialog
-        assert(dialog_manager.dialogs.find(rootDialog.id))
-        strictEqual(dialog_manager.rootDialog.id, rootDialog.id)
-        dialog_manager.rootDialog = undefined
-        strictEqual(dialog_manager.rootDialog, undefined)
-    })
-    """
+        def assert_is_trace(activity, description):  # pylint: disable=unused-argument
+            assert activity.type == ActivityTypes.trace
+
+        def assert_is_trace_and_label(activity, description):
+            assert_is_trace(activity, description)
+            assert activity.label == "Bot State"
+
+        test_flow = await SimpleComponentDialog.create_test_flow(
+            dialog, SkillFlowTestCase.root_bot_only, True
+        )
+
+        step1 = await test_flow.send("Hi")
+        step2 = await step1.assert_reply("Hello, what is your name?")
+        step3 = await step2.assert_reply(assert_is_trace_and_label)
+        step4 = await step3.send("SomeName")
+        step5 = await step4.assert_reply("Hello SomeName, nice to meet you!")
+        await step5.assert_reply(assert_is_trace_and_label)
+
+        self.assertEqual(
+            SimpleComponentDialog.dm_turn_result.turn_result.status,
+            DialogTurnStatus.Complete,
+        )
