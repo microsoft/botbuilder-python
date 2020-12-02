@@ -1,7 +1,4 @@
-"""CosmosDB Middleware for Python Bot Framework.
-
-This is middleware to store items in CosmosDB.
-Part of the Azure Bot Framework in Python.
+"""Implements a CosmosDB based storage provider using partitioning for a bot.
 """
 
 # Copyright (c) Microsoft Corporation. All rights reserved.
@@ -67,7 +64,7 @@ class CosmosDbPartitionedConfig:
 
 
 class CosmosDbPartitionedStorage(Storage):
-    """The class for partitioned CosmosDB middleware for the Azure Bot Framework."""
+    """A CosmosDB based storage provider using partitioning for a bot."""
 
     def __init__(self, config: CosmosDbPartitionedConfig):
         """Create the storage object.
