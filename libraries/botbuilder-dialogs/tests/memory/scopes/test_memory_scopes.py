@@ -19,8 +19,9 @@ from botbuilder.dialogs import (
     DialogInstance,
     DialogSet,
     DialogState,
+    ObjectPath,
 )
-from botbuilder.dialogs.memory.scopes import ClassMemoryScope
+from botbuilder.dialogs.memory.scopes import ClassMemoryScope, ConversationMemoryScope
 from botbuilder.schema import (
     Activity,
     ActivityTypes,
@@ -171,8 +172,39 @@ class MemoryScopesTests(aiounittest.AsyncTestCase):
         await scope.save_changes(dialog_context)
         self.assertEqual("test message", dialog.message)
 
+    async def test_conversation_memory_scope_should_return_conversation_state(self):
+        # Create ConversationState with MemoryStorage and register the state as middleware.
+        conversation_state = ConversationState(MemoryStorage())
+
+        # Create a DialogState property, DialogSet and register the dialogs.
+        dialog_state = conversation_state.create_property("dialogs")
+        dialogs = DialogSet(dialog_state)
+        dialog = TestDialog("test", "test message")
+        dialogs.add(dialog)
+
+        # Create test context
+        context = TurnContext(TestAdapter(), MemoryScopesTests.begin_message)
+        context.turn_state["ConversationState"] = conversation_state
+
+        dialog_context = await dialogs.create_context(context)
+
+        # Initialize conversation state
+        foo_cls = namedtuple("TestObject", "foo")
+        conversation_prop = conversation_state.create_property("conversation")
+        await conversation_prop.set(context, foo_cls(foo="bar"))
+        await conversation_state.save_changes(context)
+
+        # Run test
+        scope = ConversationMemoryScope()
+        memory = scope.get_memory(dialog_context)
+        self.assertTrue(memory, "memory not returned")
+
+        # TODO: Make get_path_value take conversation.foo
+        test_obj = ObjectPath.get_path_value(memory, "conversation")
+        self.assertEqual("bar", test_obj.foo)
+
     """
-    it("ConversationMemoryScope should return conversation state.", async function():
+    async def test_conversation_memory_scope_should_return_conversation_state(self):
         # Create ConversationState with MemoryStorage and register the state as middleware.
         conversation_state = ConversationState(MemoryStorage())
 
@@ -196,7 +228,6 @@ class MemoryScopesTests(aiounittest.AsyncTestCase):
         memory = scope.get_memory(dialog_context)
         self.assertEqual(typeof memory, "object", "state not returned")
         self.assertEqual(memory.conversation.foo, "bar")
-    })
 
     it("UserMemoryScope should not return state if not loaded.", async function():
         # Initialize user state
