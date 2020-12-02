@@ -1,7 +1,4 @@
-"""CosmosDB Middleware for Python Bot Framework.
-
-This is middleware to store items in CosmosDB.
-Part of the Azure Bot Framework in Python.
+"""Implements a CosmosDB based storage provider.
 """
 
 # Copyright (c) Microsoft Corporation. All rights reserved.
@@ -100,7 +97,7 @@ class CosmosDbKeyEscape:
 
 
 class CosmosDbStorage(Storage):
-    """The class for CosmosDB middleware for the Azure Bot Framework."""
+    """A CosmosDB based storage provider for a bot."""
 
     def __init__(
         self, config: CosmosDbConfig, client: cosmos_client.CosmosClient = None
