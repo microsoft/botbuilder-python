@@ -1,0 +1,36 @@
+trigger: none # no ci trigger
+
+pr: none # no pr trigger
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: AzurePowerShell@5
+  displayName: 'Create container'
+  inputs:
+    azureSubscription: 'FUSE Temporary (174c5021-8109-4087-a3e2-a1de20420569)'
+    ScriptType: 'InlineScript'
+    Inline: |
+      Set-PSDebug -Trace 1;
+      Write-Host 'blah';
+      Write-Host 'az group create --name NightlyPythonFunctionalTestContainerRegistryRG --location eastus'
+      az group create --name NightlyPythonFunctionalTestContainerRegistryRG --location eastus
+      Write-Host 'az acr create --resource-group NightlyPythonFunctionalTestContainerRegistryRG --name NightlyPythonFunctionalTestContainerRegistry --sku Basic'
+      az acr create --resource-group NightlyPythonFunctionalTestContainerRegistryRG --name NightlyPythonFunctionalTestContainerRegistry --sku Basic
+      az acr login --name NightlyPythonFunctionalTestContainerRegistry
+      docker pull hello-world
+      docker tag hello-world nightlypythonfunctionaltestcontainerregistry.azurecr.io/hello-world:v1
+      docker push nightlypythonfunctionaltestcontainerregistry.azurecr.io/hello-world:v1
+      docker rmi nightlypythonfunctionaltestcontainerregistry.azurecr.io/hello-world:v1
+      az acr repository list --name NightlyPythonFunctionalTestContainerRegistry --output table
+      az acr repository show-tags --name NightlyPythonFunctionalTestContainerRegistry --repository hello-world --output table
+    azurePowerShellVersion: 'LatestVersion'
+
+- script: echo Hello, world!
+  displayName: 'Run a one-line script'
+
+- script: |
+    echo Add other tasks to build, test, and deploy your project.
+    echo See https://aka.ms/yaml
+  displayName: 'Run a multi-line script'

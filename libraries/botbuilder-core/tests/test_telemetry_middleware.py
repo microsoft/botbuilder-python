@@ -7,11 +7,14 @@ import uuid
 from typing import Dict
 from unittest.mock import Mock
 import aiounittest
+from botframework.connector import Channels
+
 from botbuilder.core import (
     NullTelemetryClient,
     TelemetryLoggerMiddleware,
     TelemetryLoggerConstants,
     TurnContext,
+    MessageFactory,
 )
 from botbuilder.core.adapters import TestAdapter, TestFlow
 from botbuilder.schema import (
@@ -19,7 +22,9 @@ from botbuilder.schema import (
     ActivityTypes,
     ChannelAccount,
     ConversationAccount,
+    ConversationReference,
 )
+from botbuilder.schema.teams import TeamInfo, TeamsChannelData, TenantInfo
 
 
 class TestTelemetryMiddleware(aiounittest.AsyncTestCase):
@@ -226,6 +231,47 @@ class TestTelemetryMiddleware(aiounittest.AsyncTestCase):
                 },
             ),
         ]
+        self.assert_telemetry_calls(telemetry, telemetry_call_expected)
+
+    async def test_log_teams(self):
+        telemetry = Mock()
+        my_logger = TelemetryLoggerMiddleware(telemetry, True)
+
+        adapter = TestAdapter(
+            template_or_conversation=ConversationReference(channel_id=Channels.ms_teams)
+        )
+        adapter.use(my_logger)
+
+        team_info = TeamInfo(id="teamId", name="teamName",)
+
+        channel_data = TeamsChannelData(
+            team=team_info, tenant=TenantInfo(id="tenantId"),
+        )
+
+        activity = MessageFactory.text("test")
+        activity.channel_data = channel_data
+        activity.from_property = ChannelAccount(
+            id="userId", name="userName", aad_object_id="aaId",
+        )
+
+        test_flow = TestFlow(None, adapter)
+        await test_flow.send(activity)
+
+        telemetry_call_expected = [
+            (
+                TelemetryLoggerConstants.BOT_MSG_RECEIVE_EVENT,
+                {
+                    "text": "test",
+                    "fromId": "userId",
+                    "recipientId": "bot",
+                    "recipientName": "Bot",
+                    "TeamsTenantId": TenantInfo(id="tenantId"),
+                    "TeamsUserAadObjectId": "aaId",
+                    "TeamsTeamInfo": TeamInfo.serialize(team_info),
+                },
+            ),
+        ]
+
         self.assert_telemetry_calls(telemetry, telemetry_call_expected)
 
     def create_reply(self, activity, text, locale=None):

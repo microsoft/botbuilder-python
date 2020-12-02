@@ -32,6 +32,8 @@ class SkillValidation:
             "https://login.microsoftonline.com/f8cdef31-a31e-4b4a-93e4-5f571e91255a/v2.0",  # Auth v3.2, 2.0 token
             "https://sts.windows.net/cab8a31a-1906-4287-a0d8-4eef66b95f6e/",  # Auth for US Gov, 1.0 token
             "https://login.microsoftonline.us/cab8a31a-1906-4287-a0d8-4eef66b95f6e/v2.0",  # Auth for US Gov, 2.0 token
+            "https://login.microsoftonline.us/f8cdef31-a31e-4b4a-93e4-5f571e91255a/",  # Auth for US Gov, 1.0 token
+            "https://login.microsoftonline.us/f8cdef31-a31e-4b4a-93e4-5f571e91255a/v2.0",  # Auth for US Gov, 2.0 token
         ],
         audience=None,
         clock_tolerance=timedelta(minutes=5),
@@ -65,6 +67,12 @@ class SkillValidation:
         """
         if AuthenticationConstants.VERSION_CLAIM not in claims:
             return False
+
+        if (
+            claims.get(AuthenticationConstants.APP_ID_CLAIM, None)
+            == AuthenticationConstants.ANONYMOUS_SKILL_APP_ID
+        ):
+            return True
 
         audience = claims.get(AuthenticationConstants.AUDIENCE_CLAIM)
 
@@ -123,6 +131,20 @@ class SkillValidation:
         await SkillValidation._validate_identity(identity, credentials)
 
         return identity
+
+    @staticmethod
+    def create_anonymous_skill_claim():
+        """
+        Creates a ClaimsIdentity for an anonymous (unauthenticated) skill.
+        :return ClaimsIdentity:
+        """
+        return ClaimsIdentity(
+            {
+                AuthenticationConstants.APP_ID_CLAIM: AuthenticationConstants.ANONYMOUS_SKILL_APP_ID
+            },
+            True,
+            AuthenticationConstants.ANONYMOUS_AUTH_TYPE,
+        )
 
     @staticmethod
     async def _validate_identity(

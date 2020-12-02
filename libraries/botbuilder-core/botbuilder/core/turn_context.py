@@ -18,6 +18,10 @@ from .re_escape import escape
 
 
 class TurnContext:
+
+    # Same constant as in the BF Adapter, duplicating here to avoid circular dependency
+    _INVOKE_RESPONSE_KEY = "BotFrameworkAdapter.InvokeResponse"
+
     def __init__(self, adapter_or_context, request: Activity = None):
         """
         Creates a new TurnContext instance.
@@ -202,6 +206,11 @@ class TurnContext:
                 responses = []
                 for activity in output:
                     self.buffered_reply_activities.append(activity)
+                    # Ensure the TurnState has the InvokeResponseKey, since this activity
+                    # is not being sent through the adapter, where it would be added to TurnState.
+                    if activity.type == ActivityTypes.invoke_response:
+                        self.turn_state[TurnContext._INVOKE_RESPONSE_KEY] = activity
+
                     responses.append(ResourceResponse())
 
                 if sent_non_trace_activity:

@@ -13,6 +13,12 @@ from uuid import uuid4
 from typing import Awaitable, Coroutine, Dict, List, Callable, Union
 from copy import copy
 from threading import Lock
+from botframework.connector.auth import AppCredentials, ClaimsIdentity
+from botframework.connector.token_api.models import (
+    SignInUrlResponse,
+    TokenExchangeResource,
+    TokenExchangeRequest,
+)
 from botbuilder.schema import (
     ActivityTypes,
     Activity,
@@ -21,12 +27,6 @@ from botbuilder.schema import (
     ChannelAccount,
     ResourceResponse,
     TokenResponse,
-)
-from botframework.connector.auth import AppCredentials, ClaimsIdentity
-from botframework.connector.token_api.models import (
-    SignInUrlResponse,
-    TokenExchangeResource,
-    TokenExchangeRequest,
 )
 from ..bot_adapter import BotAdapter
 from ..turn_context import TurnContext
@@ -153,7 +153,7 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
             self._conversation_lock.release()
 
         activity.timestamp = activity.timestamp or datetime.utcnow()
-        await self.run_pipeline(TurnContext(self, activity), logic)
+        await self.run_pipeline(self.create_turn_context(activity), logic)
 
     async def send_activities(
         self, context, activities: List[Activity]
@@ -225,9 +225,10 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
             type=ActivityTypes.conversation_update,
             members_added=[],
             members_removed=[],
+            channel_id=channel_id,
             conversation=ConversationAccount(id=str(uuid.uuid4())),
         )
-        context = TurnContext(self, update)
+        context = self.create_turn_context(update)
         return await callback(context)
 
     async def receive_activity(self, activity):
@@ -252,7 +253,7 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
             request.id = str(self._next_id)
 
         # Create context object and run middleware.
-        context = TurnContext(self, request)
+        context = self.create_turn_context(request)
         return await self.run_pipeline(context, self.logic)
 
     def get_next_activity(self) -> Activity:
@@ -534,6 +535,9 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
 
         return None
 
+    def create_turn_context(self, activity: Activity) -> TurnContext:
+        return TurnContext(self, activity)
+
 
 class TestFlow:
     __test__ = False
@@ -595,6 +599,7 @@ class TestFlow:
         :param is_substring:
         :return:
         """
+
         # TODO: refactor method so expected can take a Callable[[Activity], None]
         def default_inspector(reply, description=None):
             if isinstance(expected, Activity):
@@ -646,6 +651,45 @@ class TestFlow:
                 else:
                     await asyncio.sleep(0.05)
                     await wait_for_activity()
+
+            await wait_for_activity()
+
+        return TestFlow(await test_flow_previous(), self.adapter)
+
+    async def assert_no_reply(
+        self, description=None, timeout=None,  # pylint: disable=unused-argument
+    ) -> "TestFlow":
+        """
+        Generates an assertion if the bot responds when no response is expected.
+        :param description:
+        :param timeout:
+        """
+        if description is None:
+            description = ""
+
+        async def test_flow_previous():
+            nonlocal timeout
+            if not timeout:
+                timeout = 3000
+            start = datetime.now()
+            adapter = self.adapter
+
+            async def wait_for_activity():
+                nonlocal timeout
+                current = datetime.now()
+
+                if (current - start).total_seconds() * 1000 > timeout:
+                    # operation timed out and recieved no reply
+                    return
+
+                if adapter.activity_buffer:
+                    reply = adapter.activity_buffer.pop(0)
+                    raise RuntimeError(
+                        f"TestAdapter.assert_no_reply(): '{reply.text}' is responded when waiting for no reply."
+                    )
+
+                await asyncio.sleep(0.05)
+                await wait_for_activity()
 
             await wait_for_activity()
 

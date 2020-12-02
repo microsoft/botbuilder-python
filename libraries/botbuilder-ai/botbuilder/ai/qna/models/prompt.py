@@ -15,7 +15,7 @@ class Prompt(Model):
     }
 
     def __init__(self, **kwargs):
-        super(Prompt, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.display_order = kwargs.get("display_order", None)
         self.qna_id = kwargs.get("qna_id", None)
         self.display_text = kwargs.get("display_text", None)

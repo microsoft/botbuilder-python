@@ -104,7 +104,11 @@ class AppCredentials(Authentication):
     def _should_authorize(
         self, session: requests.Session  # pylint: disable=unused-argument
     ) -> bool:
-        return True
+        # We don't set the token if the AppId is not set, since it means that we are in an un-authenticated scenario.
+        return (
+            self.microsoft_app_id != AuthenticationConstants.ANONYMOUS_SKILL_APP_ID
+            and self.microsoft_app_id is not None
+        )
 
     def get_access_token(self, force_refresh: bool = False) -> str:
         """

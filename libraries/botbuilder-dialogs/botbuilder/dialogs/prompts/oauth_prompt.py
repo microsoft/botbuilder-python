@@ -203,13 +203,17 @@ class OAuthPrompt(Dialog):
             The prompt generally continues to receive the user's replies until it accepts the
             user's reply as valid input for the prompt.
         """
-        # Recognize token
-        recognized = await self._recognize_token(dialog_context)
-
         # Check for timeout
         state = dialog_context.active_dialog.state
         is_message = dialog_context.context.activity.type == ActivityTypes.message
-        has_timed_out = is_message and (
+        is_timeout_activity_type = (
+            is_message
+            or OAuthPrompt._is_token_response_event(dialog_context.context)
+            or OAuthPrompt._is_teams_verification_invoke(dialog_context.context)
+            or OAuthPrompt._is_token_exchange_request_invoke(dialog_context.context)
+        )
+
+        has_timed_out = is_timeout_activity_type and (
             datetime.now() > state[OAuthPrompt.PERSISTED_EXPIRES]
         )
 
@@ -220,6 +224,9 @@ class OAuthPrompt(Dialog):
             state["state"]["attemptCount"] = 1
         else:
             state["state"]["attemptCount"] += 1
+
+        # Recognize token
+        recognized = await self._recognize_token(dialog_context)
 
         # Validate the return value
         is_valid = False
@@ -238,6 +245,9 @@ class OAuthPrompt(Dialog):
         # Return recognized value or re-prompt
         if is_valid:
             return await dialog_context.end_dialog(recognized.value)
+        if is_message and self._settings.end_on_invalid_message:
+            # If EndOnInvalidMessage is set, complete the prompt with no result.
+            return await dialog_context.end_dialog(None)
 
         # Send retry prompt
         if (
@@ -362,7 +372,9 @@ class OAuthPrompt(Dialog):
                 ):
                     if context.activity.channel_id == Channels.emulator:
                         card_action_type = ActionTypes.open_url
-                else:
+                elif not OAuthPrompt._channel_requires_sign_in_link(
+                    context.activity.channel_id
+                ):
                     link = None
 
                 json_token_ex_resource = (
@@ -546,7 +558,7 @@ class OAuthPrompt(Dialog):
                 if not token_exchange_response or not token_exchange_response.token:
                     await context.send_activity(
                         self._get_token_exchange_invoke_response(
-                            int(HTTPStatus.CONFLICT),
+                            int(HTTPStatus.PRECONDITION_FAILED),
                             "The bot is unable to exchange token. Proceed with regular login.",
                         )
                     )
@@ -609,7 +621,6 @@ class OAuthPrompt(Dialog):
     @staticmethod
     def _channel_suppports_oauth_card(channel_id: str) -> bool:
         if channel_id in [
-            Channels.ms_teams,
             Channels.cortana,
             Channels.skype,
             Channels.skype_for_business,
@@ -617,6 +628,13 @@ class OAuthPrompt(Dialog):
             return False
 
         return True
+
+    @staticmethod
+    def _channel_requires_sign_in_link(channel_id: str) -> bool:
+        if channel_id in [Channels.ms_teams]:
+            return True
+
+        return False
 
     @staticmethod
     def _is_token_exchange_request_invoke(context: TurnContext) -> bool:

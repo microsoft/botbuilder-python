@@ -5,6 +5,7 @@
 class TelemetryConstants:
     """Telemetry logger property names."""
 
+    ATTACHMENTS_PROPERTY: str = "attachments"
     CHANNEL_ID_PROPERTY: str = "channelId"
     CONVERSATION_ID_PROPERTY: str = "conversationId"
     CONVERSATION_NAME_PROPERTY: str = "conversationName"

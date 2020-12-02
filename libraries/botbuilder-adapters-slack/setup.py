@@ -8,6 +8,8 @@ REQUIRES = [
     "botbuilder-schema==4.10.0",
     "botframework-connector==4.10.0",
     "botbuilder-core==4.10.0",
+    "pyslack",
+    "slackclient",
 ]
 
 TEST_REQUIRES = ["aiounittest==1.3.0"]
@@ -32,7 +34,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/x-rst",
     license=package_info["__license__"],
-    packages=["botbuilder.adapters", "botbuilder.adapters.slack",],
+    packages=["botbuilder.adapters.slack"],
     install_requires=REQUIRES + TEST_REQUIRES,
     tests_require=TEST_REQUIRES,
     include_package_data=True,

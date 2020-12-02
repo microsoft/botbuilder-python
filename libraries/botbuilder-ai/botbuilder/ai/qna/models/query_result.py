@@ -18,7 +18,7 @@ class QueryResult(Model):
     }
 
     def __init__(self, **kwargs):
-        super(QueryResult, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.questions = kwargs.get("questions", None)
         self.answer = kwargs.get("answer", None)
         self.score = kwargs.get("score", None)

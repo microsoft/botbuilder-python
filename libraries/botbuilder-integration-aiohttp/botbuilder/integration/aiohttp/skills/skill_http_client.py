@@ -50,7 +50,7 @@ class SkillHttpClient(BotFrameworkHttpClient):
             originating_audience = (
                 GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
                 if self._channel_provider is not None
-                and self._channel_provider.IsGovernment()
+                and self._channel_provider.is_government()
                 else AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
             )
 

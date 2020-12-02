@@ -26,6 +26,6 @@ class QnAResponseContext(Model):
 
         """
 
-        super(QnAResponseContext, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.is_context_only = kwargs.get("is_context_only", None)
         self.prompts = kwargs.get("prompts", None)

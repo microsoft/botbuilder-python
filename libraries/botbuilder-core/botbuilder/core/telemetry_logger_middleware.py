@@ -1,9 +1,11 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 """Middleware Component for logging Activity messages."""
-
 from typing import Awaitable, Callable, List, Dict
 from botbuilder.schema import Activity, ConversationReference, ActivityTypes
+from botbuilder.schema.teams import TeamsChannelData, TeamInfo
+from botframework.connector import Channels
+
 from .bot_telemetry_client import BotTelemetryClient
 from .bot_assert import BotAssert
 from .middleware_set import Middleware
@@ -183,6 +185,10 @@ class TelemetryLoggerMiddleware(Middleware):
             if activity.speak and activity.speak.strip():
                 properties[TelemetryConstants.SPEAK_PROPERTY] = activity.speak
 
+        TelemetryLoggerMiddleware.__populate_additional_channel_properties(
+            activity, properties
+        )
+
         # Additional properties can override "stock" properties
         if additional_properties:
             for prop in additional_properties:
@@ -211,6 +217,10 @@ class TelemetryLoggerMiddleware(Middleware):
 
         # Use the LogPersonalInformation flag to toggle logging PII data, text and user name are common examples
         if self.log_personal_information:
+            if activity.attachments and activity.attachments.strip():
+                properties[
+                    TelemetryConstants.ATTACHMENTS_PROPERTY
+                ] = activity.attachments
             if activity.from_property.name and activity.from_property.name.strip():
                 properties[
                     TelemetryConstants.FROM_NAME_PROPERTY
@@ -284,3 +294,25 @@ class TelemetryLoggerMiddleware(Middleware):
                 properties[prop.key] = prop.value
 
         return properties
+
+    @staticmethod
+    def __populate_additional_channel_properties(
+        activity: Activity, properties: dict,
+    ):
+        if activity.channel_id == Channels.ms_teams:
+            teams_channel_data: TeamsChannelData = activity.channel_data
+
+            properties["TeamsTenantId"] = (
+                teams_channel_data.tenant
+                if teams_channel_data and teams_channel_data.tenant
+                else ""
+            )
+
+            properties["TeamsUserAadObjectId"] = (
+                activity.from_property.aad_object_id if activity.from_property else ""
+            )
+
+            if teams_channel_data and teams_channel_data.team:
+                properties["TeamsTeamInfo"] = TeamInfo.serialize(
+                    teams_channel_data.team
+                )

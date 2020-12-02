@@ -1,7 +1,9 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+import base64
 import json
 from abc import ABC, abstractmethod
+from _sha256 import sha256
 
 
 class TelemetryProcessor(ABC):
@@ -11,8 +13,9 @@ class TelemetryProcessor(ABC):
     def activity_json(self) -> json:
         """Retrieve the request body as json (Activity)."""
         body_text = self.get_request_body()
-        body = json.loads(body_text) if body_text is not None else None
-        return body
+        if body_text:
+            return body_text if isinstance(body_text, dict) else json.loads(body_text)
+        return None
 
     @abstractmethod
     def can_process(self) -> bool:
@@ -67,15 +70,34 @@ class TelemetryProcessor(ABC):
         conversation = (
             post_data["conversation"] if "conversation" in post_data else None
         )
-        conversation_id = conversation["id"] if "id" in conversation else None
-        context.user.id = channel_id + user_id
-        context.session.id = conversation_id
 
-        # Additional bot-specific properties
+        session_id = ""
+        if "id" in conversation:
+            conversation_id = conversation["id"]
+            session_id = base64.b64encode(
+                sha256(conversation_id.encode("utf-8")).digest()
+            ).decode()
+
+        # Set the user id on the Application Insights telemetry item.
+        context.user.id = channel_id + user_id
+
+        # Set the session id on the Application Insights telemetry item.
+        # Hashed ID is used due to max session ID length for App Insights session Id
+        context.session.id = session_id
+
+        # Set the activity id:
+        # https://github.com/Microsoft/botframework-obi/blob/master/botframework-activity/botframework-activity.md#id
         if "id" in post_data:
             data.properties["activityId"] = post_data["id"]
+
+        # Set the channel id:
+        # https://github.com/Microsoft/botframework-obi/blob/master/botframework-activity/botframework-activity.md#channel-id
         if "channelId" in post_data:
             data.properties["channelId"] = post_data["channelId"]
+
+        # Set the activity type:
+        # https://github.com/Microsoft/botframework-obi/blob/master/botframework-activity/botframework-activity.md#type
         if "type" in post_data:
             data.properties["activityType"] = post_data["type"]
+
         return True
