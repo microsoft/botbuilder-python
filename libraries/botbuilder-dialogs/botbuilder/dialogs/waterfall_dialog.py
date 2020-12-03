@@ -164,7 +164,7 @@ class WaterfallDialog(Dialog):
         """
         step_name = self._steps[index].__qualname__
 
-        if not step_name or ">" in step_name:
+        if not step_name or step_name.endswith("<lambda>"):
             step_name = f"Step{index + 1}of{len(self._steps)}"
 
         return step_name
