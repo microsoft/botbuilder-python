@@ -44,18 +44,25 @@ class DialogMemoryScope(MemoryScope):
         if not memory:
             raise TypeError(f"Expecting: memory object, but received None")
 
-        # if active dialog is a container dialog then "dialog" binds to it
-        if dialog_context.active_dialog:
+        # If active dialog is a container dialog then "dialog" binds to it.
+        # Otherwise the "dialog" will bind to the dialogs parent assuming it
+        # is a container.
+        parent = dialog_context
+        if not self.is_container(parent) and self.is_container(parent.parent):
+            parent = parent.parent
+
+        # If there's no active dialog then throw an error.
+        if not parent.active_dialog:
+            raise Exception(
+                "Cannot set DialogMemoryScope. There is no active dialog dialog or parent dialog in the context"
+            )
+
+        parent.active_dialog.state = memory
+
+    def is_container(self, dialog_context: "DialogContext"):
+        if dialog_context and dialog_context.active_dialog:
             dialog = dialog_context.find_dialog_sync(dialog_context.active_dialog.id)
             if isinstance(dialog, self._dialog_container_cls):
-                dialog_context.active_dialog.state = memory
-                return
-        elif dialog_context.parent and dialog_context.parent.active_dialog:
-            dialog_context.parent.active_dialog.state = memory
-            return
-        elif dialog_context.active_dialog:
-            dialog_context.active_dialog.state = memory
+                return True
 
-        raise Exception(
-            "Cannot set DialogMemoryScope. There is no active dialog dialog or parent dialog in the context"
-        )
+        return False
