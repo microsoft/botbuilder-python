@@ -17,6 +17,7 @@ import aiounittest
 from botbuilder.ai.qna import QnAMakerEndpoint, QnAMaker, QnAMakerOptions
 from botbuilder.ai.qna.models import (
     FeedbackRecord,
+    JoinOperator,
     Metadata,
     QueryResult,
     QnARequestContext,
@@ -166,6 +167,96 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         self.assertIsNotNone(result)
         self.assertEqual(1, len(result.answers))
         self.assertFalse(result.active_learning_enabled)
+
+    async def test_returns_answer_with_strict_filters_with_or_operator(self):
+        # Arrange
+        question: str = "Where can you find"
+        response_path: str = "RetrunsAnswer_WithStrictFilter_Or_Operator.json"
+        response_json = QnaApplicationTest._get_json_for_file(response_path)
+
+        strict_filters = [
+            Metadata(name="species", value="human"),
+            Metadata(name="type", value="water"),
+        ]
+        options = QnAMakerOptions(
+            top=5,
+            strict_filters=strict_filters,
+            strict_filters_join_operator=JoinOperator.OR,
+        )
+        qna = QnAMaker(endpoint=QnaApplicationTest.tests_endpoint)
+        context = QnaApplicationTest._get_context(question, TestAdapter())
+
+        # Act
+        with patch(
+            "aiohttp.ClientSession.post",
+            return_value=aiounittest.futurized(response_json),
+        ) as mock_http_client:
+            result = await qna.get_answers_raw(context, options)
+
+            serialized_http_req_args = mock_http_client.call_args[1]["data"]
+            req_args = json.loads(serialized_http_req_args)
+
+            # Assert
+            self.assertIsNotNone(result)
+            self.assertEqual(3, len(result.answers))
+            self.assertEqual(
+                JoinOperator.OR, req_args["strictFiltersCompoundOperationType"]
+            )
+
+            req_args_strict_filters = req_args["strictFilters"]
+
+            first_filter = strict_filters[0]
+            self.assertEqual(first_filter.name, req_args_strict_filters[0]["name"])
+            self.assertEqual(first_filter.value, req_args_strict_filters[0]["value"])
+
+            second_filter = strict_filters[1]
+            self.assertEqual(second_filter.name, req_args_strict_filters[1]["name"])
+            self.assertEqual(second_filter.value, req_args_strict_filters[1]["value"])
+
+    async def test_returns_answer_with_strict_filters_with_and_operator(self):
+        # Arrange
+        question: str = "Where can you find"
+        response_path: str = "RetrunsAnswer_WithStrictFilter_And_Operator.json"
+        response_json = QnaApplicationTest._get_json_for_file(response_path)
+
+        strict_filters = [
+            Metadata(name="species", value="human"),
+            Metadata(name="type", value="water"),
+        ]
+        options = QnAMakerOptions(
+            top=5,
+            strict_filters=strict_filters,
+            strict_filters_join_operator=JoinOperator.AND,
+        )
+        qna = QnAMaker(endpoint=QnaApplicationTest.tests_endpoint)
+        context = QnaApplicationTest._get_context(question, TestAdapter())
+
+        # Act
+        with patch(
+            "aiohttp.ClientSession.post",
+            return_value=aiounittest.futurized(response_json),
+        ) as mock_http_client:
+            result = await qna.get_answers_raw(context, options)
+
+            serialized_http_req_args = mock_http_client.call_args[1]["data"]
+            req_args = json.loads(serialized_http_req_args)
+
+            # Assert
+            self.assertIsNotNone(result)
+            self.assertEqual(1, len(result.answers))
+            self.assertEqual(
+                JoinOperator.AND, req_args["strictFiltersCompoundOperationType"]
+            )
+
+            req_args_strict_filters = req_args["strictFilters"]
+
+            first_filter = strict_filters[0]
+            self.assertEqual(first_filter.name, req_args_strict_filters[0]["name"])
+            self.assertEqual(first_filter.value, req_args_strict_filters[0]["value"])
+
+            second_filter = strict_filters[1]
+            self.assertEqual(second_filter.name, req_args_strict_filters[1]["name"])
+            self.assertEqual(second_filter.value, req_args_strict_filters[1]["value"])
 
     async def test_returns_answer_using_requests_module(self):
         question: str = "how do I clean the stove?"
