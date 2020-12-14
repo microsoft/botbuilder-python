@@ -215,3 +215,91 @@ class ActivityPromptTests(aiounittest.AsyncTestCase):
         step1 = await adapter.send("hello")
         step2 = await step1.assert_reply("please send an event.")
         await step2.assert_reply("please send an event.")
+
+    async def test_activity_prompt_onerror_should_return_dialogcontext(self):
+        # Create ConversationState with MemoryStorage and register the state as middleware.
+        convo_state = ConversationState(MemoryStorage())
+
+        # Create a DialogState property, DialogSet and AttachmentPrompt.
+        dialog_state = convo_state.create_property("dialog_state")
+        dialogs = DialogSet(dialog_state)
+        dialogs.add(SimpleActivityPrompt("EventActivityPrompt", validator))
+
+        async def exec_test(turn_context: TurnContext):
+            dialog_context = await dialogs.create_context(turn_context)
+
+            results = await dialog_context.continue_dialog()
+
+            if results.status == DialogTurnStatus.Empty:
+                options = PromptOptions(
+                    prompt=Activity(
+                        type=ActivityTypes.message, text="please send an event."
+                    )
+                )
+
+                try:
+                    await dialog_context.prompt("EventActivityPrompt", options)
+                    await dialog_context.prompt("Non existent id", options)
+                except Exception as err:
+                    self.assertIsNotNone(
+                        err.data["DialogContext"]  # pylint: disable=no-member
+                    )
+                    self.assertEqual(
+                        err.data["DialogContext"][  # pylint: disable=no-member
+                            "active_dialog"
+                        ],
+                        "EventActivityPrompt",
+                    )
+                else:
+                    raise Exception("Should have thrown an error.")
+
+            elif results.status == DialogTurnStatus.Complete:
+                await turn_context.send_activity(results.result)
+
+            await convo_state.save_changes(turn_context)
+
+        # Initialize TestAdapter.
+        adapter = TestAdapter(exec_test)
+
+        await adapter.send("hello")
+
+    async def test_activity_replace_dialog_onerror_should_return_dialogcontext(self):
+        # Create ConversationState with MemoryStorage and register the state as middleware.
+        convo_state = ConversationState(MemoryStorage())
+
+        # Create a DialogState property, DialogSet and AttachmentPrompt.
+        dialog_state = convo_state.create_property("dialog_state")
+        dialogs = DialogSet(dialog_state)
+        dialogs.add(SimpleActivityPrompt("EventActivityPrompt", validator))
+
+        async def exec_test(turn_context: TurnContext):
+            dialog_context = await dialogs.create_context(turn_context)
+
+            results = await dialog_context.continue_dialog()
+
+            if results.status == DialogTurnStatus.Empty:
+                options = PromptOptions(
+                    prompt=Activity(
+                        type=ActivityTypes.message, text="please send an event."
+                    )
+                )
+
+                try:
+                    await dialog_context.prompt("EventActivityPrompt", options)
+                    await dialog_context.replace_dialog("Non existent id", options)
+                except Exception as err:
+                    self.assertIsNotNone(
+                        err.data["DialogContext"]  # pylint: disable=no-member
+                    )
+                else:
+                    raise Exception("Should have thrown an error.")
+
+            elif results.status == DialogTurnStatus.Complete:
+                await turn_context.send_activity(results.result)
+
+            await convo_state.save_changes(turn_context)
+
+        # Initialize TestAdapter.
+        adapter = TestAdapter(exec_test)
+
+        await adapter.send("hello")
