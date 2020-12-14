@@ -12,6 +12,7 @@ from botbuilder.schema import (
     HealthCheckResponse,
 )
 
+from .bot import Bot
 from .bot_adapter import BotAdapter
 from .healthcheck import HealthCheck
 from .serializer_helper import serializer_helper
@@ -20,7 +21,7 @@ from .invoke_response import InvokeResponse
 from .turn_context import TurnContext
 
 
-class ActivityHandler:
+class ActivityHandler(Bot):
     """
     Handles activities and should be subclassed.
 
@@ -30,7 +31,9 @@ class ActivityHandler:
         in the derived class.
     """
 
-    async def on_turn(self, turn_context: TurnContext):
+    async def on_turn(
+        self, turn_context: TurnContext
+    ):  # pylint: disable=arguments-differ
         """
         Called by the adapter (for example, :class:`BotFrameworkAdapter`) at runtime
         in order to process an inbound :class:`botbuilder.schema.Activity`.
