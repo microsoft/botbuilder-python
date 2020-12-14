@@ -16,6 +16,10 @@ class GenerateAnswerRequestBody(Model):
         "qna_id": {"key": "qnaId", "type": "int"},
         "is_test": {"key": "isTest", "type": "bool"},
         "ranker_type": {"key": "rankerType", "type": "RankerTypes"},
+        "strict_filters_join_operator": {
+            "key": "strictFiltersCompoundOperationType",
+            "type": "str",
+        },
     }
 
     def __init__(self, **kwargs):
@@ -28,3 +32,6 @@ class GenerateAnswerRequestBody(Model):
         self.qna_id = kwargs.get("qna_id", None)
         self.is_test = kwargs.get("is_test", None)
         self.ranker_type = kwargs.get("ranker_type", None)
+        self.strict_filters_join_operator = kwargs.get(
+            "strict_filters_join_operator", None
+        )
