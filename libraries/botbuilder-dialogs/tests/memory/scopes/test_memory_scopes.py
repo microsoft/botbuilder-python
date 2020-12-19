@@ -22,6 +22,9 @@ from botbuilder.dialogs.memory.scopes import (
     ConversationMemoryScope,
     DialogMemoryScope,
     UserMemoryScope,
+    SettingsMemoryScope,
+    ThisMemoryScope,
+    TurnMemoryScope,
 )
 from botbuilder.schema import (
     Activity,
@@ -387,7 +390,7 @@ class MemoryScopesTests(aiounittest.AsyncTestCase):
         scope.set_memory(dialog_context, foo_cls("bar"))
         memory = scope.get_memory(dialog_context)
         self.assertIsNotNone(memory, "state not returned")
-        assert memory.foo == "bar"
+        self.assertEqual(memory.foo, "bar")
 
     async def test_dialog_memory_scope_should_raise_error_if_set_memory_called_without_memory(
         self,
@@ -410,8 +413,10 @@ class MemoryScopesTests(aiounittest.AsyncTestCase):
             await dialog_context.begin_dialog("container")
             scope.set_memory(dialog_context, None)
 
-    """
     async def test_settings_memory_scope_should_return_content_of_settings(self):
+        # pylint: disable=import-outside-toplevel
+        from test_settings import DefaultConfig
+
         # Create a DialogState property, DialogSet and register the dialogs.
         conversation_state = ConversationState(MemoryStorage())
         dialog_state = conversation_state.create_property("dialogs")
@@ -420,35 +425,19 @@ class MemoryScopesTests(aiounittest.AsyncTestCase):
         # Create test context
         context = TurnContext(TestAdapter(), MemoryScopesTests.begin_message)
         dialog_context = await dialogs.create_context(context)
-        settings = require("./test.settings.json")
-        dialog_context.context.turn_state.set("settings", settings)
+        settings = DefaultConfig()
+        dialog_context.context.turn_state["settings"] = settings
 
         # Run test
         scope = SettingsMemoryScope()
         memory = scope.get_memory(dialog_context)
-        self.assertEqual(typeof memory, "object", "settings not returned")
-        self.assertEqual(memory.string, "test")
-        self.assertEqual(memory.int, 3)
-        self.assertEqual(memory.array[0], "zero")
-        self.assertEqual(memory.array[1], "one")
-        self.assertEqual(memory.array[2], "two")
-        self.assertEqual(memory.array[3], "three")
-        self.assertEqual(dialog_context.state.getValue("settings.fakeArray.0"), "zero")
-        self.assertEqual(dialog_context.state.getValue("settings.fakeArray.1"), "one")
-        self.assertEqual(dialog_context.state.getValue("settings.fakeArray.2"), "two")
-        self.assertEqual(dialog_context.state.getValue("settings.fakeArray.3"), "three")
-        self.assertEqual(dialog_context.state.getValue("settings.fakeArray.zzz"), "cat")
-        for (key in process.env):
-            if (typeof process.env[key] == "string"):
-                assert(memory[key] == process.env[key])
-            }
-        }
-
-        # override settings with process.env
-        self.assertEqual(dialog_context.state.getValue("settings.to_be_overridden"), "one")
-        process.env["to_be_overridden"] = "two"
-        self.assertEqual(dialog_context.state.getValue("settings.not_to_be_overridden"), "one")
-        self.assertEqual(dialog_context.state.getValue("settings.to_be_overridden"), "two", "settings should be overriden by environment variables")
+        self.assertIsNotNone(memory)
+        self.assertEqual(memory.STRING, "test")
+        self.assertEqual(memory.INT, 3)
+        self.assertEqual(memory.LIST[0], "zero")
+        self.assertEqual(memory.LIST[1], "one")
+        self.assertEqual(memory.LIST[2], "two")
+        self.assertEqual(memory.LIST[3], "three")
 
     async def test_this_memory_scope_should_return_active_dialogs_state(self):
         # Create a DialogState property, DialogSet and register the dialogs.
@@ -467,9 +456,8 @@ class MemoryScopesTests(aiounittest.AsyncTestCase):
         scope = ThisMemoryScope()
         await dialog_context.begin_dialog("test")
         memory = scope.get_memory(dialog_context)
-        assert(typeof memory != None, "state not returned")
-        assert(memory.is_dialog == True)
-
+        self.assertIsNotNone(memory, "state not returned")
+        self.assertTrue(memory["is_dialog"])
 
     async def test_this_memory_scope_should_overwrite_active_dialogs_memory(self):
         # Create a DialogState property, DialogSet and register the dialogs.
@@ -487,13 +475,15 @@ class MemoryScopesTests(aiounittest.AsyncTestCase):
         # Run test
         scope = ThisMemoryScope()
         await dialog_context.begin_dialog("container")
-        scope.setMemory(dialog_context, { foo: "bar" })
+        foo_cls = namedtuple("TestObject", "foo")
+        scope.set_memory(dialog_context, foo_cls("bar"))
         memory = scope.get_memory(dialog_context)
         self.assertIsNotNone(memory, "state not returned")
-        assert(memory.foo == "bar")
+        self.assertEqual(memory.foo, "bar")
 
-
-    async def test_this_memory_scope_should_raise_error_if_set_memory_called_without_memory(self):
+    async def test_this_memory_scope_should_raise_error_if_set_memory_called_without_memory(
+        self,
+    ):
         # Create a DialogState property, DialogSet and register the dialogs.
         storage = MemoryStorage()
         conversation_state = ConversationState(storage)
@@ -507,18 +497,14 @@ class MemoryScopesTests(aiounittest.AsyncTestCase):
         dialog_context = await dialogs.create_context(context)
 
         # Run test
-        error = False
-        try:
+        with self.assertRaises(Exception):
             scope = ThisMemoryScope()
             await dialog_context.begin_dialog("container")
-            scope.setMemory(dialog_context, None)
-        } catch (err):
-            error = True
-        }
-        assert(error)
+            scope.set_memory(dialog_context, None)
 
-
-    async def test_this_memory_scope_should_raise_error_if_set_memory_called_without_active_dialog(self):
+    async def test_this_memory_scope_should_raise_error_if_set_memory_called_without_active_dialog(
+        self,
+    ):
         # Create a DialogState property, DialogSet and register the dialogs.
         storage = MemoryStorage()
         conversation_state = ConversationState(storage)
@@ -532,39 +518,10 @@ class MemoryScopesTests(aiounittest.AsyncTestCase):
         dialog_context = await dialogs.create_context(context)
 
         # Run test
-        error = False
-        try:
+        with self.assertRaises(Exception):
             scope = ThisMemoryScope()
-            scope.setMemory(dialog_context, { foo: "bar" })
-        } catch (err):
-            error = True
-        }
-        assert(error)
-
-
-    async def test_this_memory_scope_should_raise_error_if_delete_called(self):
-        # Create a DialogState property, DialogSet and register the dialogs.
-        storage = MemoryStorage()
-        conversation_state = ConversationState(storage)
-        dialog_state = conversation_state.create_property("dialogs")
-        dialogs = DialogSet(dialog_state)
-        container = TestContainer("container")
-        dialogs.add(container)
-
-        # Create test context
-        context = TurnContext(TestAdapter(), MemoryScopesTests.begin_message)
-        dialog_context = await dialogs.create_context(context)
-
-        # Run test
-        error = False
-        try:
-            scope = ThisMemoryScope()
-            await scope.delete(dialog_context)
-        } catch (err):
-            error = True
-        }
-        assert(error)
-
+            foo_cls = namedtuple("TestObject", "foo")
+            scope.set_memory(dialog_context, foo_cls("bar"))
 
     async def test_turn_memory_scope_should_persist_changes_to_turn_state(self):
         # Create a DialogState property, DialogSet and register the dialogs.
@@ -582,11 +539,10 @@ class MemoryScopesTests(aiounittest.AsyncTestCase):
         # Run test
         scope = TurnMemoryScope()
         memory = scope.get_memory(dialog_context)
-        assert(typeof memory != None, "state not returned")
-        memory.foo = "bar"
+        self.assertIsNotNone(memory, "state not returned")
+        memory["foo"] = "bar"
         memory = scope.get_memory(dialog_context)
-        assert(memory.foo == "bar")
-
+        self.assertEqual(memory["foo"], "bar")
 
     async def test_turn_memory_scope_should_overwrite_values_in_turn_state(self):
         # Create a DialogState property, DialogSet and register the dialogs.
@@ -603,56 +559,8 @@ class MemoryScopesTests(aiounittest.AsyncTestCase):
 
         # Run test
         scope = TurnMemoryScope()
-        scope.setMemory(dialog_context, { foo: "bar" })
+        foo_cls = namedtuple("TestObject", "foo")
+        scope.set_memory(dialog_context, foo_cls("bar"))
         memory = scope.get_memory(dialog_context)
-        assert(typeof memory != None, "state not returned")
-        assert(memory.foo == "bar")
-
-
-    async def test_turn_memory_scope_should_raise_error_when_set_memory_called_without_memory(self):
-        # Create a DialogState property, DialogSet and register the dialogs.
-        storage = MemoryStorage()
-        conversation_state = ConversationState(storage)
-        dialog_state = conversation_state.create_property("dialogs")
-        dialogs = DialogSet(dialog_state)
-        dialog = TestDialog("test", "test message")
-        dialogs.add(dialog)
-
-        # Create test context
-        context = TurnContext(TestAdapter(), MemoryScopesTests.begin_message)
-        dialog_context = await dialogs.create_context(context)
-
-        # Run test
-        error = False
-        try:
-            scope = TurnMemoryScope()
-            scope.setMemory(dialog_context, None)
-        } catch (err):
-            error = True
-        }
-        assert(error)
-
-
-    async def test_turn_memory_scope_should_raise_error_when_delete_called(self):
-        # Create a DialogState property, DialogSet and register the dialogs.
-        storage = MemoryStorage()
-        conversation_state = ConversationState(storage)
-        dialog_state = conversation_state.create_property("dialogs")
-        dialogs = DialogSet(dialog_state)
-        dialog = TestDialog("test", "test message")
-        dialogs.add(dialog)
-
-        # Create test context
-        context = TurnContext(TestAdapter(), MemoryScopesTests.begin_message)
-        dialog_context = await dialogs.create_context(context)
-
-        # Run test
-        error = False
-        try:
-            scope = TurnMemoryScope()
-            await scope.delete(dialog_context)
-        } catch (err):
-            error = True
-        }
-        assert(error)
-    """
+        self.assertIsNotNone(memory, "state not returned")
+        self.assertEqual(memory.foo, "bar")
