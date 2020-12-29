@@ -14,7 +14,7 @@ class QnACardBuilder:
 
     @staticmethod
     def get_suggestions_card(
-        suggestions: [str], card_title: str, card_no_match: str
+        suggestions: List[str], card_title: str, card_no_match: str
     ) -> Activity:
         """
         Get active learning suggestions card.
