@@ -8,6 +8,7 @@
 from .feedback_record import FeedbackRecord
 from .feedback_records import FeedbackRecords
 from .generate_answer_request_body import GenerateAnswerRequestBody
+from .join_operator import JoinOperator
 from .metadata import Metadata
 from .prompt import Prompt
 from .qnamaker_trace_info import QnAMakerTraceInfo
@@ -21,6 +22,7 @@ __all__ = [
     "FeedbackRecord",
     "FeedbackRecords",
     "GenerateAnswerRequestBody",
+    "JoinOperator",
     "Metadata",
     "Prompt",
     "QnAMakerTraceInfo",

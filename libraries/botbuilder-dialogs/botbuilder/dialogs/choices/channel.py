@@ -61,6 +61,7 @@ class Channel:
             Channels.ms_teams: 3,
             Channels.line: 99,
             Channels.slack: 100,
+            Channels.telegram: 100,
             Channels.emulator: 100,
             Channels.direct_line: 100,
             Channels.webchat: 100,
