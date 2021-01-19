@@ -1,3 +1,7 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
+
 class Claim:
     def __init__(self, claim_type: str, value):
         self.type = claim_type
