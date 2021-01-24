@@ -20,7 +20,7 @@ class DialogInstance:
         :var self.state: The instance's persisted state.
         :vartype self.state: :class:`typing.Dict[str, object]`
         """
-        self.id = id or None  # pylint: disable=invalid-name
+        self.id = id  # pylint: disable=invalid-name
 
         self.state = state or {}
 

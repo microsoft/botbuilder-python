@@ -31,10 +31,9 @@ class DialogContainer(Dialog, ABC):
         """
         Called when an event has been raised, using `DialogContext.emitEvent()`, by either the current dialog or a
          dialog that the current dialog started.
-        <param name="dialog_context">The dialog context for the current turn of conversation.</param>
-        <param name="e">The event being raised.</param>
-        <param name="cancellationToken">The cancellation token.</param>
-        <returns>True if the event is handled by the current dialog and bubbling should stop.</returns>
+        :param dialog_context: The dialog context for the current turn of conversation.
+        :param dialog_event: The event being raised.
+        :return: True if the event is handled by the current dialog and bubbling should stop.
         """
         handled = await super().on_dialog_event(dialog_context, dialog_event)
 
@@ -45,8 +44,6 @@ class DialogContainer(Dialog, ABC):
                 f"Unhandled dialog event: {dialog_event.name}. Active Dialog: "
                 f"{dialog_context.active_dialog.id}"
             )
-
-            # dialog_context.dialogs.telemetry_client.TrackTrace(trace_message, Severity.Warning, null)
 
             await dialog_context.context.send_trace_activity(trace_message)
 
@@ -60,15 +57,14 @@ class DialogContainer(Dialog, ABC):
         to the container level unless a container doesn't handle it.  To support this DialogContainers define a
         protected virtual method GetInternalVersion() which computes if this dialog or child dialogs have changed
         which is then examined via calls to check_for_version_change_async().
-        <returns>version which represents the change of the internals of this container.</returns>
+        :return: version which represents the change of the internals of this container.
         """
         return self.dialogs.get_version()
 
     async def check_for_version_change_async(self, dialog_context: DialogContext):
         """
-        <param name="dialog_context">dialog context.</param>
-        <param name="cancellationToken">cancellationToken.</param>
-        <returns>task.</returns>
+        :param dialog_context: dialog context.
+        :return: task.
         Checks to see if a containers child dialogs have changed since the current dialog instance
         was started.
 

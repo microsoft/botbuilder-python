@@ -362,13 +362,13 @@ class DialogContext:
         """
         Searches for a dialog with a given ID.
         Emits a named event for the current dialog, or someone who started it, to handle.
-        <param name="name">Name of the event to raise.</param>
-        <param name="value">Value to send along with the event.</param>
-        <param name="bubble">Flag to control whether the event should be bubbled to its parent if not handled locally.
-        Defaults to a value of `true`.</param>
-        <param name="from_leaf">Whether the event is emitted from a leaf node.</param>
-        <param name="cancellationToken">The cancellation token.</param>
-        <returns>True if the event was handled.</returns>
+        :param name: Name of the event to raise.
+        :param value: Value to send along with the event.
+        :param bubble: Flag to control whether the event should be bubbled to its parent if not handled locally.
+        Defaults to a value of `True`.
+        :param from_leaf: Whether the event is emitted from a leaf node.
+        :param cancellationToken: The cancellation token.
+        :return: True if the event was handled.
         """
         try:
             # Initialize event
