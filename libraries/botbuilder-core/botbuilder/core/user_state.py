@@ -23,7 +23,7 @@ class UserState(BotState):
         """
         self.namespace = namespace
 
-        super(UserState, self).__init__(storage, "UserState")
+        super(UserState, self).__init__(storage, "Internal.UserState")
 
     def get_storage_key(self, turn_context: TurnContext) -> str:
         """
