@@ -381,9 +381,9 @@ class ActivityHandler(Bot):
         :type turn_context: :class:`botbuilder.core.TurnContext`
         :returns: A task that represents the work queued to execute
         """
-        if turn_context.activity.action == "add":
+        if turn_context.activity.action in ("add", "add-upgrade"):
             return await self.on_installation_update_add(turn_context)
-        if turn_context.activity.action == "remove":
+        if turn_context.activity.action in ("remove", "remove-upgrade"):
             return await self.on_installation_update_remove(turn_context)
         return
 
