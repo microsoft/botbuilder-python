@@ -295,35 +295,6 @@ class DialogManagerTests(aiounittest.AsyncTestCase):
             DialogTurnStatus.Empty,
         )
 
-    async def test_trace_skill_state(self):
-        SimpleComponentDialog.dm_turn_result = None
-        dialog = SimpleComponentDialog()
-
-        def assert_is_trace(activity, description):  # pylint: disable=unused-argument
-            assert activity.type == ActivityTypes.trace
-
-        def assert_is_trace_and_label(activity, description):
-            assert_is_trace(activity, description)
-            assert activity.label == "Skill State"
-
-        test_flow = await SimpleComponentDialog.create_test_flow(
-            dialog, SkillFlowTestCase.leaf_skill, True
-        )
-
-        step1 = await test_flow.send("Hi")
-        step2 = await step1.assert_reply(assert_is_trace)
-        step2 = await step2.assert_reply("Hello, what is your name?")
-        step3 = await step2.assert_reply(assert_is_trace_and_label)
-        step4 = await step3.send("SomeName")
-        step5 = await step4.assert_reply("Hello SomeName, nice to meet you!")
-        step6 = await step5.assert_reply(assert_is_trace_and_label)
-        await step6.assert_reply(assert_is_trace)
-
-        self.assertEqual(
-            SimpleComponentDialog.dm_turn_result.turn_result.status,
-            DialogTurnStatus.Complete,
-        )
-
     async def test_trace_bot_state(self):
         SimpleComponentDialog.dm_turn_result = None
         dialog = SimpleComponentDialog()
