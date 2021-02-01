@@ -49,11 +49,6 @@ class SkillDialog(Dialog):
         """
         dialog_args = self._validate_begin_dialog_args(options)
 
-        await dialog_context.context.send_trace_activity(
-            f"{SkillDialog.__name__}.BeginDialogAsync()",
-            label=f"Using activity of type: {dialog_args.activity.type}",
-        )
-
         # Create deep clone of the original activity to avoid altering it before forwarding it.
         skill_activity: Activity = deepcopy(dialog_args.activity)
 
@@ -90,19 +85,9 @@ class SkillDialog(Dialog):
         if not self._on_validate_activity(dialog_context.context.activity):
             return self.end_of_turn
 
-        await dialog_context.context.send_trace_activity(
-            f"{SkillDialog.__name__}.continue_dialog()",
-            label=f"ActivityType: {dialog_context.context.activity.type}",
-        )
-
         # Handle EndOfConversation from the skill (this will be sent to the this dialog by the SkillHandler if
         # received from the Skill)
         if dialog_context.context.activity.type == ActivityTypes.end_of_conversation:
-            await dialog_context.context.send_trace_activity(
-                f"{SkillDialog.__name__}.continue_dialog()",
-                label=f"Got {ActivityTypes.end_of_conversation}",
-            )
-
             return await dialog_context.end_dialog(
                 dialog_context.context.activity.value
             )
@@ -156,10 +141,6 @@ class SkillDialog(Dialog):
     ):
         # Send of of conversation to the skill if the dialog has been cancelled.
         if reason in (DialogReason.CancelCalled, DialogReason.ReplaceCalled):
-            await context.send_trace_activity(
-                f"{SkillDialog.__name__}.end_dialog()",
-                label=f"ActivityType: {context.activity.type}",
-            )
             activity = Activity(type=ActivityTypes.end_of_conversation)
 
             # Apply conversation reference and common properties from incoming activity before sending.

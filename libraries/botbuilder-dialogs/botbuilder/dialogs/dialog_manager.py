@@ -306,12 +306,6 @@ class DialogManager:
             # Handle remote cancellation request from parent.
             active_dialog_context = self.get_active_dialog_context(dialog_context)
 
-            remote_cancel_text = "Skill was canceled through an EndOfConversation activity from the parent."
-            await turn_context.send_trace_activity(
-                f"{self.__class__.__name__}.on_turn_async()",
-                label=f"{remote_cancel_text}",
-            )
-
             # Send cancellation message to the top dialog in the stack to ensure all the parents are canceled in the
             # right order.
             return await active_dialog_context.cancel_all_dialogs(True)
@@ -333,23 +327,11 @@ class DialogManager:
         turn_result = await dialog_context.continue_dialog()
         if turn_result.status == DialogTurnStatus.Empty:
             # restart root dialog
-            start_message_text = f"Starting {self._root_dialog_id}."
-            await turn_context.send_trace_activity(
-                f"{self.__class__.__name__}.handle_skill_on_turn_async()",
-                label=f"{start_message_text}",
-            )
             turn_result = await dialog_context.begin_dialog(self._root_dialog_id)
 
         await DialogManager.send_state_snapshot_trace(dialog_context, "Skill State")
 
         if self.should_send_end_of_conversation_to_parent(turn_context, turn_result):
-            end_message_text = f"Dialog {self._root_dialog_id} has **completed**. Sending EndOfConversation."
-            await turn_context.send_trace_activity(
-                f"{self.__class__.__name__}.handle_skill_on_turn_async()",
-                label=f"{end_message_text}",
-                value=turn_result.result,
-            )
-
             # Send End of conversation at the end.
             activity = Activity(
                 type=ActivityTypes.end_of_conversation,
