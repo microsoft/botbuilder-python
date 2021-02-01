@@ -4,7 +4,9 @@ import asyncio
 from typing import Awaitable, Callable
 
 from botbuilder.schema import Activity, ActivityTypes
+from botframework.connector.auth import ClaimsIdentity, SkillValidation
 
+from .bot_adapter import BotAdapter
 from .middleware_set import Middleware
 from .turn_context import TurnContext
 
@@ -82,9 +84,12 @@ class ShowTypingMiddleware(Middleware):
         def stop_interval():
             timer.set_clear_timer()
 
-        # if it's a message, start sending typing activities until the
-        # bot logic is done.
-        if context.activity.type == ActivityTypes.message:
+        # Start a timer to periodically send the typing activity
+        # (bots running as skills should not send typing activity)
+        if (
+            context.activity.type == ActivityTypes.message
+            and not ShowTypingMiddleware._is_skill_bot(context)
+        ):
             start_interval(context, self._delay, self._period)
 
         # call the bot logic
@@ -93,3 +98,10 @@ class ShowTypingMiddleware(Middleware):
         stop_interval()
 
         return result
+
+    @staticmethod
+    def _is_skill_bot(context: TurnContext) -> bool:
+        claims_identity = context.turn_state.get(BotAdapter.BOT_IDENTITY_KEY)
+        return isinstance(
+            claims_identity, ClaimsIdentity
+        ) and SkillValidation.is_skill_claim(claims_identity.claims)

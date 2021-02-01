@@ -10,6 +10,7 @@ from botbuilder.core.teams import (
     teams_get_team_info,
     teams_notify_user,
 )
+from botbuilder.core.teams.teams_activity_extensions import teams_get_meeting_info
 
 
 class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
@@ -149,3 +150,13 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         # Assert
         assert activity.channel_data.notification.alert
         assert activity.id == "id123"
+
+    def test_teams_meeting_info(self):
+        # Arrange
+        activity = Activity(channel_data={"meeting": {"id": "meeting123"}})
+
+        # Act
+        meeting_id = teams_get_meeting_info(activity).id
+
+        # Assert
+        assert meeting_id == "meeting123"

@@ -1,13 +1,18 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 import uuid
-from botbuilder.schema import Activity, ActivityTypes, ConversationReference
+from botbuilder.schema import (
+    Activity,
+    ActivityEventNames,
+    ActivityTypes,
+    ConversationReference,
+)
 
 
 def get_continuation_activity(reference: ConversationReference) -> Activity:
     return Activity(
         type=ActivityTypes.event,
-        name="ContinueConversation",
+        name=ActivityEventNames.continue_conversation,
         id=str(uuid.uuid1()),
         channel_id=reference.channel_id,
         service_url=reference.service_url,

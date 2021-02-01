@@ -4,7 +4,7 @@
 
 class SlackAdapterOptions:
     """
-    Class for defining implementation of the SlackAdapter Options.
+    Defines the implementation of the SlackAdapter options.
     """
 
     def __init__(
@@ -14,10 +14,14 @@ class SlackAdapterOptions:
         slack_client_signing_secret: str,
     ):
         """
-        Initializes new instance of SlackAdapterOptions
+        Initializes a new instance of SlackAdapterOptions.
+
         :param slack_verification_token: A token for validating the origin of incoming webhooks.
+        :type slack_verification_token: str
         :param slack_bot_token: A token for a bot to work on a single workspace.
-        :param slack_client_signing_secret: The token used to validate that incoming webhooks are originated from Slack.
+        :type slack_bot_token: str
+        :param slack_client_signing_secret: The token used to validate that incoming webhooks originated from Slack.
+        :type slack_client_signing_secret: str
         """
         self.slack_verification_token = slack_verification_token
         self.slack_bot_token = slack_bot_token
@@ -29,18 +33,21 @@ class SlackAdapterOptions:
 
     async def get_token_for_team(self, team_id: str) -> str:
         """
-        A method that receives a Slack team id and returns the bot token associated with that team. Required for
-        multi-team apps.
-        :param team_id:Team ID.
-        :return:The bot token associated with the team.
+        Receives a Slack team ID and returns the bot token associated with that team. Required for multi-team apps.
+
+        :param team_id: The team ID.
+        :type team_id: str
+        :raises: :func:`NotImplementedError`
         """
         raise NotImplementedError()
 
     async def get_bot_user_by_team(self, team_id: str) -> str:
         """
-        A method that receives a Slack team id and returns the bot user id associated with that team. Required for
-        multi-team apps.
-        :param team_id:Team ID.
-        :return:The bot user id associated with that team.
+        A method that receives a Slack team ID and returns the bot user ID associated with that team. Required for
+         multi-team apps.
+
+        :param team_id: The team ID.
+        :type team_id: str
+        :raises: :func:`NotImplementedError`
         """
         raise NotImplementedError()

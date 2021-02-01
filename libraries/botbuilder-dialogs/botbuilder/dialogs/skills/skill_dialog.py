@@ -244,17 +244,30 @@ class SkillDialog(Dialog):
             # Process replies in the response.Body.
             response.body: List[Activity]
             response.body = ExpectedReplies().deserialize(response.body).activities
+            # Track sent invoke responses, so more than one is not sent.
+            sent_invoke_response = False
 
             for from_skill_activity in response.body:
                 if from_skill_activity.type == ActivityTypes.end_of_conversation:
                     # Capture the EndOfConversation activity if it was sent from skill
                     eoc_activity = from_skill_activity
-                elif await self._intercept_oauth_cards(
+
+                    # The conversation has ended, so cleanup the conversation id
+                    await self.dialog_options.conversation_id_factory.delete_conversation_reference(
+                        skill_conversation_id
+                    )
+                elif not sent_invoke_response and await self._intercept_oauth_cards(
                     context, from_skill_activity, self.dialog_options.connection_name
                 ):
-                    # do nothing. Token exchange succeeded, so no oauthcard needs to be shown to the user
-                    pass
+                    # Token exchange succeeded, so no oauthcard needs to be shown to the user
+                    sent_invoke_response = True
                 else:
+                    # If an invoke response has already been sent we should ignore future invoke responses as this
+                    # represents a bug in the skill.
+                    if from_skill_activity.type == ActivityTypes.invoke_response:
+                        if sent_invoke_response:
+                            continue
+                        sent_invoke_response = True
                     # Send the response back to the channel.
                     await context.send_activity(from_skill_activity)
 

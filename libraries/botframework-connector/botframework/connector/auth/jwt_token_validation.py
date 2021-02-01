@@ -1,9 +1,11 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+
 from typing import Dict, List, Union
 
-from botbuilder.schema import Activity
+from botbuilder.schema import Activity, RoleTypes
 
+from ..channels import Channels
 from .authentication_configuration import AuthenticationConfiguration
 from .authentication_constants import AuthenticationConstants
 from .emulator_validation import EmulatorValidation
@@ -43,14 +45,29 @@ class JwtTokenValidation:
         """
         if not auth_header:
             # No auth header was sent. We might be on the anonymous code path.
-            is_auth_disabled = await credentials.is_authentication_disabled()
-            if is_auth_disabled:
-                # We are on the anonymous code path.
-                return ClaimsIdentity({}, True)
+            auth_is_disabled = await credentials.is_authentication_disabled()
+            if not auth_is_disabled:
+                # No Auth Header. Auth is required. Request is not authorized.
+                raise PermissionError("Unauthorized Access. Request is not authorized")
 
-            # No Auth Header. Auth is required. Request is not authorized.
-            raise PermissionError("Unauthorized Access. Request is not authorized")
+            # Check if the activity is for a skill call and is coming from the Emulator.
+            try:
+                if (
+                    activity.channel_id == Channels.emulator
+                    and activity.recipient.role == RoleTypes.skill
+                    and activity.relates_to is not None
+                ):
+                    # Return an anonymous claim with an anonymous skill AppId
+                    return SkillValidation.create_anonymous_skill_claim()
+            except AttributeError:
+                pass
 
+            # In the scenario where Auth is disabled, we still want to have the
+            # IsAuthenticated flag set in the ClaimsIdentity. To do this requires
+            # adding in an empty claim.
+            return ClaimsIdentity({}, True, AuthenticationConstants.ANONYMOUS_AUTH_TYPE)
+
+        # Validate the header and extract claims.
         claims_identity = await JwtTokenValidation.validate_auth_header(
             auth_header,
             credentials,

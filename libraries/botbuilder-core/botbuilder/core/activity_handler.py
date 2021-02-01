@@ -12,6 +12,7 @@ from botbuilder.schema import (
     HealthCheckResponse,
 )
 
+from .bot import Bot
 from .bot_adapter import BotAdapter
 from .healthcheck import HealthCheck
 from .serializer_helper import serializer_helper
@@ -20,7 +21,7 @@ from .invoke_response import InvokeResponse
 from .turn_context import TurnContext
 
 
-class ActivityHandler:
+class ActivityHandler(Bot):
     """
     Handles activities and should be subclassed.
 
@@ -30,7 +31,9 @@ class ActivityHandler:
         in the derived class.
     """
 
-    async def on_turn(self, turn_context: TurnContext):
+    async def on_turn(
+        self, turn_context: TurnContext
+    ):  # pylint: disable=arguments-differ
         """
         Called by the adapter (for example, :class:`BotFrameworkAdapter`) at runtime
         in order to process an inbound :class:`botbuilder.schema.Activity`.
@@ -373,6 +376,36 @@ class ActivityHandler:
         """
         Override this in a derived class to provide logic specific to
         ActivityTypes.InstallationUpdate activities.
+
+        :param turn_context: The context object for this turn
+        :type turn_context: :class:`botbuilder.core.TurnContext`
+        :returns: A task that represents the work queued to execute
+        """
+        if turn_context.activity.action in ("add", "add-upgrade"):
+            return await self.on_installation_update_add(turn_context)
+        if turn_context.activity.action in ("remove", "remove-upgrade"):
+            return await self.on_installation_update_remove(turn_context)
+        return
+
+    async def on_installation_update_add(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext
+    ):
+        """
+        Override this in a derived class to provide logic specific to
+        ActivityTypes.InstallationUpdate activities with 'action' set to 'add'.
+
+        :param turn_context: The context object for this turn
+        :type turn_context: :class:`botbuilder.core.TurnContext`
+        :returns: A task that represents the work queued to execute
+        """
+        return
+
+    async def on_installation_update_remove(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext
+    ):
+        """
+        Override this in a derived class to provide logic specific to
+        ActivityTypes.InstallationUpdate activities with 'action' set to 'remove'.
 
         :param turn_context: The context object for this turn
         :type turn_context: :class:`botbuilder.core.TurnContext`
