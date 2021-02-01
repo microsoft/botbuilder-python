@@ -268,8 +268,40 @@ class TestActivityHandler(aiounittest.AsyncTestCase):
         assert bot.record[0] == "on_installation_update"
         assert bot.record[1] == "on_installation_update_add"
 
-    async def test_on_installation_update_add_remove(self):
+    async def test_on_installation_update_add_upgrade(self):
+        activity = Activity(
+            type=ActivityTypes.installation_update, action="add-upgrade"
+        )
+
+        adapter = TestInvokeAdapter()
+        turn_context = TurnContext(adapter, activity)
+
+        # Act
+        bot = TestingActivityHandler()
+        await bot.on_turn(turn_context)
+
+        assert len(bot.record) == 2
+        assert bot.record[0] == "on_installation_update"
+        assert bot.record[1] == "on_installation_update_add"
+
+    async def test_on_installation_update_remove(self):
         activity = Activity(type=ActivityTypes.installation_update, action="remove")
+
+        adapter = TestInvokeAdapter()
+        turn_context = TurnContext(adapter, activity)
+
+        # Act
+        bot = TestingActivityHandler()
+        await bot.on_turn(turn_context)
+
+        assert len(bot.record) == 2
+        assert bot.record[0] == "on_installation_update"
+        assert bot.record[1] == "on_installation_update_remove"
+
+    async def test_on_installation_update_remove_upgrade(self):
+        activity = Activity(
+            type=ActivityTypes.installation_update, action="remove-upgrade"
+        )
 
         adapter = TestInvokeAdapter()
         turn_context = TurnContext(adapter, activity)
