@@ -484,6 +484,32 @@ class TeamsActivityHandler(ActivityHandler):
         """
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
+    async def on_teams_tab_fetch(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext, tab_request: TabRequest
+    ):
+        """
+        Override this in a derived class to provide logic for when a tab is fetched.
+
+        :param turn_context: A context object for this turn.
+        :param tab_request: The tab invoke request value payload.
+
+        :returns: A Tab Response for the request.
+        """
+        raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
+
+    async def on_teams_tab_submit(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext, tab_submit: TabSubmit
+    ):
+        """
+        Override this in a derived class to provide logic for when a tab is submitted.
+
+        :param turn_context: A context object for this turn.
+        :param tab_submit: The tab submit invoke request value payload.
+
+        :returns: A Tab Response for the request.
+        """
+        raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
+
     async def on_conversation_update_activity(self, turn_context: TurnContext):
         """
         Invoked when a conversation update activity is received from the channel.
@@ -851,31 +877,5 @@ class TeamsActivityHandler(ActivityHandler):
         :param turn_context: A context object for this turn.
 
         :returns: A task that represents the work queued to execute.
-        """
-        return
-
-    async def on_teams_tab_fetch(  # pylint: disable=unused-argument
-        self, turn_context: TurnContext, tab_request: TabRequest
-    ):
-        """
-        Override this in a derived class to provide logic for when a tab is fetched.
-
-        :param turn_context: A context object for this turn.
-        :param tab_request: The tab invoke request value payload.
-
-        :returns: A Tab Response for the request.
-        """
-        return
-
-    async def on_teams_tab_submit(  # pylint: disable=unused-argument
-        self, turn_context: TurnContext, tab_submit: TabSubmit
-    ):
-        """
-        Override this in a derived class to provide logic for when a tab is submitted.
-
-        :param turn_context: A context object for this turn.
-        :param tab_submit: The tab submit invoke request value payload.
-
-        :returns: A Tab Response for the request.
         """
         return
