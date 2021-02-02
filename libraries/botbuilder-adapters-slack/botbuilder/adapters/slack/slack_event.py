@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from typing import List
 from botbuilder.adapters.slack.slack_message import SlackMessage
 
 
@@ -24,7 +25,7 @@ class SlackEvent:
         self.user = kwargs.get("user")
         self.user_id = kwargs.get("user_id")
         self.bot_id = kwargs.get("bot_id")
-        self.actions: [str] = kwargs.get("actions")
+        self.actions: List[str] = kwargs.get("actions")
         self.item = kwargs.get("item")
         self.item_channel = kwargs.get("item_channel")
         self.files: [] = kwargs.get("files")
