@@ -2296,7 +2296,7 @@ class TabSubmit(Model):
     }
 
     def __init__(
-        self, *, tab_entity_context=None, context=None, data=data, **kwargs
+        self, *, tab_entity_context=None, context=None, data=None, **kwargs
     ) -> None:
         super(TabSubmit, self).__init__(**kwargs)
         self.tab_entity_context = tab_entity_context
