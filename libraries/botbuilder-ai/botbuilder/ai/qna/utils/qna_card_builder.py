@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from typing import List
 from botbuilder.core import CardFactory
 from botbuilder.schema import Activity, ActivityTypes, CardAction, HeroCard
 
@@ -14,7 +15,7 @@ class QnACardBuilder:
 
     @staticmethod
     def get_suggestions_card(
-        suggestions: [str], card_title: str, card_no_match: str
+        suggestions: List[str], card_title: str, card_no_match: str
     ) -> Activity:
         """
         Get active learning suggestions card.
