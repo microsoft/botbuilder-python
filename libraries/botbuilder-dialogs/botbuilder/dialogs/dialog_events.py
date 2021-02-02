@@ -10,4 +10,6 @@ class DialogEvents(str, Enum):
     reprompt_dialog = "repromptDialog"
     cancel_dialog = "cancelDialog"
     activity_received = "activityReceived"
+    version_changed = "versionChanged"
     error = "error"
+    custom = "custom"

@@ -25,7 +25,7 @@ class ConversationState(BotState):
         :param storage: The storage containing the conversation state.
         :type storage: :class:`Storage`
         """
-        super(ConversationState, self).__init__(storage, "ConversationState")
+        super(ConversationState, self).__init__(storage, "Internal.ConversationState")
 
     def get_storage_key(self, turn_context: TurnContext) -> object:
         """

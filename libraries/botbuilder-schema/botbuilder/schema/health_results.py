@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from typing import List
 from msrest.serialization import Model
 
 
@@ -19,7 +20,7 @@ class HealthResults(Model):
         success: bool = None,
         authorization: str = None,
         user_agent: str = None,
-        messages: [str] = None,
+        messages: List[str] = None,
         diagnostics: object = None,
         **kwargs
     ) -> None:
