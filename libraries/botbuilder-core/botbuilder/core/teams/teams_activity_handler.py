@@ -24,7 +24,7 @@ from botbuilder.schema.teams import (
     TaskModuleRequest,
     TaskModuleResponse,
     TabRequest,
-    TabSubmit
+    TabSubmit,
 )
 from botframework.connector import Channels
 from ..serializer_helper import deserializer_helper
@@ -169,9 +169,7 @@ class TeamsActivityHandler(ActivityHandler):
                 return self._create_invoke_response(
                     await self.on_teams_tab_fetch(
                         turn_context,
-                        deserializer_helper(
-                            TabRequest, turn_context.activity.value
-                        ),
+                        deserializer_helper(TabRequest, turn_context.activity.value),
                     )
                 )
 
@@ -179,9 +177,7 @@ class TeamsActivityHandler(ActivityHandler):
                 return self._create_invoke_response(
                     await self.on_teams_tab_submit(
                         turn_context,
-                        deserializer_helper(
-                            TabSubmit, turn_context.activity.value
-                        ),
+                        deserializer_helper(TabSubmit, turn_context.activity.value),
                     )
                 )
 

@@ -29,7 +29,7 @@ from botbuilder.schema.teams import (
     TeamsChannelAccount,
     TabRequest,
     TabSubmit,
-    TabContext
+    TabContext,
 )
 from botframework.connector import Channels
 from simple_adapter import SimpleAdapter
@@ -301,17 +301,13 @@ class TestingTeamsActivityHandler(TeamsActivityHandler):
         self, turn_context: TurnContext, tab_request: TabRequest
     ):
         self.record.append("on_teams_tab_fetch")
-        return await super().on_teams_tab_fetch(
-            turn_context, tab_request
-        )
+        return await super().on_teams_tab_fetch(turn_context, tab_request)
 
     async def on_teams_tab_submit(
         self, turn_context: TurnContext, tab_submit: TabSubmit
     ):
         self.record.append("on_teams_tab_submit")
-        return await super().on_teams_tab_submit(
-            turn_context, tab_submit
-        )
+        return await super().on_teams_tab_submit(turn_context, tab_submit)
 
 
 class NotImplementedAdapter(BotAdapter):
@@ -1012,10 +1008,7 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         activity = Activity(
             type=ActivityTypes.invoke,
             name="tab/fetch",
-            value={
-                "data": {"key": "value"},
-                "context": TabContext().serialize(),
-            },
+            value={"data": {"key": "value"}, "context": TabContext().serialize(),},
         )
 
         turn_context = TurnContext(SimpleAdapter(), activity)
@@ -1034,10 +1027,7 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         activity = Activity(
             type=ActivityTypes.invoke,
             name="tab/submit",
-            value={
-                "data": {"key": "value"},
-                "context": TabContext().serialize(),
-            },
+            value={"data": {"key": "value"}, "context": TabContext().serialize(),},
         )
 
         turn_context = TurnContext(SimpleAdapter(), activity)
