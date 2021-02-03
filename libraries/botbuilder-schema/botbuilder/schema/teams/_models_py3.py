@@ -2124,7 +2124,7 @@ class TabRequest(Model):
     """
 
     _attribute_map = {
-        "tab_entity_context": {"key": "tabEntityContext", "type": "TabEntityContext"},
+        "tab_entity_context": {"key": "tabContext", "type": "TabEntityContext"},
         "context": {"key": "context", "type": "TabContext"},
         "state": {"key": "state", "type": "str"},
     }
