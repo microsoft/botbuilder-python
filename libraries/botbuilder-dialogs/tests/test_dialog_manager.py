@@ -38,6 +38,7 @@ from botbuilder.schema import (
     ActivityTypes,
     ChannelAccount,
     ConversationAccount,
+    EndOfConversationCodes,
     InputHints,
 )
 from botframework.connector.auth import AuthenticationConstants, ClaimsIdentity
@@ -236,6 +237,10 @@ class DialogManagerTests(aiounittest.AsyncTestCase):
                     self.assertEqual(
                         SimpleComponentDialog.eoc_sent.type,
                         ActivityTypes.end_of_conversation,
+                    )
+                    self.assertEqual(
+                        SimpleComponentDialog.eoc_sent.code,
+                        EndOfConversationCodes.completed_successfully,
                     )
                     self.assertEqual(SimpleComponentDialog.eoc_sent.value, "SomeName")
                 else:
