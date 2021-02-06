@@ -2265,7 +2265,7 @@ class TabSubmitData(Model):
 
     _attribute_map = {
         "type": {"key": "type", "type": "str"},
-        "properties": {"key": "properties", "type": "object"},
+        "properties": {"key": "properties", "type": "{object}"},
     }
 
     def __init__(self, *, type=None, properties=None, **kwargs) -> None:
