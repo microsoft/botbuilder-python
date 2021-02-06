@@ -2168,11 +2168,12 @@ class TabResponseCards(Model):
     Envelope for cards for a TabResponse.
 
     :param cards: Gets or sets adaptive card for this card tab response.
-    :type cards: list[object]
+    :type cards:
+    list[ ~botframework.connector.teams.models.TabResponseCard]
     """
 
     _attribute_map = {
-        "cards": {"key": "cards", "type": "[object]"},
+        "cards": {"key": "cards", "type": "[TabResponseCard]"},
     }
 
     def __init__(self, *, cards=None, **kwargs) -> None:
@@ -2233,7 +2234,7 @@ class TabSumit(Model):
     """
 
     _attribute_map = {
-        "tab_entity_context": {"key": "tabEntityContext", "type": "TabEntityContext"},
+        "tab_entity_context": {"key": "tabContext", "type": "TabEntityContext"},
         "context": {"key": "context", "type": "TabContext"},
         "data": {"key": "data", "type": "TabSubmitData"},
     }
