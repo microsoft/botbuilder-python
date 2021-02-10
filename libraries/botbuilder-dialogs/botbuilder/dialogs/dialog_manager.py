@@ -16,7 +16,7 @@ from botbuilder.dialogs.memory import (
     DialogStateManager,
     DialogStateManagerConfiguration,
 )
-from botbuilder.schema import Activity, ActivityTypes
+from botbuilder.schema import Activity, ActivityTypes, EndOfConversationCodes
 from botframework.connector.auth import (
     AuthenticationConstants,
     ClaimsIdentity,
@@ -337,6 +337,9 @@ class DialogManager:
                 type=ActivityTypes.end_of_conversation,
                 value=turn_result.result,
                 locale=turn_context.activity.locale,
+                code=EndOfConversationCodes.completed_successfully
+                if turn_result.status == DialogTurnStatus.Complete
+                else EndOfConversationCodes.user_cancelled,
             )
             await turn_context.send_activity(activity)
 
