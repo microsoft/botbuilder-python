@@ -5,6 +5,8 @@ import pytest
 from botbuilder.core import StoreItem
 from botbuilder.azure import BlobStorage, BlobStorageSettings
 from botbuilder.testing import StorageBaseTests
+from azure.storage.blob.aio import BlobServiceClient
+from azure.core.exceptions import ResourceNotFoundError
 
 # local blob emulator instance blob
 
@@ -26,12 +28,12 @@ def get_storage():
 
 
 async def reset():
-    storage = get_storage()
+    storage = BlobServiceClient.from_connection_string(
+        BLOB_STORAGE_SETTINGS.connection_string
+    )
     try:
-        await storage.client.delete_container(
-            container_name=BLOB_STORAGE_SETTINGS.container_name
-        )
-    except Exception:
+        await storage.delete_container(BLOB_STORAGE_SETTINGS.container_name)
+    except ResourceNotFoundError:
         pass
 
 
@@ -44,7 +46,7 @@ class SimpleStoreItem(StoreItem):
 
 class TestBlobStorageConstructor:
     @pytest.mark.asyncio
-    async def test_blob_storage_init_should_error_without_cosmos_db_config(self):
+    async def test_blob_storage_init_should_error_without_blob_config(self):
         try:
             BlobStorage(BlobStorageSettings())  # pylint: disable=no-value-for-parameter
         except Exception as error:

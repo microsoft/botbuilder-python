@@ -3,13 +3,33 @@ from typing import Dict, List
 
 from jsonpickle import encode
 from jsonpickle.unpickler import Unpickler
-from azure.storage.blob import BlockBlobService, Blob, PublicAccess
+from azure.core.exceptions import (
+    HttpResponseError,
+    ResourceExistsError,
+    ResourceNotFoundError,
+)
 from botbuilder.core import Storage
-
-# TODO: sanitize_blob_name
+from azure.storage.blob.aio import (
+    BlobServiceClient,
+    BlobClient,
+    StorageStreamDownloader,
+)
+from azure.core import MatchConditions
 
 
 class BlobStorageSettings:
+    """The class for Azure Blob configuration for the Azure Bot Framework.
+
+    :param container_name: Name of the Blob container.
+    :type container_name: str
+    :param account_name: Name of the Blob Storage account. Required if not using connection_string.
+    :type account_name: str
+    :param account_key: Key of the Blob Storage account. Required if not using connection_string.
+    :type account_key: str
+    :param connection_string: Connection string of the Blob Storage account.
+        Required if not using account_name and account_key.
+    :type connection_string: str
+    """
     def __init__(
         self,
         container_name: str,
@@ -23,56 +43,106 @@ class BlobStorageSettings:
         self.connection_string = connection_string
 
 
+# New Azure Blob SDK only allows connection strings, but our SDK allows key+name.
+# This is here for backwards compatibility.
+def convert_account_name_and_key_to_connection_string(settings: BlobStorageSettings):
+    if not settings.account_name or not settings.account_key:
+        raise Exception(
+            "account_name and account_key are both required for BlobStorageSettings if not using a connections string."
+        )
+    return (
+        f"DefaultEndpointsProtocol=https;AccountName={settings.account_name};"
+        f"AccountKey={settings.account_key};EndpointSuffix=core.windows.net"
+    )
+
+
 class BlobStorage(Storage):
+    """An Azure Blob based storage provider for a bot.
+
+    This class uses a single Azure Storage Blob Container.
+    Each entity or StoreItem is serialized into a JSON string and stored in an individual text blob.
+    Each blob is named after the store item key,  which is encoded so that it conforms a valid blob name.
+    If an entity is an StoreItem, the storage object will set the entity's e_tag
+    property value to the blob's e_tag upon read. Afterward, an match_condition with the ETag value
+    will be generated during Write. New entities start with a null e_tag.
+
+    :param settings: Settings used to instantiate the Blob service.
+    :type settings: :class:`botbuilder.azure.BlobStorageSettings`
+    """
     def __init__(self, settings: BlobStorageSettings):
+        if not settings.container_name:
+            raise Exception("Container name is required.")
+
         if settings.connection_string:
-            client = BlockBlobService(connection_string=settings.connection_string)
-        elif settings.account_name and settings.account_key:
-            client = BlockBlobService(
-                account_name=settings.account_name, account_key=settings.account_key
+            blob_service_client = BlobServiceClient.from_connection_string(
+                settings.connection_string
             )
         else:
-            raise Exception(
-                "Connection string should be provided if there are no account name and key"
+            blob_service_client = BlobServiceClient.from_connection_string(
+                convert_account_name_and_key_to_connection_string(settings)
             )
 
-        self.client = client
-        self.settings = settings
+        self.__container_client = blob_service_client.get_container_client(
+            settings.container_name
+        )
+
+        self.__initialized = False
+
+    async def _initialize(self):
+        if self.__initialized is False:
+            # This should only happen once - assuming this is a singleton.
+            # ContainerClient.exists() method is available in an unreleased version of the SDK. Until then, we use:
+            try:
+                await self.__container_client.create_container()
+            except ResourceExistsError:
+                pass
+            self.__initialized = True
+        return self.__initialized
 
     async def read(self, keys: List[str]) -> Dict[str, object]:
+        """Retrieve entities from the configured blob container.
+
+        :param keys: An array of entity keys.
+        :type keys: Dict[str, object]
+        :return dict:
+        """
         if not keys:
             raise Exception("Keys are required when reading")
 
-        self.client.create_container(self.settings.container_name)
-        self.client.set_container_acl(
-            self.settings.container_name, public_access=PublicAccess.Container
-        )
+        await self._initialize()
+
         items = {}
 
         for key in keys:
-            if self.client.exists(
-                container_name=self.settings.container_name, blob_name=key
-            ):
-                items[key] = self._blob_to_store_item(
-                    self.client.get_blob_to_text(
-                        container_name=self.settings.container_name, blob_name=key
-                    )
-                )
+            blob_name = self._get_blob_name(key)
+            blob_client = self.__container_client.get_blob_client(blob_name)
+
+            try:
+                items[key] = await self._inner_read_blob(blob_client)
+            except HttpResponseError as err:
+                if err.status_code == 404:
+                    continue
 
         return items
 
     async def write(self, changes: Dict[str, object]):
+        """Stores a new entity in the configured blob container.
+
+        :param changes: The changes to write to storage.
+        :type changes: Dict[str, object]
+        :return:
+        """
         if changes is None:
             raise Exception("Changes are required when writing")
         if not changes:
             return
 
-        self.client.create_container(self.settings.container_name)
-        self.client.set_container_acl(
-            self.settings.container_name, public_access=PublicAccess.Container
-        )
+        await self._initialize()
 
         for (name, item) in changes.items():
+            blob_name = self._get_blob_name(name)
+            blob_reference = self.__container_client.get_blob_client(blob_name)
+
             e_tag = None
             if isinstance(item, dict):
                 e_tag = item.get("e_tag", None)
@@ -81,39 +151,54 @@ class BlobStorage(Storage):
             e_tag = None if e_tag == "*" else e_tag
             if e_tag == "":
                 raise Exception("blob_storage.write(): etag missing")
+
             item_str = self._store_item_to_str(item)
-            try:
-                self.client.create_blob_from_text(
-                    container_name=self.settings.container_name,
-                    blob_name=name,
-                    text=item_str,
-                    if_match=e_tag,
+
+            if e_tag:
+                await blob_reference.upload_blob(
+                    item_str, match_condition=MatchConditions.IfNotModified, etag=e_tag
                 )
-            except Exception as error:
-                raise error
+            else:
+                await blob_reference.upload_blob(item_str, overwrite=True)
 
     async def delete(self, keys: List[str]):
+        """Deletes entity blobs from the configured container.
+
+        :param keys: An array of entity keys.
+        :type keys: Dict[str, object]
+        """
         if keys is None:
             raise Exception("BlobStorage.delete: keys parameter can't be null")
 
-        self.client.create_container(self.settings.container_name)
-        self.client.set_container_acl(
-            self.settings.container_name, public_access=PublicAccess.Container
-        )
+        await self._initialize()
 
         for key in keys:
-            if self.client.exists(
-                container_name=self.settings.container_name, blob_name=key
-            ):
-                self.client.delete_blob(
-                    container_name=self.settings.container_name, blob_name=key
-                )
-
-    def _blob_to_store_item(self, blob: Blob) -> object:
-        item = json.loads(blob.content)
-        item["e_tag"] = blob.properties.etag
-        result = Unpickler().restore(item)
-        return result
+            blob_name = self._get_blob_name(key)
+            blob_client = self.__container_client.get_blob_client(blob_name)
+            try:
+                await blob_client.delete_blob()
+            # We can't delete what's already gone.
+            except ResourceNotFoundError:
+                pass
 
     def _store_item_to_str(self, item: object) -> str:
         return encode(item)
+
+    async def _inner_read_blob(self, blob_client: BlobClient):
+        blob = await blob_client.download_blob()
+
+        return await self._blob_to_store_item(blob)
+
+    @staticmethod
+    async def _blob_to_store_item(blob: StorageStreamDownloader) -> object:
+        item = json.loads(await blob.content_as_text())
+        item["e_tag"] = blob.properties.etag.replace('"', "")
+        result = Unpickler().restore(item)
+        return result
+
+    @staticmethod
+    def _get_blob_name(key: str):
+        if not key:
+            raise Exception("Key required.")
+
+        return encode(key)
