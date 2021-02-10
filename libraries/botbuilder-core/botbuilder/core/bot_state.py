@@ -14,7 +14,7 @@ from .property_manager import PropertyManager
 
 class CachedBotState:
     """
-        Internal cached bot state.
+    Internal cached bot state.
     """
 
     def __init__(self, state: Dict[str, object] = None):

@@ -8,7 +8,7 @@ from botbuilder.adapters.slack.slack_message import SlackMessage
 
 class SlackPayload:
     def __init__(self, **kwargs):
-        self.type: [str] = kwargs.get("type")
+        self.type: List[str] = kwargs.get("type")
         self.token: str = kwargs.get("token")
         self.channel: str = kwargs.get("channel")
         self.thread_ts: str = kwargs.get("thread_ts")

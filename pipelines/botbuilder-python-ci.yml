@@ -66,7 +66,7 @@ jobs:
       pip install pytest
       pip install pytest-cov
       pip install coveralls
-      pytest --junitxml=junit/test-results.$(PYTHON_VERSION).xml --cov-config=.coveragerc --cov --cov-report=xml --cov-report=html
+      pytest --junitxml=junit/test-results.$(PYTHON_VERSION).xml --cov-config=.coveragerc --cov --cov-report=xml --cov-report=html --ignore=libraries/functional-tests/tests/test_slack_client.py
     displayName: Pytest
 
   - task: PublishCodeCoverageResults@1
