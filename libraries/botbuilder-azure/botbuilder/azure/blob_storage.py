@@ -30,6 +30,7 @@ class BlobStorageSettings:
         Required if not using account_name and account_key.
     :type connection_string: str
     """
+
     def __init__(
         self,
         container_name: str,
@@ -69,6 +70,7 @@ class BlobStorage(Storage):
     :param settings: Settings used to instantiate the Blob service.
     :type settings: :class:`botbuilder.azure.BlobStorageSettings`
     """
+
     def __init__(self, settings: BlobStorageSettings):
         if not settings.container_name:
             raise Exception("Container name is required.")
