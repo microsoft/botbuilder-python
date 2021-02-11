@@ -116,8 +116,7 @@ class BlobStorage(Storage):
         items = {}
 
         for key in keys:
-            blob_name = self._get_blob_name(key)
-            blob_client = self.__container_client.get_blob_client(blob_name)
+            blob_client = self.__container_client.get_blob_client(key)
 
             try:
                 items[key] = await self._inner_read_blob(blob_client)
@@ -142,8 +141,7 @@ class BlobStorage(Storage):
         await self._initialize()
 
         for (name, item) in changes.items():
-            blob_name = self._get_blob_name(name)
-            blob_reference = self.__container_client.get_blob_client(blob_name)
+            blob_reference = self.__container_client.get_blob_client(name)
 
             e_tag = None
             if isinstance(item, dict):
@@ -175,8 +173,7 @@ class BlobStorage(Storage):
         await self._initialize()
 
         for key in keys:
-            blob_name = self._get_blob_name(key)
-            blob_client = self.__container_client.get_blob_client(blob_name)
+            blob_client = self.__container_client.get_blob_client(key)
             try:
                 await blob_client.delete_blob()
             # We can't delete what's already gone.
@@ -197,10 +194,3 @@ class BlobStorage(Storage):
         item["e_tag"] = blob.properties.etag.replace('"', "")
         result = Unpickler().restore(item)
         return result
-
-    @staticmethod
-    def _get_blob_name(key: str):
-        if not key:
-            raise Exception("Key required.")
-
-        return encode(key)
