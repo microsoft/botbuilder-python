@@ -2,12 +2,26 @@
 # Licensed under the MIT License.
 
 import re
-from copy import copy
+from copy import copy, deepcopy
+from datetime import datetime
 from typing import List, Callable, Union, Dict
-from botbuilder.schema import Activity, ConversationReference, Mention, ResourceResponse
+from botbuilder.schema import (
+    Activity,
+    ActivityTypes,
+    ConversationReference,
+    InputHints,
+    Mention,
+    ResourceResponse,
+    DeliveryModes,
+)
+from .re_escape import escape
 
 
 class TurnContext:
+
+    # Same constant as in the BF Adapter, duplicating here to avoid circular dependency
+    _INVOKE_RESPONSE_KEY = "BotFrameworkAdapter.InvokeResponse"
+
     def __init__(self, adapter_or_context, request: Activity = None):
         """
         Creates a new TurnContext instance.
@@ -40,6 +54,9 @@ class TurnContext:
             )
 
         self._turn_state = {}
+
+        # A list of activities to send when `context.Activity.DeliveryMode == 'expectReplies'`
+        self.buffered_reply_activities = []
 
     @property
     def turn_state(self) -> Dict[str, object]:
@@ -137,35 +154,76 @@ class TurnContext:
         self._services[key] = value
 
     async def send_activity(
-        self, *activity_or_text: Union[Activity, str]
+        self,
+        activity_or_text: Union[Activity, str],
+        speak: str = None,
+        input_hint: str = None,
     ) -> ResourceResponse:
         """
         Sends a single activity or message to the user.
         :param activity_or_text:
         :return:
         """
-        reference = TurnContext.get_conversation_reference(self.activity)
-
-        output = [
-            TurnContext.apply_conversation_reference(
-                Activity(text=a, type="message") if isinstance(a, str) else a, reference
+        if isinstance(activity_or_text, str):
+            activity_or_text = Activity(
+                text=activity_or_text,
+                input_hint=input_hint or InputHints.accepting_input,
+                speak=speak,
             )
-            for a in activity_or_text
-        ]
-        for activity in output:
+
+        result = await self.send_activities([activity_or_text])
+        return result[0] if result else None
+
+    async def send_activities(
+        self, activities: List[Activity]
+    ) -> List[ResourceResponse]:
+        sent_non_trace_activity = False
+        ref = TurnContext.get_conversation_reference(self.activity)
+
+        def activity_validator(activity: Activity) -> Activity:
+            if not getattr(activity, "type", None):
+                activity.type = ActivityTypes.message
+            if activity.type != ActivityTypes.trace:
+                nonlocal sent_non_trace_activity
+                sent_non_trace_activity = True
             if not activity.input_hint:
                 activity.input_hint = "acceptingInput"
+            activity.id = None
+            return activity
 
-        async def callback(context: "TurnContext", output):
-            responses = await context.adapter.send_activities(context, output)
-            context._responded = True  # pylint: disable=protected-access
+        output = [
+            activity_validator(
+                TurnContext.apply_conversation_reference(deepcopy(act), ref)
+            )
+            for act in activities
+        ]
+
+        # send activities through adapter
+        async def logic():
+            nonlocal sent_non_trace_activity
+
+            if self.activity.delivery_mode == DeliveryModes.expect_replies:
+                responses = []
+                for activity in output:
+                    self.buffered_reply_activities.append(activity)
+                    # Ensure the TurnState has the InvokeResponseKey, since this activity
+                    # is not being sent through the adapter, where it would be added to TurnState.
+                    if activity.type == ActivityTypes.invoke_response:
+                        self.turn_state[TurnContext._INVOKE_RESPONSE_KEY] = activity
+
+                    responses.append(ResourceResponse())
+
+                if sent_non_trace_activity:
+                    self.responded = True
+
+                return responses
+
+            responses = await self.adapter.send_activities(self, output)
+            if sent_non_trace_activity:
+                self.responded = True
             return responses
 
-        result = await self._emit(
-            self._on_send_activities, output, callback(self, output)
-        )
-
-        return result[0] if result else ResourceResponse()
+        return await self._emit(self._on_send_activities, output, logic())
 
     async def update_activity(self, activity: Activity):
         """
@@ -173,9 +231,11 @@ class TurnContext:
         :param activity:
         :return:
         """
+        reference = TurnContext.get_conversation_reference(self.activity)
+
         return await self._emit(
             self._on_update_activity,
-            activity,
+            TurnContext.apply_conversation_reference(activity, reference),
             self.adapter.update_activity(self, activity),
         )
 
@@ -240,8 +300,22 @@ class TurnContext:
                 raise error
 
         await emit_next(0)
-        # This should be changed to `return await logic()`
+        # logic does not use parentheses because it's a coroutine
         return await logic
+
+    async def send_trace_activity(
+        self, name: str, value: object = None, value_type: str = None, label: str = None
+    ) -> ResourceResponse:
+        trace_activity = Activity(
+            type=ActivityTypes.trace,
+            timestamp=datetime.utcnow(),
+            name=name,
+            value=value,
+            value_type=value_type,
+            label=label,
+        )
+
+        return await self.send_activity(trace_activity)
 
     @staticmethod
     def get_conversation_reference(activity: Activity) -> ConversationReference:
@@ -260,6 +334,7 @@ class TurnContext:
             bot=copy(activity.recipient),
             conversation=copy(activity.conversation),
             channel_id=activity.channel_id,
+            locale=activity.locale,
             service_url=activity.service_url,
         )
 
@@ -277,6 +352,7 @@ class TurnContext:
         :return:
         """
         activity.channel_id = reference.channel_id
+        activity.locale = reference.locale
         activity.service_url = reference.service_url
         activity.conversation = reference.conversation
         if is_incoming:
@@ -313,9 +389,11 @@ class TurnContext:
     def remove_mention_text(activity: Activity, identifier: str) -> str:
         mentions = TurnContext.get_mentions(activity)
         for mention in mentions:
-            if mention.mentioned.id == identifier:
+            if mention.additional_properties["mentioned"]["id"] == identifier:
                 mention_name_match = re.match(
-                    r"<at(.*)>(.*?)<\/at>", mention.text, re.IGNORECASE
+                    r"<at(.*)>(.*?)<\/at>",
+                    escape(mention.additional_properties["text"]),
+                    re.IGNORECASE,
                 )
                 if mention_name_match:
                     activity.text = re.sub(
@@ -331,4 +409,5 @@ class TurnContext:
             for entity in activity.entities:
                 if entity.type.lower() == "mention":
                     result.append(entity)
+
         return result

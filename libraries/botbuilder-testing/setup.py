@@ -5,12 +5,12 @@ import os
 from setuptools import setup
 
 REQUIRES = [
-    "botbuilder-schema>=4.4.0b1",
-    "botbuilder-core>=4.4.0b1",
-    "botbuilder-dialogs>=4.4.0b1",
+    "botbuilder-schema==4.12.0",
+    "botbuilder-core==4.12.0",
+    "botbuilder-dialogs==4.12.0",
 ]
 
-TESTS_REQUIRES = ["aiounittest>=1.1.0"]
+TESTS_REQUIRES = ["aiounittest==1.3.0"]
 
 root = os.path.abspath(os.path.dirname(__file__))
 
@@ -41,7 +41,7 @@ setup(
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 5 - Production/Stable",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
     ],
 )

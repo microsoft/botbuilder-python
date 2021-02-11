@@ -55,9 +55,11 @@ class NumberPrompt(Prompt):
 
         result = PromptRecognizerResult()
         if turn_context.activity.type == ActivityTypes.message:
-            message = turn_context.activity
+            utterance = turn_context.activity.text
+            if not utterance:
+                return result
             culture = self._get_culture(turn_context)
-            results: [ModelResult] = recognize_number(message.text, culture)
+            results: [ModelResult] = recognize_number(utterance, culture)
 
             if results:
                 result.succeeded = True

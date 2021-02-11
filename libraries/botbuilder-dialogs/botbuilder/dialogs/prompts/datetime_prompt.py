@@ -50,11 +50,17 @@ class DateTimePrompt(Prompt):
         result = PromptRecognizerResult()
         if turn_context.activity.type == ActivityTypes.message:
             # Recognize utterance
-            message = turn_context.activity
+            utterance = turn_context.activity.text
+            if not utterance:
+                return result
             # TODO: English constant needs to be ported.
-            culture = message.locale if message.locale is not None else "English"
+            culture = (
+                turn_context.activity.locale
+                if turn_context.activity.locale is not None
+                else "English"
+            )
 
-            results = recognize_datetime(message.text, culture)
+            results = recognize_datetime(utterance, culture)
             if results:
                 result.succeeded = True
                 result.value = []

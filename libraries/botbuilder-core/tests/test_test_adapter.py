@@ -2,9 +2,11 @@
 # Licensed under the MIT License.
 
 import aiounittest
-from botbuilder.schema import Activity, ConversationReference
+
+from botframework.connector.auth import MicrosoftAppCredentials
 from botbuilder.core import TurnContext
 from botbuilder.core.adapters import TestAdapter
+from botbuilder.schema import Activity, ConversationReference, ChannelAccount
 
 RECEIVED_MESSAGE = Activity(type="message", text="received")
 UPDATED_ACTIVITY = Activity(type="message", text="update")
@@ -37,7 +39,7 @@ class TestTestAdapter(aiounittest.AsyncTestCase):
         await adapter.receive_activity(Activity(type="message", text="test"))
 
     async def test_should_set_activity_type_when_receive_activity_receives_activity_without_type(
-        self
+        self,
     ):
         async def logic(context: TurnContext):
             assert context.activity.type == "message"
@@ -135,3 +137,142 @@ class TestTestAdapter(aiounittest.AsyncTestCase):
             adapter.deleted_activities[0].activity_id
             == DELETED_ACTIVITY_REFERENCE.activity_id
         )
+
+    async def test_get_user_token_returns_null(self):
+        adapter = TestAdapter()
+        activity = Activity(
+            channel_id="directline", from_property=ChannelAccount(id="testuser")
+        )
+
+        turn_context = TurnContext(adapter, activity)
+
+        token_response = await adapter.get_user_token(turn_context, "myConnection")
+        assert not token_response
+
+        oauth_app_credentials = MicrosoftAppCredentials(None, None)
+        token_response = await adapter.get_user_token(
+            turn_context, "myConnection", oauth_app_credentials=oauth_app_credentials
+        )
+        assert not token_response
+
+    async def test_get_user_token_returns_null_with_code(self):
+        adapter = TestAdapter()
+        activity = Activity(
+            channel_id="directline", from_property=ChannelAccount(id="testuser")
+        )
+
+        turn_context = TurnContext(adapter, activity)
+
+        token_response = await adapter.get_user_token(
+            turn_context, "myConnection", "abc123"
+        )
+        assert not token_response
+
+        oauth_app_credentials = MicrosoftAppCredentials(None, None)
+        token_response = await adapter.get_user_token(
+            turn_context,
+            "myConnection",
+            "abc123",
+            oauth_app_credentials=oauth_app_credentials,
+        )
+        assert not token_response
+
+    async def test_get_user_token_returns_token(self):
+        adapter = TestAdapter()
+        connection_name = "myConnection"
+        channel_id = "directline"
+        user_id = "testUser"
+        token = "abc123"
+        activity = Activity(
+            channel_id=channel_id, from_property=ChannelAccount(id=user_id)
+        )
+
+        turn_context = TurnContext(adapter, activity)
+
+        adapter.add_user_token(connection_name, channel_id, user_id, token)
+
+        token_response = await adapter.get_user_token(turn_context, connection_name)
+        assert token_response
+        assert token == token_response.token
+        assert connection_name == token_response.connection_name
+
+        oauth_app_credentials = MicrosoftAppCredentials(None, None)
+        token_response = await adapter.get_user_token(
+            turn_context, connection_name, oauth_app_credentials=oauth_app_credentials
+        )
+        assert token_response
+        assert token == token_response.token
+        assert connection_name == token_response.connection_name
+
+    async def test_get_user_token_returns_token_with_magice_code(self):
+        adapter = TestAdapter()
+        connection_name = "myConnection"
+        channel_id = "directline"
+        user_id = "testUser"
+        token = "abc123"
+        magic_code = "888999"
+        activity = Activity(
+            channel_id=channel_id, from_property=ChannelAccount(id=user_id)
+        )
+
+        turn_context = TurnContext(adapter, activity)
+
+        adapter.add_user_token(connection_name, channel_id, user_id, token, magic_code)
+
+        # First no magic_code
+        token_response = await adapter.get_user_token(turn_context, connection_name)
+        assert not token_response
+
+        # Can be retrieved with magic code
+        token_response = await adapter.get_user_token(
+            turn_context, connection_name, magic_code
+        )
+        assert token_response
+        assert token == token_response.token
+        assert connection_name == token_response.connection_name
+
+        # Then can be retrieved without magic code
+        token_response = await adapter.get_user_token(turn_context, connection_name)
+        assert token_response
+        assert token == token_response.token
+        assert connection_name == token_response.connection_name
+
+        # Then can be retrieved using customized AppCredentials
+        oauth_app_credentials = MicrosoftAppCredentials(None, None)
+        token_response = await adapter.get_user_token(
+            turn_context, connection_name, oauth_app_credentials=oauth_app_credentials
+        )
+        assert token_response
+        assert token == token_response.token
+        assert connection_name == token_response.connection_name
+
+    async def test_should_validate_no_reply_when_no_reply_expected(self):
+        async def logic(context: TurnContext):
+            await context.send_activity(RECEIVED_MESSAGE)
+
+        adapter = TestAdapter(logic)
+        test_flow = await adapter.test("test", "received")
+        await test_flow.assert_no_reply("should be no additional replies")
+
+    async def test_should_timeout_waiting_for_assert_no_reply_when_no_reply_expected(
+        self,
+    ):
+        async def logic(context: TurnContext):
+            await context.send_activity(RECEIVED_MESSAGE)
+
+        adapter = TestAdapter(logic)
+        test_flow = await adapter.test("test", "received")
+        await test_flow.assert_no_reply("no reply received", 500)
+
+    async def test_should_throw_error_with_assert_no_reply_when_no_reply_expected_but_was_received(
+        self,
+    ):
+        async def logic(context: TurnContext):
+            activities = [RECEIVED_MESSAGE, RECEIVED_MESSAGE]
+            await context.send_activities(activities)
+
+        adapter = TestAdapter(logic)
+        test_flow = await adapter.test("test", "received")
+
+        with self.assertRaises(Exception):
+            await test_flow.assert_no_reply("should be no additional replies")

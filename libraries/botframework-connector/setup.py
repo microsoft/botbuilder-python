@@ -1,16 +1,19 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+
 import os
 from setuptools import setup
 
 NAME = "botframework-connector"
-VERSION = os.environ["packageVersion"] if "packageVersion" in os.environ else "4.4.0b1"
+VERSION = os.environ["packageVersion"] if "packageVersion" in os.environ else "4.12.0"
 REQUIRES = [
-    "msrest>=0.6.6",
-    "requests>=2.8.1",
-    "cryptography>=2.3.0",
-    "PyJWT>=1.5.3",
-    "botbuilder-schema>=4.4.0b1",
+    "msrest==0.6.10",
+    "requests==2.23.0",
+    "cryptography==3.2",
+    "PyJWT==1.5.3",
+    "botbuilder-schema==4.12.0",
+    "adal==1.2.1",
+    "msal==1.6.0",
 ]
 
 root = os.path.abspath(os.path.dirname(__file__))
@@ -34,6 +37,8 @@ setup(
         "botframework.connector.models",
         "botframework.connector.aio",
         "botframework.connector.aio.operations_async",
+        "botframework.connector.teams",
+        "botframework.connector.teams.operations",
         "botframework.connector.token_api",
         "botframework.connector.token_api.aio",
         "botframework.connector.token_api.models",
@@ -48,7 +53,7 @@ setup(
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 5 - Production/Stable",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
     ],
 )

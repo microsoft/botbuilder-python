@@ -30,7 +30,7 @@ class TestBotAdapter(aiounittest.AsyncTestCase):
 
     async def test_pass_resource_responses_through(self):
         def validate_responses(  # pylint: disable=unused-argument
-            activities: List[Activity]
+            activities: List[Activity],
         ):
             pass  # no need to do anything.
 
@@ -42,7 +42,7 @@ class TestBotAdapter(aiounittest.AsyncTestCase):
 
         resource_response = await context.send_activity(activity)
         self.assertTrue(
-            resource_response.id == activity_id, "Incorrect response Id returned"
+            resource_response.id != activity_id, "Incorrect response Id returned"
         )
 
     async def test_continue_conversation_direct_msg(self):
@@ -67,7 +67,7 @@ class TestBotAdapter(aiounittest.AsyncTestCase):
             nonlocal callback_invoked
             callback_invoked = True
 
-        await adapter.continue_conversation("MyBot", reference, continue_callback)
+        await adapter.continue_conversation(reference, continue_callback, "MyBot")
         self.assertTrue(callback_invoked)
 
     async def test_turn_error(self):

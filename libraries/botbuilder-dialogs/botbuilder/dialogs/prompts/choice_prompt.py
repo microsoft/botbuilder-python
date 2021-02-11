@@ -121,7 +121,9 @@ class ChoicePrompt(Prompt):
             if self.choice_options
             else ChoicePrompt._default_choice_options[culture]
         )
-        choice_style = options.style if options.style else self.style
+        choice_style = (
+            0 if options.style == 0 else options.style if options.style else self.style
+        )
 
         if is_retry and options.retry_prompt is not None:
             prompt = self.append_choices(
@@ -150,6 +152,8 @@ class ChoicePrompt(Prompt):
         if turn_context.activity.type == ActivityTypes.message:
             activity: Activity = turn_context.activity
             utterance: str = activity.text
+            if not utterance:
+                return result
             opt: FindChoicesOptions = self.recognizer_options if self.recognizer_options else FindChoicesOptions()
             opt.locale = (
                 activity.locale

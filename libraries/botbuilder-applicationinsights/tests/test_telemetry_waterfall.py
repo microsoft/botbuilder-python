@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from unittest.mock import patch
+from unittest.mock import create_autospec, MagicMock
 from typing import Dict
 import aiounittest
 from botbuilder.core.adapters import TestAdapter, TestFlow
@@ -14,6 +14,8 @@ from botbuilder.core import (
 )
 from botbuilder.dialogs import (
     Dialog,
+    DialogInstance,
+    DialogReason,
     DialogSet,
     WaterfallDialog,
     DialogTurnResult,
@@ -23,6 +25,8 @@ from botbuilder.dialogs import (
 BEGIN_MESSAGE = Activity()
 BEGIN_MESSAGE.text = "begin"
 BEGIN_MESSAGE.type = "message"
+
+MOCK_TELEMETRY = "botbuilder.applicationinsights.ApplicationInsightsTelemetryClient"
 
 
 class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
@@ -34,15 +38,12 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
         # assert
         self.assertEqual(type(dialog.telemetry_client), NullTelemetryClient)
 
-    @patch("botbuilder.applicationinsights.ApplicationInsightsTelemetryClient")
-    async def test_execute_sequence_waterfall_steps(  # pylint: disable=invalid-name
-        self, MockTelemetry
-    ):
+    async def test_execute_sequence_waterfall_steps(self):
         # arrange
 
         # Create new ConversationState with MemoryStorage and register the state as middleware.
         convo_state = ConversationState(MemoryStorage())
-        telemetry = MockTelemetry()
+        telemetry = MagicMock(name=MOCK_TELEMETRY)
 
         # Create a DialogState property, DialogSet and register the WaterfallDialog.
         dialog_state = convo_state.create_property("dialogState")
@@ -84,23 +85,19 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
         await tf4.assert_reply("ending WaterfallDialog.")
 
         # assert
-
         telemetry_calls = [
             ("WaterfallStart", {"DialogId": "test"}),
-            ("WaterfallStep", {"DialogId": "test", "StepName": "Step1of2"}),
-            ("WaterfallStep", {"DialogId": "test", "StepName": "Step2of2"}),
+            ("WaterfallStep", {"DialogId": "test", "StepName": step1.__qualname__}),
+            ("WaterfallStep", {"DialogId": "test", "StepName": step2.__qualname__}),
         ]
         self.assert_telemetry_calls(telemetry, telemetry_calls)
 
-    @patch("botbuilder.applicationinsights.ApplicationInsightsTelemetryClient")
-    async def test_ensure_end_dialog_called(
-        self, MockTelemetry
-    ):  # pylint: disable=invalid-name
+    async def test_ensure_end_dialog_called(self):
         # arrange
 
         # Create new ConversationState with MemoryStorage and register the state as middleware.
         convo_state = ConversationState(MemoryStorage())
-        telemetry = MockTelemetry()
+        telemetry = MagicMock(name=MOCK_TELEMETRY)
 
         # Create a DialogState property, DialogSet and register the WaterfallDialog.
         dialog_state = convo_state.create_property("dialogState")
@@ -142,14 +139,48 @@ class TelemetryWaterfallTests(aiounittest.AsyncTestCase):
         # assert
         telemetry_calls = [
             ("WaterfallStart", {"DialogId": "test"}),
-            ("WaterfallStep", {"DialogId": "test", "StepName": "Step1of2"}),
-            ("WaterfallStep", {"DialogId": "test", "StepName": "Step2of2"}),
+            ("WaterfallStep", {"DialogId": "test", "StepName": step1.__qualname__}),
+            ("WaterfallStep", {"DialogId": "test", "StepName": step2.__qualname__}),
             ("WaterfallComplete", {"DialogId": "test"}),
             ("WaterfallStart", {"DialogId": "test"}),
-            ("WaterfallStep", {"DialogId": "test", "StepName": "Step1of2"}),
+            ("WaterfallStep", {"DialogId": "test", "StepName": step1.__qualname__}),
         ]
-        print(str(telemetry.track_event.call_args_list))
         self.assert_telemetry_calls(telemetry, telemetry_calls)
+
+    async def test_cancelling_waterfall_telemetry(self):
+        # Arrange
+        dialog_id = "waterfall"
+        index = 0
+        guid = "(guid)"
+
+        async def my_waterfall_step(step) -> DialogTurnResult:
+            await step.context.send_activity("step1 response")
+            return Dialog.end_of_turn
+
+        dialog = WaterfallDialog(dialog_id, [my_waterfall_step])
+
+        telemetry_client = create_autospec(NullTelemetryClient)
+        dialog.telemetry_client = telemetry_client
+
+        dialog_instance = DialogInstance()
+        dialog_instance.id = dialog_id
+        dialog_instance.state = {"instanceId": guid, "stepIndex": index}
+
+        # Act
+        await dialog.end_dialog(
+            TurnContext(TestAdapter(), Activity()),
+            dialog_instance,
+            DialogReason.CancelCalled,
+        )
+
+        # Assert
+        telemetry_props = telemetry_client.track_event.call_args_list[0][0][1]
+
+        self.assertEqual(3, len(telemetry_props))
+        self.assertEqual(dialog_id, telemetry_props["DialogId"])
+        self.assertEqual(my_waterfall_step.__qualname__, telemetry_props["StepName"])
+        self.assertEqual(guid, telemetry_props["InstanceId"])
+        telemetry_client.track_event.assert_called_once()
 
     def assert_telemetry_call(
         self, telemetry_mock, index: int, event_name: str, props: Dict[str, str]

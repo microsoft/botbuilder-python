@@ -9,6 +9,7 @@ from . import conversation_reference_extension
 from .about import __version__
 from .activity_handler import ActivityHandler
 from .auto_save_state_middleware import AutoSaveStateMiddleware
+from .bot import Bot
 from .bot_assert import BotAssert
 from .bot_adapter import BotAdapter
 from .bot_framework_adapter import BotFrameworkAdapter, BotFrameworkAdapterSettings
@@ -16,7 +17,11 @@ from .bot_state import BotState
 from .bot_state_set import BotStateSet
 from .bot_telemetry_client import BotTelemetryClient, Severity
 from .card_factory import CardFactory
+from .channel_service_handler import BotActionNotImplementedError, ChannelServiceHandler
+from .component_registration import ComponentRegistration
 from .conversation_state import ConversationState
+from .oauth.extended_user_token_provider import ExtendedUserTokenProvider
+from .oauth.user_token_provider import UserTokenProvider
 from .intent_score import IntentScore
 from .invoke_response import InvokeResponse
 from .memory_storage import MemoryStorage
@@ -35,13 +40,19 @@ from .telemetry_constants import TelemetryConstants
 from .telemetry_logger_constants import TelemetryLoggerConstants
 from .telemetry_logger_middleware import TelemetryLoggerMiddleware
 from .turn_context import TurnContext
+from .transcript_logger import TranscriptLogger, TranscriptLoggerMiddleware
 from .user_state import UserState
-from .user_token_provider import UserTokenProvider
+from .register_class_middleware import RegisterClassMiddleware
+from .adapter_extensions import AdapterExtensions
+from .healthcheck import HealthCheck
 
 __all__ = [
     "ActivityHandler",
+    "AdapterExtensions",
     "AnonymousReceiveMiddleware",
     "AutoSaveStateMiddleware",
+    "Bot",
+    "BotActionNotImplementedError",
     "BotAdapter",
     "BotAssert",
     "BotFrameworkAdapter",
@@ -51,8 +62,12 @@ __all__ = [
     "BotTelemetryClient",
     "calculate_change_hash",
     "CardFactory",
+    "ChannelServiceHandler",
+    "ComponentRegistration",
     "ConversationState",
     "conversation_reference_extension",
+    "ExtendedUserTokenProvider",
+    "HealthCheck",
     "IntentScore",
     "InvokeResponse",
     "MemoryStorage",
@@ -62,6 +77,7 @@ __all__ = [
     "MiddlewareSet",
     "NullTelemetryClient",
     "PrivateConversationState",
+    "RegisterClassMiddleware",
     "Recognizer",
     "RecognizerResult",
     "Severity",
@@ -74,6 +90,8 @@ __all__ = [
     "TelemetryLoggerConstants",
     "TelemetryLoggerMiddleware",
     "TopIntent",
+    "TranscriptLogger",
+    "TranscriptLoggerMiddleware",
     "TurnContext",
     "UserState",
     "UserTokenProvider",

@@ -6,9 +6,9 @@ from setuptools import setup
 
 REQUIRES = [
     "azure-cognitiveservices-language-luis==0.2.0",
-    "botbuilder-schema>=4.4.0b1",
-    "botbuilder-core>=4.4.0b1",
-    "aiohttp>=3.5.4",
+    "botbuilder-schema==4.12.0",
+    "botbuilder-core==4.12.0",
+    "aiohttp==3.6.2",
 ]
 
 TESTS_REQUIRES = ["aiounittest>=1.1.0"]
@@ -39,6 +39,7 @@ setup(
         "botbuilder.ai.luis",
         "botbuilder.ai.qna.models",
         "botbuilder.ai.qna.utils",
+        "botbuilder.ai.qna.dialogs",
     ],
     install_requires=REQUIRES + TESTS_REQUIRES,
     tests_require=TESTS_REQUIRES,
@@ -48,7 +49,7 @@ setup(
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 5 - Production/Stable",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
     ],
 )

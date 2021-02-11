@@ -2,9 +2,12 @@
 # Licensed under the MIT License.
 
 from abc import ABC
+from typing import Union
 
+from .authentication_configuration import AuthenticationConfiguration
 from .authentication_constants import AuthenticationConstants
 from .channel_validation import ChannelValidation
+from .channel_provider import ChannelProvider
 from .claims_identity import ClaimsIdentity
 from .credential_provider import CredentialProvider
 from .jwt_token_extractor import JwtTokenExtractor
@@ -25,8 +28,13 @@ class EnterpriseChannelValidation(ABC):
         auth_header: str,
         credentials: CredentialProvider,
         channel_id: str,
-        channel_service: str,
+        channel_service_or_provider: Union[str, ChannelProvider],
+        auth_configuration: AuthenticationConfiguration = None,
     ) -> ClaimsIdentity:
+        channel_service = channel_service_or_provider
+        if isinstance(channel_service_or_provider, ChannelProvider):
+            channel_service = await channel_service_or_provider.get_channel_service()
+
         endpoint = (
             ChannelValidation.open_id_metadata_endpoint
             if ChannelValidation.open_id_metadata_endpoint
@@ -41,7 +49,7 @@ class EnterpriseChannelValidation(ABC):
         )
 
         identity: ClaimsIdentity = await token_extractor.get_identity_from_auth_header(
-            auth_header, channel_id
+            auth_header, channel_id, auth_configuration.required_endorsements
         )
         return await EnterpriseChannelValidation.validate_identity(
             identity, credentials
@@ -53,17 +61,22 @@ class EnterpriseChannelValidation(ABC):
         credentials: CredentialProvider,
         service_url: str,
         channel_id: str,
-        channel_service: str,
+        channel_service_or_provider: Union[str, ChannelProvider],
+        auth_configuration: AuthenticationConfiguration = None,
     ) -> ClaimsIdentity:
         identity: ClaimsIdentity = await EnterpriseChannelValidation.authenticate_channel_token(
-            auth_header, credentials, channel_id, channel_service
+            auth_header,
+            credentials,
+            channel_id,
+            channel_service_or_provider,
+            auth_configuration,
         )
 
         service_url_claim: str = identity.get_claim_value(
             AuthenticationConstants.SERVICE_URL_CLAIM
         )
         if service_url_claim != service_url:
-            raise Exception("Unauthorized. service_url claim do not match.")
+            raise PermissionError("Unauthorized. service_url claim do not match.")
 
         return identity
 
@@ -73,11 +86,11 @@ class EnterpriseChannelValidation(ABC):
     ) -> ClaimsIdentity:
         if identity is None:
             # No valid identity. Not Authorized.
-            raise Exception("Unauthorized. No valid identity.")
+            raise PermissionError("Unauthorized. No valid identity.")
 
         if not identity.is_authenticated:
             # The token is in some way invalid. Not Authorized.
-            raise Exception("Unauthorized. Is not authenticated.")
+            raise PermissionError("Unauthorized. Is not authenticated.")
 
         # Now check that the AppID in the claim set matches
         # what we're looking for. Note that in a multi-tenant bot, this value
@@ -90,7 +103,7 @@ class EnterpriseChannelValidation(ABC):
             != AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER
         ):
             # The relevant Audience Claim MUST be present. Not Authorized.
-            raise Exception("Unauthorized. Issuer claim MUST be present.")
+            raise PermissionError("Unauthorized. Issuer claim MUST be present.")
 
         # The AppId from the claim in the token must match the AppId specified by the developer.
         # In this case, the token is destined for the app, so we find the app ID in the audience claim.
@@ -99,7 +112,7 @@ class EnterpriseChannelValidation(ABC):
         )
         if not await credentials.is_valid_appid(aud_claim or ""):
             # The AppId is not valid or not present. Not Authorized.
-            raise Exception(
+            raise PermissionError(
                 f"Unauthorized. Invalid AppId passed on token: { aud_claim }"
             )
 

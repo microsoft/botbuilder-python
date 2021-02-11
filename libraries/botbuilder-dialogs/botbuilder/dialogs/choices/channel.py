@@ -32,7 +32,6 @@ class Channel:
             # https://dev.kik.com/#/docs/messaging#text-response-object
             Channels.kik: 20,
             Channels.telegram: 100,
-            Channels.slack: 100,
             Channels.emulator: 100,
             Channels.direct_line: 100,
             Channels.webchat: 100,
@@ -62,6 +61,7 @@ class Channel:
             Channels.ms_teams: 3,
             Channels.line: 99,
             Channels.slack: 100,
+            Channels.telegram: 100,
             Channels.emulator: 100,
             Channels.direct_line: 100,
             Channels.webchat: 100,
@@ -88,7 +88,7 @@ class Channel:
 
     @staticmethod
     def max_action_title_length(  # pylint: disable=unused-argument
-        channel_id: str
+        channel_id: str,
     ) -> int:
         """Maximum length allowed for Action Titles.
 

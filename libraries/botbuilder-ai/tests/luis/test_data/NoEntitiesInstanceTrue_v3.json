@@ -1,0 +1,33 @@
+{
+    "entities": {
+      "$instance": {}
+    },
+    "intents": {
+      "Greeting": {
+        "score": 0.9589885
+      }
+    },
+    "text": "Hi",
+    "v3": {
+      "options": {
+        "includeAllIntents": false,
+        "includeAPIResults": true,
+        "includeInstanceData": true,
+        "log": true,
+        "preferExternalEntities": true,
+        "slot": "production"
+      },
+      "response": {
+        "query": "Hi",
+        "prediction": {
+          "topIntent": "Greeting",
+          "intents": {
+            "Greeting": {
+              "score": 0.9589885
+            }
+          },
+          "entities": {}
+        }
+      }
+    }
+  }

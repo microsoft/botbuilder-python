@@ -63,18 +63,19 @@ class ChoiceRecognizers:
         locale = options.locale if (options and options.locale) else Culture.English
         matched = Find.find_choices(utterance, choices_list, options)
         if not matched:
-            # Next try finding by ordinal
-            matches = ChoiceRecognizers._recognize_ordinal(utterance, locale)
+            matches = []
 
-            if matches:
+            if not options or options.recognize_ordinals:
+                # Next try finding by ordinal
+                matches = ChoiceRecognizers._recognize_ordinal(utterance, locale)
                 for match in matches:
                     ChoiceRecognizers._match_choice_by_index(
                         choices_list, matched, match
                     )
-            else:
-                # Finally try by numerical index
-                matches = ChoiceRecognizers._recognize_number(utterance, locale)
 
+            if not matches and (not options or options.recognize_numbers):
+                # Then try by numerical index
+                matches = ChoiceRecognizers._recognize_number(utterance, locale)
                 for match in matches:
                     ChoiceRecognizers._match_choice_by_index(
                         choices_list, matched, match

@@ -3,8 +3,8 @@
 Microsoft Bot Framework Connector for Python
 ============================================
 
-.. image:: https://fuselabs.visualstudio.com/SDK_v4/_apis/build/status/Python/SDK_v4-Python-CI?branchName=master
-   :target:  https://fuselabs.visualstudio.com/SDK_v4/_apis/build/status/Python/SDK_v4-Python-CI
+.. image:: https://dev.azure.com/FuseLabs/SDK_v4/_apis/build/status/Python/Python-CI-PR-yaml?branchName=master
+   :target:  https://dev.azure.com/FuseLabs/SDK_v4/_apis/build/status/Python/Python-CI-PR-yaml?branchName=master
    :align: right
    :alt: Azure DevOps status for master branch
 .. image:: https://badge.fury.io/py/botframework-connector.svg
@@ -39,9 +39,9 @@ Client creation (with authentication), conversation initialization and activity 
 
 .. code-block:: python
 
-  from microsoft.botbuilder.schema import *
-  from microsoft.botframework.connector import ConnectorClient
-  from microsoft.botframework.connector.auth import MicrosoftTokenAuthentication
+  from botbuilder.schema import *
+  from botframework.connector import ConnectorClient
+  from botframework.connector.auth import MicrosoftAppCredentials
 
   APP_ID = '<your-app-id>'
   APP_PASSWORD = '<your-app-password>'
@@ -50,7 +50,7 @@ Client creation (with authentication), conversation initialization and activity 
   BOT_ID = '<bot-id>'
   RECIPIENT_ID = '<user-id>'
 
-  credentials = MicrosoftTokenAuthentication(APP_ID, APP_PASSWORD)
+  credentials = MicrosoftAppCredentials(APP_ID, APP_PASSWORD)
   connector = ConnectorClient(credentials, base_url=SERVICE_URL)
 
   conversation = connector.conversations.create_conversation(ConversationParameters(

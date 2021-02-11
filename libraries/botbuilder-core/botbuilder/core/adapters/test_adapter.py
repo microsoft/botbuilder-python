@@ -7,10 +7,18 @@
 
 import asyncio
 import inspect
+import uuid
 from datetime import datetime
+from uuid import uuid4
 from typing import Awaitable, Coroutine, Dict, List, Callable, Union
 from copy import copy
 from threading import Lock
+from botframework.connector.auth import AppCredentials, ClaimsIdentity
+from botframework.connector.token_api.models import (
+    SignInUrlResponse,
+    TokenExchangeResource,
+    TokenExchangeRequest,
+)
 from botbuilder.schema import (
     ActivityTypes,
     Activity,
@@ -22,7 +30,7 @@ from botbuilder.schema import (
 )
 from ..bot_adapter import BotAdapter
 from ..turn_context import TurnContext
-from ..user_token_provider import UserTokenProvider
+from ..oauth.extended_user_token_provider import ExtendedUserTokenProvider
 
 
 class UserToken:
@@ -47,19 +55,51 @@ class UserToken:
         )
 
 
+class ExchangeableToken(UserToken):
+    def __init__(
+        self,
+        connection_name: str = None,
+        user_id: str = None,
+        channel_id: str = None,
+        token: str = None,
+        exchangeable_item: str = None,
+    ):
+        super(ExchangeableToken, self).__init__(
+            connection_name=connection_name,
+            user_id=user_id,
+            channel_id=channel_id,
+            token=token,
+        )
+
+        self.exchangeable_item = exchangeable_item
+
+    def equals_key(self, rhs: "ExchangeableToken") -> bool:
+        return (
+            rhs is not None
+            and self.exchangeable_item == rhs.exchangeable_item
+            and super().equals_key(rhs)
+        )
+
+    def to_key(self) -> str:
+        return self.exchangeable_item
+
+
 class TokenMagicCode:
     def __init__(self, key: UserToken = None, magic_code: str = None):
         self.key = key
         self.magic_code = magic_code
 
 
-class TestAdapter(BotAdapter, UserTokenProvider):
+class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
+    __test__ = False
+    __EXCEPTION_EXPECTED = "ExceptionExpected"
+
     def __init__(
         self,
         logic: Coroutine = None,
         template_or_conversation: Union[Activity, ConversationReference] = None,
         send_trace_activities: bool = False,
-    ):  # pylint: disable=unused-argument
+    ):
         """
         Creates a new TestAdapter instance.
         :param logic:
@@ -71,6 +111,7 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         self._user_tokens: List[UserToken] = []
         self._magic_codes: List[TokenMagicCode] = []
         self._conversation_lock = Lock()
+        self.exchangeable_tokens: Dict[str, ExchangeableToken] = {}
         self.activity_buffer: List[Activity] = []
         self.updated_activities: List[Activity] = []
         self.deleted_activities: List[ConversationReference] = []
@@ -112,9 +153,11 @@ class TestAdapter(BotAdapter, UserTokenProvider):
             self._conversation_lock.release()
 
         activity.timestamp = activity.timestamp or datetime.utcnow()
-        await self.run_pipeline(TurnContext(self, activity), logic)
+        await self.run_pipeline(self.create_turn_context(activity), logic)
 
-    async def send_activities(self, context, activities: List[Activity]):
+    async def send_activities(
+        self, context, activities: List[Activity]
+    ) -> List[ResourceResponse]:
         """
         INTERNAL: called by the logic under test to send a set of activities. These will be buffered
         to the current `TestFlow` instance for comparison against the expected results.
@@ -155,16 +198,38 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         self.updated_activities.append(activity)
 
     async def continue_conversation(
-        self, bot_id: str, reference: ConversationReference, callback: Callable
+        self,
+        reference: ConversationReference,
+        callback: Callable,
+        bot_id: str = None,
+        claims_identity: ClaimsIdentity = None,  # pylint: disable=unused-argument
+        audience: str = None,
     ):
         """
         The `TestAdapter` just calls parent implementation.
-        :param bot_id
         :param reference:
         :param callback:
+        :param bot_id:
+        :param claims_identity:
         :return:
         """
-        await super().continue_conversation(bot_id, reference, callback)
+        await super().continue_conversation(
+            reference, callback, bot_id, claims_identity, audience
+        )
+
+    async def create_conversation(
+        self, channel_id: str, callback: Callable  # pylint: disable=unused-argument
+    ):
+        self.activity_buffer.clear()
+        update = Activity(
+            type=ActivityTypes.conversation_update,
+            members_added=[],
+            members_removed=[],
+            channel_id=channel_id,
+            conversation=ConversationAccount(id=str(uuid.uuid4())),
+        )
+        context = self.create_turn_context(update)
+        return await callback(context)
 
     async def receive_activity(self, activity):
         """
@@ -188,11 +253,13 @@ class TestAdapter(BotAdapter, UserTokenProvider):
             request.id = str(self._next_id)
 
         # Create context object and run middleware.
-        context = TurnContext(self, request)
+        context = self.create_turn_context(request)
         return await self.run_pipeline(context, self.logic)
 
     def get_next_activity(self) -> Activity:
-        return self.activity_buffer.pop(0)
+        if len(self.activity_buffer) > 0:
+            return self.activity_buffer.pop(0)
+        return None
 
     async def send(self, user_says) -> object:
         """
@@ -236,6 +303,20 @@ class TestAdapter(BotAdapter, UserTokenProvider):
                     timeout = arg[3]
             await self.test(arg[0], arg[1], description, timeout)
 
+    @staticmethod
+    def create_conversation_reference(
+        name: str, user: str = "User1", bot: str = "Bot"
+    ) -> ConversationReference:
+        return ConversationReference(
+            channel_id="test",
+            service_url="https://test.com",
+            conversation=ConversationAccount(
+                is_group=False, conversation_type=name, id=name,
+            ),
+            user=ChannelAccount(id=user.lower(), name=user.lower(),),
+            bot=ChannelAccount(id=bot.lower(), name=bot.lower(),),
+        )
+
     def add_user_token(
         self,
         connection_name: str,
@@ -259,7 +340,11 @@ class TestAdapter(BotAdapter, UserTokenProvider):
             self._magic_codes.append(code)
 
     async def get_user_token(
-        self, context: TurnContext, connection_name: str, magic_code: str = None
+        self,
+        context: TurnContext,
+        connection_name: str,
+        magic_code: str = None,
+        oauth_app_credentials: AppCredentials = None,  # pylint: disable=unused-argument
     ) -> TokenResponse:
         key = UserToken()
         key.channel_id = context.activity.channel_id
@@ -295,7 +380,11 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         return None
 
     async def sign_out_user(
-        self, context: TurnContext, connection_name: str, user_id: str = None
+        self,
+        context: TurnContext,
+        connection_name: str = None,
+        user_id: str = None,
+        oauth_app_credentials: AppCredentials = None,  # pylint: disable=unused-argument
     ):
         channel_id = context.activity.channel_id
         user_id = context.activity.from_property.id
@@ -311,23 +400,151 @@ class TestAdapter(BotAdapter, UserTokenProvider):
         self._user_tokens = new_records
 
     async def get_oauth_sign_in_link(
-        self, context: TurnContext, connection_name: str
+        self,
+        context: TurnContext,
+        connection_name: str,
+        final_redirect: str = None,  # pylint: disable=unused-argument
+        oauth_app_credentials: AppCredentials = None,  # pylint: disable=unused-argument
     ) -> str:
         return (
             f"https://fake.com/oauthsignin"
             f"/{connection_name}/{context.activity.channel_id}/{context.activity.from_property.id}"
         )
 
-    async def get_aad_tokens(
-        self, context: TurnContext, connection_name: str, resource_urls: List[str]
+    async def get_token_status(
+        self,
+        context: TurnContext,
+        connection_name: str = None,
+        user_id: str = None,
+        include_filter: str = None,
+        oauth_app_credentials: AppCredentials = None,
     ) -> Dict[str, TokenResponse]:
         return None
 
+    async def get_aad_tokens(
+        self,
+        context: TurnContext,
+        connection_name: str,
+        resource_urls: List[str],
+        user_id: str = None,  # pylint: disable=unused-argument
+        oauth_app_credentials: AppCredentials = None,  # pylint: disable=unused-argument
+    ) -> Dict[str, TokenResponse]:
+        return None
+
+    def add_exchangeable_token(
+        self,
+        connection_name: str,
+        channel_id: str,
+        user_id: str,
+        exchangeable_item: str,
+        token: str,
+    ):
+        key = ExchangeableToken(
+            connection_name=connection_name,
+            channel_id=channel_id,
+            user_id=user_id,
+            exchangeable_item=exchangeable_item,
+            token=token,
+        )
+        self.exchangeable_tokens[key.to_key()] = key
+
+    def throw_on_exchange_request(
+        self,
+        connection_name: str,
+        channel_id: str,
+        user_id: str,
+        exchangeable_item: str,
+    ):
+        key = ExchangeableToken(
+            connection_name=connection_name,
+            channel_id=channel_id,
+            user_id=user_id,
+            exchangeable_item=exchangeable_item,
+            token=TestAdapter.__EXCEPTION_EXPECTED,
+        )
+
+        self.exchangeable_tokens[key.to_key()] = key
+
+    async def get_sign_in_resource_from_user(
+        self,
+        turn_context: TurnContext,
+        connection_name: str,
+        user_id: str,
+        final_redirect: str = None,
+    ) -> SignInUrlResponse:
+        return await self.get_sign_in_resource_from_user_and_credentials(
+            turn_context, None, connection_name, user_id, final_redirect
+        )
+
+    async def get_sign_in_resource_from_user_and_credentials(
+        self,
+        turn_context: TurnContext,
+        oauth_app_credentials: AppCredentials,
+        connection_name: str,
+        user_id: str,
+        final_redirect: str = None,
+    ) -> SignInUrlResponse:
+        return SignInUrlResponse(
+            sign_in_link=f"https://fake.com/oauthsignin/{connection_name}/{turn_context.activity.channel_id}/{user_id}",
+            token_exchange_resource=TokenExchangeResource(
+                id=str(uuid4()),
+                provider_id=None,
+                uri=f"api://{connection_name}/resource",
+            ),
+        )
+
+    async def exchange_token(
+        self,
+        turn_context: TurnContext,
+        connection_name: str,
+        user_id: str,
+        exchange_request: TokenExchangeRequest,
+    ) -> TokenResponse:
+        return await self.exchange_token_from_credentials(
+            turn_context, None, connection_name, user_id, exchange_request
+        )
+
+    async def exchange_token_from_credentials(
+        self,
+        turn_context: TurnContext,
+        oauth_app_credentials: AppCredentials,
+        connection_name: str,
+        user_id: str,
+        exchange_request: TokenExchangeRequest,
+    ) -> TokenResponse:
+        exchangeable_value = exchange_request.token or exchange_request.uri
+
+        key = ExchangeableToken(
+            channel_id=turn_context.activity.channel_id,
+            connection_name=connection_name,
+            exchangeable_item=exchangeable_value,
+            user_id=user_id,
+        )
+
+        token_exchange_response = self.exchangeable_tokens.get(key.to_key())
+        if token_exchange_response:
+            if token_exchange_response.token == TestAdapter.__EXCEPTION_EXPECTED:
+                raise Exception("Exception occurred during exchanging tokens")
+
+            return TokenResponse(
+                channel_id=key.channel_id,
+                connection_name=key.connection_name,
+                token=token_exchange_response.token,
+                expiration=None,
+            )
+
+        return None
+
+    def create_turn_context(self, activity: Activity) -> TurnContext:
+        return TurnContext(self, activity)
+
 
 class TestFlow:
+    __test__ = False
+
     def __init__(self, previous: Callable, adapter: TestAdapter):
         """
-        INTERNAL: creates a new TestFlow instance.
+        INTERNAL: creates a TestFlow instance.
         :param previous:
         :param adapter:
         """
@@ -382,6 +599,7 @@ class TestFlow:
         :param is_substring:
         :return:
         """
+
         # TODO: refactor method so expected can take a Callable[[Activity], None]
         def default_inspector(reply, description=None):
             if isinstance(expected, Activity):
@@ -433,6 +651,45 @@ class TestFlow:
                 else:
                     await asyncio.sleep(0.05)
                     await wait_for_activity()
+
+            await wait_for_activity()
+
+        return TestFlow(await test_flow_previous(), self.adapter)
+
+    async def assert_no_reply(
+        self, description=None, timeout=None,  # pylint: disable=unused-argument
+    ) -> "TestFlow":
+        """
+        Generates an assertion if the bot responds when no response is expected.
+        :param description:
+        :param timeout:
+        """
+        if description is None:
+            description = ""
+
+        async def test_flow_previous():
+            nonlocal timeout
+            if not timeout:
+                timeout = 3000
+            start = datetime.now()
+            adapter = self.adapter
+
+            async def wait_for_activity():
+                nonlocal timeout
+                current = datetime.now()
+
+                if (current - start).total_seconds() * 1000 > timeout:
+                    # operation timed out and recieved no reply
+                    return
+
+                if adapter.activity_buffer:
+                    reply = adapter.activity_buffer.pop(0)
+                    raise RuntimeError(
+                        f"TestAdapter.assert_no_reply(): '{reply.text}' is responded when waiting for no reply."
+                    )
+
+                await asyncio.sleep(0.05)
+                await wait_for_activity()
 
             await wait_for_activity()
 

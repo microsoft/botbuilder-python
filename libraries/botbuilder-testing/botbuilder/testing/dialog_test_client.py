@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+
 from typing import List, Union
 
 from botbuilder.core import (
@@ -53,6 +54,7 @@ class DialogTestClient:
         :type conversation_state: ConversationState
         """
         self.dialog_turn_result: DialogTurnResult = None
+        self.dialog_context = None
         self.conversation_state: ConversationState = (
             ConversationState(MemoryStorage())
             if conversation_state is None
@@ -107,10 +109,10 @@ class DialogTestClient:
             dialog_set = DialogSet(dialog_state)
             dialog_set.add(target_dialog)
 
-            dialog_context = await dialog_set.create_context(turn_context)
-            self.dialog_turn_result = await dialog_context.continue_dialog()
+            self.dialog_context = await dialog_set.create_context(turn_context)
+            self.dialog_turn_result = await self.dialog_context.continue_dialog()
             if self.dialog_turn_result.status == DialogTurnStatus.Empty:
-                self.dialog_turn_result = await dialog_context.begin_dialog(
+                self.dialog_turn_result = await self.dialog_context.begin_dialog(
                     target_dialog.id, initial_dialog_options
                 )
 

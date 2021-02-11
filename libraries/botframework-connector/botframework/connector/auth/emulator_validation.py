@@ -1,12 +1,18 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 import asyncio
+from typing import Union
+
 import jwt
 
 from .jwt_token_extractor import JwtTokenExtractor
 from .verify_options import VerifyOptions
-from .constants import Constants
+from .authentication_constants import AuthenticationConstants
 from .credential_provider import CredentialProvider
 from .claims_identity import ClaimsIdentity
 from .government_constants import GovernmentConstants
+from .channel_provider import ChannelProvider
 
 
 class EmulatorValidation:
@@ -29,6 +35,10 @@ class EmulatorValidation:
             "https://sts.windows.net/cab8a31a-1906-4287-a0d8-4eef66b95f6e/",
             # Auth for US Gov, 2.0 token
             "https://login.microsoftonline.us/cab8a31a-1906-4287-a0d8-4eef66b95f6e/v2.0",
+            # Auth for US Gov, 1.0 token
+            "https://login.microsoftonline.us/f8cdef31-a31e-4b4a-93e4-5f571e91255a/",
+            # Auth for US Gov, 2.0 token
+            "https://login.microsoftonline.us/f8cdef31-a31e-4b4a-93e4-5f571e91255a/v2.0",
         ],
         audience=None,
         clock_tolerance=5 * 60,
@@ -44,27 +54,14 @@ class EmulatorValidation:
 
         :return: True, if the token was issued by the Emulator. Otherwise, false.
         """
-        # The Auth Header generally looks like this:
-        # "Bearer eyJ0e[...Big Long String...]XAiO"
-        if not auth_header:
-            # No token. Can't be an emulator token.
+        from .jwt_token_validation import (  # pylint: disable=import-outside-toplevel
+            JwtTokenValidation,
+        )
+
+        if not JwtTokenValidation.is_valid_token_format(auth_header):
             return False
 
-        parts = auth_header.split(" ")
-        if len(parts) != 2:
-            # Emulator tokens MUST have exactly 2 parts.
-            # If we don't have 2 parts, it's not an emulator token
-            return False
-
-        auth_scheme = parts[0]
-        bearer_token = parts[1]
-
-        # We now have an array that should be:
-        # [0] = "Bearer"
-        # [1] = "[Big Long String]"
-        if auth_scheme != "Bearer":
-            # The scheme from the emulator MUST be "Bearer"
-            return False
+        bearer_token = auth_header.split(" ")[1]
 
         # Parse the Big Long String into an actual token.
         token = jwt.decode(bearer_token, verify=False)
@@ -92,7 +89,7 @@ class EmulatorValidation:
     async def authenticate_emulator_token(
         auth_header: str,
         credentials: CredentialProvider,
-        channel_service: str,
+        channel_service_or_provider: Union[str, ChannelProvider],
         channel_id: str,
     ) -> ClaimsIdentity:
         """ Validate the incoming Auth Header
@@ -111,31 +108,33 @@ class EmulatorValidation:
         # pylint: disable=import-outside-toplevel
         from .jwt_token_validation import JwtTokenValidation
 
+        if isinstance(channel_service_or_provider, ChannelProvider):
+            is_gov = channel_service_or_provider.is_government()
+        else:
+            is_gov = JwtTokenValidation.is_government(channel_service_or_provider)
+
         open_id_metadata = (
             GovernmentConstants.TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL
-            if (
-                channel_service is not None
-                and JwtTokenValidation.is_government(channel_service)
-            )
-            else Constants.TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL
+            if is_gov
+            else AuthenticationConstants.TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL
         )
 
         token_extractor = JwtTokenExtractor(
             EmulatorValidation.TO_BOT_FROM_EMULATOR_TOKEN_VALIDATION_PARAMETERS,
             open_id_metadata,
-            Constants.ALLOWED_SIGNING_ALGORITHMS,
+            AuthenticationConstants.ALLOWED_SIGNING_ALGORITHMS,
         )
 
-        identity = await asyncio.ensure_future(
-            token_extractor.get_identity_from_auth_header(auth_header, channel_id)
+        identity = await token_extractor.get_identity_from_auth_header(
+            auth_header, channel_id
         )
         if not identity:
             # No valid identity. Not Authorized.
-            raise Exception("Unauthorized. No valid identity.")
+            raise PermissionError("Unauthorized. No valid identity.")
 
         if not identity.is_authenticated:
             # The token is in some way invalid. Not Authorized.
-            raise Exception("Unauthorized. Is not authenticated")
+            raise PermissionError("Unauthorized. Is not authenticated")
 
         # Now check that the AppID in the claimset matches
         # what we're looking for. Note that in a multi-tenant bot, this value
@@ -143,7 +142,9 @@ class EmulatorValidation:
         # Async validation.
         version_claim = identity.get_claim_value(EmulatorValidation.VERSION_CLAIM)
         if version_claim is None:
-            raise Exception('Unauthorized. "ver" claim is required on Emulator Tokens.')
+            raise PermissionError(
+                'Unauthorized. "ver" claim is required on Emulator Tokens.'
+            )
 
         app_id = ""
 
@@ -155,7 +156,7 @@ class EmulatorValidation:
             app_id_claim = identity.get_claim_value(EmulatorValidation.APP_ID_CLAIM)
             if not app_id_claim:
                 # No claim around AppID. Not Authorized.
-                raise Exception(
+                raise PermissionError(
                     "Unauthorized. "
                     '"appid" claim is required on Emulator Token version "1.0".'
                 )
@@ -163,10 +164,12 @@ class EmulatorValidation:
             app_id = app_id_claim
         elif version_claim == "2.0":
             # Emulator, "2.0" puts the AppId in the "azp" claim.
-            app_authz_claim = identity.get_claim_value(Constants.AUTHORIZED_PARTY)
+            app_authz_claim = identity.get_claim_value(
+                AuthenticationConstants.AUTHORIZED_PARTY
+            )
             if not app_authz_claim:
                 # No claim around AppID. Not Authorized.
-                raise Exception(
+                raise PermissionError(
                     "Unauthorized. "
                     '"azp" claim is required on Emulator Token version "2.0".'
                 )
@@ -174,7 +177,7 @@ class EmulatorValidation:
             app_id = app_authz_claim
         else:
             # Unknown Version. Not Authorized.
-            raise Exception(
+            raise PermissionError(
                 "Unauthorized. Unknown Emulator Token version ", version_claim, "."
             )
 
@@ -182,6 +185,8 @@ class EmulatorValidation:
             credentials.is_valid_appid(app_id)
         )
         if not is_valid_app_id:
-            raise Exception("Unauthorized. Invalid AppId passed on token: ", app_id)
+            raise PermissionError(
+                "Unauthorized. Invalid AppId passed on token: ", app_id
+            )
 
         return identity

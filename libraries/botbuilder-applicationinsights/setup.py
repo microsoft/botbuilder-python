@@ -5,16 +5,16 @@ import os
 from setuptools import setup
 
 REQUIRES = [
-    "applicationinsights>=0.11.9",
-    "botbuilder-schema>=4.4.0b1",
-    "botframework-connector>=4.4.0b1",
-    "botbuilder-core>=4.4.0b1",
+    "applicationinsights==0.11.9",
+    "botbuilder-schema==4.12.0",
+    "botframework-connector==4.12.0",
+    "botbuilder-core==4.12.0",
 ]
 TESTS_REQUIRES = [
-    "aiounittest>=1.1.0",
-    "django>=2.2",  # For samples
-    "djangorestframework>=3.9.2",  # For samples
-    "flask>=1.0.2",  # For samples
+    "aiounittest==1.3.0",
+    "django==2.2.6",  # For samples
+    "djangorestframework==3.10.3",  # For samples
+    "flask==1.1.1",  # For samples
 ]
 
 root = os.path.abspath(os.path.dirname(__file__))
@@ -47,6 +47,7 @@ setup(
         "botbuilder.applicationinsights",
         "botbuilder.applicationinsights.django",
         "botbuilder.applicationinsights.flask",
+        "botbuilder.applicationinsights.processor",
     ],
     install_requires=REQUIRES + TESTS_REQUIRES,
     tests_require=TESTS_REQUIRES,
@@ -56,7 +57,7 @@ setup(
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 5 - Production/Stable",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
     ],
 )

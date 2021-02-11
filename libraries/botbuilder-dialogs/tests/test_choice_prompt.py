@@ -8,7 +8,13 @@ from recognizers_text import Culture
 
 from botbuilder.core import CardFactory, ConversationState, MemoryStorage, TurnContext
 from botbuilder.core.adapters import TestAdapter
-from botbuilder.dialogs import DialogSet, DialogTurnResult, DialogTurnStatus
+from botbuilder.dialogs import (
+    DialogSet,
+    DialogTurnResult,
+    DialogTurnStatus,
+    ChoiceRecognizers,
+    FindChoicesOptions,
+)
 from botbuilder.dialogs.choices import Choice, ListStyle
 from botbuilder.dialogs.prompts import (
     ChoicePrompt,
@@ -315,7 +321,7 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
         await step3.assert_reply("red")
 
     async def test_should_use_context_activity_locale_over_default_locale_when_rendering_choices(
-        self
+        self,
     ):
         async def exec_test(turn_context: TurnContext):
             dialog_context = await dialogs.create_context(turn_context)
@@ -477,7 +483,7 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
         await step3.assert_reply("red")
 
     async def test_should_create_prompt_with_suggested_action_style_when_specified(
-        self
+        self,
     ):
         async def exec_test(turn_context: TurnContext):
             dialog_context = await dialogs.create_context(turn_context)
@@ -693,3 +699,19 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
 
         step1 = await adapter.send("Hello")
         await step1.assert_reply(assert_expected_activity)
+
+    async def test_should_not_find_a_choice_in_an_utterance_by_ordinal(self):
+        found = ChoiceRecognizers.recognize_choices(
+            "the first one please",
+            _color_choices,
+            FindChoicesOptions(recognize_numbers=False, recognize_ordinals=False),
+        )
+        assert not found
+
+    async def test_should_not_find_a_choice_in_an_utterance_by_numerical_index(self):
+        found = ChoiceRecognizers.recognize_choices(
+            "one",
+            _color_choices,
+            FindChoicesOptions(recognize_numbers=False, recognize_ordinals=False),
+        )
+        assert not found

@@ -4,11 +4,11 @@
 import os
 from setuptools import setup
 
-VERSION = os.environ["packageVersion"] if "packageVersion" in os.environ else "4.4.0b1"
+VERSION = os.environ["packageVersion"] if "packageVersion" in os.environ else "4.12.0"
 REQUIRES = [
-    "botbuilder-schema>=4.4.0b1",
-    "botframework-connector>=4.4.0b1",
-    "jsonpickle>=1.2",
+    "botbuilder-schema==4.12.0",
+    "botframework-connector==4.12.0",
+    "jsonpickle==1.2",
 ]
 
 root = os.path.abspath(os.path.dirname(__file__))
@@ -35,6 +35,10 @@ setup(
         "botbuilder.core",
         "botbuilder.core.adapters",
         "botbuilder.core.inspection",
+        "botbuilder.core.integration",
+        "botbuilder.core.skills",
+        "botbuilder.core.teams",
+        "botbuilder.core.oauth",
     ],
     install_requires=REQUIRES,
     classifiers=[
@@ -42,7 +46,7 @@ setup(
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 5 - Production/Stable",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
     ],
 )

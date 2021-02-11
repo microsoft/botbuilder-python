@@ -4,10 +4,18 @@
 
 import datetime
 import copy
+import random
+import string
 from queue import Queue
 from abc import ABC, abstractmethod
 from typing import Awaitable, Callable, List
-from botbuilder.schema import Activity, ActivityTypes, ConversationReference
+from botbuilder.schema import (
+    Activity,
+    ActivityEventNames,
+    ActivityTypes,
+    ChannelAccount,
+    ConversationReference,
+)
 from .middleware_set import Middleware
 from .turn_context import TurnContext
 
@@ -44,9 +52,17 @@ class TranscriptLoggerMiddleware(Middleware):
         activity = context.activity
         # Log incoming activity at beginning of turn
         if activity:
+            if not activity.from_property:
+                activity.from_property = ChannelAccount()
             if not activity.from_property.role:
                 activity.from_property.role = "user"
-            self.log_activity(transcript, copy.copy(activity))
+
+            # We should not log ContinueConversation events used by skills to initialize the middleware.
+            if not (
+                context.activity.type == ActivityTypes.event
+                and context.activity.name == ActivityEventNames.continue_conversation
+            ):
+                await self.log_activity(transcript, copy.copy(activity))
 
         # hook up onSend pipeline
         # pylint: disable=unused-argument
@@ -57,8 +73,27 @@ class TranscriptLoggerMiddleware(Middleware):
         ):
             # Run full pipeline
             responses = await next_send()
-            for activity in activities:
-                self.log_activity(transcript, copy.copy(activity))
+            for index, activity in enumerate(activities):
+                cloned_activity = copy.copy(activity)
+                if responses and index < len(responses):
+                    cloned_activity.id = responses[index].id
+
+                # For certain channels, a ResourceResponse with an id is not always sent to the bot.
+                # This fix uses the timestamp on the activity to populate its id for logging the transcript
+                # If there is no outgoing timestamp, the current time for the bot is used for the activity.id
+                if not cloned_activity.id:
+                    alphanumeric = string.ascii_lowercase + string.digits
+                    prefix = "g_" + "".join(
+                        random.choice(alphanumeric) for i in range(5)
+                    )
+                    epoch = datetime.datetime.utcfromtimestamp(0)
+                    if cloned_activity.timestamp:
+                        reference = cloned_activity.timestamp
+                    else:
+                        reference = datetime.datetime.today()
+                    delta = (reference - epoch).total_seconds() * 1000
+                    cloned_activity.id = f"{prefix}{delta}"
+                await self.log_activity(transcript, cloned_activity)
             return responses
 
         context.on_send_activities(send_activities_handler)
@@ -71,7 +106,7 @@ class TranscriptLoggerMiddleware(Middleware):
             response = await next_update()
             update_activity = copy.copy(activity)
             update_activity.type = ActivityTypes.message_update
-            self.log_activity(transcript, update_activity)
+            await self.log_activity(transcript, update_activity)
             return response
 
         context.on_update_activity(update_activity_handler)
@@ -91,7 +126,7 @@ class TranscriptLoggerMiddleware(Middleware):
             deleted_activity: Activity = TurnContext.apply_conversation_reference(
                 delete_msg, reference, False
             )
-            self.log_activity(transcript, deleted_activity)
+            await self.log_activity(transcript, deleted_activity)
 
         context.on_delete_activity(delete_activity_handler)
 
@@ -106,7 +141,7 @@ class TranscriptLoggerMiddleware(Middleware):
             await self.logger.log_activity(activity)
             transcript.task_done()
 
-    def log_activity(self, transcript: Queue, activity: Activity) -> None:
+    async def log_activity(self, transcript: Queue, activity: Activity) -> None:
         """Logs the activity.
         :param transcript: transcript.
         :param activity: Activity to log.

@@ -14,7 +14,7 @@ from botbuilder.core import (
 )
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.core.inspection import InspectionMiddleware, InspectionState
-from botbuilder.schema import Activity, ActivityTypes, ChannelAccount, Mention
+from botbuilder.schema import Activity, ActivityTypes, ChannelAccount, Entity, Mention
 
 
 class TestConversationState(aiounittest.AsyncTestCase):
@@ -37,7 +37,7 @@ class TestConversationState(aiounittest.AsyncTestCase):
         assert outbound_activity.text, "hi"
 
     async def test_should_replicate_activity_data_to_listening_emulator_following_open_and_attach(
-        self
+        self,
     ):
         inbound_expectation, outbound_expectation, state_expectation = (
             False,
@@ -147,7 +147,7 @@ class TestConversationState(aiounittest.AsyncTestCase):
         assert mocker.call_count, 3
 
     async def test_should_replicate_activity_data_to_listening_emulator_following_open_and_attach_with_at_mention(
-        self
+        self,
     ):
         inbound_expectation, outbound_expectation, state_expectation = (
             False,
@@ -249,10 +249,12 @@ class TestConversationState(aiounittest.AsyncTestCase):
                 text=attach_command,
                 recipient=ChannelAccount(id=recipient_id),
                 entities=[
-                    Mention(
-                        type="mention",
-                        text=f"<at>{recipient_id}</at>",
-                        mentioned=ChannelAccount(name="Bot", id=recipient_id),
+                    Entity().deserialize(
+                        Mention(
+                            type="mention",
+                            text=f"<at>{recipient_id}</at>",
+                            mentioned=ChannelAccount(name="Bot", id=recipient_id),
+                        ).serialize()
                     )
                 ],
             )

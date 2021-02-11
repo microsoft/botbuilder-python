@@ -59,7 +59,7 @@ class WaterfallDialog(Dialog):
         properties = {}
         properties["DialogId"] = self.id
         properties["InstanceId"] = instance_id
-        self.telemetry_client.track_event("WaterfallStart", properties=properties)
+        self.telemetry_client.track_event("WaterfallStart", properties)
 
         # Run first stepkinds
         return await self.run_step(dialog_context, 0, DialogReason.BeginCalled, None)
@@ -164,7 +164,7 @@ class WaterfallDialog(Dialog):
         """
         step_name = self._steps[index].__qualname__
 
-        if not step_name or ">" in step_name:
+        if not step_name or step_name.endswith("<lambda>"):
             step_name = f"Step{index + 1}of{len(self._steps)}"
 
         return step_name

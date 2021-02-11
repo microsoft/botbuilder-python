@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 from asyncio import wait
 from typing import List
 from .bot_state import BotState

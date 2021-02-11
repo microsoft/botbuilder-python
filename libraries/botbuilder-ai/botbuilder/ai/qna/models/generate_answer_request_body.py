@@ -1,12 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from typing import List
-
 from msrest.serialization import Model
-
-from .metadata import Metadata
-from .qna_request_context import QnARequestContext
 
 
 class GenerateAnswerRequestBody(Model):
@@ -19,41 +14,24 @@ class GenerateAnswerRequestBody(Model):
         "strict_filters": {"key": "strictFilters", "type": "[Metadata]"},
         "context": {"key": "context", "type": "QnARequestContext"},
         "qna_id": {"key": "qnaId", "type": "int"},
+        "is_test": {"key": "isTest", "type": "bool"},
+        "ranker_type": {"key": "rankerType", "type": "RankerTypes"},
+        "strict_filters_join_operator": {
+            "key": "strictFiltersCompoundOperationType",
+            "type": "str",
+        },
     }
 
-    def __init__(
-        self,
-        question: str,
-        top: int,
-        score_threshold: float,
-        strict_filters: List[Metadata],
-        context: QnARequestContext = None,
-        qna_id: int = None,
-        **kwargs
-    ):
-        """
-        Parameters:
-        -----------
-
-        question: The user question to query against the knowledge base.
-
-        top: Max number of answers to be returned for the question.
-
-        score_threshold: Threshold for answers returned based on score.
-
-        strict_filters: Find answers that contains these metadata.
-
-        context: The context from which the QnA was extracted.
-
-        qna_id: Id of the current question asked.
-
-        """
-
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
-        self.question = question
-        self.top = top
-        self.score_threshold = score_threshold
-        self.strict_filters = strict_filters
-        self.context = context
-        self.qna_id = qna_id
+        self.question = kwargs.get("question", None)
+        self.top = kwargs.get("top", None)
+        self.score_threshold = kwargs.get("score_threshold", None)
+        self.strict_filters = kwargs.get("strict_filters", None)
+        self.context = kwargs.get("context", None)
+        self.qna_id = kwargs.get("qna_id", None)
+        self.is_test = kwargs.get("is_test", None)
+        self.ranker_type = kwargs.get("ranker_type", None)
+        self.strict_filters_join_operator = kwargs.get(
+            "strict_filters_join_operator", None
+        )

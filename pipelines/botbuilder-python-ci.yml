@@ -1,0 +1,111 @@
+variables:
+  # Container registry service connection established during pipeline creation
+  CI_PULL_REQUEST: $(System.PullRequest.PullRequestId)
+  COVERALLS_FLAG_NAME: Build \# $(Build.BuildNumber)
+  COVERALLS_GIT_BRANCH: $(Build.SourceBranchName)
+  COVERALLS_GIT_COMMIT: $(Build.SourceVersion)
+  COVERALLS_SERVICE_JOB_ID: $(Build.BuildId)
+  COVERALLS_SERVICE_NAME: python-ci
+  python.36: 3.6.x
+  python.37: 3.7.x
+  python.38: 3.8.x
+  # PythonCoverallsToken: get this from Azure
+
+jobs:
+# Build and publish container
+- job: Build
+#Multi-configuration and multi-agent job options are not exported to YAML. Configure these options using documentation guidance: https://docs.microsoft.com/vsts/pipelines/process/phases
+  pool:
+    name: Hosted Ubuntu 1604
+
+  strategy:
+      matrix:
+        Python36:
+          PYTHON_VERSION: '$(python.36)'
+        Python37:
+          PYTHON_VERSION: '$(python.37)'
+        Python38:
+          PYTHON_VERSION: '$(python.38)'
+      maxParallel: 3
+
+  steps:
+  - powershell: |
+      Get-ChildItem env:* | sort-object name | Format-Table -Autosize -Wrap | Out-String -Width 120
+    displayName: 'Get environment vars'
+
+  - task: UsePythonVersion@0
+    displayName: 'Use Python $(PYTHON_VERSION)'
+    inputs:
+      versionSpec: '$(PYTHON_VERSION)'
+
+  - script: 'sudo ln -s /opt/hostedtoolcache/Python/3.6.9/x64/lib/libpython3.6m.so.1.0 /usr/lib/libpython3.6m.so'
+    displayName: libpython3.6m
+
+  - script: |
+      python -m pip install --upgrade pip
+      pip install -e ./libraries/botbuilder-schema
+      pip install -e ./libraries/botframework-connector
+      pip install -e ./libraries/botbuilder-core
+      pip install -e ./libraries/botbuilder-ai
+      pip install -e ./libraries/botbuilder-applicationinsights
+      pip install -e ./libraries/botbuilder-dialogs
+      pip install -e ./libraries/botbuilder-azure
+      pip install -e ./libraries/botbuilder-testing
+      pip install -e ./libraries/botbuilder-integration-applicationinsights-aiohttp
+      pip install -e ./libraries/botbuilder-adapters-slack
+      pip install -e ./libraries/botbuilder-integration-aiohttp
+      pip install -r ./libraries/botframework-connector/tests/requirements.txt
+      pip install -r ./libraries/botbuilder-core/tests/requirements.txt
+      pip install -r ./libraries/botbuilder-ai/tests/requirements.txt
+      pip install coveralls
+      pip install pylint==2.4.4
+      pip install black==19.10b0
+    displayName: 'Install dependencies'
+
+  - script: |
+      pip install pytest
+      pip install pytest-cov
+      pip install coveralls
+      pytest --junitxml=junit/test-results.$(PYTHON_VERSION).xml --cov-config=.coveragerc --cov --cov-report=xml --cov-report=html --ignore=libraries/functional-tests/tests/test_slack_client.py
+    displayName: Pytest
+
+  - task: PublishCodeCoverageResults@1
+    displayName: 'Publish Test Coverage'
+    inputs:
+      codeCoverageTool: Cobertura
+      summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
+      reportDirectory: '$(System.DefaultWorkingDirectory)/**/htmlcov'
+
+  - task: PublishTestResults@2
+    displayName: 'Publish Test Results **/test-results.$(PYTHON_VERSION).xml'
+    inputs:
+      testResultsFiles: '**/test-results.$(PYTHON_VERSION).xml'
+      testRunTitle: 'Python $(PYTHON_VERSION)'
+
+  - script: 'black --check libraries'
+    displayName: 'Check Black compliant'
+
+  - script: 'pylint --rcfile=.pylintrc libraries'
+    displayName: Pylint
+
+  - script: 'COVERALLS_REPO_TOKEN=$(PythonCoverallsToken) coveralls'
+    displayName: 'Push test results to coveralls https://coveralls.io/github/microsoft/botbuilder-python'
+    continueOnError: true
+    condition: and(succeeded(), eq(variables['System.PullRequest.IsFork'], 'false'))
+
+  - powershell: |
+      Set-Location ..
+      Get-ChildItem -Recurse -Force
+
+    displayName: 'Dir workspace'
+    condition: succeededOrFailed()
+
+  - powershell: |
+      # This task copies the code coverage file created by dotnet test into a well known location. In all
+      # checks I've done, dotnet test ALWAYS outputs the coverage file to the temp directory.
+      # My attempts to override this and have it go directly to the CodeCoverage directory have
+      # all failed, so I'm just doing the copy here.  (cmullins)
+
+      Get-ChildItem -Path "$(Build.SourcesDirectory)" -Include "*coverage*" | Copy-Item -Destination "$(Build.ArtifactStagingDirectory)/CodeCoverage"
+    displayName: 'Copy .coverage Files to CodeCoverage folder'
+    continueOnError: true

@@ -5,18 +5,19 @@ import os
 from setuptools import setup
 
 REQUIRES = [
+    "regex<=2019.08.19",
     "recognizers-text-date-time>=1.0.2a1",
     "recognizers-text-number-with-unit>=1.0.2a1",
     "recognizers-text-number>=1.0.2a1",
     "recognizers-text>=1.0.2a1",
     "recognizers-text-choice>=1.0.2a1",
-    "babel>=2.7.0",
-    "botbuilder-schema>=4.4.0b1",
-    "botframework-connector>=4.4.0b1",
-    "botbuilder-core>=4.4.0b1",
+    "babel==2.7.0",
+    "botbuilder-schema==4.12.0",
+    "botframework-connector==4.12.0",
+    "botbuilder-core==4.12.0",
 ]
 
-TEST_REQUIRES = ["aiounittest>=1.1.0"]
+TEST_REQUIRES = ["aiounittest==1.3.0"]
 
 root = os.path.abspath(os.path.dirname(__file__))
 
@@ -42,6 +43,7 @@ setup(
         "botbuilder.dialogs",
         "botbuilder.dialogs.prompts",
         "botbuilder.dialogs.choices",
+        "botbuilder.dialogs.skills",
     ],
     install_requires=REQUIRES + TEST_REQUIRES,
     tests_require=TEST_REQUIRES,
@@ -51,7 +53,7 @@ setup(
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 5 - Production/Stable",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
     ],
 )

@@ -2,7 +2,9 @@
 # Licensed under the MIT License.
 
 from copy import copy
-from typing import List, Union
+from typing import Any, List, Union
+import json
+import requests
 
 from aiohttp import ClientResponse, ClientSession
 
@@ -109,7 +111,8 @@ class GenerateAnswerUtils:
         with the options passed as arguments into get_answers().
         Return:
         -------
-        QnAMakerOptions with options passed into constructor overwritten by new options passed into get_answers()
+        QnAMakerOptions with options passed into constructor overwritten
+        by new options passed into get_answers()
 
         rtype:
         ------
@@ -139,6 +142,11 @@ class GenerateAnswerUtils:
 
             hydrated_options.context = query_options.context
             hydrated_options.qna_id = query_options.qna_id
+            hydrated_options.is_test = query_options.is_test
+            hydrated_options.ranker_type = query_options.ranker_type
+            hydrated_options.strict_filters_join_operator = (
+                query_options.strict_filters_join_operator
+            )
 
         return hydrated_options
 
@@ -154,11 +162,14 @@ class GenerateAnswerUtils:
             strict_filters=options.strict_filters,
             context=options.context,
             qna_id=options.qna_id,
+            is_test=options.is_test,
+            ranker_type=options.ranker_type,
+            strict_filters_join_operator=options.strict_filters_join_operator,
         )
 
         http_request_helper = HttpRequestUtils(self._http_client)
 
-        response: ClientResponse = await http_request_helper.execute_http_request(
+        response: Any = await http_request_helper.execute_http_request(
             url, question, self._endpoint, options.timeout
         )
 
@@ -178,6 +189,8 @@ class GenerateAnswerUtils:
             strict_filters=options.strict_filters,
             context=options.context,
             qna_id=options.qna_id,
+            is_test=options.is_test,
+            ranker_type=options.ranker_type,
         )
 
         trace_activity = Activity(
@@ -194,21 +207,26 @@ class GenerateAnswerUtils:
         self, result, options: QnAMakerOptions
     ) -> QueryResults:
         json_res = result
+
         if isinstance(result, ClientResponse):
             json_res = await result.json()
+
+        if isinstance(result, requests.Response):
+            json_res = json.loads(result.text)
 
         answers_within_threshold = [
             {**answer, "score": answer["score"] / 100}
             for answer in json_res["answers"]
             if answer["score"] / 100 > options.score_threshold
         ]
+
         sorted_answers = sorted(
             answers_within_threshold, key=lambda ans: ans["score"], reverse=True
         )
 
-        answers_as_query_results = list(
-            map(lambda answer: QueryResult(**answer), sorted_answers)
-        )
+        answers_as_query_results = [
+            QueryResult().deserialize(answer) for answer in sorted_answers
+        ]
 
         active_learning_enabled = (
             json_res["activeLearningEnabled"]

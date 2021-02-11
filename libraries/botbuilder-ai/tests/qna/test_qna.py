@@ -2,23 +2,28 @@
 # Licensed under the MIT License.
 
 # pylint: disable=protected-access
+# pylint: disable=too-many-lines
 
-import json
+import unittest
 from os import path
 from typing import List, Dict
-import unittest
 from unittest.mock import patch
+
+import json
+import requests
 from aiohttp import ClientSession
 
 import aiounittest
 from botbuilder.ai.qna import QnAMakerEndpoint, QnAMaker, QnAMakerOptions
 from botbuilder.ai.qna.models import (
     FeedbackRecord,
+    JoinOperator,
     Metadata,
     QueryResult,
     QnARequestContext,
 )
-from botbuilder.ai.qna.utils import QnATelemetryConstants
+from botbuilder.ai.qna.utils import HttpRequestUtils, QnATelemetryConstants
+from botbuilder.ai.qna.models import GenerateAnswerRequestBody
 from botbuilder.core import BotAdapter, BotTelemetryClient, TurnContext
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.schema import (
@@ -30,6 +35,8 @@ from botbuilder.schema import (
 
 
 class TestContext(TurnContext):
+    __test__ = False
+
     def __init__(self, request):
         super().__init__(TestAdapter(), request)
         self.sent: List[Activity] = list()
@@ -107,7 +114,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
             score_threshold=0.8,
             timeout=9000,
             top=5,
-            strict_filters=[Metadata("movie", "disney")],
+            strict_filters=[Metadata(**{"movie": "disney"})],
         )
 
         qna_with_options = QnAMaker(self.tests_endpoint, options)
@@ -116,7 +123,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         expected_threshold = 0.8
         expected_timeout = 9000
         expected_top = 5
-        expected_strict_filters = [Metadata("movie", "disney")]
+        expected_strict_filters = [Metadata(**{"movie": "disney"})]
 
         self.assertEqual(expected_threshold, actual_options.score_threshold)
         self.assertEqual(expected_timeout, actual_options.timeout)
@@ -161,12 +168,121 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         self.assertEqual(1, len(result.answers))
         self.assertFalse(result.active_learning_enabled)
 
+    async def test_returns_answer_with_strict_filters_with_or_operator(self):
+        # Arrange
+        question: str = "Where can you find"
+        response_path: str = "RetrunsAnswer_WithStrictFilter_Or_Operator.json"
+        response_json = QnaApplicationTest._get_json_for_file(response_path)
+
+        strict_filters = [
+            Metadata(name="species", value="human"),
+            Metadata(name="type", value="water"),
+        ]
+        options = QnAMakerOptions(
+            top=5,
+            strict_filters=strict_filters,
+            strict_filters_join_operator=JoinOperator.OR,
+        )
+        qna = QnAMaker(endpoint=QnaApplicationTest.tests_endpoint)
+        context = QnaApplicationTest._get_context(question, TestAdapter())
+
+        # Act
+        with patch(
+            "aiohttp.ClientSession.post",
+            return_value=aiounittest.futurized(response_json),
+        ) as mock_http_client:
+            result = await qna.get_answers_raw(context, options)
+
+            serialized_http_req_args = mock_http_client.call_args[1]["data"]
+            req_args = json.loads(serialized_http_req_args)
+
+            # Assert
+            self.assertIsNotNone(result)
+            self.assertEqual(3, len(result.answers))
+            self.assertEqual(
+                JoinOperator.OR, req_args["strictFiltersCompoundOperationType"]
+            )
+
+            req_args_strict_filters = req_args["strictFilters"]
+
+            first_filter = strict_filters[0]
+            self.assertEqual(first_filter.name, req_args_strict_filters[0]["name"])
+            self.assertEqual(first_filter.value, req_args_strict_filters[0]["value"])
+
+            second_filter = strict_filters[1]
+            self.assertEqual(second_filter.name, req_args_strict_filters[1]["name"])
+            self.assertEqual(second_filter.value, req_args_strict_filters[1]["value"])
+
+    async def test_returns_answer_with_strict_filters_with_and_operator(self):
+        # Arrange
+        question: str = "Where can you find"
+        response_path: str = "RetrunsAnswer_WithStrictFilter_And_Operator.json"
+        response_json = QnaApplicationTest._get_json_for_file(response_path)
+
+        strict_filters = [
+            Metadata(name="species", value="human"),
+            Metadata(name="type", value="water"),
+        ]
+        options = QnAMakerOptions(
+            top=5,
+            strict_filters=strict_filters,
+            strict_filters_join_operator=JoinOperator.AND,
+        )
+        qna = QnAMaker(endpoint=QnaApplicationTest.tests_endpoint)
+        context = QnaApplicationTest._get_context(question, TestAdapter())
+
+        # Act
+        with patch(
+            "aiohttp.ClientSession.post",
+            return_value=aiounittest.futurized(response_json),
+        ) as mock_http_client:
+            result = await qna.get_answers_raw(context, options)
+
+            serialized_http_req_args = mock_http_client.call_args[1]["data"]
+            req_args = json.loads(serialized_http_req_args)
+
+            # Assert
+            self.assertIsNotNone(result)
+            self.assertEqual(1, len(result.answers))
+            self.assertEqual(
+                JoinOperator.AND, req_args["strictFiltersCompoundOperationType"]
+            )
+
+            req_args_strict_filters = req_args["strictFilters"]
+
+            first_filter = strict_filters[0]
+            self.assertEqual(first_filter.name, req_args_strict_filters[0]["name"])
+            self.assertEqual(first_filter.value, req_args_strict_filters[0]["value"])
+
+            second_filter = strict_filters[1]
+            self.assertEqual(second_filter.name, req_args_strict_filters[1]["name"])
+            self.assertEqual(second_filter.value, req_args_strict_filters[1]["value"])
+
+    async def test_returns_answer_using_requests_module(self):
+        question: str = "how do I clean the stove?"
+        response_path: str = "ReturnsAnswer.json"
+        response_json = QnaApplicationTest._get_json_for_file(response_path)
+
+        qna = QnAMaker(endpoint=QnaApplicationTest.tests_endpoint, http_client=requests)
+        context = QnaApplicationTest._get_context(question, TestAdapter())
+
+        with patch("requests.post", return_value=response_json):
+            result = await qna.get_answers_raw(context)
+            answers = result.answers
+
+            self.assertIsNotNone(result)
+            self.assertEqual(1, len(answers))
+            self.assertEqual(
+                "BaseCamp: You can use a damp rag to clean around the Power Pack",
+                answers[0].answer,
+            )
+
     async def test_returns_answer_using_options(self):
         # Arrange
         question: str = "up"
         response_path: str = "AnswerWithOptions.json"
         options = QnAMakerOptions(
-            score_threshold=0.8, top=5, strict_filters=[Metadata("movie", "disney")]
+            score_threshold=0.8, top=5, strict_filters=[Metadata(**{"movie": "disney"})]
         )
 
         # Act
@@ -249,6 +365,36 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
             self.assertIsNotNone(result)
             self.assertEqual(
                 options.timeout, qna._generate_answer_helper.options.timeout
+            )
+
+    async def test_returns_answer_using_requests_module_with_no_timeout(self):
+        url = f"{QnaApplicationTest._host}/knowledgebases/{QnaApplicationTest._knowledge_base_id}/generateAnswer"
+        question = GenerateAnswerRequestBody(
+            question="how do I clean the stove?",
+            top=1,
+            score_threshold=0.3,
+            strict_filters=[],
+            context=None,
+            qna_id=None,
+            is_test=False,
+            ranker_type="Default",
+        )
+        response_path = "ReturnsAnswer.json"
+        response_json = QnaApplicationTest._get_json_for_file(response_path)
+
+        http_request_helper = HttpRequestUtils(requests)
+
+        with patch("requests.post", return_value=response_json):
+            result = await http_request_helper.execute_http_request(
+                url, question, QnaApplicationTest.tests_endpoint, timeout=None
+            )
+            answers = result["answers"]
+
+            self.assertIsNotNone(result)
+            self.assertEqual(1, len(answers))
+            self.assertEqual(
+                "BaseCamp: You can use a damp rag to clean around the Power Pack",
+                answers[0]["answer"],
             )
 
     async def test_telemetry_returns_answer(self):
@@ -702,6 +848,38 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
                 "Should have 3 filtered answers after low score variation.",
             )
 
+    async def test_should_answer_with_is_test_true(self):
+        options = QnAMakerOptions(top=1, is_test=True)
+        qna = QnAMaker(QnaApplicationTest.tests_endpoint)
+        question: str = "Q11"
+        context = QnaApplicationTest._get_context(question, TestAdapter())
+        response_json = QnaApplicationTest._get_json_for_file(
+            "QnaMaker_IsTest_true.json"
+        )
+
+        with patch(
+            "aiohttp.ClientSession.post",
+            return_value=aiounittest.futurized(response_json),
+        ):
+            results = await qna.get_answers(context, options=options)
+            self.assertEqual(0, len(results), "Should have received zero answer.")
+
+    async def test_should_answer_with_ranker_type_question_only(self):
+        options = QnAMakerOptions(top=1, ranker_type="QuestionOnly")
+        qna = QnAMaker(QnaApplicationTest.tests_endpoint)
+        question: str = "Q11"
+        context = QnaApplicationTest._get_context(question, TestAdapter())
+        response_json = QnaApplicationTest._get_json_for_file(
+            "QnaMaker_RankerType_QuestionOnly.json"
+        )
+
+        with patch(
+            "aiohttp.ClientSession.post",
+            return_value=aiounittest.futurized(response_json),
+        ):
+            results = await qna.get_answers(context, options=options)
+            self.assertEqual(2, len(results), "Should have received two answers.")
+
     async def test_should_answer_with_prompts(self):
         options = QnAMakerOptions(top=2)
         qna = QnAMaker(QnaApplicationTest.tests_endpoint, options)
@@ -723,7 +901,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
         qna = QnAMaker(QnaApplicationTest.tests_endpoint)
         question: str = "where can I buy?"
         context = QnARequestContext(
-            previous_qna_id=5, prvious_user_query="how do I clean the stove?"
+            previous_qna_id=5, previous_user_query="how do I clean the stove?"
         )
         options = QnAMakerOptions(top=2, qna_id=55, context=context)
         turn_context = QnaApplicationTest._get_context(question, TestAdapter())
@@ -776,6 +954,46 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
                 2, len(results), "Should have received more than one answers."
             )
             self.assertEqual(True, results[0].score < 1, "Score should be low.")
+
+    async def test_low_score_variation(self):
+        qna = QnAMaker(QnaApplicationTest.tests_endpoint)
+        options = QnAMakerOptions(top=5, context=None)
+
+        turn_context = QnaApplicationTest._get_context("Q11", TestAdapter())
+        response_json = QnaApplicationTest._get_json_for_file(
+            "QnaMaker_TopNAnswer.json"
+        )
+
+        # active learning enabled
+        with patch(
+            "aiohttp.ClientSession.post",
+            return_value=aiounittest.futurized(response_json),
+        ):
+            results = await qna.get_answers(turn_context, options)
+            self.assertIsNotNone(results)
+            self.assertEqual(4, len(results), "should get four results")
+
+            filtered_results = qna.get_low_score_variation(results)
+            self.assertIsNotNone(filtered_results)
+            self.assertEqual(3, len(filtered_results), "should get three results")
+
+        # active learning disabled
+        turn_context = QnaApplicationTest._get_context("Q11", TestAdapter())
+        response_json = QnaApplicationTest._get_json_for_file(
+            "QnaMaker_TopNAnswer_DisableActiveLearning.json"
+        )
+
+        with patch(
+            "aiohttp.ClientSession.post",
+            return_value=aiounittest.futurized(response_json),
+        ):
+            results = await qna.get_answers(turn_context, options)
+            self.assertIsNotNone(results)
+            self.assertEqual(4, len(results), "should get four results")
+
+            filtered_results = qna.get_low_score_variation(results)
+            self.assertIsNotNone(filtered_results)
+            self.assertEqual(3, len(filtered_results), "should get three results")
 
     @classmethod
     async def _get_service_result(
