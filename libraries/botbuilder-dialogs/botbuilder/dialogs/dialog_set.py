@@ -4,7 +4,13 @@ import inspect
 from hashlib import sha256
 from typing import Dict
 
-from botbuilder.core import NullTelemetryClient, BotTelemetryClient, TurnContext, BotAssert, StatePropertyAccessor
+from botbuilder.core import (
+    NullTelemetryClient,
+    BotTelemetryClient,
+    TurnContext,
+    BotAssert,
+    StatePropertyAccessor,
+)
 from .dialog import Dialog
 from .dialog_state import DialogState
 

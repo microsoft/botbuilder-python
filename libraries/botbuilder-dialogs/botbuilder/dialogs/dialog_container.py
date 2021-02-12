@@ -23,7 +23,7 @@ class DialogContainer(Dialog, ABC):
         """
         Gets the telemetry client for logging events.
         """
-        return super._telemetry_client
+        return self._telemetry_client
 
     @telemetry_client.setter
     def telemetry_client(self, value: BotTelemetryClient) -> None:
@@ -31,9 +31,9 @@ class DialogContainer(Dialog, ABC):
         Sets the telemetry client for all dialogs in this set.
         """
         if value is None:
-            super._telemetry_client = NullTelemetryClient()
+            self._telemetry_client = NullTelemetryClient()
         else:
-            super._telemetry_client = value
+            self._telemetry_client = value
 
         # Care! Dialogs.TelemetryClient assignment internally assigns the
         # TelemetryClient for each dialog which could lead to an eventual stack
@@ -41,7 +41,7 @@ class DialogContainer(Dialog, ABC):
         # Don't set the telemetry client if the candidate instance is the same as
         # the currently set one.
         if self.dialogs.telemetry_client != value:
-            self.dialogs.telemetry_client = super._telemetry_client
+            self.dialogs.telemetry_client = self._telemetry_client
 
     @abstractmethod
     def create_child_context(self, dialog_context: DialogContext) -> DialogContext:
