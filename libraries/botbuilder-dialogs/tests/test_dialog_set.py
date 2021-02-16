@@ -7,8 +7,8 @@ from botbuilder.core import ConversationState, MemoryStorage, NullTelemetryClien
 
 
 class MyBotTelemetryClient(NullTelemetryClient):
+    # pylint: disable=useless-return
     def __init__(self):
-        # pylint: disable=useless-return
         super().__init__()
         return
 
