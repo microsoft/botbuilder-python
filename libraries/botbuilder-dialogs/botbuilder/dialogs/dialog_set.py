@@ -4,7 +4,13 @@ import inspect
 from hashlib import sha256
 from typing import Dict
 
-from botbuilder.core import TurnContext, BotAssert, StatePropertyAccessor
+from botbuilder.core import (
+    NullTelemetryClient,
+    BotTelemetryClient,
+    TurnContext,
+    BotAssert,
+    StatePropertyAccessor,
+)
 from .dialog import Dialog
 from .dialog_state import DialogState
 
@@ -34,10 +40,30 @@ class DialogSet:
                 del frame
 
         self._dialog_state = dialog_state
-        # self.__telemetry_client = NullBotTelemetryClient.Instance;
+        self.__telemetry_client = NullTelemetryClient()
 
         self._dialogs: Dict[str, Dialog] = {}
         self._version: str = None
+
+    @property
+    def telemetry_client(self) -> BotTelemetryClient:
+        """
+        Gets the telemetry client for logging events.
+        """
+        return self.__telemetry_client
+
+    @telemetry_client.setter
+    def telemetry_client(self, value: BotTelemetryClient) -> None:
+        """
+        Sets the telemetry client for all dialogs in this set.
+        """
+        if value is None:
+            self.__telemetry_client = NullTelemetryClient()
+        else:
+            self.__telemetry_client = value
+
+        for dialog in self._dialogs.values():
+            dialog.telemetry_client = self.__telemetry_client
 
     def get_version(self) -> str:
         """

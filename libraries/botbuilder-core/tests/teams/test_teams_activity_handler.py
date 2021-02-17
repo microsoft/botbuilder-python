@@ -27,6 +27,9 @@ from botbuilder.schema.teams import (
     TaskModuleRequestContext,
     TeamInfo,
     TeamsChannelAccount,
+    TabRequest,
+    TabSubmit,
+    TabContext,
 )
 from botframework.connector import Channels
 from simple_adapter import SimpleAdapter
@@ -293,6 +296,18 @@ class TestingTeamsActivityHandler(TeamsActivityHandler):
         return await super().on_teams_task_module_submit(
             turn_context, task_module_request
         )
+
+    async def on_teams_tab_fetch(
+        self, turn_context: TurnContext, tab_request: TabRequest
+    ):
+        self.record.append("on_teams_tab_fetch")
+        return await super().on_teams_tab_fetch(turn_context, tab_request)
+
+    async def on_teams_tab_submit(
+        self, turn_context: TurnContext, tab_submit: TabSubmit
+    ):
+        self.record.append("on_teams_tab_submit")
+        return await super().on_teams_tab_submit(turn_context, tab_submit)
 
 
 class NotImplementedAdapter(BotAdapter):
@@ -987,6 +1002,44 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         assert len(bot.record) == 2
         assert bot.record[0] == "on_invoke_activity"
         assert bot.record[1] == "on_teams_task_module_submit"
+
+    async def test_on_teams_tab_fetch(self):
+        # Arrange
+        activity = Activity(
+            type=ActivityTypes.invoke,
+            name="tab/fetch",
+            value={"data": {"key": "value"}, "context": TabContext().serialize(),},
+        )
+
+        turn_context = TurnContext(SimpleAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        # Assert
+        assert len(bot.record) == 2
+        assert bot.record[0] == "on_invoke_activity"
+        assert bot.record[1] == "on_teams_tab_fetch"
+
+    async def test_on_teams_tab_submit(self):
+        # Arrange
+        activity = Activity(
+            type=ActivityTypes.invoke,
+            name="tab/submit",
+            value={"data": {"key": "value"}, "context": TabContext().serialize(),},
+        )
+
+        turn_context = TurnContext(SimpleAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        # Assert
+        assert len(bot.record) == 2
+        assert bot.record[0] == "on_invoke_activity"
+        assert bot.record[1] == "on_teams_tab_submit"
 
     async def test_on_end_of_conversation_activity(self):
         activity = Activity(type=ActivityTypes.end_of_conversation)
