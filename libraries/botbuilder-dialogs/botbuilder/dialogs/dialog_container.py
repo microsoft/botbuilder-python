@@ -4,6 +4,7 @@
 from abc import ABC, abstractmethod
 
 
+from botbuilder.core import NullTelemetryClient, BotTelemetryClient
 from .dialog import Dialog
 from .dialog_context import DialogContext
 from .dialog_event import DialogEvent
@@ -16,6 +17,31 @@ class DialogContainer(Dialog, ABC):
         super().__init__(dialog_id)
 
         self.dialogs = DialogSet()
+
+    @property
+    def telemetry_client(self) -> BotTelemetryClient:
+        """
+        Gets the telemetry client for logging events.
+        """
+        return self._telemetry_client
+
+    @telemetry_client.setter
+    def telemetry_client(self, value: BotTelemetryClient) -> None:
+        """
+        Sets the telemetry client for all dialogs in this set.
+        """
+        if value is None:
+            self._telemetry_client = NullTelemetryClient()
+        else:
+            self._telemetry_client = value
+
+        # Care! Dialogs.TelemetryClient assignment internally assigns the
+        # TelemetryClient for each dialog which could lead to an eventual stack
+        # overflow in cyclical dialog structures.
+        # Don't set the telemetry client if the candidate instance is the same as
+        # the currently set one.
+        if self.dialogs.telemetry_client != value:
+            self.dialogs.telemetry_client = self._telemetry_client
 
     @abstractmethod
     def create_child_context(self, dialog_context: DialogContext) -> DialogContext:
