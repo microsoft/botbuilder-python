@@ -23,6 +23,8 @@ from botbuilder.schema.teams import (
     O365ConnectorCardActionQuery,
     TaskModuleRequest,
     TaskModuleResponse,
+    TabRequest,
+    TabSubmit,
 )
 from botframework.connector import Channels
 from ..serializer_helper import deserializer_helper
@@ -160,6 +162,22 @@ class TeamsActivityHandler(ActivityHandler):
                         deserializer_helper(
                             TaskModuleRequest, turn_context.activity.value
                         ),
+                    )
+                )
+
+            if turn_context.activity.name == "tab/fetch":
+                return self._create_invoke_response(
+                    await self.on_teams_tab_fetch(
+                        turn_context,
+                        deserializer_helper(TabRequest, turn_context.activity.value),
+                    )
+                )
+
+            if turn_context.activity.name == "tab/submit":
+                return self._create_invoke_response(
+                    await self.on_teams_tab_submit(
+                        turn_context,
+                        deserializer_helper(TabSubmit, turn_context.activity.value),
                     )
                 )
 
@@ -463,6 +481,32 @@ class TeamsActivityHandler(ActivityHandler):
         :param task_module_request: The task module invoke request value payload.
 
         :returns: A Task Module Response for the request.
+        """
+        raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
+
+    async def on_teams_tab_fetch(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext, tab_request: TabRequest
+    ):
+        """
+        Override this in a derived class to provide logic for when a tab is fetched.
+
+        :param turn_context: A context object for this turn.
+        :param tab_request: The tab invoke request value payload.
+
+        :returns: A Tab Response for the request.
+        """
+        raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
+
+    async def on_teams_tab_submit(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext, tab_submit: TabSubmit
+    ):
+        """
+        Override this in a derived class to provide logic for when a tab is submitted.
+
+        :param turn_context: A context object for this turn.
+        :param tab_submit: The tab submit invoke request value payload.
+
+        :returns: A Tab Response for the request.
         """
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 

@@ -62,6 +62,15 @@ from ._models_py3 import TeamsMeetingInfo
 from ._models_py3 import TeamsMeetingParticipant
 from ._models_py3 import MeetingParticipantInfo
 from ._models_py3 import CacheInfo
+from ._models_py3 import TabContext
+from ._models_py3 import TabRequest
+from ._models_py3 import TabResponseCard
+from ._models_py3 import TabResponseCards
+from ._models_py3 import TabResponsePayload
+from ._models_py3 import TabSubmit
+from ._models_py3 import TabSubmitData
+from ._models_py3 import TabSuggestedActions
+from ._models_py3 import TaskModuleCardResponse
 
 __all__ = [
     "AppBasedLinkQuery",
@@ -125,4 +134,13 @@ __all__ = [
     "TeamsMeetingParticipant",
     "MeetingParticipantInfo",
     "CacheInfo",
+    "TabContext",
+    "TabRequest",
+    "TabResponseCard",
+    "TabResponseCards",
+    "TabResponsePayload",
+    "TabSubmit",
+    "TabSubmitData",
+    "TabSuggestedActions",
+    "TaskModuleCardResponse",
 ]
