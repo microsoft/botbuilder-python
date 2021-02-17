@@ -40,11 +40,6 @@ class DialogExtensions:
                     # No dialogs to cancel, just return.
                     return
 
-                remote_cancel_text = "Skill was canceled through an EndOfConversation activity from the parent."
-                await turn_context.send_trace_activity(
-                    f"Extension {Dialog.__name__}.run_dialog", label=remote_cancel_text,
-                )
-
                 # Send cancellation message to the dialog to ensure all the parents are canceled
                 # in the right order.
                 await dialog_context.cancel_all_dialogs()
@@ -73,15 +68,6 @@ class DialogExtensions:
             or result.status == DialogTurnStatus.Cancelled
         ):
             if DialogExtensions.__send_eoc_to_parent(turn_context):
-                end_message_text = (
-                    f"Dialog {dialog.id} has **completed**. Sending EndOfConversation."
-                )
-                await turn_context.send_trace_activity(
-                    f"Extension {Dialog.__name__}.run_dialog",
-                    label=end_message_text,
-                    value=result.result,
-                )
-
                 activity = Activity(
                     type=ActivityTypes.end_of_conversation,
                     value=result.result,
