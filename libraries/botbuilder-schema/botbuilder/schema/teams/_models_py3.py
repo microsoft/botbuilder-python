@@ -10,6 +10,27 @@ from botbuilder.schema import (
 )
 
 
+class TabEntityContext(Model):
+    """
+    Current TabRequest entity context, or 'tabEntityId'.
+
+    :param tab_entity_id: Gets or sets the entity id of the tab.
+    :type tab_entity_id: str
+    """
+
+    _attribute_map = {
+        "tab_entity_id": {"key": "tabEntityId", "type": "str"},
+    }
+
+    def __init__(self, *, tab_entity_id=None, **kwargs) -> None:
+        super(TabEntityContext, self).__init__(**kwargs)
+        self.tab_entity_id = tab_entity_id
+        self._custom_init()
+
+    def _custom_init(self):
+        return
+
+
 class TaskModuleRequest(Model):
     """Task module invoke request value payload.
 
@@ -18,17 +39,24 @@ class TaskModuleRequest(Model):
     :param context: Current user context, i.e., the current theme
     :type context:
      ~botframework.connector.teams.models.TaskModuleRequestContext
+    :param tab_entity_context: Gets or sets current tab request context.
+    :type tab_entity_context:
+     ~botframework.connector.teams.models.TabEntityContext
     """
 
     _attribute_map = {
         "data": {"key": "data", "type": "object"},
         "context": {"key": "context", "type": "TaskModuleRequestContext"},
+        "tab_entity_context": {"key": "tabContext", "type": "TabEntityContext"},
     }
 
-    def __init__(self, *, data=None, context=None, **kwargs) -> None:
+    def __init__(
+        self, *, data=None, context=None, tab_entity_context=None, **kwargs
+    ) -> None:
         super(TaskModuleRequest, self).__init__(**kwargs)
         self.data = data
         self.context = context
+        self.tab_entity_context = tab_entity_context
 
 
 class AppBasedLinkQuery(Model):
@@ -2058,3 +2086,287 @@ class TeamsMeetingParticipant(Model):
         self.user = user
         self.meeting = meeting
         self.conversation = conversation
+
+
+class TabContext(Model):
+    """
+    Current tab request context, i.e., the current theme.
+
+    :param theme: Gets or sets the current user's theme.
+    :type theme: str
+    """
+
+    _attribute_map = {
+        "theme": {"key": "theme", "type": "str"},
+    }
+
+    def __init__(self, *, theme=None, **kwargs) -> None:
+        super(TabContext, self).__init__(**kwargs)
+        self.theme = theme
+        self._custom_init()
+
+    def _custom_init(self):
+        return
+
+
+class TabRequest(Model):
+    """
+    Invoke ('tab/fetch') request value payload.
+
+    :param tab_entity_context: Gets or sets current tab entity request context.
+    :type tab_entity_context:
+     ~botframework.connector.teams.models.TabEntityContext
+    :param context: Gets or sets current tab entity request context.
+    :type context:
+     ~botframework.connector.teams.models.TabContext
+    :param state: Gets or sets state, which is the magic code for OAuth Flow.
+    :type state: str
+    """
+
+    _attribute_map = {
+        "tab_entity_context": {"key": "tabContext", "type": "TabEntityContext"},
+        "context": {"key": "context", "type": "TabContext"},
+        "state": {"key": "state", "type": "str"},
+    }
+
+    def __init__(
+        self, *, tab_entity_context=None, context=None, state=None, **kwargs
+    ) -> None:
+        super(TabRequest, self).__init__(**kwargs)
+        self.tab_entity_context = tab_entity_context
+        self.context = context
+        self.state = state
+        self._custom_init()
+
+    def _custom_init(self):
+        return
+
+
+class TabResponseCard(Model):
+    """
+    Envelope for cards for a Tab request.
+
+    :param card: Gets or sets adaptive card for this card tab response.
+    :type card: object
+    """
+
+    _attribute_map = {
+        "card": {"key": "card", "type": "object"},
+    }
+
+    def __init__(self, *, card=None, **kwargs) -> None:
+        super(TabResponseCard, self).__init__(**kwargs)
+        self.card = card
+        self._custom_init()
+
+    def _custom_init(self):
+        return
+
+
+class TabResponseCards(Model):
+    """
+    Envelope for cards for a TabResponse.
+
+    :param cards: Gets or sets adaptive card for this card tab response.
+    :type cards:
+    list[ ~botframework.connector.teams.models.TabResponseCard]
+    """
+
+    _attribute_map = {
+        "cards": {"key": "cards", "type": "[TabResponseCard]"},
+    }
+
+    def __init__(self, *, cards=None, **kwargs) -> None:
+        super(TabResponseCards, self).__init__(**kwargs)
+        self.cards = cards
+        self._custom_init()
+
+    def _custom_init(self):
+        return
+
+
+class TabResponsePayload(Model):
+    """
+    Initializes a new instance of the TabResponsePayload class.
+
+    :param type: Gets or sets choice of action options when responding to the
+     tab/fetch message. Possible values include: 'continue', 'auth' or 'silentAuth'
+    :type type: str
+    :param value: Gets or sets the TabResponseCards when responding to 
+     tab/fetch activity with type of 'continue'.
+    :type value: TabResponseCards
+    :param suggested_actions: Gets or sets the Suggested Actions for this card tab.
+    :type suggested_actions: TabSuggestedActions
+    """
+
+    _attribute_map = {
+        "type": {"key": "type", "type": "str"},
+        "value": {"key": "value", "type": "TabResponseCards"},
+        "suggested_actions": {"key": "suggestedActions", "type": "TabSuggestedActions"},
+    }
+
+    def __init__(
+        self, *, type=None, value=None, suggested_actions=None, **kwargs
+    ) -> None:
+        super(TabResponsePayload, self).__init__(**kwargs)
+        self.type = type
+        self.value = value
+        self.suggested_actions = suggested_actions
+        self._custom_init()
+
+    def _custom_init(self):
+        return
+
+
+class TabResponse(Model):
+    """
+    Envelope for Card Tab Response Payload.
+
+    :param tab: Possible values include: 'continue', 'auth' or 'silentAuth'
+    :type type: ~botframework.connector.teams.models.TabResponsePayload
+    """
+
+    _attribute_map = {
+        "tab": {"key": "tab", "type": "TabResponsePayload"},
+    }
+
+    def __init__(self, *, tab=None, **kwargs) -> None:
+        super(TabResponse, self).__init__(**kwargs)
+        self.tab = tab
+        self._custom_init()
+
+    def _custom_init(self):
+        return
+
+
+class TabSumit(Model):
+    """
+    Invoke ('tab/submit') request value payload.
+
+    :param tab_entity_context: Gets or sets current tab entity request context.
+    :type tab_entity_context:
+     ~botframework.connector.teams.models.TabEntityContext
+    :param context: Gets or sets current tab entity request context.
+    :type context:
+     ~botframework.connector.teams.models.TabContext
+    :param data: User input data. Free payload containing properties of key-value pairs.
+    :type data:
+     ~botframework.connector.teams.models.TabSubmitData
+    """
+
+    _attribute_map = {
+        "tab_entity_context": {"key": "tabContext", "type": "TabEntityContext"},
+        "context": {"key": "context", "type": "TabContext"},
+        "data": {"key": "data", "type": "TabSubmitData"},
+    }
+
+    def __init__(
+        self, *, tab_entity_context=None, context=None, data=None, **kwargs
+    ) -> None:
+        super(TabSumit, self).__init__(**kwargs)
+        self.tab_entity_context = tab_entity_context
+        self.context = context
+        self.data = data
+        self._custom_init()
+
+    def _custom_init(self):
+        return
+
+
+class TabSubmitData(Model):
+    """
+    Invoke ('tab/submit') request value payload data.
+
+    :param type: Currently, 'tab/submit'.
+    :type type: str
+    :param properties: Gets or sets properties that are not otherwise defined by the TabSubmit
+     type but that might appear in the serialized REST JSON object.
+    :type properties: object
+    """
+
+    _attribute_map = {
+        "type": {"key": "type", "type": "str"},
+        "properties": {"key": "properties", "type": "{object}"},
+    }
+
+    def __init__(self, *, type=None, properties=None, **kwargs) -> None:
+        super(TabSubmitData, self).__init__(**kwargs)
+        self.type = type
+        self.properties = properties
+        self._custom_init()
+
+    def _custom_init(self):
+        return
+
+
+class TabSubmit(Model):
+    """
+    Initializes a new instance of the TabSubmit class.
+
+    :param tab_entity_context: Gets or sets current tab entity request context.
+    :type tab_entity_context: ~botframework.connector.teams.models.TabEntityContext
+    :param context: Gets or sets current user context, i.e., the current theme.
+    :type context: ~botframework.connector.teams.models.TabContext
+    :param data: User input data. Free payload containing properties of key-value pairs.
+    :type data: ~botframework.connector.teams.models.TabSubmitData
+    """
+
+    _attribute_map = {
+        "tab_entity_context": {"key": "tabContext", "type": "TabEntityContext"},
+        "context": {"key": "context", "type": "TabContext"},
+        "data": {"key": "data", "type": "TabSubmitData"},
+    }
+
+    def __init__(
+        self, *, tab_entity_context=None, context=None, data=None, **kwargs
+    ) -> None:
+        super(TabSubmit, self).__init__(**kwargs)
+        self.tab_entity_context = tab_entity_context
+        self.context = context
+        self.data = data
+        self._custom_init()
+
+    def _custom_init(self):
+        return
+
+
+class TabSuggestedActions(Model):
+    """
+    Tab SuggestedActions (Only when type is 'auth' or 'silentAuth').
+
+    :param actions: Gets or sets adaptive card for this card tab response.
+    :type actions: list[~botframework.connector.models.CardAction]
+    """
+
+    _attribute_map = {
+        "actions": {"key": "actions", "type": "[CardAction]"},
+    }
+
+    def __init__(self, *, actions=None, **kwargs) -> None:
+        super(TabSuggestedActions, self).__init__(**kwargs)
+        self.actions = actions
+        self._custom_init()
+
+    def _custom_init(self):
+        return
+
+
+class TaskModuleCardResponse(TaskModuleResponseBase):
+    """
+    Tab Response to 'task/submit' from a tab.
+
+    :param value: The JSON for the Adaptive cards to appear in the tab.
+    :type value: ~botframework.connector.teams.models.TabResponse
+    """
+
+    _attribute_map = {
+        "value": {"key": "value", "type": "TabResponse"},
+    }
+
+    def __init__(self, *, value=None, **kwargs) -> None:
+        super(TaskModuleCardResponse, self).__init__("continue", **kwargs)
+        self.value = value
+        self._custom_init()
+
+    def _custom_init(self):
+        return
