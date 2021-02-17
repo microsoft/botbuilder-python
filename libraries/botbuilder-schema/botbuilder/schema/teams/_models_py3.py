@@ -2218,6 +2218,27 @@ class TabResponsePayload(Model):
         return
 
 
+class TabResponse(Model):
+    """
+    Envelope for Card Tab Response Payload.
+
+    :param tab: Possible values include: 'continue', 'auth' or 'silentAuth'
+    :type type: ~botframework.connector.teams.models.TabResponsePayload
+    """
+
+    _attribute_map = {
+        "tab": {"key": "tab", "type": "TabResponsePayload"},
+    }
+
+    def __init__(self, *, tab=None, **kwargs) -> None:
+        super(TabResponse, self).__init__(**kwargs)
+        self.tab = tab
+        self._custom_init()
+
+    def _custom_init(self):
+        return
+
+
 class TabSumit(Model):
     """
     Invoke ('tab/submit') request value payload.
