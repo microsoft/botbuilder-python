@@ -7,8 +7,9 @@ from jsonpickle import decode
 
 from botbuilder.azure import AzureQueueStorage
 
-EMULATOR_RUNNING = True
+EMULATOR_RUNNING = False
 
+# This connection string is to connect to local Azure Storage Emulator.
 CONNECTION_STRING = (
     "AccountName=devstoreaccount1;"
     "AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr"
