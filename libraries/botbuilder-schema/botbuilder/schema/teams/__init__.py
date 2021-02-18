@@ -63,6 +63,7 @@ from ._models_py3 import TeamsMeetingParticipant
 from ._models_py3 import MeetingParticipantInfo
 from ._models_py3 import CacheInfo
 from ._models_py3 import TabContext
+from ._models_py3 import TabEntityContext
 from ._models_py3 import TabRequest
 from ._models_py3 import TabResponseCard
 from ._models_py3 import TabResponseCards
@@ -136,6 +137,7 @@ __all__ = [
     "MeetingParticipantInfo",
     "CacheInfo",
     "TabContext",
+    "TabEntityContext",
     "TabRequest",
     "TabResponseCard",
     "TabResponseCards",
