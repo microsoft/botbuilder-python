@@ -4,16 +4,18 @@
 from abc import ABC, abstractmethod
 from botbuilder.schema import Activity
 
+
 class QueueStorage(ABC):
     """
     A base class for enqueueing an Activity for later processing.
     """
+
     @abstractmethod
     async def queue_activity(
-            self,
-            activity: Activity,
-            visibility_timeout: int = None,
-            time_to_live: int = None
+        self,
+        activity: Activity,
+        visibility_timeout: int = None,
+        time_to_live: int = None,
     ) -> str:
         """
         Enqueues an Activity for later processing. The visibility timeout specifies how long the message should be
