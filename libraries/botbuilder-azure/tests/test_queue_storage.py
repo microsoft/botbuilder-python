@@ -24,12 +24,14 @@ QUEUE_NAME = "queue"
 class TestAzureQueueStorageConstructor:
     def test_queue_storage_init_should_error_without_connection_string(self):
         try:
+            # pylint: disable=no-value-for-parameter
             AzureQueueStorage()
         except Exception as error:
             assert error
 
     def test_queue_storage_init_should_error_without_queue_name(self):
         try:
+            # pylint: disable=no-value-for-parameter
             AzureQueueStorage(queues_storage_connection_string="somestring")
         except Exception as error:
             assert error
