@@ -26,8 +26,7 @@ class AllowedSkillsClaimsValidator:
             async def allow_callers_claims_validator(claims: Dict[str, object]):
                 if skillValidation.is_skill_claim(claims):
                     raise PermissionError(
-                        f'Received a request from a bot with an app ID of "{app_id}".'
-                        f" To enable requests from this caller, add the app ID to your configuration file."
+                        "Invalid call from a skill."
                     )
 
                 return
