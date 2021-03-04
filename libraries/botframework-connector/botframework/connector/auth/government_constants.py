@@ -1,5 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+
 from abc import ABC
 
 
@@ -15,9 +16,7 @@ class GovernmentConstants(ABC):
     TO CHANNEL FROM BOT: Login URL
     """
     TO_CHANNEL_FROM_BOT_LOGIN_URL = (
-        "https://login.microsoftonline.us/"
-        "cab8a31a-1906-4287-a0d8-4eef66b95f6e/"
-        "oauth2/v2.0/token"
+        "https://login.microsoftonline.us/MicrosoftServices.onmicrosoft.us"
     )
 
     """

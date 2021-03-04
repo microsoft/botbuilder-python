@@ -10,10 +10,6 @@ from unittest import mock
 from unittest.mock import MagicMock, Mock
 
 from aiounittest import AsyncTestCase
-from azure.cognitiveservices.language.luis.runtime import LUISRuntimeClient
-from azure.cognitiveservices.language.luis.runtime.luis_runtime_client import (
-    LUISRuntimeClientConfiguration,
-)
 from msrest import Deserializer
 from requests import Session
 from requests.models import Response
@@ -69,21 +65,6 @@ class LuisRecognizerTest(AsyncTestCase):
         self.assertEqual("b31aeaf3-3511-495b-a07f-571fc873214b", app.application_id)
         self.assertEqual("048ec46dc58e495482b0c447cfdbd291", app.endpoint_key)
         self.assertEqual("https://westus.api.cognitive.microsoft.com", app.endpoint)
-
-    def test_luis_recognizer_timeout(self):
-        endpoint = (
-            "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/"
-            "b31aeaf3-3511-495b-a07f-571fc873214b?verbose=true&timezoneOffset=-360"
-            "&subscription-key=048ec46dc58e495482b0c447cfdbd291&q="
-        )
-        expected_timeout = 300
-        options_with_timeout = LuisPredictionOptions(timeout=expected_timeout * 1000)
-
-        recognizer_with_timeout = LuisRecognizer(endpoint, options_with_timeout)
-
-        self.assertEqual(
-            expected_timeout, recognizer_with_timeout._runtime.config.connection.timeout
-        )
 
     def test_none_endpoint(self):
         # Arrange
@@ -417,24 +398,6 @@ class LuisRecognizerTest(AsyncTestCase):
             self._mocked_results, min_score=0.4
         )
         self.assertEqual(default_intent, "Greeting")
-
-    async def test_user_agent_contains_product_version(self):
-        utterance: str = "please book from May 5 to June 6"
-        response_path: str = "MultipleDateTimeEntities.json"  # it doesn't matter to use which file.
-
-        recognizer, _ = await LuisRecognizerTest._get_recognizer_result(
-            utterance, response_path, bot_adapter=NullAdapter()
-        )
-
-        runtime: LUISRuntimeClient = recognizer._runtime
-        config: LUISRuntimeClientConfiguration = runtime.config
-        user_agent = config.user_agent
-
-        # Verify we didn't unintentionally stamp on the user-agent from the client.
-        self.assertTrue("azure-cognitiveservices-language-luis" in user_agent)
-
-        # And that we added the bot.builder package details.
-        self.assertTrue("botbuilder-ai/4" in user_agent)
 
     def test_telemetry_construction(self):
         # Arrange

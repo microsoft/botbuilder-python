@@ -1,5 +1,9 @@
-from typing import List
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
 
+# pylint: disable=too-many-lines
+
+from typing import List
 import aiounittest
 from botbuilder.core import BotAdapter, TurnContext
 from botbuilder.core.teams import TeamsActivityHandler
@@ -7,6 +11,7 @@ from botbuilder.schema import (
     Activity,
     ActivityTypes,
     ChannelAccount,
+    ConversationAccount,
     ConversationReference,
     ResourceResponse,
 )
@@ -22,6 +27,9 @@ from botbuilder.schema.teams import (
     TaskModuleRequestContext,
     TeamInfo,
     TeamsChannelAccount,
+    TabRequest,
+    TabSubmit,
+    TabContext,
 )
 from botframework.connector import Channels
 from simple_adapter import SimpleAdapter
@@ -37,12 +45,26 @@ class TestingTeamsActivityHandler(TeamsActivityHandler):
         self.record.append("on_conversation_update_activity")
         return await super().on_conversation_update_activity(turn_context)
 
+    async def on_teams_members_added(  # pylint: disable=unused-argument
+        self,
+        teams_members_added: [TeamsChannelAccount],
+        team_info: TeamInfo,
+        turn_context: TurnContext,
+    ):
+        self.record.append("on_teams_members_added")
+        return await super().on_teams_members_added(
+            teams_members_added, team_info, turn_context
+        )
+
     async def on_teams_members_removed(
-        self, teams_members_removed: [TeamsChannelAccount], turn_context: TurnContext
+        self,
+        teams_members_removed: [TeamsChannelAccount],
+        team_info: TeamInfo,
+        turn_context: TurnContext,
     ):
         self.record.append("on_teams_members_removed")
         return await super().on_teams_members_removed(
-            teams_members_removed, turn_context
+            teams_members_removed, team_info, turn_context
         )
 
     async def on_message_activity(self, turn_context: TurnContext):
@@ -56,6 +78,14 @@ class TestingTeamsActivityHandler(TeamsActivityHandler):
     async def on_event(self, turn_context: TurnContext):
         self.record.append("on_event")
         return await super().on_event(turn_context)
+
+    async def on_end_of_conversation_activity(self, turn_context: TurnContext):
+        self.record.append("on_end_of_conversation_activity")
+        return await super().on_end_of_conversation_activity(turn_context)
+
+    async def on_typing_activity(self, turn_context: TurnContext):
+        self.record.append("on_typing_activity")
+        return await super().on_typing_activity(turn_context)
 
     async def on_unrecognized_activity_type(self, turn_context: TurnContext):
         self.record.append("on_unrecognized_activity_type")
@@ -77,6 +107,14 @@ class TestingTeamsActivityHandler(TeamsActivityHandler):
             channel_info, team_info, turn_context
         )
 
+    async def on_teams_channel_restored(
+        self, channel_info: ChannelInfo, team_info: TeamInfo, turn_context: TurnContext
+    ):
+        self.record.append("on_teams_channel_restored")
+        return await super().on_teams_channel_restored(
+            channel_info, team_info, turn_context
+        )
+
     async def on_teams_channel_deleted(
         self, channel_info: ChannelInfo, team_info: TeamInfo, turn_context: TurnContext
     ):
@@ -85,11 +123,41 @@ class TestingTeamsActivityHandler(TeamsActivityHandler):
             channel_info, team_info, turn_context
         )
 
+    async def on_teams_team_archived(
+        self, team_info: TeamInfo, turn_context: TurnContext
+    ):
+        self.record.append("on_teams_team_archived")
+        return await super().on_teams_team_archived(team_info, turn_context)
+
+    async def on_teams_team_deleted(
+        self, team_info: TeamInfo, turn_context: TurnContext
+    ):
+        self.record.append("on_teams_team_deleted")
+        return await super().on_teams_team_deleted(team_info, turn_context)
+
+    async def on_teams_team_hard_deleted(
+        self, team_info: TeamInfo, turn_context: TurnContext
+    ):
+        self.record.append("on_teams_team_hard_deleted")
+        return await super().on_teams_team_hard_deleted(team_info, turn_context)
+
     async def on_teams_team_renamed_activity(
         self, team_info: TeamInfo, turn_context: TurnContext
     ):
         self.record.append("on_teams_team_renamed_activity")
         return await super().on_teams_team_renamed_activity(team_info, turn_context)
+
+    async def on_teams_team_restored(
+        self, team_info: TeamInfo, turn_context: TurnContext
+    ):
+        self.record.append("on_teams_team_restored")
+        return await super().on_teams_team_restored(team_info, turn_context)
+
+    async def on_teams_team_unarchived(
+        self, team_info: TeamInfo, turn_context: TurnContext
+    ):
+        self.record.append("on_teams_team_unarchived")
+        return await super().on_teams_team_unarchived(team_info, turn_context)
 
     async def on_invoke_activity(self, turn_context: TurnContext):
         self.record.append("on_invoke_activity")
@@ -229,6 +297,18 @@ class TestingTeamsActivityHandler(TeamsActivityHandler):
             turn_context, task_module_request
         )
 
+    async def on_teams_tab_fetch(
+        self, turn_context: TurnContext, tab_request: TabRequest
+    ):
+        self.record.append("on_teams_tab_fetch")
+        return await super().on_teams_tab_fetch(turn_context, tab_request)
+
+    async def on_teams_tab_submit(
+        self, turn_context: TurnContext, tab_submit: TabSubmit
+    ):
+        self.record.append("on_teams_tab_submit")
+        return await super().on_teams_tab_submit(turn_context, tab_submit)
+
 
 class NotImplementedAdapter(BotAdapter):
     async def delete_activity(
@@ -290,6 +370,28 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         assert bot.record[0] == "on_conversation_update_activity"
         assert bot.record[1] == "on_teams_channel_renamed"
 
+    async def test_on_teams_channel_restored_activity(self):
+        # arrange
+        activity = Activity(
+            type=ActivityTypes.conversation_update,
+            channel_data={
+                "eventType": "channelRestored",
+                "channel": {"id": "asdfqwerty", "name": "channel_restored"},
+            },
+            channel_id=Channels.ms_teams,
+        )
+
+        turn_context = TurnContext(NotImplementedAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        # Assert
+        assert len(bot.record) == 2
+        assert bot.record[0] == "on_conversation_update_activity"
+        assert bot.record[1] == "on_teams_channel_restored"
+
     async def test_on_teams_channel_deleted_activity(self):
         # arrange
         activity = Activity(
@@ -311,6 +413,72 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         assert len(bot.record) == 2
         assert bot.record[0] == "on_conversation_update_activity"
         assert bot.record[1] == "on_teams_channel_deleted"
+
+    async def test_on_teams_team_archived(self):
+        # arrange
+        activity = Activity(
+            type=ActivityTypes.conversation_update,
+            channel_data={
+                "eventType": "teamArchived",
+                "team": {"id": "team_id_1", "name": "archived_team_name"},
+            },
+            channel_id=Channels.ms_teams,
+        )
+
+        turn_context = TurnContext(NotImplementedAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        # Assert
+        assert len(bot.record) == 2
+        assert bot.record[0] == "on_conversation_update_activity"
+        assert bot.record[1] == "on_teams_team_archived"
+
+    async def test_on_teams_team_deleted(self):
+        # arrange
+        activity = Activity(
+            type=ActivityTypes.conversation_update,
+            channel_data={
+                "eventType": "teamDeleted",
+                "team": {"id": "team_id_1", "name": "deleted_team_name"},
+            },
+            channel_id=Channels.ms_teams,
+        )
+
+        turn_context = TurnContext(NotImplementedAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        # Assert
+        assert len(bot.record) == 2
+        assert bot.record[0] == "on_conversation_update_activity"
+        assert bot.record[1] == "on_teams_team_deleted"
+
+    async def test_on_teams_team_hard_deleted(self):
+        # arrange
+        activity = Activity(
+            type=ActivityTypes.conversation_update,
+            channel_data={
+                "eventType": "teamHardDeleted",
+                "team": {"id": "team_id_1", "name": "hard_deleted_team_name"},
+            },
+            channel_id=Channels.ms_teams,
+        )
+
+        turn_context = TurnContext(NotImplementedAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        # Assert
+        assert len(bot.record) == 2
+        assert bot.record[0] == "on_conversation_update_activity"
+        assert bot.record[1] == "on_teams_team_hard_deleted"
 
     async def test_on_teams_team_renamed_activity(self):
         # arrange
@@ -334,11 +502,121 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         assert bot.record[0] == "on_conversation_update_activity"
         assert bot.record[1] == "on_teams_team_renamed_activity"
 
+    async def test_on_teams_team_restored(self):
+        # arrange
+        activity = Activity(
+            type=ActivityTypes.conversation_update,
+            channel_data={
+                "eventType": "teamRestored",
+                "team": {"id": "team_id_1", "name": "restored_team_name"},
+            },
+            channel_id=Channels.ms_teams,
+        )
+
+        turn_context = TurnContext(NotImplementedAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        # Assert
+        assert len(bot.record) == 2
+        assert bot.record[0] == "on_conversation_update_activity"
+        assert bot.record[1] == "on_teams_team_restored"
+
+    async def test_on_teams_team_unarchived(self):
+        # arrange
+        activity = Activity(
+            type=ActivityTypes.conversation_update,
+            channel_data={
+                "eventType": "teamUnarchived",
+                "team": {"id": "team_id_1", "name": "unarchived_team_name"},
+            },
+            channel_id=Channels.ms_teams,
+        )
+
+        turn_context = TurnContext(NotImplementedAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        # Assert
+        assert len(bot.record) == 2
+        assert bot.record[0] == "on_conversation_update_activity"
+        assert bot.record[1] == "on_teams_team_unarchived"
+
+    async def test_on_teams_members_added_activity(self):
+        # arrange
+        activity = Activity(
+            type=ActivityTypes.conversation_update,
+            channel_data={
+                "eventType": "teamMemberAdded",
+                "team": {"id": "team_id_1", "name": "new_team_name"},
+            },
+            members_added=[
+                ChannelAccount(
+                    id="123",
+                    name="test_user",
+                    aad_object_id="asdfqwerty",
+                    role="tester",
+                )
+            ],
+            channel_id=Channels.ms_teams,
+            conversation=ConversationAccount(id="456"),
+        )
+
+        turn_context = TurnContext(SimpleAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        # Assert
+        assert len(bot.record) == 2
+        assert bot.record[0] == "on_conversation_update_activity"
+        assert bot.record[1] == "on_teams_members_added"
+
+    async def test_bot_on_teams_members_added_activity(self):
+        # arrange
+        activity = Activity(
+            recipient=ChannelAccount(id="botid"),
+            type=ActivityTypes.conversation_update,
+            channel_data={
+                "eventType": "teamMemberAdded",
+                "team": {"id": "team_id_1", "name": "new_team_name"},
+            },
+            members_added=[
+                ChannelAccount(
+                    id="botid",
+                    name="test_user",
+                    aad_object_id="asdfqwerty",
+                    role="tester",
+                )
+            ],
+            channel_id=Channels.ms_teams,
+            conversation=ConversationAccount(id="456"),
+        )
+
+        turn_context = TurnContext(SimpleAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        # Assert
+        assert len(bot.record) == 2
+        assert bot.record[0] == "on_conversation_update_activity"
+        assert bot.record[1] == "on_teams_members_added"
+
     async def test_on_teams_members_removed_activity(self):
         # arrange
         activity = Activity(
             type=ActivityTypes.conversation_update,
-            channel_data={"eventType": "teamMemberRemoved"},
+            channel_data={
+                "eventType": "teamMemberRemoved",
+                "team": {"id": "team_id_1", "name": "new_team_name"},
+            },
             members_removed=[
                 ChannelAccount(
                     id="123",
@@ -724,3 +1002,65 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         assert len(bot.record) == 2
         assert bot.record[0] == "on_invoke_activity"
         assert bot.record[1] == "on_teams_task_module_submit"
+
+    async def test_on_teams_tab_fetch(self):
+        # Arrange
+        activity = Activity(
+            type=ActivityTypes.invoke,
+            name="tab/fetch",
+            value={"data": {"key": "value"}, "context": TabContext().serialize(),},
+        )
+
+        turn_context = TurnContext(SimpleAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        # Assert
+        assert len(bot.record) == 2
+        assert bot.record[0] == "on_invoke_activity"
+        assert bot.record[1] == "on_teams_tab_fetch"
+
+    async def test_on_teams_tab_submit(self):
+        # Arrange
+        activity = Activity(
+            type=ActivityTypes.invoke,
+            name="tab/submit",
+            value={"data": {"key": "value"}, "context": TabContext().serialize(),},
+        )
+
+        turn_context = TurnContext(SimpleAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        # Assert
+        assert len(bot.record) == 2
+        assert bot.record[0] == "on_invoke_activity"
+        assert bot.record[1] == "on_teams_tab_submit"
+
+    async def test_on_end_of_conversation_activity(self):
+        activity = Activity(type=ActivityTypes.end_of_conversation)
+
+        turn_context = TurnContext(SimpleAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        assert len(bot.record) == 1
+        assert bot.record[0] == "on_end_of_conversation_activity"
+
+    async def test_typing_activity(self):
+        activity = Activity(type=ActivityTypes.typing)
+
+        turn_context = TurnContext(SimpleAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        assert len(bot.record) == 1
+        assert bot.record[0] == "on_typing_activity"

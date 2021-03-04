@@ -1,13 +1,23 @@
 import hashlib
 import json
+from datetime import datetime
 from uuid import uuid4
 from asyncio import Future
-from typing import Dict, List
+from typing import Dict, List, Callable
 
 from unittest.mock import Mock, MagicMock
 import aiounittest
 
-from botbuilder.core import TurnContext, BotActionNotImplementedError
+from botframework.connector.auth import (
+    AuthenticationConfiguration,
+    AuthenticationConstants,
+    ClaimsIdentity,
+)
+from botbuilder.core import (
+    TurnContext,
+    BotActionNotImplementedError,
+    conversation_reference_extension,
+)
 from botbuilder.core.skills import ConversationIdFactoryBase, SkillHandler
 from botbuilder.schema import (
     Activity,
@@ -22,11 +32,7 @@ from botbuilder.schema import (
     PagedMembersResult,
     ResourceResponse,
     Transcript,
-)
-from botframework.connector.auth import (
-    AuthenticationConfiguration,
-    AuthenticationConstants,
-    ClaimsIdentity,
+    CallerIdConstants,
 )
 
 
@@ -57,7 +63,7 @@ class ConversationIdFactoryForTest(ConversationIdFactoryBase):
         return conversation_reference
 
     async def delete_conversation_reference(self, skill_conversation_id: str):
-        raise NotImplementedError()
+        pass
 
 
 class SkillHandlerInstanceForTests(SkillHandler):
@@ -165,15 +171,15 @@ class SkillHandlerInstanceForTests(SkillHandler):
 class TestSkillHandler(aiounittest.AsyncTestCase):
     @classmethod
     def setUpClass(cls):
-        bot_id = str(uuid4())
-        skill_id = str(uuid4())
+        cls.bot_id = str(uuid4())
+        cls.skill_id = str(uuid4())
 
         cls._test_id_factory = ConversationIdFactoryForTest()
 
         cls._claims_identity = ClaimsIdentity({}, False)
 
-        cls._claims_identity.claims[AuthenticationConstants.AUDIENCE_CLAIM] = bot_id
-        cls._claims_identity.claims[AuthenticationConstants.APP_ID_CLAIM] = skill_id
+        cls._claims_identity.claims[AuthenticationConstants.AUDIENCE_CLAIM] = cls.bot_id
+        cls._claims_identity.claims[AuthenticationConstants.APP_ID_CLAIM] = cls.skill_id
         cls._claims_identity.claims[
             AuthenticationConstants.SERVICE_URL_CLAIM
         ] = "http://testbot.com/api/messages"
@@ -183,9 +189,13 @@ class TestSkillHandler(aiounittest.AsyncTestCase):
         )
 
     def create_skill_handler_for_testing(self, adapter) -> SkillHandlerInstanceForTests:
+        mock_bot = Mock()
+        mock_bot.on_turn = MagicMock(return_value=Future())
+        mock_bot.on_turn.return_value.set_result(Mock())
+
         return SkillHandlerInstanceForTests(
             adapter,
-            Mock(),
+            mock_bot,
             self._test_id_factory,
             Mock(),
             AuthenticationConfiguration(),
@@ -195,78 +205,285 @@ class TestSkillHandler(aiounittest.AsyncTestCase):
         self._conversation_id = await self._test_id_factory.create_skill_conversation_id(
             self._conversation_reference
         )
+        # python 3.7 doesn't support AsyncMock, change this when min ver is 3.8
+        send_activities_called = False
 
         mock_adapter = Mock()
-        mock_adapter.continue_conversation = MagicMock(return_value=Future())
-        mock_adapter.continue_conversation.return_value.set_result(Mock())
 
-        sut = self.create_skill_handler_for_testing(mock_adapter)
+        async def continue_conversation(
+            reference: ConversationReference,
+            callback: Callable,
+            bot_id: str = None,
+            claims_identity: ClaimsIdentity = None,
+            audience: str = None,
+        ):  # pylint: disable=unused-argument
+            # Invoke the callback created by the handler so we can assert the rest of the execution.
+            turn_context = TurnContext(
+                mock_adapter,
+                conversation_reference_extension.get_continuation_activity(
+                    self._conversation_reference
+                ),
+            )
+            await callback(turn_context)
 
-        activity = Activity(type=ActivityTypes.message, attachments=[], entities=[])
-        TurnContext.apply_conversation_reference(activity, self._conversation_reference)
+            # Assert the callback set the right properties.
+            assert (
+                f"{CallerIdConstants.bot_to_bot_prefix}{self.skill_id}"
+            ), turn_context.activity.caller_id
 
-        await sut.test_on_send_to_conversation(
-            self._claims_identity, self._conversation_id, activity
-        )
+        async def send_activities(
+            context: TurnContext, activities: List[Activity]
+        ):  # pylint: disable=unused-argument
+            # Messages should not have a caller id set when sent back to the caller.
+            nonlocal send_activities_called
+            assert activities[0].caller_id is None
+            assert activities[0].reply_to_id is None
+            send_activities_called = True
+            return [ResourceResponse(id="resourceId")]
 
-        args, kwargs = mock_adapter.continue_conversation.call_args_list[0]
+        mock_adapter.continue_conversation = continue_conversation
+        mock_adapter.send_activities = send_activities
 
-        assert isinstance(args[0], ConversationReference)
-        assert callable(args[1])
-        assert isinstance(kwargs["claims_identity"], ClaimsIdentity)
+        types_to_test = [
+            ActivityTypes.end_of_conversation,
+            ActivityTypes.event,
+            ActivityTypes.message,
+        ]
 
-    async def test_on_reply_to_activity(self):
+        for activity_type in types_to_test:
+            with self.subTest(act_type=activity_type):
+                send_activities_called = False
+                activity = Activity(type=activity_type, attachments=[], entities=[])
+                TurnContext.apply_conversation_reference(
+                    activity, self._conversation_reference
+                )
+                sut = self.create_skill_handler_for_testing(mock_adapter)
+
+                resource_response = await sut.test_on_send_to_conversation(
+                    self._claims_identity, self._conversation_id, activity
+                )
+
+                if activity_type == ActivityTypes.message:
+                    assert send_activities_called
+                    assert resource_response.id == "resourceId"
+
+    async def test_forwarding_on_send_to_conversation(self):
         self._conversation_id = await self._test_id_factory.create_skill_conversation_id(
             self._conversation_reference
         )
 
+        resource_response_id = "rId"
+
+        async def side_effect(
+            *arg_list, **args_dict
+        ):  # pylint: disable=unused-argument
+            fake_context = Mock()
+            fake_context.turn_state = {}
+            fake_context.send_activity = MagicMock(return_value=Future())
+            fake_context.send_activity.return_value.set_result(
+                ResourceResponse(id=resource_response_id)
+            )
+            await arg_list[1](fake_context)
+
         mock_adapter = Mock()
-        mock_adapter.continue_conversation = MagicMock(return_value=Future())
-        mock_adapter.continue_conversation.return_value.set_result(Mock())
+        mock_adapter.continue_conversation = side_effect
+        mock_adapter.send_activities = MagicMock(return_value=Future())
+        mock_adapter.send_activities.return_value.set_result([])
 
         sut = self.create_skill_handler_for_testing(mock_adapter)
 
         activity = Activity(type=ActivityTypes.message, attachments=[], entities=[])
-        activity_id = str(uuid4())
         TurnContext.apply_conversation_reference(activity, self._conversation_reference)
 
-        await sut.test_on_reply_to_activity(
+        assert not activity.caller_id
+
+        response = await sut.test_on_send_to_conversation(
+            self._claims_identity, self._conversation_id, activity
+        )
+
+        assert response.id is resource_response_id
+
+    async def test_on_reply_to_activity(self):
+        resource_response_id = "resourceId"
+        self._conversation_id = await self._test_id_factory.create_skill_conversation_id(
+            self._conversation_reference
+        )
+
+        types_to_test = [
+            ActivityTypes.end_of_conversation,
+            ActivityTypes.event,
+            ActivityTypes.message,
+        ]
+
+        for activity_type in types_to_test:
+            with self.subTest(act_type=activity_type):
+                mock_adapter = Mock()
+                mock_adapter.continue_conversation = MagicMock(return_value=Future())
+                mock_adapter.continue_conversation.return_value.set_result(Mock())
+                mock_adapter.send_activities = MagicMock(return_value=Future())
+                mock_adapter.send_activities.return_value.set_result(
+                    [ResourceResponse(id=resource_response_id)]
+                )
+
+                sut = self.create_skill_handler_for_testing(mock_adapter)
+
+                activity = Activity(type=activity_type, attachments=[], entities=[])
+                activity_id = str(uuid4())
+                TurnContext.apply_conversation_reference(
+                    activity, self._conversation_reference
+                )
+
+                resource_response = await sut.test_on_reply_to_activity(
+                    self._claims_identity, self._conversation_id, activity_id, activity
+                )
+
+                # continue_conversation validation
+                (
+                    args_continue,
+                    kwargs_continue,
+                ) = mock_adapter.continue_conversation.call_args_list[0]
+                mock_adapter.continue_conversation.assert_called_once()
+
+                assert isinstance(args_continue[0], ConversationReference)
+                assert callable(args_continue[1])
+                assert isinstance(kwargs_continue["claims_identity"], ClaimsIdentity)
+
+                turn_context = TurnContext(
+                    mock_adapter,
+                    conversation_reference_extension.get_continuation_activity(
+                        self._conversation_reference
+                    ),
+                )
+                await args_continue[1](turn_context)
+                # assert the callback set the right properties.
+                assert (
+                    f"{CallerIdConstants.bot_to_bot_prefix}{self.skill_id}"
+                ), turn_context.activity.caller_id
+
+                if activity_type == ActivityTypes.message:
+                    # send_activities validation
+                    (args_send, _,) = mock_adapter.send_activities.call_args_list[0]
+                    activity_from_send = args_send[1][0]
+                    assert activity_from_send.caller_id is None
+                    assert activity_from_send.reply_to_id, activity_id
+                    assert resource_response.id, resource_response_id
+                else:
+                    # Assert mock SendActivitiesAsync wasn't called
+                    mock_adapter.send_activities.assert_not_called()
+
+    async def test_on_update_activity(self):
+        self._conversation_id = await self._test_id_factory.create_skill_conversation_id(
+            self._conversation_reference
+        )
+        resource_response_id = "resourceId"
+        called_continue = False
+        called_update = False
+
+        mock_adapter = Mock()
+        activity = Activity(type=ActivityTypes.message, attachments=[], entities=[])
+        activity_id = str(uuid4())
+        message = activity.text = f"TestUpdate {datetime.now()}."
+
+        async def continue_conversation(
+            reference: ConversationReference,
+            callback: Callable,
+            bot_id: str = None,
+            claims_identity: ClaimsIdentity = None,
+            audience: str = None,
+        ):  # pylint: disable=unused-argument
+            # Invoke the callback created by the handler so we can assert the rest of the execution.
+            nonlocal called_continue
+            turn_context = TurnContext(
+                mock_adapter,
+                conversation_reference_extension.get_continuation_activity(
+                    self._conversation_reference
+                ),
+            )
+            await callback(turn_context)
+
+            # Assert the callback set the right properties.
+            assert (
+                f"{CallerIdConstants.bot_to_bot_prefix}{self.skill_id}"
+            ), turn_context.activity.caller_id
+            called_continue = True
+
+        async def update_activity(
+            context: TurnContext,  # pylint: disable=unused-argument
+            new_activity: Activity,
+        ) -> ResourceResponse:
+            # Assert the activity being sent.
+            nonlocal called_update
+            assert activity_id, new_activity.reply_to_id
+            assert message, new_activity.text
+            called_update = True
+
+            return ResourceResponse(id=resource_response_id)
+
+        mock_adapter.continue_conversation = continue_conversation
+        mock_adapter.update_activity = update_activity
+
+        sut = self.create_skill_handler_for_testing(mock_adapter)
+        resource_response = await sut.test_on_update_activity(
             self._claims_identity, self._conversation_id, activity_id, activity
         )
 
-        args, kwargs = mock_adapter.continue_conversation.call_args_list[0]
-
-        assert isinstance(args[0], ConversationReference)
-        assert callable(args[1])
-        assert isinstance(kwargs["claims_identity"], ClaimsIdentity)
-
-    async def test_on_update_activity(self):
-        self._conversation_id = ""
-
-        mock_adapter = Mock()
-
-        sut = self.create_skill_handler_for_testing(mock_adapter)
-
-        activity = Activity(type=ActivityTypes.message, attachments=[], entities=[])
-        activity_id = str(uuid4())
-
-        with self.assertRaises(BotActionNotImplementedError):
-            await sut.test_on_update_activity(
-                self._claims_identity, self._conversation_id, activity_id, activity
-            )
+        assert called_continue
+        assert called_update
+        assert resource_response, resource_response_id
 
     async def test_on_delete_activity(self):
-        self._conversation_id = ""
+        self._conversation_id = await self._test_id_factory.create_skill_conversation_id(
+            self._conversation_reference
+        )
+
+        resource_response_id = "resourceId"
+        called_continue = False
+        called_delete = False
 
         mock_adapter = Mock()
-
-        sut = self.create_skill_handler_for_testing(mock_adapter)
         activity_id = str(uuid4())
 
-        with self.assertRaises(BotActionNotImplementedError):
-            await sut.test_on_delete_activity(
-                self._claims_identity, self._conversation_id, activity_id
+        async def continue_conversation(
+            reference: ConversationReference,
+            callback: Callable,
+            bot_id: str = None,
+            claims_identity: ClaimsIdentity = None,
+            audience: str = None,
+        ):  # pylint: disable=unused-argument
+            # Invoke the callback created by the handler so we can assert the rest of the execution.
+            nonlocal called_continue
+            turn_context = TurnContext(
+                mock_adapter,
+                conversation_reference_extension.get_continuation_activity(
+                    self._conversation_reference
+                ),
             )
+            await callback(turn_context)
+            called_continue = True
+
+        async def delete_activity(
+            context: TurnContext,  # pylint: disable=unused-argument
+            conversation_reference: ConversationReference,
+        ) -> ResourceResponse:
+            # Assert the activity being sent.
+            nonlocal called_delete
+            # Assert the activity_id being deleted.
+            assert activity_id, conversation_reference.activity_id
+            called_delete = True
+
+            return ResourceResponse(id=resource_response_id)
+
+        mock_adapter.continue_conversation = continue_conversation
+        mock_adapter.delete_activity = delete_activity
+
+        sut = self.create_skill_handler_for_testing(mock_adapter)
+
+        await sut.test_on_delete_activity(
+            self._claims_identity, self._conversation_id, activity_id
+        )
+
+        assert called_continue
+        assert called_delete
 
     async def test_on_get_activity_members(self):
         self._conversation_id = ""
@@ -366,3 +583,47 @@ class TestSkillHandler(aiounittest.AsyncTestCase):
             await sut.test_on_upload_attachment(
                 self._claims_identity, self._conversation_id, attachment_data
             )
+
+    async def test_event_activity(self):
+        activity = Activity(type=ActivityTypes.event)
+        await self.__activity_callback_test(activity)
+        assert (
+            activity.caller_id
+            == f"{CallerIdConstants.bot_to_bot_prefix}{self.skill_id}"
+        )
+
+    async def test_eoc_activity(self):
+        activity = Activity(type=ActivityTypes.end_of_conversation)
+        await self.__activity_callback_test(activity)
+        assert (
+            activity.caller_id
+            == f"{CallerIdConstants.bot_to_bot_prefix}{self.skill_id}"
+        )
+
+    async def __activity_callback_test(self, activity: Activity):
+        self._conversation_id = await self._test_id_factory.create_skill_conversation_id(
+            self._conversation_reference
+        )
+
+        mock_adapter = Mock()
+        mock_adapter.continue_conversation = MagicMock(return_value=Future())
+        mock_adapter.continue_conversation.return_value.set_result(Mock())
+        mock_adapter.send_activities = MagicMock(return_value=Future())
+        mock_adapter.send_activities.return_value.set_result([])
+
+        sut = self.create_skill_handler_for_testing(mock_adapter)
+
+        activity_id = str(uuid4())
+        TurnContext.apply_conversation_reference(activity, self._conversation_reference)
+
+        await sut.test_on_reply_to_activity(
+            self._claims_identity, self._conversation_id, activity_id, activity
+        )
+
+        args, kwargs = mock_adapter.continue_conversation.call_args_list[0]
+
+        assert isinstance(args[0], ConversationReference)
+        assert callable(args[1])
+        assert isinstance(kwargs["claims_identity"], ClaimsIdentity)
+
+        await args[1](TurnContext(mock_adapter, activity))

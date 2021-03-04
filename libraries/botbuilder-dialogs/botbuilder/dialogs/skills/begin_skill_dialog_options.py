@@ -5,7 +5,7 @@ from botbuilder.schema import Activity
 
 
 class BeginSkillDialogOptions:
-    def __init__(self, activity: Activity):  # pylint: disable=unused-argument
+    def __init__(self, activity: Activity):
         self.activity = activity
 
     @staticmethod
@@ -14,5 +14,4 @@ class BeginSkillDialogOptions:
             return BeginSkillDialogOptions(obj["activity"])
         if hasattr(obj, "activity"):
             return BeginSkillDialogOptions(obj.activity)
-
         return None

@@ -1,15 +1,21 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from botframework.connector.auth import (
+    ClaimsIdentity,
+    SkillValidation,
+    AuthenticationConstants,
+    GovernmentConstants,
+)
 from botbuilder.core import BotAdapter, StatePropertyAccessor, TurnContext
+from botbuilder.core.skills import SkillHandler, SkillConversationReference
 from botbuilder.dialogs import (
     Dialog,
     DialogEvents,
     DialogSet,
     DialogTurnStatus,
 )
-from botbuilder.schema import Activity, ActivityTypes
-from botframework.connector.auth import ClaimsIdentity, SkillValidation
+from botbuilder.schema import Activity, ActivityTypes, EndOfConversationCodes
 
 
 class DialogExtensions:
@@ -17,73 +23,91 @@ class DialogExtensions:
     async def run_dialog(
         dialog: Dialog, turn_context: TurnContext, accessor: StatePropertyAccessor
     ):
+        """
+        Creates a dialog stack and starts a dialog, pushing it onto the stack.
+        """
+
         dialog_set = DialogSet(accessor)
         dialog_set.add(dialog)
 
         dialog_context = await dialog_set.create_context(turn_context)
 
-        claims = turn_context.turn_state.get(BotAdapter.BOT_IDENTITY_KEY)
-        if isinstance(claims, ClaimsIdentity) and SkillValidation.is_skill_claim(
-            claims.claims
-        ):
-            # The bot is running as a skill.
-            if (
-                turn_context.activity.type == ActivityTypes.end_of_conversation
-                and dialog_context.stack
-                and DialogExtensions.__is_eoc_coming_from_parent(turn_context)
-            ):
-                remote_cancel_text = "Skill was canceled through an EndOfConversation activity from the parent."
-                await turn_context.send_trace_activity(
-                    f"Extension {Dialog.__name__}.run_dialog", label=remote_cancel_text,
-                )
-
-                await dialog_context.cancel_all_dialogs()
-            else:
-                # Process a reprompt event sent from the parent.
-                if (
-                    turn_context.activity.type == ActivityTypes.event
-                    and turn_context.activity.name == DialogEvents.reprompt_dialog
-                    and dialog_context.stack
-                ):
-                    await dialog_context.reprompt_dialog()
+        # Handle EoC and Reprompt event from a parent bot (can be root bot to skill or skill to skill)
+        if DialogExtensions.__is_from_parent_to_skill(turn_context):
+            # Handle remote cancellation request from parent.
+            if turn_context.activity.type == ActivityTypes.end_of_conversation:
+                if not dialog_context.stack:
+                    # No dialogs to cancel, just return.
                     return
 
-                # Run the Dialog with the new message Activity and capture the results
-                # so we can send end of conversation if needed.
-                result = await dialog_context.continue_dialog()
-                if result.status == DialogTurnStatus.Empty:
-                    start_message_text = f"Starting {dialog.id}"
-                    await turn_context.send_trace_activity(
-                        f"Extension {Dialog.__name__}.run_dialog",
-                        label=start_message_text,
-                    )
-                    result = await dialog_context.begin_dialog(dialog.id)
+                # Send cancellation message to the dialog to ensure all the parents are canceled
+                # in the right order.
+                await dialog_context.cancel_all_dialogs()
+                return
 
-                # Send end of conversation if it is completed or cancelled.
-                if (
-                    result.status == DialogTurnStatus.Complete
-                    or result.status == DialogTurnStatus.Cancelled
-                ):
-                    end_message_text = f"Dialog {dialog.id} has **completed**. Sending EndOfConversation."
-                    await turn_context.send_trace_activity(
-                        f"Extension {Dialog.__name__}.run_dialog",
-                        label=end_message_text,
-                        value=result.result,
-                    )
+            # Handle a reprompt event sent from the parent.
+            if (
+                turn_context.activity.type == ActivityTypes.event
+                and turn_context.activity.name == DialogEvents.reprompt_dialog
+            ):
+                if not dialog_context.stack:
+                    # No dialogs to reprompt, just return.
+                    return
 
-                    activity = Activity(
-                        type=ActivityTypes.end_of_conversation, value=result.result
-                    )
-                    await turn_context.send_activity(activity)
+                await dialog_context.reprompt_dialog()
+                return
 
-        else:
-            # The bot is running as a standard bot.
-            results = await dialog_context.continue_dialog()
-            if results.status == DialogTurnStatus.Empty:
-                await dialog_context.begin_dialog(dialog.id)
+        # Continue or start the dialog.
+        result = await dialog_context.continue_dialog()
+        if result.status == DialogTurnStatus.Empty:
+            result = await dialog_context.begin_dialog(dialog.id)
+
+        # Skills should send EoC when the dialog completes.
+        if (
+            result.status == DialogTurnStatus.Complete
+            or result.status == DialogTurnStatus.Cancelled
+        ):
+            if DialogExtensions.__send_eoc_to_parent(turn_context):
+                activity = Activity(
+                    type=ActivityTypes.end_of_conversation,
+                    value=result.result,
+                    locale=turn_context.activity.locale,
+                    code=EndOfConversationCodes.completed_successfully
+                    if result.status == DialogTurnStatus.Complete
+                    else EndOfConversationCodes.user_cancelled,
+                )
+                await turn_context.send_activity(activity)
 
     @staticmethod
-    def __is_eoc_coming_from_parent(turn_context: TurnContext) -> bool:
-        # To determine the direction we check callerId property which is set to the parent bot
-        # by the BotFrameworkHttpClient on outgoing requests.
-        return bool(turn_context.activity.caller_id)
+    def __is_from_parent_to_skill(turn_context: TurnContext) -> bool:
+        if turn_context.turn_state.get(SkillHandler.SKILL_CONVERSATION_REFERENCE_KEY):
+            return False
+
+        claims_identity = turn_context.turn_state.get(BotAdapter.BOT_IDENTITY_KEY)
+        return isinstance(
+            claims_identity, ClaimsIdentity
+        ) and SkillValidation.is_skill_claim(claims_identity.claims)
+
+    @staticmethod
+    def __send_eoc_to_parent(turn_context: TurnContext) -> bool:
+        claims_identity = turn_context.turn_state.get(BotAdapter.BOT_IDENTITY_KEY)
+        if isinstance(
+            claims_identity, ClaimsIdentity
+        ) and SkillValidation.is_skill_claim(claims_identity.claims):
+            # EoC Activities returned by skills are bounced back to the bot by SkillHandler.
+            # In those cases we will have a SkillConversationReference instance in state.
+            skill_conversation_reference: SkillConversationReference = turn_context.turn_state.get(
+                SkillHandler.SKILL_CONVERSATION_REFERENCE_KEY
+            )
+            if skill_conversation_reference:
+                # If the skillConversationReference.OAuthScope is for one of the supported channels,
+                # we are at the root and we should not send an EoC.
+                return (
+                    skill_conversation_reference.oauth_scope
+                    != AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
+                    and skill_conversation_reference.oauth_scope
+                    != GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
+                )
+            return True
+
+        return False

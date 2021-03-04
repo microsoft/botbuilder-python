@@ -5,10 +5,10 @@ import os
 from setuptools import setup
 
 REQUIRES = [
-    "azure-cosmos==3.1.2",
-    "azure-storage-blob==2.1.0",
-    "botbuilder-schema>=4.7.1",
-    "botframework-connector>=4.7.1",
+    "azure-cosmos==3.2.0",
+    "azure-storage-blob==12.7.0",
+    "botbuilder-schema==4.12.0",
+    "botframework-connector==4.12.0",
     "jsonpickle==1.2",
 ]
 TEST_REQUIRES = ["aiounittest==1.3.0"]

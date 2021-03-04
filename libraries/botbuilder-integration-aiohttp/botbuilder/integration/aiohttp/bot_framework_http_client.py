@@ -14,20 +14,23 @@ from botbuilder.schema import (
     ExpectedReplies,
     ConversationReference,
     ConversationAccount,
+    ChannelAccount,
+    RoleTypes,
 )
 from botframework.connector.auth import (
     ChannelProvider,
     CredentialProvider,
-    GovernmentConstants,
     MicrosoftAppCredentials,
+    AppCredentials,
+    MicrosoftGovernmentAppCredentials,
 )
 
 
 class BotFrameworkHttpClient(BotFrameworkClient):
 
     """
-    A skill host adapter implements API to forward activity to a skill and
-    implements routing ChannelAPI calls from the Skill up through the bot/adapter.
+    A skill host adapter that implements the API to forward activity to a skill and
+    implements routing ChannelAPI calls from the skill up through the bot/adapter.
     """
 
     INVOKE_ACTIVITY_NAME = "SkillEvents.ChannelApiInvoke"
@@ -70,15 +73,12 @@ class BotFrameworkHttpClient(BotFrameworkClient):
         )
 
         # Capture current activity settings before changing them.
-        # TODO: DO we need to set the activity ID? (events that are created manually don't have it).
         original_conversation_id = activity.conversation.id
         original_service_url = activity.service_url
-        original_caller_id = activity.caller_id
         original_relates_to = activity.relates_to
+        original_recipient = activity.recipient
 
         try:
-            # TODO: The relato has to be ported to the adapter in the new integration library when
-            #  resolving conflicts in merge
             activity.relates_to = ConversationReference(
                 service_url=activity.service_url,
                 activity_id=activity.id,
@@ -97,33 +97,40 @@ class BotFrameworkHttpClient(BotFrameworkClient):
             )
             activity.conversation.id = conversation_id
             activity.service_url = service_url
-            activity.caller_id = f"urn:botframework:aadappid:{from_bot_id}"
+            if not activity.recipient:
+                activity.recipient = ChannelAccount(role=RoleTypes.skill)
+            else:
+                activity.recipient.role = RoleTypes.skill
 
-            headers_dict = {
-                "Content-type": "application/json; charset=utf-8",
-            }
-            if token:
-                headers_dict.update(
-                    {"Authorization": f"Bearer {token}",}
-                )
+            status, content = await self._post_content(to_url, token, activity)
 
-            json_content = json.dumps(activity.serialize())
-            resp = await self._session.post(
-                to_url, data=json_content.encode("utf8"), headers=headers_dict,
-            )
-            resp.raise_for_status()
-            data = (await resp.read()).decode()
-            content = json.loads(data) if data else None
-
-            if content:
-                return InvokeResponse(status=resp.status, body=content)
+            return InvokeResponse(status=status, body=content)
 
         finally:
             # Restore activity properties.
             activity.conversation.id = original_conversation_id
             activity.service_url = original_service_url
-            activity.caller_id = original_caller_id
             activity.relates_to = original_relates_to
+            activity.recipient = original_recipient
+
+    async def _post_content(
+        self, to_url: str, token: str, activity: Activity
+    ) -> (int, object):
+        headers_dict = {
+            "Content-type": "application/json; charset=utf-8",
+        }
+        if token:
+            headers_dict.update(
+                {"Authorization": f"Bearer {token}",}
+            )
+
+        json_content = json.dumps(activity.serialize())
+        resp = await self._session.post(
+            to_url, data=json_content.encode("utf-8"), headers=headers_dict,
+        )
+        resp.raise_for_status()
+        data = (await resp.read()).decode()
+        return resp.status, json.loads(data) if data else None
 
     async def post_buffered_activity(
         self,
@@ -147,27 +154,26 @@ class BotFrameworkHttpClient(BotFrameworkClient):
 
     async def _get_app_credentials(
         self, app_id: str, oauth_scope: str
-    ) -> MicrosoftAppCredentials:
+    ) -> AppCredentials:
         if not app_id:
-            return MicrosoftAppCredentials(None, None)
+            return MicrosoftAppCredentials.empty()
 
+        # in the cache?
         cache_key = f"{app_id}{oauth_scope}"
         app_credentials = BotFrameworkHttpClient._APP_CREDENTIALS_CACHE.get(cache_key)
-
         if app_credentials:
             return app_credentials
 
+        # create a new AppCredentials
         app_password = await self._credential_provider.get_app_password(app_id)
-        app_credentials = MicrosoftAppCredentials(
-            app_id, app_password, oauth_scope=oauth_scope
-        )
-        if self._channel_provider and self._channel_provider.is_government():
-            app_credentials.oauth_endpoint = (
-                GovernmentConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL
-            )
-            app_credentials.oauth_scope = (
-                GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
-            )
 
+        app_credentials = (
+            MicrosoftGovernmentAppCredentials(app_id, app_password, scope=oauth_scope)
+            if self._channel_provider and self._channel_provider.is_government()
+            else MicrosoftAppCredentials(app_id, app_password, oauth_scope=oauth_scope)
+        )
+
+        # put it in the cache
         BotFrameworkHttpClient._APP_CREDENTIALS_CACHE[cache_key] = app_credentials
+
         return app_credentials

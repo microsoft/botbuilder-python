@@ -5,17 +5,17 @@ import hashlib
 import hmac
 import json
 from io import IOBase
-from typing import Union
+from typing import List, Union
 
 import aiohttp
 from aiohttp.web_request import Request
 
+from slack.web.client import WebClient
+from slack.web.slack_response import SlackResponse
+
 from botbuilder.schema import Activity
 from botbuilder.adapters.slack import SlackAdapterOptions
 from botbuilder.adapters.slack.slack_message import SlackMessage
-
-from slack.web.client import WebClient
-from slack.web.slack_response import SlackResponse
 
 POST_MESSAGE_URL = "https://slack.com/api/chat.postMessage"
 POST_EPHEMERAL_MESSAGE_URL = "https://slack.com/api/chat.postEphemeral"
@@ -116,7 +116,7 @@ class SlackClient(WebClient):
         date_to: str = None,
         count: int = None,
         page: int = None,
-        types: [str] = None,
+        types: List[str] = None,
     ) -> SlackResponse:
         args = {}
 
@@ -185,7 +185,7 @@ class SlackClient(WebClient):
         target_user: str,
         parse: str = None,
         link_names: bool = False,
-        attachments: [str] = None,  # pylint: disable=unused-argument
+        attachments: List[str] = None,  # pylint: disable=unused-argument
         as_user: bool = False,
     ) -> SlackResponse:
         args = {
@@ -210,8 +210,8 @@ class SlackClient(WebClient):
         bot_name: str = None,
         parse: str = None,
         link_names: bool = False,
-        blocks: [str] = None,  # pylint: disable=unused-argument
-        attachments: [str] = None,  # pylint: disable=unused-argument
+        blocks: List[str] = None,  # pylint: disable=unused-argument
+        attachments: List[str] = None,  # pylint: disable=unused-argument
         unfurl_links: bool = False,
         icon_url: str = None,
         icon_emoji: str = None,
@@ -328,7 +328,7 @@ class SlackClient(WebClient):
         bot_name: str = None,
         parse: str = None,
         link_names: bool = False,
-        attachments: [str] = None,  # pylint: disable=unused-argument
+        attachments: List[str] = None,  # pylint: disable=unused-argument
         as_user: bool = False,
     ):
         args = {
@@ -353,7 +353,7 @@ class SlackClient(WebClient):
         self,
         file: Union[str, IOBase] = None,
         content: str = None,
-        channels: [str] = None,
+        channels: List[str] = None,
         title: str = None,
         initial_comment: str = None,
         file_type: str = None,

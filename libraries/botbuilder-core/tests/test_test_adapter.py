@@ -3,10 +3,10 @@
 
 import aiounittest
 
+from botframework.connector.auth import MicrosoftAppCredentials
 from botbuilder.core import TurnContext
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.schema import Activity, ConversationReference, ChannelAccount
-from botframework.connector.auth import MicrosoftAppCredentials
 
 RECEIVED_MESSAGE = Activity(type="message", text="received")
 UPDATED_ACTIVITY = Activity(type="message", text="update")
@@ -245,3 +245,34 @@ class TestTestAdapter(aiounittest.AsyncTestCase):
         assert token_response
         assert token == token_response.token
         assert connection_name == token_response.connection_name
+
+    async def test_should_validate_no_reply_when_no_reply_expected(self):
+        async def logic(context: TurnContext):
+            await context.send_activity(RECEIVED_MESSAGE)
+
+        adapter = TestAdapter(logic)
+        test_flow = await adapter.test("test", "received")
+        await test_flow.assert_no_reply("should be no additional replies")
+
+    async def test_should_timeout_waiting_for_assert_no_reply_when_no_reply_expected(
+        self,
+    ):
+        async def logic(context: TurnContext):
+            await context.send_activity(RECEIVED_MESSAGE)
+
+        adapter = TestAdapter(logic)
+        test_flow = await adapter.test("test", "received")
+        await test_flow.assert_no_reply("no reply received", 500)
+
+    async def test_should_throw_error_with_assert_no_reply_when_no_reply_expected_but_was_received(
+        self,
+    ):
+        async def logic(context: TurnContext):
+            activities = [RECEIVED_MESSAGE, RECEIVED_MESSAGE]
+            await context.send_activities(activities)
+
+        adapter = TestAdapter(logic)
+        test_flow = await adapter.test("test", "received")
+
+        with self.assertRaises(Exception):
+            await test_flow.assert_no_reply("should be no additional replies")

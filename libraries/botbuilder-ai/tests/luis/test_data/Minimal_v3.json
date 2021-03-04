@@ -1,0 +1,83 @@
+{
+    "entities": {
+      "Airline": [
+        [
+          "Delta"
+        ]
+      ],
+      "datetime": [
+        {
+          "timex": [
+            "T15"
+          ],
+          "type": "time"
+        }
+      ],
+      "dimension": [
+        {
+          "number": 3,
+          "units": "Picometer"
+        }
+      ]
+    },
+    "intents": {
+      "Roles": {
+        "score": 0.446264923
+      }
+    },
+    "sentiment": {
+      "label": "neutral",
+      "score": 0.5
+    },
+    "text": "fly on delta at 3pm",
+    "v3": {
+      "options": {
+        "includeAllIntents": false,
+        "includeAPIResults": true,
+        "includeInstanceData": false,
+        "log": true,
+        "preferExternalEntities": true,
+        "slot": "production"
+      },
+      "response": {
+        "prediction": {
+          "entities": {
+            "Airline": [
+              [
+                "Delta"
+              ]
+            ],
+            "datetimeV2": [
+              {
+                "type": "time",
+                "values": [
+                  {
+                    "timex": "T15",
+                    "value": "15:00:00"
+                  }
+                ]
+              }
+            ],
+            "dimension": [
+              {
+                "number": 3,
+                "unit": "Picometer"
+              }
+            ]
+          },
+          "intents": {
+            "Roles": {
+              "score": 0.446264923
+            }
+          },
+          "normalizedQuery": "fly on delta at 3pm",
+          "sentiment": {
+            "label": "neutral",
+            "score": 0.5
+          },
+          "topIntent": "Roles"
+        },
+        "query": "fly on delta at 3pm"
+      }
+    }
+  }

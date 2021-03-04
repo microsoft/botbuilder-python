@@ -9,14 +9,19 @@ from botbuilder.schema import (
     ChannelAccount,
     MessageReaction,
     SignInConstants,
+    HealthCheckResponse,
 )
+
+from .bot import Bot
+from .bot_adapter import BotAdapter
+from .healthcheck import HealthCheck
 from .serializer_helper import serializer_helper
 from .bot_framework_adapter import BotFrameworkAdapter
 from .invoke_response import InvokeResponse
 from .turn_context import TurnContext
 
 
-class ActivityHandler:
+class ActivityHandler(Bot):
     """
     Handles activities and should be subclassed.
 
@@ -26,7 +31,9 @@ class ActivityHandler:
         in the derived class.
     """
 
-    async def on_turn(self, turn_context: TurnContext):
+    async def on_turn(
+        self, turn_context: TurnContext
+    ):  # pylint: disable=arguments-differ
         """
         Called by the adapter (for example, :class:`BotFrameworkAdapter`) at runtime
         in order to process an inbound :class:`botbuilder.schema.Activity`.
@@ -80,6 +87,10 @@ class ActivityHandler:
                 )
         elif turn_context.activity.type == ActivityTypes.end_of_conversation:
             await self.on_end_of_conversation_activity(turn_context)
+        elif turn_context.activity.type == ActivityTypes.typing:
+            await self.on_typing_activity(turn_context)
+        elif turn_context.activity.type == ActivityTypes.installation_update:
+            await self.on_installation_update(turn_context)
         else:
             await self.on_unrecognized_activity_type(turn_context)
 
@@ -346,6 +357,62 @@ class ActivityHandler:
         """
         return
 
+    async def on_typing_activity(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext
+    ):
+        """
+        Override this in a derived class to provide logic specific to
+        ActivityTypes.typing activities, such as the conversational logic.
+
+        :param turn_context: The context object for this turn
+        :type turn_context: :class:`botbuilder.core.TurnContext`
+        :returns: A task that represents the work queued to execute
+        """
+        return
+
+    async def on_installation_update(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext
+    ):
+        """
+        Override this in a derived class to provide logic specific to
+        ActivityTypes.InstallationUpdate activities.
+
+        :param turn_context: The context object for this turn
+        :type turn_context: :class:`botbuilder.core.TurnContext`
+        :returns: A task that represents the work queued to execute
+        """
+        if turn_context.activity.action in ("add", "add-upgrade"):
+            return await self.on_installation_update_add(turn_context)
+        if turn_context.activity.action in ("remove", "remove-upgrade"):
+            return await self.on_installation_update_remove(turn_context)
+        return
+
+    async def on_installation_update_add(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext
+    ):
+        """
+        Override this in a derived class to provide logic specific to
+        ActivityTypes.InstallationUpdate activities with 'action' set to 'add'.
+
+        :param turn_context: The context object for this turn
+        :type turn_context: :class:`botbuilder.core.TurnContext`
+        :returns: A task that represents the work queued to execute
+        """
+        return
+
+    async def on_installation_update_remove(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext
+    ):
+        """
+        Override this in a derived class to provide logic specific to
+        ActivityTypes.InstallationUpdate activities with 'action' set to 'remove'.
+
+        :param turn_context: The context object for this turn
+        :type turn_context: :class:`botbuilder.core.TurnContext`
+        :returns: A task that represents the work queued to execute
+        """
+        return
+
     async def on_unrecognized_activity_type(  # pylint: disable=unused-argument
         self, turn_context: TurnContext
     ):
@@ -386,6 +453,11 @@ class ActivityHandler:
                 await self.on_sign_in_invoke(turn_context)
                 return self._create_invoke_response()
 
+            if turn_context.activity.name == "healthcheck":
+                return self._create_invoke_response(
+                    await self.on_healthcheck(turn_context)
+                )
+
             raise _InvokeResponseException(HTTPStatus.NOT_IMPLEMENTED)
         except _InvokeResponseException as invoke_exception:
             return invoke_exception.create_invoke_response()
@@ -405,6 +477,21 @@ class ActivityHandler:
         :returns: A task that represents the work queued to execute
         """
         raise _InvokeResponseException(HTTPStatus.NOT_IMPLEMENTED)
+
+    async def on_healthcheck(self, turn_context: TurnContext) -> HealthCheckResponse:
+        """
+        Invoked when the bot is sent a health check from the hosting infrastructure or, in the case of
+        Skills the parent bot. By default, this method acknowledges the health state of the bot.
+
+        When the on_invoke_activity method receives an Invoke with a Activity.name of `healthCheck`, it
+        calls this method.
+
+        :param turn_context: A context object for this turn.
+        :return: The HealthCheckResponse object
+        """
+        return HealthCheck.create_healthcheck_response(
+            turn_context.turn_state.get(BotAdapter.BOT_CONNECTOR_CLIENT_KEY)
+        )
 
     @staticmethod
     def _create_invoke_response(body: object = None) -> InvokeResponse:

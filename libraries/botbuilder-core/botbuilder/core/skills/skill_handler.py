@@ -7,8 +7,8 @@ from botbuilder.core import Bot, BotAdapter, ChannelServiceHandler, TurnContext
 from botbuilder.schema import (
     Activity,
     ActivityTypes,
-    ConversationReference,
     ResourceResponse,
+    CallerIdConstants,
 )
 from botframework.connector.auth import (
     AuthenticationConfiguration,
@@ -17,6 +17,7 @@ from botframework.connector.auth import (
     ClaimsIdentity,
     CredentialProvider,
     GovernmentConstants,
+    JwtTokenValidation,
 )
 from .skill_conversation_reference import SkillConversationReference
 from .conversation_id_factory import ConversationIdFactoryBase
@@ -61,9 +62,9 @@ class SkillHandler(ChannelServiceHandler):
         This method allows you to send an activity to the end of a conversation.
 
         This is slightly different from ReplyToActivity().
-        * SendToConversation(conversationId) - will append the activity to the end
+        * SendToConversation(conversation_id) - will append the activity to the end
         of the conversation according to the timestamp or semantics of the channel.
-        * ReplyToActivity(conversationId,ActivityId) - adds the activity as a reply
+        * ReplyToActivity(conversation_id,ActivityId) - adds the activity as a reply
         to another activity, if the channel supports it. If the channel does not
         support nested replies, ReplyToActivity falls back to SendToConversation.
 
@@ -71,9 +72,12 @@ class SkillHandler(ChannelServiceHandler):
         conversation.
 
         Use SendToConversation in all other cases.
-        :param claims_identity:
-        :param conversation_id:
-        :param activity:
+        :param claims_identity: Claims identity for the bot.
+        :type claims_identity: :class:`botframework.connector.auth.ClaimsIdentity`
+        :param conversation_id:The conversation ID.
+        :type conversation_id: str
+        :param activity: Activity to send.
+        :type activity: Activity
         :return:
         """
         return await self._process_activity(
@@ -93,9 +97,9 @@ class SkillHandler(ChannelServiceHandler):
         This method allows you to reply to an activity.
 
         This is slightly different from SendToConversation().
-        * SendToConversation(conversationId) - will append the activity to the end
+        * SendToConversation(conversation_id) - will append the activity to the end
         of the conversation according to the timestamp or semantics of the channel.
-        * ReplyToActivity(conversationId,ActivityId) - adds the activity as a reply
+        * ReplyToActivity(conversation_id,ActivityId) - adds the activity as a reply
         to another activity, if the channel supports it. If the channel does not
         support nested replies, ReplyToActivity falls back to SendToConversation.
 
@@ -103,15 +107,108 @@ class SkillHandler(ChannelServiceHandler):
         conversation.
 
         Use SendToConversation in all other cases.
-        :param claims_identity:
-        :param conversation_id:
-        :param activity_id:
-        :param activity:
+        :param claims_identity: Claims identity for the bot.
+        :type claims_identity: :class:`botframework.connector.auth.ClaimsIdentity`
+        :param conversation_id:The conversation ID.
+        :type conversation_id: str
+        :param activity_id: Activity ID to send.
+        :type activity_id: str
+        :param activity: Activity to send.
+        :type activity: Activity
         :return:
         """
         return await self._process_activity(
             claims_identity, conversation_id, activity_id, activity,
         )
+
+    async def on_delete_activity(
+        self, claims_identity: ClaimsIdentity, conversation_id: str, activity_id: str
+    ):
+        skill_conversation_reference = await self._get_skill_conversation_reference(
+            conversation_id
+        )
+
+        async def callback(turn_context: TurnContext):
+            turn_context.turn_state[
+                self.SKILL_CONVERSATION_REFERENCE_KEY
+            ] = skill_conversation_reference
+            await turn_context.delete_activity(activity_id)
+
+        await self._adapter.continue_conversation(
+            skill_conversation_reference.conversation_reference,
+            callback,
+            claims_identity=claims_identity,
+            audience=skill_conversation_reference.oauth_scope,
+        )
+
+    async def on_update_activity(
+        self,
+        claims_identity: ClaimsIdentity,
+        conversation_id: str,
+        activity_id: str,
+        activity: Activity,
+    ) -> ResourceResponse:
+        skill_conversation_reference = await self._get_skill_conversation_reference(
+            conversation_id
+        )
+
+        resource_response: ResourceResponse = None
+
+        async def callback(turn_context: TurnContext):
+            nonlocal resource_response
+            turn_context.turn_state[
+                self.SKILL_CONVERSATION_REFERENCE_KEY
+            ] = skill_conversation_reference
+            activity.apply_conversation_reference(
+                skill_conversation_reference.conversation_reference
+            )
+            turn_context.activity.id = activity_id
+            turn_context.activity.caller_id = (
+                f"{CallerIdConstants.bot_to_bot_prefix}"
+                f"{JwtTokenValidation.get_app_id_from_claims(claims_identity.claims)}"
+            )
+            resource_response = await turn_context.update_activity(activity)
+
+        await self._adapter.continue_conversation(
+            skill_conversation_reference.conversation_reference,
+            callback,
+            claims_identity=claims_identity,
+            audience=skill_conversation_reference.oauth_scope,
+        )
+
+        return resource_response or ResourceResponse(id=str(uuid4()).replace("-", ""))
+
+    async def _get_skill_conversation_reference(
+        self, conversation_id: str
+    ) -> SkillConversationReference:
+        # Get the SkillsConversationReference
+        conversation_reference_result = await self._conversation_id_factory.get_conversation_reference(
+            conversation_id
+        )
+
+        # ConversationIdFactory can return either a SkillConversationReference (the newer way),
+        # or a ConversationReference (the old way, but still here for compatibility).  If a
+        # ConversationReference is returned, build a new SkillConversationReference to simplify
+        # the remainder of this method.
+        if isinstance(conversation_reference_result, SkillConversationReference):
+            skill_conversation_reference: SkillConversationReference = conversation_reference_result
+        else:
+            skill_conversation_reference: SkillConversationReference = SkillConversationReference(
+                conversation_reference=conversation_reference_result,
+                oauth_scope=(
+                    GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
+                    if self._channel_provider and self._channel_provider.is_government()
+                    else AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
+                ),
+            )
+
+        if not skill_conversation_reference:
+            raise KeyError("SkillConversationReference not found")
+
+        if not skill_conversation_reference.conversation_reference:
+            raise KeyError("conversationReference not found")
+
+        return skill_conversation_reference
 
     async def _process_activity(
         self,
@@ -120,43 +217,29 @@ class SkillHandler(ChannelServiceHandler):
         reply_to_activity_id: str,
         activity: Activity,
     ) -> ResourceResponse:
-        conversation_reference_result = await self._conversation_id_factory.get_conversation_reference(
+        skill_conversation_reference = await self._get_skill_conversation_reference(
             conversation_id
         )
 
-        oauth_scope = None
-        conversation_reference = None
-        if isinstance(conversation_reference_result, SkillConversationReference):
-            oauth_scope = conversation_reference_result.oauth_scope
-            conversation_reference = (
-                conversation_reference_result.conversation_reference
-            )
-        else:
-            conversation_reference = conversation_reference_result
-            oauth_scope = (
-                GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
-                if self._channel_provider and self._channel_provider.is_government()
-                else AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
-            )
-
-        if not conversation_reference:
-            raise KeyError("ConversationReference not found")
-
-        activity_conversation_reference = ConversationReference(
-            activity_id=activity.id,
-            user=activity.from_property,
-            bot=activity.recipient,
-            conversation=activity.conversation,
-            channel_id=activity.channel_id,
-            service_url=activity.service_url,
-        )
+        # If an activity is sent, return the ResourceResponse
+        resource_response: ResourceResponse = None
 
         async def callback(context: TurnContext):
+            nonlocal resource_response
             context.turn_state[
                 SkillHandler.SKILL_CONVERSATION_REFERENCE_KEY
-            ] = activity_conversation_reference
-            TurnContext.apply_conversation_reference(activity, conversation_reference)
+            ] = skill_conversation_reference
+
+            TurnContext.apply_conversation_reference(
+                activity, skill_conversation_reference.conversation_reference
+            )
+
             context.activity.id = reply_to_activity_id
+
+            app_id = JwtTokenValidation.get_app_id_from_claims(claims_identity.claims)
+            context.activity.caller_id = (
+                f"{CallerIdConstants.bot_to_bot_prefix}{app_id}"
+            )
 
             if activity.type == ActivityTypes.end_of_conversation:
                 await self._conversation_id_factory.delete_conversation_reference(
@@ -168,15 +251,19 @@ class SkillHandler(ChannelServiceHandler):
                 self._apply_event_to_turn_context_activity(context, activity)
                 await self._bot.on_turn(context)
             else:
-                await context.send_activity(activity)
+                resource_response = await context.send_activity(activity)
 
         await self._adapter.continue_conversation(
-            conversation_reference,
+            skill_conversation_reference.conversation_reference,
             callback,
             claims_identity=claims_identity,
-            audience=oauth_scope,
+            audience=skill_conversation_reference.oauth_scope,
         )
-        return ResourceResponse(id=str(uuid4()))
+
+        if not resource_response:
+            resource_response = ResourceResponse(id=str(uuid4()))
+
+        return resource_response
 
     @staticmethod
     def _apply_eoc_to_turn_context_activity(
@@ -189,6 +276,7 @@ class SkillHandler(ChannelServiceHandler):
         context.activity.reply_to_id = end_of_conversation_activity.reply_to_id
         context.activity.value = end_of_conversation_activity.value
         context.activity.entities = end_of_conversation_activity.entities
+        context.activity.locale = end_of_conversation_activity.locale
         context.activity.local_timestamp = end_of_conversation_activity.local_timestamp
         context.activity.timestamp = end_of_conversation_activity.timestamp
         context.activity.channel_data = end_of_conversation_activity.channel_data
@@ -208,6 +296,7 @@ class SkillHandler(ChannelServiceHandler):
         context.activity.reply_to_id = event_activity.reply_to_id
         context.activity.value = event_activity.value
         context.activity.entities = event_activity.entities
+        context.activity.locale = event_activity.locale
         context.activity.local_timestamp = event_activity.local_timestamp
         context.activity.timestamp = event_activity.timestamp
         context.activity.channel_data = event_activity.channel_data

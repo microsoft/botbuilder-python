@@ -39,6 +39,7 @@ from botframework.connector.token_api.models import (
 )
 from botbuilder.schema import (
     Activity,
+    ActivityEventNames,
     ActivityTypes,
     ChannelAccount,
     ConversationAccount,
@@ -48,12 +49,16 @@ from botbuilder.schema import (
     TokenResponse,
     ResourceResponse,
     DeliveryModes,
+    CallerIdConstants,
 )
 
 from . import __version__
 from .bot_adapter import BotAdapter
+from .oauth import (
+    ConnectorClientBuilder,
+    ExtendedUserTokenProvider,
+)
 from .turn_context import TurnContext
-from .extended_user_token_provider import ExtendedUserTokenProvider
 from .invoke_response import InvokeResponse
 from .conversation_reference_extension import get_continuation_activity
 
@@ -163,7 +168,9 @@ class BotFrameworkAdapterSettings:
         )
 
 
-class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
+class BotFrameworkAdapter(
+    BotAdapter, ExtendedUserTokenProvider, ConnectorClientBuilder
+):
     """
     Defines an adapter to connect a bot to a service endpoint.
 
@@ -273,10 +280,18 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
         context.turn_state[BotAdapter.BOT_CALLBACK_HANDLER_KEY] = callback
         context.turn_state[BotAdapter.BOT_OAUTH_SCOPE_KEY] = audience
 
-        # Add the channel service URL to the trusted services list so we can send messages back.
-        # the service URL for skills is trusted because it is applied by the SkillHandler based
-        # on the original request received by the root bot
-        AppCredentials.trust_service_url(reference.service_url)
+        # If we receive a valid app id in the incoming token claims, add the channel service URL to the
+        # trusted services list so we can send messages back.
+        # The service URL for skills is trusted because it is applied by the SkillHandler based on the original
+        # request received by the root bot
+        app_id_from_claims = JwtTokenValidation.get_app_id_from_claims(
+            claims_identity.claims
+        )
+        if app_id_from_claims:
+            if SkillValidation.is_skill_claim(
+                claims_identity.claims
+            ) or await self._credential_provider.is_valid_appid(app_id_from_claims):
+                AppCredentials.trust_service_url(reference.service_url)
 
         client = await self.create_connector_client(
             reference.service_url, claims_identity, audience
@@ -351,7 +366,7 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
             if reference.conversation and reference.conversation.tenant_id:
                 # Putting tenant_id in channel_data is a temporary while we wait for the Teams API to be updated
                 parameters.channel_data = {
-                    "tenant": {"id": reference.conversation.tenant_id}
+                    "tenant": {"tenantId": reference.conversation.tenant_id}
                 }
 
                 # Permanent solution is to put tenant_id in parameters.tenant_id
@@ -376,7 +391,7 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
 
             event_activity = Activity(
                 type=ActivityTypes.event,
-                name="CreateConversation",
+                name=ActivityEventNames.create_conversation,
                 channel_id=channel_id,
                 service_url=service_url,
                 id=resource_response.activity_id
@@ -437,16 +452,17 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
         self, activity: Activity, identity: ClaimsIdentity, logic: Callable
     ):
         context = self._create_context(activity)
+
+        activity.caller_id = await self.__generate_callerid(identity)
         context.turn_state[BotAdapter.BOT_IDENTITY_KEY] = identity
         context.turn_state[BotAdapter.BOT_CALLBACK_HANDLER_KEY] = logic
 
-        # To create the correct cache key, provide the OAuthScope when calling CreateConnectorClientAsync.
-        # The OAuthScope is also stored on the TurnState to get the correct AppCredentials if fetching a token
-        # is required.
+        # The OAuthScope is also stored on the TurnState to get the correct AppCredentials if fetching
+        # a token is required.
         scope = (
-            self.__get_botframework_oauth_scope()
-            if not SkillValidation.is_skill_claim(identity.claims)
-            else JwtTokenValidation.get_app_id_from_claims(identity.claims)
+            JwtTokenValidation.get_app_id_from_claims(identity.claims)
+            if SkillValidation.is_skill_claim(identity.claims)
+            else self.__get_botframework_oauth_scope()
         )
         context.turn_state[BotAdapter.BOT_OAUTH_SCOPE_KEY] = scope
 
@@ -474,14 +490,8 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
 
         await self.run_pipeline(context, logic)
 
-        if activity.type == ActivityTypes.invoke:
-            invoke_response = context.turn_state.get(
-                BotFrameworkAdapter._INVOKE_RESPONSE_KEY  # pylint: disable=protected-access
-            )
-            if invoke_response is None:
-                return InvokeResponse(status=int(HTTPStatus.NOT_IMPLEMENTED))
-            return invoke_response.value
-
+        # Handle ExpectedReplies scenarios where the all the activities have been buffered and sent back at once
+        # in an invoke response.
         # Return the buffered activities in the response.  In this case, the invoker
         # should deserialize accordingly:
         #    activities = ExpectedReplies().deserialize(response.body).activities
@@ -491,6 +501,39 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
             ).serialize()
             return InvokeResponse(status=int(HTTPStatus.OK), body=expected_replies)
 
+        # Handle Invoke scenarios, which deviate from the request/request model in that
+        # the Bot will return a specific body and return code.
+        if activity.type == ActivityTypes.invoke:
+            invoke_response = context.turn_state.get(
+                BotFrameworkAdapter._INVOKE_RESPONSE_KEY  # pylint: disable=protected-access
+            )
+            if invoke_response is None:
+                return InvokeResponse(status=int(HTTPStatus.NOT_IMPLEMENTED))
+            return invoke_response.value
+
+        return None
+
+    async def __generate_callerid(self, claims_identity: ClaimsIdentity) -> str:
+        # Is the bot accepting all incoming messages?
+        is_auth_disabled = await self._credential_provider.is_authentication_disabled()
+        if is_auth_disabled:
+            # Return None so that the callerId is cleared.
+            return None
+
+        # Is the activity from another bot?
+        if SkillValidation.is_skill_claim(claims_identity.claims):
+            app_id = JwtTokenValidation.get_app_id_from_claims(claims_identity.claims)
+            return f"{CallerIdConstants.bot_to_bot_prefix}{app_id}"
+
+        # Is the activity from Public Azure?
+        if not self._channel_provider or self._channel_provider.is_public_azure():
+            return CallerIdConstants.public_azure_channel
+
+        # Is the activity from Azure Gov?
+        if self._channel_provider and self._channel_provider.is_government():
+            return CallerIdConstants.us_gov_channel
+
+        # Return None so that the callerId is cleared.
         return None
 
     async def _authenticate_request(
@@ -1058,7 +1101,8 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
         self, service_url: str, identity: ClaimsIdentity = None, audience: str = None
     ) -> ConnectorClient:
         """
-        Creates the connector client
+        Implementation of ConnectorClientProvider.create_connector_client.
+
         :param service_url: The service URL
         :param identity: The claims identity
         :param audience:
@@ -1139,39 +1183,43 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
     ) -> SignInUrlResponse:
         if not connection_name:
             raise TypeError(
-                "BotFrameworkAdapter.get_sign_in_resource_from_user(): missing connection_name"
+                "BotFrameworkAdapter.get_sign_in_resource_from_user_and_credentials(): missing connection_name"
             )
-        if (
-            not turn_context.activity.from_property
-            or not turn_context.activity.from_property.id
-        ):
+        if not user_id:
             raise TypeError(
-                "BotFrameworkAdapter.get_sign_in_resource_from_user(): missing activity id"
+                "BotFrameworkAdapter.get_sign_in_resource_from_user_and_credentials(): missing user_id"
             )
-        if user_id and turn_context.activity.from_property.id != user_id:
-            raise TypeError(
-                "BotFrameworkAdapter.get_sign_in_resource_from_user(): cannot get signin resource"
-                " for a user that is different from the conversation"
+
+        activity = turn_context.activity
+
+        app_id = self.__get_app_id(turn_context)
+        token_exchange_state = TokenExchangeState(
+            connection_name=connection_name,
+            conversation=ConversationReference(
+                activity_id=activity.id,
+                bot=activity.recipient,
+                channel_id=activity.channel_id,
+                conversation=activity.conversation,
+                locale=activity.locale,
+                service_url=activity.service_url,
+                user=activity.from_property,
+            ),
+            relates_to=activity.relates_to,
+            ms_app_id=app_id,
+        )
+
+        state = base64.b64encode(
+            json.dumps(token_exchange_state.serialize()).encode(
+                encoding="UTF-8", errors="strict"
             )
+        ).decode()
 
         client = await self._create_token_api_client(
             turn_context, oauth_app_credentials
         )
-        conversation = TurnContext.get_conversation_reference(turn_context.activity)
-
-        state = TokenExchangeState(
-            connection_name=connection_name,
-            conversation=conversation,
-            relates_to=turn_context.activity.relates_to,
-            ms_app_id=client.config.credentials.microsoft_app_id,
-        )
-
-        final_state = base64.b64encode(
-            json.dumps(state.serialize()).encode(encoding="UTF-8", errors="strict")
-        ).decode()
 
         return client.bot_sign_in.get_sign_in_resource(
-            final_state, final_redirect=final_redirect
+            state, final_redirect=final_redirect
         )
 
     async def exchange_token(
@@ -1211,13 +1259,17 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
             turn_context, oauth_app_credentials
         )
 
-        return client.user_token.exchange_async(
+        result = client.user_token.exchange_async(
             user_id,
             connection_name,
             turn_context.activity.channel_id,
             exchange_request.uri,
             exchange_request.token,
         )
+
+        if isinstance(result, TokenResponse):
+            return result
+        raise TypeError(f"exchange_async returned improper result: {type(result)}")
 
     def can_process_outgoing_activity(self, activity: Activity) -> bool:
         return False
@@ -1229,7 +1281,7 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
 
     @staticmethod
     def key_for_connector_client(service_url: str, app_id: str, scope: str):
-        return f"{service_url}:{app_id}:{scope}"
+        return f"{service_url if service_url else ''}:{app_id if app_id else ''}:{scope if scope else ''}"
 
     async def _create_token_api_client(
         self, context: TurnContext, oauth_app_credentials: AppCredentials = None,
@@ -1242,7 +1294,7 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider):
             self._is_emulating_oauth_cards = True
 
         app_id = self.__get_app_id(context)
-        scope = context.turn_state.get(BotAdapter.BOT_OAUTH_SCOPE_KEY)
+        scope = self.__get_botframework_oauth_scope()
         app_credentials = oauth_app_credentials or await self.__get_app_credentials(
             app_id, scope
         )

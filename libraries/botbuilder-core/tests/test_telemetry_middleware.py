@@ -3,14 +3,18 @@
 
 # pylint: disable=line-too-long,missing-docstring,unused-variable
 import copy
+import uuid
 from typing import Dict
 from unittest.mock import Mock
 import aiounittest
+from botframework.connector import Channels
+
 from botbuilder.core import (
     NullTelemetryClient,
     TelemetryLoggerMiddleware,
     TelemetryLoggerConstants,
     TurnContext,
+    MessageFactory,
 )
 from botbuilder.core.adapters import TestAdapter, TestFlow
 from botbuilder.schema import (
@@ -18,7 +22,9 @@ from botbuilder.schema import (
     ActivityTypes,
     ChannelAccount,
     ConversationAccount,
+    ConversationReference,
 )
+from botbuilder.schema.teams import TeamInfo, TeamsChannelData, TenantInfo
 
 
 class TestTelemetryMiddleware(aiounittest.AsyncTestCase):
@@ -27,6 +33,47 @@ class TestTelemetryMiddleware(aiounittest.AsyncTestCase):
         telemetry = NullTelemetryClient()
         my_logger = TelemetryLoggerMiddleware(telemetry, True)
         assert my_logger
+
+    async def test_do_not_throw_on_null_from(self):
+        telemetry = Mock()
+        my_logger = TelemetryLoggerMiddleware(telemetry, False)
+
+        adapter = TestAdapter(
+            template_or_conversation=Activity(
+                channel_id="test",
+                recipient=ChannelAccount(id="bot", name="Bot"),
+                conversation=ConversationAccount(id=str(uuid.uuid4())),
+            )
+        )
+        adapter.use(my_logger)
+
+        async def send_proactive(context: TurnContext):
+            await context.send_activity("proactive")
+
+        async def logic(context: TurnContext):
+            await adapter.create_conversation(
+                context.activity.channel_id, send_proactive,
+            )
+
+        adapter.logic = logic
+
+        test_flow = TestFlow(None, adapter)
+        await test_flow.send("foo")
+        await test_flow.assert_reply("proactive")
+
+        telemetry_calls = [
+            (
+                TelemetryLoggerConstants.BOT_MSG_RECEIVE_EVENT,
+                {
+                    "fromId": None,
+                    "conversationName": None,
+                    "locale": None,
+                    "recipientId": "bot",
+                    "recipientName": "Bot",
+                },
+            ),
+        ]
+        self.assert_telemetry_calls(telemetry, telemetry_calls)
 
     async def test_should_send_receive(self):
         telemetry = Mock()
@@ -55,7 +102,7 @@ class TestTelemetryMiddleware(aiounittest.AsyncTestCase):
                     "conversationName": None,
                     "locale": None,
                     "recipientId": "bot",
-                    "recipientName": "user",
+                    "recipientName": "Bot",
                 },
             ),
             (
@@ -76,7 +123,7 @@ class TestTelemetryMiddleware(aiounittest.AsyncTestCase):
                     "conversationName": None,
                     "locale": None,
                     "recipientId": "bot",
-                    "recipientName": "user",
+                    "recipientName": "Bot",
                     "fromName": "user",
                 },
             ),
@@ -147,7 +194,7 @@ class TestTelemetryMiddleware(aiounittest.AsyncTestCase):
                     "conversationName": None,
                     "locale": None,
                     "recipientId": "bot",
-                    "recipientName": "user",
+                    "recipientName": "Bot",
                 },
             ),
             (
@@ -169,7 +216,7 @@ class TestTelemetryMiddleware(aiounittest.AsyncTestCase):
                     "conversationName": None,
                     "locale": None,
                     "recipientId": "bot",
-                    "recipientName": "user",
+                    "recipientName": "Bot",
                     "fromName": "user",
                 },
             ),
@@ -184,6 +231,47 @@ class TestTelemetryMiddleware(aiounittest.AsyncTestCase):
                 },
             ),
         ]
+        self.assert_telemetry_calls(telemetry, telemetry_call_expected)
+
+    async def test_log_teams(self):
+        telemetry = Mock()
+        my_logger = TelemetryLoggerMiddleware(telemetry, True)
+
+        adapter = TestAdapter(
+            template_or_conversation=ConversationReference(channel_id=Channels.ms_teams)
+        )
+        adapter.use(my_logger)
+
+        team_info = TeamInfo(id="teamId", name="teamName",)
+
+        channel_data = TeamsChannelData(
+            team=team_info, tenant=TenantInfo(id="tenantId"),
+        )
+
+        activity = MessageFactory.text("test")
+        activity.channel_data = channel_data
+        activity.from_property = ChannelAccount(
+            id="userId", name="userName", aad_object_id="aaId",
+        )
+
+        test_flow = TestFlow(None, adapter)
+        await test_flow.send(activity)
+
+        telemetry_call_expected = [
+            (
+                TelemetryLoggerConstants.BOT_MSG_RECEIVE_EVENT,
+                {
+                    "text": "test",
+                    "fromId": "userId",
+                    "recipientId": "bot",
+                    "recipientName": "Bot",
+                    "TeamsTenantId": TenantInfo(id="tenantId"),
+                    "TeamsUserAadObjectId": "aaId",
+                    "TeamsTeamInfo": TeamInfo.serialize(team_info),
+                },
+            ),
+        ]
+
         self.assert_telemetry_calls(telemetry, telemetry_call_expected)
 
     def create_reply(self, activity, text, locale=None):

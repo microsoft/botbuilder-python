@@ -4,13 +4,18 @@
 from copy import deepcopy
 from typing import List
 
-from botbuilder.schema import Activity, ActivityTypes, ExpectedReplies, DeliveryModes
-from botbuilder.core import (
-    BotAdapter,
-    TurnContext,
+from botframework.connector.token_api.models import TokenExchangeRequest
+from botbuilder.schema import (
+    Activity,
+    ActivityTypes,
+    ExpectedReplies,
+    DeliveryModes,
+    SignInConstants,
+    TokenExchangeInvokeRequest,
 )
+from botbuilder.core import BotAdapter, TurnContext, ExtendedUserTokenProvider
+from botbuilder.core.card_factory import ContentTypes
 from botbuilder.core.skills import SkillConversationIdFactoryOptions
-
 from botbuilder.dialogs import (
     Dialog,
     DialogContext,
@@ -24,6 +29,10 @@ from .skill_dialog_options import SkillDialogOptions
 
 
 class SkillDialog(Dialog):
+    SKILLCONVERSATIONIDSTATEKEY = (
+        "Microsoft.Bot.Builder.Dialogs.SkillDialog.SkillConversationId"
+    )
+
     def __init__(self, dialog_options: SkillDialogOptions, dialog_id: str):
         super().__init__(dialog_id)
         if not dialog_options:
@@ -38,12 +47,7 @@ class SkillDialog(Dialog):
         :param dialog_context: The dialog context for the current turn of conversation.
         :param options: (Optional) additional argument(s) to pass to the dialog being started.
         """
-        dialog_args = SkillDialog._validate_begin_dialog_args(options)
-
-        await dialog_context.context.send_trace_activity(
-            f"{SkillDialog.__name__}.BeginDialogAsync()",
-            label=f"Using activity of type: {dialog_args.activity.type}",
-        )
+        dialog_args = self._validate_begin_dialog_args(options)
 
         # Create deep clone of the original activity to avoid altering it before forwarding it.
         skill_activity: Activity = deepcopy(dialog_args.activity)
@@ -55,52 +59,55 @@ class SkillDialog(Dialog):
             is_incoming=True,
         )
 
+        # Store delivery mode in dialog state for later use.
         dialog_context.active_dialog.state[
             self._deliver_mode_state_key
         ] = dialog_args.activity.delivery_mode
 
+        # Create the conversationId and store it in the dialog context state so we can use it later
+        skill_conversation_id = await self._create_skill_conversation_id(
+            dialog_context.context, dialog_context.context.activity
+        )
+        dialog_context.active_dialog.state[
+            SkillDialog.SKILLCONVERSATIONIDSTATEKEY
+        ] = skill_conversation_id
+
         # Send the activity to the skill.
-        eoc_activity = await self._send_to_skill(dialog_context.context, skill_activity)
+        eoc_activity = await self._send_to_skill(
+            dialog_context.context, skill_activity, skill_conversation_id
+        )
         if eoc_activity:
             return await dialog_context.end_dialog(eoc_activity.value)
 
         return self.end_of_turn
 
     async def continue_dialog(self, dialog_context: DialogContext):
-        await dialog_context.context.send_trace_activity(
-            f"{SkillDialog.__name__}.continue_dialog()",
-            label=f"ActivityType: {dialog_context.context.activity.type}",
-        )
+        if not self._on_validate_activity(dialog_context.context.activity):
+            return self.end_of_turn
 
         # Handle EndOfConversation from the skill (this will be sent to the this dialog by the SkillHandler if
         # received from the Skill)
         if dialog_context.context.activity.type == ActivityTypes.end_of_conversation:
-            await dialog_context.context.send_trace_activity(
-                f"{SkillDialog.__name__}.continue_dialog()",
-                label=f"Got {ActivityTypes.end_of_conversation}",
-            )
-
             return await dialog_context.end_dialog(
                 dialog_context.context.activity.value
             )
 
-        # Forward only Message and Event activities to the skill
-        if (
-            dialog_context.context.activity.type == ActivityTypes.message
-            or dialog_context.context.activity.type == ActivityTypes.event
-        ):
-            # Create deep clone of the original activity to avoid altering it before forwarding it.
-            skill_activity = deepcopy(dialog_context.context.activity)
-            skill_activity.delivery_mode = dialog_context.active_dialog.state[
-                self._deliver_mode_state_key
-            ]
+        # Create deep clone of the original activity to avoid altering it before forwarding it.
+        skill_activity = deepcopy(dialog_context.context.activity)
 
-            # Just forward to the remote skill
-            eoc_activity = await self._send_to_skill(
-                dialog_context.context, skill_activity
-            )
-            if eoc_activity:
-                return await dialog_context.end_dialog(eoc_activity.value)
+        skill_activity.delivery_mode = dialog_context.active_dialog.state[
+            self._deliver_mode_state_key
+        ]
+
+        # Just forward to the remote skill
+        skill_conversation_id = dialog_context.active_dialog.state[
+            SkillDialog.SKILLCONVERSATIONIDSTATEKEY
+        ]
+        eoc_activity = await self._send_to_skill(
+            dialog_context.context, skill_activity, skill_conversation_id
+        )
+        if eoc_activity:
+            return await dialog_context.end_dialog(eoc_activity.value)
 
         return self.end_of_turn
 
@@ -119,7 +126,9 @@ class SkillDialog(Dialog):
             is_incoming=True,
         )
 
-        await self._send_to_skill(context, reprompt_event)
+        # connection Name is not applicable for a RePrompt, as we don't expect as OAuthCard in response.
+        skill_conversation_id = instance.state[SkillDialog.SKILLCONVERSATIONIDSTATEKEY]
+        await self._send_to_skill(context, reprompt_event, skill_conversation_id)
 
     async def resume_dialog(  # pylint: disable=unused-argument
         self, dialog_context: "DialogContext", reason: DialogReason, result: object
@@ -132,10 +141,6 @@ class SkillDialog(Dialog):
     ):
         # Send of of conversation to the skill if the dialog has been cancelled.
         if reason in (DialogReason.CancelCalled, DialogReason.ReplaceCalled):
-            await context.send_trace_activity(
-                f"{SkillDialog.__name__}.end_dialog()",
-                label=f"ActivityType: {context.activity.type}",
-            )
             activity = Activity(type=ActivityTypes.end_of_conversation)
 
             # Apply conversation reference and common properties from incoming activity before sending.
@@ -147,12 +152,15 @@ class SkillDialog(Dialog):
             activity.channel_data = context.activity.channel_data
             activity.additional_properties = context.activity.additional_properties
 
-            await self._send_to_skill(context, activity)
+            # connection Name is not applicable for an EndDialog, as we don't expect as OAuthCard in response.
+            skill_conversation_id = instance.state[
+                SkillDialog.SKILLCONVERSATIONIDSTATEKEY
+            ]
+            await self._send_to_skill(context, activity, skill_conversation_id)
 
         await super().end_dialog(context, instance, reason)
 
-    @staticmethod
-    def _validate_begin_dialog_args(options: object) -> BeginSkillDialogOptions:
+    def _validate_begin_dialog_args(self, options: object) -> BeginSkillDialogOptions:
         if not options:
             raise TypeError("options cannot be None.")
 
@@ -168,38 +176,34 @@ class SkillDialog(Dialog):
                 "SkillDialog: activity object in options as BeginSkillDialogOptions cannot be None."
             )
 
-        # Only accept Message or Event activities
-        if (
-            dialog_args.activity.type != ActivityTypes.message
-            and dialog_args.activity.type != ActivityTypes.event
-        ):
-            raise TypeError(
-                f"Only {ActivityTypes.message} and {ActivityTypes.event} activities are supported."
-                f" Received activity of type {dialog_args.activity.type}."
-            )
-
         return dialog_args
 
-    async def _send_to_skill(
-        self, context: TurnContext, activity: Activity,
-    ) -> Activity:
-        # Create a conversationId to interact with the skill and send the activity
-        conversation_id_factory_options = SkillConversationIdFactoryOptions(
-            from_bot_oauth_scope=context.turn_state.get(BotAdapter.BOT_OAUTH_SCOPE_KEY),
-            from_bot_id=self.dialog_options.bot_id,
-            activity=activity,
-            bot_framework_skill=self.dialog_options.skill,
-        )
+    def _on_validate_activity(
+        self, activity: Activity  # pylint: disable=unused-argument
+    ) -> bool:
+        """
+        Validates the activity sent during continue_dialog.
 
-        skill_conversation_id = await self.dialog_options.conversation_id_factory.create_skill_conversation_id(
-            conversation_id_factory_options
-        )
+        Override this method to implement a custom validator for the activity being sent during continue_dialog.
+        This method can be used to ignore activities of a certain type if needed.
+        If this method returns false, the dialog will end the turn without processing the activity.
+        """
+        return True
+
+    async def _send_to_skill(
+        self, context: TurnContext, activity: Activity, skill_conversation_id: str
+    ) -> Activity:
+        if activity.type == ActivityTypes.invoke:
+            # Force ExpectReplies for invoke activities so we can get the replies right away and send
+            # them back to the channel if needed. This makes sure that the dialog will receive the Invoke
+            # response from the skill and any other activities sent, including EoC.
+            activity.delivery_mode = DeliveryModes.expect_replies
 
         # Always save state before forwarding
         # (the dialog stack won't get updated with the skillDialog and things won't work if you don't)
-        skill_info = self.dialog_options.skill
         await self.dialog_options.conversation_state.save_changes(context, True)
 
+        skill_info = self.dialog_options.skill
         response = await self.dialog_options.skill_client.post_activity(
             self.dialog_options.bot_id,
             skill_info.app_id,
@@ -221,13 +225,125 @@ class SkillDialog(Dialog):
             # Process replies in the response.Body.
             response.body: List[Activity]
             response.body = ExpectedReplies().deserialize(response.body).activities
+            # Track sent invoke responses, so more than one is not sent.
+            sent_invoke_response = False
 
             for from_skill_activity in response.body:
                 if from_skill_activity.type == ActivityTypes.end_of_conversation:
                     # Capture the EndOfConversation activity if it was sent from skill
                     eoc_activity = from_skill_activity
+
+                    # The conversation has ended, so cleanup the conversation id
+                    await self.dialog_options.conversation_id_factory.delete_conversation_reference(
+                        skill_conversation_id
+                    )
+                elif not sent_invoke_response and await self._intercept_oauth_cards(
+                    context, from_skill_activity, self.dialog_options.connection_name
+                ):
+                    # Token exchange succeeded, so no oauthcard needs to be shown to the user
+                    sent_invoke_response = True
                 else:
+                    # If an invoke response has already been sent we should ignore future invoke responses as this
+                    # represents a bug in the skill.
+                    if from_skill_activity.type == ActivityTypes.invoke_response:
+                        if sent_invoke_response:
+                            continue
+                        sent_invoke_response = True
                     # Send the response back to the channel.
                     await context.send_activity(from_skill_activity)
 
         return eoc_activity
+
+    async def _create_skill_conversation_id(
+        self, context: TurnContext, activity: Activity
+    ) -> str:
+        # Create a conversationId to interact with the skill and send the activity
+        conversation_id_factory_options = SkillConversationIdFactoryOptions(
+            from_bot_oauth_scope=context.turn_state.get(BotAdapter.BOT_OAUTH_SCOPE_KEY),
+            from_bot_id=self.dialog_options.bot_id,
+            activity=activity,
+            bot_framework_skill=self.dialog_options.skill,
+        )
+        skill_conversation_id = await self.dialog_options.conversation_id_factory.create_skill_conversation_id(
+            conversation_id_factory_options
+        )
+        return skill_conversation_id
+
+    async def _intercept_oauth_cards(
+        self, context: TurnContext, activity: Activity, connection_name: str
+    ):
+        """
+        Tells is if we should intercept the OAuthCard message.
+        """
+        if not connection_name or not isinstance(
+            context.adapter, ExtendedUserTokenProvider
+        ):
+            # The adapter may choose not to support token exchange, in which case we fallback to
+            # showing an oauth card to the user.
+            return False
+
+        oauth_card_attachment = next(
+            attachment
+            for attachment in activity.attachments
+            if attachment.content_type == ContentTypes.oauth_card
+        )
+        if oauth_card_attachment:
+            oauth_card = oauth_card_attachment.content
+            if (
+                oauth_card
+                and oauth_card.token_exchange_resource
+                and oauth_card.token_exchange_resource.uri
+            ):
+                try:
+                    result = await context.adapter.exchange_token(
+                        turn_context=context,
+                        connection_name=connection_name,
+                        user_id=context.activity.from_property.id,
+                        exchange_request=TokenExchangeRequest(
+                            uri=oauth_card.token_exchange_resource.uri
+                        ),
+                    )
+
+                    if result and result.token:
+                        # If token above is null, then SSO has failed and hence we return false.
+                        # If not, send an invoke to the skill with the token.
+                        return await self._send_token_exchange_invoke_to_skill(
+                            activity,
+                            oauth_card.token_exchange_resource.id,
+                            oauth_card.connection_name,
+                            result.token,
+                        )
+                except:
+                    # Failures in token exchange are not fatal. They simply mean that the user needs
+                    # to be shown the OAuth card.
+                    return False
+
+        return False
+
+    async def _send_token_exchange_invoke_to_skill(
+        self,
+        incoming_activity: Activity,
+        request_id: str,
+        connection_name: str,
+        token: str,
+    ):
+        activity = incoming_activity.create_reply()
+        activity.type = ActivityTypes.invoke
+        activity.name = SignInConstants.token_exchange_operation_name
+        activity.value = TokenExchangeInvokeRequest(
+            id=request_id, token=token, connection_name=connection_name,
+        )
+
+        # route the activity to the skill
+        skill_info = self.dialog_options.skill
+        response = await self.dialog_options.skill_client.post_activity(
+            self.dialog_options.bot_id,
+            skill_info.app_id,
+            skill_info.skill_endpoint,
+            self.dialog_options.skill_host_endpoint,
+            incoming_activity.conversation.id,
+            activity,
+        )
+
+        # Check response status: true if success, false if failure
+        return response.is_successful_status_code()

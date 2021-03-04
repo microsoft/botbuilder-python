@@ -125,10 +125,16 @@ class _OpenIdMetadata:
         self.last_updated = datetime.min
 
     async def get(self, key_id: str):
-        # If keys are more than 5 days old, refresh them
-        if self.last_updated < (datetime.now() + timedelta(days=5)):
+        # If keys are more than 1 day old, refresh them
+        if self.last_updated < (datetime.now() - timedelta(days=1)):
             await self._refresh()
-        return self._find(key_id)
+
+        key = self._find(key_id)
+        if not key and self.last_updated < (datetime.now() - timedelta(hours=1)):
+            # Refresh the cache if a key is not found (max once per hour)
+            await self._refresh()
+            key = self._find(key_id)
+        return key
 
     async def _refresh(self):
         response = requests.get(self.url)

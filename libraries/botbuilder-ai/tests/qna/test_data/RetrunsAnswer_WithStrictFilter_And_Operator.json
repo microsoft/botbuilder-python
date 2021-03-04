@@ -1,0 +1,29 @@
+{
+    "answers": [
+        {
+            "questions": [
+                "Where can you find Misty",
+                "Misty"
+            ],
+            "answer": "Wherever people are having a swimming good time",
+            "score": 74.51,
+            "id": 27,
+            "source": "Editorial",
+            "metadata": [
+                {
+                    "name": "species",
+                    "value": "human"
+                },
+                {
+                    "name": "type",
+                    "value": "water"
+                }
+            ],
+            "context": {
+                "isContextOnly": false,
+                "prompts": []
+            }
+        }
+    ],
+    "activeLearningEnabled": true
+}

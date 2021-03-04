@@ -12,9 +12,9 @@ REQUIRES = [
     "recognizers-text>=1.0.2a1",
     "recognizers-text-choice>=1.0.2a1",
     "babel==2.7.0",
-    "botbuilder-schema>=4.7.1",
-    "botframework-connector>=4.7.1",
-    "botbuilder-core>=4.7.1",
+    "botbuilder-schema==4.12.0",
+    "botframework-connector==4.12.0",
+    "botbuilder-core==4.12.0",
 ]
 
 TEST_REQUIRES = ["aiounittest==1.3.0"]
@@ -44,6 +44,9 @@ setup(
         "botbuilder.dialogs.prompts",
         "botbuilder.dialogs.choices",
         "botbuilder.dialogs.skills",
+        "botbuilder.dialogs.memory",
+        "botbuilder.dialogs.memory.path_resolvers",
+        "botbuilder.dialogs.memory.scopes",
     ],
     install_requires=REQUIRES + TEST_REQUIRES,
     tests_require=TEST_REQUIRES,

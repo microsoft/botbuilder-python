@@ -2,7 +2,14 @@
 # Licensed under the MIT License.
 
 from typing import List, Tuple
+
+from botframework.connector.aio import ConnectorClient
+from botframework.connector.teams.teams_connector_client import TeamsConnectorClient
 from botbuilder.schema import ConversationParameters, ConversationReference
+from botbuilder.core.teams.teams_activity_extensions import (
+    teams_get_meeting_info,
+    teams_get_channel_data,
+)
 from botbuilder.core.turn_context import Activity, TurnContext
 from botbuilder.schema.teams import (
     ChannelInfo,
@@ -10,9 +17,8 @@ from botbuilder.schema.teams import (
     TeamsChannelData,
     TeamsChannelAccount,
     TeamsPagedMembersResult,
+    TeamsMeetingParticipant,
 )
-from botframework.connector.aio import ConnectorClient
-from botframework.connector.teams.teams_connector_client import TeamsConnectorClient
 
 
 class TeamsInfo:
@@ -22,8 +28,8 @@ class TeamsInfo:
     ) -> Tuple[ConversationReference, str]:
         if not turn_context:
             raise ValueError("The turn_context cannot be None")
-        if not turn_context.activity:
-            raise ValueError("The turn_context.activity cannot be None")
+        if not activity:
+            raise ValueError("The activity cannot be None")
         if not teams_channel_id:
             raise ValueError("The teams_channel_id cannot be None or empty")
 
@@ -123,10 +129,7 @@ class TeamsInfo:
 
         connector_client = await TeamsInfo._get_connector_client(turn_context)
         return await TeamsInfo._get_paged_members(
-            connector_client,
-            turn_context.activity.conversation.id,
-            continuation_token,
-            page_size,
+            connector_client, team_id, continuation_token, page_size,
         )
 
     @staticmethod
@@ -142,7 +145,9 @@ class TeamsInfo:
                 connector_client, conversation_id, continuation_token, page_size
             )
 
-        return await TeamsInfo.get_paged_team_members(turn_context, team_id, page_size)
+        return await TeamsInfo.get_paged_team_members(
+            turn_context, team_id, continuation_token, page_size
+        )
 
     @staticmethod
     async def get_team_member(
@@ -177,6 +182,48 @@ class TeamsInfo:
             )
 
         return await TeamsInfo.get_team_member(turn_context, team_id, member_id)
+
+    @staticmethod
+    async def get_meeting_participant(
+        turn_context: TurnContext,
+        meeting_id: str = None,
+        participant_id: str = None,
+        tenant_id: str = None,
+    ) -> TeamsMeetingParticipant:
+        meeting_id = (
+            meeting_id
+            if meeting_id
+            else teams_get_meeting_info(turn_context.activity).id
+        )
+        if meeting_id is None:
+            raise TypeError(
+                "TeamsInfo._get_meeting_participant: method requires a meeting_id"
+            )
+
+        participant_id = (
+            participant_id
+            if participant_id
+            else turn_context.activity.from_property.aad_object_id
+        )
+        if participant_id is None:
+            raise TypeError(
+                "TeamsInfo._get_meeting_participant: method requires a participant_id"
+            )
+
+        tenant_id = (
+            tenant_id
+            if tenant_id
+            else teams_get_channel_data(turn_context.activity).tenant.id
+        )
+        if tenant_id is None:
+            raise TypeError(
+                "TeamsInfo._get_meeting_participant: method requires a tenant_id"
+            )
+
+        connector_client = await TeamsInfo.get_teams_connector_client(turn_context)
+        return connector_client.teams.fetch_participant(
+            meeting_id, participant_id, tenant_id
+        )
 
     @staticmethod
     async def get_teams_connector_client(
@@ -245,7 +292,7 @@ class TeamsInfo:
             )
 
         return await connector_client.conversations.get_teams_conversation_paged_members(
-            conversation_id, continuation_token, page_size
+            conversation_id, page_size, continuation_token
         )
 
     @staticmethod

@@ -1,12 +1,14 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+
 import uuid
 from typing import Dict, List, Union
 from unittest.mock import Mock
 
 import pytest
 
-from botbuilder.schema import Activity
+from botbuilder.schema import Activity, ConversationReference, ChannelAccount, RoleTypes
+from botframework.connector import Channels
 from botframework.connector.auth import (
     AuthenticationConfiguration,
     AuthenticationConstants,
@@ -21,6 +23,7 @@ from botframework.connector.auth import (
     GovernmentChannelValidation,
     SimpleChannelProvider,
     ChannelProvider,
+    AppCredentials,
 )
 
 
@@ -62,7 +65,6 @@ class TestAuth:
         # No validator should pass.
         await JwtTokenValidation.validate_claims(default_auth_config, claims)
 
-        # ClaimsValidator configured but no exception should pass.
         mock_validator = Mock()
         auth_with_validator = AuthenticationConfiguration(
             claims_validator=mock_validator
@@ -74,6 +76,34 @@ class TestAuth:
             await JwtTokenValidation.validate_claims(auth_with_validator, claims)
 
         assert "Invalid claims." in str(excinfo.value)
+
+        # No validator with not skill cliams should pass.
+        default_auth_config.claims_validator = None
+        claims: List[Dict] = {
+            AuthenticationConstants.VERSION_CLAIM: "1.0",
+            AuthenticationConstants.AUDIENCE_CLAIM: "this_bot_id",
+            AuthenticationConstants.APP_ID_CLAIM: "this_bot_id",  # Skill claims aud!=azp
+        }
+
+        await JwtTokenValidation.validate_claims(default_auth_config, claims)
+
+        # No validator with skill cliams should fail.
+        claims: List[Dict] = {
+            AuthenticationConstants.VERSION_CLAIM: "1.0",
+            AuthenticationConstants.AUDIENCE_CLAIM: "this_bot_id",
+            AuthenticationConstants.APP_ID_CLAIM: "not_this_bot_id",  # Skill claims aud!=azp
+        }
+
+        mock_validator.side_effect = PermissionError(
+            "Unauthorized Access. Request is not authorized. Skill Claims require validation."
+        )
+        with pytest.raises(PermissionError) as excinfo_skill:
+            await JwtTokenValidation.validate_claims(auth_with_validator, claims)
+
+        assert (
+            "Unauthorized Access. Request is not authorized. Skill Claims require validation."
+            in str(excinfo_skill.value)
+        )
 
     @pytest.mark.asyncio
     async def test_connector_auth_header_correct_app_id_and_service_url_should_validate(
@@ -235,7 +265,7 @@ class TestAuth:
 
         await JwtTokenValidation.authenticate_request(activity, header, credentials)
 
-        assert MicrosoftAppCredentials.is_trusted_service(
+        assert AppCredentials.is_trusted_service(
             "https://smba.trafficmanager.net/amer-client-ss.msg/"
         )
 
@@ -260,6 +290,32 @@ class TestAuth:
 
         assert not MicrosoftAppCredentials.is_trusted_service(
             "https://webchat.botframework.com/"
+        )
+
+    @pytest.mark.asyncio
+    # Tests with a valid Token and invalid service url and ensures that Service url is NOT added to
+    # Trusted service url list.
+    async def test_channel_authentication_disabled_and_skill_should_be_anonymous(self):
+        activity = Activity(
+            channel_id=Channels.emulator,
+            service_url="https://webchat.botframework.com/",
+            relates_to=ConversationReference(),
+            recipient=ChannelAccount(role=RoleTypes.skill),
+        )
+        header = ""
+        credentials = SimpleCredentialProvider("", "")
+
+        claims_principal = await JwtTokenValidation.authenticate_request(
+            activity, header, credentials
+        )
+
+        assert (
+            claims_principal.authentication_type
+            == AuthenticationConstants.ANONYMOUS_AUTH_TYPE
+        )
+        assert (
+            JwtTokenValidation.get_app_id_from_claims(claims_principal.claims)
+            == AuthenticationConstants.ANONYMOUS_SKILL_APP_ID
         )
 
     @pytest.mark.asyncio
@@ -291,8 +347,10 @@ class TestAuth:
             activity, header, credentials
         )
 
-        assert claims_principal.is_authenticated
-        assert not claims_principal.claims
+        assert (
+            claims_principal.authentication_type
+            == AuthenticationConstants.ANONYMOUS_AUTH_TYPE
+        )
 
     @pytest.mark.asyncio
     # Tests with no authentication header and makes sure the service URL is not added to the trusted list.

@@ -8,7 +8,7 @@ from . import common
 class LoggingHandler(logging.LoggingHandler):
     """This class is a LoggingHandler that uses the same settings as the Django middleware to configure
     the telemetry client.  This can be referenced from LOGGING in your Django settings.py file.  As an
-    example, this code would send all Django log messages--WARNING and up--to Application Insights:
+    example, this code would send all Django log messages, WARNING and up, to Application Insights:
 
     .. code:: python
 

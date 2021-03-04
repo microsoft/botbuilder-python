@@ -1,18 +1,19 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+
 import os
 from setuptools import setup
 
 NAME = "botframework-connector"
-VERSION = os.environ["packageVersion"] if "packageVersion" in os.environ else "4.7.1"
+VERSION = os.environ["packageVersion"] if "packageVersion" in os.environ else "4.12.0"
 REQUIRES = [
     "msrest==0.6.10",
-    "requests==2.22.0",
-    "cryptography==2.8.0",
+    "requests==2.23.0",
+    "cryptography==3.3.2",
     "PyJWT==1.5.3",
-    "botbuilder-schema>=4.7.1",
+    "botbuilder-schema==4.12.0",
     "adal==1.2.1",
-    "msal==1.1.0",
+    "msal==1.6.0",
 ]
 
 root = os.path.abspath(os.path.dirname(__file__))
