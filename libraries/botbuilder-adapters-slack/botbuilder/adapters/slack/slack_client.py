@@ -14,7 +14,7 @@ from slack.web.client import WebClient
 from slack.web.slack_response import SlackResponse
 
 from botbuilder.schema import Activity
-from botbuilder.adapters.slack import SlackAdapterOptions
+from botbuilder.adapters.slack.slack_client_options import SlackClientOptions
 from botbuilder.adapters.slack.slack_message import SlackMessage
 
 POST_MESSAGE_URL = "https://slack.com/api/chat.postMessage"
@@ -26,7 +26,7 @@ class SlackClient(WebClient):
     Slack client that extends https://github.com/slackapi/python-slackclient.
     """
 
-    def __init__(self, options: SlackAdapterOptions):
+    def __init__(self, options: SlackClientOptions):
         if not options or not options.slack_bot_token:
             raise Exception("SlackAdapterOptions and bot_token are required")
 
@@ -374,19 +374,10 @@ class SlackClient(WebClient):
 
         return await self.files_upload(file=file, content=content, **args)
 
-    async def get_bot_user_by_team(self, activity: Activity) -> str:
-        if self.identity:
-            return self.identity
-
-        if not activity.conversation.properties["team"]:
-            return None
-
-        user = await self.options.get_bot_user_by_team(
-            activity.conversation.properties["team"]
-        )
-        if user:
-            return user
-        raise Exception("Missing credentials for team.")
+    async def get_bot_user_identity(
+        self, activity: Activity
+    ) -> str:  # pylint: disable=unused-argument
+        return self.identity
 
     def verify_signature(self, req: Request, body: str) -> bool:
         timestamp = req.headers["X-Slack-Request-Timestamp"]
@@ -402,7 +393,7 @@ class SlackClient(WebClient):
 
         return computed_signature == received_signature
 
-    async def post_message_to_slack(self, message: SlackMessage) -> SlackResponse:
+    async def post_message(self, message: SlackMessage) -> SlackResponse:
         if not message:
             return None
 

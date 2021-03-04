@@ -22,11 +22,11 @@ class SlackMessage:
         self.icons = kwargs.get("icons")
         self.blocks: [Block] = kwargs.get("blocks")
 
-        self.attachments = None
-        if "attachments" in kwargs:
-            # Create proper Attachment objects
-            # It would appear that we can get dict fields from the wire that aren't defined
-            # in the Attachment class.  So only pass in known fields.
+        # Create proper Attachment objects
+        # It would appear that we can get dict fields from the wire that aren't defined
+        # in the Attachment class.  So only pass in known fields.
+        attachments = kwargs.get("attachments")
+        if attachments is not None:
             self.attachments = [
                 Attachment(**{x: att[x] for x in att if x in Attachment.attributes})
                 for att in kwargs.get("attachments")

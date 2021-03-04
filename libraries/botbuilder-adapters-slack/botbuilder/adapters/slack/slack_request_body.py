@@ -23,8 +23,8 @@ class SlackRequestBody:
         self.command = kwargs.get("command")
 
         self.payload: SlackPayload = None
-        if "payload" in kwargs:
-            payload = kwargs.get("payload")
+        payload = kwargs.get("payload")
+        if payload is not None:
             self.payload = (
                 payload
                 if isinstance(payload, SlackPayload)
@@ -32,6 +32,6 @@ class SlackRequestBody:
             )
 
         self.event: SlackEvent = None
-        if "event" in kwargs:
-            event = kwargs.get("event")
+        event = kwargs.get("event")
+        if event is not None:
             self.event = event if isinstance(event, SlackEvent) else SlackEvent(**event)

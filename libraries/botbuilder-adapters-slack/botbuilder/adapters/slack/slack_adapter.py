@@ -20,6 +20,7 @@ from botbuilder.schema import (
 from .activity_resourceresponse import ActivityResourceResponse
 from .slack_client import SlackClient
 from .slack_helper import SlackHelper
+from .slack_adatper_options import SlackAdapterOptions
 
 
 class SlackAdapter(BotAdapter, ABC):
@@ -32,10 +33,12 @@ class SlackAdapter(BotAdapter, ABC):
         self,
         client: SlackClient,
         on_turn_error: Callable[[TurnContext, Exception], Awaitable] = None,
+        options: SlackAdapterOptions = None,
     ):
         super().__init__(on_turn_error)
         self.slack_client = client
         self.slack_logged_in = False
+        self.options = options if options else SlackAdapterOptions()
 
     async def send_activities(
         self, context: TurnContext, activities: List[Activity]
@@ -62,7 +65,7 @@ class SlackAdapter(BotAdapter, ABC):
             if activity.type == ActivityTypes.message:
                 message = SlackHelper.activity_to_slack(activity)
 
-                slack_response = await self.slack_client.post_message_to_slack(message)
+                slack_response = await self.slack_client.post_message(message)
 
                 if slack_response and slack_response.status_code / 100 == 2:
                     resource_response = ActivityResourceResponse(
@@ -99,8 +102,8 @@ class SlackAdapter(BotAdapter, ABC):
             raise Exception("Activity.conversation is required")
 
         message = SlackHelper.activity_to_slack(activity)
-        results = await self.slack_client.update(
-            timestamp=message.ts, channel_id=message.channel, text=message.text,
+        results = await self.slack_client.chat_update(
+            ts=message.ts, channel=message.channel, text=message.text,
         )
 
         if results.status_code / 100 != 2:
@@ -130,17 +133,17 @@ class SlackAdapter(BotAdapter, ABC):
         if not context.activity.timestamp:
             raise Exception("Activity.timestamp is required")
 
-        await self.slack_client.delete_message(
-            channel_id=reference.channel_id, timestamp=context.activity.timestamp
+        await self.slack_client.chat_delete(
+            channel=reference.channel_id, ts=context.activity.timestamp
         )
 
     async def continue_conversation(
         self,
         reference: ConversationReference,
         callback: Callable,
-        bot_id: str = None,
+        bot_id: str = None,  # pylint: disable=unused-argument
         claims_identity: ClaimsIdentity = None,
-        audience: str = None,
+        audience: str = None,  # pylint: disable=unused-argument
     ):
         """
         Send a proactive message to a conversation.
@@ -203,14 +206,19 @@ class SlackAdapter(BotAdapter, ABC):
             self.slack_logged_in = True
 
         body = await req.text()
+
+        if (
+            self.options.verify_incoming_requests
+            and not self.slack_client.verify_signature(req, body)
+        ):
+            return SlackHelper.response(
+                req, 401, "Rejected due to mismatched header signature"
+            )
+
         slack_body = SlackHelper.deserialize_body(req.content_type, body)
 
         if slack_body.type == "url_verification":
             return SlackHelper.response(req, 200, slack_body.challenge)
-
-        if not self.slack_client.verify_signature(req, body):
-            text = "Rejected due to mismatched header signature"
-            return SlackHelper.response(req, 401, text)
 
         if (
             not self.slack_client.options.slack_verification_token
@@ -231,7 +239,9 @@ class SlackAdapter(BotAdapter, ABC):
                 slack_body, self.slack_client
             )
         else:
-            raise Exception(f"Unknown Slack event type {slack_body.type}")
+            return SlackHelper.response(
+                req, 200, f"Unknown Slack event type {slack_body.type}"
+            )
 
         context = TurnContext(self, activity)
         await self.run_pipeline(context, logic)
