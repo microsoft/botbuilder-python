@@ -15,9 +15,10 @@ from botbuilder.dialogs import (
     ChoiceRecognizers,
     FindChoicesOptions,
 )
-from botbuilder.dialogs.choices import Choice, ListStyle
+from botbuilder.dialogs.choices import Choice, ChoiceFactoryOptions, ListStyle
 from botbuilder.dialogs.prompts import (
     ChoicePrompt,
+    PromptCultureModel,
     PromptOptions,
     PromptValidatorContext,
 )
@@ -369,6 +370,222 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
         )
         step3 = await step2.send(_answer_message)
         await step3.assert_reply("red")
+
+    async def test_should_default_to_english_locale(self):
+        async def exec_test(turn_context: TurnContext):
+            dialog_context = await dialogs.create_context(turn_context)
+
+            results: DialogTurnResult = await dialog_context.continue_dialog()
+
+            if results.status == DialogTurnStatus.Empty:
+                options = PromptOptions(
+                    prompt=Activity(
+                        type=ActivityTypes.message, text="Please choose a color."
+                    ),
+                    choices=_color_choices,
+                )
+                await dialog_context.prompt("prompt", options)
+            elif results.status == DialogTurnStatus.Complete:
+                selected_choice = results.result
+                await turn_context.send_activity(selected_choice.value)
+
+            await convo_state.save_changes(turn_context)
+
+        async def validator(prompt: PromptValidatorContext) -> bool:
+            assert prompt
+
+            if not prompt.recognized.succeeded:
+                await prompt.context.send_activity("Bad input.")
+
+            return prompt.recognized.succeeded
+
+        locales = [None, "", "not-supported"]
+
+        for locale in locales:
+            adapter = TestAdapter(exec_test)
+
+            convo_state = ConversationState(MemoryStorage())
+            dialog_state = convo_state.create_property("dialogState")
+            dialogs = DialogSet(dialog_state)
+
+            choice_prompt = ChoicePrompt("prompt", validator)
+            dialogs.add(choice_prompt)
+
+            step1 = await adapter.send(
+                Activity(type=ActivityTypes.message, text="Hello", locale=locale)
+            )
+            step2 = await step1.assert_reply(
+                "Please choose a color. (1) red, (2) green, or (3) blue"
+            )
+            step3 = await step2.send(_answer_message)
+            await step3.assert_reply("red")
+
+    async def test_should_recognize_locale_variations_of_correct_locales(self):
+        def cap_ending(locale: str) -> str:
+            return f"{locale.split('-')[0]}-{locale.split('-')[1].upper()}"
+
+        def title_ending(locale: str) -> str:
+            return locale[:3] + locale[3].upper() + locale[4:]
+
+        def cap_two_letter(locale: str) -> str:
+            return locale.split("-")[0].upper()
+
+        def lower_two_letter(locale: str) -> str:
+            return locale.split("-")[0].upper()
+
+        async def exec_test_for_locale(valid_locale: str, locale_variations: List):
+            # Hold the correct answer from when a valid locale is used
+            expected_answer = None
+
+            def inspector(activity: Activity):
+                nonlocal expected_answer
+
+                if valid_locale == test_locale:
+                    expected_answer = activity.text
+                else:
+                    # Ensure we're actually testing a variation.
+                    assert activity.locale != valid_locale
+
+                assert activity.text == expected_answer
+                return True
+
+            async def exec_test(turn_context: TurnContext):
+                dialog_context = await dialogs.create_context(turn_context)
+
+                results: DialogTurnResult = await dialog_context.continue_dialog()
+
+                if results.status == DialogTurnStatus.Empty:
+                    options = PromptOptions(
+                        prompt=Activity(
+                            type=ActivityTypes.message, text="Please choose a color."
+                        ),
+                        choices=_color_choices,
+                    )
+                    await dialog_context.prompt("prompt", options)
+                elif results.status == DialogTurnStatus.Complete:
+                    selected_choice = results.result
+                    await turn_context.send_activity(selected_choice.value)
+
+                await convo_state.save_changes(turn_context)
+
+            async def validator(prompt: PromptValidatorContext) -> bool:
+                assert prompt
+
+                if not prompt.recognized.succeeded:
+                    await prompt.context.send_activity("Bad input.")
+
+                return prompt.recognized.succeeded
+
+            test_locale = None
+            for test_locale in locale_variations:
+                adapter = TestAdapter(exec_test)
+
+                convo_state = ConversationState(MemoryStorage())
+                dialog_state = convo_state.create_property("dialogState")
+                dialogs = DialogSet(dialog_state)
+
+                choice_prompt = ChoicePrompt("prompt", validator)
+                dialogs.add(choice_prompt)
+
+                step1 = await adapter.send(
+                    Activity(
+                        type=ActivityTypes.message, text="Hello", locale=test_locale
+                    )
+                )
+                await step1.assert_reply(inspector)
+
+        locales = [
+            "zh-cn",
+            "nl-nl",
+            "en-us",
+            "fr-fr",
+            "de-de",
+            "it-it",
+            "ja-jp",
+            "ko-kr",
+            "pt-br",
+            "es-es",
+            "tr-tr",
+            "de-de",
+        ]
+
+        locale_tests = []
+        for locale in locales:
+            locale_tests.append(
+                [
+                    locale,
+                    cap_ending(locale),
+                    title_ending(locale),
+                    cap_two_letter(locale),
+                    lower_two_letter(locale),
+                ]
+            )
+
+        # Test each valid locale
+        for locale_tests in locale_tests:
+            await exec_test_for_locale(locale_tests[0], locale_tests)
+
+    async def test_should_recognize_and_use_custom_locale_dict(self,):
+        async def exec_test(turn_context: TurnContext):
+            dialog_context = await dialogs.create_context(turn_context)
+
+            results: DialogTurnResult = await dialog_context.continue_dialog()
+
+            if results.status == DialogTurnStatus.Empty:
+                options = PromptOptions(
+                    prompt=Activity(
+                        type=ActivityTypes.message, text="Please choose a color."
+                    ),
+                    choices=_color_choices,
+                )
+                await dialog_context.prompt("prompt", options)
+            elif results.status == DialogTurnStatus.Complete:
+                selected_choice = results.result
+                await turn_context.send_activity(selected_choice.value)
+
+            await convo_state.save_changes(turn_context)
+
+        async def validator(prompt: PromptValidatorContext) -> bool:
+            assert prompt
+
+            if not prompt.recognized.succeeded:
+                await prompt.context.send_activity("Bad input.")
+
+            return prompt.recognized.succeeded
+
+        adapter = TestAdapter(exec_test)
+
+        convo_state = ConversationState(MemoryStorage())
+        dialog_state = convo_state.create_property("dialogState")
+        dialogs = DialogSet(dialog_state)
+
+        culture = PromptCultureModel(
+            locale="custom-locale",
+            no_in_language="customNo",
+            yes_in_language="customYes",
+            separator="customSeparator",
+            inline_or="customInlineOr",
+            inline_or_more="customInlineOrMore",
+        )
+
+        custom_dict = {
+            culture.locale: ChoiceFactoryOptions(
+                inline_or=culture.inline_or,
+                inline_or_more=culture.inline_or_more,
+                inline_separator=culture.separator,
+                include_numbers=True,
+            )
+        }
+
+        choice_prompt = ChoicePrompt("prompt", validator, choice_defaults=custom_dict)
+        dialogs.add(choice_prompt)
+
+        step1 = await adapter.send(
+            Activity(type=ActivityTypes.message, text="Hello", locale=culture.locale)
+        )
+        await step1.assert_reply(
+            "Please choose a color. (1) redcustomSeparator(2) greencustomInlineOrMore(3) blue"
+        )
 
     async def test_should_not_render_choices_if_list_style_none_is_specified(self):
         async def exec_test(turn_context: TurnContext):
