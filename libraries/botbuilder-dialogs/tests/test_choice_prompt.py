@@ -437,8 +437,10 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
             # Hold the correct answer from when a valid locale is used
             expected_answer = None
 
-            def inspector(activity: Activity):
+            def inspector(activity: Activity, description: str):
                 nonlocal expected_answer
+
+                assert not description
 
                 if valid_locale == test_locale:
                     expected_answer = activity.text
