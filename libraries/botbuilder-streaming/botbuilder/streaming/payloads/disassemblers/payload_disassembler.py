@@ -45,7 +45,7 @@ class PayloadDisassembler(ABC):
         description = StreamDescription(id=str(stream.id))
 
         # TODO: This content type is hardcoded for POC, investigate how to proceed
-        content = bytes(stream.content).decode('utf8')
+        content = bytes(stream.content).decode("utf8")
 
         try:
             json.loads(content)

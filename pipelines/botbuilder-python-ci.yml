@@ -54,6 +54,7 @@ jobs:
       pip install -e ./libraries/botbuilder-integration-applicationinsights-aiohttp
       pip install -e ./libraries/botbuilder-adapters-slack
       pip install -e ./libraries/botbuilder-integration-aiohttp
+      pip install -e ./libraries/botbuilder-streaming
       pip install -r ./libraries/botframework-connector/tests/requirements.txt
       pip install -r ./libraries/botbuilder-core/tests/requirements.txt
       pip install -r ./libraries/botbuilder-ai/tests/requirements.txt
