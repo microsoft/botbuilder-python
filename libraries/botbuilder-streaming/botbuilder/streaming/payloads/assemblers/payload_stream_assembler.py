@@ -13,6 +13,7 @@ from .assembler import Assembler
 
 
 class PayloadStreamAssembler(Assembler):
+    # pylint: disable=super-init-not-called
     def __init__(
         self,
         stream_manager: "payloads.StreamManager",
@@ -20,7 +21,6 @@ class PayloadStreamAssembler(Assembler):
         type: str = None,
         length: int = None,
     ):
-
         self._stream_manager = stream_manager or payloads.StreamManager()
         self._stream: "streaming.PayloadStream" = None
         self._lock = Lock()

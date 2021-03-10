@@ -27,11 +27,6 @@ async def aiohttp_error_middleware(request, handler):
         raise HTTPUnauthorized()
     except KeyError:
         raise HTTPNotFound()
-    except Exception as error:
-        try:
-            raise error
-            raise HTTPInternalServerError()
-        except:
-            pass
-
+    except Exception:
         traceback.print_exc()
+        raise HTTPInternalServerError()

@@ -1,11 +1,12 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import traceback
+# import traceback
 
 from queue import Queue
 from typing import Awaitable, Callable
-from threading import Event, Lock, Semaphore
+
+# from threading import Event, Lock, Semaphore
 
 import asyncio
 import threading

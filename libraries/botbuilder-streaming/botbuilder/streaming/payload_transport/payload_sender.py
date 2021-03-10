@@ -80,7 +80,8 @@ class PayloadSender:
 
                 if did_disconnect:
                     self._connected_event.clear()
-                    if self.disconnected:
+                    if callable(self.disconnected):
+                        # pylint: disable=not-callable
                         self.disconnected(
                             self, event_args or DisconnectedEventArgs.empty
                         )

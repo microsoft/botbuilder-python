@@ -70,7 +70,8 @@ class PayloadReceiver:
                 self._receiver = None
 
                 if did_disconnect:
-                    if self.disconnected:
+                    if callable(self.disconnected):
+                        # pylint: disable=not-callable
                         self.disconnected(
                             self, event_args or DisconnectedEventArgs.empty
                         )

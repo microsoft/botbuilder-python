@@ -4,7 +4,6 @@
 from uuid import UUID
 from typing import List
 
-import botbuilder.streaming as streaming
 from botbuilder.streaming.payload_transport import PayloadSender
 from botbuilder.streaming.payloads.models import PayloadTypes, ResponsePayload
 

@@ -1,7 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import asyncio
 from http import HTTPStatus
 from logging import Logger
 from typing import Any
@@ -64,7 +63,9 @@ class StreamingHttpDriver(AsyncRequestsHTTPDriver):
         self._request_handler = request_handler
         self._logger = logger
 
-    async def send(self, request: ClientRequest, **config: Any) -> AsyncClientResponse:
+    async def send(
+        self, request: ClientRequest, **config: Any  # pylint: disable=unused-argument
+    ) -> AsyncClientResponse:
         # TODO: validate form of request to perform operations
         streaming_request = StreamingRequest(
             path=request.url[request.url.index("v3/") :], verb=request.method
@@ -91,6 +92,5 @@ class StreamingHttpDriver(AsyncRequestsHTTPDriver):
         except Exception as error:
             # TODO: log error
             raise error
-            pass
 
         return None

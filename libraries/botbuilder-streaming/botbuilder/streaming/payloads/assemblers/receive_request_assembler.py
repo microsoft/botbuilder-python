@@ -14,6 +14,7 @@ from .assembler import Assembler
 
 
 class ReceiveRequestAssembler(Assembler):
+    # pylint: disable=super-init-not-called
     def __init__(
         self,
         header: Header,

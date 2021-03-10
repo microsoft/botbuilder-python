@@ -31,13 +31,14 @@ class WebSocketTransport(TransportReceiverBase, TransportSenderBase):
                     "Closed by the WebSocketTransport",
                 )
             except Exception:
+                # pylint: disable=pointless-string-statement
                 """
                 Any exception thrown here will be caused by the socket already being closed,
                 which is the state we want to put it in by calling this method, which
                 means we don't care if it was already closed and threw an exception
                 when we tried to close it again.
                 """
-                pass
+                traceback.print_exc()
 
     # TODO: might need to remove offset and count if no segmentation possible
     # TODO: considering to create a BFTransportBuffer class to abstract the logic of binary buffers adapting to

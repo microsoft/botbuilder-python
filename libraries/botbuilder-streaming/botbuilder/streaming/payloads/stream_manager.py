@@ -4,7 +4,6 @@
 from uuid import UUID
 from typing import Callable, Dict, List
 
-import botbuilder.streaming as streaming
 from botbuilder.streaming.payloads.assemblers import PayloadStreamAssembler
 from botbuilder.streaming.payloads.models import Header
 

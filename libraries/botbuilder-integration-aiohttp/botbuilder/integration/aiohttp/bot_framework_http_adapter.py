@@ -12,7 +12,7 @@ from aiohttp.web import (
     HTTPUnauthorized,
     HTTPUnsupportedMediaType,
 )
-from botbuilder.core import Bot, BotFrameworkAdapterSettings, BotFrameworkAdapter
+from botbuilder.core import Bot, BotFrameworkAdapterSettings
 from botbuilder.core.streaming import (
     AiohttpWebSocket,
     BotFrameworkHttpAdapterBase,
@@ -24,6 +24,7 @@ from botframework.connector.auth import AuthenticationConstants, JwtTokenValidat
 
 class BotFrameworkHttpAdapter(BotFrameworkHttpAdapterBase):
     def __init__(self, settings: BotFrameworkAdapterSettings):
+        # pylint: disable=invalid-name
         super().__init__(settings)
 
         self._AUTH_HEADER_NAME = "authorization"
@@ -97,12 +98,13 @@ class BotFrameworkHttpAdapter(BotFrameworkHttpAdapterBase):
 
             await request_handler.listen()
         except Exception as error:
-            import traceback
+            import traceback  # pylint: disable=import-outside-toplevel
 
             traceback.print_exc()
             raise Exception(f"Unable to create transport server. Error: {str(error)}")
 
     async def _http_authenticate_request(self, request: Request) -> bool:
+        # pylint: disable=no-member
         try:
             if not await self._credential_provider.is_authentication_disabled():
                 auth_header = request.headers.get(self._AUTH_HEADER_NAME)

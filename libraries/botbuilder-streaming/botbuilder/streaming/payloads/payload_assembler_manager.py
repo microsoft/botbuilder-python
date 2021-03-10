@@ -4,7 +4,6 @@
 from uuid import UUID
 from typing import Awaitable, Callable, Dict, List, Union
 
-import botbuilder.streaming as streaming
 from botbuilder.streaming.payloads.assemblers import (
     Assembler,
     ReceiveRequestAssembler,
@@ -33,7 +32,7 @@ class PayloadAssemblerManager:
         # TODO: The return value SHOULDN'T be a union, we should interface List[int] into a BFStream class
         if self._is_stream_payload(header):
             return self._stream_manager.get_payload_stream(header)
-        elif not self._active_assemblers.get(header.id):
+        if not self._active_assemblers.get(header.id):
             # a new requestId has come in, start a new task to process it as it is received
             assembler = self._create_payload_assembler(header)
             if assembler:
@@ -63,7 +62,7 @@ class PayloadAssemblerManager:
             return ReceiveRequestAssembler(
                 header, self._stream_manager, self._on_receive_request
             )
-        elif header.type == PayloadTypes.RESPONSE:
+        if header.type == PayloadTypes.RESPONSE:
             return ReceiveResponseAssembler(
                 header, self._stream_manager, self._on_receive_response
             )

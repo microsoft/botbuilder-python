@@ -28,6 +28,7 @@ from .aiohttp_web_socket import AiohttpWebSocket
 
 
 class BotFrameworkHttpAdapterBase(BotFrameworkAdapter, StreamingActivityProcessor):
+    # pylint: disable=pointless-string-statement
     def __init__(self, settings: BotFrameworkAdapterSettings):
         super().__init__(settings)
 
@@ -104,29 +105,29 @@ class BotFrameworkHttpAdapterBase(BotFrameworkAdapter, StreamingActivityProcesso
                 return await correct_handler.send_activity(activity)
 
             return await possible_handlers[0].send_activity(activity)
-        else:
-            if self.connected_bot:
-                # This is a proactive message that will need a new streaming connection opened.
-                # The ServiceUrl of a streaming connection follows the pattern "url:[ChannelName]:[Protocol]:[Host]".
 
-                uri = activity.service_url.split(":")
-                protocol = uri[len(uri) - 2]
-                host = uri[len(uri) - 1]
-                # TODO: discuss if should abstract this from current package
-                # TODO: manage life cycle of sessions (when should we close them)
-                session = ClientSession()
-                aiohttp_ws = await session.ws_connect(protocol + host + "/api/messages")
-                web_socket = AiohttpWebSocket(aiohttp_ws, session)
-                handler = StreamingRequestHandler(self.connected_bot, self, web_socket)
+        if self.connected_bot:
+            # This is a proactive message that will need a new streaming connection opened.
+            # The ServiceUrl of a streaming connection follows the pattern "url:[ChannelName]:[Protocol]:[Host]".
 
-                if self.request_handlers is None:
-                    self.request_handlers = []
+            uri = activity.service_url.split(":")
+            protocol = uri[len(uri) - 2]
+            host = uri[len(uri) - 1]
+            # TODO: discuss if should abstract this from current package
+            # TODO: manage life cycle of sessions (when should we close them)
+            session = ClientSession()
+            aiohttp_ws = await session.ws_connect(protocol + host + "/api/messages")
+            web_socket = AiohttpWebSocket(aiohttp_ws, session)
+            handler = StreamingRequestHandler(self.connected_bot, self, web_socket)
 
-                self.request_handlers.append(handler)
+            if self.request_handlers is None:
+                self.request_handlers = []
 
-                return await handler.send_activity(activity)
+            self.request_handlers.append(handler)
 
-            return None
+            return await handler.send_activity(activity)
+
+        return None
 
     def can_process_outgoing_activity(self, activity: Activity) -> bool:
         if not activity:

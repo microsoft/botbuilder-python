@@ -72,7 +72,9 @@ class WebSocketServer:
         self._sender.disconnect()
         self._receiver.disconnect()
 
-    def _on_connection_disconnected(self, sender: object, event_args: object):
+    def _on_connection_disconnected(
+        self, sender: object, event_args: object  # pylint: disable=unused-argument
+    ):
         if not self._is_disconnecting:
             self._is_disconnecting = True
 
@@ -84,6 +86,7 @@ class WebSocketServer:
                 sender.disconnect()
 
             if self.disconnected_event_handler:
+                # pylint: disable=not-callable
                 self.disconnected_event_handler(self, DisconnectedEventArgs.empty)
 
             self._is_disconnecting = False

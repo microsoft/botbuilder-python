@@ -1,8 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import asyncio
-
 from msrest.pipeline import AsyncPipeline, AsyncHTTPPolicy, SansIOHTTPPolicy
 from msrest.universal_http.async_requests import AsyncRequestsHTTPSender as Driver
 from msrest.pipeline.async_requests import (

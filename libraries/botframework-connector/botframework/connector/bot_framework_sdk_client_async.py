@@ -3,7 +3,7 @@
 
 from typing import Optional, Type
 
-from msrest.async_client import SDKClientAsync, ServiceClientAsync
+from msrest.async_client import SDKClientAsync
 from msrest.universal_http.async_abc import AsyncHTTPSender as AsyncHttpDriver
 from msrest.pipeline import AsyncPipeline
 from msrest.pipeline.aiohttp import AsyncHTTPSender

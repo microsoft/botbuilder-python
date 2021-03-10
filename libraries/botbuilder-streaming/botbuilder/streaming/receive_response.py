@@ -35,7 +35,7 @@ class ReceiveResponse:
                 return ""
 
             # TODO: encoding double check
-            return bytes(content_stream.stream).decode("utf8")
+            return content_stream.decode("utf8")
         except Exception as error:
             raise error
 

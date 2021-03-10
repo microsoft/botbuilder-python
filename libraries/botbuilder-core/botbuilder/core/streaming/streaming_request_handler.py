@@ -84,11 +84,12 @@ class StreamingRequestHandler(RequestHandler):
     async def process_request(
         self, request: ReceiveRequest, logger: Logger, context: object
     ) -> StreamingResponse:
+        # pylint: disable=pointless-string-statement
         response = StreamingResponse()
 
         # We accept all POSTs regardless of path, but anything else requires special treatment.
         if not request.verb == StreamingRequest.POST:
-            return self._handle_custom_paths()
+            return self._handle_custom_paths(request, response)
 
         # Convert the StreamingRequest into an activity the adapter can understand.
         try:
@@ -200,11 +201,9 @@ class StreamingRequestHandler(RequestHandler):
 
             if server_response.status_code == HTTPStatus.OK:
                 return server_response.read_body_as_json(ReceiveResponse)
-        except Exception as error:
-            # TODO: remove printing
+        except Exception:
+            # TODO: remove printing and log it
             traceback.print_exc()
-            # TODO: log error
-            pass
 
         return None
 
@@ -252,7 +251,11 @@ class StreamingRequestHandler(RequestHandler):
 
         return None
 
-    def _server_disconnected(self, sender: object, event: DisconnectedEventArgs):
+    def _server_disconnected(
+        self,
+        sender: object,  # pylint: disable=unused-argument
+        event: DisconnectedEventArgs,  # pylint: disable=unused-argument
+    ):
         self._server_is_connected = False
 
     def _handle_custom_paths(

@@ -7,6 +7,7 @@ from botbuilder.streaming.transport import TransportConstants
 
 
 class Header:
+    # pylint: disable=invalid-name
     def __init__(self, *, type: str = None, id: UUID = None, end: bool = None):
         self._internal_payload_length = None
         self.type: str = type

@@ -8,15 +8,15 @@ from botbuilder.streaming.transport import TransportConstants
 
 from .models import Header
 
-_char_to_binary_int = {val.decode(): list(val)[0] for val in [b".", b"\n", b"1", b"0"]}
+_CHAR_TO_BINARY_INT = {val.decode(): list(val)[0] for val in [b".", b"\n", b"1", b"0"]}
 
 
 # TODO: consider abstracting the binary int list logic into a class for easier handling
 class HeaderSerializer:
-    DELIMITER = _char_to_binary_int["."]
-    TERMINATOR = _char_to_binary_int["\n"]
-    END = _char_to_binary_int["1"]
-    NOT_END = _char_to_binary_int["0"]
+    DELIMITER = _CHAR_TO_BINARY_INT["."]
+    TERMINATOR = _CHAR_TO_BINARY_INT["\n"]
+    END = _CHAR_TO_BINARY_INT["1"]
+    NOT_END = _CHAR_TO_BINARY_INT["0"]
     TYPE_OFFSET = 0
     TYPE_DELIMITER_OFFSET = 1
     LENGTH_OFFSET = 2
@@ -29,7 +29,11 @@ class HeaderSerializer:
     TERMINATOR_OFFSET = 47
 
     @staticmethod
-    def serialize(header: Header, buffer: List[int], offset: int) -> int:
+    def serialize(
+        header: Header,
+        buffer: List[int],
+        offset: int,  # pylint: disable=unused-argument
+    ) -> int:
 
         # write type
         buffer[HeaderSerializer.TYPE_OFFSET] = HeaderSerializer._char_to_binary_int(
@@ -66,7 +70,9 @@ class HeaderSerializer:
         return TransportConstants.MAX_HEADER_LENGTH
 
     @staticmethod
-    def deserialize(buffer: List[int], offset: int, count: int) -> Header:
+    def deserialize(
+        buffer: List[int], offset: int, count: int  # pylint: disable=unused-argument
+    ) -> Header:
         if count != TransportConstants.MAX_HEADER_LENGTH:
             raise ValueError("Cannot deserialize header, incorrect length")
 
