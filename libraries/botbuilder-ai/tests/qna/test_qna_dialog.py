@@ -10,6 +10,7 @@ from botbuilder.core import ConversationState, MemoryStorage, TurnContext
 from botbuilder.core.adapters import TestAdapter, TestFlow
 from botbuilder.dialogs import DialogSet, DialogTurnStatus
 
+
 class QnaMakerDialogTest(aiounittest.AsyncTestCase):
     # Note this is NOT a real QnA Maker application ID nor a real QnA Maker subscription-key
     # theses are GUIDs edited to look right to the parsing and validation code.
