@@ -20,8 +20,13 @@ class QnaMakerDialogTest(aiounittest.AsyncTestCase):
     _host: str = "https://dummyqnahost.azurewebsites.net/qnamaker"
 
     _tell_me_about_birds: str = "Tell me about birds"
+    _choose_bird: str = "Choose one of the following birds to get more info"
     _bald_eagle: str = "Bald Eagle"
     _esper: str = "Esper"
+
+    DEFAULT_ACTIVE_LEARNING_TITLE: str = "Did you mean:"
+    DEFAULT_NO_MATCH_TEXT: str = "None of the above."
+    DEFAULT_CARD_NO_MATCH_RESPONSE: str = "Thanks for the feedback."
 
     async def test_multiturn_dialog(self):
         # Set Up QnAMakerDialog
@@ -41,7 +46,7 @@ class QnaMakerDialogTest(aiounittest.AsyncTestCase):
             if (turn_context.activity.type != ActivityTypes.message):
                 raise TypeError('Failed to execute QnA dialog. Should have received a message activity.')
 
-            response_json = QnaMakerDialogTest._get_json_res(turn_context.activity.text)
+            response_json = self._get_json_res(turn_context.activity.text)
             dialog_context = await dialogs.create_context(turn_context)
             with patch(
                 "aiohttp.ClientSession.post",
@@ -59,19 +64,9 @@ class QnaMakerDialogTest(aiounittest.AsyncTestCase):
         test_flow = TestFlow(None, test_adapter)
         tf2 = await test_flow.send(self._tell_me_about_birds)
         dialog_reply: Activity = tf2.adapter.activity_buffer[0]
-        self.assertIsNotNone(dialog_reply)
-        self.assertIsInstance(dialog_reply, Activity)
-        attachments = dialog_reply.attachments
-        self.assertTrue(attachments)
-        self.assertEqual(len(attachments), 1)
-        buttons = attachments[0].content.buttons
-        self.assertEqual(
-            len(buttons), 2, "Should have only received 2 buttons in multi-turn prompt"
-        )
-        self.assertEqual(buttons[0].value, self._bald_eagle)
-        self.assertEqual(buttons[1].value, "Hummingbird")
-        tf3 = await tf2.assert_reply("Choose one of the following birds to get more info")
-        tf4 = await tf3.send("Bald Eagle")
+        self._assert_has_valid_hero_card_buttons(dialog_reply, button_count=2)
+        tf3 = await tf2.assert_reply(self._choose_bird)
+        tf4 = await tf3.send(self._bald_eagle)
         await tf4.assert_reply("Apparently these guys aren't actually bald!")
     
     async def test_active_learning(self):
@@ -92,7 +87,7 @@ class QnaMakerDialogTest(aiounittest.AsyncTestCase):
             if (turn_context.activity.type != ActivityTypes.message):
                 raise TypeError('Failed to execute QnA dialog. Should have received a message activity.')
 
-            response_json = QnaMakerDialogTest._get_json_res(turn_context.activity.text)
+            response_json = self._get_json_res(turn_context.activity.text)
             dialog_context = await dialogs.create_context(turn_context)
             with patch(
                 "aiohttp.ClientSession.post",
@@ -109,17 +104,45 @@ class QnaMakerDialogTest(aiounittest.AsyncTestCase):
         test_adapter = TestAdapter(execute_qna_dialog)
         test_flow = TestFlow(None, test_adapter)
         tf2 = await test_flow.send(self._esper)
+        dialog_reply: Activity = tf2.adapter.activity_buffer[0]
+        self._assert_has_valid_hero_card_buttons(dialog_reply, button_count=3)
+        tf3 = await tf2.assert_reply(self.DEFAULT_ACTIVE_LEARNING_TITLE)
+        tf4 = await tf3.send(self.DEFAULT_NO_MATCH_TEXT)
+        await tf4.assert_reply(self.DEFAULT_CARD_NO_MATCH_RESPONSE)
+
         print(tf2)
 
-    @classmethod
-    def _get_json_res(cls, text: str) -> object:
-        if (text == cls._tell_me_about_birds):
+    def _assert_has_valid_hero_card_buttons(self, activity: Activity, button_count: int):
+        self.assertIsInstance(activity, Activity)
+        attachments = activity.attachments
+        self.assertTrue(attachments)
+        self.assertEqual(len(attachments), 1)
+        buttons = attachments[0].content.buttons
+        button_count_err = f"Should have only received {button_count} buttons in multi-turn prompt"
+
+        if (activity.text == self._choose_bird):
+            self.assertEqual(
+                len(buttons), button_count, button_count_err
+            )
+            self.assertEqual(buttons[0].value, self._bald_eagle)
+            self.assertEqual(buttons[1].value, "Hummingbird")
+        
+        if (activity.text == self.DEFAULT_ACTIVE_LEARNING_TITLE):
+            self.assertEqual(
+                len(buttons), button_count, button_count_err
+            )
+            self.assertEqual(buttons[0].value, "Esper seeks")
+            self.assertEqual(buttons[1].value, "Esper sups")
+            self.assertEqual(buttons[2].value, self.DEFAULT_NO_MATCH_TEXT)
+
+    def _get_json_res(self, text: str) -> object:
+        if (text == self._tell_me_about_birds):
             return QnaMakerDialogTest._get_json_for_file("QnAMakerDialog_MultiTurn_Answer1.json")
         
-        if (text == cls._bald_eagle):
+        if (text == self._bald_eagle):
             return QnaMakerDialogTest._get_json_for_file("QnAMakerDialog_MultiTurn_Answer2.json")
         
-        if (text == cls._esper):
+        if (text == self._esper):
             return QnaMakerDialogTest._get_json_for_file("QnAMakerDialog_ActiveLearning.json")
 
         return None
@@ -134,4 +157,4 @@ class QnaMakerDialogTest(aiounittest.AsyncTestCase):
         response_json = json.loads(response_str)
 
         return response_json
-        
+    
