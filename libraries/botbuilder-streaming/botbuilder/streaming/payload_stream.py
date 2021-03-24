@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from threading import Lock, Semaphore
+from asyncio import Lock, Semaphore
 from typing import List
 
 from botbuilder.streaming.payloads.assemblers import PayloadStreamAssembler
@@ -34,13 +34,13 @@ class PayloadStream:
         buffer_copy = buffer[offset : offset + count]
         self.give_buffer(buffer_copy)
 
-    def read(self, buffer: List[int], offset: int, count: int):
+    async def read(self, buffer: List[int], offset: int, count: int):
         if self._end:
             return 0
 
         if not self._active:
-            self._data_available.acquire()
-            with self._lock:
+            await self._data_available.acquire()
+            async with self._lock:
                 self._active.extend(self._buffer)
                 self._buffer = []
 
@@ -64,12 +64,14 @@ class PayloadStream:
 
         return available_count
 
-    def read_until_end(self):
+    async def read_until_end(self):
         result = [None] * self._assembler.content_length
         current_size = 0
 
         while not self._end:
-            count = self.read(result, current_size, self._assembler.content_length)
+            count = await self.read(
+                result, current_size, self._assembler.content_length
+            )
             current_size += count
 
         return result

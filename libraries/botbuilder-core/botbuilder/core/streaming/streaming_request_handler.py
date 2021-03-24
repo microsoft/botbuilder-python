@@ -93,8 +93,9 @@ class StreamingRequestHandler(RequestHandler):
 
         # Convert the StreamingRequest into an activity the adapter can understand.
         try:
-            body_str = request.read_body_as_str()
+            body_str = await request.read_body_as_str()
         except Exception as error:
+            traceback.print_exc()
             response.status_code = int(HTTPStatus.BAD_REQUEST)
             # TODO: log error
 
@@ -149,6 +150,7 @@ class StreamingRequestHandler(RequestHandler):
                     response.set_body(adapter_response.body)
 
         except Exception as error:
+            traceback.print_exc()
             response.status_code = int(HTTPStatus.INTERNAL_SERVER_ERROR)
             response.set_body(str(error))
             # TODO: log error
@@ -184,7 +186,7 @@ class StreamingRequestHandler(RequestHandler):
                 return server_response.read_body_as_json(ResourceResponse)
         except Exception:
             # TODO: log error
-            pass
+            traceback.print_exc()
 
         return None
 

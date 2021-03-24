@@ -3,7 +3,6 @@
 
 import asyncio
 from uuid import UUID
-from threading import Lock, Thread
 from typing import Awaitable, Callable, List
 
 import botbuilder.streaming as streaming
@@ -32,16 +31,14 @@ class ReceiveRequestAssembler(Assembler):
         self._on_completed = on_completed
         self.identifier = header.id
         self._length = header.payload_length if header.end else None
-        self._lock = Lock()
         self._stream: List[int] = None
 
     def create_stream_from_payload(self) -> List[int]:
         return [None] * (self._length or 0)
 
     def get_payload_as_stream(self) -> List[int]:
-        with self._lock:
-            if self._stream is None:
-                self._stream = self.create_stream_from_payload()
+        if self._stream is None:
+            self._stream = self.create_stream_from_payload()
 
         return self._stream
 
@@ -49,14 +46,8 @@ class ReceiveRequestAssembler(Assembler):
         if header.end:
             self.end = True
 
-            # Execute the request on a separate Thread in the background
-            def schedule_task():
-                loop = asyncio.new_event_loop()
-                loop.run_until_complete(self.process_request(stream))
-
-            new_thread = Thread(target=schedule_task, args=())
-            new_thread.daemon = True
-            new_thread.start()
+            # Execute the request in the background
+            asyncio.ensure_future(self.process_request(stream))
 
     def close(self):
         self._stream_manager.close_stream(self.identifier)

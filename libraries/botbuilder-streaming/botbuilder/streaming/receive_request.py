@@ -14,7 +14,7 @@ class ReceiveRequest:
         self.path = path
         self.streams: List[ContentStream] = streams or []
 
-    def read_body_as_str(self) -> str:
+    async def read_body_as_str(self) -> str:
         try:
             content_stream = self.streams[0] if self.streams else None
 
@@ -23,7 +23,7 @@ class ReceiveRequest:
                 return ""
 
             # TODO: encoding double check
-            stream = content_stream.stream.read_until_end()
+            stream = await content_stream.stream.read_until_end()
             return bytes(stream).decode("utf-8-sig")
         except Exception as error:
             raise error

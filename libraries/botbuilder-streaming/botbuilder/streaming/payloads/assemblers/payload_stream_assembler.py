@@ -3,7 +3,6 @@
 
 from uuid import UUID
 from typing import List
-from threading import Lock
 
 import botbuilder.streaming as streaming
 import botbuilder.streaming.payloads as payloads
@@ -23,7 +22,7 @@ class PayloadStreamAssembler(Assembler):
     ):
         self._stream_manager = stream_manager or payloads.StreamManager()
         self._stream: "streaming.PayloadStream" = None
-        self._lock = Lock()
+        # self._lock = Lock()
         self.identifier = identifier
         self.content_type = type
         self.content_length = length
@@ -33,9 +32,8 @@ class PayloadStreamAssembler(Assembler):
         return streaming.PayloadStream(self)
 
     def get_payload_as_stream(self) -> "streaming.PayloadStream":
-        with self._lock:
-            if not self._stream:
-                self._stream = self.create_stream_from_payload()
+        if not self._stream:
+            self._stream = self.create_stream_from_payload()
 
         return self._stream
 

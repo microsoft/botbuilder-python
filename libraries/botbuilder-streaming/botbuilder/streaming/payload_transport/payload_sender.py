@@ -1,8 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import asyncio
-from threading import Event
+from asyncio import Event, ensure_future
 from typing import Awaitable, Callable, List
 
 from botbuilder.streaming.transport import (
@@ -89,7 +88,7 @@ class PayloadSender:
                 self._is_disconnecting = False
 
     async def _write_packet(self, packet: SendPacket):
-        self._connected_event.wait()
+        await self._connected_event.wait()
 
         try:
             # determine if we know the payload length and end
@@ -144,7 +143,7 @@ class PayloadSender:
 
             if packet.sent_callback:
                 # TODO: should this really run in the background?
-                asyncio.create_task(packet.sent_callback(packet.header))
+                ensure_future(packet.sent_callback(packet.header))
         except Exception as exception:
             disconnected_args = DisconnectedEventArgs(reason=str(exception))
             self.disconnect(disconnected_args)
