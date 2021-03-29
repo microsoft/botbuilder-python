@@ -3,6 +3,7 @@
 
 import json
 import urllib.parse
+from datetime import datetime, timezone
 
 from aiohttp.web_request import Request
 from aiohttp.web_response import Response
@@ -124,9 +125,9 @@ class SlackHelper:
 
         activity = Activity(
             channel_id="slack",
-            conversation=ConversationAccount(id=payload.channel.id, properties={}),
+            conversation=ConversationAccount(id=payload.channel.get("id"), properties={}),
             from_property=ChannelAccount(
-                id=payload.message.bot_id if payload.message.bot_id else payload.user.id
+                id=payload.message.bot_id if payload.message.bot_id else payload.user.get("id")
             ),
             recipient=ChannelAccount(),
             channel_data=payload,
@@ -141,7 +142,7 @@ class SlackHelper:
             payload.type == "block_actions" or payload.type == "interactive_message"
         ):
             activity.type = ActivityTypes.message
-            activity.text = payload.actions.value
+            activity.text = payload.actions[0].value
 
         return activity
 
@@ -168,12 +169,13 @@ class SlackHelper:
                 id=event.channel if event.channel else event.channel_id, properties={}
             ),
             from_property=ChannelAccount(
-                id=event.bot_id if event.bot_id else event.user_id
+                id=event.bot_id if event.bot_id else event.user_id if event.user_id else event.user
             ),
             recipient=ChannelAccount(id=None),
             channel_data=event,
             text=event.text,
             type=ActivityTypes.event,
+            timestamp=datetime.fromtimestamp(float(event.event_ts), tz=timezone.utc)
         )
 
         if event.thread_ts:
@@ -254,7 +256,7 @@ class SlackHelper:
         for pair in pairs:
             key_value = pair.split("=")
             key = key_value[0]
-            value = urllib.parse.unquote(key_value[1])
+            value = json.loads(urllib.parse.unquote(key_value[1]))
 
             values[key] = value
 
@@ -287,7 +289,7 @@ class SlackHelper:
             return SlackRequestBody(**request_dict)
 
         if "payload=" in request_body:
-            payload = SlackPayload(**request_dict)
+            payload = SlackPayload(**(request_dict.get("payload")))
             return SlackRequestBody(payload=payload, token=payload.token)
 
         return SlackRequestBody(**request_dict)

@@ -1,7 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from typing import List
+from typing import Optional, List
+from botbuilder.adapters.slack.slack_action import SlackAction
 from botbuilder.adapters.slack.slack_message import SlackMessage
 
 
@@ -25,10 +26,13 @@ class SlackEvent:
         self.user = kwargs.get("user")
         self.user_id = kwargs.get("user_id")
         self.bot_id = kwargs.get("bot_id")
-        self.actions: List[str] = kwargs.get("actions")
+        self.actions: Optional[List[SlackAction]] = None
         self.item = kwargs.get("item")
         self.item_channel = kwargs.get("item_channel")
         self.files: [] = kwargs.get("files")
         self.message = (
             None if "message" not in kwargs else SlackMessage(**kwargs.get("message"))
         )
+
+        if "actions" in kwargs:
+            self.actions = [SlackAction(**action) for action in kwargs.get("actions")]

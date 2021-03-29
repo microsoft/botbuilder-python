@@ -2,19 +2,19 @@
 # Licensed under the MIT License.
 
 from typing import Optional, List
-from slack.web.classes.actions import Action
+from botbuilder.adapters.slack.slack_action import SlackAction
 from botbuilder.adapters.slack.slack_message import SlackMessage
 
 
 class SlackPayload:
     def __init__(self, **kwargs):
-        self.type: List[str] = kwargs.get("type")
+        self.type: [str] = kwargs.get("type")
         self.token: str = kwargs.get("token")
         self.channel: str = kwargs.get("channel")
         self.thread_ts: str = kwargs.get("thread_ts")
         self.team: str = kwargs.get("team")
         self.user: str = kwargs.get("user")
-        self.actions: Optional[List[Action]] = None
+        self.actions: Optional[List[SlackAction]] = None
         self.trigger_id: str = kwargs.get("trigger_id")
         self.action_ts: str = kwargs.get("action_ts")
         self.submission: str = kwargs.get("submission")
@@ -26,6 +26,9 @@ class SlackPayload:
             message = kwargs.get("message")
             self.message = (
                 message
-                if isinstance(message) is SlackMessage
+                if isinstance(message, SlackMessage)
                 else SlackMessage(**message)
             )
+
+        if "actions" in kwargs:
+            self.actions = [SlackAction(**action) for action in kwargs.get("actions")]
