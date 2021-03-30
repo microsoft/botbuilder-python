@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from asyncio import Event, ensure_future
+from asyncio import Event, ensure_future, iscoroutinefunction, isfuture
 from typing import Awaitable, Callable, List
 
 from botbuilder.streaming.transport import (
@@ -61,7 +61,7 @@ class PayloadSender:
 
         self._send_queue.post(packet)
 
-    def disconnect(self, event_args: DisconnectedEventArgs = None):
+    async def disconnect(self, event_args: DisconnectedEventArgs = None):
         did_disconnect = False
 
         if not self._is_disconnecting:
@@ -81,9 +81,16 @@ class PayloadSender:
                     self._connected_event.clear()
                     if callable(self.disconnected):
                         # pylint: disable=not-callable
-                        self.disconnected(
-                            self, event_args or DisconnectedEventArgs.empty
-                        )
+                        if iscoroutinefunction(self.disconnected) or isfuture(
+                            self.disconnected
+                        ):
+                            await self.disconnected(
+                                self, event_args or DisconnectedEventArgs.empty
+                            )
+                        else:
+                            self.disconnected(
+                                self, event_args or DisconnectedEventArgs.empty
+                            )
             finally:
                 self._is_disconnecting = False
 
@@ -141,9 +148,11 @@ class PayloadSender:
                             # TODO: make custom exception
                             raise Exception("TransportDisconnectedException")
 
+                        offset += count
+
             if packet.sent_callback:
                 # TODO: should this really run in the background?
                 ensure_future(packet.sent_callback(packet.header))
         except Exception as exception:
             disconnected_args = DisconnectedEventArgs(reason=str(exception))
-            self.disconnect(disconnected_args)
+            await self.disconnect(disconnected_args)
