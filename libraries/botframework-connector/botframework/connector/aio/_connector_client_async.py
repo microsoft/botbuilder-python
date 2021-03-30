@@ -5,16 +5,26 @@
 # license information.
 # --------------------------------------------------------------------------
 
-from msrest.async_client import SDKClientAsync
+from typing import Optional, Type
+
+from msrest.universal_http.async_abc import AsyncHTTPSender as AsyncHttpDriver
+from msrest.pipeline.aiohttp import AsyncHTTPSender
+from msrest.async_client import AsyncPipeline
 from msrest import Serializer, Deserializer
 
-from .._configuration import ConnectorClientConfiguration
 from .operations_async import AttachmentsOperations
 from .operations_async import ConversationsOperations
 from .. import models
 
 
-class ConnectorClient(SDKClientAsync):
+# TODO: experimental
+from ..bot_framework_sdk_client_async import (
+    BotFrameworkSDKClientAsync,
+    BotFrameworkConnectorConfiguration,
+)
+
+
+class ConnectorClient(BotFrameworkSDKClientAsync):
     """The Bot Connector REST API allows your bot to send and receive messages to channels configured in the
     [Bot Framework Developer Portal](https://dev.botframework.com). The Connector service uses industry-standard REST
     and JSON over HTTPS.
@@ -45,9 +55,26 @@ class ConnectorClient(SDKClientAsync):
     :param str base_url: Service URL
     """
 
-    def __init__(self, credentials, base_url=None):
-
-        self.config = ConnectorClientConfiguration(credentials, base_url)
+    def __init__(
+        self,
+        credentials,
+        base_url=None,
+        *,
+        pipeline_type: Optional[Type[AsyncPipeline]] = None,
+        sender: Optional[AsyncHTTPSender] = None,
+        driver: Optional[AsyncHttpDriver] = None,
+        custom_configuration: [BotFrameworkConnectorConfiguration] = None,
+    ):
+        if custom_configuration:
+            self.config = custom_configuration
+        else:
+            self.config = BotFrameworkConnectorConfiguration(
+                credentials,
+                base_url,
+                pipeline_type=pipeline_type,
+                sender=sender,
+                driver=driver,
+            )
         super(ConnectorClient, self).__init__(self.config)
 
         client_models = {

@@ -4,16 +4,16 @@
 import os
 from setuptools import setup
 
-VERSION = os.environ["packageVersion"] if "packageVersion" in os.environ else "4.13.0"
+VERSION = os.environ["packageVersion"] if "packageVersion" in os.environ else "4.12.0"
 REQUIRES = [
-    "botbuilder-schema==4.13.0",
-    "botframework-connector==4.13.0",
-    "jsonpickle==1.2",
+    "botbuilder-schema>=4.12.0",
+    "botframework-connector>=4.12.0",
+    "botbuilder-core>=4.12.0",
 ]
 
 root = os.path.abspath(os.path.dirname(__file__))
 
-with open(os.path.join(root, "botbuilder", "core", "about.py")) as f:
+with open(os.path.join(root, "botbuilder", "streaming", "about.py")) as f:
     package_info = {}
     info = f.read()
     exec(info, package_info)
@@ -27,19 +27,17 @@ setup(
     url=package_info["__uri__"],
     author=package_info["__author__"],
     description=package_info["__description__"],
-    keywords=["BotBuilderCore", "bots", "ai", "botframework", "botbuilder"],
+    keywords=["BotBuilderStreaming", "bots", "ai", "botframework", "botbuilder",],
     long_description=long_description,
     long_description_content_type="text/x-rst",
     license=package_info["__license__"],
     packages=[
-        "botbuilder.core",
-        "botbuilder.core.adapters",
-        "botbuilder.core.inspection",
-        "botbuilder.core.integration",
-        "botbuilder.core.skills",
-        "botbuilder.core.streaming",
-        "botbuilder.core.teams",
-        "botbuilder.core.oauth",
+        "botbuilder.streaming",
+        "botbuilder.streaming.payloads",
+        "botbuilder.streaming.payloads.models",
+        "botbuilder.streaming.payload_transport",
+        "botbuilder.streaming.transport",
+        "botbuilder.streaming.transport.web_socket",
     ],
     install_requires=REQUIRES,
     classifiers=[

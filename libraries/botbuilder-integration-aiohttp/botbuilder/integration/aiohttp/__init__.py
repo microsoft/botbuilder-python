@@ -8,9 +8,11 @@
 from .aiohttp_channel_service import aiohttp_channel_service_routes
 from .aiohttp_channel_service_exception_middleware import aiohttp_error_middleware
 from .bot_framework_http_client import BotFrameworkHttpClient
+from .bot_framework_http_adapter import BotFrameworkHttpAdapter
 
 __all__ = [
     "aiohttp_channel_service_routes",
     "aiohttp_error_middleware",
     "BotFrameworkHttpClient",
+    "BotFrameworkHttpAdapter",
 ]
