@@ -32,8 +32,7 @@ class SendQueue:
                     try:
                         await self._action(item)
                     except Exception:
-                        # AppInsights.TrackException(e)
-                        pass
+                        traceback.print_exc()
                     finally:
                         self._queue.task_done()
             except Exception:

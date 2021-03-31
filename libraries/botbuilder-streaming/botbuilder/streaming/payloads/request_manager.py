@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from asyncio import Future
+from asyncio import Future, shield
 from uuid import UUID
 from typing import Dict
 
@@ -38,7 +38,7 @@ class RequestManager:
         self._pending_requests[request_id] = pending_request
 
         try:
-            response: streaming.ReceiveResponse = await pending_request
+            response: streaming.ReceiveResponse = await shield(pending_request)
             return response
 
         finally:

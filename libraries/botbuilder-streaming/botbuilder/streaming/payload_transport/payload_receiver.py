@@ -3,6 +3,7 @@
 
 import traceback
 
+from asyncio import iscoroutinefunction, isfuture
 from typing import Callable, List
 
 import botbuilder.streaming as streaming
@@ -53,7 +54,7 @@ class PayloadReceiver:
         self._get_stream = get_stream
         self._receive_action = receive_action
 
-    def disconnect(self, event_args: DisconnectedEventArgs = None):
+    async def disconnect(self, event_args: DisconnectedEventArgs = None):
         did_disconnect = False
 
         if not self._is_disconnecting:
@@ -61,20 +62,27 @@ class PayloadReceiver:
             try:
                 try:
                     if self._receiver:
-                        self._receiver.close()
+                        await self._receiver.close()
                         # TODO: investigate if 'dispose' is necessary
                         did_disconnect = True
                 except Exception:
-                    pass
+                    traceback.print_exc()
 
                 self._receiver = None
 
                 if did_disconnect:
                     if callable(self.disconnected):
                         # pylint: disable=not-callable
-                        self.disconnected(
-                            self, event_args or DisconnectedEventArgs.empty
-                        )
+                        if iscoroutinefunction(self.disconnected) or isfuture(
+                            self.disconnected
+                        ):
+                            await self.disconnected(
+                                self, event_args or DisconnectedEventArgs.empty
+                            )
+                        else:
+                            self.disconnected(
+                                self, event_args or DisconnectedEventArgs.empty
+                            )
             finally:
                 self._is_disconnecting = False
 
@@ -153,4 +161,4 @@ class PayloadReceiver:
                 is_closed = True
                 disconnect_args = DisconnectedEventArgs(reason=str(exception))
 
-        self.disconnect(disconnect_args)
+        await self.disconnect(disconnect_args)

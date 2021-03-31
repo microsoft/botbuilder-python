@@ -2,6 +2,8 @@
 # Licensed under the MIT License.
 
 import asyncio
+import traceback
+
 from typing import Any, Optional, Union
 
 from aiohttp import ClientWebSocketResponse, WSMsgType, ClientSession
@@ -38,19 +40,25 @@ class AiohttpWebSocket(WebSocket):
         try:
             message = await self._aiohttp_ws.receive()
 
+            if message.type == WSMsgType.TEXT:
+                message_data = list(str(message.data).encode("ascii"))
+            elif message.type == WSMsgType.BINARY:
+                message_data = list(message.data)
+            elif isinstance(message.data, int):
+                message_data = []
+
             # async for message in self._aiohttp_ws:
             return WebSocketMessage(
-                message_type=WebSocketMessageType(int(message.type)),
-                data=list(str(message.data).encode("ascii"))
-                if message.type == WSMsgType.TEXT
-                else list(message.data),
+                message_type=WebSocketMessageType(int(message.type)), data=message_data
             )
         except Exception as error:
+            traceback.print_exc()
             raise error
 
     async def send(
         self, buffer: Any, message_type: WebSocketMessageType, end_of_message: bool
     ):
+        is_closing = self._aiohttp_ws.closed
         try:
             if message_type == WebSocketMessageType.BINARY:
                 # TODO: The clening buffer line should be removed, just for bypassing bug in POC
@@ -63,6 +71,7 @@ class AiohttpWebSocket(WebSocket):
                     f"AiohttpWebSocket - message_type: {message_type} currently not supported"
                 )
         except Exception as error:
+            traceback.print_exc()
             raise error
 
     @property

@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from asyncio import Future
+from asyncio import Future, iscoroutinefunction, isfuture
 from typing import Callable
 
 from botbuilder.streaming import (
@@ -68,11 +68,11 @@ class WebSocketServer:
 
         return await self._protocol_adapter.send_request(request)
 
-    def disconnect(self):
-        self._sender.disconnect()
-        self._receiver.disconnect()
+    async def disconnect(self):
+        await self._sender.disconnect()
+        await self._receiver.disconnect()
 
-    def _on_connection_disconnected(
+    async def _on_connection_disconnected(
         self, sender: object, event_args: object  # pylint: disable=unused-argument
     ):
         if not self._is_disconnecting:
@@ -83,7 +83,12 @@ class WebSocketServer:
                 self._closed_signal = None
 
             if sender in [self._sender, self._receiver]:
-                sender.disconnect()
+                if iscoroutinefunction(sender.disconnect) or isfuture(
+                    sender.disconnect
+                ):
+                    await sender.disconnect()
+                else:
+                    sender.disconnect()
 
             if self.disconnected_event_handler:
                 # pylint: disable=not-callable
