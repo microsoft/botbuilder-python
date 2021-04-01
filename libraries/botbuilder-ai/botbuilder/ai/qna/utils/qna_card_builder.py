@@ -67,13 +67,6 @@ class QnACardBuilder:
             for prompt in result.context.prompts
         ]
 
-        # Add No match text
-        button_list.append(
-            CardAction(
-                value=card_no_match_text, type="imBack", title=card_no_match_text,
-            )
-        )
-
         attachment = CardFactory.hero_card(HeroCard(buttons=button_list))
 
         return Activity(
