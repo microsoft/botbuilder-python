@@ -134,7 +134,7 @@ class SlackAdapter(BotAdapter, ABC):
             raise Exception("Activity.timestamp is required")
 
         await self.slack_client.chat_delete(
-            channel=reference.channel_id, ts=context.activity.timestamp
+            channel=reference.conversation.id, ts=reference.activity_id
         )
 
     async def continue_conversation(
