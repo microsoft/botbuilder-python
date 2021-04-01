@@ -31,8 +31,8 @@ class SlackClient(WebClient):
             raise Exception("SlackAdapterOptions and bot_token are required")
 
         if (
-                not options.slack_verification_token
-                and not options.slack_client_signing_secret
+            not options.slack_verification_token
+            and not options.slack_client_signing_secret
         ):
             warning = (
                 "\n****************************************************************************************\n"
@@ -59,10 +59,10 @@ class SlackClient(WebClient):
         if self.options.slack_bot_token:
             self.identity = await self.test_auth()
         elif (
-                not self.options.slack_client_id
-                or not self.options.slack_client_secret
-                or not self.options.slack_redirect_uri
-                or not self.options.slack_scopes
+            not self.options.slack_client_id
+            or not self.options.slack_client_secret
+            or not self.options.slack_redirect_uri
+            or not self.options.slack_scopes
         ):
             raise Exception(
                 "Missing Slack API credentials! Provide SlackClientId, SlackClientSecret, scopes and SlackRedirectUri "
@@ -84,12 +84,12 @@ class SlackClient(WebClient):
         return await self.api_call("users.counts")
 
     async def im_history_ex(
-            self,
-            channel: str,
-            latest_timestamp: str = None,
-            oldest_timestamp: str = None,
-            count: int = None,
-            unreads: bool = None,
+        self,
+        channel: str,
+        latest_timestamp: str = None,
+        oldest_timestamp: str = None,
+        count: int = None,
+        unreads: bool = None,
     ) -> SlackResponse:
         args = {}
         if latest_timestamp:
@@ -104,19 +104,19 @@ class SlackClient(WebClient):
         return await self.im_history(channel=channel, **args)
 
     async def files_info_ex(
-            self, file_id: str, page: int = None, count: int = None
+        self, file_id: str, page: int = None, count: int = None
     ) -> SlackResponse:
         args = {"count": str(count), "page": str(page)}
         return await self.files_info(file=file_id, **args)
 
     async def files_list_ex(
-            self,
-            user_id: str = None,
-            date_from: str = None,
-            date_to: str = None,
-            count: int = None,
-            page: int = None,
-            types: List[str] = None,
+        self,
+        user_id: str = None,
+        date_from: str = None,
+        date_to: str = None,
+        count: int = None,
+        page: int = None,
+        types: List[str] = None,
     ) -> SlackResponse:
         args = {}
 
@@ -139,7 +139,7 @@ class SlackClient(WebClient):
         return await self.files_list(**args)
 
     async def groups_history_ex(
-            self, channel: str, latest: str = None, oldest: str = None, count: int = None
+        self, channel: str, latest: str = None, oldest: str = None, count: int = None
     ) -> SlackResponse:
         args = {}
 
@@ -161,7 +161,7 @@ class SlackClient(WebClient):
         return await self.api_call("users.prefs.get", http_verb="GET")
 
     async def stars_list_ex(
-            self, user: str = None, count: int = None, page: int = None
+        self, user: str = None, count: int = None, page: int = None
     ) -> SlackResponse:
         args = {}
 
@@ -179,14 +179,14 @@ class SlackClient(WebClient):
         return await self.api_call("groups.close", params=args)
 
     async def chat_post_ephemeral_ex(
-            self,
-            channel: str,
-            text: str,
-            target_user: str,
-            parse: str = None,
-            link_names: bool = False,
-            attachments: List[str] = None,  # pylint: disable=unused-argument
-            as_user: bool = False,
+        self,
+        channel: str,
+        text: str,
+        target_user: str,
+        parse: str = None,
+        link_names: bool = False,
+        attachments: List[str] = None,  # pylint: disable=unused-argument
+        as_user: bool = False,
     ) -> SlackResponse:
         args = {
             "text": text,
@@ -204,18 +204,18 @@ class SlackClient(WebClient):
         return await self.chat_postEphemeral(channel=channel, user=target_user, **args)
 
     async def chat_post_message_ex(
-            self,
-            channel: str,
-            text: str,
-            bot_name: str = None,
-            parse: str = None,
-            link_names: bool = False,
-            blocks: List[str] = None,  # pylint: disable=unused-argument
-            attachments: List[str] = None,  # pylint: disable=unused-argument
-            unfurl_links: bool = False,
-            icon_url: str = None,
-            icon_emoji: str = None,
-            as_user: bool = False,
+        self,
+        channel: str,
+        text: str,
+        bot_name: str = None,
+        parse: str = None,
+        link_names: bool = False,
+        blocks: List[str] = None,  # pylint: disable=unused-argument
+        attachments: List[str] = None,  # pylint: disable=unused-argument
+        unfurl_links: bool = False,
+        icon_url: str = None,
+        icon_emoji: str = None,
+        as_user: bool = False,
     ) -> SlackResponse:
         args = {
             "text": text,
@@ -246,13 +246,13 @@ class SlackClient(WebClient):
         return await self.chat_postMessage(channel=channel, **args)
 
     async def search_all_ex(
-            self,
-            query: str,
-            sorting: str = None,
-            direction: str = None,
-            enable_highlights: bool = False,
-            count: int = None,
-            page: int = None,
+        self,
+        query: str,
+        sorting: str = None,
+        direction: str = None,
+        enable_highlights: bool = False,
+        count: int = None,
+        page: int = None,
     ) -> SlackResponse:
         args = {"highlight": "1" if enable_highlights else "0"}
 
@@ -271,13 +271,13 @@ class SlackClient(WebClient):
         return await self.search_all(query=query, **args)
 
     async def search_files_ex(
-            self,
-            query: str,
-            sorting: str = None,
-            direction: str = None,
-            enable_highlights: bool = False,
-            count: int = None,
-            page: int = None,
+        self,
+        query: str,
+        sorting: str = None,
+        direction: str = None,
+        enable_highlights: bool = False,
+        count: int = None,
+        page: int = None,
     ) -> SlackResponse:
         args = {"highlight": "1" if enable_highlights else "0"}
 
@@ -296,13 +296,13 @@ class SlackClient(WebClient):
         return await self.search_files(query=query, **args)
 
     async def search_messages_ex(
-            self,
-            query: str,
-            sorting: str = None,
-            direction: str = None,
-            enable_highlights: bool = False,
-            count: int = None,
-            page: int = None,
+        self,
+        query: str,
+        sorting: str = None,
+        direction: str = None,
+        enable_highlights: bool = False,
+        count: int = None,
+        page: int = None,
     ) -> SlackResponse:
         args = {"highlight": "1" if enable_highlights else "0"}
 
@@ -321,15 +321,15 @@ class SlackClient(WebClient):
         return await self.search_messages(query=query, **args)
 
     async def chat_update_ex(
-            self,
-            timestamp: str,
-            channel: str,
-            text: str,
-            bot_name: str = None,
-            parse: str = None,
-            link_names: bool = False,
-            attachments: List[str] = None,  # pylint: disable=unused-argument
-            as_user: bool = False,
+        self,
+        timestamp: str,
+        channel: str,
+        text: str,
+        bot_name: str = None,
+        parse: str = None,
+        link_names: bool = False,
+        attachments: List[str] = None,  # pylint: disable=unused-argument
+        as_user: bool = False,
     ):
         args = {
             "text": text,
@@ -350,13 +350,13 @@ class SlackClient(WebClient):
         return await self.chat_update(channel=channel, ts=timestamp)
 
     async def files_upload_ex(
-            self,
-            file: Union[str, IOBase] = None,
-            content: str = None,
-            channels: List[str] = None,
-            title: str = None,
-            initial_comment: str = None,
-            file_type: str = None,
+        self,
+        file: Union[str, IOBase] = None,
+        content: str = None,
+        channels: List[str] = None,
+        title: str = None,
+        initial_comment: str = None,
+        file_type: str = None,
     ):
         args = {}
 
@@ -375,7 +375,7 @@ class SlackClient(WebClient):
         return await self.files_upload(file=file, content=content, **args)
 
     async def get_bot_user_identity(
-            self, activity: Activity # pylint: disable=unused-argument
+        self, activity: Activity  # pylint: disable=unused-argument
     ) -> str:
         return self.identity
 
@@ -409,7 +409,7 @@ class SlackClient(WebClient):
         if message.blocks:
             request_content["blocks"] = json.dumps(message.blocks)
 
-        session = aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=30), )
+        session = aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=30),)
 
         http_verb = "POST"
         api_url = POST_EPHEMERAL_MESSAGE_URL if message.ephemeral else POST_MESSAGE_URL
