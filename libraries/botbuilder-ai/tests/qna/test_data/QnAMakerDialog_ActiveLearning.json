@@ -1,0 +1,65 @@
+{
+    "answers": [
+        {
+            "questions": [
+                "Esper seeks"
+            ],
+            "answer": "Esper seeks. She's a curious little explorer. Young toddlers seek out new adventures, expanding their knowledge base. It's their job to test limits, to learn about them. It's the adult's job to enforce the limits, while also allowing room for exploration",
+            "score": 79.65,
+            "id": 35,
+            "source": "Editorial",
+            "isDocumentText": false,
+            "metadata": [],
+            "context": {
+                "isContextOnly": false,
+                "prompts": []
+            }
+        },
+        {
+            "questions": [
+                "Esper sups"
+            ],
+            "answer": "Esper sups. She eats just about anything. She loves her broccoli. Anything that she sees her parents eating, she wants to part take in herself.\n\nCaution though. If she spots you eating dessert, you best be prepared to share with her. Best to wait until she goes down for bed and then sneak your favorite snack in, without her prying eyes.",
+            "score": 79.65,
+            "id": 36,
+            "source": "Editorial",
+            "isDocumentText": false,
+            "metadata": [],
+            "context": {
+                "isContextOnly": false,
+                "prompts": []
+            }
+        },
+        {
+            "questions": [
+                "Esper screams"
+            ],
+            "answer": "Esper screams. The currently 1-year old toddler has a brain that's rapidly developing, expanding to new abilities at an alarming rate. With it may come fright or possibly frustration as they understand what could be done, however they need to master how to do a task themselves",
+            "score": 66.89,
+            "id": 34,
+            "source": "Editorial",
+            "isDocumentText": false,
+            "metadata": [],
+            "context": {
+                "isContextOnly": false,
+                "prompts": []
+            }
+        },
+        {
+            "questions": [
+                "Esper sleeps"
+            ],
+            "answer": "Esper sleeps. Esper sleeps on her floor bed. She never had a crib, as her parents placed her directly on the floor bed since birth. With this comes the benefit of not having to have an awkward transition period from crib to bed, when she gets old enough.\n\nThe idea of using the bed is that it offers the child more freedom to move about--more autonomy. Downside is, they will definitely wander off the bed, when they don't want to sleep",
+            "score": 65.71,
+            "id": 33,
+            "source": "Editorial",
+            "isDocumentText": false,
+            "metadata": [],
+            "context": {
+                "isContextOnly": false,
+                "prompts": []
+            }
+        }
+    ],
+    "activeLearningEnabled": true
+}
