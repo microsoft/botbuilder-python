@@ -1,0 +1,20 @@
+{
+    "answers": [
+        {
+            "questions": [
+                "Bald Eagle"
+            ],
+            "answer": "Apparently these guys aren't actually bald!",
+            "score": 100.0,
+            "id": 38,
+            "source": "Editorial",
+            "isDocumentText": false,
+            "metadata": [],
+            "context": {
+                "isContextOnly": true,
+                "prompts": []
+            }
+        }
+    ],
+    "activeLearningEnabled": true
+}
