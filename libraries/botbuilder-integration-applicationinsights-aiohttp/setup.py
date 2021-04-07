@@ -6,7 +6,7 @@ from setuptools import setup
 
 REQUIRES = [
     "applicationinsights>=0.11.9",
-    "aiohttp==3.6.2",
+    "aiohttp>=3.6.2,<3.8.0",
     "botbuilder-schema==4.13.0",
     "botframework-connector==4.13.0",
     "botbuilder-core==4.13.0",
