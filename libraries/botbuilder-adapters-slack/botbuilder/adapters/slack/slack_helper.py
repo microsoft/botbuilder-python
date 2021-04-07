@@ -58,19 +58,28 @@ class SlackHelper:
 
                     elif att.content_type == "application/vnd.microsoft.card.hero":
                         message.blocks = [
-                            {"type": "section",
-                             "text": {"type": "mrkdwn", "text": att.content.text}
-                             },
-                            {"type": "actions",
-                             "elements": [{"type": "button",
-                                           "text": {"type": "plain_text", "text": i.title},
-                                           "value": i.value} for i in att.content.buttons]
-                             }
+                            {
+                                "type": "section",
+                                "text": {"type": "mrkdwn", "text": att.content.text},
+                            },
+                            {
+                                "type": "actions",
+                                "elements": [
+                                    {
+                                        "type": "button",
+                                        "text": {"type": "plain_text", "text": i.title},
+                                        "value": i.value,
+                                    }
+                                    for i in att.content.buttons
+                                ],
+                            },
                         ]
 
                     else:
                         new_attachment = Attachment(
-                            author_name=att.name, thumb_url=att.thumbnail_url, text="",
+                            author_name=att.name,
+                            thumb_url=att.thumbnail_url,
+                            text="",
                         )
                         attachments.append(new_attachment)
 
@@ -138,9 +147,13 @@ class SlackHelper:
 
         activity = Activity(
             channel_id="slack",
-            conversation=ConversationAccount(id=payload.channel.get("id"), properties={}),
+            conversation=ConversationAccount(
+                id=payload.channel.get("id"), properties={}
+            ),
             from_property=ChannelAccount(
-                id=payload.message.bot_id if payload.message.bot_id else payload.user.get("id")
+                id=payload.message.bot_id
+                if payload.message.bot_id
+                else payload.user.get("id")
             ),
             recipient=ChannelAccount(),
             channel_data=payload,
@@ -182,13 +195,17 @@ class SlackHelper:
                 id=event.channel if event.channel else event.channel_id, properties={}
             ),
             from_property=ChannelAccount(
-                id=event.bot_id if event.bot_id else event.user_id if event.user_id else event.user
+                id=event.bot_id
+                if event.bot_id
+                else event.user_id
+                if event.user_id
+                else event.user
             ),
             recipient=ChannelAccount(id=None),
             channel_data=event,
             text=event.text,
             type=ActivityTypes.event,
-            timestamp=datetime.fromtimestamp(float(event.event_ts), tz=timezone.utc)
+            timestamp=datetime.fromtimestamp(float(event.event_ts), tz=timezone.utc),
         )
 
         if event.thread_ts:
