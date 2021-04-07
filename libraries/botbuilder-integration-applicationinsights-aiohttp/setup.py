@@ -7,10 +7,10 @@ from setuptools import setup
 REQUIRES = [
     "applicationinsights>=0.11.9",
     "aiohttp>=3.6.2,<3.8.0",
-    "botbuilder-schema==4.12.0",
-    "botframework-connector==4.12.0",
-    "botbuilder-core==4.12.0",
-    "botbuilder-applicationinsights==4.12.0",
+    "botbuilder-schema==4.13.0",
+    "botframework-connector==4.13.0",
+    "botbuilder-core==4.13.0",
+    "botbuilder-applicationinsights==4.13.0",
 ]
 TESTS_REQUIRES = [
     "aiounittest==1.3.0",
