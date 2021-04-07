@@ -12,60 +12,30 @@ from botbuilder.dialogs.choices import (
     ListStyle,
 )
 from .prompt import Prompt
+from .prompt_culture_models import PromptCultureModels
 from .prompt_options import PromptOptions
 from .prompt_recognizer_result import PromptRecognizerResult
 
 
 class ConfirmPrompt(Prompt):
-    # TODO: Fix to reference recognizer to use proper constants
-    choice_defaults: Dict[str, object] = {
-        "Spanish": (
-            Choice("Si"),
-            Choice("No"),
-            ChoiceFactoryOptions(", ", " o ", ", o ", True),
-        ),
-        "Dutch": (
-            Choice("Ja"),
-            Choice("Nee"),
-            ChoiceFactoryOptions(", ", " of ", ", of ", True),
-        ),
-        "English": (
-            Choice("Yes"),
-            Choice("No"),
-            ChoiceFactoryOptions(", ", " or ", ", or ", True),
-        ),
-        "French": (
-            Choice("Oui"),
-            Choice("Non"),
-            ChoiceFactoryOptions(", ", " ou ", ", ou ", True),
-        ),
-        "German": (
-            Choice("Ja"),
-            Choice("Nein"),
-            ChoiceFactoryOptions(", ", " oder ", ", oder ", True),
-        ),
-        "Japanese": (
-            Choice("はい"),
-            Choice("いいえ"),
-            ChoiceFactoryOptions("、 ", " または ", "、 または ", True),
-        ),
-        "Portuguese": (
-            Choice("Sim"),
-            Choice("Não"),
-            ChoiceFactoryOptions(", ", " ou ", ", ou ", True),
-        ),
-        "Chinese": (
-            Choice("是的"),
-            Choice("不"),
-            ChoiceFactoryOptions("， ", " 要么 ", "， 要么 ", True),
-        ),
+    _default_choice_options: Dict[str, object] = {
+        c.locale: (
+            Choice(c.yes_in_language),
+            Choice(c.no_in_language),
+            ChoiceFactoryOptions(c.separator, c.inline_or, c.inline_or_more, True),
+        )
+        for c in PromptCultureModels.get_supported_cultures()
     }
 
     # TODO: PromptValidator
     def __init__(
-        self, dialog_id: str, validator: object = None, default_locale: str = None
+        self,
+        dialog_id: str,
+        validator: object = None,
+        default_locale: str = None,
+        choice_defaults: Dict[str, object] = None,
     ):
-        super(ConfirmPrompt, self).__init__(dialog_id, validator)
+        super().__init__(dialog_id, validator)
         if dialog_id is None:
             raise TypeError("ConfirmPrompt(): dialog_id cannot be None.")
         # TODO: Port ListStyle
@@ -74,6 +44,9 @@ class ConfirmPrompt(Prompt):
         self.default_locale = default_locale
         self.choice_options = None
         self.confirm_choices = None
+
+        if choice_defaults is not None:
+            self._default_choice_options = choice_defaults
 
     async def on_prompt(
         self,
@@ -89,8 +62,8 @@ class ConfirmPrompt(Prompt):
 
         # Format prompt to send
         channel_id = turn_context.activity.channel_id
-        culture = self.determine_culture(turn_context.activity)
-        defaults = self.choice_defaults[culture]
+        culture = self._determine_culture(turn_context.activity)
+        defaults = self._default_choice_options[culture]
         choice_opts = (
             self.choice_options if self.choice_options is not None else defaults[2]
         )
@@ -125,7 +98,7 @@ class ConfirmPrompt(Prompt):
             utterance = turn_context.activity.text
             if not utterance:
                 return result
-            culture = self.determine_culture(turn_context.activity)
+            culture = self._determine_culture(turn_context.activity)
             results = recognize_boolean(utterance, culture)
             if results:
                 first = results[0]
@@ -135,7 +108,7 @@ class ConfirmPrompt(Prompt):
             else:
                 # First check whether the prompt was sent to the user with numbers
                 # if it was we should recognize numbers
-                defaults = self.choice_defaults[culture]
+                defaults = self._default_choice_options[culture]
                 opts = (
                     self.choice_options
                     if self.choice_options is not None
@@ -161,12 +134,13 @@ class ConfirmPrompt(Prompt):
 
         return result
 
-    def determine_culture(self, activity: Activity) -> str:
+    def _determine_culture(self, activity: Activity) -> str:
         culture = (
-            activity.locale if activity.locale is not None else self.default_locale
+            PromptCultureModels.map_to_nearest_language(activity.locale)
+            or self.default_locale
+            or PromptCultureModels.English.locale
         )
-        if not culture or culture not in self.choice_defaults:
-            culture = (
-                "English"  # TODO: Fix to reference recognizer to use proper constants
-            )
+        if not culture or not self._default_choice_options.get(culture):
+            culture = PromptCultureModels.English.locale
+
         return culture
