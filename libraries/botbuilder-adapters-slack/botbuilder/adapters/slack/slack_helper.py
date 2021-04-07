@@ -55,6 +55,19 @@ class SlackHelper:
                 for att in activity.attachments:
                     if att.name == "blocks":
                         message.blocks = att.content
+
+                    elif att.content_type == "application/vnd.microsoft.card.hero":
+                        message.blocks = [
+                            {"type": "section",
+                             "text": {"type": "mrkdwn", "text": att.content.text}
+                             },
+                            {"type": "actions",
+                             "elements": [{"type": "button",
+                                           "text": {"type": "plain_text", "text": i.title},
+                                           "value": i.value} for i in att.content.buttons]
+                             }
+                        ]
+
                     else:
                         new_attachment = Attachment(
                             author_name=att.name, thumb_url=att.thumbnail_url, text="",
