@@ -1,5 +1,5 @@
-from botbuilder.adapters.slack.slack_text import SlackText
 from typing import Optional
+from botbuilder.adapters.slack.slack_text import SlackText
 
 
 # Slack action block (https://api.slack.com/reference/block-kit/block-elements)
