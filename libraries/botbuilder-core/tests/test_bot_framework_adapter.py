@@ -12,6 +12,7 @@ from botbuilder.core import (
     BotFrameworkAdapterSettings,
     TurnContext,
 )
+from botbuilder.core.invoke_response import InvokeResponse
 from botbuilder.schema import (
     Activity,
     ActivityTypes,
@@ -22,6 +23,13 @@ from botbuilder.schema import (
     DeliveryModes,
     ExpectedReplies,
     CallerIdConstants,
+    SignInConstants,
+    TokenExchangeInvokeRequest,
+    TokenExchangeInvokeResponse,
+)
+from botframework.connector.token_api.models import (
+    TokenExchangeRequest,
+    TokenResponse as ConnectorTokenResponse,
 )
 from botframework.connector.aio import ConnectorClient
 from botframework.connector.auth import (
@@ -188,6 +196,31 @@ class AdapterUnderTest(BotFrameworkAdapter):
         )
 
         return self.connector_client_mock
+
+    async def _create_token_api_client(
+        self, context: TurnContext, oauth_app_credentials: AppCredentials = None
+    ):
+        client = await super()._create_token_api_client(context, oauth_app_credentials)
+
+        def mock_exchange_async(
+            user_id,  # pylint: disable=unused-argument
+            connection_name,
+            channel_id,
+            uri=None,  # pylint: disable=unused-argument
+            token=None,
+            custom_headers=None,  # pylint: disable=unused-argument
+            raw=False,  # pylint: disable=unused-argument
+            **operation_config,  # pylint: disable=unused-argument
+        ):
+            return ConnectorTokenResponse(
+                channel_id=channel_id,
+                connection_name=connection_name,
+                token=token,
+                expiration=None,
+            )
+
+        client.user_token.exchange_async = mock_exchange_async
+        return client
 
 
 async def process_activity(
@@ -730,4 +763,125 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
         assert (
             adapter.connector_client_mock.conversations.send_to_conversation.call_count
             == 3
+        )
+
+    async def test_process_activity_with_identity_token_exchange_invoke_response(self):
+        mock_credential_provider = unittest.mock.create_autospec(CredentialProvider)
+
+        settings = BotFrameworkAdapterSettings(
+            app_id="bot_id", credential_provider=mock_credential_provider,
+        )
+        adapter = AdapterUnderTest(settings)
+
+        identity = ClaimsIdentity(
+            claims={
+                AuthenticationConstants.AUDIENCE_CLAIM: "bot_id",
+                AuthenticationConstants.APP_ID_CLAIM: "bot_id",
+                AuthenticationConstants.VERSION_CLAIM: "1.0",
+            },
+            is_authenticated=True,
+        )
+
+        inbound_activity = Activity(
+            type=ActivityTypes.invoke,
+            name=SignInConstants.token_exchange_operation_name,
+            service_url="http://tempuri.org/whatever",
+            delivery_mode=DeliveryModes.normal,
+            conversation=ConversationAccount(id="conversationId"),
+            value=TokenExchangeInvokeRequest(
+                id="token_exchange_id",
+                token="token",
+                connection_name="connection_name",
+            ),
+        )
+
+        async def callback(context: TurnContext):
+            activity = Activity(
+                type=ActivityTypes.invoke_response,
+                value=InvokeResponse(
+                    status=200,
+                    body=TokenExchangeInvokeResponse(
+                        id=context.activity.value.id,
+                        connection_name=context.activity.value.connection_name,
+                    ),
+                ),
+            )
+
+            await context.send_activity(activity)
+
+        invoke_response = await adapter.process_activity_with_identity(
+            inbound_activity, identity, callback,
+        )
+
+        assert invoke_response
+        assert invoke_response.status == 200
+        assert invoke_response.body["id"] == inbound_activity.value.id
+        assert (
+            invoke_response.body["connectionName"]
+            == inbound_activity.value.connection_name
+        )
+
+    async def test_exchange_token_from_credentials(self):
+        mock_credential_provider = unittest.mock.create_autospec(CredentialProvider)
+
+        settings = BotFrameworkAdapterSettings(
+            app_id="bot_id", credential_provider=mock_credential_provider,
+        )
+        adapter = AdapterUnderTest(settings)
+
+        identity = ClaimsIdentity(
+            claims={
+                AuthenticationConstants.AUDIENCE_CLAIM: "bot_id",
+                AuthenticationConstants.APP_ID_CLAIM: "bot_id",
+                AuthenticationConstants.VERSION_CLAIM: "1.0",
+            },
+            is_authenticated=True,
+        )
+
+        inbound_activity = Activity(
+            type=ActivityTypes.invoke,
+            name=SignInConstants.token_exchange_operation_name,
+            service_url="http://tempuri.org/whatever",
+            conversation=ConversationAccount(id="conversationId"),
+            value=TokenExchangeInvokeRequest(
+                id="token_exchange_id",
+                token="token",
+                connection_name="connection_name",
+            ),
+        )
+
+        async def callback(context):
+            result = await adapter.exchange_token_from_credentials(
+                turn_context=context,
+                oauth_app_credentials=None,
+                connection_name=context.activity.value.connection_name,
+                exchange_request=TokenExchangeRequest(
+                    token=context.activity.value.token, uri=context.activity.service_url
+                ),
+                user_id="user_id",
+            )
+
+            activity = Activity(
+                type=ActivityTypes.invoke_response,
+                value=InvokeResponse(
+                    status=200,
+                    body=TokenExchangeInvokeResponse(
+                        id=context.activity.value.id,
+                        connection_name=result.connection_name,
+                    ),
+                ),
+            )
+
+            await context.send_activity(activity)
+
+        invoke_response = await adapter.process_activity_with_identity(
+            inbound_activity, identity, callback,
+        )
+
+        assert invoke_response
+        assert invoke_response.status == 200
+        assert invoke_response.body["id"] == inbound_activity.value.id
+        assert (
+            invoke_response.body["connectionName"]
+            == inbound_activity.value.connection_name
         )
