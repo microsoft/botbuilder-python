@@ -30,6 +30,7 @@ from .message_factory import MessageFactory
 from .middleware_set import AnonymousReceiveMiddleware, Middleware, MiddlewareSet
 from .null_telemetry_client import NullTelemetryClient
 from .private_conversation_state import PrivateConversationState
+from .queue_storage import QueueStorage
 from .recognizer import Recognizer
 from .recognizer_result import RecognizerResult, TopIntent
 from .show_typing_middleware import ShowTypingMiddleware
@@ -77,6 +78,7 @@ __all__ = [
     "MiddlewareSet",
     "NullTelemetryClient",
     "PrivateConversationState",
+    "QueueStorage",
     "RegisterClassMiddleware",
     "Recognizer",
     "RecognizerResult",
