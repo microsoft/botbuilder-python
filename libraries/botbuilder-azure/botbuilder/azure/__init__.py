@@ -6,6 +6,7 @@
 # --------------------------------------------------------------------------
 
 from .about import __version__
+from .azure_queue_storage import AzureQueueStorage
 from .cosmosdb_storage import CosmosDbStorage, CosmosDbConfig, CosmosDbKeyEscape
 from .cosmosdb_partitioned_storage import (
     CosmosDbPartitionedStorage,
@@ -14,6 +15,7 @@ from .cosmosdb_partitioned_storage import (
 from .blob_storage import BlobStorage, BlobStorageSettings
 
 __all__ = [
+    "AzureQueueStorage",
     "BlobStorage",
     "BlobStorageSettings",
     "CosmosDbStorage",
