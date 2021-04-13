@@ -8,6 +8,8 @@ REQUIRES = [
     "botbuilder-schema==4.13.0",
     "botbuilder-core==4.13.0",
     "botbuilder-dialogs==4.13.0",
+    "botbuilder-azure==4.13.0",
+    "pytest~=6.2.3",
 ]
 
 TESTS_REQUIRES = ["aiounittest==1.3.0"]
