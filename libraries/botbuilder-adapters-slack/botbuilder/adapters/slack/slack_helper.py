@@ -124,24 +124,35 @@ class SlackHelper:
 
         activity = Activity(
             channel_id="slack",
-            conversation=ConversationAccount(id=payload.channel.id, properties={}),
+            conversation=ConversationAccount(id=payload.channel["id"], properties={}),
             from_property=ChannelAccount(
-                id=payload.message.bot_id if payload.message.bot_id else payload.user.id
+                id=payload.message.bot_id
+                if payload.message.bot_id
+                else payload.user["id"]
             ),
             recipient=ChannelAccount(),
             channel_data=payload,
             text=None,
             type=ActivityTypes.event,
+            value=payload,
         )
 
         if payload.thread_ts:
             activity.conversation.properties["thread_ts"] = payload.thread_ts
 
-        if payload.actions and (
-            payload.type == "block_actions" or payload.type == "interactive_message"
-        ):
-            activity.type = ActivityTypes.message
-            activity.text = payload.actions.value
+        if payload.actions:
+            action = payload.actions[0]
+
+            if action["type"] == "button":
+                activity.text = action["value"]
+            elif action["type"] == "select":
+                selected_option = action["selected_options"]
+                activity.text = selected_option["value"] if selected_option else None
+            elif action["type"] == "static_select":
+                activity.text = action["selected_options"]["value"]
+
+            if activity.text:
+                activity.type = ActivityTypes.message
 
         return activity
 
@@ -176,26 +187,27 @@ class SlackHelper:
             type=ActivityTypes.event,
         )
 
-        if event.thread_ts:
-            activity.conversation.properties["thread_ts"] = event.thread_ts
-
         if not activity.conversation.id:
             if event.item and event.item_channel:
                 activity.conversation.id = event.item_channel
             else:
                 activity.conversation.id = event.team
 
-        activity.recipient.id = await client.get_bot_user_by_team(activity=activity)
+        activity.recipient.id = await client.get_bot_user_identity(activity=activity)
 
-        # If this is a message originating from a user, we'll mark it as such
-        # If this is a message from a bot (bot_id != None), we want to ignore it by
-        # leaving the activity type as Event.  This will stop it from being included in dialogs,
-        # but still allow the Bot to act on it if it chooses (via ActivityHandler.on_event_activity).
-        # NOTE: This catches a message from ANY bot, including this bot.
-        # Note also, bot_id here is not the same as bot_user_id so we can't (yet) identify messages
-        # originating from this bot without doing an additional API call.
+        if event.thread_ts:
+            activity.conversation.properties["thread_ts"] = event.thread_ts
+
         if event.type == "message" and not event.subtype and not event.bot_id:
-            activity.type = ActivityTypes.message
+            if not event.subtype:
+                activity.type = ActivityTypes.message
+                activity.text = event.text
+
+            activity.conversation.properties["channel_type"] = event.channel_type
+            activity.value = event
+        else:
+            activity.name = event.type
+            activity.value = event
 
         return activity
 
@@ -226,9 +238,11 @@ class SlackHelper:
             channel_data=body,
             text=body.text,
             type=ActivityTypes.event,
+            name="Command",
+            value=body.command,
         )
 
-        activity.recipient.id = await client.get_bot_user_by_team(activity)
+        activity.recipient.id = await client.get_bot_user_identity(activity)
         activity.conversation.properties["team"] = body.team_id
 
         return activity

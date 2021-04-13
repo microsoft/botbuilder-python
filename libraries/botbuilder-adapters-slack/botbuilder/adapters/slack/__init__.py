@@ -6,7 +6,7 @@
 # --------------------------------------------------------------------------
 
 from .about import __version__
-from .slack_options import SlackAdapterOptions
+from .slack_client_options import SlackClientOptions
 from .slack_client import SlackClient
 from .slack_adapter import SlackAdapter
 from .slack_payload import SlackPayload
@@ -15,10 +15,11 @@ from .slack_event import SlackEvent
 from .activity_resourceresponse import ActivityResourceResponse
 from .slack_request_body import SlackRequestBody
 from .slack_helper import SlackHelper
+from .slack_adatper_options import SlackAdapterOptions
 
 __all__ = [
     "__version__",
-    "SlackAdapterOptions",
+    "SlackClientOptions",
     "SlackClient",
     "SlackAdapter",
     "SlackPayload",
@@ -27,4 +28,5 @@ __all__ = [
     "ActivityResourceResponse",
     "SlackRequestBody",
     "SlackHelper",
+    "SlackAdapterOptions",
 ]
