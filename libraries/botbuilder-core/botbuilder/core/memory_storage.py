@@ -67,7 +67,7 @@ class MemoryStorage(Storage):
                     old_state_etag is not None
                     and new_value_etag is not None
                     and new_value_etag != "*"
-                    and new_value_etag < old_state_etag
+                    and new_value_etag != old_state_etag
                 ):
                     raise KeyError(
                         "Etag conflict.\nOriginal: %s\r\nCurrent: %s"
