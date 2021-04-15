@@ -5,6 +5,7 @@ import traceback
 
 from http import HTTPStatus
 from typing import Awaitable, Callable
+from botframework.connector.channels import Channels
 
 from botframework.connector.token_api.models import (
     TokenResponse,
@@ -33,7 +34,7 @@ class _TokenStoreItem(StoreItem):
         super().__init__(**kwargs)
 
     @staticmethod
-    def get_storagge_key(turn_context: TurnContext):
+    def get_storage_key(turn_context: TurnContext):
         activity = turn_context.activity
         if not activity.channel_id:
             raise TypeError("invalid activity-missing channel_id")
@@ -91,7 +92,10 @@ class TeamsSSOTokenExchangeMiddleware(Middleware):
     async def on_turn(
         self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]
     ):
-        if context.activity.name == SignInConstants.token_exchange_operation_name:
+        if (
+            context.activity.channel_id == Channels.ms_teams
+            and context.activity.name == SignInConstants.token_exchange_operation_name
+        ):
             # If the TokenExchange is NOT successful, the response will have already been sent by _exchanged_token
             if not await self._exchanged_token(context):
                 return
@@ -108,7 +112,7 @@ class TeamsSSOTokenExchangeMiddleware(Middleware):
         # Create a StoreItem with Etag of the unique 'signin/tokenExchange' request
         store_item = _TokenStoreItem(e_tag=turn_context.activity.value.get("id", None))
 
-        store_items = {_TokenStoreItem.get_storagge_key(turn_context): store_item}
+        store_items = {_TokenStoreItem.get_storage_key(turn_context): store_item}
         try:
             # Writing the IStoreItem with ETag of unique id will succeed only once
             await self._storage.write(store_items)
