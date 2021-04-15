@@ -170,7 +170,6 @@ class TeamsSSOTokenExchangeMiddleware(Middleware):
                 )
         except:
             traceback.print_exc()
-            pass
         if not token_exchange_response or not token_exchange_response.token:
             # The token could not be exchanged (which could be due to a consent requirement)
             # Notify the sender that PreconditionFailed so they can respond accordingly.
