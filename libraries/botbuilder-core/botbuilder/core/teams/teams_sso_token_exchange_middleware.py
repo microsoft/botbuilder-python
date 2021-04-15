@@ -119,9 +119,7 @@ class TeamsSSOTokenExchangeMiddleware(Middleware):
         except Exception as error:
             # Memory storage throws a generic exception with a Message of 'Etag conflict. [other error info]'
             # CosmosDbPartitionedStorage throws: ex.Message.Contains("precondition is not met")
-            if "Etag conflict" in str(error) or "precondition is not met" in str(
-                error
-            ):
+            if "Etag conflict" in str(error) or "precondition is not met" in str(error):
                 # Do NOT proceed processing self message, some other thread or machine already has processed it.
 
                 # Send 200 invoke response.
