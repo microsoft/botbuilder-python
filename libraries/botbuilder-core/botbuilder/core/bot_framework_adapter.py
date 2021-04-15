@@ -512,7 +512,9 @@ class BotFrameworkAdapter(
                 return InvokeResponse(status=int(HTTPStatus.NOT_IMPLEMENTED))
             return InvokeResponse(
                 status=invoke_response.value.status,
-                body=invoke_response.value.body.serialize(),
+                body=invoke_response.value.body.serialize()
+                if invoke_response.value.body
+                else None,
             )
 
         return None
@@ -1278,7 +1280,7 @@ class BotFrameworkAdapter(
                 token=result.token,
                 expiration=result.expiration,
             )
-        raise TypeError(f"exchange_async returned improper result: {type(result)}")
+        raise TypeError(f"exchange token returned improper result: {type(result)}")
 
     @staticmethod
     def key_for_connector_client(service_url: str, app_id: str, scope: str):
