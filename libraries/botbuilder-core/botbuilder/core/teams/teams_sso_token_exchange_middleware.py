@@ -118,8 +118,8 @@ class TeamsSSOTokenExchangeMiddleware(Middleware):
             await self._storage.write(store_items)
         except Exception as error:
             # Memory storage throws a generic exception with a Message of 'Etag conflict. [other error info]'
-            # CosmosDbPartitionedStorage throws: ex.Message.Contains("pre-condition is not met")
-            if "Etag conflict" in str(error) or "pre-condition is not met" in str(
+            # CosmosDbPartitionedStorage throws: ex.Message.Contains("precondition is not met")
+            if "Etag conflict" in str(error) or "precondition is not met" in str(
                 error
             ):
                 # Do NOT proceed processing self message, some other thread or machine already has processed it.
