@@ -88,6 +88,9 @@ class HttpRequestUtils:
             "Ocp-Apim-Subscription-Key": f"EndpointKey {endpoint.endpoint_key}",
         }
 
+        if "v5.0-preview.1" in endpoint.host:
+            headers["Ocp-Apim-Subscription-Key"] = endpoint.endpoint_key
+
         return headers
 
     def _get_user_agent(self):
