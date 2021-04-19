@@ -36,6 +36,7 @@ from botframework.connector.token_api.models import (
     TokenStatus,
     TokenExchangeRequest,
     SignInUrlResponse,
+    TokenResponse as ConnectorTokenResponse,
 )
 from botbuilder.schema import (
     Activity,
@@ -509,7 +510,12 @@ class BotFrameworkAdapter(
             )
             if invoke_response is None:
                 return InvokeResponse(status=int(HTTPStatus.NOT_IMPLEMENTED))
-            return invoke_response.value
+            return InvokeResponse(
+                status=invoke_response.value.status,
+                body=invoke_response.value.body.serialize()
+                if invoke_response.value.body
+                else None,
+            )
 
         return None
 
@@ -1267,9 +1273,14 @@ class BotFrameworkAdapter(
             exchange_request.token,
         )
 
-        if isinstance(result, TokenResponse):
-            return result
-        raise TypeError(f"exchange_async returned improper result: {type(result)}")
+        if isinstance(result, ConnectorTokenResponse):
+            return TokenResponse(
+                channel_id=result.channel_id,
+                connection_name=result.connection_name,
+                token=result.token,
+                expiration=result.expiration,
+            )
+        raise TypeError(f"exchange token returned improper result: {type(result)}")
 
     def can_process_outgoing_activity(
         self, activity: Activity  # pylint: disable=unused-argument

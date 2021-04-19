@@ -1,0 +1,32 @@
+{
+    "answers": [
+        {
+            "questions": [
+                "Tell me about birds",
+                "What do you know about birds"
+            ],
+            "answer": "Choose one of the following birds to get more info",
+            "score": 100.0,
+            "id": 37,
+            "source": "Editorial",
+            "isDocumentText": false,
+            "metadata": [],
+            "context": {
+                "isContextOnly": false,
+                "prompts": [
+                    {
+                        "displayOrder": 1,
+                        "qnaId": 38,
+                        "displayText": "Bald Eagle"
+                    },
+                    {
+                        "displayOrder": 2,
+                        "qnaId": 39,
+                        "displayText": "Hummingbird"
+                    }
+                ]
+            }
+        }
+    ],
+    "activeLearningEnabled": true
+}
