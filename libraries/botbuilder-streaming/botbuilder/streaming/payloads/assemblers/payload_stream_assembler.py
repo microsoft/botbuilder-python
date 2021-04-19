@@ -32,7 +32,7 @@ class PayloadStreamAssembler(Assembler):
         return streaming.PayloadStream(self)
 
     def get_payload_as_stream(self) -> "streaming.PayloadStream":
-        if not self._stream:
+        if self._stream is None:
             self._stream = self.create_stream_from_payload()
 
         return self._stream
