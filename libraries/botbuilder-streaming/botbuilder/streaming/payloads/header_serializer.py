@@ -65,7 +65,7 @@ class HeaderSerializer:
         buffer[HeaderSerializer.END_OFFSET] = (
             HeaderSerializer.END if header.end else HeaderSerializer.NOT_END
         )
-        buffer[HeaderSerializer.TERMINATOR_OFFSET] = HeaderSerializer.DELIMITER
+        buffer[HeaderSerializer.TERMINATOR_OFFSET] = HeaderSerializer.TERMINATOR
 
         return TransportConstants.MAX_HEADER_LENGTH
 
@@ -153,7 +153,7 @@ class HeaderSerializer:
 
     @staticmethod
     def _uuid_to_numeric_encoded_str(value: UUID) -> bytes:
-        return str(int(value)).encode("ascii")
+        return str(value).encode("ascii")
 
     @staticmethod
     def _binary_int_to_char(binary_int: int) -> str:

@@ -18,10 +18,10 @@ class ResponseMessageStreamDisassembler(PayloadDisassembler):
 
     @property
     def type(self) -> str:
-        return PayloadTypes.REQUEST
+        return PayloadTypes.STREAM
 
     async def get_stream(self) -> List[int]:
-        # TODO: align logic below to the shape of content_stream.content
-        stream: List[int] = list(str(self.content_stream.content).encode())
+        # TODO: check if bypass is correct here or if serialization should take place.
+        # this is redundant -->stream: List[int] = list(str(self.content_stream.content).encode())
 
-        return stream
+        return self.content_stream.content
