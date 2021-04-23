@@ -10,7 +10,7 @@ from botbuilder.streaming.payloads.assemblers import PayloadStreamAssembler
 class PayloadStream:
     def __init__(self, assembler: PayloadStreamAssembler):
         self._assembler = assembler
-        self._buffer: List[int] = []
+        self._buffer_queue: List[List[int]] = []
         self._lock = Lock()
         self._data_available = Semaphore(0)
         self._producer_length = 0  # total length
@@ -20,10 +20,11 @@ class PayloadStream:
         self._end = False
 
     def __len__(self):
-        return len(self._buffer)
+        return _producer_length
 
     def give_buffer(self, buffer: List[int]):
-        self._buffer.extend(buffer)
+        self._buffer_queue.append(buffer)
+        self._producer_length += len(buffer)
 
         self._data_available.release()
 
@@ -41,8 +42,7 @@ class PayloadStream:
         if not self._active:
             await self._data_available.acquire()
             async with self._lock:
-                self._active.extend(self._buffer)
-                self._buffer = []
+                self._active = self._buffer_queue.pop(0)
 
         available_count = min(len(self._active) - self._active_offset, count)
 

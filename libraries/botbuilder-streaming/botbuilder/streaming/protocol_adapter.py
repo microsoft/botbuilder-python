@@ -55,9 +55,9 @@ class ProtocolAdapter:
         response_task = self._request_manager.get_response(request_id)
         request_task = self._send_operations.send_request(request_id, request)
 
-        [request, _] = await asyncio.gather(request_task, response_task)
+        [_, response] = await asyncio.gather(request_task, response_task)
 
-        return request
+        return response
 
     async def _on_receive_request(self, identifier: UUID, request: ReceiveRequest):
         # request is done, we can handle it

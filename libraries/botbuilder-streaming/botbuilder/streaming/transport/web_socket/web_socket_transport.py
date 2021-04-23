@@ -44,21 +44,16 @@ class WebSocketTransport(TransportReceiverBase, TransportSenderBase):
     # TODO: considering to create a BFTransportBuffer class to abstract the logic of binary buffers adapting to
     #  current interfaces
     async def receive(
-        self, buffer: List[int], offset: int = None, count: int = None
+        self, buffer: List[int], offset: int = 0, count: int = None
     ) -> int:
         try:
             if self._socket:
                 result = await self._socket.receive()
-                buffer_index = buffer.index(None) if None in buffer else 0
-                result_index = 0
-                while (
-                    buffer_index < len(buffer)
-                    and result_index < len(result.data)
-                    and result_index < count
-                ):
+                buffer_index = offset
+                result_length = count if count is not None else len(result.data)
+                for result_index in range(result_length):
                     buffer[buffer_index] = result.data[result_index]
                     buffer_index += 1
-                    result_index += 1
                 if result.message_type == WebSocketMessageType.CLOSE:
                     await self._socket.close(
                         WebSocketCloseStatus.NORMAL_CLOSURE, "Socket closed"
@@ -68,7 +63,7 @@ class WebSocketTransport(TransportReceiverBase, TransportSenderBase):
                     if self._socket.status == WebSocketState.CLOSED:
                         self._socket.dispose()
 
-                return len(result.data)
+                return result_length
         except Exception as error:
             # Exceptions of the three types below will also have set the socket's state to closed, which fires an
             # event consumers of this class are subscribed to and have handling around. Any other exception needs to
