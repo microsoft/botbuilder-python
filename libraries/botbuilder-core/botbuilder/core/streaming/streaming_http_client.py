@@ -32,9 +32,7 @@ class StreamingProtocolClientResponse(AsyncClientResponse):
         """Return the whole body as bytes in memory.
         """
         if not self._body:
-            raise ValueError(
-                "Body is not available. Call async method load_body, or do your call with stream=False."
-            )
+            return bytes([])
         return self._body
 
     async def load_body(self) -> None:

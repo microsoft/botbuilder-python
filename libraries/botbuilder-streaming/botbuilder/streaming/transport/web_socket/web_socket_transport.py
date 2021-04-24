@@ -18,7 +18,6 @@ class WebSocketTransport(TransportReceiverBase, TransportSenderBase):
 
     @property
     def is_connected(self):
-        print("Getting value")
         # TODO: mock logic
         return self._socket.status == WebSocketState.OPEN
 
@@ -71,12 +70,14 @@ class WebSocketTransport(TransportReceiverBase, TransportSenderBase):
             raise error
 
     # TODO: might need to remove offset and count if no segmentation possible (or put them in BFTransportBuffer)
-    async def send(
-        self, buffer: List[int], offset: int = None, count: int = None
-    ) -> int:
+    async def send(self, buffer: List[int], offset: int = 0, count: int = None) -> int:
         try:
             if self._socket:
-                await self._socket.send(buffer, WebSocketMessageType.BINARY, True)
+                await self._socket.send(
+                    buffer[offset:count] if count is not None else buffer,
+                    WebSocketMessageType.BINARY,
+                    True,
+                )
                 return count or len(buffer)
         except Exception as error:
             # Exceptions of the three types below will also have set the socket's state to closed, which fires an

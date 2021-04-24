@@ -18,6 +18,7 @@ class ReceiveResponse:
     ) -> Union[Model, Serializable]:
         try:
             body_str = self.read_body_as_str()
+            body = None
 
             if issubclass(cls, Serializable):
                 body = cls().from_json(body_str)

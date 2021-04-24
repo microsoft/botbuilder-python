@@ -199,10 +199,7 @@ class StreamingRequestHandler(RequestHandler):
                     "Error while attempting to send: Streaming transport is disconnected."
                 )
 
-            server_response = await self._server.send(request)
-
-            if server_response.status_code == HTTPStatus.OK:
-                return server_response.read_body_as_json(ReceiveResponse)
+            return await self._server.send(request)
         except Exception:
             # TODO: remove printing and log it
             traceback.print_exc()

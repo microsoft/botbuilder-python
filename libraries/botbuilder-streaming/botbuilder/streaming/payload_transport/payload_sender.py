@@ -138,7 +138,6 @@ class PayloadSender:
                         # TODO: this has to be improved in custom buffer class (validate buffer ended)
                         for index in range(count):
                             self._send_content_buffer[index] = packet.payload[index]
-                        count = len(self._send_content_buffer)
 
                         # Send: Packet content
                         length = await self._sender.send(
