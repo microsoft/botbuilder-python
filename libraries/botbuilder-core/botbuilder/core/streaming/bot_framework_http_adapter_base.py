@@ -4,7 +4,6 @@
 from http import HTTPStatus
 from typing import Awaitable, Callable, List
 
-from aiohttp import ClientSession
 from botbuilder.core import (
     Bot,
     BotFrameworkAdapter,
@@ -24,7 +23,6 @@ from botframework.connector.auth import (
 from .streaming_activity_processor import StreamingActivityProcessor
 from .streaming_request_handler import StreamingRequestHandler
 from .streaming_http_client import StreamingHttpDriver
-from .aiohttp_web_socket import AiohttpWebSocket
 
 
 class BotFrameworkHttpAdapterBase(BotFrameworkAdapter, StreamingActivityProcessor):
@@ -80,54 +78,7 @@ class BotFrameworkHttpAdapterBase(BotFrameworkAdapter, StreamingActivityProcesso
         return None
 
     async def send_streaming_activity(self, activity: Activity) -> ResourceResponse:
-        # Check to see if any of this adapter's StreamingRequestHandlers is associated with this conversation.
-        possible_handlers = [
-            handler
-            for handler in self.request_handlers
-            if handler.service_url == activity.service_url
-            and handler.has_conversation(activity.conversation.id)
-        ]
-
-        if possible_handlers:
-            if len(possible_handlers) > 1:
-                # The conversation has moved to a new connection and the former
-                # StreamingRequestHandler needs to be told to forget about it.
-                possible_handlers.sort(
-                    key=lambda handler: handler.conversation_added_time(
-                        activity.conversation.id
-                    )
-                )
-                correct_handler = possible_handlers[-1]
-                for handler in possible_handlers:
-                    if handler is not correct_handler:
-                        handler.forget_conversation(activity.conversation.id)
-
-                return await correct_handler.send_activity(activity)
-
-            return await possible_handlers[0].send_activity(activity)
-
-        if self.connected_bot:
-            # This is a proactive message that will need a new streaming connection opened.
-            # The ServiceUrl of a streaming connection follows the pattern "url:[ChannelName]:[Protocol]:[Host]".
-
-            uri = activity.service_url.split(":")
-            protocol = uri[len(uri) - 2]
-            host = uri[len(uri) - 1]
-            # TODO: discuss if should abstract this from current package
-            # TODO: manage life cycle of sessions (when should we close them)
-            session = ClientSession()
-            aiohttp_ws = await session.ws_connect(protocol + host + "/api/messages")
-            web_socket = AiohttpWebSocket(aiohttp_ws, session)
-            handler = StreamingRequestHandler(self.connected_bot, self, web_socket)
-
-            if self.request_handlers is None:
-                self.request_handlers = []
-
-            self.request_handlers.append(handler)
-
-            return await handler.send_activity(activity)
-
-        return None
+        raise NotImplementedError()
 
     def can_process_outgoing_activity(self, activity: Activity) -> bool:
         if not activity:
