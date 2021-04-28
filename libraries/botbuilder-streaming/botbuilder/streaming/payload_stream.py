@@ -20,7 +20,7 @@ class PayloadStream:
         self._end = False
 
     def __len__(self):
-        return _producer_length
+        return self._producer_length
 
     def give_buffer(self, buffer: List[int]):
         self._buffer_queue.append(buffer)
