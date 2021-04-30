@@ -39,10 +39,8 @@ class AttachmentPrompt(Prompt):
             )
 
         if is_retry and options.retry_prompt:
-            options.retry_prompt.input_hint = InputHints.expecting_input
             await turn_context.send_activity(options.retry_prompt)
         elif options.prompt:
-            options.prompt.input_hint = InputHints.expecting_input
             await turn_context.send_activity(options.prompt)
 
     async def on_recognize(
