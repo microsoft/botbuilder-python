@@ -88,6 +88,7 @@ class PayloadReceiver:
 
     async def _receive_packets(self):
         is_closed = False
+        disconnect_args = None
 
         while self._receiver and self._receiver.is_connected and not is_closed:
             # receive a single packet

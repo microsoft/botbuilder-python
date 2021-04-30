@@ -27,7 +27,7 @@ class SendQueue:
         while True:
             try:
                 while True:
-                    await sleep(1)
+                    await sleep(0.2)
                     item = await self._queue.get()
                     try:
                         await self._action(item)
