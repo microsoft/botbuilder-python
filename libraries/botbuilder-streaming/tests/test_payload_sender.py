@@ -40,13 +40,15 @@ class TestPayloadSender(aiounittest.AsyncTestCase):
         sender = MockTransportSender()
         sut.connect(sender)
 
-        headerId: UUID = uuid4()
-        header = Header(type="A", id=headerId, end=True)
+        header_id: UUID = uuid4()
+        header = Header(type="A", id=header_id, end=True)
         header.payload_length = 3
         payload = [1, 2, 3]
 
-        async def mock_sent_callback(h: Header):
-            print(f"{h.type}.{h.payload_length}.{h.id}.{h.end}")
+        async def mock_sent_callback(callback_header: Header):
+            print(
+                f"{callback_header.type}.{callback_header.payload_length}.{callback_header.id}.{callback_header.end}"
+            )
 
         # Act
         sut.send_payload(
