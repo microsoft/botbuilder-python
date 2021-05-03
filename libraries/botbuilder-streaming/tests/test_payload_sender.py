@@ -29,7 +29,7 @@ class MockTransportSender(TransportSenderBase):
 
         return count
 
-    async def close(self):
+    def close(self):
         pass
 
 
