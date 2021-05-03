@@ -49,7 +49,9 @@ class TestPayloadSender(aiounittest.AsyncTestCase):
             print(f"{h.type}.{h.payload_length}.{h.id}.{h.end}")
 
         # Act
-        sut.send_payload(header, payload, is_length_known=True, sent_callback=mock_sent_callback)
+        sut.send_payload(
+            header, payload, is_length_known=True, sent_callback=mock_sent_callback
+        )
 
         # Assert
         await sender.send_called.acquire()
