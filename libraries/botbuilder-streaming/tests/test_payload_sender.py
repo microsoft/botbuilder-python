@@ -53,3 +53,4 @@ class TestPayloadSender(aiounittest.AsyncTestCase):
 
         # Assert
         await sender.send_called.acquire()
+        await sut.disconnect()
