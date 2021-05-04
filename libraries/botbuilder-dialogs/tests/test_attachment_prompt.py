@@ -77,7 +77,7 @@ class AttachmentPromptTests(aiounittest.AsyncTestCase):
         prompt_activity = Activity(
             type=ActivityTypes.message,
             text="please add an attachment.",
-            input_hint=InputHints.accepting_input
+            input_hint=InputHints.accepting_input,
         )
 
         async def exec_test(turn_context: TurnContext):
@@ -86,9 +86,7 @@ class AttachmentPromptTests(aiounittest.AsyncTestCase):
             results = await dialog_context.continue_dialog()
 
             if results.status == DialogTurnStatus.Empty:
-                options = PromptOptions(
-                    prompt=copy.copy(prompt_activity)
-                )
+                options = PromptOptions(prompt=copy.copy(prompt_activity))
                 await dialog_context.prompt("AttachmentPrompt", options)
             elif results.status == DialogTurnStatus.Complete:
                 attachment = results.result[0]
