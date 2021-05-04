@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import copy
 import aiounittest
 from botbuilder.dialogs.prompts import (
     AttachmentPrompt,
@@ -17,8 +18,6 @@ from botbuilder.core import (
 )
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.dialogs import DialogSet, DialogTurnStatus
-
-import copy
 
 
 class AttachmentPromptTests(aiounittest.AsyncTestCase):

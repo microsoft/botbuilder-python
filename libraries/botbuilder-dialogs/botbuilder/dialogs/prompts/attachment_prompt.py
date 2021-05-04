@@ -3,7 +3,7 @@
 
 from typing import Callable, Dict
 
-from botbuilder.schema import ActivityTypes, InputHints
+from botbuilder.schema import ActivityTypes
 from botbuilder.core import TurnContext
 
 from .prompt import Prompt, PromptValidatorContext
