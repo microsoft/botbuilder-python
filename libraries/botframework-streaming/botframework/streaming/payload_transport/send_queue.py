@@ -3,7 +3,7 @@
 
 import traceback
 
-from asyncio import Queue, ensure_future, sleep
+from asyncio import Queue, ensure_future
 from typing import Awaitable, Callable
 
 
