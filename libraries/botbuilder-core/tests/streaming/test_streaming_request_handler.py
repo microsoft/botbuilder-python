@@ -7,7 +7,7 @@ from typing import Any
 import aiounittest
 
 from botbuilder.core.streaming import StreamingRequestHandler
-from botbuilder.streaming.transport.web_socket import (
+from botframework.streaming.transport.web_socket import (
     WebSocket,
     WebSocketState,
     WebSocketCloseStatus,

@@ -10,7 +10,7 @@ from msrest.universal_http.async_abc import AsyncClientResponse
 from msrest.universal_http.async_requests import (
     AsyncRequestsHTTPSender as AsyncRequestsHTTPDriver,
 )
-from botbuilder.streaming import StreamingRequest, ReceiveResponse
+from botframework.streaming import StreamingRequest, ReceiveResponse
 
 from .streaming_request_handler import StreamingRequestHandler
 

@@ -3,7 +3,7 @@
 
 import json
 
-from botbuilder.streaming.payloads.models import Serializable
+from botframework.streaming.payloads.models import Serializable
 
 
 class VersionInfo(Serializable):

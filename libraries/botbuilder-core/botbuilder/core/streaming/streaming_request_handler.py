@@ -11,7 +11,7 @@ from typing import Dict, List
 
 from botbuilder.core import Bot
 from botbuilder.schema import Activity, Attachment, ResourceResponse
-from botbuilder.streaming import (
+from botframework.streaming import (
     RequestHandler,
     ReceiveRequest,
     ReceiveResponse,
@@ -20,8 +20,8 @@ from botbuilder.streaming import (
     __title__,
     __version__,
 )
-from botbuilder.streaming.transport import DisconnectedEventArgs
-from botbuilder.streaming.transport.web_socket import WebSocket, WebSocketServer
+from botframework.streaming.transport import DisconnectedEventArgs
+from botframework.streaming.transport.web_socket import WebSocket, WebSocketServer
 
 from .streaming_activity_processor import StreamingActivityProcessor
 from .version_info import VersionInfo

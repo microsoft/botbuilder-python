@@ -9,7 +9,7 @@ from typing import Any, Optional, Union
 from aiohttp import ClientWebSocketResponse, WSMsgType, ClientSession
 from aiohttp.web import WebSocketResponse
 
-from botbuilder.streaming.transport.web_socket import (
+from botframework.streaming.transport.web_socket import (
     WebSocket,
     WebSocketMessage,
     WebSocketCloseStatus,
