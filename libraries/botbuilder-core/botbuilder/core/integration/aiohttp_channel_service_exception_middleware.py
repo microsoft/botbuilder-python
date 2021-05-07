@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import traceback
+
 from aiohttp.web import (
     middleware,
     HTTPNotImplemented,
@@ -26,4 +28,5 @@ async def aiohttp_error_middleware(request, handler):
     except KeyError:
         raise HTTPNotFound()
     except Exception:
+        traceback.print_exc()
         raise HTTPInternalServerError()

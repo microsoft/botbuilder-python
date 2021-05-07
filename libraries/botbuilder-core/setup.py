@@ -37,6 +37,7 @@ setup(
         "botbuilder.core.inspection",
         "botbuilder.core.integration",
         "botbuilder.core.skills",
+        "botbuilder.core.streaming",
         "botbuilder.core.teams",
         "botbuilder.core.oauth",
     ],

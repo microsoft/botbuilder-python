@@ -42,6 +42,7 @@ setup(
     packages=[
         "botbuilder.integration.aiohttp",
         "botbuilder.integration.aiohttp.skills",
+        "botbuilder.integration.aiohttp.streaming",
     ],
     install_requires=REQUIRES,
     classifiers=[
