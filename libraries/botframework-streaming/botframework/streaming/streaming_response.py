@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 import json
+from http import HTTPStatus
 from uuid import UUID, uuid4
 from typing import List, Union
 
@@ -12,7 +13,7 @@ from botframework.streaming.payloads.models import Serializable
 
 class StreamingResponse:
     def __init__(
-        self, *, status_code: int = None, streams: List[ResponseMessageStream] = None
+        self, *, status_code: int = 0, streams: List[ResponseMessageStream] = None
     ):
         self.status_code = status_code
         self.streams = streams
@@ -48,3 +49,19 @@ class StreamingResponse:
             response.add_stream(body)
 
         return response
+
+    @staticmethod
+    def not_found(body: object = None) -> "StreamingResponse":
+        return StreamingResponse.create_response(HTTPStatus.NOT_FOUND, body)
+
+    @staticmethod
+    def forbidden(body: object = None) -> "StreamingResponse":
+        return StreamingResponse.create_response(HTTPStatus.FORBIDDEN, body)
+
+    @staticmethod
+    def ok(body: object = None) -> "StreamingResponse":
+        return StreamingResponse.create_response(HTTPStatus.OK, body)
+
+    @staticmethod
+    def internal_server_error(body: object = None) -> "StreamingResponse":
+        return StreamingResponse.create_response(HTTPStatus.INTERNAL_SERVER_ERROR, body)
