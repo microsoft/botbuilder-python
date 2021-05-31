@@ -185,9 +185,9 @@ class SkillHandler(ChannelServiceHandler):
                 conversation_id
             )
         except NotImplementedError:
-            self._logger.warning(
-                "Got NotImplementedError when trying to call get_skill_conversation_reference() on the SkillConversationIdFactory, attempting to use deprecated get_conversation_reference() method instead."
-            )
+            # self._logger.warning(
+            #     "Got NotImplementedError when trying to call get_skill_conversation_reference() on the SkillConversationIdFactory, attempting to use deprecated get_conversation_reference() method instead."
+            # )
 
             # Attempt to get SkillConversationReference using deprecated method.
             # this catch should be removed once we remove the deprecated method. 

@@ -56,7 +56,7 @@ class ConversationIdFactoryBase(ABC):
         """
         raise NotImplementedError()
 
-    @abstractmethod
+    # @abstractmethod
     async def get_skill_conversation_reference(
         self, skill_conversation_id: str
     ) -> SkillConversationReference:
