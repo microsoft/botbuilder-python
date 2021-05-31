@@ -20,8 +20,7 @@ from botframework.connector.auth import (
     JwtTokenValidation,
 )
 from .skill_conversation_reference import SkillConversationReference
-from .conversation_id_factory import ConversationIdFactoryBase
-
+from .skill_conversation_id_factory import SkillConversationIdFactory
 
 class SkillHandler(ChannelServiceHandler):
 
@@ -33,7 +32,7 @@ class SkillHandler(ChannelServiceHandler):
         self,
         adapter: BotAdapter,
         bot: Bot,
-        conversation_id_factory: ConversationIdFactoryBase,
+        conversation_id_factory: SkillConversationIdFactory,
         credential_provider: CredentialProvider,
         auth_configuration: AuthenticationConfiguration,
         channel_provider: ChannelProvider = None,
