@@ -21,39 +21,68 @@ class SkillConversationIdFactory(ConversationIdFactoryBase):
         self,
         options: SkillConversationIdFactoryOptions
     ) -> str:
+        """
+        Creates a new `SkillConversationReference`.
+
+        :param options: Creation options to use when creating the `SkillConversationReference`.
+        :type options: :class:`botbuilder.core.skills.SkillConversationIdFactoryOptions`
+        :return: ID of the created `SkillConversationReference`.
+        """
+
         if not options:
-            raise TypeError("SkillConversationIdFactory() options can't be None")
+            raise TypeError("options can't be None")
 
         conversation_reference = TurnContext.get_conversation_reference(options.activity)
 
         skill_conversation_id = str(uuid())
 
+        # Create the SkillConversationReference instance.
         skill_conversation_reference = SkillConversationReference(
             conversation_reference=ConversationReference(conversation_reference),
             oauth_scope=options.from_bot_oauth_scope
         )
 
+        # Store the SkillConversationReference using the skill_conversation_id as a key.
         skill_conversation_info = { [skill_conversation_id]: skill_conversation_reference }
 
         await self._storage.write(skill_conversation_info)
 
+        # Return the generated skill_conversation_id (that will be also used as the conversation ID to call the skill).
         return skill_conversation_id
 
-    async def get_conversation_reference(
+    async def get_skill_conversation_reference(
         self, 
         skill_conversation_id: str
     ) -> SkillConversationReference:
+        """
+        Retrieve a `SkillConversationReference` with the specified ID.
+
+        :param skill_conversation_id: The ID of the `SkillConversationReference` to retrieve.
+        :type skill_conversation_id: str
+        :return: `SkillConversationReference` for the specified ID; None if not found.
+        """
+
         if not skill_conversation_id:
             raise TypeError("skill_conversation_id can't be None")
 
+        # Get the SkillConversationReference from storage for the given skill_conversation_id.
         skill_conversation_reference = await self._storage.read([skill_conversation_id])
-        if not skill_conversation_reference:
-            raise TypeError("skill_conversation_reference")
 
-        return SkillConversationReference(skill_conversation_reference)
+        if skill_conversation_reference:
+            return SkillConversationReference(skill_conversation_reference)
+
+        return None
 
     async def delete_conversation_reference(
         self,
         skill_conversation_id: str
     ):
+        """
+        Deletes the `SkillConversationReference` with the specified ID.
+
+        :param skill_conversation_id: The ID of the `SkillConversationReference` to be deleted.
+        :type skill_conversation_id: str
+        """
+
+        # Delete the SkillConversationReference from storage.
         await self._storage.delete([skill_conversation_id])

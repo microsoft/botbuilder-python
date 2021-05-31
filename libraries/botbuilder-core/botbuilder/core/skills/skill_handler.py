@@ -20,7 +20,7 @@ from botframework.connector.auth import (
     JwtTokenValidation,
 )
 from .skill_conversation_reference import SkillConversationReference
-from .skill_conversation_id_factory import SkillConversationIdFactory
+from .conversation_id_factory import ConversationIdFactoryBase
 
 class SkillHandler(ChannelServiceHandler):
 
@@ -32,7 +32,7 @@ class SkillHandler(ChannelServiceHandler):
         self,
         adapter: BotAdapter,
         bot: Bot,
-        conversation_id_factory: SkillConversationIdFactory,
+        conversation_id_factory: ConversationIdFactoryBase,
         credential_provider: CredentialProvider,
         auth_configuration: AuthenticationConfiguration,
         channel_provider: ChannelProvider = None,
@@ -180,20 +180,24 @@ class SkillHandler(ChannelServiceHandler):
     async def _get_skill_conversation_reference(
         self, conversation_id: str
     ) -> SkillConversationReference:
-        # Get the SkillsConversationReference
-        conversation_reference_result = await self._conversation_id_factory.get_conversation_reference(
-            conversation_id
-        )
+        try:
+            skill_conversation_reference = await self._conversation_id_factory.get_skill_conversation_reference(
+                conversation_id
+            )
+        except NotImplementedError:
+            self._logger.warning(
+                "Got NotImplementedError when trying to call get_skill_conversation_reference() on the SkillConversationIdFactory, attempting to use deprecated get_conversation_reference() method instead."
+            )
 
-        # ConversationIdFactory can return either a SkillConversationReference (the newer way),
-        # or a ConversationReference (the old way, but still here for compatibility).  If a
-        # ConversationReference is returned, build a new SkillConversationReference to simplify
-        # the remainder of this method.
-        if isinstance(conversation_reference_result, SkillConversationReference):
-            skill_conversation_reference: SkillConversationReference = conversation_reference_result
-        else:
+            # Attempt to get SkillConversationReference using deprecated method.
+            # this catch should be removed once we remove the deprecated method. 
+            # We need to use the deprecated method for backward compatibility.
+            conversation_reference = await self._conversation_id_factory.get_conversation_reference(
+                conversation_id
+            )
+
             skill_conversation_reference: SkillConversationReference = SkillConversationReference(
-                conversation_reference=conversation_reference_result,
+                conversation_reference=conversation_reference,
                 oauth_scope=(
                     GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
                     if self._channel_provider and self._channel_provider.is_government()

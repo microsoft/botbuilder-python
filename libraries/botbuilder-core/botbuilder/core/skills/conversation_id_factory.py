@@ -44,16 +44,28 @@ class ConversationIdFactoryBase(ABC):
     @abstractmethod
     async def get_conversation_reference(
         self, skill_conversation_id: str
-    ) -> Union[SkillConversationReference, ConversationReference]:
+    ) -> ConversationReference:
+        """
+        [DEPRECATED] Method is deprecated, please use get_skill_conversation_reference() instead.
+
+        Retrieves a :class:`ConversationReference` using a conversation id passed in.
+
+        :param skill_conversation_id: The conversation id for which to retrieve the :class:`ConversationReference`.
+        :type skill_conversation_id: str
+        :returns: `ConversationReference` for the specified ID.
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    async def get_skill_conversation_reference(
+        self, skill_conversation_id: str
+    ) -> SkillConversationReference:
         """
         Retrieves a :class:`SkillConversationReference` using a conversation id passed in.
 
         :param skill_conversation_id: The conversation id for which to retrieve the :class:`SkillConversationReference`.
         :type skill_conversation_id: str
-
-        .. note::
-            SkillConversationReference is the preferred return type, while the :class:`SkillConversationReference`
-            type is provided for backwards compatability.
+        :returns: `SkillConversationReference` for the specified ID.
         """
         raise NotImplementedError()
 
