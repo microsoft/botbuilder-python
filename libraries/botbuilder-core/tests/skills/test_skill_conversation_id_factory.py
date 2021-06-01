@@ -33,13 +33,13 @@ class SkillConversationIdFactoryForTest(AsyncTestCase):
         skill_conversation_id = await self._skill_conversation_id_factory.create_skill_conversation_id(
             options= SkillConversationIdFactoryOptions(
                 activity=self._build_message_activity(conversation_reference),
-                bot_framework_skill=self._build_bot_framework_skill,
+                bot_framework_skill=self._build_bot_framework_skill(),
                 from_bot_id=self._bot_id,
                 from_bot_oauth_scope=self._bot_id
             )
         )
 
-        self.assertFalse(skill_conversation_id == None, "Expected a valid skill conversation ID to be created")
+        assert skill_conversation_id and skill_conversation_id.strip(), "Expected a valid skill conversation ID to be created"
 
         # Retrieve skill conversation
         retrieved_conversation_reference = await self._skill_conversation_id_factory.get_skill_conversation_reference(skill_conversation_id)
@@ -108,5 +108,5 @@ class SkillConversationIdFactoryForTest(AsyncTestCase):
         return BotFrameworkSkill(
             app_id=self._application_id,
             id=self.SKILL_ID,
-            skill_endpoint=""
+            skill_endpoint=self.SERVICE_URL
         )

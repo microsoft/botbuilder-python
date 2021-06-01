@@ -1,10 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import json
 from uuid import uuid4 as uuid
 from botbuilder.core import TurnContext, Storage
-from botbuilder.schema import ConversationReference
 from .conversation_id_factory import ConversationIdFactoryBase
 from .skill_conversation_id_factory_options import SkillConversationIdFactoryOptions
 from .skill_conversation_reference import SkillConversationReference

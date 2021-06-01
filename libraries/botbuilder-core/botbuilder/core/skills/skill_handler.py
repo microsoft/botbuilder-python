@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 from uuid import uuid4
+from logging import Logger, getLogger
 
 from botbuilder.core import Bot, BotAdapter, ChannelServiceHandler, TurnContext
 from botbuilder.schema import (
@@ -36,7 +37,7 @@ class SkillHandler(ChannelServiceHandler):
         credential_provider: CredentialProvider,
         auth_configuration: AuthenticationConfiguration,
         channel_provider: ChannelProvider = None,
-        logger: object = None,
+        logger: Logger = None,
     ):
         super().__init__(credential_provider, auth_configuration, channel_provider)
 
@@ -50,7 +51,7 @@ class SkillHandler(ChannelServiceHandler):
         self._adapter = adapter
         self._bot = bot
         self._conversation_id_factory = conversation_id_factory
-        self._logger = logger
+        self._logger = logger or getLogger()
 
     async def on_send_to_conversation(
         self, claims_identity: ClaimsIdentity, conversation_id: str, activity: Activity,
@@ -185,9 +186,9 @@ class SkillHandler(ChannelServiceHandler):
                 conversation_id
             )
         except NotImplementedError:
-            # self._logger.warning(
-            #     "Got NotImplementedError when trying to call get_skill_conversation_reference() on the SkillConversationIdFactory, attempting to use deprecated get_conversation_reference() method instead."
-            # )
+            self._logger.warning(
+                "Got NotImplementedError when trying to call get_skill_conversation_reference() on the SkillConversationIdFactory, attempting to use deprecated get_conversation_reference() method instead."
+            )
 
             # Attempt to get SkillConversationReference using deprecated method.
             # this catch should be removed once we remove the deprecated method. 
