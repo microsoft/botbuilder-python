@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from abc import ABC, abstractmethod
+from abc import ABC
 from typing import Union
 from botbuilder.schema import ConversationReference
 from .skill_conversation_id_factory_options import SkillConversationIdFactoryOptions
@@ -17,7 +17,6 @@ class ConversationIdFactoryBase(ABC):
         SkillConversationReferences and deletion.
     """
 
-    @abstractmethod
     async def create_skill_conversation_id(
         self,
         options_or_conversation_reference: Union[
@@ -41,7 +40,6 @@ class ConversationIdFactoryBase(ABC):
         """
         raise NotImplementedError()
 
-    # @abstractmethod
     async def get_conversation_reference(
         self, skill_conversation_id: str
     ) -> ConversationReference:
@@ -56,7 +54,6 @@ class ConversationIdFactoryBase(ABC):
         """
         raise NotImplementedError()
 
-    # @abstractmethod
     async def get_skill_conversation_reference(
         self, skill_conversation_id: str
     ) -> SkillConversationReference:
@@ -69,7 +66,6 @@ class ConversationIdFactoryBase(ABC):
         """
         raise NotImplementedError()
 
-    @abstractmethod
     async def delete_conversation_reference(self, skill_conversation_id: str):
         """
         Removes any reference to objects keyed on the conversation id passed in.

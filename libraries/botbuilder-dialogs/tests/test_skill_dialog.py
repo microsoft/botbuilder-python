@@ -43,7 +43,9 @@ from botbuilder.dialogs import (
 )
 
 
-class SimpleConversationIdFactory(ConversationIdFactoryBase):
+class SimpleConversationIdFactory(
+    ConversationIdFactoryBase
+):  # pylint: disable=abstract-method
     def __init__(self):
         self.conversation_refs = {}
         self.create_count = 0

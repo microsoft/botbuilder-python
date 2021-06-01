@@ -23,6 +23,7 @@ from botframework.connector.auth import (
 from .skill_conversation_reference import SkillConversationReference
 from .conversation_id_factory import ConversationIdFactoryBase
 
+
 class SkillHandler(ChannelServiceHandler):
 
     SKILL_CONVERSATION_REFERENCE_KEY = (
@@ -187,11 +188,13 @@ class SkillHandler(ChannelServiceHandler):
             )
         except NotImplementedError:
             self._logger.warning(
-                "Got NotImplementedError when trying to call get_skill_conversation_reference() on the SkillConversationIdFactory, attempting to use deprecated get_conversation_reference() method instead."
+                "Got NotImplementedError when trying to call get_skill_conversation_reference() "
+                "on the SkillConversationIdFactory, attempting to use deprecated "
+                "get_conversation_reference() method instead."
             )
 
             # Attempt to get SkillConversationReference using deprecated method.
-            # this catch should be removed once we remove the deprecated method. 
+            # this catch should be removed once we remove the deprecated method.
             # We need to use the deprecated method for backward compatibility.
             conversation_reference = await self._conversation_id_factory.get_conversation_reference(
                 conversation_id

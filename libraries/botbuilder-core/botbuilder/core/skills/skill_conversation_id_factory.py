@@ -6,6 +6,8 @@ from botbuilder.core import TurnContext, Storage
 from .conversation_id_factory import ConversationIdFactoryBase
 from .skill_conversation_id_factory_options import SkillConversationIdFactoryOptions
 from .skill_conversation_reference import SkillConversationReference
+from .skill_conversation_reference import ConversationReference
+
 
 class SkillConversationIdFactory(ConversationIdFactoryBase):
     def __init__(self, storage: Storage):
@@ -14,9 +16,8 @@ class SkillConversationIdFactory(ConversationIdFactoryBase):
 
         self._storage = storage
 
-    async def create_skill_conversation_id(
-        self,
-        options: SkillConversationIdFactoryOptions
+    async def create_skill_conversation_id(  # pylint: disable=arguments-differ
+        self, options: SkillConversationIdFactoryOptions
     ) -> str:
         """
         Creates a new `SkillConversationReference`.
@@ -29,27 +30,33 @@ class SkillConversationIdFactory(ConversationIdFactoryBase):
         if not options:
             raise TypeError("options can't be None")
 
-        conversation_reference = TurnContext.get_conversation_reference(options.activity)
+        conversation_reference = TurnContext.get_conversation_reference(
+            options.activity
+        )
 
         skill_conversation_id = str(uuid())
 
         # Create the SkillConversationReference instance.
         skill_conversation_reference = SkillConversationReference(
             conversation_reference=conversation_reference,
-            oauth_scope=options.from_bot_oauth_scope
+            oauth_scope=options.from_bot_oauth_scope,
         )
 
         # Store the SkillConversationReference using the skill_conversation_id as a key.
-        skill_conversation_info = { skill_conversation_id: skill_conversation_reference }
+        skill_conversation_info = {skill_conversation_id: skill_conversation_reference}
 
         await self._storage.write(skill_conversation_info)
 
         # Return the generated skill_conversation_id (that will be also used as the conversation ID to call the skill).
         return skill_conversation_id
 
+    async def get_conversation_reference(
+        self, skill_conversation_id: str
+    ) -> ConversationReference:
+        return await super().get_conversation_reference(skill_conversation_id)
+
     async def get_skill_conversation_reference(
-        self, 
-        skill_conversation_id: str
+        self, skill_conversation_id: str
     ) -> SkillConversationReference:
         """
         Retrieve a `SkillConversationReference` with the specified ID.
@@ -67,10 +74,7 @@ class SkillConversationIdFactory(ConversationIdFactoryBase):
 
         return skill_conversation_reference.get(skill_conversation_id)
 
-    async def delete_conversation_reference(
-        self,
-        skill_conversation_id: str
-    ):
+    async def delete_conversation_reference(self, skill_conversation_id: str):
         """
         Deletes the `SkillConversationReference` with the specified ID.
 

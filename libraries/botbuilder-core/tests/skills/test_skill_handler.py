@@ -42,14 +42,18 @@ from botbuilder.schema import (
 )
 
 
-class ConversationIdFactoryForTest(ConversationIdFactoryBase):
+class ConversationIdFactoryForTest(
+    ConversationIdFactoryBase
+):  # pylint: disable=abstract-method
     def __init__(self):
         self._conversation_refs: Dict[str, str] = {}
 
     async def create_skill_conversation_id(  # pylint: disable=W0221
         self, options: SkillConversationIdFactoryOptions
     ) -> str:
-        conversation_reference = TurnContext.get_conversation_reference(options.activity)
+        conversation_reference = TurnContext.get_conversation_reference(
+            options.activity
+        )
 
         key = hashlib.md5(
             f"{conversation_reference.conversation.id}{conversation_reference.service_url}".encode()
@@ -57,7 +61,7 @@ class ConversationIdFactoryForTest(ConversationIdFactoryBase):
 
         skill_conversation_reference = SkillConversationReference(
             conversation_reference=conversation_reference,
-            oauth_scope=options.from_bot_oauth_scope
+            oauth_scope=options.from_bot_oauth_scope,
         )
 
         self._conversation_refs[key] = skill_conversation_reference
@@ -72,7 +76,10 @@ class ConversationIdFactoryForTest(ConversationIdFactoryBase):
     async def delete_conversation_reference(self, skill_conversation_id: str):
         pass
 
-class LegacyConversationIdFactoryForTest(ConversationIdFactoryBase):
+
+class LegacyConversationIdFactoryForTest(
+    ConversationIdFactoryBase
+):  # pylint: disable=abstract-method
     def __init__(self):
         self._conversation_refs: Dict[str, str] = {}
 
@@ -228,16 +235,18 @@ class TestSkillHandler(aiounittest.AsyncTestCase):
         skill = BotFrameworkSkill(
             app_id=cls.skill_id,
             id="skill",
-            skill_endpoint="http://testbot.com/api/messages"
+            skill_endpoint="http://testbot.com/api/messages",
         )
         cls._options = SkillConversationIdFactoryOptions(
             from_bot_oauth_scope=cls.bot_id,
             from_bot_id=cls.bot_id,
             activity=activity,
-            bot_framework_skill=skill
+            bot_framework_skill=skill,
         )
 
-    def create_skill_handler_for_testing(self, adapter, factory: ConversationIdFactoryBase = None) -> SkillHandlerInstanceForTests:
+    def create_skill_handler_for_testing(
+        self, adapter, factory: ConversationIdFactoryBase = None
+    ) -> SkillHandlerInstanceForTests:
         mock_bot = Mock()
         mock_bot.on_turn = MagicMock(return_value=Future())
         mock_bot.on_turn.return_value.set_result(Mock())
@@ -259,7 +268,9 @@ class TestSkillHandler(aiounittest.AsyncTestCase):
             service_url="http://testbot.com/api/messages",
         )
 
-        conversation_id = await legacy_factory.create_skill_conversation_id(conversation_reference)
+        conversation_id = await legacy_factory.create_skill_conversation_id(
+            conversation_reference
+        )
 
         async def continue_conversation(
             reference: ConversationReference,
@@ -289,10 +300,14 @@ class TestSkillHandler(aiounittest.AsyncTestCase):
         activity.apply_conversation_reference(conversation_reference)
 
         sut = self.create_skill_handler_for_testing(mock_adapter, legacy_factory)
-        await sut.test_on_send_to_conversation(self._claims_identity, conversation_id, activity)
+        await sut.test_on_send_to_conversation(
+            self._claims_identity, conversation_id, activity
+        )
 
     async def test_on_send_to_conversation(self):
-        conversation_id = await self._test_id_factory.create_skill_conversation_id(self._options)
+        conversation_id = await self._test_id_factory.create_skill_conversation_id(
+            self._options
+        )
 
         # python 3.7 doesn't support AsyncMock, change this when min ver is 3.8
         send_activities_called = False
@@ -357,7 +372,9 @@ class TestSkillHandler(aiounittest.AsyncTestCase):
                     assert resource_response.id == "resourceId"
 
     async def test_forwarding_on_send_to_conversation(self):
-        conversation_id = await self._test_id_factory.create_skill_conversation_id(self._options)
+        conversation_id = await self._test_id_factory.create_skill_conversation_id(
+            self._options
+        )
 
         resource_response_id = "rId"
 
@@ -392,7 +409,9 @@ class TestSkillHandler(aiounittest.AsyncTestCase):
 
     async def test_on_reply_to_activity(self):
         resource_response_id = "resourceId"
-        conversation_id = await self._test_id_factory.create_skill_conversation_id(self._options)
+        conversation_id = await self._test_id_factory.create_skill_conversation_id(
+            self._options
+        )
 
         types_to_test = [
             ActivityTypes.end_of_conversation,
@@ -457,7 +476,9 @@ class TestSkillHandler(aiounittest.AsyncTestCase):
                     mock_adapter.send_activities.assert_not_called()
 
     async def test_on_update_activity(self):
-        conversation_id = await self._test_id_factory.create_skill_conversation_id(self._options)
+        conversation_id = await self._test_id_factory.create_skill_conversation_id(
+            self._options
+        )
         resource_response_id = "resourceId"
         called_continue = False
         called_update = False
@@ -515,7 +536,9 @@ class TestSkillHandler(aiounittest.AsyncTestCase):
         assert resource_response, resource_response_id
 
     async def test_on_delete_activity(self):
-        conversation_id = await self._test_id_factory.create_skill_conversation_id(self._options)
+        conversation_id = await self._test_id_factory.create_skill_conversation_id(
+            self._options
+        )
 
         resource_response_id = "resourceId"
         called_continue = False
@@ -598,9 +621,7 @@ class TestSkillHandler(aiounittest.AsyncTestCase):
         sut = self.create_skill_handler_for_testing(mock_adapter)
 
         with self.assertRaises(BotActionNotImplementedError):
-            await sut.test_on_get_conversations(
-                self._claims_identity, conversation_id
-            )
+            await sut.test_on_get_conversations(self._claims_identity, conversation_id)
 
     async def test_on_get_conversation_members(self):
         conversation_id = ""
@@ -682,7 +703,9 @@ class TestSkillHandler(aiounittest.AsyncTestCase):
         )
 
     async def __activity_callback_test(self, activity: Activity):
-        conversation_id = await self._test_id_factory.create_skill_conversation_id(self._options)
+        conversation_id = await self._test_id_factory.create_skill_conversation_id(
+            self._options
+        )
 
         mock_adapter = Mock()
         mock_adapter.continue_conversation = MagicMock(return_value=Future())
