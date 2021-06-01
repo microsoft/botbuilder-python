@@ -1,14 +1,13 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from botbuilder.core import TurnContext, Storage
-from botbuilder.core.skills import (
-    ConversationIdFactoryBase,
-    SkillConversationIdFactoryOptions,
-    SkillConversationReference,
-)
-from botbuilder.schema import ConversationReference
+import json
 from uuid import uuid4 as uuid
+from botbuilder.core import TurnContext, Storage
+from botbuilder.schema import ConversationReference
+from .conversation_id_factory import ConversationIdFactoryBase
+from .skill_conversation_id_factory_options import SkillConversationIdFactoryOptions
+from .skill_conversation_reference import SkillConversationReference
 
 class SkillConversationIdFactory(ConversationIdFactoryBase):
     def __init__(self, storage: Storage):
@@ -38,12 +37,12 @@ class SkillConversationIdFactory(ConversationIdFactoryBase):
 
         # Create the SkillConversationReference instance.
         skill_conversation_reference = SkillConversationReference(
-            conversation_reference=ConversationReference(conversation_reference),
+            conversation_reference=conversation_reference,
             oauth_scope=options.from_bot_oauth_scope
         )
 
         # Store the SkillConversationReference using the skill_conversation_id as a key.
-        skill_conversation_info = { [skill_conversation_id]: skill_conversation_reference }
+        skill_conversation_info = { skill_conversation_id: skill_conversation_reference }
 
         await self._storage.write(skill_conversation_info)
 
@@ -68,10 +67,7 @@ class SkillConversationIdFactory(ConversationIdFactoryBase):
         # Get the SkillConversationReference from storage for the given skill_conversation_id.
         skill_conversation_reference = await self._storage.read([skill_conversation_id])
 
-        if skill_conversation_reference:
-            return SkillConversationReference(skill_conversation_reference)
-
-        return None
+        return skill_conversation_reference.get(skill_conversation_id)
 
     async def delete_conversation_reference(
         self,
