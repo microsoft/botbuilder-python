@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 from uuid import uuid4 as uuid
 from aiounittest import AsyncTestCase
 from botbuilder.core import MemoryStorage
