@@ -65,14 +65,14 @@ class SkillValidation:
         :param claims: A dict of claims.
         :return bool:
         """
-        if AuthenticationConstants.VERSION_CLAIM not in claims:
-            return False
-
         if (
             claims.get(AuthenticationConstants.APP_ID_CLAIM, None)
             == AuthenticationConstants.ANONYMOUS_SKILL_APP_ID
         ):
             return True
+
+        if AuthenticationConstants.VERSION_CLAIM not in claims:
+            return False
 
         audience = claims.get(AuthenticationConstants.AUDIENCE_CLAIM)
 
