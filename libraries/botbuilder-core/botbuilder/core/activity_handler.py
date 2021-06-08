@@ -456,11 +456,11 @@ class ActivityHandler(Bot):
                 return self._create_invoke_response()
 
             if turn_context.activity.name == "adaptiveCard/action":
-                invokeValue = self._get_adaptive_card_invoke_value(
+                invoke_value = self._get_adaptive_card_invoke_value(
                     turn_context.activity
                 )
                 return self._create_invoke_response(
-                    await self.on_adaptive_card_invoke(turn_context, invokeValue)
+                    await self.on_adaptive_card_invoke(turn_context, invoke_value)
                 )
 
             if turn_context.activity.name == "healthcheck":
@@ -531,9 +531,9 @@ class ActivityHandler(Bot):
             )
             raise _InvokeResponseException(HTTPStatus.BAD_REQUEST, response)
 
-        invokeValue = None
+        invoke_value = None
         try:
-            invokeValue = AdaptiveCardInvokeValue(**activity.value)
+            invoke_value = AdaptiveCardInvokeValue(**activity.value)
         except:
             response = self._create_adaptive_card_invoke_error_response(
                 HTTPStatus.BAD_REQUEST,
@@ -542,21 +542,21 @@ class ActivityHandler(Bot):
             )
             raise _InvokeResponseException(HTTPStatus.BAD_REQUEST, response)
 
-        if invokeValue.action is None:
+        if invoke_value.action is None:
             response = self._create_adaptive_card_invoke_error_response(
                 HTTPStatus.BAD_REQUEST, "BadRequest", "Missing action property"
             )
             raise _InvokeResponseException(HTTPStatus.BAD_REQUEST, response)
 
-        if invokeValue.action.get("type") != "Action.Execute":
+        if invoke_value.action.get("type") != "Action.Execute":
             response = self._create_adaptive_card_invoke_error_response(
                 HTTPStatus.BAD_REQUEST,
                 "NotSupported",
-                f"The action '{invokeValue.action.get('type')}' is not supported.",
+                f"The action '{invoke_value.action.get('type')}' is not supported.",
             )
             raise _InvokeResponseException(HTTPStatus.BAD_REQUEST, response)
 
-        return invokeValue
+        return invoke_value
 
     def _create_adaptive_card_invoke_error_response(
         self, status_code: HTTPStatus, code: str, message: str
