@@ -12,7 +12,7 @@ from botframework.streaming.payloads.assemblers import PayloadStreamAssembler
 class TestResponses(aiounittest.AsyncTestCase):
     async def test_content_stream_ctor_none_assembler_throws(self):
         with self.assertRaises(TypeError):
-            sut = ContentStream(uuid4(), None)
+            ContentStream(uuid4(), None)
 
     async def test_content_stream_id(self):
         test_id = uuid4()

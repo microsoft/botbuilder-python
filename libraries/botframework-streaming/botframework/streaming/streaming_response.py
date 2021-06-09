@@ -58,6 +58,7 @@ class StreamingResponse:
     def forbidden(body: object = None) -> "StreamingResponse":
         return StreamingResponse.create_response(HTTPStatus.FORBIDDEN, body)
 
+    # pylint: disable=invalid-name
     @staticmethod
     def ok(body: object = None) -> "StreamingResponse":
         return StreamingResponse.create_response(HTTPStatus.OK, body)

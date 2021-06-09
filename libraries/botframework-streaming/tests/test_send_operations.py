@@ -1,11 +1,11 @@
-import json
-from http import HTTPStatus
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 from typing import List
 from uuid import uuid4
 
 import aiounittest
 
-from botbuilder.schema import Activity
 from botframework.streaming import PayloadStream, StreamingRequest
 from botframework.streaming.payloads import SendOperations
 from botframework.streaming.payloads.assemblers import PayloadStreamAssembler
