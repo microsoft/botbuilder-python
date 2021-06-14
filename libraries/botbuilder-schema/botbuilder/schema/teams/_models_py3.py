@@ -2370,3 +2370,85 @@ class TaskModuleCardResponse(TaskModuleResponseBase):
 
     def _custom_init(self):
         return
+
+
+class MeetingDetails(Model):
+    """Specific details of a Teams meeting.
+
+    :param id: The meeting's Id, encoded as a BASE64 string.
+    :type id: str
+    :param ms_graph_resource_id: The MsGraphResourceId, used specifically for MS Graph API calls.
+    :type ms_graph_resource_id: str
+    :param scheduled_start_time: The meeting's scheduled start time, in UTC.
+    :type scheduled_start_time: str
+    :param scheduled_end_time: The meeting's scheduled end time, in UTC.
+    :type scheduled_end_time: str
+    :param join_url: The URL used to join the meeting.
+    :type join_url: str
+    :param title: The title of the meeting.
+    :type title: str
+    :param type: The meeting's type.
+    :type type: str
+    """
+
+    _attribute_map = {
+        "id": {"key": "uniqueId", "type": "str"},
+        "ms_graph_resource_id": {"key": "msGraphResourceId", "type": "str"},
+        "scheduled_start_time": {"key": "scheduledStartTime", "type": "str"},
+        "scheduled_end_time": {"key": "scheduledEndTime", "type": "str"},
+        "join_url": {"key": "joinUrl", "type": "str"},
+        "title": {"key": "title", "type": "str"},
+        "type": {"key": "type", "type": "str"},
+    }
+
+    def __init__(
+        self,
+        *,
+        id: str = None,
+        ms_graph_resource_id: str = None,
+        scheduled_start_time: str = None,
+        scheduled_end_time: str = None,
+        join_url: str = None,
+        title: str = None,
+        type: str = None,
+        **kwargs
+    ) -> None:
+        super(MeetingDetails, self).__init__(**kwargs)
+        self.id = id
+        self.ms_graph_resource_id = ms_graph_resource_id
+        self.scheduled_start_time = scheduled_start_time
+        self.scheduled_end_time = scheduled_end_time
+        self.join_url = join_url
+        self.title = title
+        self.type = type
+
+
+class MeetingInfo(Model):
+    """General information about a Teams meeting.
+
+    :param details: The specific details of a Teams meeting.
+    :type details: ~botframework.connector.teams.models.MeetingDetails
+    :param conversation: The Conversation Account for the meeting.
+    :type conversation: ~botbuilder.schema.models.ConversationAccount
+    :param organizer: The meeting's scheduled start time, in UTC.
+    :type organizer: ~botbuilder.schema.models.TeamsChannelAccount
+    """
+
+    _attribute_map = {
+        "details": {"key": "details", "type": "object"},
+        "conversation": {"key": "conversation", "type": "object"},
+        "organizer": {"key": "organizer", "type": "object"}
+    }
+
+    def __init__(
+        self,
+        *,
+        details: MeetingDetails = None,
+        conversation: ConversationAccount = None,
+        organizer: TeamsChannelAccount = None,
+        **kwargs
+    ) -> None:
+        super(MeetingInfo, self).__init__(**kwargs)
+        self.details = details
+        self.conversation = conversation
+        self.organizer = organizer
