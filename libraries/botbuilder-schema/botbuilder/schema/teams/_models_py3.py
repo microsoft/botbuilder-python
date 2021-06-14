@@ -2437,7 +2437,7 @@ class MeetingInfo(Model):
     _attribute_map = {
         "details": {"key": "details", "type": "object"},
         "conversation": {"key": "conversation", "type": "object"},
-        "organizer": {"key": "organizer", "type": "object"}
+        "organizer": {"key": "organizer", "type": "object"},
     }
 
     def __init__(

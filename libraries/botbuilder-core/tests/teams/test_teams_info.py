@@ -226,9 +226,7 @@ class TestTeamsInfo(aiounittest.AsyncTestCase):
             text="Test-get_meeting_info",
             channel_id=Channels.ms_teams,
             from_property=ChannelAccount(aad_object_id="participantId-1"),
-            channel_data={
-                "meeting": {"id": "meetingId-1"}
-            },
+            channel_data={"meeting": {"id": "meetingId-1"}},
             service_url="https://test.coffee",
         )
 

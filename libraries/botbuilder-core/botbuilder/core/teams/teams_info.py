@@ -226,11 +226,9 @@ class TeamsInfo:
             meeting_id, participant_id, tenant_id
         )
 
-
     @staticmethod
     async def get_meeting_info(
-            turn_context: TurnContext,
-            meeting_id: str = None
+        turn_context: TurnContext, meeting_id: str = None
     ) -> MeetingInfo:
         meeting_id = (
             meeting_id
