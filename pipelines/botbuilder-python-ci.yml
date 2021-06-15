@@ -6,7 +6,6 @@ variables:
   COVERALLS_GIT_COMMIT: $(Build.SourceVersion)
   COVERALLS_SERVICE_JOB_ID: $(Build.BuildId)
   COVERALLS_SERVICE_NAME: python-ci
-  python.36: 3.6.x
   python.37: 3.7.x
   python.38: 3.8.x
   # PythonCoverallsToken: get this from Azure
@@ -20,8 +19,6 @@ jobs:
 
   strategy:
       matrix:
-        Python36:
-          PYTHON_VERSION: '$(python.36)'
         Python37:
           PYTHON_VERSION: '$(python.37)'
         Python38:
@@ -38,9 +35,6 @@ jobs:
     inputs:
       versionSpec: '$(PYTHON_VERSION)'
 
-  - script: 'sudo ln -s /opt/hostedtoolcache/Python/3.6.9/x64/lib/libpython3.6m.so.1.0 /usr/lib/libpython3.6m.so'
-    displayName: libpython3.6m
-
   - script: |
       python -m pip install --upgrade pip
       pip install -e ./libraries/botbuilder-schema
@@ -54,6 +48,7 @@ jobs:
       pip install -e ./libraries/botbuilder-integration-applicationinsights-aiohttp
       pip install -e ./libraries/botbuilder-adapters-slack
       pip install -e ./libraries/botbuilder-integration-aiohttp
+      pip install -e ./libraries/botframework-streaming
       pip install -r ./libraries/botframework-connector/tests/requirements.txt
       pip install -r ./libraries/botbuilder-core/tests/requirements.txt
       pip install -r ./libraries/botbuilder-ai/tests/requirements.txt

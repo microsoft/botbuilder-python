@@ -1,7 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import asyncio
 from typing import Union
 
 import jwt
@@ -181,9 +180,8 @@ class EmulatorValidation:
                 "Unauthorized. Unknown Emulator Token version ", version_claim, "."
             )
 
-        is_valid_app_id = await asyncio.ensure_future(
-            credentials.is_valid_appid(app_id)
-        )
+        is_valid_app_id = await credentials.is_valid_appid(app_id)
+
         if not is_valid_app_id:
             raise PermissionError(
                 "Unauthorized. Invalid AppId passed on token: ", app_id

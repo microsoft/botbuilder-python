@@ -1282,6 +1282,16 @@ class BotFrameworkAdapter(
             )
         raise TypeError(f"exchange token returned improper result: {type(result)}")
 
+    def can_process_outgoing_activity(
+        self, activity: Activity  # pylint: disable=unused-argument
+    ) -> bool:
+        return False
+
+    async def process_outgoing_activity(
+        self, turn_context: TurnContext, activity: Activity
+    ) -> ResourceResponse:
+        raise Exception("NotImplemented")
+
     @staticmethod
     def key_for_connector_client(service_url: str, app_id: str, scope: str):
         return f"{service_url if service_url else ''}:{app_id if app_id else ''}:{scope if scope else ''}"
