@@ -84,7 +84,9 @@ class TestRequestManager(aiounittest.AsyncTestCase):
             nonlocal test_response
 
             while True:
-                signal = await manager.signal_response(request_id, response=test_response)
+                signal = await manager.signal_response(
+                    request_id, response=test_response
+                )
                 if signal:
                     break
                 await asyncio.sleep(2)
