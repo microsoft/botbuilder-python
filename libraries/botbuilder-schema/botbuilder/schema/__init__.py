@@ -3,6 +3,9 @@
 
 from ._models_py3 import Activity
 from ._models_py3 import ActivityEventNames
+from ._models_py3 import AdaptiveCardInvokeAction
+from ._models_py3 import AdaptiveCardInvokeResponse
+from ._models_py3 import AdaptiveCardInvokeValue
 from ._models_py3 import AnimationCard
 from ._models_py3 import Attachment
 from ._models_py3 import AttachmentData
@@ -76,6 +79,9 @@ from .speech_constants import SpeechConstants
 __all__ = [
     "Activity",
     "ActivityEventNames",
+    "AdaptiveCardInvokeAction",
+    "AdaptiveCardInvokeResponse",
+    "AdaptiveCardInvokeValue",
     "AnimationCard",
     "Attachment",
     "AttachmentData",
