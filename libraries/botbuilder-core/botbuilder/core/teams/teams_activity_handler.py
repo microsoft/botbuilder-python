@@ -777,9 +777,7 @@ class TeamsActivityHandler(ActivityHandler):
             ChannelAccount().deserialize(member.serialize())
             for member in teams_members_added
         ]
-        return await super().on_members_added_activity(
-            teams_members_added, turn_context
-        )
+        return await self.on_members_added_activity(teams_members_added, turn_context)
 
     async def on_teams_members_removed_dispatch(  # pylint: disable=unused-argument
         self,
@@ -833,7 +831,7 @@ class TeamsActivityHandler(ActivityHandler):
             ChannelAccount().deserialize(member.serialize())
             for member in teams_members_removed
         ]
-        return await super().on_members_removed_activity(members_removed, turn_context)
+        return await self.on_members_removed_activity(members_removed, turn_context)
 
     async def on_teams_channel_deleted(  # pylint: disable=unused-argument
         self, channel_info: ChannelInfo, team_info: TeamInfo, turn_context: TurnContext
