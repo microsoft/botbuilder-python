@@ -5,10 +5,10 @@ import os
 from setuptools import setup
 
 REQUIRES = [
-    "botbuilder-schema==4.13.0",
-    "botbuilder-core==4.13.0",
-    "botbuilder-dialogs==4.13.0",
-    "botbuilder-azure==4.13.0",
+    "botbuilder-schema==4.14.0",
+    "botbuilder-core==4.14.0",
+    "botbuilder-dialogs==4.14.0",
+    "botbuilder-azure==4.14.0",
     "pytest~=6.2.3",
 ]
 
