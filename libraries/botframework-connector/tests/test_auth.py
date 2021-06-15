@@ -59,7 +59,7 @@ class TestAuth:
 
     @pytest.mark.asyncio
     async def test_claims_validation(self):
-        claims: List[Dict] = []
+        claims: List[Dict] = {}
         default_auth_config = AuthenticationConfiguration()
 
         # No validator should pass.
