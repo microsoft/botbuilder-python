@@ -9,9 +9,9 @@ from botframework.streaming.payloads.models import Serializable
 
 
 class ReceiveResponse:
-    def __init__(self, status_code: int = None, streams: List[ContentStream] = None):
+    def __init__(self, status_code: int = 0, streams: List[ContentStream] = None):
         self.status_code = status_code
-        self.streams = streams
+        self.streams = streams or []
 
     def read_body_as_json(
         self, cls: Union[Type[Model], Type[Serializable]]

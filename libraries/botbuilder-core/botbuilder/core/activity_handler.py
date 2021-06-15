@@ -6,6 +6,8 @@ from typing import List, Union
 from botbuilder.schema import (
     Activity,
     ActivityTypes,
+    AdaptiveCardInvokeResponse,
+    AdaptiveCardInvokeValue,
     ChannelAccount,
     MessageReaction,
     SignInConstants,
@@ -453,6 +455,14 @@ class ActivityHandler(Bot):
                 await self.on_sign_in_invoke(turn_context)
                 return self._create_invoke_response()
 
+            if turn_context.activity.name == "adaptiveCard/action":
+                invoke_value = self._get_adaptive_card_invoke_value(
+                    turn_context.activity
+                )
+                return self._create_invoke_response(
+                    await self.on_adaptive_card_invoke(turn_context, invoke_value)
+                )
+
             if turn_context.activity.name == "healthcheck":
                 return self._create_invoke_response(
                     await self.on_healthcheck(turn_context)
@@ -493,9 +503,69 @@ class ActivityHandler(Bot):
             turn_context.turn_state.get(BotAdapter.BOT_CONNECTOR_CLIENT_KEY)
         )
 
+    async def on_adaptive_card_invoke(
+        self, turn_context: TurnContext, invoke_value: AdaptiveCardInvokeValue
+    ) -> AdaptiveCardInvokeResponse:
+        """
+        Invoked when the bot is sent an Adaptive Card Action Execute.
+
+        When the on_invoke_activity method receives an Invoke with a Activity.name of `adaptiveCard/action`, it
+        calls this method.
+
+        :param turn_context: A context object for this turn.
+        :type turn_context: :class:`botbuilder.core.TurnContext`
+        :param invoke_value: A string-typed object from the incoming activity's value.
+        :type invoke_value: :class:`botframework.schema.models.AdaptiveCardInvokeValue`
+        :return: The HealthCheckResponse object
+        """
+        raise _InvokeResponseException(HTTPStatus.NOT_IMPLEMENTED)
+
     @staticmethod
     def _create_invoke_response(body: object = None) -> InvokeResponse:
         return InvokeResponse(status=int(HTTPStatus.OK), body=serializer_helper(body))
+
+    def _get_adaptive_card_invoke_value(self, activity: Activity):
+        if activity.value is None:
+            response = self._create_adaptive_card_invoke_error_response(
+                HTTPStatus.BAD_REQUEST, "BadRequest", "Missing value property"
+            )
+            raise _InvokeResponseException(HTTPStatus.BAD_REQUEST, response)
+
+        invoke_value = None
+        try:
+            invoke_value = AdaptiveCardInvokeValue(**activity.value)
+        except:
+            response = self._create_adaptive_card_invoke_error_response(
+                HTTPStatus.BAD_REQUEST,
+                "BadRequest",
+                "Value property is not properly formed",
+            )
+            raise _InvokeResponseException(HTTPStatus.BAD_REQUEST, response)
+
+        if invoke_value.action is None:
+            response = self._create_adaptive_card_invoke_error_response(
+                HTTPStatus.BAD_REQUEST, "BadRequest", "Missing action property"
+            )
+            raise _InvokeResponseException(HTTPStatus.BAD_REQUEST, response)
+
+        if invoke_value.action.get("type") != "Action.Execute":
+            response = self._create_adaptive_card_invoke_error_response(
+                HTTPStatus.BAD_REQUEST,
+                "NotSupported",
+                f"The action '{invoke_value.action.get('type')}' is not supported.",
+            )
+            raise _InvokeResponseException(HTTPStatus.BAD_REQUEST, response)
+
+        return invoke_value
+
+    def _create_adaptive_card_invoke_error_response(
+        self, status_code: HTTPStatus, code: str, message: str
+    ):
+        return AdaptiveCardInvokeResponse(
+            status_code=status_code,
+            type="application/vnd.microsoft.error",
+            value=Exception(code, message),
+        )
 
 
 class _InvokeResponseException(Exception):
