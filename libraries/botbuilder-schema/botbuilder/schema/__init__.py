@@ -72,8 +72,6 @@ from ._connector_client_enums import (
 
 from ._sign_in_enums import SignInConstants
 from .callerid_constants import CallerIdConstants
-from .health_results import HealthResults
-from .healthcheck_response import HealthCheckResponse
 from .speech_constants import SpeechConstants
 
 __all__ = [
@@ -146,7 +144,5 @@ __all__ = [
     "ContactRelationUpdateActionTypes",
     "InstallationUpdateActionTypes",
     "CallerIdConstants",
-    "HealthResults",
-    "HealthCheckResponse",
     "SpeechConstants",
 ]
