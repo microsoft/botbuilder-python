@@ -11,12 +11,9 @@ from botbuilder.schema import (
     ChannelAccount,
     MessageReaction,
     SignInConstants,
-    HealthCheckResponse,
 )
 
 from .bot import Bot
-from .bot_adapter import BotAdapter
-from .healthcheck import HealthCheck
 from .serializer_helper import serializer_helper
 from .bot_framework_adapter import BotFrameworkAdapter
 from .invoke_response import InvokeResponse
@@ -463,11 +460,6 @@ class ActivityHandler(Bot):
                     await self.on_adaptive_card_invoke(turn_context, invoke_value)
                 )
 
-            if turn_context.activity.name == "healthcheck":
-                return self._create_invoke_response(
-                    await self.on_healthcheck(turn_context)
-                )
-
             raise _InvokeResponseException(HTTPStatus.NOT_IMPLEMENTED)
         except _InvokeResponseException as invoke_exception:
             return invoke_exception.create_invoke_response()
@@ -487,21 +479,6 @@ class ActivityHandler(Bot):
         :returns: A task that represents the work queued to execute
         """
         raise _InvokeResponseException(HTTPStatus.NOT_IMPLEMENTED)
-
-    async def on_healthcheck(self, turn_context: TurnContext) -> HealthCheckResponse:
-        """
-        Invoked when the bot is sent a health check from the hosting infrastructure or, in the case of
-        Skills the parent bot. By default, this method acknowledges the health state of the bot.
-
-        When the on_invoke_activity method receives an Invoke with a Activity.name of `healthCheck`, it
-        calls this method.
-
-        :param turn_context: A context object for this turn.
-        :return: The HealthCheckResponse object
-        """
-        return HealthCheck.create_healthcheck_response(
-            turn_context.turn_state.get(BotAdapter.BOT_CONNECTOR_CLIENT_KEY)
-        )
 
     async def on_adaptive_card_invoke(
         self, turn_context: TurnContext, invoke_value: AdaptiveCardInvokeValue
