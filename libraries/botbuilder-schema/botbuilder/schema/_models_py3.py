@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from typing import List
+
 from botbuilder.schema._connector_client_enums import ActivityTypes
 from datetime import datetime
 from enum import Enum
@@ -744,7 +746,7 @@ class Activity(Model):
             service_url=self.service_url,
         )
 
-    def get_mentions(self) -> [Mention]:
+    def get_mentions(self) -> List[Mention]:
         """
         Resolves the mentions from the entities of this activity.
 
