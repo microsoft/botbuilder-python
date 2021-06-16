@@ -3,8 +3,6 @@
 
 from abc import ABC, abstractmethod
 
-from botbuilder.schema import Activity
-
 from botframework.connector import ConnectorClient
 
 

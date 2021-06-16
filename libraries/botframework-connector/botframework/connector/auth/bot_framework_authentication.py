@@ -44,7 +44,7 @@ class BotFrameworkAuthentication(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def create_connector_factory(
+    def create_connector_factory(
         self, claims_identity: ClaimsIdentity
     ) -> ConnectorFactory:
         """

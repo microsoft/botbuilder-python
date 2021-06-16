@@ -3,6 +3,7 @@
 
 # pylint: disable=ungrouped-imports
 import enum
+from typing import List
 import uuid
 
 import aiounittest
@@ -204,7 +205,7 @@ class DialogExtensionsTests(aiounittest.AsyncTestCase):
                     ] = SkillConversationReference(None, self.parent_bot_id)
 
             async def capture_eoc(
-                inner_context: TurnContext, activities: [], next
+                inner_context: TurnContext, activities: List[Activity], next
             ):  # pylint: disable=unused-argument
                 for activity in activities:
                     if activity.type == ActivityTypes.end_of_conversation:

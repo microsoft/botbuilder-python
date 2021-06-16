@@ -186,8 +186,6 @@ class BotFrameworkAdapter(
         upon the activity, both before and after the bot logic runs.
     """
 
-    _INVOKE_RESPONSE_KEY = "BotFrameworkAdapter.InvokeResponse"
-
     def __init__(self, settings: BotFrameworkAdapterSettings):
         """
         Initializes a new instance of the :class:`BotFrameworkAdapter` class.
