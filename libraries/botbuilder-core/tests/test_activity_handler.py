@@ -5,7 +5,7 @@ import aiounittest
 from botframework.connector import ConnectorClient
 from botframework.connector.auth import AppCredentials
 
-from botbuilder.core import ActivityHandler, BotAdapter, TurnContext, InvokeResponse
+from botbuilder.core import ActivityHandler, BotAdapter, TurnContext
 from botbuilder.schema import (
     Activity,
     ActivityTypes,
@@ -13,10 +13,7 @@ from botbuilder.schema import (
     ConversationReference,
     MessageReaction,
     ResourceResponse,
-    HealthCheckResponse,
 )
-
-from botbuilder.core.bot_framework_adapter import USER_AGENT
 
 
 class TestingActivityHandler(ActivityHandler):
@@ -101,10 +98,6 @@ class TestingActivityHandler(ActivityHandler):
     ):
         self.record.append("on_sign_in_invoke")
         return
-
-    async def on_healthcheck(self, turn_context: TurnContext) -> HealthCheckResponse:
-        self.record.append("on_healthcheck")
-        return HealthCheckResponse()
 
 
 class NotImplementedAdapter(BotAdapter):
@@ -313,46 +306,3 @@ class TestActivityHandler(aiounittest.AsyncTestCase):
         assert len(bot.record) == 2
         assert bot.record[0] == "on_installation_update"
         assert bot.record[1] == "on_installation_update_remove"
-
-    async def test_healthcheck(self):
-        activity = Activity(type=ActivityTypes.invoke, name="healthcheck",)
-
-        adapter = TestInvokeAdapter()
-        turn_context = TurnContext(adapter, activity)
-
-        bot = ActivityHandler()
-        await bot.on_turn(turn_context)
-
-        self.assertIsNotNone(adapter.activity)
-        self.assertIsInstance(adapter.activity.value, InvokeResponse)
-        self.assertEqual(adapter.activity.value.status, 200)
-
-        response = HealthCheckResponse.deserialize(adapter.activity.value.body)
-        self.assertTrue(response.health_results.success)
-        self.assertTrue(response.health_results.messages)
-        self.assertEqual(response.health_results.messages[0], "Health check succeeded.")
-
-    async def test_healthcheck_with_connector(self):
-        activity = Activity(type=ActivityTypes.invoke, name="healthcheck",)
-
-        adapter = TestInvokeAdapter()
-        turn_context = TurnContext(adapter, activity)
-
-        mock_connector_client = MockConnectorClient()
-        turn_context.turn_state[
-            BotAdapter.BOT_CONNECTOR_CLIENT_KEY
-        ] = mock_connector_client
-
-        bot = ActivityHandler()
-        await bot.on_turn(turn_context)
-
-        self.assertIsNotNone(adapter.activity)
-        self.assertIsInstance(adapter.activity.value, InvokeResponse)
-        self.assertEqual(adapter.activity.value.status, 200)
-
-        response = HealthCheckResponse.deserialize(adapter.activity.value.body)
-        self.assertTrue(response.health_results.success)
-        self.assertEqual(response.health_results.authorization, "Bearer awesome")
-        self.assertEqual(response.health_results.user_agent, USER_AGENT)
-        self.assertTrue(response.health_results.messages)
-        self.assertEqual(response.health_results.messages[0], "Health check succeeded.")
