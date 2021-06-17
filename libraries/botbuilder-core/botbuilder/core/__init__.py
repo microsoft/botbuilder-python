@@ -18,6 +18,7 @@ from .bot_state_set import BotStateSet
 from .bot_telemetry_client import BotTelemetryClient, Severity
 from .card_factory import CardFactory
 from .channel_service_handler import BotActionNotImplementedError, ChannelServiceHandler
+from .cloud_adapter_base import CloudAdapterBase
 from .component_registration import ComponentRegistration
 from .conversation_state import ConversationState
 from .oauth.extended_user_token_provider import ExtendedUserTokenProvider
@@ -64,6 +65,7 @@ __all__ = [
     "calculate_change_hash",
     "CardFactory",
     "ChannelServiceHandler",
+    "CloudAdapterBase",
     "ComponentRegistration",
     "ConversationState",
     "conversation_reference_extension",
