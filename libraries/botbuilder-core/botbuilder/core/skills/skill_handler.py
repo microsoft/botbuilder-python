@@ -207,7 +207,8 @@ class SkillHandler(ChannelServiceHandler):
                     conversation_reference=conversation_reference,
                     oauth_scope=(
                         GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
-                        if self._channel_provider and self._channel_provider.is_government()
+                        if self._channel_provider
+                        and self._channel_provider.is_government()
                         else AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
                     ),
                 )
