@@ -134,7 +134,9 @@ class CloudAdapter(CloudAdapterBase, BotFrameworkHttpAdapterIntegrationBase):
         await ws_response.prepare(request)
         bf_web_socket = AiohttpWebSocket(ws_response)
 
-        streaming_activity_processor = _StreamingActivityProcessor(authentication_request_result, self, bot, bf_web_socket)
+        streaming_activity_processor = _StreamingActivityProcessor(
+            authentication_request_result, self, bot, bf_web_socket
+        )
 
 
 class _StreamingActivityProcessor(StreamingActivityProcessor):
@@ -152,8 +154,10 @@ class _StreamingActivityProcessor(StreamingActivityProcessor):
         self._request_handler = StreamingRequestHandler(bot, self, web_socket)
 
         # Fix up the connector factory so connector create from it will send over this connection
-        self._authenticate_request_result.connector_factory = _StreamingConnectorFactory(self._request_handler)
-    
+        self._authenticate_request_result.connector_factory = _StreamingConnectorFactory(
+            self._request_handler
+        )
+
     async def listen(self):
         await self._request_handler.listen()
 
@@ -162,7 +166,9 @@ class _StreamingActivityProcessor(StreamingActivityProcessor):
         activity: Activity,
         bot_callback_handler: Callable[[TurnContext], Awaitable],
     ) -> InvokeResponse:
-        return await self._adapter.process_activity(self._authenticate_request_result, activity, bot_callback_handler)
+        return await self._adapter.process_activity(
+            self._authenticate_request_result, activity, bot_callback_handler
+        )
 
 
 class _StreamingConnectorFactory(ConnectorFactory):
