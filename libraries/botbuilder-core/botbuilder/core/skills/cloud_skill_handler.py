@@ -1,46 +1,28 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from uuid import uuid4
+from logging import Logger
+from botbuilder.core import BotAdapter, Bot, CloudChannelServiceHandler
+from botbuilder.schema import Activity, ResourceResponse
+from botframework.connector.auth import BotFrameworkAuthentication, ClaimsIdentity
 
-from botbuilder.core import Bot, BotAdapter, ChannelServiceHandler, TurnContext
-from botbuilder.schema import (
-    Activity,
-    ActivityTypes,
-    ResourceResponse,
-    CallerIdConstants,
-)
-from botframework.connector.auth import (
-    AuthenticationConfiguration,
-    AuthenticationConstants,
-    ChannelProvider,
-    ClaimsIdentity,
-    CredentialProvider,
-    GovernmentConstants,
-    JwtTokenValidation,
-)
-from .skill_conversation_reference import SkillConversationReference
 from .conversation_id_factory import ConversationIdFactoryBase
+from .skill_handler import SkillHandler
 from ._skill_handler_impl import _SkillHandlerImpl
 
 
-class SkillHandler(ChannelServiceHandler):
-
-    SKILL_CONVERSATION_REFERENCE_KEY = (
-        "botbuilder.core.skills.SkillConversationReference"
-    )
+class CloudSkillHandler(CloudChannelServiceHandler):
+    SKILL_CONVERSATION_REFERENCE_KEY = SkillHandler.SKILL_CONVERSATION_REFERENCE_KEY
 
     def __init__(
         self,
         adapter: BotAdapter,
         bot: Bot,
         conversation_id_factory: ConversationIdFactoryBase,
-        credential_provider: CredentialProvider,
-        auth_configuration: AuthenticationConfiguration,
-        channel_provider: ChannelProvider = None,
-        logger: object = None,
+        auth: BotFrameworkAuthentication,
+        logger: Logger = None,
     ):
-        super().__init__(credential_provider, auth_configuration, channel_provider)
+        super().__init__(auth)
 
         if not adapter:
             raise TypeError("adapter can't be None")
@@ -49,25 +31,13 @@ class SkillHandler(ChannelServiceHandler):
         if not conversation_id_factory:
             raise TypeError("conversation_id_factory can't be None")
 
-        self._adapter = adapter
-        self._bot = bot
-        self._conversation_id_factory = conversation_id_factory
-        self._logger = logger
-
-        def aux_func():
-            nonlocal self
-            return (
-                GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
-                if self._channel_provider and self._channel_provider.is_government()
-                else AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
-            )
-
         self._inner = _SkillHandlerImpl(
             self.SKILL_CONVERSATION_REFERENCE_KEY,
             adapter,
             bot,
             conversation_id_factory,
-            aux_func,
+            auth.get_originating_audience,
+            logger,
         )
 
     async def on_send_to_conversation(

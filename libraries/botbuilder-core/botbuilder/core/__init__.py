@@ -19,6 +19,7 @@ from .bot_telemetry_client import BotTelemetryClient, Severity
 from .card_factory import CardFactory
 from .channel_service_handler import BotActionNotImplementedError, ChannelServiceHandler
 from .cloud_adapter_base import CloudAdapterBase
+from .cloud_channel_service_handler import CloudChannelServiceHandler
 from .component_registration import ComponentRegistration
 from .conversation_state import ConversationState
 from .oauth.extended_user_token_provider import ExtendedUserTokenProvider
@@ -66,6 +67,7 @@ __all__ = [
     "CardFactory",
     "ChannelServiceHandler",
     "CloudAdapterBase",
+    "CloudChannelServiceHandler",
     "ComponentRegistration",
     "ConversationState",
     "conversation_reference_extension",

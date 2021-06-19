@@ -29,6 +29,8 @@ class ActivityTypes(str, Enum):
     suggestion = "suggestion"
     trace = "trace"
     handoff = "handoff"
+    command = "command"
+    command_result = "commandResult"
 
 
 class TextFormatTypes(str, Enum):
