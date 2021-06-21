@@ -219,50 +219,38 @@ class DialogContext:
         :param event_value:
         :return:
         """
-        # pylint: disable=too-many-nested-blocks
         try:
-            if cancel_parents is None:
-                event_name = event_name or DialogEvents.cancel_dialog
+            event_name = event_name or DialogEvents.cancel_dialog
+            if self.stack or self.parent:
+                # Cancel all local and parent dialogs while checking for interception
+                notify = False
+                dialog_context = self
 
-                if self.stack or self.parent:
-                    # Cancel all local and parent dialogs while checking for interception
-                    notify = False
-                    dialog_context = self
-
-                    while dialog_context:
-                        if dialog_context.stack:
-                            # Check to see if the dialog wants to handle the event
-                            if notify:
-                                event_handled = await dialog_context.emit_event(
-                                    event_name,
-                                    event_value,
-                                    bubble=False,
-                                    from_leaf=False,
-                                )
-
-                                if event_handled:
-                                    break
-
-                            # End the active dialog
-                            await dialog_context.end_active_dialog(
-                                DialogReason.CancelCalled
-                            )
-                        else:
-                            dialog_context = (
-                                dialog_context.parent if cancel_parents else None
+                while dialog_context:
+                    if dialog_context.stack:
+                        # Check to see if the dialog wants to handle the event
+                        if notify:
+                            event_handled = await dialog_context.emit_event(
+                                event_name, event_value, bubble=False, from_leaf=False,
                             )
 
-                        notify = True
+                            if event_handled:
+                                break
 
-                    return DialogTurnResult(DialogTurnStatus.Cancelled)
-                # Stack was empty and no parent
-                return DialogTurnResult(DialogTurnStatus.Empty)
+                        # End the active dialog
+                        await dialog_context.end_active_dialog(
+                            DialogReason.CancelCalled
+                        )
+                    else:
+                        dialog_context = (
+                            dialog_context.parent if cancel_parents else None
+                        )
 
-            if self.stack:
-                while self.stack:
-                    await self.end_active_dialog(DialogReason.CancelCalled)
+                    notify = True
+
                 return DialogTurnResult(DialogTurnStatus.Cancelled)
 
+            # Stack was empty and no parent
             return DialogTurnResult(DialogTurnStatus.Empty)
         except Exception as err:
             self.__set_exception_context_data(err)
