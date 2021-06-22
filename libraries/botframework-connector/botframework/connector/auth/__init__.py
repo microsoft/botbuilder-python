@@ -23,6 +23,7 @@ from .credential_provider import *
 from .channel_validation import *
 from .emulator_validation import *
 from .jwt_token_extractor import *
+from .password_service_client_credential_factory import *
 from .service_client_credentials_factory import *
 from .user_token_client import *
 from .authentication_configuration import *
