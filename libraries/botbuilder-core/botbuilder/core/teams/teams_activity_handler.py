@@ -14,6 +14,8 @@ from botbuilder.schema.teams import (
     TeamInfo,
     ChannelInfo,
     FileConsentCardResponse,
+    MeetingStartEventDetails,
+    MeetingEndEventDetails,
     TeamsChannelData,
     TeamsChannelAccount,
     MessagingExtensionAction,
@@ -872,6 +874,67 @@ class TeamsActivityHandler(ActivityHandler):
 
         :param channel_info: The channel info object which describes the channel.
         :param team_info: The team info object representing the team.
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
+        return
+
+    async def on_event_activity(self, turn_context: TurnContext):
+        """
+        Invoked when an event activity is received from the connector when the base behavior of
+        :meth:`on_turn()` is used.
+
+        :param turn_context: The context object for this turn
+        :type turn_context: :class:`botbuilder.core.TurnContext`
+
+        :returns: A task that represents the work queued to execute
+
+        .. remarks::
+            When the :meth:`on_turn()` method receives an event activity, it calls this method.
+            If the activity name is `tokens/response`, it calls :meth:`on_token_response_event()`;
+            otherwise, it calls :meth:`on_event()`.
+
+            In a derived class, override this method to add logic that applies to all event activities.
+            Add logic to apply before the specific event-handling logic before the call to this base class method.
+            Add logic to apply after the specific event-handling logic after the call to this base class method.
+
+            Event activities communicate programmatic information from a client or channel to a bot.
+            The meaning of an event activity is defined by the event activity name property, which is meaningful within
+            the scope of a channel.
+        """
+        if turn_context.activity.channel_id == Channels.ms_teams:
+            if turn_context.activity.name == "application/vnd.microsoft.meetingStart":
+                return await self.on_teams_meeting_start_event(
+                    turn_context.activity.value, turn_context
+                )
+            if turn_context.activity.name == "application/vnd.microsoft.meetingEnd":
+                return await self.on_teams_meeting_end_event(
+                    turn_context.activity.value, turn_context
+                )
+
+        return await super().on_event_activity(turn_context)
+
+    async def on_teams_meeting_start_event(
+        self, meeting: MeetingStartEventDetails, turn_context: TurnContext
+    ):  # pylint: disable=unused-argument
+        """
+        Override this in a derived class to provide logic for when a Teams meeting start event is received.
+
+        :param meeting: The details of the meeting.
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
+        return
+
+    async def on_teams_meeting_end_event(
+        self, meeting: MeetingEndEventDetails, turn_context: TurnContext
+    ):  # pylint: disable=unused-argument
+        """
+        Override this in a derived class to provide logic for when a Teams meeting end event is received.
+
+        :param meeting: The details of the meeting.
         :param turn_context: A context object for this turn.
 
         :returns: A task that represents the work queued to execute.

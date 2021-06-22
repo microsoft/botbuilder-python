@@ -19,6 +19,8 @@ from botbuilder.schema.teams import (
     AppBasedLinkQuery,
     ChannelInfo,
     FileConsentCardResponse,
+    MeetingStartEventDetails,
+    MeetingEndEventDetails,
     MessageActionsPayload,
     MessagingExtensionAction,
     MessagingExtensionQuery,
@@ -308,6 +310,26 @@ class TestingTeamsActivityHandler(TeamsActivityHandler):
     ):
         self.record.append("on_teams_tab_submit")
         return await super().on_teams_tab_submit(turn_context, tab_submit)
+
+    async def on_event_activity(self, turn_context: TurnContext):
+        self.record.append("on_event_activity")
+        return await super().on_event_activity(turn_context)
+
+    async def on_teams_meeting_start_event(
+        self, meeting: MeetingStartEventDetails, turn_context: TurnContext
+    ):
+        self.record.append("on_teams_meeting_start_event")
+        return await super().on_teams_meeting_start_event(
+            turn_context.activity.value, turn_context
+        )
+
+    async def on_teams_meeting_end_event(
+        self, meeting: MeetingEndEventDetails, turn_context: TurnContext
+    ):
+        self.record.append("on_teams_meeting_end_event")
+        return await super().on_teams_meeting_end_event(
+            turn_context.activity.value, turn_context
+        )
 
 
 class NotImplementedAdapter(BotAdapter):
@@ -1064,3 +1086,37 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
 
         assert len(bot.record) == 1
         assert bot.record[0] == "on_typing_activity"
+
+    async def test_on_teams_meeting_start_event(self):
+        activity = Activity(
+            type=ActivityTypes.event,
+            name="application/vnd.microsoft.meetingStart",
+            channel_id=Channels.ms_teams,
+        )
+
+        turn_context = TurnContext(SimpleAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        assert len(bot.record) == 2
+        assert bot.record[0] == "on_event_activity"
+        assert bot.record[1] == "on_teams_meeting_start_event"
+
+    async def test_on_teams_meeting_end_event(self):
+        activity = Activity(
+            type=ActivityTypes.event,
+            name="application/vnd.microsoft.meetingEnd",
+            channel_id=Channels.ms_teams,
+        )
+
+        turn_context = TurnContext(SimpleAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        assert len(bot.record) == 2
+        assert bot.record[0] == "on_event_activity"
+        assert bot.record[1] == "on_teams_meeting_end_event"
