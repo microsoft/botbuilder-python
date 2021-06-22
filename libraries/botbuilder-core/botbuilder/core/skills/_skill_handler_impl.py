@@ -262,9 +262,16 @@ class _SkillHandlerImpl(SkillHandler):
         self, conversation_id: str
     ) -> SkillConversationReference:
         # Get the SkillsConversationReference
-        conversation_reference_result = await self._conversation_id_factory.get_conversation_reference(
-            conversation_id
-        )
+        try:
+            conversation_reference_result = await self._conversation_id_factory.get_conversation_reference(
+                conversation_id
+            )
+        except NotImplementedError:
+            self._logger.warning(
+                "Got NotImplementedError when trying to call get_skill_conversation_reference() "
+                "on the SkillConversationIdFactory, attempting to use deprecated "
+                "get_conversation_reference() method instead."
+            )
 
         # ConversationIdFactory can return either a SkillConversationReference (the newer way),
         # or a ConversationReference (the old way, but still here for compatibility).  If a

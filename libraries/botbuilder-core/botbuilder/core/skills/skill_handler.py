@@ -49,9 +49,6 @@ class SkillHandler(ChannelServiceHandler):
         if not conversation_id_factory:
             raise TypeError("conversation_id_factory can't be None")
 
-        self._adapter = adapter
-        self._bot = bot
-        self._conversation_id_factory = conversation_id_factory
         self._logger = logger
 
         def aux_func():
