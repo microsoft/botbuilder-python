@@ -3,6 +3,9 @@
 
 from ._models_py3 import Activity
 from ._models_py3 import ActivityEventNames
+from ._models_py3 import AdaptiveCardInvokeAction
+from ._models_py3 import AdaptiveCardInvokeResponse
+from ._models_py3 import AdaptiveCardInvokeValue
 from ._models_py3 import AnimationCard
 from ._models_py3 import Attachment
 from ._models_py3 import AttachmentData
@@ -69,13 +72,14 @@ from ._connector_client_enums import (
 
 from ._sign_in_enums import SignInConstants
 from .callerid_constants import CallerIdConstants
-from .health_results import HealthResults
-from .healthcheck_response import HealthCheckResponse
 from .speech_constants import SpeechConstants
 
 __all__ = [
     "Activity",
     "ActivityEventNames",
+    "AdaptiveCardInvokeAction",
+    "AdaptiveCardInvokeResponse",
+    "AdaptiveCardInvokeValue",
     "AnimationCard",
     "Attachment",
     "AttachmentData",
@@ -140,7 +144,5 @@ __all__ = [
     "ContactRelationUpdateActionTypes",
     "InstallationUpdateActionTypes",
     "CallerIdConstants",
-    "HealthResults",
-    "HealthCheckResponse",
     "SpeechConstants",
 ]

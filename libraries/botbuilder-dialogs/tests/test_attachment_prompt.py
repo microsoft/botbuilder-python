@@ -1,13 +1,14 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import copy
 import aiounittest
 from botbuilder.dialogs.prompts import (
     AttachmentPrompt,
     PromptOptions,
     PromptValidatorContext,
 )
-from botbuilder.schema import Activity, ActivityTypes, Attachment
+from botbuilder.schema import Activity, ActivityTypes, Attachment, InputHints
 
 from botbuilder.core import (
     TurnContext,
@@ -70,6 +71,42 @@ class AttachmentPromptTests(aiounittest.AsyncTestCase):
         step2 = await step1.assert_reply("please add an attachment.")
         step3 = await step2.send(attachment_activity)
         await step3.assert_reply("some content")
+
+    async def test_attachment_prompt_with_input_hint(self):
+        prompt_activity = Activity(
+            type=ActivityTypes.message,
+            text="please add an attachment.",
+            input_hint=InputHints.accepting_input,
+        )
+
+        async def exec_test(turn_context: TurnContext):
+            dialog_context = await dialogs.create_context(turn_context)
+
+            results = await dialog_context.continue_dialog()
+
+            if results.status == DialogTurnStatus.Empty:
+                options = PromptOptions(prompt=copy.copy(prompt_activity))
+                await dialog_context.prompt("AttachmentPrompt", options)
+            elif results.status == DialogTurnStatus.Complete:
+                attachment = results.result[0]
+                content = MessageFactory.text(attachment.content)
+                await turn_context.send_activity(content)
+
+            await convo_state.save_changes(turn_context)
+
+        # Initialize TestAdapter.
+        adapter = TestAdapter(exec_test)
+
+        # Create ConversationState with MemoryStorage and register the state as middleware.
+        convo_state = ConversationState(MemoryStorage())
+
+        # Create a DialogState property, DialogSet and AttachmentPrompt.
+        dialog_state = convo_state.create_property("dialog_state")
+        dialogs = DialogSet(dialog_state)
+        dialogs.add(AttachmentPrompt("AttachmentPrompt"))
+
+        step1 = await adapter.send("hello")
+        await step1.assert_reply(prompt_activity)
 
     async def test_attachment_prompt_with_validator(self):
         async def exec_test(turn_context: TurnContext):

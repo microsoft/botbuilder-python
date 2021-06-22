@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 from abc import ABC, abstractmethod
+from base64 import b64encode
 from json import dumps
 from typing import Dict, List
 
@@ -32,14 +33,14 @@ class UserTokenClient(ABC):
 
     @abstractmethod
     async def get_sign_in_resource(
-        self, connection_name: str, activity: Activity, final_rediect: str
+        self, connection_name: str, activity: Activity, final_redirect: str
     ) -> SignInUrlResponse:
         """
         Get the raw signin link to be sent to the user for signin for a connection name.
 
         :param connection_name: Name of the auth connection to use.
         :param activity: The Activity from which to derive the token exchange state.
-        :param final_rediect: The final URL that the OAuth flow will redirect to.
+        :param final_redirect: The final URL that the OAuth flow will redirect to.
         :return: A SignInUrlResponse.
         """
         raise NotImplementedError()
@@ -134,6 +135,10 @@ class UserTokenClient(ABC):
             ms_app_id=app_id,
         )
 
-        tes_string = dumps(token_exchange_state.as_dict())
+        tes_string = b64encode(
+            dumps(token_exchange_state.serialize()).encode(
+                encoding="UTF-8", errors="strict"
+            )
+        ).decode()
 
         return tes_string

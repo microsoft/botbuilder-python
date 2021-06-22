@@ -218,6 +218,22 @@ class TestTeamsInfo(aiounittest.AsyncTestCase):
         handler = TeamsActivityHandler()
         await handler.on_turn(turn_context)
 
+    async def test_get_meeting_info(self):
+        adapter = SimpleAdapterWithCreateConversation()
+
+        activity = Activity(
+            type="message",
+            text="Test-get_meeting_info",
+            channel_id=Channels.ms_teams,
+            from_property=ChannelAccount(aad_object_id="participantId-1"),
+            channel_data={"meeting": {"id": "meetingId-1"}},
+            service_url="https://test.coffee",
+        )
+
+        turn_context = TurnContext(adapter, activity)
+        handler = TeamsActivityHandler()
+        await handler.on_turn(turn_context)
+
 
 class TestTeamsActivityHandler(TeamsActivityHandler):
     async def on_turn(self, turn_context: TurnContext):
