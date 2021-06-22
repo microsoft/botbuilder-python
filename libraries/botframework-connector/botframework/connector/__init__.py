@@ -13,6 +13,7 @@ from .version import VERSION
 # TODO: Experimental
 from .aiohttp_bf_pipeline import AsyncBfPipeline
 from .bot_framework_sdk_client_async import BotFrameworkConnectorConfiguration
+from .http_client_factory import HttpClientFactory
 
 __all__ = [
     "AsyncBfPipeline",
@@ -20,6 +21,7 @@ __all__ = [
     "ConnectorClient",
     "EmulatorApiClient",
     "BotFrameworkConnectorConfiguration",
+    "HttpClientFactory"
 ]
 
 __version__ = VERSION

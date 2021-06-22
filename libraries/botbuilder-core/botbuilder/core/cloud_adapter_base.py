@@ -262,13 +262,13 @@ class CloudAdapterBase(BotAdapter, ABC):
 
         # Create a UserTokenClient instance for the application to use. (For example, it would be used in a sign-in prompt.)
         user_token_client = await self.bot_framework_authentication.create_user_token_client(
-            authenticate_request_result.claims_identy
+            authenticate_request_result.claims_identity
         )
 
         # Create a turn context and run the pipeline.
         context = self._create_turn_context(
             activity,
-            authenticate_request_result.claims_identy,
+            authenticate_request_result.claims_identity,
             authenticate_request_result.audience,
             connector_client,
             user_token_client,
