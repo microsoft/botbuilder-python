@@ -200,14 +200,18 @@ class SkillHandler(ChannelServiceHandler):
                 conversation_id
             )
 
-            skill_conversation_reference: SkillConversationReference = SkillConversationReference(
-                conversation_reference=conversation_reference,
-                oauth_scope=(
-                    GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
-                    if self._channel_provider and self._channel_provider.is_government()
-                    else AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
-                ),
-            )
+            if isinstance(conversation_reference, SkillConversationReference):
+                skill_conversation_reference: SkillConversationReference = conversation_reference
+            else:
+                skill_conversation_reference: SkillConversationReference = SkillConversationReference(
+                    conversation_reference=conversation_reference,
+                    oauth_scope=(
+                        GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
+                        if self._channel_provider
+                        and self._channel_provider.is_government()
+                        else AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
+                    ),
+                )
 
         if not skill_conversation_reference:
             raise KeyError("SkillConversationReference not found")
