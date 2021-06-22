@@ -57,26 +57,38 @@ class PasswordServiceClientCredentialFactory(ServiceClientCredentialsFactory):
         else:
             credentials = (
                 _PrivateCloudAppCredentials(
-                    None,
-                    None,
-                    None,
-                    normalized_endpoint,
-                    validate_authority
+                    None, None, None, normalized_endpoint, validate_authority
                 )
                 if not app_id
-                else MicrosoftAppCredentials(app_id, self.password, audience, normalized_endpoint, validate_authority)
+                else MicrosoftAppCredentials(
+                    app_id,
+                    self.password,
+                    audience,
+                    normalized_endpoint,
+                    validate_authority,
+                )
             )
 
         credentials.oauth_endpoint = normalized_endpoint
         return credentials
 
+
 class _PrivateCloudAppCredentials(MicrosoftAppCredentials):
-    def __init__(self, app_id: str, password: str, oauth_scope: str, oauth_endpoint: str, validate_authority: bool):
-        super().__init__(app_id, password, channel_auth_tenant=None, oauth_scope=oauth_scope)
+    def __init__(
+        self,
+        app_id: str,
+        password: str,
+        oauth_scope: str,
+        oauth_endpoint: str,
+        validate_authority: bool,
+    ):
+        super().__init__(
+            app_id, password, channel_auth_tenant=None, oauth_scope=oauth_scope
+        )
 
         self.oauth_endpoint = oauth_endpoint
         self._validate_authority = validate_authority
-    
+
     @property
     def validate_authority(self):
         return self._validate_authority
