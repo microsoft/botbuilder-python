@@ -212,3 +212,58 @@ class TeamsOperations(object):
     fetch_participant.metadata = {
         "url": "/v1/meetings/{meetingId}/participants/{participantId}?tenantId={tenantId}"
     }
+
+    def fetch_meeting(
+        self, meeting_id: str, custom_headers=None, raw=False, **operation_config
+    ):
+        """Fetch meeting information.
+
+        :param meeting_id: Meeting Id, encoded as a BASE64 string.
+        :type meeting_id: str
+        :param dict custom_headers: headers that will be added to the request
+        :param bool raw: returns the direct response alongside the
+         deserialized response
+        :param operation_config: :ref:`Operation configuration
+         overrides<msrest:optionsforoperations>`.
+        :return: MeetingInfo or ClientRawResponse if raw=true
+        :rtype: ~botframework.connector.teams.models.MeetingInfo or
+         ~msrest.pipeline.ClientRawResponse
+        :raises:
+         :class:`HttpOperationError<msrest.exceptions.HttpOperationError>`
+        """
+
+        # Construct URL
+        url = self.fetch_participant.metadata["url"]
+        path_format_arguments = {
+            "meetingId": self._serialize.url("meeting_id", meeting_id, "str")
+        }
+        url = self._client.format_url(url, **path_format_arguments)
+
+        # Construct parameters
+        query_parameters = {}
+
+        # Construct headers
+        header_parameters = {}
+        header_parameters["Accept"] = "application/json"
+        if custom_headers:
+            header_parameters.update(custom_headers)
+
+        # Construct and send request
+        request = self._client.get(url, query_parameters, header_parameters)
+        response = self._client.send(request, stream=False, **operation_config)
+
+        if response.status_code not in [200]:
+            raise HttpOperationError(self._deserialize, response)
+
+        deserialized = None
+
+        if response.status_code == 200:
+            deserialized = self._deserialize("MeetingInfo", response)
+
+        if raw:
+            client_raw_response = ClientRawResponse(deserialized, response)
+            return client_raw_response
+
+        return deserialized
+
+    fetch_participant.metadata = {"url": "/v1/meetings/{meetingId}"}

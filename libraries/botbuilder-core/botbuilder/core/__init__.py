@@ -47,7 +47,6 @@ from .transcript_logger import TranscriptLogger, TranscriptLoggerMiddleware
 from .user_state import UserState
 from .register_class_middleware import RegisterClassMiddleware
 from .adapter_extensions import AdapterExtensions
-from .healthcheck import HealthCheck
 
 __all__ = [
     "ActivityHandler",
@@ -72,7 +71,6 @@ __all__ = [
     "ConversationState",
     "conversation_reference_extension",
     "ExtendedUserTokenProvider",
-    "HealthCheck",
     "IntentScore",
     "InvokeResponse",
     "MemoryStorage",

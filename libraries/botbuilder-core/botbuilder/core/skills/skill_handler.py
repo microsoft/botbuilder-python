@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 from uuid import uuid4
+from logging import Logger, getLogger
 
 from botbuilder.core import Bot, BotAdapter, ChannelServiceHandler, TurnContext
 from botbuilder.schema import (
@@ -38,7 +39,7 @@ class SkillHandler(ChannelServiceHandler):
         credential_provider: CredentialProvider,
         auth_configuration: AuthenticationConfiguration,
         channel_provider: ChannelProvider = None,
-        logger: object = None,
+        logger: Logger = None,
     ):
         super().__init__(credential_provider, auth_configuration, channel_provider)
 

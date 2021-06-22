@@ -8,6 +8,7 @@
 from .bot_framework_skill import BotFrameworkSkill
 from .bot_framework_client import BotFrameworkClient
 from .conversation_id_factory import ConversationIdFactoryBase
+from .skill_conversation_id_factory import SkillConversationIdFactory
 from .skill_handler import SkillHandler
 from .skill_conversation_id_factory import SkillConversationIdFactory
 from .skill_conversation_id_factory_options import SkillConversationIdFactoryOptions

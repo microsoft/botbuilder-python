@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from abc import ABC, abstractmethod
+from abc import ABC
 from typing import Union
 from botbuilder.schema import ConversationReference
 from .skill_conversation_id_factory_options import SkillConversationIdFactoryOptions
@@ -17,7 +17,6 @@ class ConversationIdFactoryBase(ABC):
         SkillConversationReferences and deletion.
     """
 
-    @abstractmethod
     async def create_skill_conversation_id(
         self,
         options_or_conversation_reference: Union[
@@ -41,23 +40,32 @@ class ConversationIdFactoryBase(ABC):
         """
         raise NotImplementedError()
 
-    @abstractmethod
     async def get_conversation_reference(
         self, skill_conversation_id: str
-    ) -> Union[SkillConversationReference, ConversationReference]:
+    ) -> ConversationReference:
+        """
+        [DEPRECATED] Method is deprecated, please use get_skill_conversation_reference() instead.
+
+        Retrieves a :class:`ConversationReference` using a conversation id passed in.
+
+        :param skill_conversation_id: The conversation id for which to retrieve the :class:`ConversationReference`.
+        :type skill_conversation_id: str
+        :returns: `ConversationReference` for the specified ID.
+        """
+        raise NotImplementedError()
+
+    async def get_skill_conversation_reference(
+        self, skill_conversation_id: str
+    ) -> SkillConversationReference:
         """
         Retrieves a :class:`SkillConversationReference` using a conversation id passed in.
 
         :param skill_conversation_id: The conversation id for which to retrieve the :class:`SkillConversationReference`.
         :type skill_conversation_id: str
-
-        .. note::
-            SkillConversationReference is the preferred return type, while the :class:`SkillConversationReference`
-            type is provided for backwards compatability.
+        :returns: `SkillConversationReference` for the specified ID.
         """
         raise NotImplementedError()
 
-    @abstractmethod
     async def delete_conversation_reference(self, skill_conversation_id: str):
         """
         Removes any reference to objects keyed on the conversation id passed in.
