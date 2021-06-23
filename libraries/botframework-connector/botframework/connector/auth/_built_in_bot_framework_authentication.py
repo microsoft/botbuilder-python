@@ -17,6 +17,8 @@ from botframework.connector.auth import (
     SimpleChannelProvider
 )
 from botframework.connector import HttpClientFactory
+from botframework.connector.auth._bot_framework_client_impl import _BotFrameworkClientImpl
+from botframework.connector.auth._user_token_client_impl import _UserTokenClientImpl
 from botframework.connector.auth.connector_factory import _ConnectorFactoryImpl
 from botframework.connector.auth.credential_provider import _DelegatingCredentialProvider
 from botframework.connector.skills import BotFrameworkClient
@@ -70,9 +72,7 @@ class _BuiltinBotFrameworkAuthentication(BotFrameworkAuthentication):
             self._to_channel_from_bot_oauth_scope
         )
 
-        caller_id = await self.generate_caller_id(
-            self._credentials_factory, claims_identity, self._caller_id
-        )
+        caller_id = await self.generate_caller_id(self._credentials_factory, claims_identity, self._caller_id)
 
         connector_factory = _ConnectorFactoryImpl(
             app_id=_BuiltinBotFrameworkAuthentication.get_app_id(claims_identity),
@@ -139,10 +139,21 @@ class _BuiltinBotFrameworkAuthentication(BotFrameworkAuthentication):
     async def create_user_token_client(
         self, claims_identity: ClaimsIdentity
     ) -> UserTokenClient:
-        pass
+        app_id = _BuiltinBotFrameworkAuthentication.get_app_id(claims_identity)
+
+        credentials = await self._credentials_factory.create_credentials(
+            app_id,
+            audience=self._to_channel_from_bot_oauth_scope,
+            login_endpoint=self._login_endpoint,
+            validate_authority=True
+        )
+
+        return _UserTokenClientImpl(app_id, credentials, self._oauth_endpoint)
 
     def create_bot_framework_client(self) -> BotFrameworkClient:
-        pass
+        return _BotFrameworkClientImpl(
+            self._credentials_factory, self._http_client_factory, self._login_endpoint, self._logger
+        )
 
     def get_originating_audience(self) -> str:
         return self._to_channel_from_bot_oauth_scope

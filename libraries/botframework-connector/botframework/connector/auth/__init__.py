@@ -9,7 +9,6 @@ from .authentication_constants import *
 from .authenticate_request_result import *
 from .bot_framework_authentication import *
 from .bot_framework_authentication_factory import *
-from .built_in_bot_framework_authentication import *
 from .government_constants import *
 from .channel_provider import *
 from .connector_factory import *

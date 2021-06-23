@@ -30,6 +30,11 @@ class GovernmentConstants(ABC):
     TO_BOT_FROM_CHANNEL_TOKEN_ISSUER = "https://api.botframework.us"
 
     """
+    OAuth Url used to get a token from OAuthApiClient.
+    """
+    OAUTH_URL_GOV = "https://api.botframework.azure.us"
+
+    """
     TO BOT FROM CHANNEL: OpenID metadata document for tokens coming from MSA
     """
     TO_BOT_FROM_CHANNEL_OPEN_ID_METADATA_URL = (

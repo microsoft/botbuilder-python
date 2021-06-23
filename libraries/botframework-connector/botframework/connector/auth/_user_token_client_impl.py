@@ -21,7 +21,7 @@ class _UserTokenClientImpl(UserTokenClient):
     def __init__(
         self,
         app_id: str,
-        credentials: AppCredentials,
+        credentials: Authentication,
         oauth_endpoint: str,
         client_configuration: TokenApiClientConfiguration = None,
     ) -> None:
