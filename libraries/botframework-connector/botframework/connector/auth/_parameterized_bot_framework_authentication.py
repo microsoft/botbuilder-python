@@ -8,8 +8,15 @@ from botframework.connector.auth import (
     ClaimsIdentity,
     UserTokenClient,
     ConnectorFactory,
-    AuthenticateRequestResult, ServiceClientCredentialsFactory, AuthenticationConfiguration, VerifyOptions,
-    JwtTokenValidation, SkillValidation, AuthenticationConstants, EmulatorValidation, JwtTokenExtractor
+    AuthenticateRequestResult,
+    ServiceClientCredentialsFactory,
+    AuthenticationConfiguration,
+    VerifyOptions,
+    JwtTokenValidation,
+    SkillValidation,
+    AuthenticationConstants,
+    EmulatorValidation,
+    JwtTokenExtractor
 )
 from botframework.connector.auth._bot_framework_client_impl import _BotFrameworkClientImpl
 from botframework.connector.auth._built_in_bot_framework_authentication import _BuiltinBotFrameworkAuthentication

@@ -11,7 +11,7 @@ from .service_client_credentials_factory import ServiceClientCredentialsFactory
 
 
 class PasswordServiceClientCredentialFactory(ServiceClientCredentialsFactory):
-    def __init__(self, app_id: str, password: str) -> None:
+    def __init__(self, app_id: str = None, password: str = None) -> None:
         self.app_id = app_id
         self.password = password
 
