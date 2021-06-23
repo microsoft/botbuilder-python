@@ -17,7 +17,6 @@ from .operations_async import ConversationsOperations
 from .. import models
 
 
-# TODO: experimental
 from ..bot_framework_sdk_client_async import (
     BotFrameworkSDKClientAsync,
     BotFrameworkConnectorConfiguration,
@@ -63,7 +62,7 @@ class ConnectorClient(BotFrameworkSDKClientAsync):
         pipeline_type: Optional[Type[AsyncPipeline]] = None,
         sender: Optional[AsyncHTTPSender] = None,
         driver: Optional[AsyncHttpDriver] = None,
-        custom_configuration: [BotFrameworkConnectorConfiguration] = None,
+        custom_configuration: Optional[BotFrameworkConnectorConfiguration] = None,
     ):
         if custom_configuration:
             self.config = custom_configuration
