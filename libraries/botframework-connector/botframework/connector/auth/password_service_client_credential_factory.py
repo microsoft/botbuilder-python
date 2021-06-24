@@ -1,7 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from re import S
+from logging import Logger
+
 from msrest.authentication import Authentication
 
 from .authentication_constants import AuthenticationConstants
@@ -11,9 +12,12 @@ from .service_client_credentials_factory import ServiceClientCredentialsFactory
 
 
 class PasswordServiceClientCredentialFactory(ServiceClientCredentialsFactory):
-    def __init__(self, app_id: str, password: str) -> None:
+    def __init__(
+        self, app_id: str = None, password: str = None, *, logger: Logger = None
+    ) -> None:
         self.app_id = app_id
         self.password = password
+        self._logger = logger
 
     async def is_valid_app_id(self, app_id: str) -> bool:
         return app_id == self.app_id

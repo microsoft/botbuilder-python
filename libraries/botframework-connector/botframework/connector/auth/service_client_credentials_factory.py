@@ -1,9 +1,9 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from msrest.authentication import Authentication
-
 from abc import ABC, abstractmethod
+
+from .app_credentials import AppCredentials
 
 
 class ServiceClientCredentialsFactory(ABC):
@@ -29,14 +29,14 @@ class ServiceClientCredentialsFactory(ABC):
     @abstractmethod
     async def create_credentials(
         self, app_id: str, audience: str, login_endpoint: str, validate_authority: bool
-    ) -> Authentication:
+    ) -> AppCredentials:
         """
-        A factory method for creating Authentication.
+        A factory method for creating AppCredentials.
         
         :param app_id: The appId.
         :param audience: The audience.
         :param login_endpoint: The login url.
         :param validate_authority: The validate authority value to use.
-        :returns: An Authentication object.
+        :returns: An AppCredentials object.
         """
         raise NotImplementedError()

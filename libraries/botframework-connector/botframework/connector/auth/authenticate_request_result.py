@@ -10,7 +10,7 @@ class AuthenticateRequestResult:
         # A value for the Audience.
         self.audience: str = None
         # A value for the ClaimsIdentity.
-        self.claims_identy: ClaimsIdentity = None
+        self.claims_identity: ClaimsIdentity = None
         # A value for the caller id.
         self.caller_id: str = None
         # A value for the ConnectorFactory.

@@ -138,6 +138,8 @@ class CloudAdapter(CloudAdapterBase, BotFrameworkHttpAdapterIntegrationBase):
             authentication_request_result, self, bot, bf_web_socket
         )
 
+        await streaming_activity_processor.listen()
+
 
 class _StreamingActivityProcessor(StreamingActivityProcessor):
     def __init__(

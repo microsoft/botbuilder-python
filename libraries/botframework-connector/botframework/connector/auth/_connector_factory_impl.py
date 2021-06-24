@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from logging import Logger
+
 from botframework.connector.aio import ConnectorClient
 
 from ..about import __version__
@@ -11,7 +13,7 @@ from .service_client_credentials_factory import ServiceClientCredentialsFactory
 USER_AGENT = f"Microsoft-BotFramework/3.1 (BotBuilder Python/{__version__})"
 
 
-class ConnectorFactoryImpl(ConnectorFactory):
+class _ConnectorFactoryImpl(ConnectorFactory):
     def __init__(
         self,
         app_id: str,
@@ -20,6 +22,7 @@ class ConnectorFactoryImpl(ConnectorFactory):
         validate_authority: bool,
         credential_factory: ServiceClientCredentialsFactory,
         connector_client_configuration: BotFrameworkConnectorConfiguration = None,
+        logger: Logger = None,
     ) -> None:
         self._app_id = app_id
         self._to_channel_from_bot_oauth_scope = to_channel_from_bot_oauth_scope
@@ -27,6 +30,7 @@ class ConnectorFactoryImpl(ConnectorFactory):
         self._validate_authority = validate_authority
         self._credential_factory = credential_factory
         self._connector_client_configuration = connector_client_configuration
+        self._logger = logger
 
     async def create(self, service_url: str, audience: str = None) -> ConnectorClient:
         # Use the credentials factory to create credentails specific to this particular cloud environment.

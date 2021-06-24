@@ -1,10 +1,11 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+from botframework.connector.auth import ServiceClientCredentialsFactory
 
 
 class CredentialProvider:
     """CredentialProvider.
-    This class allows Bots to provide their own implemention
+    This class allows Bots to provide their own implementation
     of what is, and what is not, a valid appId and password.
     This is useful in the case of multi-tenant bots, where the bot
     may need to call out to a service to determine if a particular
@@ -58,3 +59,17 @@ class SimpleCredentialProvider(CredentialProvider):
 
     async def is_authentication_disabled(self) -> bool:
         return not self.app_id
+
+
+class _DelegatingCredentialProvider(CredentialProvider):
+    def __init__(self, credentials_factory: ServiceClientCredentialsFactory):
+        self._credentials_factory = credentials_factory
+
+    async def is_valid_appid(self, app_id: str) -> bool:
+        return await self._credentials_factory.is_valid_app_id(app_id)
+
+    async def get_app_password(self, app_id: str) -> str:
+        raise NotImplementedError
+
+    async def is_authentication_disabled(self) -> bool:
+        return await self._credentials_factory.is_authentication_disabled()

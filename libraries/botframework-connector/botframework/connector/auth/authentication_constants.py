@@ -28,6 +28,11 @@ class AuthenticationConstants(ABC):
     # TO BOT FROM CHANNEL: Token issuer
     TO_BOT_FROM_CHANNEL_TOKEN_ISSUER = "https://api.botframework.com"
 
+    """
+    OAuth Url used to get a token from OAuthApiClient.
+    """
+    OAUTH_URL = "https://api.botframework.com"
+
     # Application Setting Key for the OpenIdMetadataUrl value.
     BOT_OPEN_ID_METADATA_KEY = "BotOpenIdMetadata"
 
