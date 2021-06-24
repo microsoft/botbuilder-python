@@ -3,7 +3,7 @@
 
 from abc import ABC, abstractmethod
 
-from botframework.connector import ConnectorClient
+from botframework.connector.aio import ConnectorClient
 
 
 class ConnectorFactory(ABC):

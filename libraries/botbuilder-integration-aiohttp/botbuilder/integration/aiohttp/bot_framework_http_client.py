@@ -3,7 +3,7 @@
 # pylint: disable=no-member
 
 import json
-from typing import Dict
+from typing import Dict, List, Tuple
 from logging import Logger
 
 import aiohttp
@@ -115,7 +115,7 @@ class BotFrameworkHttpClient(BotFrameworkClient):
 
     async def _post_content(
         self, to_url: str, token: str, activity: Activity
-    ) -> (int, object):
+    ) -> Tuple[int, object]:
         headers_dict = {
             "Content-type": "application/json; charset=utf-8",
         }
@@ -140,7 +140,7 @@ class BotFrameworkHttpClient(BotFrameworkClient):
         service_url: str,
         conversation_id: str,
         activity: Activity,
-    ) -> [Activity]:
+    ) -> List[Activity]:
         """
         Helper method to return a list of activities when an Activity is being
         sent with DeliveryMode == expectReplies.
