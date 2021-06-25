@@ -1,10 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import botbuilder.dialogs as dialogs
-
-from botbuilder.dialogs.dialog_context import DialogContext
-from botbuilder.dialogs.dialog_turn_result import DialogTurnResult
 from botframework.connector.auth import (
     ClaimsIdentity,
     SkillValidation,
@@ -13,14 +9,16 @@ from botframework.connector.auth import (
 )
 from botbuilder.core import BotAdapter, StatePropertyAccessor, TurnContext
 from botbuilder.core.skills import SkillHandler, SkillConversationReference
+import botbuilder.dialogs as dialogs  # pylint: disable=unused-import
+from botbuilder.dialogs.memory import DialogStateManager
+from botbuilder.dialogs.dialog_context import DialogContext
+from botbuilder.dialogs.dialog_turn_result import DialogTurnResult
 from botbuilder.dialogs import (
     DialogEvents,
     DialogSet,
     DialogTurnStatus,
 )
 from botbuilder.schema import Activity, ActivityTypes, EndOfConversationCodes
-
-from botbuilder.dialogs.memory import DialogStateManager
 
 
 class DialogExtensions:
@@ -55,8 +53,6 @@ class DialogExtensions:
         dialog_context.context.turn_state[
             dialog_state_manager.__class__.__name__
         ] = dialog_state_manager
-
-        turn_result: DialogTurnResult = None
 
         # Loop as long as we are getting valid OnError handled we should continue executing the actions for the turn.
 
