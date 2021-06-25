@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 from logging import Logger
 from typing import Dict, Optional
 
@@ -475,7 +478,10 @@ class _ParameterizedBotFrameworkAuthentication(BotFrameworkAuthentication):
         # Async validation.
 
         # Look for the "aud" claim, but only if issued from the Bot Framework
-        # TODO: check for claim_issuer in addition to claim_type
+        issuer = identity.get_claim_value(AuthenticationConstants.ISSUER_CLAIM)
+        if issuer != self._to_bot_from_channel_token_issuer:
+            raise PermissionError()
+
         app_id = identity.get_claim_value(AuthenticationConstants.AUDIENCE_CLAIM)
         if not app_id:
             # The relevant audience Claim MUST be present. Not Authorized.
