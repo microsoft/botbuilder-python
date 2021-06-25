@@ -165,7 +165,7 @@ class DialogExtensions:
         trace_label = (
             "Skill State"
             if isinstance(claims_identity, ClaimsIdentity)
-            and SkillValidation.is_skill_claim(claims_identity)
+            and SkillValidation.is_skill_claim(claims_identity.claims)
             else "Bot State"
         )
         # send trace of memory
