@@ -1,7 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from botbuilder.dialogs import dialog_turn_result
+import botbuilder.dialogs as dialogs
+
 from botbuilder.dialogs.dialog_context import DialogContext
 from botbuilder.dialogs.dialog_turn_result import DialogTurnResult
 from botframework.connector.auth import (
@@ -13,7 +14,6 @@ from botframework.connector.auth import (
 from botbuilder.core import BotAdapter, StatePropertyAccessor, TurnContext
 from botbuilder.core.skills import SkillHandler, SkillConversationReference
 from botbuilder.dialogs import (
-    Dialog,
     DialogEvents,
     DialogSet,
     DialogTurnStatus,
@@ -26,7 +26,9 @@ from botbuilder.dialogs.memory import DialogStateManager
 class DialogExtensions:
     @staticmethod
     async def run_dialog(
-        dialog: Dialog, turn_context: TurnContext, accessor: StatePropertyAccessor
+        dialog: "dialogs.Dialog",
+        turn_context: TurnContext,
+        accessor: StatePropertyAccessor,
     ):
         """
         Creates a dialog stack and starts a dialog, pushing it onto the stack.
@@ -120,7 +122,7 @@ class DialogExtensions:
         if result.status == DialogTurnStatus.Empty:
             result = await dialog_context.begin_dialog(dialog_id)
 
-        DialogExtensions._send_state_snapshot_trace(dialog_context)
+        await DialogExtensions._send_state_snapshot_trace(dialog_context)
 
         # Skills should send EoC when the dialog completes.
         if (

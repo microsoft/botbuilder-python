@@ -166,7 +166,7 @@ class DialogManager:
             "This method will be deprecated as no longer is necesary",
             PendingDeprecationWarning,
         )
-        DialogExtensions._send_state_snapshot_trace(  # pylint: disable=protected-access
+        await DialogExtensions._send_state_snapshot_trace(  # pylint: disable=protected-access
             dialog_context
         )
 
