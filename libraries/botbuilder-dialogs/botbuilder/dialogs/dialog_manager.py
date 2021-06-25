@@ -3,6 +3,7 @@
 
 from datetime import datetime, timedelta
 from threading import Lock
+from warnings import warn
 
 from botbuilder.core import (
     BotAdapter,
@@ -12,10 +13,7 @@ from botbuilder.core import (
     TurnContext,
 )
 from botbuilder.core.skills import SkillConversationReference, SkillHandler
-from botbuilder.dialogs.memory import (
-    DialogStateManager,
-    DialogStateManagerConfiguration,
-)
+from botbuilder.dialogs.memory import DialogStateManagerConfiguration
 from botbuilder.schema import Activity, ActivityTypes, EndOfConversationCodes
 from botframework.connector.auth import (
     AuthenticationConstants,
@@ -27,6 +25,7 @@ from botframework.connector.auth import (
 from .dialog import Dialog
 from .dialog_context import DialogContext
 from .dialog_events import DialogEvents
+from .dialog_extensions import DialogExtensions
 from .dialog_set import DialogSet
 from .dialog_state import DialogState
 from .dialog_manager_result import DialogManagerResult
@@ -142,60 +141,10 @@ class DialogManager:
         # Create DialogContext
         dialog_context = DialogContext(self.dialogs, context, dialog_state)
 
-        # promote initial TurnState into dialog_context.services for contextual services
-        for key, service in dialog_context.services.items():
-            dialog_context.services[key] = service
-
-        # map TurnState into root dialog context.services
-        for key, service in context.turn_state.items():
-            dialog_context.services[key] = service
-
-        # get the DialogStateManager configuration
-        dialog_state_manager = DialogStateManager(
-            dialog_context, self.state_configuration
+        # Call the common dialog "continue/begin" execution pattern shared with the classic RunAsync extension method
+        turn_result = await DialogExtensions._internal_run(  # pylint: disable=protected-access
+            context, self._root_dialog_id, dialog_context
         )
-        await dialog_state_manager.load_all_scopes()
-        dialog_context.context.turn_state[
-            dialog_state_manager.__class__.__name__
-        ] = dialog_state_manager
-
-        turn_result: DialogTurnResult = None
-
-        # Loop as long as we are getting valid OnError handled we should continue executing the actions for the turn.
-
-        # NOTE: We loop around this block because each pass through we either complete the turn and break out of the
-        # loop or we have had an exception AND there was an OnError action which captured the error.  We need to
-        # continue the turn based on the actions the OnError handler introduced.
-        end_of_turn = False
-        while not end_of_turn:
-            try:
-                claims_identity: ClaimsIdentity = context.turn_state.get(
-                    BotAdapter.BOT_IDENTITY_KEY, None
-                )
-                if isinstance(
-                    claims_identity, ClaimsIdentity
-                ) and SkillValidation.is_skill_claim(claims_identity.claims):
-                    # The bot is running as a skill.
-                    turn_result = await self.handle_skill_on_turn(dialog_context)
-                else:
-                    # The bot is running as root bot.
-                    turn_result = await self.handle_bot_on_turn(dialog_context)
-
-                # turn successfully completed, break the loop
-                end_of_turn = True
-            except Exception as err:
-                # fire error event, bubbling from the leaf.
-                handled = await dialog_context.emit_event(
-                    DialogEvents.error, err, bubble=True, from_leaf=True
-                )
-
-                if not handled:
-                    # error was NOT handled, throw the exception and end the turn. (This will trigger the
-                    # Adapter.OnError handler and end the entire dialog stack)
-                    raise
-
-        # save all state scopes to their respective botState locations.
-        await dialog_state_manager.save_all_changes()
 
         # save BotState changes
         await bot_state_set.save_all_changes(dialog_context.context, False)
@@ -204,7 +153,8 @@ class DialogManager:
 
     @staticmethod
     async def send_state_snapshot_trace(
-        dialog_context: DialogContext, trace_label: str
+        dialog_context: DialogContext,
+        trace_label: str = None,  # pylint: disable=unused-argument
     ):
         """
         Helper to send a trace activity with a memory snapshot of the active dialog DC.
@@ -212,17 +162,13 @@ class DialogManager:
         :param trace_label:
         :return:
         """
-        # send trace of memory
-        snapshot = DialogManager.get_active_dialog_context(
-            dialog_context
-        ).state.get_memory_snapshot()
-        trace_activity = Activity.create_trace_activity(
-            "BotState",
-            "https://www.botframework.com/schemas/botState",
-            snapshot,
-            trace_label,
+        warn(
+            "This method will be deprecated as no longer is necesary",
+            PendingDeprecationWarning,
         )
-        await dialog_context.context.send_activity(trace_activity)
+        await DialogExtensions._send_state_snapshot_trace(  # pylint: disable=protected-access
+            dialog_context
+        )
 
     @staticmethod
     def is_from_parent_to_skill(turn_context: TurnContext) -> bool:
@@ -246,11 +192,13 @@ class DialogManager:
         :param dialog_context:
         :return:
         """
-        child = dialog_context.child
-        if not child:
-            return dialog_context
-
-        return DialogManager.get_active_dialog_context(child)
+        warn(
+            "This method will be deprecated as no longer is necesary",
+            PendingDeprecationWarning,
+        )
+        return DialogExtensions._get_active_dialog_context(  # pylint: disable=protected-access
+            dialog_context
+        )
 
     @staticmethod
     def should_send_end_of_conversation_to_parent(
@@ -294,6 +242,10 @@ class DialogManager:
     async def handle_skill_on_turn(
         self, dialog_context: DialogContext
     ) -> DialogTurnResult:
+        warn(
+            "This method will be deprecated as no longer is necesary",
+            PendingDeprecationWarning,
+        )
         # the bot is running as a skill.
         turn_context = dialog_context.context
 
@@ -348,6 +300,10 @@ class DialogManager:
     async def handle_bot_on_turn(
         self, dialog_context: DialogContext
     ) -> DialogTurnResult:
+        warn(
+            "This method will be deprecated as no longer is necesary",
+            PendingDeprecationWarning,
+        )
         # the bot is running as a root bot.
         if dialog_context.active_dialog is None:
             # start root dialog
