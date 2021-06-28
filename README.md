@@ -21,7 +21,7 @@ For more information jump to a section below.
 
 | Branch | Description        | Build Status | Coverage Status | Code Style |
  |----|---------------|--------------|-----------------|--|
-| Main | 4.14.* Preview Builds | [![Build Status](https://fuselabs.visualstudio.com/SDK_v4/_apis/build/status/Python/Python-CI-PR-yaml?branchName=main)](https://fuselabs.visualstudio.com/SDK_v4/_build/latest?definitionId=771&branchName=main) | [![Coverage Status](https://coveralls.io/repos/github/microsoft/botbuilder-python/badge.svg?branch=HEAD)](https://coveralls.io/github/microsoft/botbuilder-python?branch=HEAD) | [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) |
+| Main | 4.14.* Builds | [![Build Status](https://fuselabs.visualstudio.com/SDK_v4/_apis/build/status/Python/Python-CI-PR-yaml?branchName=main)](https://fuselabs.visualstudio.com/SDK_v4/_build/latest?definitionId=771&branchName=main) | [![Coverage Status](https://coveralls.io/repos/github/microsoft/botbuilder-python/badge.svg?branch=HEAD)](https://coveralls.io/github/microsoft/botbuilder-python?branch=HEAD) | [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) |
 
 ## Packages
 
@@ -34,6 +34,7 @@ For more information jump to a section below.
 | botbuilder-dialogs | [![PyPI version](https://badge.fury.io/py/botbuilder-dialogs.svg)](https://pypi.org/project/botbuilder-dialogs/) |
 | botbuilder-schema | [![PyPI version](https://badge.fury.io/py/botbuilder-schema.svg)](https://pypi.org/project/botbuilder-schema/) |
 | botframework-connector | [![PyPI version](https://badge.fury.io/py/botframework-connector.svg)](https://pypi.org/project/botframework-connector/) |
+|
 
 ## Getting Started
 To get started building bots using the SDK, see the [Azure Bot Service Documentation](https://docs.microsoft.com/en-us/azure/bot-service/?view=azure-bot-service-4.0).
@@ -65,14 +66,15 @@ To use a local copy of the SDK you can link to these packages with the pip -e op
 ```bash
 pip install -e ./libraries/botbuilder-schema
 pip install -e ./libraries/botframework-connector
+pip install -e ./libraries/botframework-streaming
 pip install -e ./libraries/botbuilder-core
-pip install -e ./libraries/botbuilder-integration-aiohttp
 pip install -e ./libraries/botbuilder-ai
 pip install -e ./libraries/botbuilder-applicationinsights
-pip install -e ./libraries/botbuilder-integration-applicationinsights-aiohttp
 pip install -e ./libraries/botbuilder-dialogs
 pip install -e ./libraries/botbuilder-azure
+pip install -e ./libraries/botbuilder-integration-applicationinsights-aiohttp
 pip install -e ./libraries/botbuilder-adapters-slack
+pip install -e ./libraries/botbuilder-integration-aiohttp
 pip install -e ./libraries/botbuilder-testing
 ```
 

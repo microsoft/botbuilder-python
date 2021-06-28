@@ -2372,54 +2372,65 @@ class TaskModuleCardResponse(TaskModuleResponseBase):
         return
 
 
-class MeetingDetails(Model):
+class MeetingDetailsBase(Model):
     """Specific details of a Teams meeting.
 
     :param id: The meeting's Id, encoded as a BASE64 string.
     :type id: str
+    :param join_url: The URL used to join the meeting.
+    :type join_url: str
+    :param title: The title of the meeting.
+    :type title: str
+    """
+
+    _attribute_map = {
+        "id": {"key": "uniqueId", "type": "str"},
+        "join_url": {"key": "joinUrl", "type": "str"},
+        "title": {"key": "title", "type": "str"},
+    }
+
+    def __init__(
+        self, *, id: str = None, join_url: str = None, title: str = None, **kwargs
+    ) -> None:
+        super(MeetingDetailsBase, self).__init__(**kwargs)
+        self.id = id
+        self.join_url = join_url
+        self.title = title
+
+
+class MeetingDetails(MeetingDetailsBase):
+    """Specific details of a Teams meeting.
+
     :param ms_graph_resource_id: The MsGraphResourceId, used specifically for MS Graph API calls.
     :type ms_graph_resource_id: str
     :param scheduled_start_time: The meeting's scheduled start time, in UTC.
     :type scheduled_start_time: str
     :param scheduled_end_time: The meeting's scheduled end time, in UTC.
     :type scheduled_end_time: str
-    :param join_url: The URL used to join the meeting.
-    :type join_url: str
-    :param title: The title of the meeting.
-    :type title: str
     :param type: The meeting's type.
     :type type: str
     """
 
     _attribute_map = {
-        "id": {"key": "uniqueId", "type": "str"},
         "ms_graph_resource_id": {"key": "msGraphResourceId", "type": "str"},
         "scheduled_start_time": {"key": "scheduledStartTime", "type": "str"},
         "scheduled_end_time": {"key": "scheduledEndTime", "type": "str"},
-        "join_url": {"key": "joinUrl", "type": "str"},
-        "title": {"key": "title", "type": "str"},
         "type": {"key": "type", "type": "str"},
     }
 
     def __init__(
         self,
         *,
-        id: str = None,
         ms_graph_resource_id: str = None,
         scheduled_start_time: str = None,
         scheduled_end_time: str = None,
-        join_url: str = None,
-        title: str = None,
         type: str = None,
         **kwargs
     ) -> None:
         super(MeetingDetails, self).__init__(**kwargs)
-        self.id = id
         self.ms_graph_resource_id = ms_graph_resource_id
         self.scheduled_start_time = scheduled_start_time
         self.scheduled_end_time = scheduled_end_time
-        self.join_url = join_url
-        self.title = title
         self.type = type
 
 
@@ -2452,3 +2463,45 @@ class MeetingInfo(Model):
         self.details = details
         self.conversation = conversation
         self.organizer = organizer
+
+
+class MeetingEventDetails(MeetingDetailsBase):
+    """Base class for Teams meting start and end events.
+
+    :param meeting_type: The meeting's type.
+    :type meeting_type: str
+    """
+
+    _attribute_map = {"meeting_type": {"key": "MeetingType", "type": "str"}}
+
+    def __init__(self, *, meeting_type: str = None, **kwargs):
+        super(MeetingEventDetails, self).__init__(**kwargs)
+        self.meeting_type = meeting_type
+
+
+class MeetingStartEventDetails(MeetingDetailsBase):
+    """Specific details of a Teams meeting start event.
+
+    :param start_time: Timestamp for meeting start, in UTC.
+    :type start_time: str
+    """
+
+    _attribute_map = {"start_time": {"key": "StartTime", "type": "str"}}
+
+    def __init__(self, *, start_time: str = None, **kwargs):
+        super(MeetingStartEventDetails, self).__init__(**kwargs)
+        self.start_time = start_time
+
+
+class MeetingEndEventDetails(MeetingDetailsBase):
+    """Specific details of a Teams meeting end event.
+
+    :param end_time: Timestamp for meeting end, in UTC.
+    :type end_time: str
+    """
+
+    _attribute_map = {"end_time": {"key": "EndTime", "type": "str"}}
+
+    def __init__(self, *, end_time: str = None, **kwargs):
+        super(MeetingEndEventDetails, self).__init__(**kwargs)
+        self.end_time = end_time

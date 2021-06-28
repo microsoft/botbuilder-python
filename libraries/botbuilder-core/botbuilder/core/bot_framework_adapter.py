@@ -340,6 +340,7 @@ class BotFrameworkAdapter(
             If the conversation is established with the specified users, the ID of the activity
             will contain the ID of the new conversation.
         """
+
         try:
             if not service_url:
                 service_url = reference.service_url
@@ -366,8 +367,10 @@ class BotFrameworkAdapter(
             # Mix in the tenant ID if specified. This is required for MS Teams.
             if reference.conversation and reference.conversation.tenant_id:
                 # Putting tenant_id in channel_data is a temporary while we wait for the Teams API to be updated
-                parameters.channel_data = {
-                    "tenant": {"tenantId": reference.conversation.tenant_id}
+                if parameters.channel_data is None:
+                    parameters.channel_data = {}
+                parameters.channel_data["tenant"] = {
+                    "tenantId": reference.conversation.tenant_id
                 }
 
                 # Permanent solution is to put tenant_id in parameters.tenant_id
@@ -511,10 +514,7 @@ class BotFrameworkAdapter(
             if invoke_response is None:
                 return InvokeResponse(status=int(HTTPStatus.NOT_IMPLEMENTED))
             return InvokeResponse(
-                status=invoke_response.value.status,
-                body=invoke_response.value.body.serialize()
-                if invoke_response.value.body
-                else None,
+                status=invoke_response.value.status, body=invoke_response.value.body,
             )
 
         return None
