@@ -514,10 +514,7 @@ class BotFrameworkAdapter(
             if invoke_response is None:
                 return InvokeResponse(status=int(HTTPStatus.NOT_IMPLEMENTED))
             return InvokeResponse(
-                status=invoke_response.value.status,
-                body=invoke_response.value.body.serialize()
-                if invoke_response.value.body
-                else None,
+                status=invoke_response.value.status, body=invoke_response.value.body,
             )
 
         return None
