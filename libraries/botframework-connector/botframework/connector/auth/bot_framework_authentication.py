@@ -102,6 +102,7 @@ class BotFrameworkAuthentication(ABC):
      """
 
     async def generate_caller_id(
+        self,
         *,
         credential_factory: ServiceClientCredentialsFactory,
         claims_identity: ClaimsIdentity,

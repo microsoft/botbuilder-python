@@ -85,7 +85,9 @@ class _BuiltinBotFrameworkAuthentication(BotFrameworkAuthentication):
         )
 
         caller_id = await self.generate_caller_id(
-            self._credentials_factory, claims_identity, self._caller_id
+            credential_factory=self._credentials_factory,
+            claims_identity=claims_identity,
+            caller_id=self._caller_id,
         )
 
         connector_factory = _ConnectorFactoryImpl(

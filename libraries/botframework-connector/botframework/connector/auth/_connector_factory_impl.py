@@ -18,7 +18,7 @@ class _ConnectorFactoryImpl(ConnectorFactory):
         self,
         app_id: str,
         to_channel_from_bot_oauth_scope: str,
-        login_enpoint: str,
+        login_endpoint: str,
         validate_authority: bool,
         credential_factory: ServiceClientCredentialsFactory,
         connector_client_configuration: BotFrameworkConnectorConfiguration = None,
@@ -26,7 +26,7 @@ class _ConnectorFactoryImpl(ConnectorFactory):
     ) -> None:
         self._app_id = app_id
         self._to_channel_from_bot_oauth_scope = to_channel_from_bot_oauth_scope
-        self._login_enpoint = login_enpoint
+        self._login_endpoint = login_endpoint
         self._validate_authority = validate_authority
         self._credential_factory = credential_factory
         self._connector_client_configuration = connector_client_configuration
@@ -37,7 +37,7 @@ class _ConnectorFactoryImpl(ConnectorFactory):
         credentials = await self._credential_factory.create_credentials(
             self._app_id,
             audience or self._to_channel_from_bot_oauth_scope,
-            self._login_enpoint,
+            self._login_endpoint,
             self._validate_authority,
         )
 

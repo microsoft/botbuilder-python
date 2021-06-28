@@ -101,7 +101,7 @@ class CloudAdapter(CloudAdapterBase, BotFrameworkHttpAdapterIntegrationBase):
 
                 # Process the inbound activity with the bot
                 invoke_response = await self.process_activity(
-                    activity, auth_header, bot.on_turn
+                    auth_header, activity, bot.on_turn
                 )
 
                 # Write the response, serializing the InvokeResponse

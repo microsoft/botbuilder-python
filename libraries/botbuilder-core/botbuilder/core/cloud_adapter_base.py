@@ -246,7 +246,7 @@ class CloudAdapterBase(BotAdapter, ABC):
         )
 
         # Set the caller_id on the activity
-        activity.caller_id = auth_header_or_authenticate_request_result.caller_id
+        activity.caller_id = authenticate_request_result.caller_id
 
         # Create the connector client to use for outbound requests.
         connector_client = (
