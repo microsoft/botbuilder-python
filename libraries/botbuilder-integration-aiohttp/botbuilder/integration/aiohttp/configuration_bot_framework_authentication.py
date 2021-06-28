@@ -12,8 +12,10 @@ from botframework.connector.auth import (
     ClaimsIdentity,
     UserTokenClient,
     ConnectorFactory,
-    AuthenticateRequestResult, ServiceClientCredentialsFactory, AuthenticationConfiguration,
-    BotFrameworkAuthenticationFactory
+    AuthenticateRequestResult,
+    ServiceClientCredentialsFactory,
+    AuthenticationConfiguration,
+    BotFrameworkAuthenticationFactory,
 )
 from botframework.connector.skills import BotFrameworkClient
 
@@ -31,9 +33,15 @@ class ConfigurationBotFrameworkAuthentication(BotFrameworkAuthentication):
         self._inner: BotFrameworkAuthentication = BotFrameworkAuthenticationFactory.create(
             channel_service=getattr(configuration, "CHANNEL_SERVICE", None),
             validate_authority=getattr(configuration, "VALIDATE_AUTHORITY", True),
-            to_channel_from_bot_login_url=getattr(configuration, "TO_CHANNEL_FROM_BOT_LOGIN_URL", None),
-            to_channel_from_bot_oauth_scope=getattr(configuration, "TO_CHANNEL_FROM_BOT_OAUTH_SCOPE", None),
-            to_bot_from_channel_token_issuer=getattr(configuration, "TO_BOT_FROM_CHANNEL_TOKEN_ISSUER", None),
+            to_channel_from_bot_login_url=getattr(
+                configuration, "TO_CHANNEL_FROM_BOT_LOGIN_URL", None
+            ),
+            to_channel_from_bot_oauth_scope=getattr(
+                configuration, "TO_CHANNEL_FROM_BOT_OAUTH_SCOPE", None
+            ),
+            to_bot_from_channel_token_issuer=getattr(
+                configuration, "TO_BOT_FROM_CHANNEL_TOKEN_ISSUER", None
+            ),
             oauth_url=getattr(configuration, "OAUTH_URL", None),
             to_bot_from_channel_open_id_metadata_url=getattr(
                 configuration, "TO_BOT_FROM_CHANNEL_OPENID_METADATA_URL", None
@@ -44,14 +52,16 @@ class ConfigurationBotFrameworkAuthentication(BotFrameworkAuthentication):
             caller_id=getattr(configuration, "CALLER_ID", None),
             credential_factory=(
                 credentials_factory
-                if credentials_factory else
-                ConfigurationServiceClientCredentialFactory(configuration)
+                if credentials_factory
+                else ConfigurationServiceClientCredentialFactory(configuration)
             ),
             auth_configuration=(
-                auth_configuration if auth_configuration else AuthenticationConfiguration()
+                auth_configuration
+                if auth_configuration
+                else AuthenticationConfiguration()
             ),
             http_client_factory=http_client_factory,
-            logger=logger
+            logger=logger,
         )
 
     async def authenticate_request(
@@ -62,12 +72,18 @@ class ConfigurationBotFrameworkAuthentication(BotFrameworkAuthentication):
     async def authenticate_streaming_request(
         self, auth_header: str, channel_id_header: str
     ) -> AuthenticateRequestResult:
-        return await self._inner.authenticate_streaming_request(auth_header, channel_id_header)
+        return await self._inner.authenticate_streaming_request(
+            auth_header, channel_id_header
+        )
 
-    def create_connector_factory(self, claims_identity: ClaimsIdentity) -> ConnectorFactory:
+    def create_connector_factory(
+        self, claims_identity: ClaimsIdentity
+    ) -> ConnectorFactory:
         return self._inner.create_connector_factory(claims_identity)
 
-    async def create_user_token_client(self, claims_identity: ClaimsIdentity) -> UserTokenClient:
+    async def create_user_token_client(
+        self, claims_identity: ClaimsIdentity
+    ) -> UserTokenClient:
         return await self._inner.create_user_token_client(claims_identity)
 
     def create_bot_framework_client(self) -> BotFrameworkClient:

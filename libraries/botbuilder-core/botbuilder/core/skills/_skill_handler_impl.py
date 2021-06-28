@@ -4,7 +4,7 @@
 from uuid import uuid4
 from typing import Callable
 
-from botbuilder.core import Bot, BotAdapter, ChannelServiceHandler, TurnContext
+from botbuilder.core import Bot, BotAdapter, TurnContext
 from botbuilder.schema import (
     Activity,
     ActivityTypes,
@@ -12,11 +12,8 @@ from botbuilder.schema import (
     CallerIdConstants,
 )
 from botframework.connector.auth import (
-    AuthenticationConfiguration,
     AuthenticationConstants,
-    ChannelProvider,
     ClaimsIdentity,
-    CredentialProvider,
     GovernmentConstants,
     JwtTokenValidation,
 )

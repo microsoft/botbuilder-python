@@ -1,15 +1,12 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from uuid import uuid4
-from logging import Logger, getLogger
+from logging import Logger
 
-from botbuilder.core import Bot, BotAdapter, ChannelServiceHandler, TurnContext
+from botbuilder.core import Bot, BotAdapter, ChannelServiceHandler
 from botbuilder.schema import (
     Activity,
-    ActivityTypes,
     ResourceResponse,
-    CallerIdConstants,
 )
 from botframework.connector.auth import (
     AuthenticationConfiguration,
@@ -18,11 +15,8 @@ from botframework.connector.auth import (
     ClaimsIdentity,
     CredentialProvider,
     GovernmentConstants,
-    JwtTokenValidation,
 )
-from .skill_conversation_reference import SkillConversationReference
 from .conversation_id_factory import ConversationIdFactoryBase
-from ._skill_handler_impl import _SkillHandlerImpl
 
 
 class SkillHandler(ChannelServiceHandler):
@@ -59,6 +53,8 @@ class SkillHandler(ChannelServiceHandler):
                 if self._channel_provider and self._channel_provider.is_government()
                 else AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
             )
+
+        from ._skill_handler_impl import _SkillHandlerImpl
 
         self._inner = _SkillHandlerImpl(
             self.SKILL_CONVERSATION_REFERENCE_KEY,

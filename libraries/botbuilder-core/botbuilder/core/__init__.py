@@ -4,6 +4,8 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
+from botbuilder.schema import InvokeResponse
+
 from . import conversation_reference_extension
 
 from .about import __version__
@@ -25,7 +27,6 @@ from .conversation_state import ConversationState
 from .oauth.extended_user_token_provider import ExtendedUserTokenProvider
 from .oauth.user_token_provider import UserTokenProvider
 from .intent_score import IntentScore
-from .invoke_response import InvokeResponse
 from .memory_storage import MemoryStorage
 from .memory_transcript_store import MemoryTranscriptStore
 from .message_factory import MessageFactory

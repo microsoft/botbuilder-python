@@ -47,6 +47,7 @@ from botbuilder.schema import (
     ConversationParameters,
     ConversationReference,
     ExpectedReplies,
+    InvokeResponse,
     TokenResponse,
     ResourceResponse,
     DeliveryModes,
@@ -60,7 +61,6 @@ from .oauth import (
     ExtendedUserTokenProvider,
 )
 from .turn_context import TurnContext
-from .invoke_response import InvokeResponse
 from .conversation_reference_extension import get_continuation_activity
 
 USER_AGENT = f"Microsoft-BotFramework/3.1 (BotBuilder Python/{__version__})"

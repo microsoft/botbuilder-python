@@ -5,26 +5,27 @@ from logging import Logger
 from typing import Optional
 
 from botbuilder.schema import Activity
-from botframework.connector.auth import (
-    BotFrameworkAuthentication,
-    AuthenticateRequestResult,
-    ClaimsIdentity,
-    UserTokenClient,
-    ConnectorFactory,
-    ServiceClientCredentialsFactory,
-    AuthenticationConfiguration,
-    AuthenticationConstants,
-    SkillValidation,
-    JwtTokenValidation,
-    ChannelProvider,
-    SimpleChannelProvider,
-)
-from botframework.connector import BotFrameworkConnectorConfiguration, HttpClientFactory
+
+from ..bot_framework_sdk_client_async import BotFrameworkConnectorConfiguration
+from ..http_client_factory import HttpClientFactory
+from ..skills.bot_framework_client import BotFrameworkClient
+
 from ._bot_framework_client_impl import _BotFrameworkClientImpl
 from ._user_token_client_impl import _UserTokenClientImpl
 from ._connector_factory_impl import _ConnectorFactoryImpl
+from .authenticate_request_result import AuthenticateRequestResult
+from .authentication_configuration import AuthenticationConfiguration
+from .authentication_constants import AuthenticationConstants
+from .bot_framework_authentication import BotFrameworkAuthentication
+from .claims_identity import ClaimsIdentity
+from .channel_provider import ChannelProvider
+from .connector_factory import ConnectorFactory
 from .credential_provider import _DelegatingCredentialProvider
-from botframework.connector.skills import BotFrameworkClient
+from .jwt_token_validation import JwtTokenValidation
+from .service_client_credentials_factory import ServiceClientCredentialsFactory
+from .skill_validation import SkillValidation
+from .simple_channel_provider import SimpleChannelProvider
+from .user_token_client import UserTokenClient
 
 
 class _BuiltinBotFrameworkAuthentication(BotFrameworkAuthentication):

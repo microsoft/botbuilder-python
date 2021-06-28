@@ -4,7 +4,6 @@
 from abc import ABC, abstractmethod
 
 # TODO: add InvokeResponse to botbuilder-schema or rethink dependencies
-from botbuilder.core import InvokeResponse
 from botbuilder.schema import Activity
 
 
@@ -18,7 +17,7 @@ class BotFrameworkClient(ABC):
         service_url: str,
         conversation_id: str,
         activity: Activity,
-    ) -> InvokeResponse:
+    ) -> "botbuilder.core.InvokeResponse":
         """
         Forwards an activity to a another bot.
 

@@ -4,14 +4,13 @@
 from logging import Logger
 
 from botbuilder.schema import CallerIdConstants
-from botframework.connector import BotFrameworkConnectorConfiguration, HttpClientFactory
-from botframework.connector.auth import (
-    ServiceClientCredentialsFactory,
-    AuthenticationConfiguration,
-    GovernmentConstants,
-)
 
+from ..bot_framework_sdk_client_async import BotFrameworkConnectorConfiguration
+from ..http_client_factory import HttpClientFactory
 from ._built_in_bot_framework_authentication import _BuiltinBotFrameworkAuthentication
+from .authentication_configuration import AuthenticationConfiguration
+from .government_constants import GovernmentConstants
+from .service_client_credentials_factory import ServiceClientCredentialsFactory
 
 
 class _GovernmentCloudBotFrameworkAuthentication(_BuiltinBotFrameworkAuthentication):

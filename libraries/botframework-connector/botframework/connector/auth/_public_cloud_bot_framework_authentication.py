@@ -4,15 +4,14 @@
 from logging import Logger
 
 from botbuilder.schema import CallerIdConstants
-from botframework.connector import BotFrameworkConnectorConfiguration, HttpClientFactory
-from botframework.connector.auth import (
-    ServiceClientCredentialsFactory,
-    AuthenticationConfiguration,
-    AuthenticationConstants,
-)
-from botframework.connector.auth._built_in_bot_framework_authentication import (
-    _BuiltinBotFrameworkAuthentication,
-)
+
+from ..bot_framework_sdk_client_async import BotFrameworkConnectorConfiguration
+from ..http_client_factory import HttpClientFactory
+
+from .service_client_credentials_factory import ServiceClientCredentialsFactory
+from .authentication_configuration import AuthenticationConfiguration
+from .authentication_constants import AuthenticationConstants
+from ._built_in_bot_framework_authentication import _BuiltinBotFrameworkAuthentication
 
 
 class _PublicCloudBotFrameworkAuthentication(_BuiltinBotFrameworkAuthentication):

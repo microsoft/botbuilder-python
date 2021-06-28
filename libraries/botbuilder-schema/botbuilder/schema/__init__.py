@@ -30,6 +30,7 @@ from ._models_py3 import Fact
 from ._models_py3 import GeoCoordinates
 from ._models_py3 import HeroCard
 from ._models_py3 import InnerHttpError
+from ._models_py3 import InvokeResponse
 from ._models_py3 import MediaCard
 from ._models_py3 import MediaEventValue
 from ._models_py3 import MediaUrl
@@ -105,6 +106,7 @@ __all__ = [
     "GeoCoordinates",
     "HeroCard",
     "InnerHttpError",
+    "InvokeResponse",
     "MediaCard",
     "MediaEventValue",
     "MediaUrl",

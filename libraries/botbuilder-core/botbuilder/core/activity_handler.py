@@ -9,6 +9,7 @@ from botbuilder.schema import (
     AdaptiveCardInvokeResponse,
     AdaptiveCardInvokeValue,
     ChannelAccount,
+    InvokeResponse,
     MessageReaction,
     SignInConstants,
 )
@@ -16,7 +17,6 @@ from botbuilder.schema import (
 from .bot import Bot
 from .serializer_helper import serializer_helper
 from .bot_framework_adapter import BotFrameworkAdapter
-from .invoke_response import InvokeResponse
 from .turn_context import TurnContext
 
 

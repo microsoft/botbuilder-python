@@ -2,11 +2,9 @@
 # Licensed under the MIT License.
 from logging import Logger
 
-from botframework.connector import BotFrameworkConnectorConfiguration, HttpClientFactory
-from botframework.connector.auth import (
-    PasswordServiceClientCredentialFactory,
-    GovernmentConstants,
-)
+from ..bot_framework_sdk_client_async import BotFrameworkConnectorConfiguration
+from ..http_client_factory import HttpClientFactory
+
 from ._government_cloud_bot_framework_authentication import (
     _GovernmentCloudBotFrameworkAuthentication,
 )
@@ -19,6 +17,10 @@ from ._public_cloud_bot_framework_authentication import (
 
 from .authentication_configuration import AuthenticationConfiguration
 from .bot_framework_authentication import BotFrameworkAuthentication
+from .government_constants import GovernmentConstants
+from .password_service_client_credential_factory import (
+    PasswordServiceClientCredentialFactory,
+)
 from .service_client_credentials_factory import ServiceClientCredentialsFactory
 
 

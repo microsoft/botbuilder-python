@@ -5,25 +5,21 @@ from copy import deepcopy
 from json import dumps, loads
 from logging import Logger
 
-from botbuilder.core import InvokeResponse
 from botbuilder.schema import (
     Activity,
-    ExpectedReplies,
     ConversationReference,
     ConversationAccount,
     ChannelAccount,
+    InvokeResponse,
     RoleTypes,
 )
-from botframework.connector import (
-    HttpClientFactory,
-    HttpClientBase,
-    HttpResponseBase,
-    HttpRequest,
-)
-from botframework.connector.auth import ServiceClientCredentialsFactory
-from botframework.connector.skills import BotFrameworkClient
 
+from ..http_client_factory import HttpClientFactory
+from ..http_request import HttpRequest
 from .._not_implemented_http_client import _NotImplementedHttpClient
+from ..skills.bot_framework_client import BotFrameworkClient
+
+from .service_client_credentials_factory import ServiceClientCredentialsFactory
 
 
 class _BotFrameworkClientImpl(BotFrameworkClient):

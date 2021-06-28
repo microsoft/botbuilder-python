@@ -1,6 +1,5 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
-from botframework.connector.auth import ServiceClientCredentialsFactory
 
 
 class CredentialProvider:
@@ -21,7 +20,7 @@ class CredentialProvider:
         :param app_id: bot appid
         :return: true if it is a valid AppId
         """
-        raise NotImplementedError
+        raise NotImplementedError()
 
     async def get_app_password(self, app_id: str) -> str:
         """Get the app password for a given bot appId, if it is not a valid appId, return Null
@@ -32,7 +31,7 @@ class CredentialProvider:
         :param app_id: bot appid
         :return: password or null for invalid appid
         """
-        raise NotImplementedError
+        raise NotImplementedError()
 
     async def is_authentication_disabled(self) -> bool:
         """Checks if bot authentication is disabled.
@@ -43,7 +42,7 @@ class CredentialProvider:
 
         :return: true if bot authentication is disabled.
         """
-        raise NotImplementedError
+        raise NotImplementedError()
 
 
 class SimpleCredentialProvider(CredentialProvider):
@@ -62,14 +61,14 @@ class SimpleCredentialProvider(CredentialProvider):
 
 
 class _DelegatingCredentialProvider(CredentialProvider):
-    def __init__(self, credentials_factory: ServiceClientCredentialsFactory):
+    def __init__(self, credentials_factory: "botframework.connector.auth"):
         self._credentials_factory = credentials_factory
 
     async def is_valid_appid(self, app_id: str) -> bool:
         return await self._credentials_factory.is_valid_app_id(app_id)
 
     async def get_app_password(self, app_id: str) -> str:
-        raise NotImplementedError
+        raise NotImplementedError()
 
     async def is_authentication_disabled(self) -> bool:
         return await self._credentials_factory.is_authentication_disabled()

@@ -5,35 +5,29 @@ from logging import Logger
 from typing import Dict, Optional
 
 from botbuilder.schema import Activity, RoleTypes
-from botframework.connector import (
-    BotFrameworkConnectorConfiguration,
-    HttpClientFactory,
-    Channels,
-)
-from botframework.connector.auth import (
-    BotFrameworkAuthentication,
-    ClaimsIdentity,
-    UserTokenClient,
-    ConnectorFactory,
-    AuthenticateRequestResult,
-    ServiceClientCredentialsFactory,
-    AuthenticationConfiguration,
-    VerifyOptions,
-    JwtTokenValidation,
-    SkillValidation,
-    AuthenticationConstants,
-    EmulatorValidation,
-    JwtTokenExtractor,
-)
-from botframework.connector.auth._bot_framework_client_impl import (
-    _BotFrameworkClientImpl,
-)
-from botframework.connector.auth._built_in_bot_framework_authentication import (
-    _BuiltinBotFrameworkAuthentication,
-)
-from botframework.connector.auth._user_token_client_impl import _UserTokenClientImpl
-from botframework.connector.auth._connector_factory_impl import _ConnectorFactoryImpl
-from botframework.connector.skills import BotFrameworkClient
+
+from ..bot_framework_sdk_client_async import BotFrameworkConnectorConfiguration
+from ..http_client_factory import HttpClientFactory
+from ..channels import Channels
+from ..skills.bot_framework_client import BotFrameworkClient
+
+from .bot_framework_authentication import BotFrameworkAuthentication
+from .claims_identity import ClaimsIdentity
+from .user_token_client import UserTokenClient
+from .connector_factory import ConnectorFactory
+from .authenticate_request_result import AuthenticateRequestResult
+from .service_client_credentials_factory import ServiceClientCredentialsFactory
+from .authentication_configuration import AuthenticationConfiguration
+from .verify_options import VerifyOptions
+from .jwt_token_validation import JwtTokenValidation
+from .skill_validation import SkillValidation
+from .authentication_constants import AuthenticationConstants
+from .emulator_validation import EmulatorValidation
+from .jwt_token_extractor import JwtTokenExtractor
+from ._bot_framework_client_impl import _BotFrameworkClientImpl
+from ._built_in_bot_framework_authentication import _BuiltinBotFrameworkAuthentication
+from ._user_token_client_impl import _UserTokenClientImpl
+from ._connector_factory_impl import _ConnectorFactoryImpl
 
 
 class _ParameterizedBotFrameworkAuthentication(BotFrameworkAuthentication):
