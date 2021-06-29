@@ -58,7 +58,7 @@ class CaseInsensitiveDict(dict):
 
 class TurnMemoryScope(MemoryScope):
     def __init__(self):
-        super().__init__(scope_path.TURN)
+        super().__init__(scope_path.TURN, False)
 
     def get_memory(self, dialog_context: "DialogContext") -> object:
         if not dialog_context:
