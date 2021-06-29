@@ -55,7 +55,7 @@ class _UserTokenClientImpl(UserTokenClient):
     ) -> SignInUrlResponse:
         if connection_name is None or not isinstance(connection_name, str):
             raise TypeError("connection_name")
-        if activity is None or not isinstance(Activity, str):
+        if activity is None or not isinstance(activity, Activity):
             raise TypeError("activity")
 
         result = await self._client.bot_sign_in.get_sign_in_resource(

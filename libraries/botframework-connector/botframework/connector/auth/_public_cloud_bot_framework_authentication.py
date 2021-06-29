@@ -25,7 +25,7 @@ class _PublicCloudBotFrameworkAuthentication(_BuiltinBotFrameworkAuthentication)
     ):
         super(_PublicCloudBotFrameworkAuthentication, self).__init__(
             AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE,
-            AuthenticationConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL,
+            AuthenticationConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL_PREFIX,
             CallerIdConstants.public_azure_channel,
             "",  # channel_service
             AuthenticationConstants.OAUTH_URL,

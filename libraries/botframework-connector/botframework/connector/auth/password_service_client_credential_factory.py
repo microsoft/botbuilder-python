@@ -73,7 +73,6 @@ class PasswordServiceClientCredentialFactory(ServiceClientCredentialsFactory):
                 )
             )
 
-        credentials.oauth_endpoint = normalized_endpoint
         return credentials
 
 

@@ -12,19 +12,14 @@ from botframework.connector.auth import (
     SkillValidation,
     JwtTokenValidation,
 )
-from botframework.connector.token_api.models import SignInUrlResponse
 from botbuilder.core import (
     CardFactory,
-    ExtendedUserTokenProvider,
     MessageFactory,
     InvokeResponse,
     TurnContext,
     BotAdapter,
 )
-from botbuilder.core.oauth import (
-    ConnectorClientBuilder,
-    UserTokenProvider,
-)
+from botbuilder.core.oauth import UserTokenProvider
 from botbuilder.core.bot_framework_adapter import TokenExchangeRequest
 from botbuilder.dialogs import Dialog, DialogContext, DialogTurnResult
 from botbuilder.schema import (
@@ -45,6 +40,8 @@ from .prompt_options import PromptOptions
 from .oauth_prompt_settings import OAuthPromptSettings
 from .prompt_validator_context import PromptValidatorContext
 from .prompt_recognizer_result import PromptRecognizerResult
+
+from .._user_token_access import _UserTokenAccess
 
 
 class CallerInfo:
@@ -169,19 +166,12 @@ class OAuthPrompt(Dialog):
             dialog_context.context
         )
 
-        if not isinstance(dialog_context.context.adapter, UserTokenProvider):
-            raise TypeError(
-                "OAuthPrompt.begin_dialog(): not supported by the current adapter"
-            )
-
-        output = await dialog_context.context.adapter.get_user_token(
-            dialog_context.context,
-            self._settings.connection_name,
-            None,
-            self._settings.oath_app_credentials,
+        output = await _UserTokenAccess.get_user_token(
+            dialog_context.context, self._settings, None
         )
 
         if output is not None:
+            # Return token
             return await dialog_context.end_dialog(output)
 
         await self._send_oauth_card(dialog_context.context, options.prompt)
@@ -279,20 +269,7 @@ class OAuthPrompt(Dialog):
             If the task is successful and the user already has a token or the user successfully signs in,
             the result contains the user's token.
         """
-        adapter = context.adapter
-
-        # Validate adapter type
-        if not hasattr(adapter, "get_user_token"):
-            raise Exception(
-                "OAuthPrompt.get_user_token(): not supported for the current adapter."
-            )
-
-        return await adapter.get_user_token(
-            context,
-            self._settings.connection_name,
-            code,
-            self._settings.oath_app_credentials,
-        )
+        return await _UserTokenAccess.get_user_token(context, self._settings, code)
 
     async def sign_out_user(self, context: TurnContext):
         """
@@ -306,20 +283,7 @@ class OAuthPrompt(Dialog):
             If the task is successful and the user already has a token or the user successfully signs in,
             the result contains the user's token.
         """
-        adapter = context.adapter
-
-        # Validate adapter type
-        if not hasattr(adapter, "sign_out_user"):
-            raise Exception(
-                "OAuthPrompt.sign_out_user(): not supported for the current adapter."
-            )
-
-        return await adapter.sign_out_user(
-            context,
-            self._settings.connection_name,
-            None,
-            self._settings.oath_app_credentials,
-        )
+        return await _UserTokenAccess.sign_out_user(context, self._settings)
 
     @staticmethod
     def __create_caller_info(context: TurnContext) -> CallerInfo:
@@ -347,13 +311,9 @@ class OAuthPrompt(Dialog):
                 att.content_type == CardFactory.content_types.oauth_card
                 for att in prompt.attachments
             ):
-                adapter: ExtendedUserTokenProvider = context.adapter
                 card_action_type = ActionTypes.signin
-                sign_in_resource: SignInUrlResponse = await adapter.get_sign_in_resource_from_user_and_credentials(
-                    context,
-                    self._settings.oath_app_credentials,
-                    self._settings.connection_name,
-                    context.activity.from_property.id,
+                sign_in_resource = await _UserTokenAccess.get_sign_in_resource(
+                    context, self._settings
                 )
                 link = sign_in_resource.sign_in_link
                 bot_identity: ClaimsIdentity = context.turn_state.get(
@@ -448,16 +408,9 @@ class OAuthPrompt(Dialog):
             if state:
                 # set the ServiceUrl to the skill host's Url
                 dialog_context.context.activity.service_url = state.caller_service_url
-
-                # recreate a ConnectorClient and set it in TurnState so replies use the correct one
-                if not isinstance(context.adapter, ConnectorClientBuilder):
-                    raise TypeError(
-                        "OAuthPrompt: IConnectorClientProvider interface not implemented by the current adapter"
-                    )
-
-                connector_client_builder: ConnectorClientBuilder = context.adapter
                 claims_identity = context.turn_state.get(BotAdapter.BOT_IDENTITY_KEY)
-                connector_client = await connector_client_builder.create_connector_client(
+                connector_client = await _UserTokenAccess.create_connector_client(
+                    context,
                     dialog_context.context.activity.service_url,
                     claims_identity,
                     state.scope,
@@ -470,7 +423,9 @@ class OAuthPrompt(Dialog):
         elif OAuthPrompt._is_teams_verification_invoke(context):
             code = context.activity.value["state"]
             try:
-                token = await self.get_user_token(context, code)
+                token = await _UserTokenAccess.get_user_token(
+                    context, self._settings, code
+                )
                 if token is not None:
                     await context.send_activity(
                         Activity(
@@ -538,15 +493,11 @@ class OAuthPrompt(Dialog):
                 )
             else:
                 # No errors. Proceed with token exchange.
-                extended_user_token_provider: ExtendedUserTokenProvider = context.adapter
-
                 token_exchange_response = None
                 try:
-                    token_exchange_response = await extended_user_token_provider.exchange_token_from_credentials(
+                    token_exchange_response = await _UserTokenAccess.exchange_token(
                         context,
-                        self._settings.oath_app_credentials,
-                        self._settings.connection_name,
-                        context.activity.from_property.id,
+                        self._settings,
                         TokenExchangeRequest(token=context.activity.value.token),
                     )
                 except:
@@ -577,7 +528,9 @@ class OAuthPrompt(Dialog):
         elif context.activity.type == ActivityTypes.message and context.activity.text:
             match = re.match(r"(?<!\d)\d{6}(?!\d)", context.activity.text)
             if match:
-                token = await self.get_user_token(context, match[0])
+                token = await _UserTokenAccess.get_user_token(
+                    context, self._settings, match[0]
+                )
 
         return (
             PromptRecognizerResult(True, token)
