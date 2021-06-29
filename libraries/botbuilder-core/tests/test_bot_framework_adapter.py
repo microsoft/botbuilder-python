@@ -815,9 +815,9 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
 
         assert invoke_response
         assert invoke_response.status == 200
-        assert invoke_response.body["id"] == inbound_activity.value.id
+        assert invoke_response.body.id == inbound_activity.value.id
         assert (
-            invoke_response.body["connectionName"]
+            invoke_response.body.connection_name
             == inbound_activity.value.connection_name
         )
 
@@ -880,8 +880,8 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
 
         assert invoke_response
         assert invoke_response.status == 200
-        assert invoke_response.body["id"] == inbound_activity.value.id
+        assert invoke_response.body.id == inbound_activity.value.id
         assert (
-            invoke_response.body["connectionName"]
+            invoke_response.body.connection_name
             == inbound_activity.value.connection_name
         )
