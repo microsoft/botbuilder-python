@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 from uuid import uuid4
+from logging import Logger
 from typing import Callable
 
 from botbuilder.core import Bot, BotAdapter, TurnContext
@@ -31,7 +32,7 @@ class _SkillHandlerImpl(SkillHandler):
         bot: Bot,
         conversation_id_factory: ConversationIdFactoryBase,
         get_oauth_scope: Callable[[], str],
-        logger: object = None,
+        logger: Logger = None,
     ):
         if not skill_conversation_reference_key:
             raise TypeError("skill_conversation_reference_key can't be None")
@@ -228,11 +229,9 @@ class _SkillHandlerImpl(SkillHandler):
                 await self._conversation_id_factory.delete_conversation_reference(
                     conversation_id
                 )
-                self._apply_eoc_to_turn_context_activity(context, activity)
-                await self._bot.on_turn(context)
+                await self._send_to_bot(activity, context)
             elif activity.type == ActivityTypes.event:
-                self._apply_event_to_turn_context_activity(context, activity)
-                await self._bot.on_turn(context)
+                await self._send_to_bot(activity, context)
             elif activity.type in (ActivityTypes.command, ActivityTypes.command_result):
                 if activity.name.startswith("application/"):
                     # Send to channel and capture the resource response for the SendActivityCall so we can return it.
@@ -260,30 +259,28 @@ class _SkillHandlerImpl(SkillHandler):
     ) -> SkillConversationReference:
         # Get the SkillsConversationReference
         try:
+            skill_conversation_reference = await self._conversation_id_factory.get_skill_conversation_reference(
+                conversation_id
+            )
+        except (NotImplementedError, AttributeError):
+            if self._logger:
+                self._logger.log(
+                    30,
+                    "Got NotImplementedError when trying to call get_skill_conversation_reference() "
+                    "on the SkillConversationIdFactory, attempting to use deprecated "
+                    "get_conversation_reference() method instead.",
+                )
+
+            # ConversationIdFactory can return either a SkillConversationReference (the newer way),
+            # or a ConversationReference (the old way, but still here for compatibility).  If a
+            # ConversationReference is returned, build a new SkillConversationReference to simplify
+            # the remainder of this method.
             conversation_reference_result = await self._conversation_id_factory.get_conversation_reference(
                 conversation_id
             )
-        except NotImplementedError:
-            self._logger.warning(
-                "Got NotImplementedError when trying to call get_skill_conversation_reference() "
-                "on the SkillConversationIdFactory, attempting to use deprecated "
-                "get_conversation_reference() method instead."
-            )
-
-        # ConversationIdFactory can return either a SkillConversationReference (the newer way),
-        # or a ConversationReference (the old way, but still here for compatibility).  If a
-        # ConversationReference is returned, build a new SkillConversationReference to simplify
-        # the remainder of this method.
-        if isinstance(conversation_reference_result, SkillConversationReference):
-            skill_conversation_reference: SkillConversationReference = conversation_reference_result
-        else:
             skill_conversation_reference: SkillConversationReference = SkillConversationReference(
                 conversation_reference=conversation_reference_result,
-                oauth_scope=(
-                    GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
-                    if self._channel_provider and self._channel_provider.is_government()
-                    else AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
-                ),
+                oauth_scope=self._get_oauth_scope(),
             )
 
         if not skill_conversation_reference:
