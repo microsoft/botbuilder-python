@@ -35,6 +35,7 @@ setup(
         "botframework.connector.models",
         "botframework.connector.aio",
         "botframework.connector.aio.operations_async",
+        "botframework.connector.skills",
         "botframework.connector.teams",
         "botframework.connector.teams.operations",
         "botframework.connector.token_api",
