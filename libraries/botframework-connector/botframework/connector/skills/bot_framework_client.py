@@ -28,4 +28,4 @@ class BotFrameworkClient(ABC):
         :param conversation_id: A conversation ID to use for the conversation with the skill.
         :param activity: Activity to forward.
         """
-        pass
+        raise NotImplementedError()

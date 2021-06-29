@@ -19,7 +19,6 @@ from botbuilder.core import (
     TurnContext,
     BotAdapter,
 )
-from botbuilder.core.oauth import UserTokenProvider
 from botbuilder.core.bot_framework_adapter import TokenExchangeRequest
 from botbuilder.dialogs import Dialog, DialogContext, DialogTurnResult
 from botbuilder.schema import (

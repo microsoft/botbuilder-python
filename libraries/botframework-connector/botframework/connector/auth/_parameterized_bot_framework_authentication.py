@@ -79,7 +79,9 @@ class _ParameterizedBotFrameworkAuthentication(BotFrameworkAuthentication):
         )
 
         caller_id = await self.generate_caller_id(
-            self._credentials_factory, claims_identity, self._caller_id
+            credential_factory=self._credentials_factory,
+            claims_identity=claims_identity,
+            caller_id=self._caller_id,
         )
 
         connector_factory = _ConnectorFactoryImpl(
@@ -87,7 +89,7 @@ class _ParameterizedBotFrameworkAuthentication(BotFrameworkAuthentication):
             to_channel_from_bot_oauth_scope=self._to_channel_from_bot_oauth_scope,
             login_endpoint=self._to_channel_from_bot_login_url,
             validate_authority=self._validate_authority,
-            credentials_factory=self._credentials_factory,
+            credential_factory=self._credentials_factory,
             connector_client_configuration=self._connector_client_configuration,
             logger=self._logger,
         )
@@ -121,7 +123,9 @@ class _ParameterizedBotFrameworkAuthentication(BotFrameworkAuthentication):
         )
 
         caller_id = await self.generate_caller_id(
-            self._credentials_factory, claims_identity, self._caller_id
+            credential_factory=self._credentials_factory,
+            claims_identity=claims_identity,
+            caller_id=self._caller_id,
         )
 
         result = AuthenticateRequestResult()
@@ -139,8 +143,7 @@ class _ParameterizedBotFrameworkAuthentication(BotFrameworkAuthentication):
             to_channel_from_bot_oauth_scope=self._to_channel_from_bot_oauth_scope,
             login_endpoint=self._to_channel_from_bot_login_url,
             validate_authority=self._validate_authority,
-            credentials_factory=self._credentials_factory,
-            http_client_factory=self._http_client_factory,
+            credential_factory=self._credentials_factory,
             connector_client_configuration=self._connector_client_configuration,
             logger=self._logger,
         )

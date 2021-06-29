@@ -35,6 +35,7 @@ class SkillHandler(ChannelServiceHandler):
         channel_provider: ChannelProvider = None,
         logger: Logger = None,
     ):
+        # pylint: disable=import-outside-toplevel
         super().__init__(credential_provider, auth_configuration, channel_provider)
 
         if not adapter:

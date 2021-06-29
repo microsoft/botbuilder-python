@@ -2,7 +2,6 @@
 # Licensed under the MIT License.
 
 from abc import ABC, abstractmethod
-from logging import Logger
 
 from botframework.connector.aio import ConnectorClient
 

@@ -16,9 +16,6 @@ from botframework.streaming.payloads.models import (
 
 
 class MockStreamManager(StreamManager):
-    def __init__(self):
-        super().__init__()
-
     def get_payload_assembler(self, identifier: UUID) -> PayloadStreamAssembler:
         return PayloadStreamAssembler(self, identifier)
 

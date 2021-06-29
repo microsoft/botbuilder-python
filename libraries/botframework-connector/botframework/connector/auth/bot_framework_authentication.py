@@ -48,8 +48,9 @@ class BotFrameworkAuthentication(ABC):
         self, claims_identity: ClaimsIdentity
     ) -> ConnectorFactory:
         """
-        Creates a ConnectorFactory that can be used to create ConnectorClients that can use credentials from this particular Cloud Environment.
-        
+        Creates a ConnectorFactory that can be used to create ConnectorClients that can use credentials
+        from this particular Cloud Environment.
+
         :param claims_identity: The inbound Activity's ClaimsIdentity.
         :return: A ConnectorFactory.
         """
@@ -61,7 +62,7 @@ class BotFrameworkAuthentication(ABC):
     ) -> UserTokenClient:
         """
         Creates the appropriate UserTokenClient instance.
-        
+
         :param claims_identity: The inbound Activity's ClaimsIdentity.
         :return: An UserTokenClient.
         """
@@ -70,7 +71,7 @@ class BotFrameworkAuthentication(ABC):
     def create_bot_framework_client(self) -> BotFrameworkClient:
         """
         Creates a BotFrameworkClient for calling Skills.
-        
+
         :return: A BotFrameworkClient.
         """
         raise Exception("NotImplemented")
@@ -78,7 +79,7 @@ class BotFrameworkAuthentication(ABC):
     def get_originating_audience(self) -> str:
         """
         Gets the originating audience from Bot OAuth scope.
-        
+
         :return: The originating audience.
         """
         raise Exception("NotImplemented")
@@ -86,20 +87,11 @@ class BotFrameworkAuthentication(ABC):
     async def authenticate_channel_request(self, auth_header: str) -> ClaimsIdentity:
         """
         Authenticate Bot Framework Protocol request to Skills.
-        
+
         :param auth_header: The HTTP auth header in the skill request.
         :return: A ClaimsIdentity.
         """
         raise Exception("NotImplemented")
-
-    """
-    Generates the appropriate caller_id to write onto the Activity, this might be None.
-    
-    :param credential_factory A ServiceClientCredentialsFactory to use.
-    :param claims_identity The inbound claims.
-    :param caller_id The default caller_id to use if this is not a skill.
-    :return: The caller_id, this might be None.
-     """
 
     async def generate_caller_id(
         self,
@@ -108,6 +100,14 @@ class BotFrameworkAuthentication(ABC):
         claims_identity: ClaimsIdentity,
         caller_id: str,
     ) -> str:
+        """
+        Generates the appropriate caller_id to write onto the Activity, this might be None.
+
+        :param credential_factory A ServiceClientCredentialsFactory to use.
+        :param claims_identity The inbound claims.
+        :param caller_id The default caller_id to use if this is not a skill.
+        :return: The caller_id, this might be None.
+        """
         # Is the bot accepting all incoming messages?
         if await credential_factory.is_authentication_disabled():
             # Return None so that the caller_id is cleared.

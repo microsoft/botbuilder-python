@@ -40,7 +40,8 @@ class PasswordServiceClientCredentialFactory(ServiceClientCredentialsFactory):
         if normalized_endpoint.startswith(
             AuthenticationConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL_PREFIX
         ):
-            # TODO: Unpack necessity of these empty credentials based on the loginEndpoint as no tokens are fetched when auth is disabled.
+            # TODO: Unpack necessity of these empty credentials based on the
+            # loginEndpoint as no tokensare fetched when auth is disabled.
             credentials = (
                 MicrosoftAppCredentials.empty()
                 if not app_id

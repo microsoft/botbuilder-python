@@ -62,6 +62,7 @@ class BotFrameworkAuthenticationFactory:
         :param logger: The Logger to use.
         :return: A new BotFrameworkAuthentication instance.
         """
+        # pylint: disable=too-many-boolean-expressions
         if (
             to_channel_from_bot_login_url
             or to_channel_from_bot_oauth_scope
@@ -87,26 +88,25 @@ class BotFrameworkAuthenticationFactory:
                 connector_client_configuration,
                 logger,
             )
-        else:
-            # else apply the built in default behavior, which is either the public cloud or the gov cloud
-            # depending on whether we have a channelService value present
-            if not channel_service:
-                return _PublicCloudBotFrameworkAuthentication(
-                    credential_factory,
-                    auth_configuration,
-                    http_client_factory,
-                    connector_client_configuration,
-                    logger,
-                )
-            elif channel_service == GovernmentConstants.CHANNEL_SERVICE:
-                return _GovernmentCloudBotFrameworkAuthentication(
-                    credential_factory,
-                    auth_configuration,
-                    http_client_factory,
-                    connector_client_configuration,
-                    logger,
-                )
-            else:
-                # The ChannelService value is used an indicator of which built in set of constants to use.
-                # If it is not recognized, a full configuration is expected.
-                raise ValueError("The provided channel_service value is not supported.")
+        # else apply the built in default behavior, which is either the public cloud or the gov cloud
+        # depending on whether we have a channelService value present
+        if not channel_service:
+            return _PublicCloudBotFrameworkAuthentication(
+                credential_factory,
+                auth_configuration,
+                http_client_factory,
+                connector_client_configuration,
+                logger,
+            )
+        if channel_service == GovernmentConstants.CHANNEL_SERVICE:
+            return _GovernmentCloudBotFrameworkAuthentication(
+                credential_factory,
+                auth_configuration,
+                http_client_factory,
+                connector_client_configuration,
+                logger,
+            )
+
+        # The ChannelService value is used an indicator of which built in set of constants to use.
+        # If it is not recognized, a full configuration is expected.
+        raise ValueError("The provided channel_service value is not supported.")

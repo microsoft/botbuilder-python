@@ -30,15 +30,15 @@ class _UserTokenAccess(ABC):
                 turn_context.activity.channel_id,
                 magic_code,
             )
-        elif isinstance(turn_context.adapter, ExtendedUserTokenProvider):
+        if isinstance(turn_context.adapter, ExtendedUserTokenProvider):
             return await turn_context.adapter.get_user_token(
                 turn_context,
                 settings.connection_name,
                 magic_code,
                 settings.oath_app_credentials,
             )
-        else:
-            raise TypeError("OAuthPrompt is not supported by the current adapter")
+
+        raise TypeError("OAuthPrompt is not supported by the current adapter")
 
     @staticmethod
     async def get_sign_in_resource(
@@ -51,7 +51,7 @@ class _UserTokenAccess(ABC):
             return await user_token_client.get_sign_in_resource(
                 settings.connection_name, turn_context.activity, None
             )
-        elif isinstance(turn_context.adapter, ExtendedUserTokenProvider):
+        if isinstance(turn_context.adapter, ExtendedUserTokenProvider):
             return await turn_context.adapter.get_sign_in_resource_from_user_and_credentials(
                 turn_context,
                 settings.oath_app_credentials,
@@ -60,8 +60,8 @@ class _UserTokenAccess(ABC):
                 if turn_context.activity and turn_context.activity.from_property
                 else None,
             )
-        else:
-            raise TypeError("OAuthPrompt is not supported by the current adapter")
+
+        raise TypeError("OAuthPrompt is not supported by the current adapter")
 
     @staticmethod
     async def sign_out_user(turn_context: TurnContext, settings: OAuthPromptSettings):
@@ -74,7 +74,7 @@ class _UserTokenAccess(ABC):
                 settings.connection_name,
                 turn_context.activity.channel_id,
             )
-        elif isinstance(turn_context.adapter, ExtendedUserTokenProvider):
+        if isinstance(turn_context.adapter, ExtendedUserTokenProvider):
             return await turn_context.adapter.sign_out_user(
                 turn_context,
                 settings.connection_name,
@@ -83,8 +83,8 @@ class _UserTokenAccess(ABC):
                 else None,
                 settings.oath_app_credentials,
             )
-        else:
-            raise TypeError("OAuthPrompt is not supported by the current adapter")
+
+        raise TypeError("OAuthPrompt is not supported by the current adapter")
 
     @staticmethod
     async def exchange_token(
@@ -101,12 +101,12 @@ class _UserTokenAccess(ABC):
             return await user_token_client.exchange_token(
                 user_id, channel_id, token_exchange_request,
             )
-        elif isinstance(turn_context.adapter, ExtendedUserTokenProvider):
+        if isinstance(turn_context.adapter, ExtendedUserTokenProvider):
             return await turn_context.adapter.exchange_token(
                 turn_context, settings.connection_name, user_id, token_exchange_request,
             )
-        else:
-            raise TypeError("OAuthPrompt is not supported by the current adapter")
+
+        raise TypeError("OAuthPrompt is not supported by the current adapter")
 
     @staticmethod
     async def create_connector_client(
@@ -120,9 +120,9 @@ class _UserTokenAccess(ABC):
         )
         if connector_factory:
             return await connector_factory.create(service_url, audience)
-        elif isinstance(turn_context.adapter, ConnectorClientBuilder):
+        if isinstance(turn_context.adapter, ConnectorClientBuilder):
             return await turn_context.adapter.create_connector_client(
                 service_url, claims_identity, audience,
             )
-        else:
-            raise TypeError("OAuthPrompt is not supported by the current adapter")
+
+        raise TypeError("OAuthPrompt is not supported by the current adapter")

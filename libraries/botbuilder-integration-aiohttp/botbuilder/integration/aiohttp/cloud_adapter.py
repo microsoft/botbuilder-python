@@ -1,10 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from http import HTTPStatus
 from typing import Awaitable, Callable, Optional
 
-from aiohttp import ClientSession
 from aiohttp.web import (
     Request,
     Response,
@@ -17,7 +15,6 @@ from aiohttp.web import (
 )
 from botbuilder.core import (
     Bot,
-    BotFrameworkAdapterSettings,
     CloudAdapterBase,
     InvokeResponse,
     TurnContext,
@@ -27,23 +24,17 @@ from botbuilder.core.streaming import (
     StreamingHttpDriver,
     StreamingRequestHandler,
 )
-from botbuilder.schema import Activity, ResourceResponse
+from botbuilder.schema import Activity
 from botbuilder.integration.aiohttp.streaming import AiohttpWebSocket
-from botframework.connector import (
-    AsyncBfPipeline,
-    BotFrameworkConnectorConfiguration,
-    ConnectorClient,
-)
+from botframework.connector import AsyncBfPipeline, BotFrameworkConnectorConfiguration
+from botframework.connector.aio import ConnectorClient
 from botframework.connector.auth import (
-    AuthenticationConstants,
     AuthenticateRequestResult,
     BotFrameworkAuthentication,
     BotFrameworkAuthenticationFactory,
     ConnectorFactory,
-    JwtTokenValidation,
     MicrosoftAppCredentials,
 )
-from botframework.streaming.request_handler import RequestHandler
 
 from .bot_framework_http_adapter_integration_base import (
     BotFrameworkHttpAdapterIntegrationBase,
@@ -57,8 +48,12 @@ class CloudAdapter(CloudAdapterBase, BotFrameworkHttpAdapterIntegrationBase):
 
         :param bot_framework_authentication: Optional BotFrameworkAuthentication instance
         """
+        # pylint: disable=invalid-name
         if not bot_framework_authentication:
             bot_framework_authentication = BotFrameworkAuthenticationFactory.create()
+
+        self._AUTH_HEADER_NAME = "authorization"
+        self._CHANNEL_ID_HEADER_NAME = "channelid"
         super().__init__(bot_framework_authentication)
 
     async def process(

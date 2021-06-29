@@ -14,6 +14,7 @@ from botframework.streaming.transport import TransportSenderBase
 
 
 class MockTransportSender(TransportSenderBase):
+    # pylint: disable=unused-argument
     def __init__(self):
         super().__init__()
         self.is_connected = True

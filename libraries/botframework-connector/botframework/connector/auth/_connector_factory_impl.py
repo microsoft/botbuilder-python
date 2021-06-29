@@ -41,7 +41,8 @@ class _ConnectorFactoryImpl(ConnectorFactory):
             self._validate_authority,
         )
 
-        # A new connector client for making calls against this serviceUrl using credentials derived from the current appId and the specified audience.
+        # A new connector client for making calls against this serviceUrl using credentials derived
+        # from the current appId and the specified audience.
         if self._connector_client_configuration:
             client = ConnectorClient(
                 credentials,

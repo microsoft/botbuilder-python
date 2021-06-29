@@ -32,7 +32,7 @@ class ServiceClientCredentialsFactory(ABC):
     ) -> AppCredentials:
         """
         A factory method for creating AppCredentials.
-        
+
         :param app_id: The appId.
         :param audience: The audience.
         :param login_endpoint: The login url.

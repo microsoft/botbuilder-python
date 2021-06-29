@@ -15,12 +15,13 @@ class _HttpResponseImpl(HttpResponseBase):
     def __init__(self, client_response: ClientResponse) -> None:
         self._client_response = client_response
 
+    @property
     def status_code(self):
         return self._client_response.status
 
     async def is_succesful(self) -> bool:
         try:
-            self._client_response.raise_for_status
+            self._client_response.raise_for_status()
             return True
         except ClientResponseError:
             return False

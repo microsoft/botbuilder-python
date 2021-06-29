@@ -28,8 +28,6 @@ from botframework.connector.auth.authenticate_request_result import (
 )
 from botframework.connector.auth.connector_factory import ConnectorFactory
 from botframework.connector.auth.user_token_client import UserTokenClient
-from botframework.connector.skills import BotFrameworkClient
-
 from .bot_adapter import BotAdapter
 from .conversation_reference_extension import get_continuation_activity
 from .turn_context import TurnContext
@@ -141,11 +139,12 @@ class CloudAdapterBase(BotAdapter, ABC):
             reference.conversation.id, reference.activity_id
         )
 
-    async def continue_conversation(
-        self, reference: ConversationReference, callback: Callable
+    async def continue_conversation(  # pylint: disable=arguments-differ
+        self, reference: ConversationReference, callback: Callable,
     ):
         """
-        Sends a proactive message to a conversation. Call this method to proactively send a message to a conversation.
+        Sends a proactive message to a conversation.
+        Call this method to proactively send a message to a conversation.
         Most channels require a user to initiate a conversation with a bot before the bot can send activities
         to the user.
 
@@ -179,7 +178,8 @@ class CloudAdapterBase(BotAdapter, ABC):
         audience: str,
         logic: Callable[[TurnContext], Awaitable],
     ):
-        # Create the connector factory and  the inbound request, extracting parameters and then create a connector for outbound requests.
+        # Create the connector factory and  the inbound request, extracting parameters and then create a
+        # connector for outbound requests.
         connector_factory = self.bot_framework_authentication.create_connector_factory(
             claims_identity
         )
@@ -236,7 +236,8 @@ class CloudAdapterBase(BotAdapter, ABC):
             If the task completes successfully, then an :class:`InvokeResponse` is returned;
             otherwise. `null` is returned.
         """
-        # Authenticate the inbound request, extracting parameters and create a ConnectorFactory for creating a Connector for outbound requests.
+        # Authenticate the inbound request, extracting parameters and create a ConnectorFactory for creating a
+        # Connector for outbound requests.
         authenticate_request_result = (
             await self.bot_framework_authentication.authenticate_request(
                 activity, auth_header_or_authenticate_request_result
@@ -260,7 +261,8 @@ class CloudAdapterBase(BotAdapter, ABC):
         if not connector_client:
             raise Error("Unable to extract ConnectorClient from turn context.")
 
-        # Create a UserTokenClient instance for the application to use. (For example, it would be used in a sign-in prompt.)
+        # Create a UserTokenClient instance for the application to use.
+        # (For example, it would be used in a sign-in prompt.)
         user_token_client = await self.bot_framework_authentication.create_user_token_client(
             authenticate_request_result.claims_identity
         )
@@ -315,7 +317,8 @@ class CloudAdapterBase(BotAdapter, ABC):
         return context
 
     def _process_turn_results(self, context: TurnContext) -> InvokeResponse:
-        # Handle ExpectedReplies scenarios where all activities have been buffered and sent back at once in an invoke response.
+        # Handle ExpectedReplies scenarios where all activities have been
+        # buffered and sent back at once in an invoke response.
         if context.activity.delivery_mode == DeliveryModes.expect_replies:
             return InvokeResponse(
                 status=HTTPStatus.OK,

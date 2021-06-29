@@ -13,9 +13,7 @@ from botbuilder.schema import (
     CallerIdConstants,
 )
 from botframework.connector.auth import (
-    AuthenticationConstants,
     ClaimsIdentity,
-    GovernmentConstants,
     JwtTokenValidation,
 )
 from .skill_conversation_reference import SkillConversationReference
@@ -25,7 +23,7 @@ from .skill_handler import SkillHandler
 
 
 class _SkillHandlerImpl(SkillHandler):
-    def __init__(
+    def __init__(  # pylint: disable=super-init-not-called
         self,
         skill_conversation_reference_key: str,
         adapter: BotAdapter,

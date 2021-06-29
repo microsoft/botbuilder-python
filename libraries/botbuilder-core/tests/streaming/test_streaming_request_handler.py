@@ -17,6 +17,7 @@ from botframework.streaming.transport.web_socket import (
 
 
 class MockWebSocket(WebSocket):
+    # pylint: disable=unused-argument
     def __init__(self):
         super(MockWebSocket, self).__init__()
 

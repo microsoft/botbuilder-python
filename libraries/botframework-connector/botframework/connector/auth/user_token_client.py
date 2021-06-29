@@ -108,19 +108,18 @@ class UserTokenClient(ABC):
         """
         raise NotImplementedError()
 
-    """
-    Helper function to create the Base64 encoded token exchange state used in getSignInResource calls.
-
-    :param app_id The app_id to include in the token exchange state.
-    :param connection_name The connection_name to include in the token exchange state.
-    :param activity The [Activity](xref:botframework-schema.Activity) from which to derive the token exchange state.
-    :return: Base64 encoded token exchange state.
-    """
-
     @staticmethod
     def create_token_exchange_state(
         app_id: str, connection_name: str, activity: Activity
     ) -> str:
+        """
+        Helper function to create the Base64 encoded token exchange state used in getSignInResource calls.
+
+        :param app_id The app_id to include in the token exchange state.
+        :param connection_name The connection_name to include in the token exchange state.
+        :param activity The [Activity](xref:botframework-schema.Activity) from which to derive the token exchange state.
+        :return: Base64 encoded token exchange state.
+        """
         if app_id is None or not isinstance(app_id, str):
             raise TypeError("app_id")
         if connection_name is None or not isinstance(connection_name, str):
