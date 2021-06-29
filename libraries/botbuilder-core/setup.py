@@ -8,6 +8,7 @@ VERSION = os.environ["packageVersion"] if "packageVersion" in os.environ else "4
 REQUIRES = [
     "botbuilder-schema==4.14.0",
     "botframework-connector==4.14.0",
+    "botframework-streaming==4.14.0",
     "jsonpickle>=1.2,<1.5",
 ]
 
