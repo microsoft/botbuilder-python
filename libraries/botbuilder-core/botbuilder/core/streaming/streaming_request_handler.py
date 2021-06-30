@@ -82,7 +82,10 @@ class StreamingRequestHandler(RequestHandler):
         del self._conversations[conversation_id]
 
     async def process_request(
-        self, request: ReceiveRequest, logger: Logger, context: object
+        self,
+        request: ReceiveRequest,
+        logger: Logger,  # pylint: disable=unused-argument
+        context: object,  # pylint: disable=unused-argument
     ) -> StreamingResponse:
         # pylint: disable=pointless-string-statement
         response = StreamingResponse()

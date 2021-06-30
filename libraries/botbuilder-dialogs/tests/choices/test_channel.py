@@ -38,7 +38,6 @@ class ChannelTest(unittest.TestCase):
         supports_card_action_data: List[Tuple[Channels, int, bool]] = [
             (Channels.line, 99, True),
             (Channels.line, 100, False),
-            (Channels.cortana, 100, True),
             (Channels.slack, 100, True),
             (Channels.skype, 3, True),
             (Channels.skype, 5, False),
@@ -50,10 +49,6 @@ class ChannelTest(unittest.TestCase):
             ):
                 actual = Channel.supports_card_actions(channel, button_cnt)
                 self.assertEqual(expected, actual)
-
-    def test_should_return_false_for_has_message_feed_with_cortana(self):
-        supports = Channel.has_message_feed(Channels.cortana)
-        self.assertFalse(supports)
 
     def test_should_return_channel_id_from_context_activity(self):
         test_activity = Activity(channel_id=Channels.facebook)

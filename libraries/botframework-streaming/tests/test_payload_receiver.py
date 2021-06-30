@@ -8,6 +8,7 @@ from botframework.streaming.transport import TransportReceiverBase
 
 
 class MockTransportReceiver(TransportReceiverBase):
+    # pylint: disable=unused-argument
     def __init__(self, mock_header: bytes, mock_payload: bytes):
         self._is_connected = True
         self._mock_gen = self._mock_receive(mock_header, mock_payload)

@@ -4,7 +4,7 @@
 
 class CredentialProvider:
     """CredentialProvider.
-    This class allows Bots to provide their own implemention
+    This class allows Bots to provide their own implementation
     of what is, and what is not, a valid appId and password.
     This is useful in the case of multi-tenant bots, where the bot
     may need to call out to a service to determine if a particular
@@ -20,7 +20,7 @@ class CredentialProvider:
         :param app_id: bot appid
         :return: true if it is a valid AppId
         """
-        raise NotImplementedError
+        raise NotImplementedError()
 
     async def get_app_password(self, app_id: str) -> str:
         """Get the app password for a given bot appId, if it is not a valid appId, return Null
@@ -31,7 +31,7 @@ class CredentialProvider:
         :param app_id: bot appid
         :return: password or null for invalid appid
         """
-        raise NotImplementedError
+        raise NotImplementedError()
 
     async def is_authentication_disabled(self) -> bool:
         """Checks if bot authentication is disabled.
@@ -42,7 +42,7 @@ class CredentialProvider:
 
         :return: true if bot authentication is disabled.
         """
-        raise NotImplementedError
+        raise NotImplementedError()
 
 
 class SimpleCredentialProvider(CredentialProvider):
@@ -58,3 +58,17 @@ class SimpleCredentialProvider(CredentialProvider):
 
     async def is_authentication_disabled(self) -> bool:
         return not self.app_id
+
+
+class _DelegatingCredentialProvider(CredentialProvider):
+    def __init__(self, credentials_factory: "botframework.connector.auth"):
+        self._credentials_factory = credentials_factory
+
+    async def is_valid_appid(self, app_id: str) -> bool:
+        return await self._credentials_factory.is_valid_app_id(app_id)
+
+    async def get_app_password(self, app_id: str) -> str:
+        raise NotImplementedError()
+
+    async def is_authentication_disabled(self) -> bool:
+        return await self._credentials_factory.is_authentication_disabled()

@@ -139,37 +139,6 @@ class ChoiceFactoryTest(unittest.TestCase):
 
         self.assertEqual(expected, activity)
 
-    def test_should_choose_correct_styles_for_cortana(self):
-        expected = Activity(
-            type=ActivityTypes.message,
-            input_hint=InputHints.expecting_input,
-            attachment_layout=AttachmentLayoutTypes.list,
-            attachments=[
-                Attachment(
-                    content=HeroCard(
-                        text="select from:",
-                        buttons=[
-                            CardAction(
-                                type=ActionTypes.im_back, value="red", title="red"
-                            ),
-                            CardAction(
-                                type=ActionTypes.im_back, value="green", title="green"
-                            ),
-                            CardAction(
-                                type=ActionTypes.im_back, value="blue", title="blue"
-                            ),
-                        ],
-                    ),
-                    content_type="application/vnd.microsoft.card.hero",
-                )
-            ],
-        )
-
-        activity = ChoiceFactory.for_channel(
-            Channels.cortana, ChoiceFactoryTest.color_choices, "select from:"
-        )
-        self.assertEqual(expected, activity)
-
     def test_should_choose_correct_styles_for_teams(self):
         expected = Activity(
             type=ActivityTypes.message,

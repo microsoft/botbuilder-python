@@ -17,6 +17,7 @@ class BotAdapter(ABC):
     BOT_OAUTH_SCOPE_KEY = "botbuilder.core.BotAdapter.OAuthScope"
     BOT_CONNECTOR_CLIENT_KEY = "ConnectorClient"
     BOT_CALLBACK_HANDLER_KEY = "BotCallbackHandler"
+    _INVOKE_RESPONSE_KEY = "BotFrameworkAdapter.InvokeResponse"
 
     def __init__(
         self, on_turn_error: Callable[[TurnContext, Exception], Awaitable] = None

@@ -65,7 +65,6 @@ class Channel:
             Channels.emulator: 100,
             Channels.direct_line: 100,
             Channels.webchat: 100,
-            Channels.cortana: 100,
         }
         return (
             button_cnt <= max_actions[channel_id]
@@ -74,7 +73,7 @@ class Channel:
         )
 
     @staticmethod
-    def has_message_feed(channel_id: str) -> bool:
+    def has_message_feed(_: str) -> bool:
         """Determine if a Channel has a Message Feed.
 
         Args:
@@ -84,7 +83,7 @@ class Channel:
             bool: True if the Channel has a Message Feed, False if it does not.
         """
 
-        return not channel_id == Channels.cortana
+        return True
 
     @staticmethod
     def max_action_title_length(  # pylint: disable=unused-argument
