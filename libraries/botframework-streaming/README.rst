@@ -1,7 +1,7 @@
 
-===============================
+=================================
 BotFramework-Streaming for Python
-===============================
+=================================
 
 .. image:: https://fuselabs.visualstudio.com/SDK_v4/_apis/build/status/Python/SDK_v4-Python-CI?branchName=master
    :target:  https://fuselabs.visualstudio.com/SDK_v4/_apis/build/status/Python/SDK_v4-Python-CI
@@ -16,10 +16,9 @@ Streaming Extensions libraries for BotFramework.
 How to Install
 ==============
 
-.. code-block:: python
+.. code-block:: bash
   
   pip install botframework-streaming
-
 
 Documentation/Wiki
 ==================
