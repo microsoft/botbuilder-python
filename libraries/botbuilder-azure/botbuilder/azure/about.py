@@ -5,7 +5,7 @@ import os
 
 __title__ = "botbuilder-azure"
 __version__ = (
-    os.environ["packageVersion"] if "packageVersion" in os.environ else "4.14.0"
+    os.environ["packageVersion"] if "packageVersion" in os.environ else "4.15.0"
 )
 __uri__ = "https://www.github.com/Microsoft/botbuilder-python"
 __author__ = "Microsoft"

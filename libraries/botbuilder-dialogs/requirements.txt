@@ -1,7 +1,7 @@
 msrest==0.6.10
-botframework-connector==4.14.0
-botbuilder-schema==4.14.0
-botbuilder-core==4.14.0
+botframework-connector==4.15.0
+botbuilder-schema==4.15.0
+botbuilder-core==4.15.0
 requests==2.23.0
 PyJWT==1.5.3
 cryptography==3.3.2
