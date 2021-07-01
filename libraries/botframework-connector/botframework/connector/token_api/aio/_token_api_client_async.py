@@ -9,8 +9,8 @@ from msrest.async_client import SDKClientAsync
 from msrest import Serializer, Deserializer
 
 from .._configuration import TokenApiClientConfiguration
-from .operations_async import BotSignInOperations
-from .operations_async import UserTokenOperations
+from .operations_async._bot_sign_in_operations_async import BotSignInOperations
+from .operations_async._user_token_operations_async import UserTokenOperations
 from .. import models
 
 
