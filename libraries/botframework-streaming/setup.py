@@ -33,6 +33,8 @@ setup(
     packages=[
         "botframework.streaming",
         "botframework.streaming.payloads",
+        "botframework.streaming.payloads.assemblers",
+        "botframework.streaming.payloads.disassemblers",
         "botframework.streaming.payloads.models",
         "botframework.streaming.payload_transport",
         "botframework.streaming.transport",
