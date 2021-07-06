@@ -276,10 +276,13 @@ class _SkillHandlerImpl(SkillHandler):
             conversation_reference_result = await self._conversation_id_factory.get_conversation_reference(
                 conversation_id
             )
-            skill_conversation_reference: SkillConversationReference = SkillConversationReference(
-                conversation_reference=conversation_reference_result,
-                oauth_scope=self._get_oauth_scope(),
-            )
+            if isinstance(conversation_reference_result, SkillConversationReference):
+                skill_conversation_reference: SkillConversationReference = conversation_reference_result
+            else:
+                skill_conversation_reference: SkillConversationReference = SkillConversationReference(
+                    conversation_reference=conversation_reference_result,
+                    oauth_scope=self._get_oauth_scope(),
+                )
 
         if not skill_conversation_reference:
             raise KeyError("SkillConversationReference not found")
