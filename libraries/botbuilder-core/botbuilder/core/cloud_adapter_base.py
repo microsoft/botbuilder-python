@@ -6,13 +6,18 @@ from asyncio import sleep
 from copy import Error
 from http import HTTPStatus
 from typing import Awaitable, Callable, List, Union
+from uuid import uuid4
 
 from botbuilder.core.invoke_response import InvokeResponse
 
 from botbuilder.schema import (
     Activity,
+    ActivityEventNames,
     ActivityTypes,
+    ConversationAccount,
     ConversationReference,
+    ConversationResourceResponse,
+    ConversationParameters,
     DeliveryModes,
     ExpectedReplies,
     ResourceResponse,
@@ -171,6 +176,67 @@ class CloudAdapterBase(BotAdapter, ABC):
             claims_identity, get_continuation_activity(reference), audience, logic
         )
 
+    async def create_conversation(  # pylint: disable=arguments-differ
+        self,
+        bot_app_id: ConversationReference,
+        callback: Callable[[TurnContext], Awaitable] = None,
+        conversation_parameters: ConversationParameters = None,
+        channel_id: str = None,
+        service_url: str = None,
+        audience: str = None,
+    ):
+        if not service_url:
+            raise TypeError(
+                "CloudAdapter.create_conversation(): service_url is required."
+            )
+        if not conversation_parameters:
+            raise TypeError(
+                "CloudAdapter.create_conversation(): conversation_parameters is required."
+            )
+        if not callback:
+            raise TypeError("CloudAdapter.create_conversation(): callback is required.")
+
+        # Create a ClaimsIdentity, to create the connector and for adding to the turn context.
+        claims_identity = self.create_claims_identity(bot_app_id)
+        claims_identity.claims[AuthenticationConstants.SERVICE_URL_CLAIM] = service_url
+
+        # create the connectror factory
+        connector_factory = self.bot_framework_authentication.create_connector_factory(
+            claims_identity
+        )
+
+        # Create the connector client to use for outbound requests.
+        connector_client = await connector_factory.create(service_url, audience)
+
+        # Make the actual create conversation call using the connector.
+        create_conversation_result = await connector_client.conversations.create_conversation(
+            conversation_parameters
+        )
+
+        # Create the create activity to communicate the results to the application.
+        create_activity = self._create_create_activity(
+            create_conversation_result, channel_id, service_url, conversation_parameters
+        )
+
+        # Create a UserTokenClient instance for the application to use. (For example, in the OAuthPrompt.)
+        user_token_client = await self.bot_framework_authentication.create_user_token_client(
+            claims_identity
+        )
+
+        # Create a turn context and run the pipeline.
+        context = self._create_turn_context(
+            create_activity,
+            claims_identity,
+            None,
+            connector_client,
+            user_token_client,
+            callback,
+            connector_factory,
+        )
+
+        # Run the pipeline
+        await self.run_pipeline(context, callback)
+
     async def process_proactive(
         self,
         claims_identity: ClaimsIdentity,
@@ -292,6 +358,28 @@ class CloudAdapterBase(BotAdapter, ABC):
             },
             True,
         )
+
+    def _create_create_activity(
+        self,
+        create_conversation_result: ConversationResourceResponse,
+        channel_id: str,
+        service_url: str,
+        conversation_parameters: ConversationParameters,
+    ) -> Activity:
+        # Create a conversation update activity to represent the result.
+        activity = Activity.create_event_activity()
+        activity.name = ActivityEventNames.create_conversation
+        activity.channel_id = channel_id
+        activity.service_url = service_url
+        activity.id = create_conversation_result.activity_id or str(uuid4())
+        activity.conversation = ConversationAccount(
+            id=create_conversation_result.id,
+            tenant_id=conversation_parameters.tenant_id,
+        )
+        activity.channel_data = conversation_parameters.channel_data
+        activity.recipient = conversation_parameters.bot
+
+        return activity
 
     def _create_turn_context(
         self,

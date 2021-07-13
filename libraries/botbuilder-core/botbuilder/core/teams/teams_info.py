@@ -3,14 +3,15 @@
 
 from typing import List, Tuple
 
+from botframework.connector import Channels
 from botframework.connector.aio import ConnectorClient
-from botframework.connector.teams.teams_connector_client import TeamsConnectorClient
-from botbuilder.schema import ConversationParameters, ConversationReference
+from botframework.connector.teams import TeamsConnectorClient
 from botbuilder.core.teams.teams_activity_extensions import (
     teams_get_meeting_info,
     teams_get_channel_data,
 )
-from botbuilder.core.turn_context import Activity, TurnContext
+from botbuilder.core import CloudAdapterBase, BotFrameworkAdapter, TurnContext
+from botbuilder.schema import Activity, ConversationParameters, ConversationReference
 from botbuilder.schema.teams import (
     ChannelInfo,
     MeetingInfo,
@@ -25,15 +26,59 @@ from botbuilder.schema.teams import (
 class TeamsInfo:
     @staticmethod
     async def send_message_to_teams_channel(
-        turn_context: TurnContext, activity: Activity, teams_channel_id: str
+        turn_context: TurnContext,
+        activity: Activity,
+        teams_channel_id: str,
+        *,
+        bot_app_id: str = None,
     ) -> Tuple[ConversationReference, str]:
         if not turn_context:
             raise ValueError("The turn_context cannot be None")
+        if not turn_context.activity:
+            raise ValueError("The activity inside turn context cannot be None")
         if not activity:
             raise ValueError("The activity cannot be None")
         if not teams_channel_id:
             raise ValueError("The teams_channel_id cannot be None or empty")
 
+        if not bot_app_id:
+            return await TeamsInfo._legacy_send_message_to_teams_channel(
+                turn_context, activity, teams_channel_id
+            )
+
+        conversation_reference: ConversationReference = None
+        new_activity_id = ""
+        service_url = turn_context.activity.service_url
+        conversation_parameters = ConversationParameters(
+            is_group=True,
+            channel_data=TeamsChannelData(channel=ChannelInfo(id=teams_channel_id)),
+            activity=activity,
+        )
+
+        async def aux_callback(new_turn_context,):
+            nonlocal new_activity_id
+            nonlocal conversation_reference
+            new_activity_id = new_turn_context.activity.id
+            conversation_reference = TurnContext.get_conversation_reference(
+                new_turn_context.activity
+            )
+
+        adapter: CloudAdapterBase = turn_context.adapter
+        await adapter.create_conversation(
+            bot_app_id,
+            aux_callback,
+            conversation_parameters,
+            Channels.ms_teams,
+            service_url,
+            None,
+        )
+
+        return (conversation_reference, new_activity_id)
+
+    @staticmethod
+    async def _legacy_send_message_to_teams_channel(
+        turn_context: TurnContext, activity: Activity, teams_channel_id: str
+    ) -> Tuple[ConversationReference, str]:
         old_ref = TurnContext.get_conversation_reference(turn_context.activity)
         conversation_parameters = ConversationParameters(
             is_group=True,
@@ -41,7 +86,9 @@ class TeamsInfo:
             activity=activity,
         )
 
-        result = await turn_context.adapter.create_conversation(
+        # if this version of the method is called the adapter probably wont be CloudAdapter
+        adapter: BotFrameworkAdapter = turn_context.adapter
+        result = await adapter.create_conversation(
             old_ref, TeamsInfo._create_conversation_callback, conversation_parameters
         )
         return (result[0], result[1])

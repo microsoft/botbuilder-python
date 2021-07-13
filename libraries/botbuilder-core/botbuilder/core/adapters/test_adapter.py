@@ -217,7 +217,7 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
             reference, callback, bot_id, claims_identity, audience
         )
 
-    async def create_conversation(
+    async def create_conversation(  # pylint: disable=arguments-differ
         self, channel_id: str, callback: Callable  # pylint: disable=unused-argument
     ):
         self.activity_buffer.clear()

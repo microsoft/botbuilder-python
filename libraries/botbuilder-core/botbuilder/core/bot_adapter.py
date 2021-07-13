@@ -3,8 +3,13 @@
 
 from abc import ABC, abstractmethod
 from typing import List, Callable, Awaitable
-from botbuilder.schema import Activity, ConversationReference, ResourceResponse
-from botframework.connector.auth import ClaimsIdentity
+from botbuilder.schema import (
+    Activity,
+    ConversationReference,
+    ConversationParameters,
+    ResourceResponse,
+)
+from botframework.connector.auth import AppCredentials, ClaimsIdentity
 
 from . import conversation_reference_extension
 from .bot_assert import BotAssert
@@ -107,6 +112,47 @@ class BotAdapter(ABC):
             self, conversation_reference_extension.get_continuation_activity(reference)
         )
         return await self.run_pipeline(context, callback)
+
+    async def create_conversation(
+        self,
+        reference: ConversationReference,
+        logic: Callable[[TurnContext], Awaitable] = None,
+        conversation_parameters: ConversationParameters = None,
+        channel_id: str = None,
+        service_url: str = None,
+        credentials: AppCredentials = None,
+    ):
+        """
+        Starts a new conversation with a user. Used to direct message to a member of a group.
+
+        :param reference: The conversation reference that contains the tenant
+        :type reference: :class:`botbuilder.schema.ConversationReference`
+        :param logic: The logic to use for the creation of the conversation
+        :type logic: :class:`typing.Callable`
+        :param conversation_parameters: The information to use to create the conversation
+        :type conversation_parameters:
+        :param channel_id: The ID for the channel.
+        :type channel_id: :class:`typing.str`
+        :param service_url: The channel's service URL endpoint.
+        :type service_url: :class:`typing.str`
+        :param credentials: The application credentials for the bot.
+        :type credentials: :class:`botframework.connector.auth.AppCredentials`
+
+        :raises: It raises a generic exception error.
+
+        :return: A task representing the work queued to execute.
+
+        .. remarks::
+            To start a conversation, your bot must know its account information and the user's
+            account information on that channel.
+            Most channels only support initiating a direct message (non-group) conversation.
+            The adapter attempts to create a new conversation on the channel, and
+            then sends a conversation update activity through its middleware pipeline
+            to the the callback method.
+            If the conversation is established with the specified users, the ID of the activity
+            will contain the ID of the new conversation.
+        """
+        raise Exception("Not Implemented")
 
     async def run_pipeline(
         self, context: TurnContext, callback: Callable[[TurnContext], Awaitable] = None
