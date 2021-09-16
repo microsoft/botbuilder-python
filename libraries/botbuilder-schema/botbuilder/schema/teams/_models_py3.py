@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from typing import List
 from msrest.serialization import Model
 from botbuilder.schema import (
     Attachment,
@@ -1947,7 +1948,7 @@ class TeamsPagedMembersResult(PagedMembersResult):
         self,
         *,
         continuation_token: str = None,
-        members: [TeamsChannelAccount] = None,
+        members: List[TeamsChannelAccount] = None,
         **kwargs
     ) -> None:
         super(TeamsPagedMembersResult, self).__init__(
@@ -1977,7 +1978,7 @@ class TeamsChannelData(Model):
 
     _attribute_map = {
         "channel": {"key": "channel", "type": "ChannelInfo"},
-        "eventType": {"key": "eventType", "type": "str"},
+        "event_type": {"key": "eventType", "type": "str"},
         "team": {"key": "team", "type": "TeamInfo"},
         "notification": {"key": "notification", "type": "NotificationInfo"},
         "tenant": {"key": "tenant", "type": "TenantInfo"},
@@ -1988,7 +1989,7 @@ class TeamsChannelData(Model):
         self,
         *,
         channel=None,
-        eventType: str = None,
+        event_type: str = None,
         team=None,
         notification=None,
         tenant=None,
@@ -1998,7 +1999,7 @@ class TeamsChannelData(Model):
         super(TeamsChannelData, self).__init__(**kwargs)
         self.channel = channel
         # doing camel case here since that's how the data comes in
-        self.event_type = eventType
+        self.event_type = event_type
         self.team = team
         self.notification = notification
         self.tenant = tenant
