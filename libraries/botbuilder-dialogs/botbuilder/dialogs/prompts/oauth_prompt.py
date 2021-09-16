@@ -429,21 +429,21 @@ class OAuthPrompt(Dialog):
                     await context.send_activity(
                         Activity(
                             type="invokeResponse",
-                            value=InvokeResponse(int(HTTPStatus.OK)),
+                            value=InvokeResponse(status=HTTPStatus.OK),
                         )
                     )
                 else:
                     await context.send_activity(
                         Activity(
                             type="invokeResponse",
-                            value=InvokeResponse(int(HTTPStatus.NOT_FOUND)),
+                            value=InvokeResponse(status=HTTPStatus.NOT_FOUND),
                         )
                     )
             except Exception:
                 await context.send_activity(
                     Activity(
                         type="invokeResponse",
-                        value=InvokeResponse(int(HTTPStatus.INTERNAL_SERVER_ERROR)),
+                        value=InvokeResponse(status=HTTPStatus.INTERNAL_SERVER_ERROR),
                     )
                 )
         elif self._is_token_exchange_request_invoke(context):
