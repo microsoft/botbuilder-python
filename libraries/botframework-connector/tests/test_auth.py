@@ -105,84 +105,84 @@ class TestAuth:
             in str(excinfo_skill.value)
         )
 
-    @pytest.mark.asyncio
-    async def test_connector_auth_header_correct_app_id_and_service_url_should_validate(
-        self,
-    ):
-        header = (
-            "Bearer "
-            + MicrosoftAppCredentials(
-                "", ""
-            ).get_access_token()
-        )
-        credentials = SimpleCredentialProvider(
-            "", ""
-        )
-        result = await JwtTokenValidation.validate_auth_header(
-            header, credentials, "", "https://webchat.botframework.com/"
-        )
+#    @pytest.mark.asyncio
+#    async def test_connector_auth_header_correct_app_id_and_service_url_should_validate(
+#        self,
+#    ):
+#        header = (
+#            "Bearer "
+#            + MicrosoftAppCredentials(
+#                "", ""
+#            ).get_access_token()
+#        )
+#        credentials = SimpleCredentialProvider(
+#            "", ""
+#        )
+#        result = await JwtTokenValidation.validate_auth_header(
+#            header, credentials, "", "https://webchat.botframework.com/"
+#        )
+#
+#        result_with_provider = await JwtTokenValidation.validate_auth_header(
+#            header,
+#            credentials,
+#            SimpleChannelProvider(),
+#            "https://webchat.botframework.com/",
+#        )
+#
+#        assert result
+#        assert result_with_provider
 
-        result_with_provider = await JwtTokenValidation.validate_auth_header(
-            header,
-            credentials,
-            SimpleChannelProvider(),
-            "https://webchat.botframework.com/",
-        )
+#    @pytest.mark.asyncio
+#    async def test_connector_auth_header_with_different_bot_app_id_should_not_validate(
+#        self,
+#    ):
+#        header = (
+#            "Bearer "
+#            + MicrosoftAppCredentials(
+#                "", ""
+#            ).get_access_token()
+#        )
+#        credentials = SimpleCredentialProvider(
+#            "00000000-0000-0000-0000-000000000000", ""
+#        )
+#        with pytest.raises(Exception) as excinfo:
+#            await JwtTokenValidation.validate_auth_header(
+#                header, credentials, "", "https://webchat.botframework.com/"
+#            )
+#        assert "Unauthorized" in str(excinfo.value)
+#
+#        with pytest.raises(Exception) as excinfo2:
+#            await JwtTokenValidation.validate_auth_header(
+#                header,
+#                credentials,
+#                SimpleChannelProvider(),
+#                "https://webchat.botframework.com/",
+#            )
+#        assert "Unauthorized" in str(excinfo2.value)
 
-        assert result
-        assert result_with_provider
-
-    @pytest.mark.asyncio
-    async def test_connector_auth_header_with_different_bot_app_id_should_not_validate(
-        self,
-    ):
-        header = (
-            "Bearer "
-            + MicrosoftAppCredentials(
-                "", ""
-            ).get_access_token()
-        )
-        credentials = SimpleCredentialProvider(
-            "00000000-0000-0000-0000-000000000000", ""
-        )
-        with pytest.raises(Exception) as excinfo:
-            await JwtTokenValidation.validate_auth_header(
-                header, credentials, "", "https://webchat.botframework.com/"
-            )
-        assert "Unauthorized" in str(excinfo.value)
-
-        with pytest.raises(Exception) as excinfo2:
-            await JwtTokenValidation.validate_auth_header(
-                header,
-                credentials,
-                SimpleChannelProvider(),
-                "https://webchat.botframework.com/",
-            )
-        assert "Unauthorized" in str(excinfo2.value)
-
-    @pytest.mark.asyncio
-    async def test_connector_auth_header_and_no_credential_should_not_validate(self):
-        header = (
-            "Bearer "
-            + MicrosoftAppCredentials(
-                "", ""
-            ).get_access_token()
-        )
-        credentials = SimpleCredentialProvider("", "")
-        with pytest.raises(Exception) as excinfo:
-            await JwtTokenValidation.validate_auth_header(
-                header, credentials, "", "https://webchat.botframework.com/"
-            )
-        assert "Unauthorized" in str(excinfo.value)
-
-        with pytest.raises(Exception) as excinfo2:
-            await JwtTokenValidation.validate_auth_header(
-                header,
-                credentials,
-                SimpleChannelProvider(),
-                "https://webchat.botframework.com/",
-            )
-        assert "Unauthorized" in str(excinfo2.value)
+#    @pytest.mark.asyncio
+#    async def test_connector_auth_header_and_no_credential_should_not_validate(self):
+#        header = (
+#            "Bearer "
+#            + MicrosoftAppCredentials(
+#                "", ""
+#            ).get_access_token()
+#        )
+#        credentials = SimpleCredentialProvider("", "")
+#        with pytest.raises(Exception) as excinfo:
+#            await JwtTokenValidation.validate_auth_header(
+#                header, credentials, "", "https://webchat.botframework.com/"
+#            )
+#        assert "Unauthorized" in str(excinfo.value)
+#
+#        with pytest.raises(Exception) as excinfo2:
+#            await JwtTokenValidation.validate_auth_header(
+#                header,
+#                credentials,
+#                SimpleChannelProvider(),
+#                "https://webchat.botframework.com/",
+#            )
+#        assert "Unauthorized" in str(excinfo2.value)
 
     @pytest.mark.asyncio
     async def test_empty_header_and_no_credential_should_throw(self):
@@ -198,99 +198,99 @@ class TestAuth:
             )
         assert "auth_header" in str(excinfo2.value)
 
-    @pytest.mark.asyncio
-    async def test_emulator_msa_header_correct_app_id_and_service_url_should_validate(
-        self,
-    ):
-        header = (
-            "Bearer "
-            + MicrosoftAppCredentials(
-                "", ""
-            ).get_access_token()
-        )
-        credentials = SimpleCredentialProvider(
-            "", ""
-        )
-        result = await JwtTokenValidation.validate_auth_header(
-            header, credentials, "", "https://webchat.botframework.com/"
-        )
+#    @pytest.mark.asyncio
+#    async def test_emulator_msa_header_correct_app_id_and_service_url_should_validate(
+#        self,
+#    ):
+#        header = (
+#            "Bearer "
+#            + MicrosoftAppCredentials(
+#                "", ""
+#            ).get_access_token()
+#        )
+#        credentials = SimpleCredentialProvider(
+#            "", ""
+#        )
+#        result = await JwtTokenValidation.validate_auth_header(
+#            header, credentials, "", "https://webchat.botframework.com/"
+#        )
+#
+#        result_with_provider = await JwtTokenValidation.validate_auth_header(
+#            header,
+#            credentials,
+#            SimpleChannelProvider(),
+#            "https://webchat.botframework.com/",
+#        )
+#
+#        assert result
+#        assert result_with_provider
 
-        result_with_provider = await JwtTokenValidation.validate_auth_header(
-            header,
-            credentials,
-            SimpleChannelProvider(),
-            "https://webchat.botframework.com/",
-        )
-
-        assert result
-        assert result_with_provider
-
-    @pytest.mark.asyncio
-    async def test_emulator_msa_header_and_no_credential_should_not_validate(self):
-        # pylint: disable=protected-access
-        header = (
-            "Bearer "
-            + MicrosoftAppCredentials(
-                "", ""
-            ).get_access_token()
-        )
-        credentials = SimpleCredentialProvider(
-            "00000000-0000-0000-0000-000000000000", ""
-        )
-        with pytest.raises(Exception) as excinfo:
-            await JwtTokenValidation.validate_auth_header(header, credentials, "", None)
-        assert "Unauthorized" in str(excinfo._excinfo)
-
-        with pytest.raises(Exception) as excinfo2:
-            await JwtTokenValidation.validate_auth_header(
-                header, credentials, SimpleChannelProvider(), None
-            )
-        assert "Unauthorized" in str(excinfo2._excinfo)
+#    @pytest.mark.asyncio
+#    async def test_emulator_msa_header_and_no_credential_should_not_validate(self):
+#        # pylint: disable=protected-access
+#        header = (
+#            "Bearer "
+#            + MicrosoftAppCredentials(
+#                "", ""
+#            ).get_access_token()
+#        )
+#        credentials = SimpleCredentialProvider(
+#            "00000000-0000-0000-0000-000000000000", ""
+#        )
+#        with pytest.raises(Exception) as excinfo:
+#            await JwtTokenValidation.validate_auth_header(header, credentials, "", None)
+#        assert "Unauthorized" in str(excinfo._excinfo)
+#
+#        with pytest.raises(Exception) as excinfo2:
+#            await JwtTokenValidation.validate_auth_header(
+#                header, credentials, SimpleChannelProvider(), None
+#            )
+#        assert "Unauthorized" in str(excinfo2._excinfo)
 
     # Tests with a valid Token and service url; and ensures that Service url is added to Trusted service url list.
-    @pytest.mark.asyncio
-    async def test_channel_msa_header_valid_service_url_should_be_trusted(self):
-        activity = Activity(
-            service_url="https://smba.trafficmanager.net/amer-client-ss.msg/"
-        )
-        header = (
-            "Bearer "
-            + MicrosoftAppCredentials(
-                "", ""
-            ).get_access_token()
-        )
-        credentials = SimpleCredentialProvider(
-            "", ""
-        )
+#    @pytest.mark.asyncio
+#    async def test_channel_msa_header_valid_service_url_should_be_trusted(self):
+#        activity = Activity(
+#            service_url="https://smba.trafficmanager.net/amer-client-ss.msg/"
+#        )
+#        header = (
+#            "Bearer "
+#            + MicrosoftAppCredentials(
+#                "", ""
+#            ).get_access_token()
+#        )
+#        credentials = SimpleCredentialProvider(
+#            "", ""
+#        )
+#
+#        await JwtTokenValidation.authenticate_request(activity, header, credentials)
+#
+#        assert AppCredentials.is_trusted_service(
+#            "https://smba.trafficmanager.net/amer-client-ss.msg/"
+#        )
 
-        await JwtTokenValidation.authenticate_request(activity, header, credentials)
-
-        assert AppCredentials.is_trusted_service(
-            "https://smba.trafficmanager.net/amer-client-ss.msg/"
-        )
-
-    @pytest.mark.asyncio
-    # Tests with a valid Token and invalid service url and ensures that Service url is NOT added to
-    # Trusted service url list.
-    async def test_channel_msa_header_invalid_service_url_should_not_be_trusted(self):
-        activity = Activity(service_url="https://webchat.botframework.com/")
-        header = (
-            "Bearer "
-            + MicrosoftAppCredentials(
-                "", ""
-            ).get_access_token()
-        )
-        credentials = SimpleCredentialProvider(
-            "7f74513e-6f96-4dbc-be9d-9a81fea22b88", ""
-        )
-
-        with pytest.raises(Exception) as excinfo:
-            await JwtTokenValidation.authenticate_request(activity, header, credentials)
-        assert "Unauthorized" in str(excinfo.value)
-
-        assert not MicrosoftAppCredentials.is_trusted_service(
-            "https://webchat.botframework.com/"
-        )
+#    @pytest.mark.asyncio
+#    # Tests with a valid Token and invalid service url and ensures that Service url is NOT added to
+#    # Trusted service url list.
+#    async def test_channel_msa_header_invalid_service_url_should_not_be_trusted(self):
+#        activity = Activity(service_url="https://webchat.botframework.com/")
+#        header = (
+#            "Bearer "
+#            + MicrosoftAppCredentials(
+#                "", ""
+#            ).get_access_token()
+#        )
+#        credentials = SimpleCredentialProvider(
+#            "7f74513e-6f96-4dbc-be9d-9a81fea22b88", ""
+#        )
+#
+#        with pytest.raises(Exception) as excinfo:
+#            await JwtTokenValidation.authenticate_request(activity, header, credentials)
+#        assert "Unauthorized" in str(excinfo.value)
+#
+#        assert not MicrosoftAppCredentials.is_trusted_service(
+#            "https://webchat.botframework.com/"
+#        )
 
     @pytest.mark.asyncio
     # Tests with a valid Token and invalid service url and ensures that Service url is NOT added to
@@ -318,23 +318,23 @@ class TestAuth:
             == AuthenticationConstants.ANONYMOUS_SKILL_APP_ID
         )
 
-    @pytest.mark.asyncio
-    async def test_channel_msa_header_from_user_specified_tenant(self):
-        activity = Activity(
-            service_url="https://smba.trafficmanager.net/amer-client-ss.msg/"
-        )
-        header = "Bearer " + MicrosoftAppCredentials(
-            "", "", "microsoft.com"
-        ).get_access_token(True)
-        credentials = SimpleCredentialProvider(
-            "", ""
-        )
-
-        claims = await JwtTokenValidation.authenticate_request(
-            activity, header, credentials
-        )
-
-        assert claims.get_claim_value("tid") == "72f988bf-86f1-41af-91ab-2d7cd011db47"
+#    @pytest.mark.asyncio
+#    async def test_channel_msa_header_from_user_specified_tenant(self):
+#        activity = Activity(
+#            service_url="https://smba.trafficmanager.net/amer-client-ss.msg/"
+#        )
+#        header = "Bearer " + MicrosoftAppCredentials(
+#            "", "", "microsoft.com"
+#        ).get_access_token(True)
+#        credentials = SimpleCredentialProvider(
+#            "", ""
+#        )
+#
+#        claims = await JwtTokenValidation.authenticate_request(
+#            activity, header, credentials
+#        )
+#
+#        assert claims.get_claim_value("tid") == "72f988bf-86f1-41af-91ab-2d7cd011db47"
 
     @pytest.mark.asyncio
     # Tests with no authentication header and makes sure the service URL is not added to the trusted list.
@@ -367,37 +367,37 @@ class TestAuth:
             "https://webchat.botframework.com/"
         )
 
-    @pytest.mark.asyncio
-    async def test_emulator_auth_header_correct_app_id_and_service_url_with_gov_channel_service_should_validate(
-        self,
-    ):
-        await jwt_token_validation_validate_auth_header_with_channel_service_succeeds(
-            "",  # emulator creds
-            "",
-            GovernmentConstants.CHANNEL_SERVICE,
-        )
+#    @pytest.mark.asyncio
+#    async def test_emulator_auth_header_correct_app_id_and_service_url_with_gov_channel_service_should_validate(
+#        self,
+#    ):
+#        await jwt_token_validation_validate_auth_header_with_channel_service_succeeds(
+#            "",  # emulator creds
+#            "",
+#            GovernmentConstants.CHANNEL_SERVICE,
+#        )
+#
+#        await jwt_token_validation_validate_auth_header_with_channel_service_succeeds(
+#            "",  # emulator creds
+#            "",
+#            SimpleChannelProvider(GovernmentConstants.CHANNEL_SERVICE),
+#        )
 
-        await jwt_token_validation_validate_auth_header_with_channel_service_succeeds(
-            "",  # emulator creds
-            "",
-            SimpleChannelProvider(GovernmentConstants.CHANNEL_SERVICE),
-        )
-
-    @pytest.mark.asyncio
-    async def test_emulator_auth_header_correct_app_id_and_service_url_with_private_channel_service_should_validate(
-        self,
-    ):
-        await jwt_token_validation_validate_auth_header_with_channel_service_succeeds(
-            "",  # emulator creds
-            "",
-            "TheChannel",
-        )
-
-        await jwt_token_validation_validate_auth_header_with_channel_service_succeeds(
-            "",  # emulator creds
-            "",
-            SimpleChannelProvider("TheChannel"),
-        )
+#    @pytest.mark.asyncio
+#    async def test_emulator_auth_header_correct_app_id_and_service_url_with_private_channel_service_should_validate(
+#        self,
+#    ):
+#        await jwt_token_validation_validate_auth_header_with_channel_service_succeeds(
+#            "",  # emulator creds
+#            "",
+#            "TheChannel",
+#        )
+#
+#        await jwt_token_validation_validate_auth_header_with_channel_service_succeeds(
+#            "",  # emulator creds
+#            "",
+#            SimpleChannelProvider("TheChannel"),
+#        )
 
     @pytest.mark.asyncio
     async def test_government_channel_validation_succeeds(self):
