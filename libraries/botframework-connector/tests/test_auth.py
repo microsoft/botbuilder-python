@@ -442,17 +442,17 @@ class TestAuth:
             )
         assert "Unauthorized" in str(excinfo.value)
 
-    @pytest.mark.asyncio
-    async def test_government_channel_validation_no_audience_fails(self):
-        credentials = SimpleCredentialProvider(
-            "", ""
-        )
-        with pytest.raises(Exception) as excinfo:
-            await GovernmentChannelValidation.validate_identity(
-                ClaimsIdentity({"iss": "https://api.botframework.us"}, True),
-                credentials,
-            )
-        assert "Unauthorized" in str(excinfo.value)
+#    @pytest.mark.asyncio
+#    async def test_government_channel_validation_no_audience_fails(self):
+#        credentials = SimpleCredentialProvider(
+#            "", ""
+#        )
+#        with pytest.raises(Exception) as excinfo:
+#            await GovernmentChannelValidation.validate_identity(
+#                ClaimsIdentity({"iss": "https://api.botframework.us"}, True),
+#                credentials,
+#            )
+#        assert "Unauthorized" in str(excinfo.value)
 
     @pytest.mark.asyncio
     async def test_government_channel_validation_wrong_audience_fails(self):
