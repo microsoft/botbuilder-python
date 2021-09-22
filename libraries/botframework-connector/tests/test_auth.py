@@ -112,11 +112,11 @@ class TestAuth:
         header = (
             "Bearer "
             + MicrosoftAppCredentials(
-                "2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F"
+                "", ""
             ).get_access_token()
         )
         credentials = SimpleCredentialProvider(
-            "2cd87869-38a0-4182-9251-d056e8f0ac24", ""
+            "", ""
         )
         result = await JwtTokenValidation.validate_auth_header(
             header, credentials, "", "https://webchat.botframework.com/"
@@ -139,7 +139,7 @@ class TestAuth:
         header = (
             "Bearer "
             + MicrosoftAppCredentials(
-                "2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F"
+                "", ""
             ).get_access_token()
         )
         credentials = SimpleCredentialProvider(
@@ -165,7 +165,7 @@ class TestAuth:
         header = (
             "Bearer "
             + MicrosoftAppCredentials(
-                "2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F"
+                "", ""
             ).get_access_token()
         )
         credentials = SimpleCredentialProvider("", "")
@@ -205,11 +205,11 @@ class TestAuth:
         header = (
             "Bearer "
             + MicrosoftAppCredentials(
-                "2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F"
+                "", ""
             ).get_access_token()
         )
         credentials = SimpleCredentialProvider(
-            "2cd87869-38a0-4182-9251-d056e8f0ac24", ""
+            "", ""
         )
         result = await JwtTokenValidation.validate_auth_header(
             header, credentials, "", "https://webchat.botframework.com/"
@@ -231,7 +231,7 @@ class TestAuth:
         header = (
             "Bearer "
             + MicrosoftAppCredentials(
-                "2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F"
+                "", ""
             ).get_access_token()
         )
         credentials = SimpleCredentialProvider(
@@ -256,11 +256,11 @@ class TestAuth:
         header = (
             "Bearer "
             + MicrosoftAppCredentials(
-                "2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F"
+                "", ""
             ).get_access_token()
         )
         credentials = SimpleCredentialProvider(
-            "2cd87869-38a0-4182-9251-d056e8f0ac24", ""
+            "", ""
         )
 
         await JwtTokenValidation.authenticate_request(activity, header, credentials)
@@ -277,7 +277,7 @@ class TestAuth:
         header = (
             "Bearer "
             + MicrosoftAppCredentials(
-                "2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F"
+                "", ""
             ).get_access_token()
         )
         credentials = SimpleCredentialProvider(
@@ -324,10 +324,10 @@ class TestAuth:
             service_url="https://smba.trafficmanager.net/amer-client-ss.msg/"
         )
         header = "Bearer " + MicrosoftAppCredentials(
-            "2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F", "microsoft.com"
+            "", "", "microsoft.com"
         ).get_access_token(True)
         credentials = SimpleCredentialProvider(
-            "2cd87869-38a0-4182-9251-d056e8f0ac24", ""
+            "", ""
         )
 
         claims = await JwtTokenValidation.authenticate_request(
@@ -372,14 +372,14 @@ class TestAuth:
         self,
     ):
         await jwt_token_validation_validate_auth_header_with_channel_service_succeeds(
-            "2cd87869-38a0-4182-9251-d056e8f0ac24",  # emulator creds
-            "2.30Vs3VQLKt974F",
+            "",  # emulator creds
+            "",
             GovernmentConstants.CHANNEL_SERVICE,
         )
 
         await jwt_token_validation_validate_auth_header_with_channel_service_succeeds(
-            "2cd87869-38a0-4182-9251-d056e8f0ac24",  # emulator creds
-            "2.30Vs3VQLKt974F",
+            "",  # emulator creds
+            "",
             SimpleChannelProvider(GovernmentConstants.CHANNEL_SERVICE),
         )
 
@@ -388,21 +388,21 @@ class TestAuth:
         self,
     ):
         await jwt_token_validation_validate_auth_header_with_channel_service_succeeds(
-            "2cd87869-38a0-4182-9251-d056e8f0ac24",  # emulator creds
-            "2.30Vs3VQLKt974F",
+            "",  # emulator creds
+            "",
             "TheChannel",
         )
 
         await jwt_token_validation_validate_auth_header_with_channel_service_succeeds(
-            "2cd87869-38a0-4182-9251-d056e8f0ac24",  # emulator creds
-            "2.30Vs3VQLKt974F",
+            "",  # emulator creds
+            "",
             SimpleChannelProvider("TheChannel"),
         )
 
     @pytest.mark.asyncio
     async def test_government_channel_validation_succeeds(self):
         credentials = SimpleCredentialProvider(
-            "2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F"
+            "", ""
         )
 
         await GovernmentChannelValidation.validate_identity(
@@ -423,7 +423,7 @@ class TestAuth:
     @pytest.mark.asyncio
     async def test_government_channel_validation_no_issuer_fails(self):
         credentials = SimpleCredentialProvider(
-            "2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F"
+            "", ""
         )
         with pytest.raises(Exception) as excinfo:
             await GovernmentChannelValidation.validate_identity(
@@ -434,7 +434,7 @@ class TestAuth:
     @pytest.mark.asyncio
     async def test_government_channel_validation_wrong_issuer_fails(self):
         credentials = SimpleCredentialProvider(
-            "2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F"
+            "", ""
         )
         with pytest.raises(Exception) as excinfo:
             await GovernmentChannelValidation.validate_identity(
@@ -445,7 +445,7 @@ class TestAuth:
     @pytest.mark.asyncio
     async def test_government_channel_validation_no_audience_fails(self):
         credentials = SimpleCredentialProvider(
-            "2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F"
+            "", ""
         )
         with pytest.raises(Exception) as excinfo:
             await GovernmentChannelValidation.validate_identity(
@@ -457,7 +457,7 @@ class TestAuth:
     @pytest.mark.asyncio
     async def test_government_channel_validation_wrong_audience_fails(self):
         credentials = SimpleCredentialProvider(
-            "2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F"
+            "", ""
         )
         with pytest.raises(Exception) as excinfo:
             await GovernmentChannelValidation.validate_identity(
@@ -471,7 +471,7 @@ class TestAuth:
     @pytest.mark.asyncio
     async def test_enterprise_channel_validation_succeeds(self):
         credentials = SimpleCredentialProvider(
-            "2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F"
+            "", ""
         )
 
         await EnterpriseChannelValidation.validate_identity(
@@ -492,7 +492,7 @@ class TestAuth:
     @pytest.mark.asyncio
     async def test_enterprise_channel_validation_no_issuer_fails(self):
         credentials = SimpleCredentialProvider(
-            "2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F"
+            "", ""
         )
         with pytest.raises(Exception) as excinfo:
             await EnterpriseChannelValidation.validate_identity(
@@ -503,7 +503,7 @@ class TestAuth:
     @pytest.mark.asyncio
     async def test_enterprise_channel_validation_wrong_issuer_fails(self):
         credentials = SimpleCredentialProvider(
-            "2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F"
+            "", ""
         )
         with pytest.raises(Exception) as excinfo:
             await EnterpriseChannelValidation.validate_identity(
@@ -514,7 +514,7 @@ class TestAuth:
     @pytest.mark.asyncio
     async def test_enterprise_channel_validation_no_audience_fails(self):
         credentials = SimpleCredentialProvider(
-            "2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F"
+            "", ""
         )
         with pytest.raises(Exception) as excinfo:
             await GovernmentChannelValidation.validate_identity(
@@ -526,7 +526,7 @@ class TestAuth:
     @pytest.mark.asyncio
     async def test_enterprise_channel_validation_wrong_audience_fails(self):
         credentials = SimpleCredentialProvider(
-            "2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F"
+            "", ""
         )
         with pytest.raises(Exception) as excinfo:
             await GovernmentChannelValidation.validate_identity(
