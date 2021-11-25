@@ -62,6 +62,14 @@ class MicrosoftAppCredentials(AppCredentials, ABC):
             auth_token = self.__get_msal_app().acquire_token_for_client(
                 scopes=self.scopes
             )
+
+        # acquire_token...() returns None if there are no any tokens and
+        # a dict which contains 'error' in case of error
+        if auth_token is None:
+            raise UserWarning("No any access tokens")
+        if 'error' in auth_token:
+            raise UserWarning(f"Failed to get access token: {auth_token}")
+
         return auth_token["access_token"]
 
     def __get_msal_app(self):
