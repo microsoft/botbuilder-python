@@ -12,9 +12,9 @@ REQUIRES = [
     "recognizers-text>=1.0.2a1",
     "recognizers-text-choice>=1.0.2a1",
     "babel==2.7.0",
-    "botbuilder-schema==4.14.0",
-    "botframework-connector==4.14.0",
-    "botbuilder-core==4.14.0",
+    "botbuilder-schema==4.14.1",
+    "botframework-connector==4.14.1",
+    "botbuilder-core==4.14.1",
 ]
 
 TEST_REQUIRES = ["aiounittest==1.3.0"]

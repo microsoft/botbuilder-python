@@ -1,4 +1,4 @@
-botbuilder-schema==4.14.0
-botbuilder-core==4.14.0
-botbuilder-dialogs==4.14.0
+botbuilder-schema==4.14.1
+botbuilder-core==4.14.1
+botbuilder-dialogs==4.14.1
 aiounittest==1.4.0
