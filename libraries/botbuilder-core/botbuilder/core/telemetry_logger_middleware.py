@@ -14,6 +14,7 @@ from .turn_context import TurnContext
 from .telemetry_constants import TelemetryConstants
 from .telemetry_logger_constants import TelemetryLoggerConstants
 
+import jsonpickle
 
 # pylint: disable=line-too-long
 class TelemetryLoggerMiddleware(Middleware):
@@ -217,10 +218,10 @@ class TelemetryLoggerMiddleware(Middleware):
 
         # Use the LogPersonalInformation flag to toggle logging PII data, text and user name are common examples
         if self.log_personal_information:
-            if activity.attachments and activity.attachments.strip():
+            if activity.attachments and len(activity.attachments) > 0:
                 properties[
                     TelemetryConstants.ATTACHMENTS_PROPERTY
-                ] = activity.attachments
+                ] = jsonpickle.encode(activity.attachments)
             if activity.from_property.name and activity.from_property.name.strip():
                 properties[
                     TelemetryConstants.FROM_NAME_PROPERTY
