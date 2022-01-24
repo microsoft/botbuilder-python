@@ -6,6 +6,8 @@ from botbuilder.schema import Activity, ConversationReference, ActivityTypes
 from botbuilder.schema.teams import TeamsChannelData, TeamInfo
 from botframework.connector import Channels
 
+from jsonpickle import encode
+
 from .bot_telemetry_client import BotTelemetryClient
 from .bot_assert import BotAssert
 from .middleware_set import Middleware
@@ -14,7 +16,6 @@ from .turn_context import TurnContext
 from .telemetry_constants import TelemetryConstants
 from .telemetry_logger_constants import TelemetryLoggerConstants
 
-import jsonpickle
 
 # pylint: disable=line-too-long
 class TelemetryLoggerMiddleware(Middleware):
@@ -34,7 +35,7 @@ class TelemetryLoggerMiddleware(Middleware):
 
     @property
     def log_personal_information(self) -> bool:
-        """ Gets a value indicating whether determines whether to log personal
+        """Gets a value indicating whether determines whether to log personal
         information that came from the user."""
         return self._log_personal_information
 
@@ -219,9 +220,9 @@ class TelemetryLoggerMiddleware(Middleware):
         # Use the LogPersonalInformation flag to toggle logging PII data, text and user name are common examples
         if self.log_personal_information:
             if activity.attachments and len(activity.attachments) > 0:
-                properties[
-                    TelemetryConstants.ATTACHMENTS_PROPERTY
-                ] = jsonpickle.encode(activity.attachments)
+                properties[TelemetryConstants.ATTACHMENTS_PROPERTY] = encode(
+                    activity.attachments
+                )
             if activity.from_property.name and activity.from_property.name.strip():
                 properties[
                     TelemetryConstants.FROM_NAME_PROPERTY
@@ -298,7 +299,8 @@ class TelemetryLoggerMiddleware(Middleware):
 
     @staticmethod
     def __populate_additional_channel_properties(
-        activity: Activity, properties: dict,
+        activity: Activity,
+        properties: dict,
     ):
         if activity.channel_id == Channels.ms_teams:
             teams_channel_data: TeamsChannelData = activity.channel_data
