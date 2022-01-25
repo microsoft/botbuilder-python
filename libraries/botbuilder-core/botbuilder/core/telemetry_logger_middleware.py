@@ -6,6 +6,8 @@ from botbuilder.schema import Activity, ConversationReference, ActivityTypes
 from botbuilder.schema.teams import TeamsChannelData, TeamInfo
 from botframework.connector import Channels
 
+from jsonpickle import encode
+
 from .bot_telemetry_client import BotTelemetryClient
 from .bot_assert import BotAssert
 from .middleware_set import Middleware
@@ -14,7 +16,6 @@ from .turn_context import TurnContext
 from .telemetry_constants import TelemetryConstants
 from .telemetry_logger_constants import TelemetryLoggerConstants
 
-import jsonpickle
 
 # pylint: disable=line-too-long
 class TelemetryLoggerMiddleware(Middleware):
@@ -219,9 +220,9 @@ class TelemetryLoggerMiddleware(Middleware):
         # Use the LogPersonalInformation flag to toggle logging PII data, text and user name are common examples
         if self.log_personal_information:
             if activity.attachments and len(activity.attachments) > 0:
-                properties[
-                    TelemetryConstants.ATTACHMENTS_PROPERTY
-                ] = jsonpickle.encode(activity.attachments)
+                properties[TelemetryConstants.ATTACHMENTS_PROPERTY] = encode(
+                    activity.attachments
+                )
             if activity.from_property.name and activity.from_property.name.strip():
                 properties[
                     TelemetryConstants.FROM_NAME_PROPERTY
