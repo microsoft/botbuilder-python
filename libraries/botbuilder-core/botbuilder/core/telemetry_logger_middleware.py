@@ -35,7 +35,7 @@ class TelemetryLoggerMiddleware(Middleware):
 
     @property
     def log_personal_information(self) -> bool:
-        """ Gets a value indicating whether determines whether to log personal
+        """Gets a value indicating whether determines whether to log personal
         information that came from the user."""
         return self._log_personal_information
 
@@ -299,7 +299,8 @@ class TelemetryLoggerMiddleware(Middleware):
 
     @staticmethod
     def __populate_additional_channel_properties(
-        activity: Activity, properties: dict,
+        activity: Activity,
+        properties: dict,
     ):
         if activity.channel_id == Channels.ms_teams:
             teams_channel_data: TeamsChannelData = activity.channel_data
