@@ -2,11 +2,11 @@
 # Licensed under the MIT License.
 """Middleware Component for logging Activity messages."""
 from typing import Awaitable, Callable, List, Dict
+from jsonpickle import encode
+
 from botbuilder.schema import Activity, ConversationReference, ActivityTypes
 from botbuilder.schema.teams import TeamsChannelData, TeamInfo
 from botframework.connector import Channels
-
-from jsonpickle import encode
 
 from .bot_telemetry_client import BotTelemetryClient
 from .bot_assert import BotAssert
