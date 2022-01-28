@@ -2,6 +2,8 @@
 # Licensed under the MIT License.
 """Middleware Component for logging Activity messages."""
 from typing import Awaitable, Callable, List, Dict
+from jsonpickle import encode
+
 from botbuilder.schema import Activity, ConversationReference, ActivityTypes
 from botbuilder.schema.teams import TeamsChannelData, TeamInfo
 from botframework.connector import Channels
@@ -33,7 +35,7 @@ class TelemetryLoggerMiddleware(Middleware):
 
     @property
     def log_personal_information(self) -> bool:
-        """ Gets a value indicating whether determines whether to log personal
+        """Gets a value indicating whether determines whether to log personal
         information that came from the user."""
         return self._log_personal_information
 
@@ -217,10 +219,10 @@ class TelemetryLoggerMiddleware(Middleware):
 
         # Use the LogPersonalInformation flag to toggle logging PII data, text and user name are common examples
         if self.log_personal_information:
-            if activity.attachments and activity.attachments.strip():
-                properties[
-                    TelemetryConstants.ATTACHMENTS_PROPERTY
-                ] = activity.attachments
+            if activity.attachments and len(activity.attachments) > 0:
+                properties[TelemetryConstants.ATTACHMENTS_PROPERTY] = encode(
+                    activity.attachments
+                )
             if activity.from_property.name and activity.from_property.name.strip():
                 properties[
                     TelemetryConstants.FROM_NAME_PROPERTY
