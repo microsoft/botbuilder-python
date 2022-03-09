@@ -1,4 +1,4 @@
-msrest==0.6.10
+msrest==0.6.19
 botframework-connector==4.15.0
 botbuilder-schema==4.15.0
 botbuilder-core==4.15.0
