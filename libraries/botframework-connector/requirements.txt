@@ -1,4 +1,4 @@
-msrest==0.6.10
+msrest==0.6.19
 botbuilder-schema==4.14.1
 requests==2.23.0
 PyJWT==1.5.3

@@ -1,4 +1,4 @@
-msrest==0.6.10
+msrest==0.6.19
 botframework-connector==4.14.1
 botbuilder-schema==4.14.1
 aiohttp==3.7.4
