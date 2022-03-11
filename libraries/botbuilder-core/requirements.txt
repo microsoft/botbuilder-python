@@ -1,5 +1,5 @@
 msrest==0.6.19
-botframework-connector>=4.15.0
+botframework-connector==4.15.0
 botbuilder-schema==4.15.0
 botframework-streaming==4.15.0
 requests==2.23.0
