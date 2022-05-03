@@ -15,7 +15,7 @@ jobs:
 - job: Build
 #Multi-configuration and multi-agent job options are not exported to YAML. Configure these options using documentation guidance: https://docs.microsoft.com/vsts/pipelines/process/phases
   pool:
-    name: Hosted Ubuntu 1604
+    vmImage: 'ubuntu-latest'
 
   strategy:
       matrix:
