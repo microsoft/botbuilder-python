@@ -104,3 +104,6 @@ jobs:
       Get-ChildItem -Path "$(Build.SourcesDirectory)" -Include "*coverage*" | Copy-Item -Destination "$(Build.ArtifactStagingDirectory)/CodeCoverage"
     displayName: 'Copy .coverage Files to CodeCoverage folder'
     continueOnError: true
+
+  - task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
+    displayName: 'Component Detection'
