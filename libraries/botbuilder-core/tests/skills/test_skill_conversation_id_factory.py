@@ -30,12 +30,14 @@ class SkillConversationIdFactoryForTest(AsyncTestCase):
         conversation_reference = self._build_conversation_reference()
 
         # Create skill conversation
-        skill_conversation_id = await self._skill_conversation_id_factory.create_skill_conversation_id(
-            options=SkillConversationIdFactoryOptions(
-                activity=self._build_message_activity(conversation_reference),
-                bot_framework_skill=self._build_bot_framework_skill(),
-                from_bot_id=self._bot_id,
-                from_bot_oauth_scope=self._bot_id,
+        skill_conversation_id = (
+            await self._skill_conversation_id_factory.create_skill_conversation_id(
+                options=SkillConversationIdFactoryOptions(
+                    activity=self._build_message_activity(conversation_reference),
+                    bot_framework_skill=self._build_bot_framework_skill(),
+                    from_bot_id=self._bot_id,
+                    from_bot_oauth_scope=self._bot_id,
+                )
             )
         )
 
@@ -44,8 +46,10 @@ class SkillConversationIdFactoryForTest(AsyncTestCase):
         ), "Expected a valid skill conversation ID to be created"
 
         # Retrieve skill conversation
-        retrieved_conversation_reference = await self._skill_conversation_id_factory.get_skill_conversation_reference(
-            skill_conversation_id
+        retrieved_conversation_reference = (
+            await self._skill_conversation_id_factory.get_skill_conversation_reference(
+                skill_conversation_id
+            )
         )
 
         # Delete
@@ -54,8 +58,10 @@ class SkillConversationIdFactoryForTest(AsyncTestCase):
         )
 
         # Retrieve again
-        deleted_conversation_reference = await self._skill_conversation_id_factory.get_skill_conversation_reference(
-            skill_conversation_id
+        deleted_conversation_reference = (
+            await self._skill_conversation_id_factory.get_skill_conversation_reference(
+                skill_conversation_id
+            )
         )
 
         self.assertIsNotNone(retrieved_conversation_reference)
@@ -70,21 +76,25 @@ class SkillConversationIdFactoryForTest(AsyncTestCase):
         conversation_reference = self._build_conversation_reference()
 
         # Create skill conversation
-        first_id = await self._skill_conversation_id_factory.create_skill_conversation_id(
-            options=SkillConversationIdFactoryOptions(
-                activity=self._build_message_activity(conversation_reference),
-                bot_framework_skill=self._build_bot_framework_skill(),
-                from_bot_id=self._bot_id,
-                from_bot_oauth_scope=self._bot_id,
+        first_id = (
+            await self._skill_conversation_id_factory.create_skill_conversation_id(
+                options=SkillConversationIdFactoryOptions(
+                    activity=self._build_message_activity(conversation_reference),
+                    bot_framework_skill=self._build_bot_framework_skill(),
+                    from_bot_id=self._bot_id,
+                    from_bot_oauth_scope=self._bot_id,
+                )
             )
         )
 
-        second_id = await self._skill_conversation_id_factory.create_skill_conversation_id(
-            options=SkillConversationIdFactoryOptions(
-                activity=self._build_message_activity(conversation_reference),
-                bot_framework_skill=self._build_bot_framework_skill(),
-                from_bot_id=self._bot_id,
-                from_bot_oauth_scope=self._bot_id,
+        second_id = (
+            await self._skill_conversation_id_factory.create_skill_conversation_id(
+                options=SkillConversationIdFactoryOptions(
+                    activity=self._build_message_activity(conversation_reference),
+                    bot_framework_skill=self._build_bot_framework_skill(),
+                    from_bot_id=self._bot_id,
+                    from_bot_oauth_scope=self._bot_id,
+                )
             )
         )
 

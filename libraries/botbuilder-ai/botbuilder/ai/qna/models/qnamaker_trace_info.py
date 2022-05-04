@@ -11,7 +11,7 @@ from .ranker_types import RankerTypes
 
 
 class QnAMakerTraceInfo:
-    """ Represents all the trace info that we collect from the QnAMaker Middleware. """
+    """Represents all the trace info that we collect from the QnAMaker Middleware."""
 
     def __init__(
         self,

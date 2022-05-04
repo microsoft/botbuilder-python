@@ -52,7 +52,8 @@ class TestTelemetryMiddleware(aiounittest.AsyncTestCase):
 
         async def logic(context: TurnContext):
             await adapter.create_conversation(
-                context.activity.channel_id, send_proactive,
+                context.activity.channel_id,
+                send_proactive,
             )
 
         adapter.logic = logic
@@ -242,16 +243,22 @@ class TestTelemetryMiddleware(aiounittest.AsyncTestCase):
         )
         adapter.use(my_logger)
 
-        team_info = TeamInfo(id="teamId", name="teamName",)
+        team_info = TeamInfo(
+            id="teamId",
+            name="teamName",
+        )
 
         channel_data = TeamsChannelData(
-            team=team_info, tenant=TenantInfo(id="tenantId"),
+            team=team_info,
+            tenant=TenantInfo(id="tenantId"),
         )
 
         activity = MessageFactory.text("test")
         activity.channel_data = channel_data
         activity.from_property = ChannelAccount(
-            id="userId", name="userName", aad_object_id="aaId",
+            id="userId",
+            name="userName",
+            aad_object_id="aaId",
         )
 
         test_flow = TestFlow(None, adapter)

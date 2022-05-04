@@ -299,7 +299,8 @@ class TelemetryLoggerMiddleware(Middleware):
 
     @staticmethod
     def __populate_additional_channel_properties(
-        activity: Activity, properties: dict,
+        activity: Activity,
+        properties: dict,
     ):
         if activity.channel_id == Channels.ms_teams:
             teams_channel_data: TeamsChannelData = activity.channel_data

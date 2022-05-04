@@ -36,7 +36,7 @@ class ChannelValidation:
         channel_id: str,
         auth_configuration: AuthenticationConfiguration = None,
     ) -> ClaimsIdentity:
-        """ Validate the incoming Auth Header
+        """Validate the incoming Auth Header
 
         Validate the incoming Auth Header as a token sent from the Bot Framework Service.
         A token issued by the Bot Framework emulator will FAIL this check.
@@ -71,7 +71,7 @@ class ChannelValidation:
         channel_id: str,
         auth_configuration: AuthenticationConfiguration = None,
     ) -> ClaimsIdentity:
-        """ Validate the incoming Auth Header
+        """Validate the incoming Auth Header
 
         Validate the incoming Auth Header as a token sent from the Bot Framework Service.
         A token issued by the Bot Framework emulator will FAIL this check.

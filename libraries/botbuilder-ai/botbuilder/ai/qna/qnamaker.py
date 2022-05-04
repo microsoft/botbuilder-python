@@ -55,9 +55,9 @@ class QnAMaker(QnAMakerTelemetryClient):
         instance_timeout = ClientTimeout(total=opt.timeout / 1000)
         self._http_client = http_client or ClientSession(timeout=instance_timeout)
 
-        self.telemetry_client: Union[
-            BotTelemetryClient, NullTelemetryClient
-        ] = telemetry_client or NullTelemetryClient()
+        self.telemetry_client: Union[BotTelemetryClient, NullTelemetryClient] = (
+            telemetry_client or NullTelemetryClient()
+        )
 
         self.log_personal_information = log_personal_information or False
 

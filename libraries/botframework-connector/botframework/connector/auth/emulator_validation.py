@@ -46,7 +46,7 @@ class EmulatorValidation:
 
     @staticmethod
     def is_token_from_emulator(auth_header: str) -> bool:
-        """ Determines if a given Auth header is from the Bot Framework Emulator
+        """Determines if a given Auth header is from the Bot Framework Emulator
 
         :param auth_header: Bearer Token, in the 'Bearer [Long String]' Format.
         :type auth_header: str
@@ -91,7 +91,7 @@ class EmulatorValidation:
         channel_service_or_provider: Union[str, ChannelProvider],
         channel_id: str,
     ) -> ClaimsIdentity:
-        """ Validate the incoming Auth Header
+        """Validate the incoming Auth Header
 
         Validate the incoming Auth Header as a token sent from the Bot Framework Service.
         A token issued by the Bot Framework emulator will FAIL this check.
