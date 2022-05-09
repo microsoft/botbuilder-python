@@ -24,7 +24,10 @@ setup(
     long_description_content_type="text/x-rst",
     license="MIT",
     install_requires=REQUIRES,
-    packages=["botbuilder.schema", "botbuilder.schema.teams",],
+    packages=[
+        "botbuilder.schema",
+        "botbuilder.schema.teams",
+    ],
     include_package_data=True,
     classifiers=[
         "Programming Language :: Python :: 3.7",

@@ -49,7 +49,10 @@ class _SkillHandlerImpl(SkillHandler):
         self._logger = logger
 
     async def on_send_to_conversation(
-        self, claims_identity: ClaimsIdentity, conversation_id: str, activity: Activity,
+        self,
+        claims_identity: ClaimsIdentity,
+        conversation_id: str,
+        activity: Activity,
     ) -> ResourceResponse:
         """
         send_to_conversation() API for Skill
@@ -76,7 +79,10 @@ class _SkillHandlerImpl(SkillHandler):
         :return:
         """
         return await self._process_activity(
-            claims_identity, conversation_id, None, activity,
+            claims_identity,
+            conversation_id,
+            None,
+            activity,
         )
 
     async def on_reply_to_activity(
@@ -113,7 +119,10 @@ class _SkillHandlerImpl(SkillHandler):
         :return:
         """
         return await self._process_activity(
-            claims_identity, conversation_id, activity_id, activity,
+            claims_identity,
+            conversation_id,
+            activity_id,
+            activity,
         )
 
     async def on_delete_activity(
@@ -257,8 +266,10 @@ class _SkillHandlerImpl(SkillHandler):
     ) -> SkillConversationReference:
         # Get the SkillsConversationReference
         try:
-            skill_conversation_reference = await self._conversation_id_factory.get_skill_conversation_reference(
-                conversation_id
+            skill_conversation_reference = (
+                await self._conversation_id_factory.get_skill_conversation_reference(
+                    conversation_id
+                )
             )
         except (NotImplementedError, AttributeError):
             if self._logger:
@@ -273,15 +284,21 @@ class _SkillHandlerImpl(SkillHandler):
             # or a ConversationReference (the old way, but still here for compatibility).  If a
             # ConversationReference is returned, build a new SkillConversationReference to simplify
             # the remainder of this method.
-            conversation_reference_result = await self._conversation_id_factory.get_conversation_reference(
-                conversation_id
+            conversation_reference_result = (
+                await self._conversation_id_factory.get_conversation_reference(
+                    conversation_id
+                )
             )
             if isinstance(conversation_reference_result, SkillConversationReference):
-                skill_conversation_reference: SkillConversationReference = conversation_reference_result
+                skill_conversation_reference: SkillConversationReference = (
+                    conversation_reference_result
+                )
             else:
-                skill_conversation_reference: SkillConversationReference = SkillConversationReference(
-                    conversation_reference=conversation_reference_result,
-                    oauth_scope=self._get_oauth_scope(),
+                skill_conversation_reference: SkillConversationReference = (
+                    SkillConversationReference(
+                        conversation_reference=conversation_reference_result,
+                        oauth_scope=self._get_oauth_scope(),
+                    )
                 )
 
         if not skill_conversation_reference:

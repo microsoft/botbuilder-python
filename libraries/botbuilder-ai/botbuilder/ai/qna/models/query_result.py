@@ -5,7 +5,7 @@ from msrest.serialization import Model
 
 
 class QueryResult(Model):
-    """ Represents an individual result from a knowledge base query. """
+    """Represents an individual result from a knowledge base query."""
 
     _attribute_map = {
         "questions": {"key": "questions", "type": "[str]"},

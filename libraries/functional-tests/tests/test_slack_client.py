@@ -33,7 +33,9 @@ class SlackClient(aiounittest.AsyncTestCase):
                 f"{self._slack_url_base}/conversations.history?token="
                 f"{self._slack_bot_token}&channel={self._slack_channel}"
             )
-            response = requests.get(url,)
+            response = requests.get(
+                url,
+            )
             last_message = response.json()["messages"][0]["text"]
 
             time.sleep(1)

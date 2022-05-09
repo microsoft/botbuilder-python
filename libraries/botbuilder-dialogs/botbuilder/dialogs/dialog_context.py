@@ -231,7 +231,10 @@ class DialogContext:
                         # Check to see if the dialog wants to handle the event
                         if notify:
                             event_handled = await dialog_context.emit_event(
-                                event_name, event_value, bubble=False, from_leaf=False,
+                                event_name,
+                                event_value,
+                                bubble=False,
+                                from_leaf=False,
                             )
 
                             if event_handled:
@@ -360,7 +363,11 @@ class DialogContext:
         """
         try:
             # Initialize event
-            dialog_event = DialogEvent(bubble=bubble, name=name, value=value,)
+            dialog_event = DialogEvent(
+                bubble=bubble,
+                name=name,
+                value=value,
+            )
 
             dialog_context = self
 

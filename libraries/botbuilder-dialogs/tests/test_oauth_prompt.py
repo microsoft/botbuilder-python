@@ -324,7 +324,9 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
         step3 = await step2.send("test invalid message")
         await step3.assert_reply("Ended")
 
-    async def test_should_timeout_oauth_prompt_with_message_activity(self,):
+    async def test_should_timeout_oauth_prompt_with_message_activity(
+        self,
+    ):
         activity = Activity(type=ActivityTypes.message, text="any")
         await self.run_timeout_test(activity)
 
@@ -344,7 +346,9 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
         )
         await self.run_timeout_test(activity)
 
-    async def test_should_not_timeout_oauth_prompt_with_custom_event_activity(self,):
+    async def test_should_not_timeout_oauth_prompt_with_custom_event_activity(
+        self,
+    ):
         activity = Activity(type=ActivityTypes.event, name="custom event name")
         await self.run_timeout_test(activity, False, "Ended", "Failed")
 
@@ -388,7 +392,8 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
         dialogs = DialogSet(dialog_state)
         dialogs.add(
             OAuthPrompt(
-                "prompt", OAuthPromptSettings(connection_name, "Login", None, 1),
+                "prompt",
+                OAuthPromptSettings(connection_name, "Login", None, 1),
             )
         )
 

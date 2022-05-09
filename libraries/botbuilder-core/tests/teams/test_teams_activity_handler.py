@@ -263,8 +263,10 @@ class TestingTeamsActivityHandler(TeamsActivityHandler):
         self.record.append(
             "on_teams_messaging_extension_configuration_query_settings_url"
         )
-        return await super().on_teams_messaging_extension_configuration_query_settings_url(
-            turn_context, query
+        return (
+            await super().on_teams_messaging_extension_configuration_query_settings_url(
+                turn_context, query
+            )
         )
 
     async def on_teams_messaging_extension_configuration_setting(
@@ -1008,7 +1010,10 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         activity = Activity(
             type=ActivityTypes.invoke,
             name="task/fetch",
-            value={"data": {"key": "value"}, "context": "",},
+            value={
+                "data": {"key": "value"},
+                "context": "",
+            },
         )
 
         turn_context = TurnContext(SimpleAdapter(), activity)
@@ -1049,7 +1054,10 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         activity = Activity(
             type=ActivityTypes.invoke,
             name="tab/fetch",
-            value={"data": {"key": "value"}, "context": TabContext().serialize(),},
+            value={
+                "data": {"key": "value"},
+                "context": TabContext().serialize(),
+            },
         )
 
         turn_context = TurnContext(SimpleAdapter(), activity)
@@ -1068,7 +1076,10 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         activity = Activity(
             type=ActivityTypes.invoke,
             name="tab/submit",
-            value={"data": {"key": "value"}, "context": TabContext().serialize(),},
+            value={
+                "data": {"key": "value"},
+                "context": TabContext().serialize(),
+            },
         )
 
         turn_context = TurnContext(SimpleAdapter(), activity)

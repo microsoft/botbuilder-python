@@ -3,7 +3,7 @@
 
 
 class Token:
-    """ Represents an individual token, such as a word in an input string. """
+    """Represents an individual token, such as a word in an input string."""
 
     def __init__(self, start: int, end: int, text: str, normalized: str):
         """

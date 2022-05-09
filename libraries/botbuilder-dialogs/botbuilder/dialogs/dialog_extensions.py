@@ -184,8 +184,10 @@ class DialogExtensions:
         ) and SkillValidation.is_skill_claim(claims_identity.claims):
             # EoC Activities returned by skills are bounced back to the bot by SkillHandler.
             # In those cases we will have a SkillConversationReference instance in state.
-            skill_conversation_reference: SkillConversationReference = turn_context.turn_state.get(
-                SkillHandler.SKILL_CONVERSATION_REFERENCE_KEY
+            skill_conversation_reference: SkillConversationReference = (
+                turn_context.turn_state.get(
+                    SkillHandler.SKILL_CONVERSATION_REFERENCE_KEY
+                )
             )
             if skill_conversation_reference:
                 # If the skillConversationReference.OAuthScope is for one of the supported channels,
