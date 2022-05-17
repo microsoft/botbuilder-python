@@ -5,6 +5,7 @@ import traceback
 
 from aiohttp.web import (
     middleware,
+    HTTPException,
     HTTPNotImplemented,
     HTTPUnauthorized,
     HTTPNotFound,
@@ -27,6 +28,8 @@ async def aiohttp_error_middleware(request, handler):
         raise HTTPUnauthorized()
     except KeyError:
         raise HTTPNotFound()
+    except HTTPException:
+        raise
     except Exception:
         traceback.print_exc()
         raise HTTPInternalServerError()
