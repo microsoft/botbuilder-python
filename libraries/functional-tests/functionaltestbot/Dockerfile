@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-FROM  tiangolo/uwsgi-nginx-flask:python3.6
+FROM  mcr.microsoft.com/oryx/python:3.10
 
 
 RUN  mkdir /functionaltestbot 
