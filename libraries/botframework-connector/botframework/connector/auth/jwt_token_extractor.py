@@ -111,6 +111,7 @@ class JwtTokenExtractor:
             metadata.public_key,
             leeway=self.validation_parameters.clock_tolerance,
             options=options,
+            algorithms=["RS256"]
         )
 
         claims = ClaimsIdentity(decoded_payload, True)
