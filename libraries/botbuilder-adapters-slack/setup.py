@@ -39,11 +39,15 @@ setup(
     tests_require=TEST_REQUIRES,
     include_package_data=True,
     classifiers=[
-        "Programming Language :: Python :: 3.7",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Development Status :: 5 - Production/Stable",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
     ],
 )
