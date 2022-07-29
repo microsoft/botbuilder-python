@@ -303,10 +303,14 @@ class LuisUtil:
     ) -> Dict[str, object]:
         # an internal method that returns a dict for json serialization.
 
-        intents: Dict[str, Dict[str, float]] = {
-            name: LuisUtil.intent_score_as_dict(intent_score)
-            for name, intent_score in recognizer_result.intents.items()
-        } if recognizer_result.intents is not None else None
+        intents: Dict[str, Dict[str, float]] = (
+            {
+                name: LuisUtil.intent_score_as_dict(intent_score)
+                for name, intent_score in recognizer_result.intents.items()
+            }
+            if recognizer_result.intents is not None
+            else None
+        )
 
         dictionary: Dict[str, object] = {
             "text": recognizer_result.text,

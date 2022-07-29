@@ -31,7 +31,7 @@ class TelemetryProcessor(ABC):
         raise NotImplementedError()
 
     def __call__(self, data, context) -> bool:
-        """ Traditional Web user and session ID's don't apply for Bots.  This processor
+        """Traditional Web user and session ID's don't apply for Bots.  This processor
         replaces the identifiers to be consistent with Bot Framework's notion of
         user and session id's.
 

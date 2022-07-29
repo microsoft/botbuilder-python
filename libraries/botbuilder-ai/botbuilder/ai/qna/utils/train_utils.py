@@ -11,7 +11,7 @@ from .http_request_utils import HttpRequestUtils
 
 
 class TrainUtils:
-    """ Class for Train API, used in active learning to add suggestions to the knowledge base  """
+    """Class for Train API, used in active learning to add suggestions to the knowledge base"""
 
     def __init__(self, endpoint: QnAMakerEndpoint, http_client: ClientSession):
         """

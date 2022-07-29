@@ -5,7 +5,7 @@ from msrest.serialization import Model
 
 
 class Prompt(Model):
-    """ Prompt Object. """
+    """Prompt Object."""
 
     _attribute_map = {
         "display_order": {"key": "displayOrder", "type": "int"},
