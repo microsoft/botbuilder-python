@@ -5,7 +5,7 @@ from .find_values_options import FindValuesOptions
 
 
 class FindChoicesOptions(FindValuesOptions):
-    """ Contains options to control how input is matched against a list of choices """
+    """Contains options to control how input is matched against a list of choices"""
 
     def __init__(
         self,

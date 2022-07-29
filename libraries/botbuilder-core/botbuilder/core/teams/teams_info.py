@@ -100,7 +100,8 @@ class TeamsInfo:
 
         connector_client = await TeamsInfo._get_connector_client(turn_context)
         return await TeamsInfo._get_members(
-            connector_client, turn_context.activity.conversation.id,
+            connector_client,
+            turn_context.activity.conversation.id,
         )
 
     @staticmethod
@@ -130,7 +131,10 @@ class TeamsInfo:
 
         connector_client = await TeamsInfo._get_connector_client(turn_context)
         return await TeamsInfo._get_paged_members(
-            connector_client, team_id, continuation_token, page_size,
+            connector_client,
+            team_id,
+            continuation_token,
+            page_size,
         )
 
     @staticmethod
@@ -253,7 +257,8 @@ class TeamsInfo:
         connector_client = await TeamsInfo._get_connector_client(turn_context)
 
         return TeamsConnectorClient(
-            connector_client.config.credentials, turn_context.activity.service_url,
+            connector_client.config.credentials,
+            turn_context.activity.service_url,
         )
 
     @staticmethod
@@ -310,8 +315,10 @@ class TeamsInfo:
                 "TeamsInfo._get_paged_members.conversation_id: cannot be empty."
             )
 
-        return await connector_client.conversations.get_teams_conversation_paged_members(
-            conversation_id, page_size, continuation_token
+        return (
+            await connector_client.conversations.get_teams_conversation_paged_members(
+                conversation_id, page_size, continuation_token
+            )
         )
 
     @staticmethod
@@ -327,8 +334,10 @@ class TeamsInfo:
         if not member_id:
             raise TypeError("TeamsInfo._get_member.member_id: cannot be empty.")
 
-        member: TeamsChannelAccount = await connector_client.conversations.get_conversation_member(
-            conversation_id, member_id
+        member: TeamsChannelAccount = (
+            await connector_client.conversations.get_conversation_member(
+                conversation_id, member_id
+            )
         )
 
         return TeamsChannelAccount().deserialize(

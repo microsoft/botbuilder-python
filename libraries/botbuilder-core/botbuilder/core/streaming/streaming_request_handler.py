@@ -139,8 +139,10 @@ class StreamingRequestHandler(RequestHandler):
                     activity.attachments = stream_attachments
 
             # Now that the request has been converted into an activity we can send it to the adapter.
-            adapter_response = await self._activity_processor.process_streaming_activity(
-                activity, self._bot.on_turn
+            adapter_response = (
+                await self._activity_processor.process_streaming_activity(
+                    activity, self._bot.on_turn
+                )
             )
 
             # Now we convert the invokeResponse returned by the adapter into a StreamingResponse we can send back

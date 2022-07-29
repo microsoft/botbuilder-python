@@ -62,7 +62,9 @@ class QnACardBuilder:
         # Add all prompts
         button_list = [
             CardAction(
-                value=prompt.display_text, type="imBack", title=prompt.display_text,
+                value=prompt.display_text,
+                type="imBack",
+                title=prompt.display_text,
             )
             for prompt in result.context.prompts
         ]

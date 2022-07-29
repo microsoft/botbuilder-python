@@ -142,8 +142,10 @@ class DialogManager:
         dialog_context = DialogContext(self.dialogs, context, dialog_state)
 
         # Call the common dialog "continue/begin" execution pattern shared with the classic RunAsync extension method
-        turn_result = await DialogExtensions._internal_run(  # pylint: disable=protected-access
-            context, self._root_dialog_id, dialog_context
+        turn_result = (
+            await DialogExtensions._internal_run(  # pylint: disable=protected-access
+                context, self._root_dialog_id, dialog_context
+            )
         )
 
         # save BotState changes
@@ -224,8 +226,8 @@ class DialogManager:
         ) and SkillValidation.is_skill_claim(claims_identity.claims):
             # EoC Activities returned by skills are bounced back to the bot by SkillHandler.
             # In those cases we will have a SkillConversationReference instance in state.
-            skill_conversation_reference: SkillConversationReference = context.turn_state.get(
-                SkillHandler.SKILL_CONVERSATION_REFERENCE_KEY
+            skill_conversation_reference: SkillConversationReference = (
+                context.turn_state.get(SkillHandler.SKILL_CONVERSATION_REFERENCE_KEY)
             )
             if skill_conversation_reference:
                 # If the skill_conversation_reference.OAuthScope is for one of the supported channels, we are at the

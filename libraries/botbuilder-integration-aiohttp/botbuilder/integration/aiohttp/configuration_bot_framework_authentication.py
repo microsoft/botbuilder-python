@@ -30,38 +30,40 @@ class ConfigurationBotFrameworkAuthentication(BotFrameworkAuthentication):
         http_client_factory: HttpClientFactory = None,
         logger: Logger = None
     ):
-        self._inner: BotFrameworkAuthentication = BotFrameworkAuthenticationFactory.create(
-            channel_service=getattr(configuration, "CHANNEL_SERVICE", None),
-            validate_authority=getattr(configuration, "VALIDATE_AUTHORITY", True),
-            to_channel_from_bot_login_url=getattr(
-                configuration, "TO_CHANNEL_FROM_BOT_LOGIN_URL", None
-            ),
-            to_channel_from_bot_oauth_scope=getattr(
-                configuration, "TO_CHANNEL_FROM_BOT_OAUTH_SCOPE", None
-            ),
-            to_bot_from_channel_token_issuer=getattr(
-                configuration, "TO_BOT_FROM_CHANNEL_TOKEN_ISSUER", None
-            ),
-            oauth_url=getattr(configuration, "OAUTH_URL", None),
-            to_bot_from_channel_open_id_metadata_url=getattr(
-                configuration, "TO_BOT_FROM_CHANNEL_OPENID_METADATA_URL", None
-            ),
-            to_bot_from_emulator_open_id_metadata_url=getattr(
-                configuration, "TO_BOT_FROM_EMULATOR_OPENID_METADATA_URL", None
-            ),
-            caller_id=getattr(configuration, "CALLER_ID", None),
-            credential_factory=(
-                credentials_factory
-                if credentials_factory
-                else ConfigurationServiceClientCredentialFactory(configuration)
-            ),
-            auth_configuration=(
-                auth_configuration
-                if auth_configuration
-                else AuthenticationConfiguration()
-            ),
-            http_client_factory=http_client_factory,
-            logger=logger,
+        self._inner: BotFrameworkAuthentication = (
+            BotFrameworkAuthenticationFactory.create(
+                channel_service=getattr(configuration, "CHANNEL_SERVICE", None),
+                validate_authority=getattr(configuration, "VALIDATE_AUTHORITY", True),
+                to_channel_from_bot_login_url=getattr(
+                    configuration, "TO_CHANNEL_FROM_BOT_LOGIN_URL", None
+                ),
+                to_channel_from_bot_oauth_scope=getattr(
+                    configuration, "TO_CHANNEL_FROM_BOT_OAUTH_SCOPE", None
+                ),
+                to_bot_from_channel_token_issuer=getattr(
+                    configuration, "TO_BOT_FROM_CHANNEL_TOKEN_ISSUER", None
+                ),
+                oauth_url=getattr(configuration, "OAUTH_URL", None),
+                to_bot_from_channel_open_id_metadata_url=getattr(
+                    configuration, "TO_BOT_FROM_CHANNEL_OPENID_METADATA_URL", None
+                ),
+                to_bot_from_emulator_open_id_metadata_url=getattr(
+                    configuration, "TO_BOT_FROM_EMULATOR_OPENID_METADATA_URL", None
+                ),
+                caller_id=getattr(configuration, "CALLER_ID", None),
+                credential_factory=(
+                    credentials_factory
+                    if credentials_factory
+                    else ConfigurationServiceClientCredentialFactory(configuration)
+                ),
+                auth_configuration=(
+                    auth_configuration
+                    if auth_configuration
+                    else AuthenticationConfiguration()
+                ),
+                http_client_factory=http_client_factory,
+                logger=logger,
+            )
         )
 
     async def authenticate_request(

@@ -99,11 +99,16 @@ class _UserTokenAccess(ABC):
         if user_token_client:
             channel_id = turn_context.activity.channel_id
             return await user_token_client.exchange_token(
-                user_id, channel_id, token_exchange_request,
+                user_id,
+                channel_id,
+                token_exchange_request,
             )
         if isinstance(turn_context.adapter, ExtendedUserTokenProvider):
             return await turn_context.adapter.exchange_token(
-                turn_context, settings.connection_name, user_id, token_exchange_request,
+                turn_context,
+                settings.connection_name,
+                user_id,
+                token_exchange_request,
             )
 
         raise TypeError("OAuthPrompt is not supported by the current adapter")
@@ -122,7 +127,9 @@ class _UserTokenAccess(ABC):
             return await connector_factory.create(service_url, audience)
         if isinstance(turn_context.adapter, ConnectorClientBuilder):
             return await turn_context.adapter.create_connector_client(
-                service_url, claims_identity, audience,
+                service_url,
+                claims_identity,
+                audience,
             )
 
         raise TypeError("OAuthPrompt is not supported by the current adapter")

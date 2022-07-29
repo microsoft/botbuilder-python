@@ -58,7 +58,7 @@ class ConversationState(BotState):
         return storage_key
 
     def __raise_type_error(self, err: str = "NoneType found while expecting value"):
-        """ Raise type error exception
+        """Raise type error exception
         :raises: :class:`TypeError`
         """
         raise TypeError(err)

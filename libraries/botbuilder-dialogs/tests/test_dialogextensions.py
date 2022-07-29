@@ -147,7 +147,8 @@ class DialogExtensionsTests(aiounittest.AsyncTestCase):
         await test_flow.assert_reply("Hello, what is your name?")
         await test_flow.send(
             Activity(
-                type=ActivityTypes.end_of_conversation, caller_id=self.parent_bot_id,
+                type=ActivityTypes.end_of_conversation,
+                caller_id=self.parent_bot_id,
             )
         )
 

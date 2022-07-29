@@ -121,8 +121,10 @@ class CloudAdapter(CloudAdapterBase, BotFrameworkHttpAdapterIntegrationBase):
         # Grab the channelId which should be in the http headers
         channel_id = request.headers.get(self._CHANNEL_ID_HEADER_NAME)
 
-        authentication_request_result = await self.bot_framework_authentication.authenticate_streaming_request(
-            auth_header, channel_id
+        authentication_request_result = (
+            await self.bot_framework_authentication.authenticate_streaming_request(
+                auth_header, channel_id
+            )
         )
 
         # Transition the request to a WebSocket connection
@@ -151,8 +153,8 @@ class _StreamingActivityProcessor(StreamingActivityProcessor):
         self._request_handler = StreamingRequestHandler(bot, self, web_socket)
 
         # Fix up the connector factory so connector create from it will send over this connection
-        self._authenticate_request_result.connector_factory = _StreamingConnectorFactory(
-            self._request_handler
+        self._authenticate_request_result.connector_factory = (
+            _StreamingConnectorFactory(self._request_handler)
         )
 
     async def listen(self):

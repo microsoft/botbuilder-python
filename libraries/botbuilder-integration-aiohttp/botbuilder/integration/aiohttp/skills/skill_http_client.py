@@ -61,8 +61,10 @@ class SkillHttpClient(BotFrameworkHttpClient):
             bot_framework_skill=to_skill,
         )
 
-        skill_conversation_id = await self._skill_conversation_id_factory.create_skill_conversation_id(
-            options
+        skill_conversation_id = (
+            await self._skill_conversation_id_factory.create_skill_conversation_id(
+                options
+            )
         )
 
         return await super().post_activity(
