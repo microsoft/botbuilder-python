@@ -5,7 +5,7 @@ from os import environ
 
 
 class DefaultConfig:
-    """ Bot Configuration """
+    """Bot Configuration"""
 
     PORT: int = 3978
     APP_ID: str = environ.get("MicrosoftAppId", "")

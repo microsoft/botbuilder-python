@@ -400,7 +400,8 @@ class BotFrameworkAdapter(
                 if resource_response.activity_id
                 else str(uuid.uuid4()),
                 conversation=ConversationAccount(
-                    id=resource_response.id, tenant_id=parameters.tenant_id,
+                    id=resource_response.id,
+                    tenant_id=parameters.tenant_id,
                 ),
                 channel_data=parameters.channel_data,
                 recipient=parameters.bot,
@@ -512,7 +513,8 @@ class BotFrameworkAdapter(
             if invoke_response is None:
                 return InvokeResponse(status=int(HTTPStatus.NOT_IMPLEMENTED))
             return InvokeResponse(
-                status=invoke_response.value.status, body=invoke_response.value.body,
+                status=invoke_response.value.status,
+                body=invoke_response.value.body,
             )
 
         return None
@@ -1295,7 +1297,9 @@ class BotFrameworkAdapter(
         return f"{service_url if service_url else ''}:{app_id if app_id else ''}:{scope if scope else ''}"
 
     async def _create_token_api_client(
-        self, context: TurnContext, oauth_app_credentials: AppCredentials = None,
+        self,
+        context: TurnContext,
+        oauth_app_credentials: AppCredentials = None,
     ) -> TokenApiClient:
         if (
             not self._is_emulating_oauth_cards

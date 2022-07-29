@@ -2,6 +2,8 @@
 # Licensed under the MIT License.
 """Middleware Component for logging Activity messages."""
 from typing import Awaitable, Callable, List, Dict
+from jsonpickle import encode
+
 from botbuilder.schema import Activity, ConversationReference, ActivityTypes
 from botbuilder.schema.teams import TeamsChannelData, TeamInfo
 from botframework.connector import Channels
@@ -33,7 +35,7 @@ class TelemetryLoggerMiddleware(Middleware):
 
     @property
     def log_personal_information(self) -> bool:
-        """ Gets a value indicating whether determines whether to log personal
+        """Gets a value indicating whether determines whether to log personal
         information that came from the user."""
         return self._log_personal_information
 
@@ -217,10 +219,10 @@ class TelemetryLoggerMiddleware(Middleware):
 
         # Use the LogPersonalInformation flag to toggle logging PII data, text and user name are common examples
         if self.log_personal_information:
-            if activity.attachments and activity.attachments.strip():
-                properties[
-                    TelemetryConstants.ATTACHMENTS_PROPERTY
-                ] = activity.attachments
+            if activity.attachments and len(activity.attachments) > 0:
+                properties[TelemetryConstants.ATTACHMENTS_PROPERTY] = encode(
+                    activity.attachments
+                )
             if activity.from_property.name and activity.from_property.name.strip():
                 properties[
                     TelemetryConstants.FROM_NAME_PROPERTY
@@ -297,13 +299,16 @@ class TelemetryLoggerMiddleware(Middleware):
 
     @staticmethod
     def __populate_additional_channel_properties(
-        activity: Activity, properties: dict,
+        activity: Activity,
+        properties: dict,
     ):
         if activity.channel_id == Channels.ms_teams:
-            teams_channel_data: TeamsChannelData = activity.channel_data
+            teams_channel_data: TeamsChannelData = TeamsChannelData().deserialize(
+                activity.channel_data
+            )
 
             properties["TeamsTenantId"] = (
-                teams_channel_data.tenant
+                teams_channel_data.tenant.id
                 if teams_channel_data and teams_channel_data.tenant
                 else ""
             )

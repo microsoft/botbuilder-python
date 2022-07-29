@@ -103,7 +103,9 @@ class SlackAdapter(BotAdapter, ABC):
 
         message = SlackHelper.activity_to_slack(activity)
         results = await self.slack_client.chat_update(
-            ts=message.ts, channel=message.channel, text=message.text,
+            ts=message.ts,
+            channel=message.channel,
+            text=message.text,
         )
 
         if results.status_code / 100 != 2:

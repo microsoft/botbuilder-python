@@ -33,7 +33,10 @@ class ObjectPathTests(aiounittest.AsyncTestCase):
             last_name="Smith",
             first_name="Fred",
             age=22,
-            location=Location(lat=1.2312312, long=3.234234,),
+            location=Location(
+                lat=1.2312312,
+                long=3.234234,
+            ),
         )
 
         overlay = Options()
@@ -53,7 +56,10 @@ class ObjectPathTests(aiounittest.AsyncTestCase):
             last_name="Smith",
             first_name="Fred",
             age=22,
-            location=Location(lat=1.2312312, long=3.234234,),
+            location=Location(
+                lat=1.2312312,
+                long=3.234234,
+            ),
         )
 
         result = ObjectPath.assign(default_options, overlay)
@@ -69,7 +75,10 @@ class ObjectPathTests(aiounittest.AsyncTestCase):
             last_name="Smith",
             first_name="Fred",
             age=22,
-            location=Location(lat=1.2312312, long=3.234234,),
+            location=Location(
+                lat=1.2312312,
+                long=3.234234,
+            ),
             dictionary={"one": 1, "two": 2},
         )
 
@@ -77,7 +86,10 @@ class ObjectPathTests(aiounittest.AsyncTestCase):
             last_name="Grant",
             first_name="Eddit",
             age=32,
-            location=Location(lat=2.2312312, long=2.234234,),
+            location=Location(
+                lat=2.2312312,
+                long=2.234234,
+            ),
             dictionary={"one": 99, "three": 3},
         )
 
@@ -98,10 +110,15 @@ class ObjectPathTests(aiounittest.AsyncTestCase):
             last_name="Smith",
             first_name="Fred",
             age=22,
-            location=Location(lat=1.2312312, long=3.234234,),
+            location=Location(
+                lat=1.2312312,
+                long=3.234234,
+            ),
         )
 
-        overlay = Options(last_name="Grant",)
+        overlay = Options(
+            last_name="Grant",
+        )
 
         result = ObjectPath.assign(default_options, overlay)
         assert result.last_name == overlay.last_name
@@ -116,7 +133,10 @@ class ObjectPathTests(aiounittest.AsyncTestCase):
             last_name="Smith",
             first_name="Fred",
             age=22,
-            location=Location(lat=1.2312312, long=3.234234,),
+            location=Location(
+                lat=1.2312312,
+                long=3.234234,
+            ),
         )
 
         result = ObjectPath.assign(None, overlay)
@@ -132,7 +152,10 @@ class ObjectPathTests(aiounittest.AsyncTestCase):
             last_name="Smith",
             first_name="Fred",
             age=22,
-            location=Location(lat=1.2312312, long=3.234234,),
+            location=Location(
+                lat=1.2312312,
+                long=3.234234,
+            ),
         )
 
         result = ObjectPath.assign(default_options, None)
@@ -152,7 +175,10 @@ class ObjectPathTests(aiounittest.AsyncTestCase):
             "last_name": "Smith",
             "first_name": "Fred",
             "age": 22,
-            "location": Location(lat=1.2312312, long=3.234234,),
+            "location": Location(
+                lat=1.2312312,
+                long=3.234234,
+            ),
         }
 
         overlay = {
@@ -171,7 +197,10 @@ class ObjectPathTests(aiounittest.AsyncTestCase):
             last_name="Smith",
             first_name="Fred",
             age=22,
-            location=Location(lat=1.2312312, long=3.234234,),
+            location=Location(
+                lat=1.2312312,
+                long=3.234234,
+            ),
         )
 
         overlay = {

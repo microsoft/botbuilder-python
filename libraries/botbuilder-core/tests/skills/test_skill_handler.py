@@ -114,17 +114,24 @@ class LegacyConversationIdFactoryForTest(
 
 class SkillHandlerInstanceForTests(SkillHandler):
     async def test_on_get_conversations(
-        self, claims_identity: ClaimsIdentity, continuation_token: str = "",
+        self,
+        claims_identity: ClaimsIdentity,
+        continuation_token: str = "",
     ) -> ConversationsResult:
         return await self.on_get_conversations(claims_identity, continuation_token)
 
     async def test_on_create_conversation(
-        self, claims_identity: ClaimsIdentity, parameters: ConversationParameters,
+        self,
+        claims_identity: ClaimsIdentity,
+        parameters: ConversationParameters,
     ) -> ConversationResourceResponse:
         return await self.on_create_conversation(claims_identity, parameters)
 
     async def test_on_send_to_conversation(
-        self, claims_identity: ClaimsIdentity, conversation_id: str, activity: Activity,
+        self,
+        claims_identity: ClaimsIdentity,
+        conversation_id: str,
+        activity: Activity,
     ) -> ResourceResponse:
         return await self.on_send_to_conversation(
             claims_identity, conversation_id, activity
@@ -163,14 +170,19 @@ class SkillHandlerInstanceForTests(SkillHandler):
         )
 
     async def test_on_delete_activity(
-        self, claims_identity: ClaimsIdentity, conversation_id: str, activity_id: str,
+        self,
+        claims_identity: ClaimsIdentity,
+        conversation_id: str,
+        activity_id: str,
     ):
         return await self.on_delete_activity(
             claims_identity, conversation_id, activity_id
         )
 
     async def test_on_get_conversation_members(
-        self, claims_identity: ClaimsIdentity, conversation_id: str,
+        self,
+        claims_identity: ClaimsIdentity,
+        conversation_id: str,
     ) -> List[ChannelAccount]:
         return await self.on_get_conversation_members(claims_identity, conversation_id)
 
@@ -186,14 +198,20 @@ class SkillHandlerInstanceForTests(SkillHandler):
         )
 
     async def test_on_delete_conversation_member(
-        self, claims_identity: ClaimsIdentity, conversation_id: str, member_id: str,
+        self,
+        claims_identity: ClaimsIdentity,
+        conversation_id: str,
+        member_id: str,
     ):
         return await self.on_delete_conversation_member(
             claims_identity, conversation_id, member_id
         )
 
     async def test_on_get_activity_members(
-        self, claims_identity: ClaimsIdentity, conversation_id: str, activity_id: str,
+        self,
+        claims_identity: ClaimsIdentity,
+        conversation_id: str,
+        activity_id: str,
     ) -> List[ChannelAccount]:
         return await self.on_get_activity_members(
             claims_identity, conversation_id, activity_id
@@ -469,7 +487,10 @@ class TestSkillHandler(aiounittest.AsyncTestCase):
 
                 if activity_type == ActivityTypes.message:
                     # send_activities validation
-                    (args_send, _,) = mock_adapter.send_activities.call_args_list[0]
+                    (
+                        args_send,
+                        _,
+                    ) = mock_adapter.send_activities.call_args_list[0]
                     activity_from_send = args_send[1][0]
                     assert activity_from_send.caller_id is None
                     assert activity_from_send.reply_to_id, activity_id

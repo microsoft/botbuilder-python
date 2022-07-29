@@ -55,7 +55,9 @@ class LuisRecognizerV3(LuisRecognizerInternal):
     async def recognizer_internal(self, turn_context: TurnContext):
         recognizer_result: RecognizerResult = None
 
-        utterance: str = turn_context.activity.text if turn_context.activity is not None else None
+        utterance: str = (
+            turn_context.activity.text if turn_context.activity is not None else None
+        )
 
         url = self._build_url()
         body = self._build_request(utterance)

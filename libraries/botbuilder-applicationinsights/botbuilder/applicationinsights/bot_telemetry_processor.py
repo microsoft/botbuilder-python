@@ -12,10 +12,14 @@ class BotTelemetryProcessor(TelemetryProcessor):
     """Application Insights Telemetry Processor for Bot"""
 
     def __init__(self, processors: List[TelemetryProcessor] = None):
-        self._processors: List[TelemetryProcessor] = [
-            DjangoTelemetryProcessor(),
-            FlaskTelemetryProcessor(),
-        ] if processors is None else processors
+        self._processors: List[TelemetryProcessor] = (
+            [
+                DjangoTelemetryProcessor(),
+                FlaskTelemetryProcessor(),
+            ]
+            if processors is None
+            else processors
+        )
 
     def can_process(self) -> bool:
         for processor in self._processors:

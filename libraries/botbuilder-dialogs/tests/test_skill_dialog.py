@@ -208,7 +208,10 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
         )
 
         sut = SkillDialog(dialog_options, "dialog_id")
-        activity_to_send = Activity(type=ActivityTypes.invoke, name=str(uuid.uuid4()),)
+        activity_to_send = Activity(
+            type=ActivityTypes.invoke,
+            name=str(uuid.uuid4()),
+        )
 
         client = DialogTestClient(
             "test",
@@ -334,7 +337,9 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
         client = DialogTestClient(
             "test",
             sut,
-            BeginSkillDialogOptions(activity=activity_to_send,),
+            BeginSkillDialogOptions(
+                activity=activity_to_send,
+            ),
             conversation_state=conversation_state,
         )
 
@@ -376,7 +381,9 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
         client = DialogTestClient(
             "test",
             sut,
-            BeginSkillDialogOptions(activity=activity_to_send,),
+            BeginSkillDialogOptions(
+                activity=activity_to_send,
+            ),
             conversation_state=conversation_state,
         )
 
@@ -418,7 +425,9 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
         client = DialogTestClient(
             "test",
             sut,
-            BeginSkillDialogOptions(activity=activity_to_send,),
+            BeginSkillDialogOptions(
+                activity=activity_to_send,
+            ),
             conversation_state=conversation_state,
         )
 
@@ -455,10 +464,15 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
         )
         sut = SkillDialog(dialog_options, dialog_id="dialog")
         activity_to_send = SkillDialogTests.create_send_activity()
-        initial_dialog_options = BeginSkillDialogOptions(activity=activity_to_send,)
+        initial_dialog_options = BeginSkillDialogOptions(
+            activity=activity_to_send,
+        )
 
         client = DialogTestClient(
-            "test", sut, initial_dialog_options, conversation_state=conversation_state,
+            "test",
+            sut,
+            initial_dialog_options,
+            conversation_state=conversation_state,
         )
         client.test_adapter.throw_on_exchange_request(
             connection_name, "test", "User1", "https://test"
@@ -499,7 +513,9 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
         client = DialogTestClient(
             "test",
             sut,
-            BeginSkillDialogOptions(activity=activity_to_send,),
+            BeginSkillDialogOptions(
+                activity=activity_to_send,
+            ),
             conversation_state=conversation_state,
         )
 
@@ -558,7 +574,9 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
         # Send something to the dialog to start it
         await client.send_activity("hello")
 
-        simple_id_factory: SimpleConversationIdFactory = dialog_options.conversation_id_factory
+        simple_id_factory: SimpleConversationIdFactory = (
+            dialog_options.conversation_id_factory
+        )
         self.assertEqual(0, len(simple_id_factory.conversation_refs))
         self.assertEqual(1, simple_id_factory.create_count)
 
@@ -593,7 +611,8 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
     def create_oauth_card_attachment_activity(uri: str) -> Activity:
         oauth_card = OAuthCard(token_exchange_resource=TokenExchangeResource(uri=uri))
         attachment = Attachment(
-            content_type=ContentTypes.oauth_card, content=oauth_card,
+            content_type=ContentTypes.oauth_card,
+            content=oauth_card,
         )
 
         attachment_activity = MessageFactory.attachment(attachment)

@@ -120,7 +120,8 @@ class TeamsActivityHandler(ActivityHandler):
                     await self.on_teams_messaging_extension_fetch_task(
                         turn_context,
                         deserializer_helper(
-                            MessagingExtensionAction, turn_context.activity.value,
+                            MessagingExtensionAction,
+                            turn_context.activity.value,
                         ),
                     )
                 )

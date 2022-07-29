@@ -64,12 +64,14 @@ class EnterpriseChannelValidation(ABC):
         channel_service_or_provider: Union[str, ChannelProvider],
         auth_configuration: AuthenticationConfiguration = None,
     ) -> ClaimsIdentity:
-        identity: ClaimsIdentity = await EnterpriseChannelValidation.authenticate_channel_token(
-            auth_header,
-            credentials,
-            channel_id,
-            channel_service_or_provider,
-            auth_configuration,
+        identity: ClaimsIdentity = (
+            await EnterpriseChannelValidation.authenticate_channel_token(
+                auth_header,
+                credentials,
+                channel_id,
+                channel_service_or_provider,
+                auth_configuration,
+            )
         )
 
         service_url_claim: str = identity.get_claim_value(

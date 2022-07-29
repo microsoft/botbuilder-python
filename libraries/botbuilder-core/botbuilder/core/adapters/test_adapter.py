@@ -311,10 +311,18 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
             channel_id="test",
             service_url="https://test.com",
             conversation=ConversationAccount(
-                is_group=False, conversation_type=name, id=name,
+                is_group=False,
+                conversation_type=name,
+                id=name,
             ),
-            user=ChannelAccount(id=user.lower(), name=user.lower(),),
-            bot=ChannelAccount(id=bot.lower(), name=bot.lower(),),
+            user=ChannelAccount(
+                id=user.lower(),
+                name=user.lower(),
+            ),
+            bot=ChannelAccount(
+                id=bot.lower(),
+                name=bot.lower(),
+            ),
         )
 
     def add_user_token(
@@ -657,7 +665,9 @@ class TestFlow:
         return TestFlow(await test_flow_previous(), self.adapter)
 
     async def assert_no_reply(
-        self, description=None, timeout=None,  # pylint: disable=unused-argument
+        self,
+        description=None,
+        timeout=None,  # pylint: disable=unused-argument
     ) -> "TestFlow":
         """
         Generates an assertion if the bot responds when no response is expected.

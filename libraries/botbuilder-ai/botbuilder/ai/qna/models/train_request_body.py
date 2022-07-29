@@ -5,7 +5,7 @@ from msrest.serialization import Model
 
 
 class TrainRequestBody(Model):
-    """ Class the models the request body that is sent as feedback to the Train API. """
+    """Class the models the request body that is sent as feedback to the Train API."""
 
     _attribute_map = {
         "feedback_records": {"key": "feedbackRecords", "type": "[FeedbackRecord]"}

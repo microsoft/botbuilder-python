@@ -527,7 +527,9 @@ class ChoicePromptTest(aiounittest.AsyncTestCase):
         for locale_tests in locale_tests:
             await exec_test_for_locale(locale_tests[0], locale_tests)
 
-    async def test_should_recognize_and_use_custom_locale_dict(self,):
+    async def test_should_recognize_and_use_custom_locale_dict(
+        self,
+    ):
         async def exec_test(turn_context: TurnContext):
             dialog_context = await dialogs.create_context(turn_context)
 

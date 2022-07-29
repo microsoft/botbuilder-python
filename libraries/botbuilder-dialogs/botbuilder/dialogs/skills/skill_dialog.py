@@ -331,7 +331,9 @@ class SkillDialog(Dialog):
         activity.type = ActivityTypes.invoke
         activity.name = SignInConstants.token_exchange_operation_name
         activity.value = TokenExchangeInvokeRequest(
-            id=request_id, token=token, connection_name=connection_name,
+            id=request_id,
+            token=token,
+            connection_name=connection_name,
         )
 
         # route the activity to the skill

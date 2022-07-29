@@ -13,7 +13,7 @@ MAX_SCORE_FOR_LOW_SCORE_VARIATION = 95.0
 
 
 class ActiveLearningUtils:
-    """ Active learning helper class """
+    """Active learning helper class"""
 
     @staticmethod
     def get_low_score_variation(

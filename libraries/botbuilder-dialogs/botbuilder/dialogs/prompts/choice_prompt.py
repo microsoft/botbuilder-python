@@ -123,7 +123,11 @@ class ChoicePrompt(Prompt):
             utterance: str = activity.text
             if not utterance:
                 return result
-            opt: FindChoicesOptions = self.recognizer_options if self.recognizer_options else FindChoicesOptions()
+            opt: FindChoicesOptions = (
+                self.recognizer_options
+                if self.recognizer_options
+                else FindChoicesOptions()
+            )
             opt.locale = self._determine_culture(turn_context.activity, opt)
             results = ChoiceRecognizers.recognize_choices(utterance, choices, opt)
 

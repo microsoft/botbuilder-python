@@ -5,7 +5,7 @@ from msrest.serialization import Model
 
 
 class FeedbackRecord(Model):
-    """ Active learning feedback record. """
+    """Active learning feedback record."""
 
     _attribute_map = {
         "user_id": {"key": "userId", "type": "str"},

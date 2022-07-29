@@ -89,8 +89,10 @@ class CloudAdapterBase(BotAdapter, ABC):
                         activity.conversation.id, activity.reply_to_id, activity
                     )
                 else:
-                    response = await connector_client.conversations.send_to_conversation(
-                        activity.conversation.id, activity
+                    response = (
+                        await connector_client.conversations.send_to_conversation(
+                            activity.conversation.id, activity
+                        )
                     )
 
             response = response or ResourceResponse(activity.id or "")
@@ -140,7 +142,9 @@ class CloudAdapterBase(BotAdapter, ABC):
         )
 
     async def continue_conversation(  # pylint: disable=arguments-differ
-        self, reference: ConversationReference, callback: Callable,
+        self,
+        reference: ConversationReference,
+        callback: Callable,
     ):
         """
         Sends a proactive message to a conversation.
@@ -190,8 +194,10 @@ class CloudAdapterBase(BotAdapter, ABC):
         )
 
         # Create a UserTokenClient instance for the application to use. (For example, in the OAuthPrompt.)
-        user_token_client = await self.bot_framework_authentication.create_user_token_client(
-            claims_identity
+        user_token_client = (
+            await self.bot_framework_authentication.create_user_token_client(
+                claims_identity
+            )
         )
 
         # Create a turn context and run the pipeline.
@@ -263,8 +269,10 @@ class CloudAdapterBase(BotAdapter, ABC):
 
         # Create a UserTokenClient instance for the application to use.
         # (For example, it would be used in a sign-in prompt.)
-        user_token_client = await self.bot_framework_authentication.create_user_token_client(
-            authenticate_request_result.claims_identity
+        user_token_client = (
+            await self.bot_framework_authentication.create_user_token_client(
+                authenticate_request_result.claims_identity
+            )
         )
 
         # Create a turn context and run the pipeline.
