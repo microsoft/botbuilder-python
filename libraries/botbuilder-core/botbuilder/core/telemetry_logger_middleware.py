@@ -303,10 +303,10 @@ class TelemetryLoggerMiddleware(Middleware):
         properties: dict,
     ):
         if activity.channel_id == Channels.ms_teams:
-            teams_channel_data: TeamsChannelData = activity.channel_data
+            teams_channel_data: TeamsChannelData = TeamsChannelData().deserialize(activity.channel_data)
 
             properties["TeamsTenantId"] = (
-                teams_channel_data.tenant
+                teams_channel_data.tenant.id
                 if teams_channel_data and teams_channel_data.tenant
                 else ""
             )
