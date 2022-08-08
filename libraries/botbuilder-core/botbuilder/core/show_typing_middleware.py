@@ -60,7 +60,8 @@ class ShowTypingMiddleware(Middleware):
         def start_interval(context: TurnContext, delay, period):
             async def aux():
                 typing_activity = Activity(
-                    type=ActivityTypes.typing, relates_to=context.activity.relates_to,
+                    type=ActivityTypes.typing,
+                    relates_to=context.activity.relates_to,
                 )
 
                 conversation_reference = TurnContext.get_conversation_reference(

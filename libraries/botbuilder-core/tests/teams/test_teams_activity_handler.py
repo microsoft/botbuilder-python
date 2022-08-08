@@ -263,8 +263,10 @@ class TestingTeamsActivityHandler(TeamsActivityHandler):
         self.record.append(
             "on_teams_messaging_extension_configuration_query_settings_url"
         )
-        return await super().on_teams_messaging_extension_configuration_query_settings_url(
-            turn_context, query
+        return (
+            await super().on_teams_messaging_extension_configuration_query_settings_url(
+                turn_context, query
+            )
         )
 
     async def on_teams_messaging_extension_configuration_setting(
@@ -1003,6 +1005,28 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         assert bot.record[0] == "on_invoke_activity"
         assert bot.record[1] == "on_teams_task_module_fetch"
 
+    async def test_on_teams_task_module_fetch_none_as_empty(self):
+        # Arrange
+        activity = Activity(
+            type=ActivityTypes.invoke,
+            name="task/fetch",
+            value={
+                "data": {"key": "value"},
+                "context": "",
+            },
+        )
+
+        turn_context = TurnContext(SimpleAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        # Assert
+        assert len(bot.record) == 2
+        assert bot.record[0] == "on_invoke_activity"
+        assert bot.record[1] == "on_teams_task_module_fetch"
+
     async def test_on_teams_task_module_submit(self):
         # Arrange
         activity = Activity(
@@ -1030,7 +1054,10 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         activity = Activity(
             type=ActivityTypes.invoke,
             name="tab/fetch",
-            value={"data": {"key": "value"}, "context": TabContext().serialize(),},
+            value={
+                "data": {"key": "value"},
+                "context": TabContext().serialize(),
+            },
         )
 
         turn_context = TurnContext(SimpleAdapter(), activity)
@@ -1049,7 +1076,10 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         activity = Activity(
             type=ActivityTypes.invoke,
             name="tab/submit",
-            value={"data": {"key": "value"}, "context": TabContext().serialize(),},
+            value={
+                "data": {"key": "value"},
+                "context": TabContext().serialize(),
+            },
         )
 
         turn_context = TurnContext(SimpleAdapter(), activity)

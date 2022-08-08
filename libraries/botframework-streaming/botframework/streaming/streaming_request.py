@@ -34,7 +34,10 @@ class StreamingRequest:
         if not method:
             return None
 
-        request = StreamingRequest(verb=method, path=path,)
+        request = StreamingRequest(
+            verb=method,
+            path=path,
+        )
 
         if body:
             request.add_stream(body)

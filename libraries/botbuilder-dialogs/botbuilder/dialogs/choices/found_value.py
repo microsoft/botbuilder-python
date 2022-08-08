@@ -3,7 +3,7 @@
 
 
 class FoundValue:
-    """ Represents a result from matching user input against a list of choices """
+    """Represents a result from matching user input against a list of choices"""
 
     def __init__(self, value: str, index: int, score: float):
         """

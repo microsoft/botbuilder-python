@@ -150,7 +150,7 @@ class TranscriptLoggerMiddleware(Middleware):
 
 
 class TranscriptStore(TranscriptLogger):
-    """ Transcript storage for conversations."""
+    """Transcript storage for conversations."""
 
     @abstractmethod
     async def get_transcript_activities(

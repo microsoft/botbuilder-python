@@ -479,7 +479,10 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
 
         async def callback(context: TurnContext):
             TestBotFrameworkAdapter.get_creds_and_assert_values(
-                context, bot_app_id, expected_scope, expected_app_credentials_count,
+                context,
+                bot_app_id,
+                expected_scope,
+                expected_app_credentials_count,
             )
             TestBotFrameworkAdapter.get_client_and_assert_values(
                 context,
@@ -498,7 +501,11 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
         )
         sut = BotFrameworkAdapter(settings)
         await sut.process_activity_with_identity(
-            Activity(channel_id="emulator", service_url=service_url, text="test",),
+            Activity(
+                channel_id="emulator",
+                service_url=service_url,
+                text="test",
+            ),
             identity,
             callback,
         )
@@ -519,10 +526,17 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
 
         async def callback(context: TurnContext):
             TestBotFrameworkAdapter.get_creds_and_assert_values(
-                context, skill_1_app_id, bot_app_id, 1,
+                context,
+                skill_1_app_id,
+                bot_app_id,
+                1,
             )
             TestBotFrameworkAdapter.get_client_and_assert_values(
-                context, skill_1_app_id, bot_app_id, service_url, 1,
+                context,
+                skill_1_app_id,
+                bot_app_id,
+                service_url,
+                1,
             )
 
             scope = context.turn_state[BotFrameworkAdapter.BOT_OAUTH_SCOPE_KEY]
@@ -535,7 +549,11 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
         settings = BotFrameworkAdapterSettings(bot_app_id)
         sut = BotFrameworkAdapter(settings)
         await sut.process_activity_with_identity(
-            Activity(channel_id="emulator", service_url=service_url, text="test",),
+            Activity(
+                channel_id="emulator",
+                service_url=service_url,
+                text="test",
+            ),
             identity,
             callback,
         )
@@ -640,17 +658,26 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
 
         async def callback(context: TurnContext):
             TestBotFrameworkAdapter.get_creds_and_assert_values(
-                context, skill_1_app_id, skill_2_app_id, 1,
+                context,
+                skill_1_app_id,
+                skill_2_app_id,
+                1,
             )
             TestBotFrameworkAdapter.get_client_and_assert_values(
-                context, skill_1_app_id, skill_2_app_id, skill_2_service_url, 1,
+                context,
+                skill_1_app_id,
+                skill_2_app_id,
+                skill_2_service_url,
+                1,
             )
 
             # pylint: disable=protected-access
             client_cache = context.adapter._connector_client_cache
             client = client_cache.get(
                 BotFrameworkAdapter.key_for_connector_client(
-                    skill_2_service_url, skill_1_app_id, skill_2_app_id,
+                    skill_2_service_url,
+                    skill_1_app_id,
+                    skill_2_app_id,
                 )
             )
             assert client
@@ -769,7 +796,8 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
         mock_credential_provider = unittest.mock.create_autospec(CredentialProvider)
 
         settings = BotFrameworkAdapterSettings(
-            app_id="bot_id", credential_provider=mock_credential_provider,
+            app_id="bot_id",
+            credential_provider=mock_credential_provider,
         )
         adapter = AdapterUnderTest(settings)
 
@@ -810,7 +838,9 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
             await context.send_activity(activity)
 
         invoke_response = await adapter.process_activity_with_identity(
-            inbound_activity, identity, callback,
+            inbound_activity,
+            identity,
+            callback,
         )
 
         assert invoke_response
@@ -825,7 +855,8 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
         mock_credential_provider = unittest.mock.create_autospec(CredentialProvider)
 
         settings = BotFrameworkAdapterSettings(
-            app_id="bot_id", credential_provider=mock_credential_provider,
+            app_id="bot_id",
+            credential_provider=mock_credential_provider,
         )
         adapter = AdapterUnderTest(settings)
 
@@ -875,7 +906,9 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
             await context.send_activity(activity)
 
         invoke_response = await adapter.process_activity_with_identity(
-            inbound_activity, identity, callback,
+            inbound_activity,
+            identity,
+            callback,
         )
 
         assert invoke_response
