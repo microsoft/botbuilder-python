@@ -251,7 +251,7 @@ class TestTelemetryMiddleware(aiounittest.AsyncTestCase):
         channel_data = TeamsChannelData(
             team=team_info,
             tenant=TenantInfo(id="tenantId"),
-        )
+        ).serialize()
 
         activity = MessageFactory.text("test")
         activity.channel_data = channel_data
@@ -272,7 +272,7 @@ class TestTelemetryMiddleware(aiounittest.AsyncTestCase):
                     "fromId": "userId",
                     "recipientId": "bot",
                     "recipientName": "Bot",
-                    "TeamsTenantId": TenantInfo(id="tenantId"),
+                    "TeamsTenantId": "tenantId",
                     "TeamsUserAadObjectId": "aaId",
                     "TeamsTeamInfo": TeamInfo.serialize(team_info),
                 },
