@@ -1,6 +1,6 @@
 # ![Bot Framework SDK v4 Python](./doc/media/FrameWorkPython.png)
 
-**The Bot Framework Python SDK is being retired with final long-term support ending in November 2023, after which this repository will be archived. There will be no further feature development, with only critical security and bug fixes within this repository being undertaken. Existing bots built with this SDK will continue to function. For all new bot development we recommend that you adopt Power Virtual Agents.**
+**The Bot Framework Python SDK is being retired with final long-term support ending in November 2023, after which this repository will be archived. There will be no further feature development, with only critical security and bug fixes within this repository being undertaken. Existing bots built with this SDK will continue to function. For all new bot development we recommend that you adopt [Power Virtual Agents](https://powervirtualagents.microsoft.com/en-us/blog/the-future-of-bot-building/).**
 ### [What's new with Bot Framework](https://docs.microsoft.com/en-us/azure/bot-service/what-is-new?view=azure-bot-service-4.0)
 
 This repository contains code for the Python version of the [Microsoft Bot Framework SDK](https://github.com/Microsoft/botframework-sdk), which is part of the Microsoft Bot Framework - a comprehensive framework for building enterprise-grade conversational AI experiences.
