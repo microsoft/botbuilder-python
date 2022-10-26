@@ -6,6 +6,7 @@ from setuptools import setup
 
 REQUIRES = [
     "regex<=2019.08.19",
+    "emoji==1.7.0",
     "recognizers-text-date-time>=1.0.2a1",
     "recognizers-text-number-with-unit>=1.0.2a1",
     "recognizers-text-number>=1.0.2a1",
