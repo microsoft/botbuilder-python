@@ -174,6 +174,7 @@ class PromptCultureModels:
         """
         return [
             cls.Chinese,
+            cls.German,
             cls.Dutch,
             cls.English,
             cls.French,

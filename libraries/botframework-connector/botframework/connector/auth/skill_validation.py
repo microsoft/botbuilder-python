@@ -55,7 +55,7 @@ class SkillValidation:
         bearer_token = auth_header.split(" ")[1]
 
         # Parse the Big Long String into an actual token.
-        token = jwt.decode(bearer_token, verify=False)
+        token = jwt.decode(bearer_token, options={"verify_signature": False})
         return SkillValidation.is_skill_claim(token)
 
     @staticmethod
