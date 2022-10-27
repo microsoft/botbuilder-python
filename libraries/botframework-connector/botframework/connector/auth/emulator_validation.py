@@ -63,7 +63,7 @@ class EmulatorValidation:
         bearer_token = auth_header.split(" ")[1]
 
         # Parse the Big Long String into an actual token.
-        token = jwt.decode(bearer_token, verify=False)
+        token = jwt.decode(bearer_token, options={"verify_signature": False})
         if not token:
             return False
 
