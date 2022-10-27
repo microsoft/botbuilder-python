@@ -68,7 +68,7 @@ class JwtTokenExtractor:
             raise error
 
     def _has_allowed_issuer(self, jwt_token: str) -> bool:
-        decoded = jwt.decode(jwt_token, verify=False)
+        decoded = jwt.decode(jwt_token, options={"verify_signature": False})
         issuer = decoded.get("iss", None)
         if issuer in self.validation_parameters.issuer:
             return True
@@ -111,6 +111,7 @@ class JwtTokenExtractor:
             metadata.public_key,
             leeway=self.validation_parameters.clock_tolerance,
             options=options,
+            algorithms=["RS256"]
         )
 
         claims = ClaimsIdentity(decoded_payload, True)
