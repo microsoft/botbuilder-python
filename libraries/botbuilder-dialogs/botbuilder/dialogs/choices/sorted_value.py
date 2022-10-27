@@ -3,7 +3,7 @@
 
 
 class SortedValue:
-    """ A value that can be sorted and still refer to its original position with a source array. """
+    """A value that can be sorted and still refer to its original position with a source array."""
 
     def __init__(self, value: str, index: int):
         """

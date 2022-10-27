@@ -15,7 +15,7 @@ jobs:
 - job: Build
 #Multi-configuration and multi-agent job options are not exported to YAML. Configure these options using documentation guidance: https://docs.microsoft.com/vsts/pipelines/process/phases
   pool:
-    name: Hosted Ubuntu 1604
+    vmImage: 'ubuntu-latest'
 
   strategy:
       matrix:
@@ -54,7 +54,7 @@ jobs:
       pip install -r ./libraries/botbuilder-ai/tests/requirements.txt
       pip install coveralls
       pip install pylint==2.4.4
-      pip install black==19.10b0
+      pip install black==22.3.0
     displayName: 'Install dependencies'
 
   - script: |
@@ -104,3 +104,6 @@ jobs:
       Get-ChildItem -Path "$(Build.SourcesDirectory)" -Include "*coverage*" | Copy-Item -Destination "$(Build.ArtifactStagingDirectory)/CodeCoverage"
     displayName: 'Copy .coverage Files to CodeCoverage folder'
     continueOnError: true
+
+  - task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
+    displayName: 'Component Detection'

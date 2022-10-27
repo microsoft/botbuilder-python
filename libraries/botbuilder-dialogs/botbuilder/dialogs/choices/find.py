@@ -14,7 +14,7 @@ from .tokenizer import Tokenizer
 
 
 class Find:
-    """ Contains methods for matching user input against a list of choices """
+    """Contains methods for matching user input against a list of choices"""
 
     @staticmethod
     def find_choices(
@@ -22,7 +22,7 @@ class Find:
         choices: [Union[str, Choice]],
         options: FindChoicesOptions = None,
     ):
-        """ Matches user input against a list of choices """
+        """Matches user input against a list of choices"""
 
         if not choices:
             raise TypeError(
@@ -92,9 +92,9 @@ class Find:
         # Search for each value within the utterance.
         matches: [ModelResult] = []
         opt = options if options else FindValuesOptions()
-        tokenizer: Callable[
-            [str, str], List[Token]
-        ] = opt.tokenizer if opt.tokenizer else Tokenizer.default_tokenizer
+        tokenizer: Callable[[str, str], List[Token]] = (
+            opt.tokenizer if opt.tokenizer else Tokenizer.default_tokenizer
+        )
         tokens = tokenizer(utterance, opt.locale)
         max_distance = (
             opt.max_token_distance if opt.max_token_distance is not None else 2

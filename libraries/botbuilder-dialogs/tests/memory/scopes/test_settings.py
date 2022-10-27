@@ -5,7 +5,7 @@ import os
 
 
 class DefaultConfig:
-    """ Bot Configuration """
+    """Bot Configuration"""
 
     STRING = os.environ.get("STRING", "test")
     INT = os.environ.get("INT", 3)

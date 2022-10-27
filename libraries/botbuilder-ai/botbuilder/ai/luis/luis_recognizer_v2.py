@@ -44,7 +44,9 @@ class LuisRecognizerV2(LuisRecognizerInternal):
 
     async def recognizer_internal(self, turn_context: TurnContext):
 
-        utterance: str = turn_context.activity.text if turn_context.activity is not None else None
+        utterance: str = (
+            turn_context.activity.text if turn_context.activity is not None else None
+        )
         luis_result: LuisResult = self._runtime.prediction.resolve(
             self._application.application_id,
             utterance,

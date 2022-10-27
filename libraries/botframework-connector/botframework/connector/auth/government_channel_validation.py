@@ -57,8 +57,10 @@ class GovernmentChannelValidation(ABC):
         channel_id: str,
         auth_configuration: AuthenticationConfiguration = None,
     ) -> ClaimsIdentity:
-        identity: ClaimsIdentity = await GovernmentChannelValidation.authenticate_channel_token(
-            auth_header, credentials, channel_id, auth_configuration
+        identity: ClaimsIdentity = (
+            await GovernmentChannelValidation.authenticate_channel_token(
+                auth_header, credentials, channel_id, auth_configuration
+            )
         )
 
         service_url_claim: str = identity.get_claim_value(

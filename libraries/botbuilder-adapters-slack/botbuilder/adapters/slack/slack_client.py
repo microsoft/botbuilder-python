@@ -409,7 +409,9 @@ class SlackClient(WebClient):
         if message.blocks:
             request_content["blocks"] = json.dumps(message.blocks)
 
-        session = aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=30),)
+        session = aiohttp.ClientSession(
+            timeout=aiohttp.ClientTimeout(total=30),
+        )
 
         http_verb = "POST"
         api_url = POST_EPHEMERAL_MESSAGE_URL if message.ephemeral else POST_MESSAGE_URL

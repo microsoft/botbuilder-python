@@ -6,12 +6,13 @@ from setuptools import setup
 
 REQUIRES = [
     "regex<=2019.08.19",
+    "emoji==1.7.0",
     "recognizers-text-date-time>=1.0.2a1",
     "recognizers-text-number-with-unit>=1.0.2a1",
     "recognizers-text-number>=1.0.2a1",
     "recognizers-text>=1.0.2a1",
     "recognizers-text-choice>=1.0.2a1",
-    "babel==2.7.0",
+    "babel==2.9.1",
     "botbuilder-schema==4.15.0",
     "botframework-connector==4.15.0",
     "botbuilder-core==4.15.0",

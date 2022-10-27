@@ -262,7 +262,9 @@ class LuisRecognizer(Recognizer):
         if turn_context.activity.type != ActivityTypes.message:
             return None
 
-        utterance: str = turn_context.activity.text if turn_context.activity is not None else None
+        utterance: str = (
+            turn_context.activity.text if turn_context.activity is not None else None
+        )
         recognizer_result: RecognizerResult = None
 
         if luis_prediction_options:
