@@ -1,3 +1,0 @@
-msrest==0.6.*
-botframework-connector>=4.15.0
-botbuilder-schema>=4.15.0
