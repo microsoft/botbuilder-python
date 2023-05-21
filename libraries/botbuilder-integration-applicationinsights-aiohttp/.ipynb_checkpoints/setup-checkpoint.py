@@ -5,21 +5,24 @@ import os
 from setuptools import setup
 
 REQUIRES = [
-    "applicationinsights==0.11.9",
+    "applicationinsights>=0.11.9",
+    "aiohttp==3.8.4",
     "botbuilder-schema==4.15.0",
     "botframework-connector==4.15.0",
     "botbuilder-core==4.15.0",
+    "botbuilder-applicationinsights==4.15.0",
 ]
 TESTS_REQUIRES = [
     "aiounittest==1.3.0",
-    "django==3.2.17",  # For samples
-    "djangorestframework==3.10.3",  # For samples
-    "flask==2.2.5",  # For samples
 ]
 
 root = os.path.abspath(os.path.dirname(__file__))
 
-with open(os.path.join(root, "botbuilder", "applicationinsights", "about.py")) as f:
+with open(
+    os.path.join(
+        root, "botbuilder", "integration", "applicationinsights", "aiohttp", "about.py"
+    )
+) as f:
     package_info = {}
     info = f.read()
     exec(info, package_info)
@@ -39,16 +42,12 @@ setup(
         "ai",
         "botframework",
         "botbuilder",
+        "aiohttp",
     ],
     long_description=long_description,
     long_description_content_type="text/x-rst",
     license=package_info["__license__"],
-    packages=[
-        "botbuilder.applicationinsights",
-        "botbuilder.applicationinsights.django",
-        "botbuilder.applicationinsights.flask",
-        "botbuilder.applicationinsights.processor",
-    ],
+    packages=["botbuilder.integration.applicationinsights.aiohttp"],
     install_requires=REQUIRES + TESTS_REQUIRES,
     tests_require=TESTS_REQUIRES,
     include_package_data=True,

@@ -5,21 +5,18 @@ import os
 from setuptools import setup
 
 REQUIRES = [
-    "applicationinsights==0.11.9",
     "botbuilder-schema==4.15.0",
-    "botframework-connector==4.15.0",
     "botbuilder-core==4.15.0",
+    "botbuilder-dialogs==4.15.0",
+    "botbuilder-azure==4.15.0",
+    "pytest~=6.2.3",
 ]
-TESTS_REQUIRES = [
-    "aiounittest==1.3.0",
-    "django==3.2.17",  # For samples
-    "djangorestframework==3.10.3",  # For samples
-    "flask==2.2.5",  # For samples
-]
+
+TESTS_REQUIRES = ["aiounittest==1.3.0"]
 
 root = os.path.abspath(os.path.dirname(__file__))
 
-with open(os.path.join(root, "botbuilder", "applicationinsights", "about.py")) as f:
+with open(os.path.join(root, "botbuilder", "testing", "about.py")) as f:
     package_info = {}
     info = f.read()
     exec(info, package_info)
@@ -33,22 +30,11 @@ setup(
     url=package_info["__uri__"],
     author=package_info["__author__"],
     description=package_info["__description__"],
-    keywords=[
-        "BotBuilderApplicationInsights",
-        "bots",
-        "ai",
-        "botframework",
-        "botbuilder",
-    ],
+    keywords="botbuilder-testing bots ai testing botframework botbuilder",
     long_description=long_description,
     long_description_content_type="text/x-rst",
     license=package_info["__license__"],
-    packages=[
-        "botbuilder.applicationinsights",
-        "botbuilder.applicationinsights.django",
-        "botbuilder.applicationinsights.flask",
-        "botbuilder.applicationinsights.processor",
-    ],
+    packages=["botbuilder.testing"],
     install_requires=REQUIRES + TESTS_REQUIRES,
     tests_require=TESTS_REQUIRES,
     include_package_data=True,

@@ -5,21 +5,17 @@ import os
 from setuptools import setup
 
 REQUIRES = [
-    "applicationinsights==0.11.9",
+    "azure-cognitiveservices-language-luis==0.2.0",
     "botbuilder-schema==4.15.0",
-    "botframework-connector==4.15.0",
     "botbuilder-core==4.15.0",
+    "aiohttp==3.8.4",
 ]
-TESTS_REQUIRES = [
-    "aiounittest==1.3.0",
-    "django==3.2.17",  # For samples
-    "djangorestframework==3.10.3",  # For samples
-    "flask==2.2.5",  # For samples
-]
+
+TESTS_REQUIRES = ["aiounittest>=1.1.0"]
 
 root = os.path.abspath(os.path.dirname(__file__))
 
-with open(os.path.join(root, "botbuilder", "applicationinsights", "about.py")) as f:
+with open(os.path.join(root, "botbuilder", "ai", "about.py")) as f:
     package_info = {}
     info = f.read()
     exec(info, package_info)
@@ -33,21 +29,17 @@ setup(
     url=package_info["__uri__"],
     author=package_info["__author__"],
     description=package_info["__description__"],
-    keywords=[
-        "BotBuilderApplicationInsights",
-        "bots",
-        "ai",
-        "botframework",
-        "botbuilder",
-    ],
+    keywords="botbuilder-ai LUIS QnAMaker bots ai botframework botbuilder",
     long_description=long_description,
     long_description_content_type="text/x-rst",
     license=package_info["__license__"],
     packages=[
-        "botbuilder.applicationinsights",
-        "botbuilder.applicationinsights.django",
-        "botbuilder.applicationinsights.flask",
-        "botbuilder.applicationinsights.processor",
+        "botbuilder.ai",
+        "botbuilder.ai.qna",
+        "botbuilder.ai.luis",
+        "botbuilder.ai.qna.models",
+        "botbuilder.ai.qna.utils",
+        "botbuilder.ai.qna.dialogs",
     ],
     install_requires=REQUIRES + TESTS_REQUIRES,
     tests_require=TESTS_REQUIRES,
