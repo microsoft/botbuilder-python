@@ -9,7 +9,7 @@ REQUIRES = [
     "botbuilder-core==4.15.0",
     "botbuilder-dialogs==4.15.0",
     "botbuilder-azure==4.15.0",
-    "pytest~=6.2.3",
+    "pytest~=7.3.1",
 ]
 
 TESTS_REQUIRES = ["aiounittest==1.3.0"]

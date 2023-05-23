@@ -3,4 +3,4 @@ botbuilder-schema==4.15.0
 botbuilder-core==4.15.0
 requests==2.31.0
 aiounittest==1.3.0
-azure-cognitiveservices-language-luis==0.7.0
+azure-cognitiveservices-language-luis==0.2.0
