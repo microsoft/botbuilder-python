@@ -5,7 +5,7 @@ import os
 from setuptools import setup
 
 REQUIRES = [
-    "azure-cognitiveservices-language-luis==0.2.0",
+    "azure-cognitiveservices-language-luis==0.7.0",
     "botbuilder-schema==4.15.0",
     "botbuilder-core==4.15.0",
     "aiohttp==3.8.4",
