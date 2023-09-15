@@ -1,0 +1,45 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  WORKING_DIR: ./libraries/botbuilder-integration-aiohttp
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Pull Source
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+
+    - name: Establish Versioning, Tags, and Labels
+      id: vtl
+      uses: mapped/action-vtl@latest
+      with:
+        baseVersion: 1.0.0
+        gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Run image
+      uses: abatilo/actions-poetry@v2.1.5
+      with:
+        poetry-version: "1.4.2"
+
+    - name: update package version
+      run: |
+        echo "${{ steps.vtl.outputs.ver_semVerNoMeta}}"
+        poetry version "${{ steps.vtl.outputs.ver_semVerNoMeta}}"
+      working-directory: ${{ env.WORKING_DIR }}
+
+    - name: publish the package to PyPI
+      run: |
+        poetry publish --build -r fury -u ${{ secrets.FURY_PUSH_TOKEN }} -p NOPASS
+      working-directory: ${{ env.WORKING_DIR }}
