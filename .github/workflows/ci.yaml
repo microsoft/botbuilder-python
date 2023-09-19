@@ -25,11 +25,11 @@ jobs:
         baseVersion: 1.0.0
         gitHubToken: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: publish botbuilder-integration-aiohttp
+    - name: publish botbuilder-integration-aiohttp-forked
       run: |
         echo version: $packageVersion
         python setup.py sdist
-        curl -F package=@./dist/botbuilder-integration-aiohttp-$packageVersion.tar.gz https://${{ secrets.FURY_PUSH_TOKEN }}@push.fury.io/mapped/
+        curl -F package=@./dist/botbuilder-integration-aiohttp-forked-$packageVersion.tar.gz https://${{ secrets.FURY_PUSH_TOKEN }}@push.fury.io/mapped/
       env:
         packageVersion: ${{ steps.vtl.outputs.ver_semVerNoMeta}}
       working-directory: ./libraries/botbuilder-integration-aiohttp

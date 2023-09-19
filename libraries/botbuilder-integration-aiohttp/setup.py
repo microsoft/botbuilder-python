@@ -7,8 +7,8 @@ from setuptools import setup
 VERSION = os.environ["packageVersion"] if "packageVersion" in os.environ else "4.15.0"
 REQUIRES = [
     "botbuilder-schema==4.14.0",
-    "botframework-connector>=4.14.0",
-    "botbuilder-core>=4.14.0",
+    "botframework-connector-forked>=1.0.10",
+    "botbuilder-core-forked>=1.0.11",
     "yarl<=1.4.2",
     "aiohttp==3.8.5",
 ]
@@ -24,7 +24,7 @@ with open(os.path.join(root, "README.rst"), encoding="utf-8") as f:
     long_description = f.read()
 
 setup(
-    name=package_info["__title__"],
+    name=package_info["__title__"] + "-forked",
     version=package_info["__version__"],
     url=package_info["__uri__"],
     author=package_info["__author__"],
