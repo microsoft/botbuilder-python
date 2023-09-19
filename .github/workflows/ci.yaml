@@ -52,11 +52,11 @@ jobs:
         packageVersion: ${{ steps.vtl.outputs.ver_semVerNoMeta}}
       working-directory: ./libraries/botframework-streaming
     
-    - name: publish botbuilder-core
+    - name: publish botbuilder-core-forked
       run: |
         echo version: $packageVersion
         python setup.py sdist
-        curl -F package=@./dist/botbuilder-core-$packageVersion.tar.gz https://${{ secrets.FURY_PUSH_TOKEN }}@push.fury.io/mapped/
+        curl -F package=@./dist/botbuilder-core-forked-$packageVersion.tar.gz https://${{ secrets.FURY_PUSH_TOKEN }}@push.fury.io/mapped/
       env:
         packageVersion: ${{ steps.vtl.outputs.ver_semVerNoMeta}}
       working-directory: ./libraries/botbuilder-core
