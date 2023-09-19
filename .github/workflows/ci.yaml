@@ -47,7 +47,7 @@ jobs:
       run: |
         echo version: $packageVersion
         python setup.py sdist
-        curl -F package=@./dist/botframework-streaming-$packageVersion.tar.gz https://${{ secrets.FURY_PUSH_TOKEN }}@push.fury.io/mapped/
+        curl -F package=@./dist/botframework-streaming-forked-$packageVersion.tar.gz https://${{ secrets.FURY_PUSH_TOKEN }}@push.fury.io/mapped/
       env:
         packageVersion: ${{ steps.vtl.outputs.ver_semVerNoMeta}}
       working-directory: ./libraries/botframework-streaming
