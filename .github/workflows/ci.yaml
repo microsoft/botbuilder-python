@@ -5,9 +5,6 @@ on:
     branches:
       - main
 
-env:
-  WORKING_DIR: ./libraries/botbuilder-integration-aiohttp
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -28,11 +25,38 @@ jobs:
         baseVersion: 1.0.0
         gitHubToken: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: publish
+    - name: publish botbuilder-integration-aiohttp
       run: |
         echo version: $packageVersion
         python setup.py sdist
         curl -F package=@./dist/botbuilder-integration-aiohttp-$packageVersion.tar.gz https://${{ secrets.FURY_PUSH_TOKEN }}@push.fury.io/mapped/
       env:
         packageVersion: ${{ steps.vtl.outputs.ver_semVerNoMeta}}
-      working-directory: ${{ env.WORKING_DIR }}
+      working-directory: ./libraries/botbuilder-integration-aiohttp
+    
+    - name: publish botframework-connector
+      run: |
+        echo version: $packageVersion
+        python setup.py sdist
+        curl -F package=@./dist/botframework-connector-$packageVersion.tar.gz https://${{ secrets.FURY_PUSH_TOKEN }}@push.fury.io/mapped/
+      env:
+        packageVersion: ${{ steps.vtl.outputs.ver_semVerNoMeta}}
+      working-directory: ./libraries/botframework-connector
+    
+    - name: publish botframework-streaming
+      run: |
+        echo version: $packageVersion
+        python setup.py sdist
+        curl -F package=@./dist/botframework-streaming-$packageVersion.tar.gz https://${{ secrets.FURY_PUSH_TOKEN }}@push.fury.io/mapped/
+      env:
+        packageVersion: ${{ steps.vtl.outputs.ver_semVerNoMeta}}
+      working-directory: ./libraries/botframework-streaming
+    
+    - name: publish botbuilder-core
+      run: |
+        echo version: $packageVersion
+        python setup.py sdist
+        curl -F package=@./dist/botbuilder-core-$packageVersion.tar.gz https://${{ secrets.FURY_PUSH_TOKEN }}@push.fury.io/mapped/
+      env:
+        packageVersion: ${{ steps.vtl.outputs.ver_semVerNoMeta}}
+      working-directory: ./libraries/botbuilder-core
