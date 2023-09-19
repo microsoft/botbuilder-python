@@ -34,11 +34,11 @@ jobs:
         packageVersion: ${{ steps.vtl.outputs.ver_semVerNoMeta}}
       working-directory: ./libraries/botbuilder-integration-aiohttp
     
-    - name: publish botframework-connector
+    - name: publish botframework-connector-forked
       run: |
         echo version: $packageVersion
         python setup.py sdist
-        curl -F package=@./dist/botframework-connector-$packageVersion.tar.gz https://${{ secrets.FURY_PUSH_TOKEN }}@push.fury.io/mapped/
+        curl -F package=@./dist/botframework-connector-forked-$packageVersion.tar.gz https://${{ secrets.FURY_PUSH_TOKEN }}@push.fury.io/mapped/
       env:
         packageVersion: ${{ steps.vtl.outputs.ver_semVerNoMeta}}
       working-directory: ./libraries/botframework-connector

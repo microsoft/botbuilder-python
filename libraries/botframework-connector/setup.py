@@ -20,7 +20,7 @@ with open(os.path.join(root, "README.rst"), encoding="utf-8") as f:
     long_description = f.read()
 
 setup(
-    name=NAME,
+    name=NAME + "-forked",
     version=VERSION,
     description="Microsoft Bot Framework Bot Builder SDK for Python.",
     author="Microsoft",
