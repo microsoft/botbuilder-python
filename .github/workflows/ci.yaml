@@ -43,7 +43,7 @@ jobs:
         packageVersion: ${{ steps.vtl.outputs.ver_semVerNoMeta}}
       working-directory: ./libraries/botframework-connector
     
-    - name: publish botframework-streaming
+    - name: publish botframework-streaming-forked
       run: |
         echo version: $packageVersion
         python setup.py sdist
