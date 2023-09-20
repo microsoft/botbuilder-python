@@ -5,7 +5,7 @@ import os
 from setuptools import setup
 
 REQUIRES = [
-    "botbuilder-schema==4.15.0",
+    "botbuilder-schema=4.14.0",
     "botbuilder-core==4.15.0",
     "botbuilder-dialogs==4.15.0",
     "botbuilder-azure==4.15.0",
