@@ -13,7 +13,7 @@ REQUIRES = [
     "recognizers-text>=1.0.2a1",
     "recognizers-text-choice>=1.0.2a1",
     "babel==2.9.1",
-    "botbuilder-schema=4.14.0",
+    "botbuilder-schema==4.14.0",
     "botframework-connector==4.15.0",
     "botbuilder-core==4.15.0",
 ]

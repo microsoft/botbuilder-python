@@ -6,7 +6,7 @@ from setuptools import setup
 
 VERSION = os.environ["packageVersion"] if "packageVersion" in os.environ else "4.15.0"
 REQUIRES = [
-    "botbuilder-schema=4.14.0",
+    "botbuilder-schema==4.14.0",
     "botframework-connector>=4.15.0",
 ]
 
