@@ -1,6 +1,6 @@
 pytest-cov>=2.6.0
 pytest~=6.2.3
 pyyaml==6.0
-azure-devtools>=0.4.1
+azure-devtools>=1.0.0
 pytest-asyncio==0.15.1
 ddt==1.2.1
