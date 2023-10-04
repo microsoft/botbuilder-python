@@ -45,7 +45,6 @@ class SkillHttpClient(BotFrameworkHttpClient):
         activity: Activity,
         originating_audience: str = None,
     ) -> InvokeResponse:
-
         if originating_audience is None:
             originating_audience = (
                 GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE

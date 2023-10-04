@@ -5,7 +5,6 @@ from .alias_path_resolver import AliasPathResolver
 
 
 class AtPathResolver(AliasPathResolver):
-
     _DELIMITERS = [".", "["]
 
     def __init__(self):

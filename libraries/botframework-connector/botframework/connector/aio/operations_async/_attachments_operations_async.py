@@ -26,7 +26,6 @@ class AttachmentsOperations:
     models = models
 
     def __init__(self, client, config, serializer, deserializer) -> None:
-
         self._client = client
         self._serialize = serializer
         self._deserialize = deserializer

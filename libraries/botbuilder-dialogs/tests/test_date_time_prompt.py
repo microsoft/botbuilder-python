@@ -32,7 +32,6 @@ class DatetimePromptTests(aiounittest.AsyncTestCase):
 
             results = await dialog_context.continue_dialog()
             if results.status == DialogTurnStatus.Empty:
-
                 options = PromptOptions(prompt=MessageFactory.text(prompt_msg))
                 await dialog_context.begin_dialog("DateTimePrompt", options)
             else:

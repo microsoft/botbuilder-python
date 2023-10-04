@@ -75,7 +75,6 @@ def safer_version(version):
 
 
 class bdist_wheel(Command):
-
     description = "create a wheel distribution"
 
     user_options = [
@@ -518,9 +517,9 @@ class bdist_wheel(Command):
 from distutils import log as logger
 import os.path
 
+
 # from wheel.bdist_wheel import bdist_wheel
 class azure_bdist_wheel(bdist_wheel):
-
     description = "Create an Azure wheel distribution"
 
     user_options = bdist_wheel.user_options + [
