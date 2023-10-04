@@ -1,7 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from asyncio import wait
 from typing import List
 from .bot_state import BotState
 from .turn_context import TurnContext
@@ -19,14 +18,9 @@ class BotStateSet:
         return self
 
     async def load_all(self, turn_context: TurnContext, force: bool = False):
-        await wait(
-            [bot_state.load(turn_context, force) for bot_state in self.bot_states]
-        )
+        for bot_state in self.bot_states:
+            await bot_state.load(turn_context, force)
 
     async def save_all_changes(self, turn_context: TurnContext, force: bool = False):
-        await wait(
-            [
-                bot_state.save_changes(turn_context, force)
-                for bot_state in self.bot_states
-            ]
-        )
+        for bot_state in self.bot_states:
+            await bot_state.save_changes(turn_context, force)
