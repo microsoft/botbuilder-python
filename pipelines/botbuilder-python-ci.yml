@@ -8,6 +8,7 @@ variables:
   COVERALLS_SERVICE_NAME: python-ci
   python.37: 3.7.x
   python.38: 3.8.x
+  python.311: 3.11.x
   # PythonCoverallsToken: get this from Azure
 
 jobs:
@@ -23,6 +24,8 @@ jobs:
           PYTHON_VERSION: '$(python.37)'
         Python38:
           PYTHON_VERSION: '$(python.38)'
+        Python311:
+          PYTHON_VERSION: '$(python.311)'
       maxParallel: 3
 
   steps:
