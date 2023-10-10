@@ -11,7 +11,7 @@ ignore=CVS,build,botbuilder-schema,samples,django_tests,Generator,operations,ope
 
 # Add files or directories matching the regex patterns to the blacklist. The
 # regex matches against base names, not paths.
-ignore-patterns=setup.py,azure_bdist_wheel.py,**/tests/**/*.py
+ignore-patterns=setup.py,azure_bdist_wheel.py
 
 # Python code to execute, usually for sys.path manipulation such as
 # pygtk.require().
