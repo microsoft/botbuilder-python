@@ -83,7 +83,7 @@ jobs:
   - script: 'black --check libraries'
     displayName: 'Check Black compliant'
 
-  - script: 'pylint --errors-only --rcfile=.pylintrc libraries'
+  - script: 'pylint --rcfile=.pylintrc libraries'
     displayName: Pylint
 
   - script: 'COVERALLS_REPO_TOKEN=$(PythonCoverallsToken) coveralls'
