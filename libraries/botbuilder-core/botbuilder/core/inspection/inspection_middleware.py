@@ -29,7 +29,6 @@ class InspectionMiddleware(InterceptionMiddleware):
         conversation_state: ConversationState = None,
         credentials: MicrosoftAppCredentials = None,
     ):
-
         self.inspection_state = inspection_state
         self.inspection_state_accessor = inspection_state.create_property(
             "InspectionSessionByStatus"
@@ -43,13 +42,11 @@ class InspectionMiddleware(InterceptionMiddleware):
 
     async def process_command(self, context: TurnContext) -> Any:
         if context.activity.type == ActivityTypes.message and context.activity.text:
-
             original_text = context.activity.text
             TurnContext.remove_recipient_mention(context.activity)
 
             command = context.activity.text.strip().split(" ")
             if len(command) > 1 and command[0] == InspectionMiddleware._COMMAND:
-
                 if len(command) == 2 and command[1] == "open":
                     await self._process_open_command(context)
                     return True

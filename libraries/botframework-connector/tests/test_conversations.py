@@ -3,7 +3,6 @@
 
 import asyncio
 import pytest
-from azure_devtools.scenario_tests import ReplayableTest
 
 from botbuilder.schema import (
     Activity,
@@ -48,9 +47,9 @@ LOOP = asyncio.get_event_loop()
 AUTH_TOKEN = LOOP.run_until_complete(get_auth_token())
 
 
-class ConversationTest(ReplayableTest):
-    def __init__(self, method_name):  # pylint: disable=useless-super-delegation
-        super(ConversationTest, self).__init__(method_name)
+class ConversationTest:
+    def __init__(self):  # pylint: disable=useless-super-delegation
+        super(ConversationTest, self).__init__()
 
     @property
     def credentials(self):
