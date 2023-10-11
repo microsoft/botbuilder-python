@@ -35,7 +35,7 @@ class SimpleAdapter(BotAdapter):
         assert activities is not None
         assert isinstance(activities, list)
         assert activities
-        for (idx, activity) in enumerate(activities):  # pylint: disable=unused-variable
+        for idx, activity in enumerate(activities):  # pylint: disable=unused-variable
             assert isinstance(activity, Activity)
             assert activity.type == "message" or activity.type == ActivityTypes.trace
             responses.append(ResourceResponse(id="5678"))

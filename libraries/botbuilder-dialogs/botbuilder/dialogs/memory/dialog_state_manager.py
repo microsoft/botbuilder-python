@@ -36,7 +36,6 @@ BUILTIN_TYPES = list(filter(lambda x: not x.startswith("_"), dir(builtins)))
 # PathResolvers allow for shortcut behavior for mapping things like $foo -> dialog.foo.
 # </summary>
 class DialogStateManager:
-
     SEPARATORS = [",", "["]
 
     def __init__(

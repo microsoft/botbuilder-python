@@ -40,7 +40,7 @@ class MemoryStorage(Storage):
             return
         try:
             # iterate over the changes
-            for (key, change) in changes.items():
+            for key, change in changes.items():
                 new_value = deepcopy(change)
                 old_state_etag = None
 

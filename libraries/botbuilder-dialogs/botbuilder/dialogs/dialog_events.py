@@ -5,7 +5,6 @@ from enum import Enum
 
 
 class DialogEvents(str, Enum):
-
     begin_dialog = "beginDialog"
     reprompt_dialog = "repromptDialog"
     cancel_dialog = "cancelDialog"

@@ -5,14 +5,12 @@ from enum import Enum
 
 
 class RoleTypes(str, Enum):
-
     user = "user"
     bot = "bot"
     skill = "skill"
 
 
 class ActivityTypes(str, Enum):
-
     message = "message"
     contact_relation_update = "contactRelationUpdate"
     conversation_update = "conversationUpdate"
@@ -34,33 +32,28 @@ class ActivityTypes(str, Enum):
 
 
 class TextFormatTypes(str, Enum):
-
     markdown = "markdown"
     plain = "plain"
     xml = "xml"
 
 
 class AttachmentLayoutTypes(str, Enum):
-
     list = "list"
     carousel = "carousel"
 
 
 class MessageReactionTypes(str, Enum):
-
     like = "like"
     plus_one = "plusOne"
 
 
 class InputHints(str, Enum):
-
     accepting_input = "acceptingInput"
     ignoring_input = "ignoringInput"
     expecting_input = "expectingInput"
 
 
 class ActionTypes(str, Enum):
-
     open_url = "openUrl"
     im_back = "imBack"
     post_back = "postBack"
@@ -74,7 +67,6 @@ class ActionTypes(str, Enum):
 
 
 class EndOfConversationCodes(str, Enum):
-
     unknown = "unknown"
     completed_successfully = "completedSuccessfully"
     user_cancelled = "userCancelled"
@@ -84,14 +76,12 @@ class EndOfConversationCodes(str, Enum):
 
 
 class ActivityImportance(str, Enum):
-
     low = "low"
     normal = "normal"
     high = "high"
 
 
 class DeliveryModes(str, Enum):
-
     normal = "normal"
     notification = "notification"
     expect_replies = "expectReplies"
@@ -99,19 +89,16 @@ class DeliveryModes(str, Enum):
 
 
 class ContactRelationUpdateActionTypes(str, Enum):
-
     add = "add"
     remove = "remove"
 
 
 class InstallationUpdateActionTypes(str, Enum):
-
     add = "add"
     remove = "remove"
 
 
 class SemanticActionStates(str, Enum):
-
     start_action = "start"
     continue_action = "continue"
     done_action = "done"
