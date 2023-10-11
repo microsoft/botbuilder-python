@@ -143,7 +143,7 @@ class BlobStorage(Storage):
 
         await self._initialize()
 
-        for (name, item) in changes.items():
+        for name, item in changes.items():
             blob_reference = self.__container_client.get_blob_client(name)
 
             e_tag = None

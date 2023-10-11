@@ -56,7 +56,6 @@ class TestMiddlewareSet(aiounittest.AsyncTestCase):
         await middleware_set.receive_activity_internal("Bye", request_handler)
 
     async def test_middleware_run_in_order(self):
-
         called_first = False
         called_second = False
 

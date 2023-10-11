@@ -254,7 +254,6 @@ class QnAMaker(QnAMakerTelemetryClient):
     def _has_matched_answer_in_kb(self, query_results: [QueryResult]) -> bool:
         if query_results:
             if query_results[0].id != -1:
-
                 return True
 
         return False

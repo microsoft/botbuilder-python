@@ -15,7 +15,6 @@ from .verify_options import VerifyOptions
 
 
 class EnterpriseChannelValidation(ABC):
-
     TO_BOT_FROM_ENTERPRISE_CHANNEL_TOKEN_VALIDATION_PARAMETERS = VerifyOptions(
         issuer=[AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER],
         audience=None,

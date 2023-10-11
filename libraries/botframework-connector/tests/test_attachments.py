@@ -5,7 +5,6 @@ import os
 import base64
 import asyncio
 import pytest
-from azure_devtools.scenario_tests import ReplayableTest
 
 import msrest
 from botbuilder.schema import AttachmentData, ErrorResponseException
@@ -51,9 +50,9 @@ LOOP = asyncio.get_event_loop()
 AUTH_TOKEN = LOOP.run_until_complete(get_auth_token())
 
 
-class AttachmentsTest(ReplayableTest):
-    def __init__(self, method_name):  # pylint: disable=useless-super-delegation
-        super(AttachmentsTest, self).__init__(method_name)
+class AttachmentsTest:
+    def __init__(self):  # pylint: disable=useless-super-delegation
+        super(AttachmentsTest, self).__init__()
 
     @property
     def credentials(self):

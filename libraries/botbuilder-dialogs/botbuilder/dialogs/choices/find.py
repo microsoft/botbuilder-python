@@ -101,7 +101,6 @@ class Find:
         )
 
         for entry in sorted_values:
-
             # Find all matches for a value
             # - To match "last one" in "the last time I chose the last one" we need
             #   to re-search the string starting from the end of the previous match.
