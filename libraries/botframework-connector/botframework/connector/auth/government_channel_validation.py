@@ -13,7 +13,6 @@ from .verify_options import VerifyOptions
 
 
 class GovernmentChannelValidation(ABC):
-
     OPEN_ID_METADATA_ENDPOINT = ""
 
     TO_BOT_FROM_GOVERNMENT_CHANNEL_TOKEN_VALIDATION_PARAMETERS = VerifyOptions(

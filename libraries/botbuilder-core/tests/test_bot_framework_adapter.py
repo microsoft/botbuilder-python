@@ -319,7 +319,6 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
         await adapter.process_activity(incoming, "", aux_func_assert_tenant_id_copied)
 
     async def test_should_create_valid_conversation_for_msteams(self):
-
         tenant_id = "testTenant"
 
         reference = deepcopy(REFERENCE)

@@ -1565,7 +1565,6 @@ class ErrorResponseException(HttpOperationError):
     """
 
     def __init__(self, deserialize, response, *args):
-
         super(ErrorResponseException, self).__init__(
             deserialize, response, "ErrorResponse", *args
         )

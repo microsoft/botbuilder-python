@@ -85,7 +85,6 @@ class AsyncServiceClientMixin:
 
         response = None
         try:
-
             try:
                 future = loop.run_in_executor(
                     None,

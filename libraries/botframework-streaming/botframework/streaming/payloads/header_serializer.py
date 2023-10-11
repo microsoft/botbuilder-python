@@ -34,7 +34,6 @@ class HeaderSerializer:
         buffer: List[int],
         offset: int,  # pylint: disable=unused-argument
     ) -> int:
-
         # write type
         buffer[HeaderSerializer.TYPE_OFFSET] = HeaderSerializer._char_to_binary_int(
             header.type
