@@ -103,7 +103,9 @@ class _BotFrameworkClientImpl(BotFrameworkClient):
         }
         if token:
             headers_dict.update(
-                {"Authorization": f"Bearer {token}",}
+                {
+                    "Authorization": f"Bearer {token}",
+                }
             )
         json_content = dumps(activity_copy.serialize()).encode("utf-8")
 

@@ -7,7 +7,7 @@ from .query_result import QueryResult
 
 
 class QueryResults(Model):
-    """ Contains answers for a user query. """
+    """Contains answers for a user query."""
 
     _attribute_map = {
         "answers": {"key": "answers", "type": "[QueryResult]"},

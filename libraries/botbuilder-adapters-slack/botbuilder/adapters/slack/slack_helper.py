@@ -56,7 +56,9 @@ class SlackHelper:
                         message.blocks = att.content
                     else:
                         new_attachment = Attachment(
-                            author_name=att.name, thumb_url=att.thumbnail_url, text="",
+                            author_name=att.name,
+                            thumb_url=att.thumbnail_url,
+                            text="",
                         )
                         attachments.append(new_attachment)
 

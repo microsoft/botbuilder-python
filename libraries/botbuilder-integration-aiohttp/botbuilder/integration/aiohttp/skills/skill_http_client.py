@@ -45,7 +45,6 @@ class SkillHttpClient(BotFrameworkHttpClient):
         activity: Activity,
         originating_audience: str = None,
     ) -> InvokeResponse:
-
         if originating_audience is None:
             originating_audience = (
                 GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
@@ -61,8 +60,10 @@ class SkillHttpClient(BotFrameworkHttpClient):
             bot_framework_skill=to_skill,
         )
 
-        skill_conversation_id = await self._skill_conversation_id_factory.create_skill_conversation_id(
-            options
+        skill_conversation_id = (
+            await self._skill_conversation_id_factory.create_skill_conversation_id(
+                options
+            )
         )
 
         return await super().post_activity(

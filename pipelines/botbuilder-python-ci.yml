@@ -8,6 +8,7 @@ variables:
   COVERALLS_SERVICE_NAME: python-ci
   python.37: 3.7.x
   python.38: 3.8.x
+  # python.311: 3.11.x
   # PythonCoverallsToken: get this from Azure
 
 jobs:
@@ -23,6 +24,8 @@ jobs:
           PYTHON_VERSION: '$(python.37)'
         Python38:
           PYTHON_VERSION: '$(python.38)'
+        # Python311:
+        #   PYTHON_VERSION: '$(python.311)'
       maxParallel: 3
 
   steps:
@@ -54,7 +57,7 @@ jobs:
       pip install -r ./libraries/botbuilder-ai/tests/requirements.txt
       pip install coveralls
       pip install pylint==2.4.4
-      pip install black==19.10b0
+      pip install black==22.3.0
     displayName: 'Install dependencies'
 
   - script: |
@@ -104,3 +107,6 @@ jobs:
       Get-ChildItem -Path "$(Build.SourcesDirectory)" -Include "*coverage*" | Copy-Item -Destination "$(Build.ArtifactStagingDirectory)/CodeCoverage"
     displayName: 'Copy .coverage Files to CodeCoverage folder'
     continueOnError: true
+
+  - task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
+    displayName: 'Component Detection'

@@ -5,7 +5,7 @@ from msrest.serialization import Model
 
 
 class Metadata(Model):
-    """ Metadata associated with the answer. """
+    """Metadata associated with the answer."""
 
     _attribute_map = {
         "name": {"key": "name", "type": "str"},

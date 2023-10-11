@@ -15,7 +15,6 @@ from .verify_options import VerifyOptions
 
 
 class EnterpriseChannelValidation(ABC):
-
     TO_BOT_FROM_ENTERPRISE_CHANNEL_TOKEN_VALIDATION_PARAMETERS = VerifyOptions(
         issuer=[AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER],
         audience=None,
@@ -64,12 +63,14 @@ class EnterpriseChannelValidation(ABC):
         channel_service_or_provider: Union[str, ChannelProvider],
         auth_configuration: AuthenticationConfiguration = None,
     ) -> ClaimsIdentity:
-        identity: ClaimsIdentity = await EnterpriseChannelValidation.authenticate_channel_token(
-            auth_header,
-            credentials,
-            channel_id,
-            channel_service_or_provider,
-            auth_configuration,
+        identity: ClaimsIdentity = (
+            await EnterpriseChannelValidation.authenticate_channel_token(
+                auth_header,
+                credentials,
+                channel_id,
+                channel_service_or_provider,
+                auth_configuration,
+            )
         )
 
         service_url_claim: str = identity.get_claim_value(

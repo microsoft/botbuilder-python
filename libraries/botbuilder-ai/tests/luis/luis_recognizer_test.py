@@ -126,7 +126,9 @@ class LuisRecognizerTest(AsyncTestCase):
 
     async def test_null_utterance(self):
         utterance: str = None
-        response_path: str = "SingleIntent_SimplyEntity.json"  # The path is irrelevant in this case
+        response_path: str = (
+            "SingleIntent_SimplyEntity.json"  # The path is irrelevant in this case
+        )
 
         _, result = await LuisRecognizerTest._get_recognizer_result(
             utterance, response_path

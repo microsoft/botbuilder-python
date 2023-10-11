@@ -55,7 +55,9 @@ class LuisRecognizerV3(LuisRecognizerInternal):
     async def recognizer_internal(self, turn_context: TurnContext):
         recognizer_result: RecognizerResult = None
 
-        utterance: str = turn_context.activity.text if turn_context.activity is not None else None
+        utterance: str = (
+            turn_context.activity.text if turn_context.activity is not None else None
+        )
 
         url = self._build_url()
         body = self._build_request(utterance)
@@ -100,7 +102,6 @@ class LuisRecognizerV3(LuisRecognizerInternal):
         return recognizer_result
 
     def _build_url(self):
-
         base_uri = (
             self._application.endpoint or "https://westus.api.cognitive.microsoft.com"
         )
@@ -170,7 +171,6 @@ class LuisRecognizerV3(LuisRecognizerInternal):
         return self._map_properties(entities, False)
 
     def _map_properties(self, source, in_instance):
-
         if isinstance(source, (int, float, bool, str)):
             return source
 

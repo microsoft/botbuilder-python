@@ -26,6 +26,7 @@ from botbuilder.schema import (
     ConversationReference,
 )
 
+
 # pylint: disable=line-too-long,missing-docstring
 class TestMemoryTranscriptStore(aiounittest.AsyncTestCase):
     # pylint: disable=unused-argument

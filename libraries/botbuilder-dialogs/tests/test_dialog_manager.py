@@ -81,7 +81,11 @@ class SimpleComponentDialog(ComponentDialog):
         self.add_dialog(TextPrompt(self.text_prompt))
         self.add_dialog(
             WaterfallDialog(
-                self.waterfall_dialog, [self.prompt_for_name, self.final_step,]
+                self.waterfall_dialog,
+                [
+                    self.prompt_for_name,
+                    self.final_step,
+                ],
             )
         )
         self.initial_dialog_id = self.waterfall_dialog

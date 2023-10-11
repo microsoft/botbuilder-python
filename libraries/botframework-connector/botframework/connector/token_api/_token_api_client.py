@@ -32,7 +32,6 @@ class TokenApiClient(SDKClient):
     """
 
     def __init__(self, credentials, base_url=None):
-
         self.config = TokenApiClientConfiguration(credentials, base_url)
         super(TokenApiClient, self).__init__(self.config.credentials, self.config)
 

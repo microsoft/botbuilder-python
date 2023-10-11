@@ -7,7 +7,7 @@ from .token import Token
 
 
 class Tokenizer:
-    """ Provides a default tokenizer implementation. """
+    """Provides a default tokenizer implementation."""
 
     @staticmethod
     def default_tokenizer(  # pylint: disable=unused-argument

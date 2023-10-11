@@ -41,7 +41,10 @@ class CloudSkillHandler(CloudChannelServiceHandler):
         )
 
     async def on_send_to_conversation(
-        self, claims_identity: ClaimsIdentity, conversation_id: str, activity: Activity,
+        self,
+        claims_identity: ClaimsIdentity,
+        conversation_id: str,
+        activity: Activity,
     ) -> ResourceResponse:
         """
         send_to_conversation() API for Skill
@@ -68,7 +71,9 @@ class CloudSkillHandler(CloudChannelServiceHandler):
         :return:
         """
         return await self._inner.on_send_to_conversation(
-            claims_identity, conversation_id, activity,
+            claims_identity,
+            conversation_id,
+            activity,
         )
 
     async def on_reply_to_activity(
@@ -105,7 +110,10 @@ class CloudSkillHandler(CloudChannelServiceHandler):
         :return:
         """
         return await self._inner.on_reply_to_activity(
-            claims_identity, conversation_id, activity_id, activity,
+            claims_identity,
+            conversation_id,
+            activity_id,
+            activity,
         )
 
     async def on_delete_activity(

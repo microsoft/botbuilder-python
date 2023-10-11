@@ -248,7 +248,11 @@ class StorageBaseTests:
     @staticmethod
     async def perform_batch_operations(storage) -> bool:
         await storage.write(
-            {"batch1": {"count": 10}, "batch2": {"count": 20}, "batch3": {"count": 30},}
+            {
+                "batch1": {"count": 10},
+                "batch2": {"count": 20},
+                "batch3": {"count": 30},
+            }
         )
 
         result = await storage.read(["batch1", "batch2", "batch3"])

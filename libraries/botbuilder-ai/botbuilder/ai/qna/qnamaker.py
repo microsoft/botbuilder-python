@@ -55,9 +55,9 @@ class QnAMaker(QnAMakerTelemetryClient):
         instance_timeout = ClientTimeout(total=opt.timeout / 1000)
         self._http_client = http_client or ClientSession(timeout=instance_timeout)
 
-        self.telemetry_client: Union[
-            BotTelemetryClient, NullTelemetryClient
-        ] = telemetry_client or NullTelemetryClient()
+        self.telemetry_client: Union[BotTelemetryClient, NullTelemetryClient] = (
+            telemetry_client or NullTelemetryClient()
+        )
 
         self.log_personal_information = log_personal_information or False
 
@@ -254,7 +254,6 @@ class QnAMaker(QnAMakerTelemetryClient):
     def _has_matched_answer_in_kb(self, query_results: [QueryResult]) -> bool:
         if query_results:
             if query_results[0].id != -1:
-
                 return True
 
         return False

@@ -26,7 +26,7 @@ class DialogTurnResult:
 
         :return self._status: The status of the stack.
         :rtype self._status: :class:`DialogTurnStatus`
-         """
+        """
         return self._status
 
     @property

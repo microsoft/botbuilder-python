@@ -6,7 +6,7 @@ from setuptools import setup
 
 NAME = "botbuilder-schema"
 VERSION = os.environ["packageVersion"] if "packageVersion" in os.environ else "4.15.0"
-REQUIRES = ["msrest==0.6.10"]
+REQUIRES = ["msrest==0.6.*", "urllib3<2.0.0"]
 
 root = os.path.abspath(os.path.dirname(__file__))
 
@@ -24,7 +24,10 @@ setup(
     long_description_content_type="text/x-rst",
     license="MIT",
     install_requires=REQUIRES,
-    packages=["botbuilder.schema", "botbuilder.schema.teams",],
+    packages=[
+        "botbuilder.schema",
+        "botbuilder.schema.teams",
+    ],
     include_package_data=True,
     classifiers=[
         "Programming Language :: Python :: 3.7",

@@ -18,7 +18,6 @@ from .activity_util import ActivityUtil
 
 
 class LuisRecognizerV2(LuisRecognizerInternal):
-
     # The value type for a LUIS trace activity.
     luis_trace_type: str = "https://www.luis.ai/schemas/trace"
 
@@ -43,8 +42,9 @@ class LuisRecognizerV2(LuisRecognizerInternal):
         self._application = luis_application
 
     async def recognizer_internal(self, turn_context: TurnContext):
-
-        utterance: str = turn_context.activity.text if turn_context.activity is not None else None
+        utterance: str = (
+            turn_context.activity.text if turn_context.activity is not None else None
+        )
         luis_result: LuisResult = self._runtime.prediction.resolve(
             self._application.application_id,
             utterance,

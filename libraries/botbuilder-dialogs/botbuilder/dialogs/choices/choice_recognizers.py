@@ -14,7 +14,7 @@ from .model_result import ModelResult
 
 
 class ChoiceRecognizers:
-    """ Contains methods for matching user input against a list of choices. """
+    """Contains methods for matching user input against a list of choices."""
 
     @staticmethod
     def recognize_choices(

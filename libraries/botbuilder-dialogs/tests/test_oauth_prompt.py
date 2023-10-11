@@ -76,7 +76,6 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
         async def inspector(
             activity: Activity, description: str = None
         ):  # pylint: disable=unused-argument
-
             self.assertTrue(len(activity.attachments) == 1)
             self.assertTrue(
                 activity.attachments[0].content_type
@@ -184,7 +183,6 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
 
             results = await dialog_context.continue_dialog()
             if results.status == DialogTurnStatus.Empty:
-
                 # If magicCode is detected when prompting, this will end the dialog and return the token in tokenResult
                 token_result = await dialog_context.prompt("prompt", PromptOptions())
                 if isinstance(token_result.result, TokenResponse):
@@ -324,7 +322,9 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
         step3 = await step2.send("test invalid message")
         await step3.assert_reply("Ended")
 
-    async def test_should_timeout_oauth_prompt_with_message_activity(self,):
+    async def test_should_timeout_oauth_prompt_with_message_activity(
+        self,
+    ):
         activity = Activity(type=ActivityTypes.message, text="any")
         await self.run_timeout_test(activity)
 
@@ -344,7 +344,9 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
         )
         await self.run_timeout_test(activity)
 
-    async def test_should_not_timeout_oauth_prompt_with_custom_event_activity(self,):
+    async def test_should_not_timeout_oauth_prompt_with_custom_event_activity(
+        self,
+    ):
         activity = Activity(type=ActivityTypes.event, name="custom event name")
         await self.run_timeout_test(activity, False, "Ended", "Failed")
 
@@ -388,7 +390,8 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
         dialogs = DialogSet(dialog_state)
         dialogs.add(
             OAuthPrompt(
-                "prompt", OAuthPromptSettings(connection_name, "Login", None, 1),
+                "prompt",
+                OAuthPromptSettings(connection_name, "Login", None, 1),
             )
         )
 

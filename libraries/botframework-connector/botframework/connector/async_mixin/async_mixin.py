@@ -85,7 +85,6 @@ class AsyncServiceClientMixin:
 
         response = None
         try:
-
             try:
                 future = loop.run_in_executor(
                     None,
@@ -143,7 +142,7 @@ class _MsrestStopIteration(Exception):
 
 
 def _msrest_next(iterator):
-    """"To avoid:
+    """ "To avoid:
     TypeError: StopIteration interacts badly with generators and cannot be raised into a Future
     """
     try:

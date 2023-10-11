@@ -282,7 +282,6 @@ class ConfirmPromptTest(aiounittest.AsyncTestCase):
 
     async def test_confirm_prompt_should_default_to_english_locale(self):
         async def exec_test(turn_context: TurnContext):
-
             dialog_context = await dialogs.create_context(turn_context)
 
             results: DialogTurnResult = await dialog_context.continue_dialog()
@@ -438,7 +437,9 @@ class ConfirmPromptTest(aiounittest.AsyncTestCase):
         for locale_tests in locale_tests:
             await exec_test_for_locale(locale_tests[0], locale_tests)
 
-    async def test_should_recognize_and_use_custom_locale_dict(self,):
+    async def test_should_recognize_and_use_custom_locale_dict(
+        self,
+    ):
         async def exec_test(turn_context: TurnContext):
             dialog_context = await dialogs.create_context(turn_context)
 

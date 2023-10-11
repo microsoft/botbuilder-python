@@ -6,8 +6,8 @@ from setuptools import setup
 
 VERSION = os.environ["packageVersion"] if "packageVersion" in os.environ else "4.15.0"
 REQUIRES = [
-    "botbuilder-schema>=4.12.0",
-    "botframework-connector>=4.12.0",
+    "botbuilder-schema==4.15.0",
+    "botframework-connector==4.15.0",
 ]
 
 root = os.path.abspath(os.path.dirname(__file__))
@@ -26,7 +26,13 @@ setup(
     url=package_info["__uri__"],
     author=package_info["__author__"],
     description=package_info["__description__"],
-    keywords=["BotFrameworkStreaming", "bots", "ai", "botframework", "botframework",],
+    keywords=[
+        "BotFrameworkStreaming",
+        "bots",
+        "ai",
+        "botframework",
+        "botframework",
+    ],
     long_description=long_description,
     long_description_content_type="text/x-rst",
     license=package_info["__license__"],
