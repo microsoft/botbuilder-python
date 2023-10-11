@@ -113,7 +113,6 @@ class TestConversationState(aiounittest.AsyncTestCase):
             y_prop = conversation_state.create_property("y")
 
             async def exec_test2(turn_context):
-
                 await turn_context.send_activity(
                     MessageFactory.text(f"echo: { turn_context.activity.text }")
                 )
@@ -227,7 +226,6 @@ class TestConversationState(aiounittest.AsyncTestCase):
             y_prop = conversation_state.create_property("y")
 
             async def exec_test2(turn_context):
-
                 await turn_context.send_activity(
                     MessageFactory.text(f"echo: {turn_context.activity.text}")
                 )

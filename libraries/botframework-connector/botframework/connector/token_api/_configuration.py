@@ -22,7 +22,6 @@ class TokenApiClientConfiguration(Configuration):
     """
 
     def __init__(self, credentials, base_url=None):
-
         if credentials is None:
             raise ValueError("Parameter 'credentials' must not be None.")
         if not base_url:

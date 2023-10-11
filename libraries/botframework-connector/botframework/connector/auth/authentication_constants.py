@@ -5,7 +5,6 @@ from abc import ABC
 
 
 class AuthenticationConstants(ABC):
-
     # TO CHANNEL FROM BOT: Login URL
     #
     # DEPRECATED: DO NOT USE

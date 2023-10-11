@@ -37,3 +37,4 @@ class SendQueue:
             except Exception:
                 # AppInsights.TrackException(e)
                 traceback.print_exc()
+                return

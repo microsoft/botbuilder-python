@@ -46,7 +46,6 @@ class ConnectorClient(SDKClient):
     """
 
     def __init__(self, credentials, base_url=None):
-
         self.config = ConnectorClientConfiguration(credentials, base_url)
         super(ConnectorClient, self).__init__(self.config.credentials, self.config)
 
