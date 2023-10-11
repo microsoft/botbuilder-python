@@ -65,7 +65,6 @@ class DialogContainer(Dialog, ABC):
 
         # Trace unhandled "versionChanged" events.
         if not handled and dialog_event.name == DialogEvents.version_changed:
-
             trace_message = (
                 f"Unhandled dialog event: {dialog_event.name}. Active Dialog: "
                 f"{dialog_context.active_dialog.id}"

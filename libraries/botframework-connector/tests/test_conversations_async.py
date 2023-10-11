@@ -3,7 +3,6 @@
 
 import asyncio
 import pytest
-from azure_devtools.scenario_tests import ReplayableTest
 
 from botbuilder.schema import (
     Activity,
@@ -48,9 +47,9 @@ LOOP = asyncio.get_event_loop()
 AUTH_TOKEN = LOOP.run_until_complete(get_auth_token())
 
 
-class TestAsyncConversation(ReplayableTest):
-    def __init__(self, method_name):
-        super(TestAsyncConversation, self).__init__(method_name)
+class TestAsyncConversation:
+    def __init__(self):
+        super(TestAsyncConversation, self).__init__()
         self.loop = asyncio.get_event_loop()
         self.credentials = MicrosoftTokenAuthenticationStub(AUTH_TOKEN)
 

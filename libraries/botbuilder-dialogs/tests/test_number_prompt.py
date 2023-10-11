@@ -180,7 +180,6 @@ class NumberPromptTests(aiounittest.AsyncTestCase):
         dialogs.add(number_prompt)
 
         async def exec_test(turn_context: TurnContext) -> None:
-
             dialog_context = await dialogs.create_context(turn_context)
             results = await dialog_context.continue_dialog()
 

@@ -45,7 +45,7 @@ class MiddlewareSet(Middleware):
         :param middleware :
         :return:
         """
-        for (idx, mid) in enumerate(middleware):
+        for idx, mid in enumerate(middleware):
             if hasattr(mid, "on_turn") and callable(mid.on_turn):
                 self._middleware.append(mid)
                 return self
