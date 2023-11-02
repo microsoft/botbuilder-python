@@ -13,6 +13,9 @@ from .cloud_adapter import CloudAdapter
 from .configuration_service_client_credential_factory import (
     ConfigurationServiceClientCredentialFactory,
 )
+from .configuration_bot_framework_authentication import (
+    ConfigurationBotFrameworkAuthentication,
+)
 
 __all__ = [
     "aiohttp_channel_service_routes",
@@ -21,4 +24,5 @@ __all__ = [
     "BotFrameworkHttpAdapter",
     "CloudAdapter",
     "ConfigurationServiceClientCredentialFactory",
+    "ConfigurationBotFrameworkAuthentication",
 ]
