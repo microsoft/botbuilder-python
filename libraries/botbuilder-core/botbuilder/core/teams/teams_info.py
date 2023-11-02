@@ -55,7 +55,9 @@ class TeamsInfo:
             activity=activity,
         )
 
-        async def aux_callback(new_turn_context,):
+        async def aux_callback(
+            new_turn_context,
+        ):
             nonlocal new_activity_id
             nonlocal conversation_reference
             new_activity_id = new_turn_context.activity.id

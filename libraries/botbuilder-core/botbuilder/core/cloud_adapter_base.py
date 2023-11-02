@@ -213,8 +213,10 @@ class CloudAdapterBase(BotAdapter, ABC):
         connector_client = await connector_factory.create(service_url, audience)
 
         # Make the actual create conversation call using the connector.
-        create_conversation_result = await connector_client.conversations.create_conversation(
-            conversation_parameters
+        create_conversation_result = (
+            await connector_client.conversations.create_conversation(
+                conversation_parameters
+            )
         )
 
         # Create the create activity to communicate the results to the application.
@@ -223,8 +225,10 @@ class CloudAdapterBase(BotAdapter, ABC):
         )
 
         # Create a UserTokenClient instance for the application to use. (For example, in the OAuthPrompt.)
-        user_token_client = await self.bot_framework_authentication.create_user_token_client(
-            claims_identity
+        user_token_client = (
+            await self.bot_framework_authentication.create_user_token_client(
+                claims_identity
+            )
         )
 
         # Create a turn context and run the pipeline.
