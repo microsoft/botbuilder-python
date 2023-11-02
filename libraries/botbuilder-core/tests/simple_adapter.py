@@ -59,7 +59,7 @@ class SimpleAdapter(BotAdapter):
 
         return responses
 
-    async def create_conversation(
+    async def create_conversation(  # pylint: disable=arguments-differ
         self,
         reference: ConversationReference,
         logic: Callable[[TurnContext], Awaitable] = None,
