@@ -5,7 +5,6 @@ from enum import Enum
 
 
 class SignInConstants(str, Enum):
-
     # Name for the signin invoke to verify the 6-digit authentication code as part of sign-in.
     verify_state_operation_name = "signin/verifyState"
     # Name for signin invoke to perform a token exchange.

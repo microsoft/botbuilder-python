@@ -188,7 +188,6 @@ class TeamsInfo:
     async def get_paged_members(
         turn_context: TurnContext, continuation_token: str = None, page_size: int = None
     ) -> List[TeamsPagedMembersResult]:
-
         team_id = TeamsInfo.get_team_id(turn_context)
         if not team_id:
             conversation_id = turn_context.activity.conversation.id

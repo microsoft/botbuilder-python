@@ -914,7 +914,6 @@ class BotFrameworkAdapter(
         magic_code: str = None,
         oauth_app_credentials: AppCredentials = None,  # pylint: disable=unused-argument
     ) -> TokenResponse:
-
         """
         Attempts to retrieve the token for a user that's in a login flow.
 

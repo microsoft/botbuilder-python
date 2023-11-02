@@ -36,7 +36,6 @@ BUILTIN_TYPES = list(filter(lambda x: not x.startswith("_"), dir(builtins)))
 # PathResolvers allow for shortcut behavior for mapping things like $foo -> dialog.foo.
 # </summary>
 class DialogStateManager:
-
     SEPARATORS = [",", "["]
 
     def __init__(
@@ -290,7 +289,10 @@ class DialogStateManager:
         # TODO: HACK to support .First() retrieval on turn.recognized.entities.foo, replace with Expressions once
         #  expressions ship
         first = ".FIRST()"
-        i_first = path.upper().rindex(first)
+        try:
+            i_first = path.upper().rindex(first)
+        except ValueError:
+            i_first = -1
         if i_first >= 0:
             remaining_path = path[i_first + len(first) :]
             path = path[0:i_first]
