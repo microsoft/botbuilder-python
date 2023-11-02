@@ -21,7 +21,6 @@ from .channel_provider import ChannelProvider
 
 
 class JwtTokenValidation:
-
     # TODO remove the default value on channel_service
     @staticmethod
     async def authenticate_request(

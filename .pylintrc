@@ -7,7 +7,7 @@ extension-pkg-whitelist=
 
 # Add files or directories to the blacklist. They should be base names, not
 # paths.
-ignore=CVS,build,botbuilder-schema,samples,django_tests,Generator,operations,operations_async,schema
+ignore=CVS,build,botbuilder-schema,samples,django_tests,Generator,operations,operations_async,schema,tests
 
 # Add files or directories matching the regex patterns to the blacklist. The
 # regex matches against base names, not paths.
@@ -160,7 +160,8 @@ disable=print-statement,
         no-name-in-module,
         too-many-branches,
         too-many-ancestors,
-        too-many-nested-blocks
+        too-many-nested-blocks,
+        attribute-defined-outside-init
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option

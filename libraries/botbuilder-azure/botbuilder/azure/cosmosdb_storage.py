@@ -178,7 +178,7 @@ class CosmosDbStorage(Storage):
             if not self.__container_exists:
                 self.__create_db_and_container()
                 # iterate over the changes
-            for (key, change) in changes.items():
+            for key, change in changes.items():
                 # store the e_tag
                 e_tag = None
                 if isinstance(change, dict):

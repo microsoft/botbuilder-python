@@ -146,7 +146,7 @@ class CosmosDbPartitionedStorage(Storage):
 
         await self.initialize()
 
-        for (key, change) in changes.items():
+        for key, change in changes.items():
             e_tag = None
             if isinstance(change, dict):
                 e_tag = change.get("e_tag", None)
