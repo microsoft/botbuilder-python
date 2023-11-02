@@ -14,7 +14,7 @@ from .configuration_service_client_credential_factory import (
     ConfigurationServiceClientCredentialFactory,
 )
 from .configuration_bot_framework_authentication import (
-    ConfigurationBotFrameworkAuthentication
+    ConfigurationBotFrameworkAuthentication,
 )
 
 __all__ = [
@@ -24,5 +24,5 @@ __all__ = [
     "BotFrameworkHttpAdapter",
     "CloudAdapter",
     "ConfigurationServiceClientCredentialFactory",
-    "ConfigurationBotFrameworkAuthentication"
+    "ConfigurationBotFrameworkAuthentication",
 ]
