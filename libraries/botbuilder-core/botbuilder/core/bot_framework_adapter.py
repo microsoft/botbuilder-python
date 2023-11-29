@@ -363,7 +363,11 @@ class BotFrameworkAdapter(
             )
 
             # Mix in the tenant ID if specified. This is required for MS Teams.
-            if reference.conversation and reference.conversation.tenant_id:
+            if (
+                reference
+                and reference.conversation
+                and reference.conversation.tenant_id
+            ):
                 # Putting tenant_id in channel_data is a temporary while we wait for the Teams API to be updated
                 if parameters.channel_data is None:
                     parameters.channel_data = {}
@@ -910,7 +914,6 @@ class BotFrameworkAdapter(
         magic_code: str = None,
         oauth_app_credentials: AppCredentials = None,  # pylint: disable=unused-argument
     ) -> TokenResponse:
-
         """
         Attempts to retrieve the token for a user that's in a login flow.
 

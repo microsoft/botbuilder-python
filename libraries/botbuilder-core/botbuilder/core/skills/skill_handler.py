@@ -20,7 +20,6 @@ from .conversation_id_factory import ConversationIdFactoryBase
 
 
 class SkillHandler(ChannelServiceHandler):
-
     SKILL_CONVERSATION_REFERENCE_KEY = (
         "botbuilder.core.skills.SkillConversationReference"
     )

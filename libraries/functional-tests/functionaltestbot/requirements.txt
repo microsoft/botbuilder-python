@@ -2,4 +2,4 @@
 # Licensed under the MIT License.
 
 botbuilder-core>=4.9.0
-flask==1.1.1
+flask==2.2.5

@@ -12,9 +12,9 @@ REQUIRES = [
 ]
 TESTS_REQUIRES = [
     "aiounittest==1.3.0",
-    "django==3.2.14",  # For samples
+    "django==3.2.21",  # For samples
     "djangorestframework==3.10.3",  # For samples
-    "flask==1.1.1",  # For samples
+    "flask==2.2.5",  # For samples
 ]
 
 root = os.path.abspath(os.path.dirname(__file__))

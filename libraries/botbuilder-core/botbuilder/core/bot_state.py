@@ -18,7 +18,6 @@ class CachedBotState:
     """
 
     def __init__(self, state: Dict[str, object] = None):
-
         self.state = state if state is not None else {}
         self.hash = self.compute_hash(state)
 

@@ -49,7 +49,6 @@ def assert_attachments(activity: Activity, count: int, types: List[str] = None):
 
 
 class TestMessageFactory(aiounittest.AsyncTestCase):
-
     suggested_actions = [
         CardAction(title="a", type=ActionTypes.im_back, value="a"),
         CardAction(title="b", type=ActionTypes.im_back, value="b"),

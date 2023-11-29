@@ -18,7 +18,6 @@ from .re_escape import escape
 
 
 class TurnContext:
-
     # Same constant as in the BF Adapter, duplicating here to avoid circular dependency
     _INVOKE_RESPONSE_KEY = "BotFrameworkAdapter.InvokeResponse"
 
