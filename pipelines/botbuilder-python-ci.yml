@@ -6,8 +6,8 @@ variables:
   COVERALLS_GIT_COMMIT: $(Build.SourceVersion)
   COVERALLS_SERVICE_JOB_ID: $(Build.BuildId)
   COVERALLS_SERVICE_NAME: python-ci
-  python.37: 3.7.x
-  python.38: 3.8.x
+  python.37: 3.7
+  python.38: 3.8
   # python.311: 3.11.x
   # PythonCoverallsToken: get this from Azure
 
@@ -60,6 +60,12 @@ jobs:
       pip install black==22.3.0
     displayName: 'Install dependencies'
 
+  - script: 'black --check libraries'
+    displayName: 'Check Black compliant'
+
+  - script: 'pylint --rcfile=.pylintrc libraries'
+    displayName: Pylint
+
   - script: |
       pip install pytest
       pip install pytest-cov
@@ -79,12 +85,6 @@ jobs:
     inputs:
       testResultsFiles: '**/test-results.$(PYTHON_VERSION).xml'
       testRunTitle: 'Python $(PYTHON_VERSION)'
-
-  - script: 'black --check libraries'
-    displayName: 'Check Black compliant'
-
-  - script: 'pylint --rcfile=.pylintrc libraries'
-    displayName: Pylint
 
   - script: 'COVERALLS_REPO_TOKEN=$(PythonCoverallsToken) coveralls'
     displayName: 'Push test results to coveralls https://coveralls.io/github/microsoft/botbuilder-python'
