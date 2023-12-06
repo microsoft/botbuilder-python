@@ -24,22 +24,6 @@ class SkillValidation:
     Validates JWT tokens sent to and from a Skill.
     """
 
-    _token_validation_parameters = VerifyOptions(
-        issuer=[
-            "https://sts.windows.net/d6d49420-f39b-4df7-a1dc-d59a935871db/",  # Auth v3.1, 1.0 token
-            "https://login.microsoftonline.com/d6d49420-f39b-4df7-a1dc-d59a935871db/v2.0",  # Auth v3.1, 2.0 token
-            "https://sts.windows.net/f8cdef31-a31e-4b4a-93e4-5f571e91255a/",  # Auth v3.2, 1.0 token
-            "https://login.microsoftonline.com/f8cdef31-a31e-4b4a-93e4-5f571e91255a/v2.0",  # Auth v3.2, 2.0 token
-            "https://sts.windows.net/cab8a31a-1906-4287-a0d8-4eef66b95f6e/",  # Auth for US Gov, 1.0 token
-            "https://login.microsoftonline.us/cab8a31a-1906-4287-a0d8-4eef66b95f6e/v2.0",  # Auth for US Gov, 2.0 token
-            "https://login.microsoftonline.us/f8cdef31-a31e-4b4a-93e4-5f571e91255a/",  # Auth for US Gov, 1.0 token
-            "https://login.microsoftonline.us/f8cdef31-a31e-4b4a-93e4-5f571e91255a/v2.0",  # Auth for US Gov, 2.0 token
-        ],
-        audience=None,
-        clock_tolerance=timedelta(minutes=5),
-        ignore_expiration=False,
-    )
-
     @staticmethod
     def is_skill_token(auth_header: str) -> bool:
         """
@@ -119,8 +103,29 @@ class SkillValidation:
             else AuthenticationConstants.TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL
         )
 
+        token_validation_parameters = VerifyOptions(
+            issuer=[
+                "https://sts.windows.net/d6d49420-f39b-4df7-a1dc-d59a935871db/",  # Auth v3.1, 1.0 token
+                "https://login.microsoftonline.com/d6d49420-f39b-4df7-a1dc-d59a935871db/v2.0",  # Auth v3.1, 2.0 token
+                "https://sts.windows.net/f8cdef31-a31e-4b4a-93e4-5f571e91255a/",  # Auth v3.2, 1.0 token
+                "https://login.microsoftonline.com/f8cdef31-a31e-4b4a-93e4-5f571e91255a/v2.0",  # Auth v3.2, 2.0 token
+                "https://sts.windows.net/cab8a31a-1906-4287-a0d8-4eef66b95f6e/",  # Auth for US Gov, 1.0 token
+                "https://login.microsoftonline.us/cab8a31a-1906-4287-a0d8-4eef66b95f6e/v2.0",  # Auth for US Gov, 2.0 token
+                "https://login.microsoftonline.us/f8cdef31-a31e-4b4a-93e4-5f571e91255a/",  # Auth for US Gov, 1.0 token
+                "https://login.microsoftonline.us/f8cdef31-a31e-4b4a-93e4-5f571e91255a/v2.0",  # Auth for US Gov, 2.0 token
+            ],
+            audience=None,
+            clock_tolerance=timedelta(minutes=5),
+            ignore_expiration=False,
+        )
+
+        if auth_configuration.valid_token_issuers:
+            token_validation_parameters.issuer.append(
+                auth_configuration.valid_token_issuers
+            )
+
         token_extractor = JwtTokenExtractor(
-            SkillValidation._token_validation_parameters,
+            token_validation_parameters,
             open_id_metadata_url,
             AuthenticationConstants.ALLOWED_SIGNING_ALGORITHMS,
         )

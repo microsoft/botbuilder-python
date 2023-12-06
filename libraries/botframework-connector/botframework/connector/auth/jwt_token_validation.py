@@ -115,7 +115,7 @@ class JwtTokenValidation:
             )
             is_gov = (
                 isinstance(channel_service_or_provider, ChannelProvider)
-                and channel_service_or_provider.is_public_azure()
+                and channel_service_or_provider.is_government()
                 or isinstance(channel_service_or_provider, str)
                 and JwtTokenValidation.is_government(channel_service_or_provider)
             )

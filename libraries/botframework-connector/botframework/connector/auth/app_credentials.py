@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 import requests
 from msrest.authentication import Authentication
 
-from botframework.connector.auth import AuthenticationConstants
+from .authentication_constants import AuthenticationConstants
 
 
 class AppCredentials(Authentication):

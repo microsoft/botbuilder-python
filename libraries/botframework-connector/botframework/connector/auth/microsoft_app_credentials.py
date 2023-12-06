@@ -14,9 +14,6 @@ class MicrosoftAppCredentials(AppCredentials, ABC):
     AppCredentials implementation using application ID and password.
     """
 
-    MICROSOFT_APP_ID = "MicrosoftAppId"
-    MICROSOFT_PASSWORD = "MicrosoftPassword"
-
     def __init__(
         self,
         app_id: str,
