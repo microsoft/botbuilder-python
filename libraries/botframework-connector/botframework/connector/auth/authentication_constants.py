@@ -60,11 +60,11 @@ class AuthenticationConstants(ABC):
         "https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration"
     )
 
-    # The V1 Azure AD token issuer URL template that will contain the tenant id where 
+    # The V1 Azure AD token issuer URL template that will contain the tenant id where
     # the token was issued from.
     VALID_TOKEN_ISSUER_URL_TEMPLATE_V1 = "https://sts.windows.net/{0}/"
 
-    # The V2 Azure AD token issuer URL template that will contain the tenant id where 
+    # The V2 Azure AD token issuer URL template that will contain the tenant id where
     # the token was issued from.
     VALID_TOKEN_ISSUER_URL_TEMPLATE_V2 = "https://login.microsoftonline.com/{0}/v2.0"
 
@@ -74,7 +74,7 @@ class AuthenticationConstants(ABC):
         "https://login.microsoftonline.us/{0}/"
     )
 
-    # The Government V2 Azure AD token issuer URL template that will contain the tenant id 
+    # The Government V2 Azure AD token issuer URL template that will contain the tenant id
     # where the token was issued from.
     VALID_GOVERNMENT_TOKEN_ISSUER_URL_TEMPLATE_V2 = (
         "https://login.microsoftonline.us/{0}/v2.0"
