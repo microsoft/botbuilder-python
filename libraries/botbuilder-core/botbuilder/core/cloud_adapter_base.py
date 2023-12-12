@@ -150,6 +150,7 @@ class CloudAdapterBase(BotAdapter, ABC):
         self,
         reference: ConversationReference,
         callback: Callable,
+        bot_app_id: str,
     ):
         """
         Sends a proactive message to a conversation.
@@ -161,9 +162,12 @@ class CloudAdapterBase(BotAdapter, ABC):
         :type reference: :class:`botbuilder.schema.ConversationReference`
         :param callback: The method to call for the resulting bot turn.
         :type callback: :class:`typing.Callable`
+        :param bot_app_id: The application Id of the bot. This is the appId returned by the Azure portal registration,
+        and is generally found in the `MicrosoftAppId` parameter in `config.py`.
+        :type bot_app_id: :class:`typing.str`
         """
         return await self.process_proactive(
-            self.create_claims_identity(),
+            self.create_claims_identity(bot_app_id),
             get_continuation_activity(reference),
             None,
             callback,
@@ -182,7 +186,7 @@ class CloudAdapterBase(BotAdapter, ABC):
 
     async def create_conversation(  # pylint: disable=arguments-differ
         self,
-        bot_app_id: ConversationReference,
+        bot_app_id: str,
         callback: Callable[[TurnContext], Awaitable] = None,
         conversation_parameters: ConversationParameters = None,
         channel_id: str = None,
