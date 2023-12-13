@@ -19,6 +19,8 @@ class GovernmentConstants(ABC):
         "https://login.microsoftonline.us/MicrosoftServices.onmicrosoft.us"
     )
 
+    DEFAULT_CHANNEL_AUTH_TENANT = "MicrosoftServices.onmicrosoft.us"
+
     """
     TO CHANNEL FROM BOT: OAuth scope to request
     """
