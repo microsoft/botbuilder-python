@@ -100,7 +100,7 @@ class CloudAdapterBase(BotAdapter, ABC):
                         )
                     )
 
-            response = response or ResourceResponse(activity.id or "")
+            response = response or ResourceResponse(id=activity.id or "")
 
             responses.append(response)
 

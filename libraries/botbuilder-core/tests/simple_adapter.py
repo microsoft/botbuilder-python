@@ -75,7 +75,7 @@ class SimpleAdapter(BotAdapter):
         if self._call_on_update is not None:
             self._call_on_update(activity)
 
-        return ResourceResponse(activity.id)
+        return ResourceResponse(id=activity.id)
 
     async def process_request(self, activity, handler):
         context = TurnContext(self, activity)
