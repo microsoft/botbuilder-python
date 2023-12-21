@@ -352,7 +352,6 @@ class TestAuth:
             == AuthenticationConstants.ANONYMOUS_AUTH_TYPE
         )
 
-
     @pytest.mark.asyncio
     async def test_government_channel_validation_succeeds(self):
         credentials = SimpleCredentialProvider("", "")
