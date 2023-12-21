@@ -61,7 +61,7 @@ class AppCredentials(Authentication):
         """
 
     @staticmethod
-    def is_trusted_service(service_url: str) -> bool: # pylint: disable=unused-argument
+    def is_trusted_service(service_url: str) -> bool:  # pylint: disable=unused-argument
         """
         Obsolete: is_trusted_service is not a required part of the security model.
         Checks if the service url is for a trusted host or not.
@@ -71,7 +71,7 @@ class AppCredentials(Authentication):
         return True
 
     @staticmethod
-    def _is_trusted_url(host: str) -> bool: # pylint: disable=unused-argument
+    def _is_trusted_url(host: str) -> bool:  # pylint: disable=unused-argument
         """
         Obsolete: _is_trusted_url is not a required part of the security model.
         """
