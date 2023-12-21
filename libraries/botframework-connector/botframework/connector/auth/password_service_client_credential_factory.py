@@ -45,7 +45,7 @@ class PasswordServiceClientCredentialFactory(ServiceClientCredentialsFactory):
         if not await self.is_valid_app_id(app_id):
             raise Exception("Invalid app_id")
 
-        credentials: MicrosoftAppCredentials = None
+        credentials: MicrosoftAppCredentials
         normalized_endpoint = login_endpoint.lower() if login_endpoint else ""
 
         if normalized_endpoint.startswith(
@@ -54,8 +54,9 @@ class PasswordServiceClientCredentialFactory(ServiceClientCredentialsFactory):
             credentials = MicrosoftAppCredentials(
                 app_id, self.password, self.tenant_id, oauth_scope
             )
-
-        elif normalized_endpoint == GovernmentConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL:
+        elif normalized_endpoint.startswith(
+            GovernmentConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL_PREFIX
+        ):
             credentials = MicrosoftGovernmentAppCredentials(
                 app_id,
                 self.password,

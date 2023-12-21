@@ -20,10 +20,19 @@ class MicrosoftGovernmentAppCredentials(MicrosoftAppCredentials):
         super().__init__(
             app_id,
             app_password,
-            channel_auth_tenant or GovernmentConstants.DEFAULT_CHANNEL_AUTH_TENANT,
-            scope or GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE,
+            channel_auth_tenant,
+            scope,
         )
 
     @staticmethod
     def empty():
         return MicrosoftGovernmentAppCredentials("", "")
+
+    def _get_default_channelauth_tenant(self) -> str:
+        return GovernmentConstants.DEFAULT_CHANNEL_AUTH_TENANT
+
+    def _get_to_channel_from_bot_loginurl_prefix(self) -> str:
+        return GovernmentConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL_PREFIX
+
+    def _get_to_channel_from_bot_oauthscope(self) -> str:
+        return GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE

@@ -76,9 +76,6 @@ class JwtTokenValidation:
             auth_configuration,
         )
 
-        # On the standard Auth path, we need to trust the URL that was incoming.
-        MicrosoftAppCredentials.trust_service_url(activity.service_url)
-
         return claims_identity
 
     @staticmethod

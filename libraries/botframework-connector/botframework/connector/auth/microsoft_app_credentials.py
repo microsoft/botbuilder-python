@@ -70,11 +70,3 @@ class MicrosoftAppCredentials(AppCredentials, ABC):
             )
 
         return self.app
-
-    def _should_authorize(self, session: requests.Session) -> bool:
-        """
-        Override of AppCredentials._should_authorize
-        :param session:
-        :return:
-        """
-        return self.microsoft_app_id and self.microsoft_app_password
