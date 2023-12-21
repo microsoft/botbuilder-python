@@ -101,7 +101,7 @@ class AppCredentials(Authentication):
         # We don't set the token if the AppId is not set, since it means that we are in an un-authenticated scenario.
         return (
             self.microsoft_app_id != AuthenticationConstants.ANONYMOUS_SKILL_APP_ID
-            and self.microsoft_app_id is not None
+            and self.microsoft_app_id 
         )
 
     def get_access_token(self, force_refresh: bool = False) -> str:
