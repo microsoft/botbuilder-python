@@ -3,7 +3,6 @@
 
 from abc import ABC
 
-import requests
 from msal import ConfidentialClientApplication
 
 from .app_credentials import AppCredentials

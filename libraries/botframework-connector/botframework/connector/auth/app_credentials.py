@@ -1,9 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from datetime import datetime, timedelta
-from urllib.parse import urlparse
-
 import requests
 from msrest.authentication import Authentication
 
@@ -64,7 +61,7 @@ class AppCredentials(Authentication):
         """
 
     @staticmethod
-    def is_trusted_service(service_url: str) -> bool:
+    def is_trusted_service(service_url: str) -> bool: # pylint: disable=unused-argument
         """
         Obsolete: is_trusted_service is not a required part of the security model.
         Checks if the service url is for a trusted host or not.
@@ -74,7 +71,7 @@ class AppCredentials(Authentication):
         return True
 
     @staticmethod
-    def _is_trusted_url(host: str) -> bool:
+    def _is_trusted_url(host: str) -> bool: # pylint: disable=unused-argument
         """
         Obsolete: _is_trusted_url is not a required part of the security model.
         """

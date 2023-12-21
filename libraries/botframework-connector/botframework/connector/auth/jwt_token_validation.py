@@ -11,7 +11,6 @@ from .authentication_constants import AuthenticationConstants
 from .emulator_validation import EmulatorValidation
 from .enterprise_channel_validation import EnterpriseChannelValidation
 from .channel_validation import ChannelValidation
-from .microsoft_app_credentials import MicrosoftAppCredentials
 from .credential_provider import CredentialProvider
 from .claims_identity import ClaimsIdentity
 from .government_constants import GovernmentConstants
