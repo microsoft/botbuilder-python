@@ -487,7 +487,8 @@ disable=raw-checker-failed,
         no-member,
         deprecated-module,
         too-many-lines,
-        c-extension-no-member
+        c-extension-no-member,
+        unsubscriptable-object
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
