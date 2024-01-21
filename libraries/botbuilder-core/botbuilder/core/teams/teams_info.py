@@ -21,6 +21,7 @@ from botbuilder.schema.teams import (
     TeamsPagedMembersResult,
     TeamsMeetingParticipant,
 )
+from botbuilder.integration.aiohttp import CloudAdapter
 
 
 class TeamsInfo:
@@ -318,9 +319,12 @@ class TeamsInfo:
 
     @staticmethod
     async def _get_connector_client(turn_context: TurnContext) -> ConnectorClient:
-        return await turn_context.adapter.create_connector_client(
-            turn_context.activity.service_url
-        )
+        if isinstance(turn_context.adapter, CloudAdapter):
+            return await turn_context.adapter.create_connector_client(turn_context)
+        else:
+            return await turn_context.adapter.create_connector_client(
+                turn_context.activity.service_url
+            )
 
     @staticmethod
     async def _get_members(

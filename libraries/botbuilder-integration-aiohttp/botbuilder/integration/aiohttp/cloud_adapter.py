@@ -137,6 +137,13 @@ class CloudAdapter(CloudAdapterBase, BotFrameworkHttpAdapterIntegrationBase):
 
         await streaming_activity_processor.listen()
 
+    async def create_connector_client(self, turn_context: TurnContext):
+        connector_client: ConnectorClient = turn_context.turn_state.get(
+            self.BOT_CONNECTOR_CLIENT_KEY
+        )
+
+        return connector_client
+
 
 class _StreamingActivityProcessor(StreamingActivityProcessor):
     def __init__(
