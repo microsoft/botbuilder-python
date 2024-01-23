@@ -318,9 +318,6 @@ class TeamsInfo:
 
     @staticmethod
     async def _get_connector_client(turn_context: TurnContext) -> ConnectorClient:
-        if hasattr(turn_context.adapter, 'create_connector_client'):
-            return await turn_context.adapter.create_connector_client(turn_context.activity.service_url)
-
         connector_client = turn_context.turn_state.get(
             BotAdapter.BOT_CONNECTOR_CLIENT_KEY
         )
