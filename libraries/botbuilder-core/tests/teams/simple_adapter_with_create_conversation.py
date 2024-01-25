@@ -58,7 +58,7 @@ class SimpleAdapterWithCreateConversation(BotAdapter):
 
         return responses
 
-    async def create_conversation(
+    async def create_conversation(  # pylint: disable=arguments-differ
         self,
         reference: ConversationReference,
         logic: Callable[[TurnContext], Awaitable] = None,
@@ -76,7 +76,7 @@ class SimpleAdapterWithCreateConversation(BotAdapter):
         if self._call_on_update is not None:
             self._call_on_update(activity)
 
-        return ResourceResponse(activity.id)
+        return ResourceResponse(id=activity.id)
 
     async def process_request(self, activity, handler):
         context = TurnContext(self, activity)
