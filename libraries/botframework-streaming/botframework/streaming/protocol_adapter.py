@@ -75,7 +75,7 @@ class ProtocolAdapter:
 
     def _on_cancel_stream(self, content_stream_assembler: PayloadStreamAssembler):
         # TODO: on original C# code content_stream_assembler is typed as IAssembler
-        asyncio.create_task(
+        task = asyncio.create_task(
             self._send_operations.send_cancel_stream(
                 content_stream_assembler.identifier
             )
