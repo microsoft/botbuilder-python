@@ -102,7 +102,6 @@ class LuisRecognizerV3(LuisRecognizerInternal):
         return recognizer_result
 
     def _build_url(self):
-
         base_uri = (
             self._application.endpoint or "https://westus.api.cognitive.microsoft.com"
         )
@@ -172,7 +171,6 @@ class LuisRecognizerV3(LuisRecognizerInternal):
         return self._map_properties(entities, False)
 
     def _map_properties(self, source, in_instance):
-
         if isinstance(source, (int, float, bool, str)):
             return source
 

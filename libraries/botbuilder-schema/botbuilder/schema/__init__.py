@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from warnings import warn
+
 from ._models_py3 import Activity
 from ._models_py3 import ActivityEventNames
 from ._models_py3 import AdaptiveCardInvokeAction

@@ -6,8 +6,9 @@ variables:
   COVERALLS_GIT_COMMIT: $(Build.SourceVersion)
   COVERALLS_SERVICE_JOB_ID: $(Build.BuildId)
   COVERALLS_SERVICE_NAME: python-ci
-  python.37: 3.7.x
-  python.38: 3.8.x
+  python.37: 3.7
+  python.38: 3.8
+  python.311: 3.11
   # PythonCoverallsToken: get this from Azure
 
 jobs:
@@ -23,6 +24,8 @@ jobs:
           PYTHON_VERSION: '$(python.37)'
         Python38:
           PYTHON_VERSION: '$(python.38)'
+        Python311:
+          PYTHON_VERSION: '$(python.311)'
       maxParallel: 3
 
   steps:
@@ -53,9 +56,15 @@ jobs:
       pip install -r ./libraries/botbuilder-core/tests/requirements.txt
       pip install -r ./libraries/botbuilder-ai/tests/requirements.txt
       pip install coveralls
-      pip install pylint==2.4.4
+      pip install pylint==2.17
       pip install black==22.3.0
     displayName: 'Install dependencies'
+
+  - script: 'black --check libraries'
+    displayName: 'Check Black compliant'
+
+  - script: 'pylint --rcfile=.pylintrc libraries'
+    displayName: Pylint
 
   - script: |
       pip install pytest
@@ -76,12 +85,6 @@ jobs:
     inputs:
       testResultsFiles: '**/test-results.$(PYTHON_VERSION).xml'
       testRunTitle: 'Python $(PYTHON_VERSION)'
-
-  - script: 'black --check libraries'
-    displayName: 'Check Black compliant'
-
-  - script: 'pylint --rcfile=.pylintrc libraries'
-    displayName: Pylint
 
   - script: 'COVERALLS_REPO_TOKEN=$(PythonCoverallsToken) coveralls'
     displayName: 'Push test results to coveralls https://coveralls.io/github/microsoft/botbuilder-python'

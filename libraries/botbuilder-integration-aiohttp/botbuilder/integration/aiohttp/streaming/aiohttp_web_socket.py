@@ -29,7 +29,7 @@ class AiohttpWebSocket(WebSocket):
 
     def dispose(self):
         if self._session:
-            asyncio.create_task(self._session.close())
+            task = asyncio.create_task(self._session.close())
 
     async def close(self, close_status: WebSocketCloseStatus, status_description: str):
         await self._aiohttp_ws.close(

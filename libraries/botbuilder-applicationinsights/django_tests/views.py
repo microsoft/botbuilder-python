@@ -52,7 +52,7 @@ def getid(request, id):
 
 @api_view(["POST"])
 def returncode(request, id):
-    return HttpResponse("Status code set to %s" % id, status=int(id))
+    return HttpResponse("returncode", status=int(id))
 
 
 @api_view(["POST"])

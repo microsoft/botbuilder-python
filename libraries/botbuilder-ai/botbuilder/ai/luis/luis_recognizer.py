@@ -256,7 +256,6 @@ class LuisRecognizer(Recognizer):
             LuisPredictionOptions, LuisRecognizerOptionsV2, LuisRecognizerOptionsV3
         ] = None,
     ) -> RecognizerResult:
-
         BotAssert.context_not_none(turn_context)
 
         if turn_context.activity.type != ActivityTypes.message:
@@ -277,7 +276,6 @@ class LuisRecognizer(Recognizer):
                 text=utterance, intents={"": IntentScore(score=1.0)}, entities={}
             )
         else:
-
             luis_recognizer = self._build_recognizer(options)
             recognizer_result = await luis_recognizer.recognizer_internal(turn_context)
 

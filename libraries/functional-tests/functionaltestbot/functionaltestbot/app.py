@@ -25,6 +25,7 @@ APP.config.from_object("config.DefaultConfig")
 SETTINGS = BotFrameworkAdapterSettings(APP.config["APP_ID"], APP.config["APP_PASSWORD"])
 ADAPTER = BotFrameworkAdapter(SETTINGS)
 
+
 # Catch-all for errors.
 # pylint: disable=unused-argument
 async def on_error(self, context: TurnContext, error: Exception):
@@ -45,6 +46,7 @@ ADAPTER.on_turn_error = MethodType(on_error, ADAPTER)
 
 # Create the main dialog
 BOT = MyBot()
+
 
 # Listen for incoming requests on GET / for Azure monitoring
 @APP.route("/", methods=["GET"])

@@ -44,7 +44,6 @@ class WaterfallDialog(Dialog):
     async def begin_dialog(
         self, dialog_context: DialogContext, options: object = None
     ) -> DialogTurnResult:
-
         if not dialog_context:
             raise TypeError("WaterfallDialog.begin_dialog(): dc cannot be None.")
 
@@ -113,7 +112,6 @@ class WaterfallDialog(Dialog):
             self.telemetry_client.track_event("WaterfallCancel", properties)
         else:
             if reason is DialogReason.EndCalled:
-
                 instance_id = str(instance.state[self.PersistedInstanceId])
                 properties = {"DialogId": self.id, "InstanceId": instance_id}
                 self.telemetry_client.track_event("WaterfallComplete", properties)
