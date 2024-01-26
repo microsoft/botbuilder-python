@@ -592,8 +592,12 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
 
         turn_context = TurnContext(SimpleAdapter(), activity)
 
-        mock_connector_client = await SimpleAdapter.create_connector_client(self, turn_context.activity.service_url)
-        turn_context.turn_state[BotAdapter.BOT_CONNECTOR_CLIENT_KEY] = mock_connector_client
+        mock_connector_client = await SimpleAdapter.create_connector_client(
+            self, turn_context.activity.service_url
+        )
+        turn_context.turn_state[
+            BotAdapter.BOT_CONNECTOR_CLIENT_KEY
+        ] = mock_connector_client
 
         # Act
         bot = TestingTeamsActivityHandler()

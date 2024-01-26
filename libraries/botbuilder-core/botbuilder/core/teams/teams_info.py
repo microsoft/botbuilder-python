@@ -10,7 +10,12 @@ from botbuilder.core.teams.teams_activity_extensions import (
     teams_get_meeting_info,
     teams_get_channel_data,
 )
-from botbuilder.core import CloudAdapterBase, BotFrameworkAdapter, TurnContext, BotAdapter
+from botbuilder.core import (
+    CloudAdapterBase,
+    BotFrameworkAdapter,
+    TurnContext,
+    BotAdapter,
+)
 from botbuilder.schema import Activity, ConversationParameters, ConversationReference
 from botbuilder.schema.teams import (
     ChannelInfo,
@@ -323,7 +328,7 @@ class TeamsInfo:
         )
 
         if connector_client is None:
-            raise ValueError('This method requires a connector client.')
+            raise ValueError("This method requires a connector client.")
 
         return connector_client
 
