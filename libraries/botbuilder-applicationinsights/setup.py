@@ -13,7 +13,7 @@ REQUIRES = [
 TESTS_REQUIRES = [
     "aiounittest==1.3.0",
     "django==3.2.21",  # For samples
-    "djangorestframework==3.10.3",  # For samples
+    "djangorestframework==3.14.0",  # For samples
     "flask==2.2.5",  # For samples
 ]
 
