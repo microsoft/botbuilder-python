@@ -45,7 +45,7 @@ class AuthenticationConstants(ABC):
     EMULATE_OAUTH_CARDS_KEY = "EmulateOAuthCards"
 
     # TO BOT FROM CHANNEL: OpenID metadata document for tokens coming from MSA
-    TO_BOT_FROM_CHANNEL_OPEN_ID_METADATA_URL = (
+    TO_BOT_FROM_CHANNEL_OPENID_METADATA_URL = (
         "https://login.botframework.com/v1/.well-known/openidconfiguration"
     )
 
@@ -56,7 +56,7 @@ class AuthenticationConstants(ABC):
     )
 
     # TO BOT FROM EMULATOR: OpenID metadata document for tokens coming from MSA
-    TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL = (
+    TO_BOT_FROM_EMULATOR_OPENID_METADATA_URL = (
         "https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration"
     )
 

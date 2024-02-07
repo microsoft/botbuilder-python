@@ -113,9 +113,9 @@ class EmulatorValidation:
             is_gov = JwtTokenValidation.is_government(channel_service_or_provider)
 
         open_id_metadata = (
-            GovernmentConstants.TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL
+            GovernmentConstants.TO_BOT_FROM_EMULATOR_OPENID_METADATA_URL
             if is_gov
-            else AuthenticationConstants.TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL
+            else AuthenticationConstants.TO_BOT_FROM_EMULATOR_OPENID_METADATA_URL
         )
 
         token_extractor = JwtTokenExtractor(

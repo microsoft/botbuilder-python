@@ -46,14 +46,14 @@ class GovernmentConstants(ABC):
     """
     TO BOT FROM CHANNEL: OpenID metadata document for tokens coming from MSA
     """
-    TO_BOT_FROM_CHANNEL_OPEN_ID_METADATA_URL = (
+    TO_BOT_FROM_CHANNEL_OPENID_METADATA_URL = (
         "https://login.botframework.azure.us/v1/.well-known/openidconfiguration"
     )
 
     """
     TO BOT FROM GOV EMULATOR: OpenID metadata document for tokens coming from MSA
     """
-    TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL = (
+    TO_BOT_FROM_EMULATOR_OPENID_METADATA_URL = (
         "https://login.microsoftonline.us/"
         "cab8a31a-1906-4287-a0d8-4eef66b95f6e/v2.0/"
         ".well-known/openid-configuration"

@@ -88,7 +88,7 @@ class ChannelValidation:
         metadata_endpoint = (
             ChannelValidation.open_id_metadata_endpoint
             if ChannelValidation.open_id_metadata_endpoint
-            else AuthenticationConstants.TO_BOT_FROM_CHANNEL_OPEN_ID_METADATA_URL
+            else AuthenticationConstants.TO_BOT_FROM_CHANNEL_OPENID_METADATA_URL
         )
 
         token_extractor = JwtTokenExtractor(
