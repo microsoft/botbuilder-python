@@ -10,9 +10,13 @@ import datetime
 import time
 import aiounittest
 import requests
+import pytest
+
+SKIP = os.getenv("SlackChannel") == ''
 
 
 class SlackClient(aiounittest.AsyncTestCase):
+    @pytest.mark.skipif(not SKIP, reason="Needs the env.SlackChannel to run.")
     async def test_send_and_receive_slack_message(self):
         # Arrange
         echo_guid = str(uuid.uuid4())
