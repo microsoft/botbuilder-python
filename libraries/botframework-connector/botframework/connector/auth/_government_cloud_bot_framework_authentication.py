@@ -24,7 +24,7 @@ class _GovernmentCloudBotFrameworkAuthentication(_BuiltinBotFrameworkAuthenticat
     ):
         super(_GovernmentCloudBotFrameworkAuthentication, self).__init__(
             GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE,
-            GovernmentConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL,
+            GovernmentConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL_PREFIX,
             CallerIdConstants.us_gov_channel,
             GovernmentConstants.CHANNEL_SERVICE,
             GovernmentConstants.OAUTH_URL_GOV,

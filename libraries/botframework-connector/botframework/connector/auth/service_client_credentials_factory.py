@@ -28,7 +28,11 @@ class ServiceClientCredentialsFactory(ABC):
 
     @abstractmethod
     async def create_credentials(
-        self, app_id: str, audience: str, login_endpoint: str, validate_authority: bool
+        self,
+        app_id: str,
+        oauth_scope: str,
+        login_endpoint: str,
+        validate_authority: bool,
     ) -> AppCredentials:
         """
         A factory method for creating AppCredentials.

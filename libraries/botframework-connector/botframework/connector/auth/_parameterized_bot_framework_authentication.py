@@ -155,7 +155,7 @@ class _ParameterizedBotFrameworkAuthentication(BotFrameworkAuthentication):
 
         credentials = await self._credentials_factory.create_credentials(
             app_id,
-            audience=self._to_channel_from_bot_oauth_scope,
+            oauth_scope=self._to_channel_from_bot_oauth_scope,
             login_endpoint=self._to_channel_from_bot_login_url,
             validate_authority=self._validate_authority,
         )
@@ -274,6 +274,11 @@ class _ParameterizedBotFrameworkAuthentication(BotFrameworkAuthentication):
             ignore_expiration=False,
         )
 
+        if self._auth_configuration.valid_token_issuers:
+            validation_params.issuer.append(
+                self._auth_configuration.valid_token_issuers
+            )
+
         # TODO: what should the openIdMetadataUrl be here?
         token_extractor = JwtTokenExtractor(
             validation_params,
@@ -361,6 +366,11 @@ class _ParameterizedBotFrameworkAuthentication(BotFrameworkAuthentication):
             clock_tolerance=5 * 60,
             ignore_expiration=False,
         )
+
+        if self._auth_configuration.valid_token_issuers:
+            to_bot_from_emulator_validation_params.issuer.append(
+                self._auth_configuration.valid_token_issuers
+            )
 
         token_extractor = JwtTokenExtractor(
             to_bot_from_emulator_validation_params,

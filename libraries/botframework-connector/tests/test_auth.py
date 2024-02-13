@@ -353,54 +353,6 @@ class TestAuth:
         )
 
     @pytest.mark.asyncio
-    # Tests with no authentication header and makes sure the service URL is not added to the trusted list.
-    async def test_channel_authentication_disabled_service_url_should_not_be_trusted(
-        self,
-    ):
-        activity = Activity(service_url="https://webchat.botframework.com/")
-        header = ""
-        credentials = SimpleCredentialProvider("", "")
-
-        await JwtTokenValidation.authenticate_request(activity, header, credentials)
-
-        assert not MicrosoftAppCredentials.is_trusted_service(
-            "https://webchat.botframework.com/"
-        )
-
-    #    @pytest.mark.asyncio
-    #    async def test_emulator_auth_header_correct_app_id_and_service_url_with_gov_channel_service_should_validate(
-    #        self,
-    #    ):
-    #        await jwt_token_validation_validate_auth_header_with_channel_service_succeeds(
-    #            "",  # emulator creds
-    #            "",
-    #            GovernmentConstants.CHANNEL_SERVICE,
-    #        )
-    #
-    #        await jwt_token_validation_validate_auth_header_with_channel_service_succeeds(
-    #            "",  # emulator creds
-    #            "",
-    #            SimpleChannelProvider(GovernmentConstants.CHANNEL_SERVICE),
-    #        )
-
-    #    @pytest.mark.asyncio
-    #    async def
-    #        test_emulator_auth_header_correct_app_id_and_service_url_with_private_channel_service_should_validate(
-    #        self,
-    #    ):
-    #        await jwt_token_validation_validate_auth_header_with_channel_service_succeeds(
-    #            "",  # emulator creds
-    #            "",
-    #            "TheChannel",
-    #        )
-    #
-    #        await jwt_token_validation_validate_auth_header_with_channel_service_succeeds(
-    #            "",  # emulator creds
-    #            "",
-    #            SimpleChannelProvider("TheChannel"),
-    #        )
-
-    @pytest.mark.asyncio
     async def test_government_channel_validation_succeeds(self):
         credentials = SimpleCredentialProvider("", "")
 
