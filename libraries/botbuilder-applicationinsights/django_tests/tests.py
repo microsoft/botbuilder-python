@@ -195,7 +195,9 @@ class MiddlewareTests(AITestCase):
         )
 
     def test_thrower(self):
-        """Tests that unhandled exceptions generate an exception telemetry item parented to the request telemetry item"""
+        """
+        Tests that unhandled exceptions generate an exception telemetry item parented to the request telemetry item
+        """
         response = self.invoke_post("thrower")
         self.assertEqual(response.status_code, 500)
 

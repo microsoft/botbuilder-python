@@ -10,7 +10,12 @@ from botbuilder.core.teams.teams_activity_extensions import (
     teams_get_meeting_info,
     teams_get_channel_data,
 )
-from botbuilder.core import CloudAdapterBase, BotFrameworkAdapter, TurnContext
+from botbuilder.core import (
+    CloudAdapterBase,
+    BotFrameworkAdapter,
+    TurnContext,
+    BotAdapter,
+)
 from botbuilder.schema import Activity, ConversationParameters, ConversationReference
 from botbuilder.schema.teams import (
     ChannelInfo,
@@ -318,9 +323,14 @@ class TeamsInfo:
 
     @staticmethod
     async def _get_connector_client(turn_context: TurnContext) -> ConnectorClient:
-        return await turn_context.adapter.create_connector_client(
-            turn_context.activity.service_url
+        connector_client = turn_context.turn_state.get(
+            BotAdapter.BOT_CONNECTOR_CLIENT_KEY
         )
+
+        if connector_client is None:
+            raise ValueError("This method requires a connector client.")
+
+        return connector_client
 
     @staticmethod
     async def _get_members(
