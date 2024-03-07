@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import html
 from rest_framework.decorators import api_view
 from botbuilder.applicationinsights.django import common
 from botbuilder.applicationinsights import ApplicationInsightsTelemetryClient
@@ -42,7 +43,7 @@ def errorer(request):
 
 
 def echoer(request):
-    return HttpResponse(request.appinsights.request.id)
+    return HttpResponse(html.escape(request.appinsights.request.id))
 
 
 @api_view(["POST"])
@@ -52,12 +53,12 @@ def getid(request, id):
 
 @api_view(["POST"])
 def returncode(request, id):
-    return HttpResponse("returncode", status=int(id))
+    return HttpResponse("returncode", status=int(html.escape(id)))
 
 
 @api_view(["POST"])
 def templater(request, data):
-    return TemplateResponse(request, "template.html", {"context": data})
+    return TemplateResponse(request, "template.html", {"context": html.escape(data)})
 
 
 class classview:
