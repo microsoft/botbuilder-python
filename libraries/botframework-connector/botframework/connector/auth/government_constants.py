@@ -24,7 +24,7 @@ class GovernmentConstants(ABC):
     """
     TO CHANNEL FROM BOT: Login URL prefix
     """
-    TO_CHANNEL_FROM_BOT_LOGIN_URL_PREFIX = "https://login.microsoftonline.com/"
+    TO_CHANNEL_FROM_BOT_LOGIN_URL_PREFIX = "https://login.microsoftonline.us/"
 
     DEFAULT_CHANNEL_AUTH_TENANT = "MicrosoftServices.onmicrosoft.us"
 
