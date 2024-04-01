@@ -1280,6 +1280,7 @@ class ChannelAccount(Model):
         "name": {"key": "name", "type": "str"},
         "aad_object_id": {"key": "aadObjectId", "type": "str"},
         "role": {"key": "role", "type": "str"},
+        "properties": {"key": "properties", "type": "object"},
     }
 
     def __init__(
@@ -1289,6 +1290,7 @@ class ChannelAccount(Model):
         name: str = None,
         aad_object_id: str = None,
         role=None,
+        properties=None,
         **kwargs
     ) -> None:
         super(ChannelAccount, self).__init__(**kwargs)
@@ -1296,6 +1298,7 @@ class ChannelAccount(Model):
         self.name = name
         self.aad_object_id = aad_object_id
         self.role = role
+        self.properties = properties
 
 
 class ConversationAccount(Model):
