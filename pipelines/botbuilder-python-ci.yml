@@ -89,10 +89,10 @@ jobs:
       testResultsFiles: '**/test-results.$(PYTHON_VERSION).xml'
       testRunTitle: 'Python $(PYTHON_VERSION)'
 
-  - script: 'COVERALLS_REPO_TOKEN=$(PythonCoverallsToken) coveralls'
-    displayName: 'Push test results to coveralls https://coveralls.io/github/microsoft/botbuilder-python'
-    continueOnError: true
-    condition: and(succeeded(), eq(variables['System.PullRequest.IsFork'], 'false'))
+  #- script: 'COVERALLS_REPO_TOKEN=$(PythonCoverallsToken) coveralls'
+  #  displayName: 'Push test results to coveralls https://coveralls.io/github/microsoft/botbuilder-python'
+  #  continueOnError: true
+  #  condition: and(succeeded(), eq(variables['System.PullRequest.IsFork'], 'false'))
 
   - powershell: |
       Set-Location ..
