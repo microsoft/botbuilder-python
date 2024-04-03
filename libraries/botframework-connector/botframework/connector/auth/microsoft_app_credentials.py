@@ -30,13 +30,6 @@ class MicrosoftAppCredentials(AppCredentials, ABC):
         self.microsoft_app_password = password
         self.app = None
 
-        # This check likely needs to be more nuanced than this.  Assuming
-        # "/.default" precludes other valid suffixes
-        scope = self.oauth_scope
-        if oauth_scope and not scope.endswith("/.default"):
-            scope += "/.default"
-        self.scopes = [scope]
-
     @staticmethod
     def empty():
         return MicrosoftAppCredentials("", "")
@@ -47,16 +40,21 @@ class MicrosoftAppCredentials(AppCredentials, ABC):
         :return: The access token for the given app id and password.
         """
 
+        scope = self.oauth_scope
+        if not scope.endswith("/.default"):
+            scope += "/.default"
+        scopes = [scope]
+
         # Firstly, looks up a token from cache
         # Since we are looking for token for the current app, NOT for an end user,
         # notice we give account parameter as None.
         auth_token = self.__get_msal_app().acquire_token_silent(
-            self.scopes, account=None
+            scopes, account=None
         )
         if not auth_token:
             # No suitable token exists in cache. Let's get a new one from AAD.
             auth_token = self.__get_msal_app().acquire_token_for_client(
-                scopes=self.scopes
+                scopes=scopes
             )
         return auth_token["access_token"]
 
