@@ -621,13 +621,7 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
             scope = context.turn_state[BotFrameworkAdapter.BOT_OAUTH_SCOPE_KEY]
             assert AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE == scope
 
-            # Ensure the serviceUrl was added to the trusted hosts
-            assert AppCredentials.is_trusted_service(channel_service_url)
-
         refs = ConversationReference(service_url=channel_service_url)
-
-        # Ensure the serviceUrl is NOT in the trusted hosts
-        assert not AppCredentials.is_trusted_service(channel_service_url)
 
         await adapter.continue_conversation(
             refs, callback, claims_identity=skills_identity
@@ -694,13 +688,7 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
             scope = context.turn_state[BotFrameworkAdapter.BOT_OAUTH_SCOPE_KEY]
             assert skill_2_app_id == scope
 
-            # Ensure the serviceUrl was added to the trusted hosts
-            assert AppCredentials.is_trusted_service(skill_2_service_url)
-
         refs = ConversationReference(service_url=skill_2_service_url)
-
-        # Ensure the serviceUrl is NOT in the trusted hosts
-        assert not AppCredentials.is_trusted_service(skill_2_service_url)
 
         await adapter.continue_conversation(
             refs, callback, claims_identity=skills_identity, audience=skill_2_app_id

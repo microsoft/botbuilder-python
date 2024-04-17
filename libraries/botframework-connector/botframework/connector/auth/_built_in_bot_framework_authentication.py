@@ -166,7 +166,7 @@ class _BuiltinBotFrameworkAuthentication(BotFrameworkAuthentication):
 
         credentials = await self._credentials_factory.create_credentials(
             app_id,
-            audience=self._to_channel_from_bot_oauth_scope,
+            oauth_scope=self._to_channel_from_bot_oauth_scope,
             login_endpoint=self._login_endpoint,
             validate_authority=True,
         )

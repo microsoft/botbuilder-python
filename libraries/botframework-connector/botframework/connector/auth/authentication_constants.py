@@ -22,7 +22,7 @@ class AuthenticationConstants(ABC):
     DEFAULT_CHANNEL_AUTH_TENANT = "botframework.com"
 
     # TO CHANNEL FROM BOT: OAuth scope to request
-    TO_CHANNEL_FROM_BOT_OAUTH_SCOPE = "https://api.botframework.com/.default"
+    TO_CHANNEL_FROM_BOT_OAUTH_SCOPE = "https://api.botframework.com"
 
     # TO BOT FROM CHANNEL: Token issuer
     TO_BOT_FROM_CHANNEL_TOKEN_ISSUER = "https://api.botframework.com"
@@ -45,7 +45,7 @@ class AuthenticationConstants(ABC):
     EMULATE_OAUTH_CARDS_KEY = "EmulateOAuthCards"
 
     # TO BOT FROM CHANNEL: OpenID metadata document for tokens coming from MSA
-    TO_BOT_FROM_CHANNEL_OPEN_ID_METADATA_URL = (
+    TO_BOT_FROM_CHANNEL_OPENID_METADATA_URL = (
         "https://login.botframework.com/v1/.well-known/openidconfiguration"
     )
 
@@ -56,8 +56,28 @@ class AuthenticationConstants(ABC):
     )
 
     # TO BOT FROM EMULATOR: OpenID metadata document for tokens coming from MSA
-    TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL = (
+    TO_BOT_FROM_EMULATOR_OPENID_METADATA_URL = (
         "https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration"
+    )
+
+    # The V1 Azure AD token issuer URL template that will contain the tenant id where
+    # the token was issued from.
+    VALID_TOKEN_ISSUER_URL_TEMPLATE_V1 = "https://sts.windows.net/{0}/"
+
+    # The V2 Azure AD token issuer URL template that will contain the tenant id where
+    # the token was issued from.
+    VALID_TOKEN_ISSUER_URL_TEMPLATE_V2 = "https://login.microsoftonline.com/{0}/v2.0"
+
+    # The Government V1 Azure AD token issuer URL template that will contain the tenant id
+    # where the token was issued from.
+    VALID_GOVERNMENT_TOKEN_ISSUER_URL_TEMPLATE_V1 = (
+        "https://login.microsoftonline.us/{0}/"
+    )
+
+    # The Government V2 Azure AD token issuer URL template that will contain the tenant id
+    # where the token was issued from.
+    VALID_GOVERNMENT_TOKEN_ISSUER_URL_TEMPLATE_V2 = (
+        "https://login.microsoftonline.us/{0}/v2.0"
     )
 
     # Allowed token signing algorithms. Tokens come from channels to the bot. The code

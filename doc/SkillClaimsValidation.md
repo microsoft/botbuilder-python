@@ -48,3 +48,11 @@ ADAPTER = BotFrameworkAdapter(
     SETTINGS,
 )
 ```
+
+For SingleTenant type bots, the additional issuers must be added based on the tenant id:
+```python
+AUTH_CONFIG = AuthenticationConfiguration(
+    claims_validator=AllowedSkillsClaimsValidator(CONFIG).claims_validator,
+    tenant_id=the_tenant_id
+)
+```

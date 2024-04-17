@@ -33,7 +33,7 @@ class GovernmentChannelValidation(ABC):
         endpoint = (
             GovernmentChannelValidation.OPEN_ID_METADATA_ENDPOINT
             if GovernmentChannelValidation.OPEN_ID_METADATA_ENDPOINT
-            else GovernmentConstants.TO_BOT_FROM_CHANNEL_OPEN_ID_METADATA_URL
+            else GovernmentConstants.TO_BOT_FROM_CHANNEL_OPENID_METADATA_URL
         )
         token_extractor = JwtTokenExtractor(
             GovernmentChannelValidation.TO_BOT_FROM_GOVERNMENT_CHANNEL_TOKEN_VALIDATION_PARAMETERS,

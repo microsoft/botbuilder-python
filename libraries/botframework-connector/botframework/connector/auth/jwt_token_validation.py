@@ -11,7 +11,6 @@ from .authentication_constants import AuthenticationConstants
 from .emulator_validation import EmulatorValidation
 from .enterprise_channel_validation import EnterpriseChannelValidation
 from .channel_validation import ChannelValidation
-from .microsoft_app_credentials import MicrosoftAppCredentials
 from .credential_provider import CredentialProvider
 from .claims_identity import ClaimsIdentity
 from .government_constants import GovernmentConstants
@@ -76,9 +75,6 @@ class JwtTokenValidation:
             auth_configuration,
         )
 
-        # On the standard Auth path, we need to trust the URL that was incoming.
-        MicrosoftAppCredentials.trust_service_url(activity.service_url)
-
         return claims_identity
 
     @staticmethod
@@ -115,7 +111,7 @@ class JwtTokenValidation:
             )
             is_gov = (
                 isinstance(channel_service_or_provider, ChannelProvider)
-                and channel_service_or_provider.is_public_azure()
+                and channel_service_or_provider.is_government()
                 or isinstance(channel_service_or_provider, str)
                 and JwtTokenValidation.is_government(channel_service_or_provider)
             )

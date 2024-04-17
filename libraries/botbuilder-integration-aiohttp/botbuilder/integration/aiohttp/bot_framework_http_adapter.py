@@ -188,12 +188,6 @@ class BotFrameworkHttpAdapter(BotFrameworkHttpAdapterBase):
                     )
                 )
 
-                # Add ServiceURL to the cache of trusted sites in order to allow token refreshing.
-                self._credentials.trust_service_url(
-                    claims_identity.claims.get(
-                        AuthenticationConstants.SERVICE_URL_CLAIM
-                    )
-                )
                 self.claims_identity = claims_identity
             return True
         except Exception as error:

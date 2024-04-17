@@ -48,10 +48,6 @@ class _BotFrameworkClientImpl(BotFrameworkClient):
         conversation_id: str,
         activity: Activity,
     ) -> InvokeResponse:
-        if not from_bot_id:
-            raise TypeError("from_bot_id")
-        if not to_bot_id:
-            raise TypeError("to_bot_id")
         if not to_url:
             raise TypeError("to_url")
         if not service_url:
@@ -100,6 +96,7 @@ class _BotFrameworkClientImpl(BotFrameworkClient):
 
         headers_dict = {
             "Content-type": "application/json; charset=utf-8",
+            "x-ms-conversation-id": conversation_id,
         }
         if token:
             headers_dict.update(

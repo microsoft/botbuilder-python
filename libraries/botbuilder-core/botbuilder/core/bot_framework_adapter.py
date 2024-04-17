@@ -279,19 +279,6 @@ class BotFrameworkAdapter(
         context.turn_state[BotAdapter.BOT_CALLBACK_HANDLER_KEY] = callback
         context.turn_state[BotAdapter.BOT_OAUTH_SCOPE_KEY] = audience
 
-        # If we receive a valid app id in the incoming token claims, add the channel service URL to the
-        # trusted services list so we can send messages back.
-        # The service URL for skills is trusted because it is applied by the SkillHandler based on the original
-        # request received by the root bot
-        app_id_from_claims = JwtTokenValidation.get_app_id_from_claims(
-            claims_identity.claims
-        )
-        if app_id_from_claims:
-            if SkillValidation.is_skill_claim(
-                claims_identity.claims
-            ) or await self._credential_provider.is_valid_appid(app_id_from_claims):
-                AppCredentials.trust_service_url(reference.service_url)
-
         client = await self.create_connector_client(
             reference.service_url, claims_identity, audience
         )

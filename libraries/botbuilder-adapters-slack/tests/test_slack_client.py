@@ -12,7 +12,7 @@ import aiounittest
 import requests
 import pytest
 
-SKIP = os.getenv("SlackChannel") == ''
+SKIP = os.getenv("SlackChannel") == ""
 
 
 class SlackClient(aiounittest.AsyncTestCase):

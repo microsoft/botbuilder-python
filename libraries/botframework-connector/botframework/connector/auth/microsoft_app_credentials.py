@@ -3,7 +3,6 @@
 
 from abc import ABC
 
-import requests
 from msal import ConfidentialClientApplication
 
 from .app_credentials import AppCredentials
@@ -13,9 +12,6 @@ class MicrosoftAppCredentials(AppCredentials, ABC):
     """
     AppCredentials implementation using application ID and password.
     """
-
-    MICROSOFT_APP_ID = "MicrosoftAppId"
-    MICROSOFT_PASSWORD = "MicrosoftPassword"
 
     def __init__(
         self,
@@ -34,13 +30,6 @@ class MicrosoftAppCredentials(AppCredentials, ABC):
         self.microsoft_app_password = password
         self.app = None
 
-        # This check likely needs to be more nuanced than this.  Assuming
-        # "/.default" precludes other valid suffixes
-        scope = self.oauth_scope
-        if oauth_scope and not scope.endswith("/.default"):
-            scope += "/.default"
-        self.scopes = [scope]
-
     @staticmethod
     def empty():
         return MicrosoftAppCredentials("", "")
@@ -51,17 +40,18 @@ class MicrosoftAppCredentials(AppCredentials, ABC):
         :return: The access token for the given app id and password.
         """
 
+        scope = self.oauth_scope
+        if not scope.endswith("/.default"):
+            scope += "/.default"
+        scopes = [scope]
+
         # Firstly, looks up a token from cache
         # Since we are looking for token for the current app, NOT for an end user,
         # notice we give account parameter as None.
-        auth_token = self.__get_msal_app().acquire_token_silent(
-            self.scopes, account=None
-        )
+        auth_token = self.__get_msal_app().acquire_token_silent(scopes, account=None)
         if not auth_token:
             # No suitable token exists in cache. Let's get a new one from AAD.
-            auth_token = self.__get_msal_app().acquire_token_for_client(
-                scopes=self.scopes
-            )
+            auth_token = self.__get_msal_app().acquire_token_for_client(scopes=scopes)
         return auth_token["access_token"]
 
     def __get_msal_app(self):
@@ -73,11 +63,3 @@ class MicrosoftAppCredentials(AppCredentials, ABC):
             )
 
         return self.app
-
-    def _should_authorize(self, session: requests.Session) -> bool:
-        """
-        Override of AppCredentials._should_authorize
-        :param session:
-        :return:
-        """
-        return self.microsoft_app_id and self.microsoft_app_password
