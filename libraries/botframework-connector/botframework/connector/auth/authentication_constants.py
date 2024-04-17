@@ -22,7 +22,7 @@ class AuthenticationConstants(ABC):
     DEFAULT_CHANNEL_AUTH_TENANT = "botframework.com"
 
     # TO CHANNEL FROM BOT: OAuth scope to request
-    TO_CHANNEL_FROM_BOT_OAUTH_SCOPE = "https://api.botframework.com/.default"
+    TO_CHANNEL_FROM_BOT_OAUTH_SCOPE = "https://api.botframework.com"
 
     # TO BOT FROM CHANNEL: Token issuer
     TO_BOT_FROM_CHANNEL_TOKEN_ISSUER = "https://api.botframework.com"

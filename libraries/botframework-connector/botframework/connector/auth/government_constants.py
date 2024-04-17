@@ -31,7 +31,7 @@ class GovernmentConstants(ABC):
     """
     TO CHANNEL FROM BOT: OAuth scope to request
     """
-    TO_CHANNEL_FROM_BOT_OAUTH_SCOPE = "https://api.botframework.us/.default"
+    TO_CHANNEL_FROM_BOT_OAUTH_SCOPE = "https://api.botframework.us"
 
     """
     TO BOT FROM CHANNEL: Token issuer
