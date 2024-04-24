@@ -231,7 +231,7 @@ class TurnContext:
         :return:
         """
         reference = TurnContext.get_conversation_reference(self.activity)
-
+        reference.activity_id = activity.id
         return await self._emit(
             self._on_update_activity,
             TurnContext.apply_conversation_reference(activity, reference),
