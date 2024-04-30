@@ -7,6 +7,7 @@ from hashlib import sha256
 from typing import Dict, List
 from threading import Semaphore
 import json
+import warnings
 from jsonpickle.pickler import Pickler
 from jsonpickle.unpickler import Unpickler
 import azure.cosmos.cosmos_client as cosmos_client  # pylint: disable=no-name-in-module,import-error
@@ -107,6 +108,9 @@ class CosmosDbStorage(Storage):
         :param config:
         """
         super(CosmosDbStorage, self).__init__()
+        warnings.warn(
+            "CosmosDbStorage is obsolete.  Use CosmosDbPartitionedStorage instead."
+        )
         self.config = config
         self.client = client or cosmos_client.CosmosClient(
             self.config.endpoint, {"masterKey": self.config.masterkey}
