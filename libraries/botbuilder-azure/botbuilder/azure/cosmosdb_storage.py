@@ -108,7 +108,9 @@ class CosmosDbStorage(Storage):
         :param config:
         """
         super(CosmosDbStorage, self).__init__()
-        warnings.warn('CosmosDbStorage is obsolete.  Use CosmosDbPartitionedStorage instead.')
+        warnings.warn(
+            "CosmosDbStorage is obsolete.  Use CosmosDbPartitionedStorage instead."
+        )
         self.config = config
         self.client = client or cosmos_client.CosmosClient(
             self.config.endpoint, {"masterKey": self.config.masterkey}
