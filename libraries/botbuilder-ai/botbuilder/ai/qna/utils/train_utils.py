@@ -45,7 +45,9 @@ class TrainUtils:
         await self._query_train(feedback_records)
 
     async def _query_train(self, feedback_records: List[FeedbackRecord]):
-        url: str = f"{ self._endpoint.host }/knowledgebases/{ self._endpoint.knowledge_base_id }/train"
+        url: str = (
+            f"{ self._endpoint.host }/knowledgebases/{ self._endpoint.knowledge_base_id }/train"
+        )
         payload_body = TrainRequestBody(feedback_records=feedback_records)
         http_request_helper = HttpRequestUtils(self._http_client)
 

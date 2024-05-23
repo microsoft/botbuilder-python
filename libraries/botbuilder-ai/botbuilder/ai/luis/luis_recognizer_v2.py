@@ -53,9 +53,11 @@ class LuisRecognizerV2(LuisRecognizerInternal):
             staging=self.luis_recognizer_options_v2.staging,
             spell_check=self.luis_recognizer_options_v2.spell_check,
             bing_spell_check_subscription_key=self.luis_recognizer_options_v2.bing_spell_check_subscription_key,
-            log=self.luis_recognizer_options_v2.log
-            if self.luis_recognizer_options_v2.log is not None
-            else True,
+            log=(
+                self.luis_recognizer_options_v2.log
+                if self.luis_recognizer_options_v2.log is not None
+                else True
+            ),
         )
 
         recognizer_result: RecognizerResult = RecognizerResult(
@@ -65,9 +67,11 @@ class LuisRecognizerV2(LuisRecognizerInternal):
             entities=LuisUtil.extract_entities_and_metadata(
                 luis_result.entities,
                 luis_result.composite_entities,
-                self.luis_recognizer_options_v2.include_instance_data
-                if self.luis_recognizer_options_v2.include_instance_data is not None
-                else True,
+                (
+                    self.luis_recognizer_options_v2.include_instance_data
+                    if self.luis_recognizer_options_v2.include_instance_data is not None
+                    else True
+                ),
             ),
         )
 

@@ -77,9 +77,9 @@ class CertificateAppCredentials(AppCredentials, ABC):
                 client_credential={
                     "thumbprint": self.certificate_thumbprint,
                     "private_key": self.certificate_private_key,
-                    "public_certificate": self.certificate_public
-                    if self.certificate_public
-                    else None,
+                    "public_certificate": (
+                        self.certificate_public if self.certificate_public else None
+                    ),
                 },
             )
 

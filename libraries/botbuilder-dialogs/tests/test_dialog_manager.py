@@ -120,17 +120,13 @@ class SimpleComponentDialog(ComponentDialog):
             if test_case != SkillFlowTestCase.root_bot_only:
                 # Create a skill ClaimsIdentity and put it in turn_state so isSkillClaim() returns True.
                 claims_identity = ClaimsIdentity({}, False)
-                claims_identity.claims[
-                    "ver"
-                ] = "2.0"  # AuthenticationConstants.VersionClaim
-                claims_identity.claims[
-                    "aud"
-                ] = (
+                claims_identity.claims["ver"] = (
+                    "2.0"  # AuthenticationConstants.VersionClaim
+                )
+                claims_identity.claims["aud"] = (
                     SimpleComponentDialog.skill_bot_id
                 )  # AuthenticationConstants.AudienceClaim
-                claims_identity.claims[
-                    "azp"
-                ] = (
+                claims_identity.claims["azp"] = (
                     SimpleComponentDialog.parent_bot_id
                 )  # AuthenticationConstants.AuthorizedParty
                 context.turn_state[BotAdapter.BOT_IDENTITY_KEY] = claims_identity

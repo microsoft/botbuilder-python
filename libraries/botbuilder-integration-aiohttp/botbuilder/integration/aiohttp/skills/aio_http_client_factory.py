@@ -31,13 +31,11 @@ class _HttpResponseImpl(HttpResponseBase):
 
 
 class _HttpClientImplementation(HttpClientBase):
-    def __init__(self) -> None:
-        self._session = ClientSession()
-
     async def post(self, *, request: HttpRequest) -> HttpResponseBase:
-        aio_response = await self._session.post(
-            request.request_uri, data=request.content, headers=request.headers
-        )
+        async with ClientSession() as session:
+            aio_response = await session.post(
+                request.request_uri, data=request.content, headers=request.headers
+            )
 
         return _HttpResponseImpl(aio_response)
 

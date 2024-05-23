@@ -3,7 +3,6 @@
 
 
 class RankerTypes:
-
     """Default Ranker Behaviour. i.e. Ranking based on Questions and Answer."""
 
     DEFAULT = "Default"

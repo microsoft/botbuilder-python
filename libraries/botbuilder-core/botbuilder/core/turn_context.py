@@ -5,6 +5,7 @@ import re
 from copy import copy, deepcopy
 from datetime import datetime
 from typing import List, Callable, Union, Dict
+from botframework.connector import Channels
 from botbuilder.schema import (
     Activity,
     ActivityTypes,
@@ -328,7 +329,13 @@ class TurnContext:
         :return:
         """
         return ConversationReference(
-            activity_id=activity.id,
+            activity_id=(
+                activity.id
+                if activity.type != ActivityTypes.conversation_update
+                and activity.channel_id != Channels.direct_line
+                and activity.channel_id != Channels.webchat
+                else None
+            ),
             user=copy(activity.from_property),
             bot=copy(activity.recipient),
             conversation=copy(activity.conversation),

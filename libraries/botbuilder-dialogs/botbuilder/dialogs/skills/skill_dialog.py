@@ -60,17 +60,17 @@ class SkillDialog(Dialog):
         )
 
         # Store delivery mode in dialog state for later use.
-        dialog_context.active_dialog.state[
-            self._deliver_mode_state_key
-        ] = dialog_args.activity.delivery_mode
+        dialog_context.active_dialog.state[self._deliver_mode_state_key] = (
+            dialog_args.activity.delivery_mode
+        )
 
         # Create the conversationId and store it in the dialog context state so we can use it later
         skill_conversation_id = await self._create_skill_conversation_id(
             dialog_context.context, dialog_context.context.activity
         )
-        dialog_context.active_dialog.state[
-            SkillDialog.SKILLCONVERSATIONIDSTATEKEY
-        ] = skill_conversation_id
+        dialog_context.active_dialog.state[SkillDialog.SKILLCONVERSATIONIDSTATEKEY] = (
+            skill_conversation_id
+        )
 
         # Send the activity to the skill.
         eoc_activity = await self._send_to_skill(
