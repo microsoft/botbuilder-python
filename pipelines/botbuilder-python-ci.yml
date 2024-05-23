@@ -60,7 +60,7 @@ jobs:
       pip install -r ./libraries/botbuilder-ai/tests/requirements.txt
       pip install coveralls
       pip install pylint==2.17
-      pip install black==22.3.0
+      pip install black==24.4.2
     displayName: 'Install dependencies'
 
   - script: 'black --check libraries'
