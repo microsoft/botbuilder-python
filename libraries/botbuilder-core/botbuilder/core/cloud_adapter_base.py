@@ -150,7 +150,9 @@ class CloudAdapterBase(BotAdapter, ABC):
         self,
         reference: ConversationReference,
         callback: Callable,
-        bot_app_id: str,
+        bot_app_id: str = None,  # pylint: disable=unused-argument
+        claims_identity: ClaimsIdentity = None,  # pylint: disable=unused-argument
+        audience: str = None,  # pylint: disable=unused-argument
     ):
         """
         Sends a proactive message to a conversation.
@@ -166,6 +168,14 @@ class CloudAdapterBase(BotAdapter, ABC):
         and is generally found in the `MicrosoftAppId` parameter in `config.py`.
         :type bot_app_id: :class:`typing.str`
         """
+        if claims_identity:
+            return await self.continue_conversation_with_claims(
+                claims_identity=claims_identity,
+                reference=reference,
+                audience=audience,
+                logic=callback
+            )
+        
         return await self.process_proactive(
             self.create_claims_identity(bot_app_id),
             get_continuation_activity(reference),

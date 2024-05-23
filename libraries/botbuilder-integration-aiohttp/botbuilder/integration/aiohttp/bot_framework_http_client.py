@@ -49,7 +49,6 @@ class BotFrameworkHttpClient(BotFrameworkClient):
         self._credential_provider = credential_provider
         self._channel_provider = channel_provider
         self._logger = logger
-        self._session = aiohttp.ClientSession()
 
     async def post_activity(
         self,
@@ -127,11 +126,14 @@ class BotFrameworkHttpClient(BotFrameworkClient):
             )
 
         json_content = json.dumps(activity.serialize())
-        resp = await self._session.post(
-            to_url,
-            data=json_content.encode("utf-8"),
-            headers=headers_dict,
-        )
+
+        async with aiohttp.ClientSession() as session:
+            resp = await session.post(
+                to_url,
+                data=json_content.encode("utf-8"),
+                headers=headers_dict,
+            )
+
         resp.raise_for_status()
         data = (await resp.read()).decode()
         return resp.status, json.loads(data) if data else None
