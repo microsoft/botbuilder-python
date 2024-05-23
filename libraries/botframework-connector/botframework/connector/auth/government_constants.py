@@ -5,7 +5,6 @@ from abc import ABC
 
 
 class GovernmentConstants(ABC):
-
     """
     Government Channel Service property value
     """

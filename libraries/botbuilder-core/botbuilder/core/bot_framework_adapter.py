@@ -387,9 +387,11 @@ class BotFrameworkAdapter(
                 name=ActivityEventNames.create_conversation,
                 channel_id=channel_id,
                 service_url=service_url,
-                id=resource_response.activity_id
-                if resource_response.activity_id
-                else str(uuid.uuid4()),
+                id=(
+                    resource_response.activity_id
+                    if resource_response.activity_id
+                    else str(uuid.uuid4())
+                ),
                 conversation=ConversationAccount(
                     id=resource_response.id,
                     tenant_id=parameters.tenant_id,

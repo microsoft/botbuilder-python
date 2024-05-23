@@ -164,9 +164,9 @@ class TelemetryLoggerMiddleware(Middleware):
         BotTelemetryClient.track_event method for the BotMessageReceived event.
         """
         properties = {
-            TelemetryConstants.FROM_ID_PROPERTY: activity.from_property.id
-            if activity.from_property
-            else None,
+            TelemetryConstants.FROM_ID_PROPERTY: (
+                activity.from_property.id if activity.from_property else None
+            ),
             TelemetryConstants.CONVERSATION_NAME_PROPERTY: activity.conversation.name,
             TelemetryConstants.LOCALE_PROPERTY: activity.locale,
             TelemetryConstants.RECIPIENT_ID_PROPERTY: activity.recipient.id,
@@ -179,9 +179,9 @@ class TelemetryLoggerMiddleware(Middleware):
                 and activity.from_property.name
                 and activity.from_property.name.strip()
             ):
-                properties[
-                    TelemetryConstants.FROM_NAME_PROPERTY
-                ] = activity.from_property.name
+                properties[TelemetryConstants.FROM_NAME_PROPERTY] = (
+                    activity.from_property.name
+                )
             if activity.text and activity.text.strip():
                 properties[TelemetryConstants.TEXT_PROPERTY] = activity.text
             if activity.speak and activity.speak.strip():
@@ -224,9 +224,9 @@ class TelemetryLoggerMiddleware(Middleware):
                     activity.attachments
                 )
             if activity.from_property.name and activity.from_property.name.strip():
-                properties[
-                    TelemetryConstants.FROM_NAME_PROPERTY
-                ] = activity.from_property.name
+                properties[TelemetryConstants.FROM_NAME_PROPERTY] = (
+                    activity.from_property.name
+                )
             if activity.text and activity.text.strip():
                 properties[TelemetryConstants.TEXT_PROPERTY] = activity.text
             if activity.speak and activity.speak.strip():
