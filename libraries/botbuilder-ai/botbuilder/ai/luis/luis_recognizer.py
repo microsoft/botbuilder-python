@@ -236,9 +236,9 @@ class LuisRecognizer(Recognizer):
 
         # Use the LogPersonalInformation flag to toggle logging PII data, text is a common example
         if self.log_personal_information and turn_context.activity.text:
-            properties[
-                LuisTelemetryConstants.question_property
-            ] = turn_context.activity.text
+            properties[LuisTelemetryConstants.question_property] = (
+                turn_context.activity.text
+            )
 
         # Additional Properties can override "stock" properties.
         if telemetry_properties is not None:

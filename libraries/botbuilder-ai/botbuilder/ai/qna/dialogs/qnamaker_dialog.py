@@ -248,9 +248,9 @@ class QnAMakerDialog(WaterfallDialog):
         dialog_options.options.context = QnARequestContext()
 
         # Storing the context info
-        step_context.values[
-            QnAMakerDialog.PROPERTY_CURRENT_QUERY
-        ] = step_context.context.activity.text
+        step_context.values[QnAMakerDialog.PROPERTY_CURRENT_QUERY] = (
+            step_context.context.activity.text
+        )
 
         # -Check if previous context is present, if yes then put it with the query
         # -Check for id if query is present in reverse index.

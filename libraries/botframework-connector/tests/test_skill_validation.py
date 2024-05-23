@@ -37,9 +37,9 @@ class TestSkillValidation(aiounittest.AsyncTestCase):
         assert not SkillValidation.is_skill_claim(claims)
 
         # Emulator Audience claim
-        claims[
-            AuthenticationConstants.AUDIENCE_CLAIM
-        ] = AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER
+        claims[AuthenticationConstants.AUDIENCE_CLAIM] = (
+            AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER
+        )
         assert not SkillValidation.is_skill_claim(claims)
 
         # No AppId claim
@@ -53,9 +53,9 @@ class TestSkillValidation(aiounittest.AsyncTestCase):
 
         # Anonymous skill app id
         del claims[AuthenticationConstants.APP_ID_CLAIM]
-        claims[
-            AuthenticationConstants.APP_ID_CLAIM
-        ] = AuthenticationConstants.ANONYMOUS_SKILL_APP_ID
+        claims[AuthenticationConstants.APP_ID_CLAIM] = (
+            AuthenticationConstants.ANONYMOUS_SKILL_APP_ID
+        )
         assert SkillValidation.is_skill_claim(claims)
 
         # All checks pass, should be good now
