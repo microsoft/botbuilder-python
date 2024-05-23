@@ -133,9 +133,9 @@ class _SkillHandlerImpl(SkillHandler):
         )
 
         async def callback(turn_context: TurnContext):
-            turn_context.turn_state[
-                self.SKILL_CONVERSATION_REFERENCE_KEY
-            ] = skill_conversation_reference
+            turn_context.turn_state[self.SKILL_CONVERSATION_REFERENCE_KEY] = (
+                skill_conversation_reference
+            )
             await turn_context.delete_activity(activity_id)
 
         await self._adapter.continue_conversation(
@@ -160,9 +160,9 @@ class _SkillHandlerImpl(SkillHandler):
 
         async def callback(turn_context: TurnContext):
             nonlocal resource_response
-            turn_context.turn_state[
-                self.SKILL_CONVERSATION_REFERENCE_KEY
-            ] = skill_conversation_reference
+            turn_context.turn_state[self.SKILL_CONVERSATION_REFERENCE_KEY] = (
+                skill_conversation_reference
+            )
             activity.apply_conversation_reference(
                 skill_conversation_reference.conversation_reference
             )
@@ -217,9 +217,9 @@ class _SkillHandlerImpl(SkillHandler):
 
         async def callback(context: TurnContext):
             nonlocal resource_response
-            context.turn_state[
-                SkillHandler.SKILL_CONVERSATION_REFERENCE_KEY
-            ] = skill_conversation_reference
+            context.turn_state[SkillHandler.SKILL_CONVERSATION_REFERENCE_KEY] = (
+                skill_conversation_reference
+            )
 
             TurnContext.apply_conversation_reference(
                 activity, skill_conversation_reference.conversation_reference

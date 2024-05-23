@@ -173,9 +173,9 @@ class CloudAdapterBase(BotAdapter, ABC):
                 claims_identity=claims_identity,
                 reference=reference,
                 audience=audience,
-                logic=callback
+                logic=callback,
             )
-        
+
         return await self.process_proactive(
             self.create_claims_identity(bot_app_id),
             get_continuation_activity(reference),
