@@ -116,9 +116,11 @@ class LuisRecognizerV3(LuisRecognizerInternal):
             uri += "/slots/%s/predict" % (self.luis_recognizer_options_v3.slot)
 
         params = "?verbose=%s&show-all-intents=%s&log=%s" % (
-            "true"
-            if self.luis_recognizer_options_v3.include_instance_data
-            else "false",
+            (
+                "true"
+                if self.luis_recognizer_options_v3.include_instance_data
+                else "false"
+            ),
             "true" if self.luis_recognizer_options_v3.include_all_intents else "false",
             "true" if self.luis_recognizer_options_v3.log else "false",
         )

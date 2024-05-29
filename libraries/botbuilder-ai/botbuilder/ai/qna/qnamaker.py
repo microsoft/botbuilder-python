@@ -182,9 +182,9 @@ class QnAMaker(QnAMakerTelemetryClient):
         properties: Dict[str, str] = dict()
         metrics: Dict[str, float] = dict()
 
-        properties[
-            QnATelemetryConstants.knowledge_base_id_property
-        ] = self._endpoint.knowledge_base_id
+        properties[QnATelemetryConstants.knowledge_base_id_property] = (
+            self._endpoint.knowledge_base_id
+        )
 
         text: str = turn_context.activity.text
         user_name: str = turn_context.activity.from_property.name

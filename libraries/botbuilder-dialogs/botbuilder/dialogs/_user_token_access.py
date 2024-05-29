@@ -56,9 +56,11 @@ class _UserTokenAccess(ABC):
                 turn_context,
                 settings.oath_app_credentials,
                 settings.connection_name,
-                turn_context.activity.from_property.id
-                if turn_context.activity and turn_context.activity.from_property
-                else None,
+                (
+                    turn_context.activity.from_property.id
+                    if turn_context.activity and turn_context.activity.from_property
+                    else None
+                ),
             )
 
         raise TypeError("OAuthPrompt is not supported by the current adapter")
@@ -78,9 +80,11 @@ class _UserTokenAccess(ABC):
             return await turn_context.adapter.sign_out_user(
                 turn_context,
                 settings.connection_name,
-                turn_context.activity.from_property.id
-                if turn_context.activity and turn_context.activity.from_property
-                else None,
+                (
+                    turn_context.activity.from_property.id
+                    if turn_context.activity and turn_context.activity.from_property
+                    else None
+                ),
                 settings.oath_app_credentials,
             )
 

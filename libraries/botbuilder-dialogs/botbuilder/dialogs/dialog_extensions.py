@@ -50,9 +50,9 @@ class DialogExtensions:
         # get the DialogStateManager configuration
         dialog_state_manager = DialogStateManager(dialog_context)
         await dialog_state_manager.load_all_scopes()
-        dialog_context.context.turn_state[
-            dialog_state_manager.__class__.__name__
-        ] = dialog_state_manager
+        dialog_context.context.turn_state[dialog_state_manager.__class__.__name__] = (
+            dialog_state_manager
+        )
 
         # Loop as long as we are getting valid OnError handled we should continue executing the actions for the turn.
 
@@ -130,9 +130,11 @@ class DialogExtensions:
                     type=ActivityTypes.end_of_conversation,
                     value=result.result,
                     locale=turn_context.activity.locale,
-                    code=EndOfConversationCodes.completed_successfully
-                    if result.status == DialogTurnStatus.Complete
-                    else EndOfConversationCodes.user_cancelled,
+                    code=(
+                        EndOfConversationCodes.completed_successfully
+                        if result.status == DialogTurnStatus.Complete
+                        else EndOfConversationCodes.user_cancelled
+                    ),
                 )
                 await turn_context.send_activity(activity)
 

@@ -200,6 +200,5 @@ class TestSkillHttpClientTests(aiounittest.AsyncTestCase):
         # pylint: disable=protected-access
         client = SkillHttpClient(Mock(), id_factory, channel_provider)
         client._post_content = value_function
-        await client._session.close()
 
         return client

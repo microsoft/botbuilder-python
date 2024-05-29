@@ -43,7 +43,7 @@ If you want to debug an issue, would like to [contribute](#contributing-code), o
 
 ### Prerequisites
 - [Git](https://git-scm.com/downloads)
-- [Python 3.8.17](https://www.python.org/downloads/)
+- [Python 3.8.17 - 3.11.x](https://www.python.org/downloads/)
 
 Python "Virtual Environments" allow Python packages to be installed in an isolated location for a particular application, rather than being installed globally, as such it is common practice to use them. Click [here](https://packaging.python.org/tutorials/installing-packages/#creating-virtual-environments) to learn more about creating _and activating_ Virtual Environments in Python.
 

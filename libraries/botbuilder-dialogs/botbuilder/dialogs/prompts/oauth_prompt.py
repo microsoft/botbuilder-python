@@ -415,9 +415,9 @@ class OAuthPrompt(Dialog):
                     state.scope,
                 )
 
-                context.turn_state[
-                    BotAdapter.BOT_CONNECTOR_CLIENT_KEY
-                ] = connector_client
+                context.turn_state[BotAdapter.BOT_CONNECTOR_CLIENT_KEY] = (
+                    connector_client
+                )
 
         elif OAuthPrompt._is_teams_verification_invoke(context):
             code = context.activity.value["state"]

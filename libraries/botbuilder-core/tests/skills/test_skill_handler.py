@@ -244,9 +244,9 @@ class TestSkillHandler(aiounittest.AsyncTestCase):
 
         cls._claims_identity.claims[AuthenticationConstants.AUDIENCE_CLAIM] = cls.bot_id
         cls._claims_identity.claims[AuthenticationConstants.APP_ID_CLAIM] = cls.skill_id
-        cls._claims_identity.claims[
-            AuthenticationConstants.SERVICE_URL_CLAIM
-        ] = "http://testbot.com/api/messages"
+        cls._claims_identity.claims[AuthenticationConstants.SERVICE_URL_CLAIM] = (
+            "http://testbot.com/api/messages"
+        )
         cls._conversation_reference = ConversationReference(
             conversation=ConversationAccount(id=str(uuid4())),
             service_url="http://testbot.com/api/messages",

@@ -128,9 +128,11 @@ class SlackHelper:
             channel_id="slack",
             conversation=ConversationAccount(id=payload.channel["id"], properties={}),
             from_property=ChannelAccount(
-                id=payload.message.bot_id
-                if payload.message.bot_id
-                else payload.user["id"]
+                id=(
+                    payload.message.bot_id
+                    if payload.message.bot_id
+                    else payload.user["id"]
+                )
             ),
             recipient=ChannelAccount(),
             channel_data=payload,

@@ -291,9 +291,11 @@ class DialogManager:
                 type=ActivityTypes.end_of_conversation,
                 value=turn_result.result,
                 locale=turn_context.activity.locale,
-                code=EndOfConversationCodes.completed_successfully
-                if turn_result.status == DialogTurnStatus.Complete
-                else EndOfConversationCodes.user_cancelled,
+                code=(
+                    EndOfConversationCodes.completed_successfully
+                    if turn_result.status == DialogTurnStatus.Complete
+                    else EndOfConversationCodes.user_cancelled
+                ),
             )
             await turn_context.send_activity(activity)
 

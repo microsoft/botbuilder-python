@@ -94,9 +94,9 @@ class DialogStateManager:
                     self._configuration.path_resolvers.append(path_resolver)
 
         # cache for any other new dialog_state_manager instances in this turn.
-        dialog_context.context.turn_state[
-            self._configuration.__class__.__name__
-        ] = self._configuration
+        dialog_context.context.turn_state[self._configuration.__class__.__name__] = (
+            self._configuration
+        )
 
     def __len__(self) -> int:
         """

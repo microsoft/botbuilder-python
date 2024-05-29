@@ -408,9 +408,9 @@ class DialogContext:
                 current_dc = current_dc.parent
 
             exception.data[type(self).__name__] = {
-                "active_dialog": None
-                if self.active_dialog is None
-                else self.active_dialog.id,
+                "active_dialog": (
+                    None if self.active_dialog is None else self.active_dialog.id
+                ),
                 "parent": None if self.parent is None else self.parent.active_dialog.id,
                 "stack": self.stack,
             }
