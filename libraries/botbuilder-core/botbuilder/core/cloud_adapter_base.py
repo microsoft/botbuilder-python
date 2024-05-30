@@ -120,7 +120,7 @@ class CloudAdapterBase(BotAdapter, ABC):
             raise Error("Unable to extract ConnectorClient from turn context.")
 
         response = await connector_client.conversations.update_activity(
-            activity.conversation.id, activity.reply_to_id, activity
+            activity.conversation.id, activity.id, activity
         )
 
         response_id = response.id if response and response.id else None
