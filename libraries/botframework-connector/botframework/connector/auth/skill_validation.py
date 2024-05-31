@@ -120,7 +120,7 @@ class SkillValidation:
         )
 
         if auth_configuration.valid_token_issuers:
-            token_validation_parameters.issuer.append(
+            token_validation_parameters.issuer.extend(
                 auth_configuration.valid_token_issuers
             )
 
