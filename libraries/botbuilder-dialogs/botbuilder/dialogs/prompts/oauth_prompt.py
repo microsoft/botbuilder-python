@@ -477,19 +477,6 @@ class OAuthPrompt(Dialog):
                         " ConnectionName in the TokenExchangeInvokeRequest",
                     )
                 )
-            elif not getattr(context.adapter, "exchange_token"):
-                # Token Exchange not supported in the adapter.
-                await context.send_activity(
-                    self._get_token_exchange_invoke_response(
-                        int(HTTPStatus.BAD_GATEWAY),
-                        "The bot's BotAdapter does not support token exchange operations."
-                        " Ensure the bot's Adapter supports the ExtendedUserTokenProvider interface.",
-                    )
-                )
-
-                raise AttributeError(
-                    "OAuthPrompt._recognize_token(): not supported by the current adapter."
-                )
             else:
                 # No errors. Proceed with token exchange.
                 token_exchange_response = None
