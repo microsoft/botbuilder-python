@@ -7,7 +7,7 @@ from setuptools import setup
 REQUIRES = [
     "azure-cosmos==3.2.0",
     "azure-storage-blob==12.7.0",
-    "azure-storage-queue==12.1.5",
+    "azure-storage-queue==12.4.0",
     "botbuilder-schema==4.16.0",
     "botframework-connector==4.16.0",
     "jsonpickle>=1.2,<1.5",
