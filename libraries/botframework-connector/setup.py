@@ -11,7 +11,7 @@ REQUIRES = [
     # "requests>=2.23.0,<2.26",
     "PyJWT>=2.4.0",
     "botbuilder-schema==4.16.0",
-    "msal==1.*",
+    "msal>=1.29.0",
 ]
 
 root = os.path.abspath(os.path.dirname(__file__))
