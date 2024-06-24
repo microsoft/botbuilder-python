@@ -24,6 +24,8 @@ class ManagedIdentityAppCredentials(AppCredentials, ABC):
             oauth_scope=oauth_scope,
         )
 
+        self._managed_identity = {"ManagedIdentityIdType": "ClientId", "Id": app_id}
+
         self.app = None
 
     @staticmethod
@@ -47,7 +49,7 @@ class ManagedIdentityAppCredentials(AppCredentials, ABC):
     def __get_msal_app(self):
         if not self.app:
             self.app = msal.ManagedIdentityClient(
-                self.microsoft_app_id,
+                self._managed_identity,
                 http_client=requests.Session(),
                 token_cache=ManagedIdentityAppCredentials.global_token_cache,
             )
