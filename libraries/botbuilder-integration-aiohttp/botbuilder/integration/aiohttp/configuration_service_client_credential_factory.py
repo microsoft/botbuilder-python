@@ -78,10 +78,10 @@ class ConfigurationServiceClientCredentialFactory(
             self._inner = PasswordServiceClientCredentialFactory(app_id, app_password, None, logger=logger)
 
     async def is_valid_app_id(self, app_id: str) -> bool:
-        return self._inner.is_valid_app_id(app_id)
+        return await self._inner.is_valid_app_id(app_id)
 
     async def is_authentication_disabled(self) -> bool:
-        return self._inner.is_authentication_disabled()
+        return await self._inner.is_authentication_disabled()
 
     async def create_credentials(
         self,
@@ -90,5 +90,5 @@ class ConfigurationServiceClientCredentialFactory(
         login_endpoint: str,
         validate_authority: bool,
     ) -> Authentication:
-        return self._inner.create_credentials(app_id, oauth_scope, login_endpoint, validate_authority)
+        return await self._inner.create_credentials(app_id, oauth_scope, login_endpoint, validate_authority)
 
