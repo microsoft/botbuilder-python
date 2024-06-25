@@ -504,7 +504,7 @@ class ChannelServiceHandler:
             )
             if not is_auth_disabled:
                 # No auth header. Auth is required. Request is not authorized.
-                raise PermissionError()
+                raise PermissionError("Authorization is required but has been disabled.")
 
             # In the scenario where Auth is disabled, we still want to have the
             # IsAuthenticated flag set in the ClaimsIdentity. To do this requires

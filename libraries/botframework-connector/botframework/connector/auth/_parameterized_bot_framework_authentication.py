@@ -473,11 +473,11 @@ class _ParameterizedBotFrameworkAuthentication(BotFrameworkAuthentication):
     ):
         if identity is None:
             # No valid identity. Not Authorized.
-            raise PermissionError()
+            raise PermissionError("Identity missing")
 
         if not identity.is_authenticated:
             # The token is in some way invalid. Not Authorized.
-            raise PermissionError()
+            raise PermissionError("Invalid token")
 
         # Now check that the AppID in the claim set matches
         # what we're looking for. Note that in a multi-tenant bot, this value
@@ -487,12 +487,12 @@ class _ParameterizedBotFrameworkAuthentication(BotFrameworkAuthentication):
         # Look for the "aud" claim, but only if issued from the Bot Framework
         issuer = identity.get_claim_value(AuthenticationConstants.ISSUER_CLAIM)
         if issuer != self._to_bot_from_channel_token_issuer:
-            raise PermissionError()
+            raise PermissionError("'iss' claim missing")
 
         app_id = identity.get_claim_value(AuthenticationConstants.AUDIENCE_CLAIM)
         if not app_id:
             # The relevant audience Claim MUST be present. Not Authorized.
-            raise PermissionError()
+            raise PermissionError("'aud' claim missing")
 
         # The AppId from the claim in the token must match the AppId specified by the developer.
         # In this case, the token is destined for the app, so we find the app ID in the audience claim.
@@ -507,8 +507,8 @@ class _ParameterizedBotFrameworkAuthentication(BotFrameworkAuthentication):
             )
             if not service_url_claim:
                 # Claim must be present. Not Authorized.
-                raise PermissionError()
+                raise PermissionError("'serviceurl' claim missing")
 
             if service_url_claim != service_url:
                 # Claim must match. Not Authorized.
-                raise PermissionError()
+                raise PermissionError("Invalid 'serviceurl' claim")

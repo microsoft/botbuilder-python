@@ -10,9 +10,8 @@ from botframework.connector.auth import PasswordServiceClientCredentialFactory
 from botframework.connector.auth import ManagedIdentityServiceClientCredentialsFactory
 from botframework.connector.auth import ServiceClientCredentialsFactory
 
-class ConfigurationServiceClientCredentialFactory(
-    ServiceClientCredentialsFactory
-):
+
+class ConfigurationServiceClientCredentialFactory(ServiceClientCredentialsFactory):
     def __init__(self, configuration: Any, *, logger: Logger = None) -> None:
         self._inner = None
 
@@ -43,8 +42,10 @@ class ConfigurationServiceClientCredentialFactory(
                 raise Exception(
                     "Property 'APP_TENANTID' is expected in configuration object"
                 )
-            
-            self._inner = ManagedIdentityServiceClientCredentialsFactory(app_id, logger=logger)
+
+            self._inner = ManagedIdentityServiceClientCredentialsFactory(
+                app_id, logger=logger
+            )
 
         elif app_type == "singletenant":
             app_tenantid = (
@@ -64,7 +65,9 @@ class ConfigurationServiceClientCredentialFactory(
                     "Property 'APP_TENANTID' is expected in configuration object"
                 )
 
-            self._inner = PasswordServiceClientCredentialFactory(app_id, app_password, app_tenantid, logger=logger)
+            self._inner = PasswordServiceClientCredentialFactory(
+                app_id, app_password, app_tenantid, logger=logger
+            )
 
         # Default to MultiTenant
         else:
@@ -74,8 +77,10 @@ class ConfigurationServiceClientCredentialFactory(
                 raise Exception(
                     "Property 'APP_PASSWORD' is expected in configuration object"
                 )
-            
-            self._inner = PasswordServiceClientCredentialFactory(app_id, app_password, None, logger=logger)
+
+            self._inner = PasswordServiceClientCredentialFactory(
+                app_id, app_password, None, logger=logger
+            )
 
     async def is_valid_app_id(self, app_id: str) -> bool:
         return await self._inner.is_valid_app_id(app_id)
@@ -90,5 +95,6 @@ class ConfigurationServiceClientCredentialFactory(
         login_endpoint: str,
         validate_authority: bool,
     ) -> Authentication:
-        return await self._inner.create_credentials(app_id, oauth_scope, login_endpoint, validate_authority)
-
+        return await self._inner.create_credentials(
+            app_id, oauth_scope, login_endpoint, validate_authority
+        )
