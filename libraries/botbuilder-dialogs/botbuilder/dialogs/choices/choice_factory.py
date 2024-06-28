@@ -26,7 +26,7 @@ class ChoiceFactory:
         Creates a message activity that includes a list of choices formatted based on the
          capabilities of a given channel.
 
-        Parameters:
+        Parameters
         ----------
         channel_id: A channel ID.
         choices: List of choices to render
@@ -81,7 +81,7 @@ class ChoiceFactory:
         """
         Creates a message activity that includes a list of choices formatted as an inline list.
 
-        Parameters:
+        Parameters
         ----------
         choices: The list of choices to render.
         text: (Optional) The text of the message to send.
@@ -140,7 +140,7 @@ class ChoiceFactory:
         """
         Creates a message activity that includes a list of choices formatted as a numbered or bulleted list.
 
-        Parameters:
+        Parameters
         ----------
 
         choices: The list of choices to render.

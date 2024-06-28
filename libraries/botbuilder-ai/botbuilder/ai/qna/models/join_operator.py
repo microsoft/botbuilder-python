@@ -8,7 +8,7 @@ class JoinOperator(str, Enum):
     """
     Join Operator for Strict Filters.
 
-    remarks:
+    remarks
     --------
     For example, when using multiple filters in a query, if you want results that
     have metadata that matches all filters, then use `AND` operator.

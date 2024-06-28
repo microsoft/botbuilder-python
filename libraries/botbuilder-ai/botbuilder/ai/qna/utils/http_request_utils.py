@@ -16,7 +16,7 @@ from ..qnamaker_endpoint import QnAMakerEndpoint
 class HttpRequestUtils:
     """HTTP request utils class.
 
-    Parameters:
+    Parameters
     -----------
 
     http_client: Client to make HTTP requests with. Default client used in the SDK is `aiohttp.ClientSession`.
@@ -35,7 +35,7 @@ class HttpRequestUtils:
         """
         Execute HTTP request.
 
-        Parameters:
+        Parameters
         -----------
 
         request_url: HTTP request URL.

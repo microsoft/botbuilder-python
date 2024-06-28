@@ -16,7 +16,7 @@ class FindChoicesOptions(FindValuesOptions):
         **kwargs,
     ):
         """
-        Parameters:
+        Parameters
         -----------
 
         no_value: (Optional) If `True`, the choices `value` field will NOT be search over. Defaults to `False`.

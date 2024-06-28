@@ -7,7 +7,7 @@ class FoundValue:
 
     def __init__(self, value: str, index: int, score: float):
         """
-        Parameters:
+        Parameters
         ----------
 
         value: The value that was matched.

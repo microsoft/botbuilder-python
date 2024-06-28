@@ -10,7 +10,7 @@ class QnAMakerOptions:
     """
     Defines options used to configure a `QnAMaker` instance.
 
-    remarks:
+    remarks
     --------
         All parameters are optional.
     """
@@ -28,7 +28,7 @@ class QnAMakerOptions:
         strict_filters_join_operator: str = JoinOperator.AND,
     ):
         """
-        Parameters:
+        Parameters
         -----------
         score_threshold (float):
             The minimum score threshold, used to filter returned results.

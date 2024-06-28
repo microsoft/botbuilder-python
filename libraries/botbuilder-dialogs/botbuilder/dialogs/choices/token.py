@@ -7,7 +7,7 @@ class Token:
 
     def __init__(self, start: int, end: int, text: str, normalized: str):
         """
-        Parameters:
+        Parameters
         ----------
 
         start: The index of the first character of the token within the outer input string.

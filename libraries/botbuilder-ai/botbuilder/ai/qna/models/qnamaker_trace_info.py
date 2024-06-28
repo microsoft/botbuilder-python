@@ -27,7 +27,7 @@ class QnAMakerTraceInfo:
         ranker_type: str = RankerTypes.DEFAULT,
     ):
         """
-        Parameters:
+        Parameters
         -----------
 
         message: Message which instigated the query to QnA Maker.

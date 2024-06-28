@@ -7,7 +7,7 @@ class FoundChoice:
 
     def __init__(self, value: str, index: int, score: float, synonym: str = None):
         """
-        Parameters:
+        Parameters
         ----------
 
         value: The value of the choice that was matched.

@@ -41,7 +41,7 @@ class GenerateAnswerUtils:
         http_client: ClientSession,
     ):
         """
-        Parameters:
+        Parameters
         -----------
 
         telemetry_client: Telemetry client.
