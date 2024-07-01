@@ -22,7 +22,7 @@ class ActiveLearningUtils:
         """
         Returns a list of QnA search results, which have low score variation.
 
-        Parameters:
+        Parameters
         -----------
 
         qna_serach_results: A list of QnA QueryResults returned from the QnA GenerateAnswer API call.

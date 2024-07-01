@@ -18,7 +18,7 @@ class QueryResults(Model):
         self, answers: List[QueryResult], active_learning_enabled: bool = None, **kwargs
     ):
         """
-        Parameters:
+        Parameters
         -----------
 
         answers: The answers for a user query.

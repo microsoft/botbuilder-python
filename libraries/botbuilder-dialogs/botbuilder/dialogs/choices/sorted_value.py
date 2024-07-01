@@ -7,7 +7,7 @@ class SortedValue:
 
     def __init__(self, value: str, index: int):
         """
-        Parameters:
+        Parameters
         -----------
 
         value: The value that will be sorted.

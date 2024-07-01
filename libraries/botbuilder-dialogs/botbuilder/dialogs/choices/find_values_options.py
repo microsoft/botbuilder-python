@@ -17,7 +17,7 @@ class FindValuesOptions:
         tokenizer: Callable[[str, str], List[Token]] = None,
     ):
         """
-        Parameters:
+        Parameters
         ----------
 
         allow_partial_matches: (Optional) If `True`, then only some of the tokens in a value need to exist to

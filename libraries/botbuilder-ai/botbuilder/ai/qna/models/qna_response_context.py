@@ -17,7 +17,7 @@ class QnAResponseContext(Model):
 
     def __init__(self, **kwargs):
         """
-        Parameters:
+        Parameters
         -----------
 
         is_context_only: Whether this prompt is context only.

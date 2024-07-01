@@ -9,7 +9,7 @@ class ModelResult:
         self, text: str, start: int, end: int, type_name: str, resolution: object
     ):
         """
-        Parameters:
+        Parameters
         ----------
 
         text: Substring of the utterance that was recognized.

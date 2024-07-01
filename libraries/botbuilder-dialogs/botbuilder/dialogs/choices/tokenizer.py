@@ -75,7 +75,7 @@ class Tokenizer:
     @staticmethod
     def _is_between(value: int, from_val: int, to_val: int) -> bool:
         """
-        Parameters:
+        Parameters
         -----------
 
         value: number value

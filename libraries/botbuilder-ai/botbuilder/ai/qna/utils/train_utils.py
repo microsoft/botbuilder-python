@@ -17,7 +17,7 @@ class TrainUtils:
         """
         Initializes a new instance for active learning train utils.
 
-        Parameters:
+        Parameters
         -----------
 
         endpoint: QnA Maker Endpoint of the knowledge base to query.

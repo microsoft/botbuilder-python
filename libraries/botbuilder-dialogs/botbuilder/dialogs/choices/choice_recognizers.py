@@ -34,7 +34,7 @@ class ChoiceRecognizers:
         - By 1's based ordinal position.
         - By 1's based index position.
 
-        Parameters:
+        Parameters
         -----------
 
         utterance: The input.
@@ -43,7 +43,7 @@ class ChoiceRecognizers:
 
         options: (Optional) Options to control the recognition strategy.
 
-        Returns:
+        Returns
         --------
         A list of found choices, sorted by most relevant first.
         """
