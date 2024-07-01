@@ -1,4 +1,4 @@
 msrest== 0.7.*
-botframework-connector==4.16.0
-botbuilder-schema==4.16.0
+botframework-connector==4.17.0
+botbuilder-schema==4.17.0
 aiohttp==3.9.5
