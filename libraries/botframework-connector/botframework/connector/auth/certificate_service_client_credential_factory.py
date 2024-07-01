@@ -88,7 +88,8 @@ class CertificateServiceClientCredentialsFactory(ServiceClientCredentialsFactory
         else:
             credentials = _CertificatePrivateCloudAppCredentials(
                 app_id,
-                self.password,
+                self.certificate_thumbprint,
+                self.certificate_private_key,
                 self.tenant_id,
                 oauth_scope,
                 login_endpoint,
@@ -102,14 +103,21 @@ class _CertificatePrivateCloudAppCredentials(CertificateAppCredentials):
     def __init__(
         self,
         app_id: str,
-        password: str,
-        tenant_id: str,
+        certificate_thumbprint: str,
+        certificate_private_key: str,
+        channel_auth_tenant: str,
         oauth_scope: str,
+        certificate_public: str,
         oauth_endpoint: str,
         validate_authority: bool,
     ):
         super().__init__(
-            app_id, password, channel_auth_tenant=tenant_id, oauth_scope=oauth_scope
+            app_id,
+            certificate_thumbprint,
+            certificate_private_key,
+            channel_auth_tenant,
+            oauth_scope,
+            certificate_public,
         )
 
         self.oauth_endpoint = oauth_endpoint
