@@ -92,6 +92,7 @@ class CertificateServiceClientCredentialsFactory(ServiceClientCredentialsFactory
                 self.certificate_private_key,
                 self.tenant_id,
                 oauth_scope,
+                self.certificate_public,
                 login_endpoint,
                 validate_authority,
             )
