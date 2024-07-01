@@ -8,7 +8,7 @@ from botframework.connector.auth import (
     GovernmentConstants,
     CertificateServiceClientCredentialsFactory,
     CertificateAppCredentials,
-    CertificateGovernmentAppCredentials
+    CertificateGovernmentAppCredentials,
 )
 
 
@@ -67,4 +67,7 @@ class CertificateServiceClientCredentialsFactoryTests(aiounittest.AsyncTestCase)
         )
 
         assert isinstance(credentials, CertificateAppCredentials)
-        assert credentials.oauth_endpoint == CertificateServiceClientCredentialsFactoryTests.private_login_endpoint
+        assert (
+            credentials.oauth_endpoint
+            == CertificateServiceClientCredentialsFactoryTests.private_login_endpoint
+        )
