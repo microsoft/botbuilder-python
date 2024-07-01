@@ -5,7 +5,10 @@ from logging import Logger
 
 from msrest.authentication import Authentication
 
+from .authentication_constants import AuthenticationConstants
+from .government_constants import GovernmentConstants
 from .certificate_app_credentials import CertificateAppCredentials
+from .certificate_government_app_credentials import CertificateGovernmentAppCredentials
 from .microsoft_app_credentials import MicrosoftAppCredentials
 from .service_client_credentials_factory import ServiceClientCredentialsFactory
 
@@ -58,13 +61,60 @@ class CertificateServiceClientCredentialsFactory(ServiceClientCredentialsFactory
         if not await self.is_valid_app_id(app_id):
             raise Exception("Invalid app_id")
 
-        credentials = CertificateAppCredentials(
-            app_id,
-            self.certificate_thumbprint,
-            self.certificate_private_key,
-            self.tenant_id,
-            oauth_scope,
-            self.certificate_public,
-        )
+        normalized_endpoint = login_endpoint.lower() if login_endpoint else ""
+
+        if normalized_endpoint.startswith(
+            AuthenticationConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL_PREFIX
+        ):
+            credentials = CertificateAppCredentials(
+                app_id,
+                self.certificate_thumbprint,
+                self.certificate_private_key,
+                self.tenant_id,
+                oauth_scope,
+                self.certificate_public,
+            )
+        elif normalized_endpoint.startswith(
+            GovernmentConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL_PREFIX
+        ):
+            credentials = CertificateGovernmentAppCredentials(
+                app_id,
+                self.certificate_thumbprint,
+                self.certificate_private_key,
+                self.tenant_id,
+                oauth_scope,
+                self.certificate_public,
+            )
+        else:
+            credentials = _CertificatePrivateCloudAppCredentials(
+                app_id,
+                self.password,
+                self.tenant_id,
+                oauth_scope,
+                login_endpoint,
+                validate_authority,
+            )
 
         return credentials
+
+
+class _CertificatePrivateCloudAppCredentials(CertificateAppCredentials):
+    def __init__(
+        self,
+        app_id: str,
+        password: str,
+        tenant_id: str,
+        oauth_scope: str,
+        oauth_endpoint: str,
+        validate_authority: bool,
+    ):
+        super().__init__(
+            app_id, password, channel_auth_tenant=tenant_id, oauth_scope=oauth_scope
+        )
+
+        self.oauth_endpoint = oauth_endpoint
+        self._validate_authority = validate_authority
+
+    @property
+    def validate_authority(self):
+        return self._validate_authority

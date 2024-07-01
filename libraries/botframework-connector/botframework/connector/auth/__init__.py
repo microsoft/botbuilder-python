@@ -17,6 +17,7 @@ from .app_credentials import *
 from .microsoft_app_credentials import *
 from .microsoft_government_app_credentials import *
 from .certificate_app_credentials import *
+from .certificate_government_app_credentials import *
 from .certificate_service_client_credential_factory import *
 from .claims_identity import *
 from .jwt_token_validation import *
