@@ -107,7 +107,7 @@ class CloudAdapter(CloudAdapterBase, BotFrameworkHttpAdapterIntegrationBase):
                 return Response(status=201)
             else:
                 raise HTTPMethodNotAllowed
-        except (HTTPUnauthorized, PermissionError) as _:
+        except PermissionError:
             raise HTTPUnauthorized
 
     async def _connect(

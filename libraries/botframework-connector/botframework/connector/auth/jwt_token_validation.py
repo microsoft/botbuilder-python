@@ -46,7 +46,7 @@ class JwtTokenValidation:
             auth_is_disabled = await credentials.is_authentication_disabled()
             if not auth_is_disabled:
                 # No Auth Header. Auth is required. Request is not authorized.
-                raise PermissionError("Unauthorized Access. Request is not authorized")
+                raise PermissionError("Required Authorization token was not supplied")
 
             # Check if the activity is for a skill call and is coming from the Emulator.
             try:

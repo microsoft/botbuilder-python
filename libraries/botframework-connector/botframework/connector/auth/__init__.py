@@ -27,3 +27,5 @@ from .password_service_client_credential_factory import *
 from .service_client_credentials_factory import *
 from .user_token_client import *
 from .authentication_configuration import *
+from .managedidentity_app_credentials import *
+from .managedidentity_service_client_credential_factory import *

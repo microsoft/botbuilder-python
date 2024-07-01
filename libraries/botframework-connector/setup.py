@@ -5,13 +5,13 @@ import os
 from setuptools import setup
 
 NAME = "botframework-connector"
-VERSION = os.environ["packageVersion"] if "packageVersion" in os.environ else "4.16.0"
+VERSION = os.environ["packageVersion"] if "packageVersion" in os.environ else "4.17.0"
 REQUIRES = [
     "msrest==0.7.*",
     # "requests>=2.23.0,<2.26",
     "PyJWT>=2.4.0",
-    "botbuilder-schema==4.16.0",
-    "msal==1.*",
+    "botbuilder-schema==4.17.0",
+    "msal>=1.29.0",
 ]
 
 root = os.path.abspath(os.path.dirname(__file__))

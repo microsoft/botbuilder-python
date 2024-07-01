@@ -8,8 +8,8 @@ REQUIRES = [
     "azure-cosmos==3.2.0",
     "azure-storage-blob==12.7.0",
     "azure-storage-queue==12.4.0",
-    "botbuilder-schema==4.16.0",
-    "botframework-connector==4.16.0",
+    "botbuilder-schema==4.17.0",
+    "botframework-connector==4.17.0",
     "jsonpickle>=1.2,<1.5",
 ]
 TEST_REQUIRES = ["aiounittest==1.3.0"]
