@@ -44,7 +44,6 @@ class CertificateAppCredentials(AppCredentials, ABC):
             oauth_scope=oauth_scope,
         )
 
-        self.scopes = [self.oauth_scope]
         self.app = None
         self.certificate_thumbprint = certificate_thumbprint
         self.certificate_private_key = certificate_private_key
@@ -56,17 +55,18 @@ class CertificateAppCredentials(AppCredentials, ABC):
         :return: The access token for the given certificate.
         """
 
+        scope = self.oauth_scope
+        if not scope.endswith("/.default"):
+            scope += "/.default"
+        scopes = [scope]
+
         # Firstly, looks up a token from cache
         # Since we are looking for token for the current app, NOT for an end user,
         # notice we give account parameter as None.
-        auth_token = self.__get_msal_app().acquire_token_silent(
-            self.scopes, account=None
-        )
+        auth_token = self.__get_msal_app().acquire_token_silent(scopes, account=None)
         if not auth_token:
             # No suitable token exists in cache. Let's get a new one from AAD.
-            auth_token = self.__get_msal_app().acquire_token_for_client(
-                scopes=self.scopes
-            )
+            auth_token = self.__get_msal_app().acquire_token_for_client(scopes=scopes)
         return auth_token["access_token"]
 
     def __get_msal_app(self):
