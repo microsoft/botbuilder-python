@@ -77,6 +77,9 @@ from ._models_py3 import TabSubmit
 from ._models_py3 import TabSubmitData
 from ._models_py3 import TabSuggestedActions
 from ._models_py3 import TaskModuleCardResponse
+from ._models_py3 import UserMeetingDetails
+from ._models_py3 import TeamsMeetingMember
+from ._models_py3 import MeetingParticipantsEventDetails
 
 __all__ = [
     "AppBasedLinkQuery",
@@ -155,4 +158,7 @@ __all__ = [
     "TabSubmitData",
     "TabSuggestedActions",
     "TaskModuleCardResponse",
+    "UserMeetingDetails",
+    "TeamsMeetingMember",
+    "MeetingParticipantsEventDetails",
 ]

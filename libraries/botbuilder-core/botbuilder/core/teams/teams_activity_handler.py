@@ -27,6 +27,7 @@ from botbuilder.schema.teams import (
     TaskModuleResponse,
     TabRequest,
     TabSubmit,
+    MeetingParticipantsEventDetails,
 )
 from botframework.connector import Channels
 from ..serializer_helper import deserializer_helper
@@ -913,6 +914,14 @@ class TeamsActivityHandler(ActivityHandler):
                 return await self.on_teams_meeting_end_event(
                     turn_context.activity.value, turn_context
                 )
+            if turn_context.activity.name == "application/vnd.microsoft.meetingParticipantJoin":
+                return await self.on_teams_meeting_participants_join_event(
+                    turn_context.activity.value, turn_context
+                )
+            if turn_context.activity.name == "application/vnd.microsoft.meetingParticipantLeave":
+                return await self.on_teams_meeting_participants_leave_event(
+                    turn_context.activity.value, turn_context
+                )
 
         return await super().on_event_activity(turn_context)
 
@@ -934,6 +943,32 @@ class TeamsActivityHandler(ActivityHandler):
     ):  # pylint: disable=unused-argument
         """
         Override this in a derived class to provide logic for when a Teams meeting end event is received.
+
+        :param meeting: The details of the meeting.
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
+        return
+
+async def on_teams_meeting_participants_join_event(
+        self, meeting: MeetingParticipantsEventDetails, turn_context: TurnContext
+    ):  # pylint: disable=unused-argument
+        """
+        Override this in a derived class to provide logic for when meeting participants are added.
+
+        :param meeting: The details of the meeting.
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
+        return
+
+async def on_teams_meeting_participants_leave_event(
+        self, meeting: MeetingParticipantsEventDetails, turn_context: TurnContext
+    ):  # pylint: disable=unused-argument
+        """
+        Override this in a derived class to provide logic for when meeting participants are removed.
 
         :param meeting: The details of the meeting.
         :param turn_context: A context object for this turn.

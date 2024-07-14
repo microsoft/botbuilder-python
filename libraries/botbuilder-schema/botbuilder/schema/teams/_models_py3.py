@@ -2506,3 +2506,49 @@ class MeetingEndEventDetails(MeetingDetailsBase):
     def __init__(self, *, end_time: str = None, **kwargs):
         super(MeetingEndEventDetails, self).__init__(**kwargs)
         self.end_time = end_time
+
+class UserMeetingDetails(Model):
+    """Specific details of a user in a Teams meeting."""
+
+    def __init__(self, *, in_meeting: bool = None, role: str = None, **kwargs) -> None:
+        super(UserMeetingDetails, self).__init__(**kwargs)
+        self.in_meeting = in_meeting
+        self.role = role
+
+
+class TeamsMeetingMember(Model):
+    """Data about the meeting participants.
+
+    :param user: The channel user data.
+    :type user: ~botbuilder.schema.models.TeamsChannelAccount
+    :param meeting: The user meeting details.
+    :type meeting: ~botbuilder.schema.models.UserMeetingDetails
+    """
+
+    _attribute_map = {
+        "user": {"key": "TeamsChannelAccount", "type": "[TeamsChannelAccount]"},
+        "meeting": {"key": "UserMeetingDetails", "type": "[UserMeetingDetails]"}
+    }
+
+    def __init__(
+        self, *, user: TeamsChannelAccount = None, meeting: UserMeetingDetails = None, **kwargs
+    ) -> None:
+        super(TeamsMeetingMember, self).__init__(**kwargs)
+        self.user = user
+        self.meeting = meeting
+
+class MeetingParticipantsEventDetails(Model):
+    """Data about the meeting participants.
+
+    :param members: The members involved in the meeting event.
+    :type members: list[~botframework.connector.teams.models.TeamsMeetingMember]
+    """
+
+    _attribute_map = {
+        "conversations": {"key": "members", "type": "[TeamsMeetingMember]"},
+    }
+
+    def __init__(self, *, members=None, **kwargs) -> None:
+        super(MeetingParticipantsEventDetails, self).__init__(**kwargs)
+        self.members = members
+
