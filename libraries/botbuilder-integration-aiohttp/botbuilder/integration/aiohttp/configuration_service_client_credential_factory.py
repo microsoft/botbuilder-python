@@ -71,13 +71,7 @@ class ConfigurationServiceClientCredentialFactory(ServiceClientCredentialsFactor
 
         # Default to MultiTenant
         else:
-            if not app_id:
-                raise Exception("Property 'APP_ID' is expected in configuration object")
-            if not app_password:
-                raise Exception(
-                    "Property 'APP_PASSWORD' is expected in configuration object"
-                )
-
+            # Specifically not checking for appId or password to allow auth disabled scenario
             self._inner = PasswordServiceClientCredentialFactory(
                 app_id, app_password, None, logger=logger
             )
