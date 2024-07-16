@@ -914,11 +914,17 @@ class TeamsActivityHandler(ActivityHandler):
                 return await self.on_teams_meeting_end_event(
                     turn_context.activity.value, turn_context
                 )
-            if turn_context.activity.name == "application/vnd.microsoft.meetingParticipantJoin":
+            if (
+                turn_context.activity.name
+                == "application/vnd.microsoft.meetingParticipantJoin"
+            ):
                 return await self.on_teams_meeting_participants_join_event(
                     turn_context.activity.value, turn_context
                 )
-            if turn_context.activity.name == "application/vnd.microsoft.meetingParticipantLeave":
+            if (
+                turn_context.activity.name
+                == "application/vnd.microsoft.meetingParticipantLeave"
+            ):
                 return await self.on_teams_meeting_participants_leave_event(
                     turn_context.activity.value, turn_context
                 )
@@ -951,7 +957,7 @@ class TeamsActivityHandler(ActivityHandler):
         """
         return
 
-async def on_teams_meeting_participants_join_event(
+    async def on_teams_meeting_participants_join_event(
         self, meeting: MeetingParticipantsEventDetails, turn_context: TurnContext
     ):  # pylint: disable=unused-argument
         """
@@ -964,7 +970,7 @@ async def on_teams_meeting_participants_join_event(
         """
         return
 
-async def on_teams_meeting_participants_leave_event(
+    async def on_teams_meeting_participants_leave_event(
         self, meeting: MeetingParticipantsEventDetails, turn_context: TurnContext
     ):  # pylint: disable=unused-argument
         """

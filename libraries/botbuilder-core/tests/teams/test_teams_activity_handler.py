@@ -333,7 +333,7 @@ class TestingTeamsActivityHandler(TeamsActivityHandler):
         return await super().on_teams_meeting_end_event(
             turn_context.activity.value, turn_context
         )
-    
+
     async def on_teams_meeting_participants_join_event(
         self, meeting: MeetingParticipantsEventDetails, turn_context: TurnContext
     ):
@@ -341,7 +341,7 @@ class TestingTeamsActivityHandler(TeamsActivityHandler):
         return await super().on_teams_meeting_participants_join_event(
             turn_context.activity.value, turn_context
         )
-    
+
     async def on_teams_meeting_participants_leave_event(
         self, meeting: MeetingParticipantsEventDetails, turn_context: TurnContext
     ):
@@ -1178,18 +1178,18 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
     async def test_on_teams_meeting_participants_join_event(self):
         # arrange
         activity = Activity(
-            type=ActivityTypes.invoke, 
+            type=ActivityTypes.event,
             channel_id=Channels.ms_teams,
             name="application/vnd.microsoft.meetingParticipantJoin",
             value={
                 "members": [
                     {
-                        "user": {"id": "id", "name": "name"}, 
-                        "meeting": {"role": "role", "in_meeting": True}
-                     }]
-                     ,
+                        "user": {"id": "123", "name": "name"},
+                        "meeting": {"role": "role", "in_meeting": True},
+                    }
+                ],
             },
-            )
+        )
 
         turn_context = TurnContext(SimpleAdapter(), activity)
 
@@ -1199,24 +1199,24 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
 
         # Assert
         assert len(bot.record) == 2
-        assert bot.record[0] == "on_invoke_activity"
+        assert bot.record[0] == "on_event_activity"
         assert bot.record[1] == "on_teams_meeting_participants_join_event"
 
     async def test_on_teams_meeting_participants_leave_event(self):
         # arrange
         activity = Activity(
-            type=ActivityTypes.invoke, 
+            type=ActivityTypes.event,
             channel_id=Channels.ms_teams,
             name="application/vnd.microsoft.meetingParticipantLeave",
             value={
                 "members": [
                     {
-                        "user": {"id": "id", "name": "name"}, 
-                        "meeting": {"role": "role", "in_meeting": True}
-                     }]
-                     ,
+                        "user": {"id": "id", "name": "name"},
+                        "meeting": {"role": "role", "in_meeting": True},
+                    }
+                ],
             },
-            )
+        )
 
         turn_context = TurnContext(SimpleAdapter(), activity)
 
@@ -1225,7 +1225,6 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         await bot.on_turn(turn_context)
 
         # Assert
-        print(bot.record)
         assert len(bot.record) == 2
-        assert bot.record[0] == "on_invoke_activity"
+        assert bot.record[0] == "on_event_activity"
         assert bot.record[1] == "on_teams_meeting_participants_leave_event"
