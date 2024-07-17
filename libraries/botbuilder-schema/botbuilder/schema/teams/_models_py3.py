@@ -2506,3 +2506,65 @@ class MeetingEndEventDetails(MeetingDetailsBase):
     def __init__(self, *, end_time: str = None, **kwargs):
         super(MeetingEndEventDetails, self).__init__(**kwargs)
         self.end_time = end_time
+
+
+class UserMeetingDetails(Model):
+    """Specific details of a user in a Teams meeting.
+
+    :param role: Role of the participant in the current meeting.
+    :type role: str
+    :param in_meeting: True, if the participant is in the meeting.
+    :type in_meeting: bool
+    """
+
+    _attribute_map = {
+        "role": {"key": "role", "type": "str"},
+        "in_meeting": {"key": "inMeeting", "type": "bool"},
+    }
+
+    def __init__(self, *, role: str = None, in_meeting: bool = None, **kwargs) -> None:
+        super(UserMeetingDetails, self).__init__(**kwargs)
+        self.in_meeting = in_meeting
+        self.role = role
+
+
+class TeamsMeetingMember(Model):
+    """Data about the meeting participants.
+
+    :param user: The channel user data.
+    :type user: TeamsChannelAccount
+    :param meeting: The user meeting details.
+    :type meeting: UserMeetingDetails
+    """
+
+    _attribute_map = {
+        "user": {"key": "user", "type": "TeamsChannelAccount"},
+        "meeting": {"key": "meeting", "type": "UserMeetingDetails"},
+    }
+
+    def __init__(
+        self,
+        *,
+        user: TeamsChannelAccount = None,
+        meeting: UserMeetingDetails = None,
+        **kwargs
+    ) -> None:
+        super(TeamsMeetingMember, self).__init__(**kwargs)
+        self.user = user
+        self.meeting = meeting
+
+
+class MeetingParticipantsEventDetails(Model):
+    """Data about the meeting participants.
+
+    :param members: The members involved in the meeting event.
+    :type members: list[~botframework.connector.models.TeamsMeetingMember]
+    """
+
+    _attribute_map = {
+        "conversations": {"key": "members", "type": "[TeamsMeetingMember]"},
+    }
+
+    def __init__(self, *, members: List[TeamsMeetingMember] = None, **kwargs) -> None:
+        super(MeetingParticipantsEventDetails, self).__init__(**kwargs)
+        self.members = members
