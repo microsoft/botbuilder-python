@@ -116,6 +116,7 @@ class BotFrameworkHttpClient(BotFrameworkClient):
     ) -> Tuple[int, object]:
         headers_dict = {
             "Content-type": "application/json; charset=utf-8",
+            "x-ms-conversation-id": activity.conversation.id,
         }
         if token:
             headers_dict.update(
