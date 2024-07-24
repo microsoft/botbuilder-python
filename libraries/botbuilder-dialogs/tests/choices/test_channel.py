@@ -25,6 +25,7 @@ class ChannelTest(unittest.TestCase):
             (Channels.kik, 21, False),
             (Channels.emulator, 100, True),
             (Channels.emulator, 101, False),
+            (Channels.direct_line_speech, 100, True),
         ]
 
         for channel, button_cnt, expected in supports_suggested_actions_data:
@@ -41,6 +42,7 @@ class ChannelTest(unittest.TestCase):
             (Channels.slack, 100, True),
             (Channels.skype, 3, True),
             (Channels.skype, 5, False),
+            (Channels.direct_line_speech, 99, True),
         ]
 
         for channel, button_cnt, expected in supports_card_action_data:

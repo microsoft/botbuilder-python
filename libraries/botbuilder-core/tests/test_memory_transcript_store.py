@@ -25,6 +25,7 @@ from botbuilder.schema import (
     ConversationAccount,
     ConversationReference,
 )
+from botframework.connector import Channels
 
 
 # pylint: disable=line-too-long,missing-docstring
@@ -98,7 +99,7 @@ class TestMemoryTranscriptStore(aiounittest.AsyncTestCase):
                     timestamp=time_stamp,
                     id=str(uuid.uuid4()),
                     text=str(i),
-                    channel_id="test",
+                    channel_id=Channels.test,
                     from_property=ChannelAccount(id=f"User{i}"),
                     conversation=ConversationAccount(id=conversation_id),
                     recipient=ChannelAccount(id="bot1", name="2"),
@@ -112,7 +113,7 @@ class TestMemoryTranscriptStore(aiounittest.AsyncTestCase):
                     timestamp=date,
                     id=str(uuid.uuid4()),
                     text=str(i),
-                    channel_id="test",
+                    channel_id=Channels.test,
                     from_property=ChannelAccount(id="Bot1", name="2"),
                     conversation=ConversationAccount(id=conversation_id),
                     recipient=ChannelAccount(id=f"User{i}"),

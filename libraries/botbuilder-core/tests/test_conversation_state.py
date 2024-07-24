@@ -6,20 +6,25 @@ import aiounittest
 from botbuilder.core import TurnContext, MemoryStorage, ConversationState
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.schema import Activity, ConversationAccount
+from botframework.connector import Channels
 
 RECEIVED_MESSAGE = Activity(
     type="message",
     text="received",
-    channel_id="test",
+    channel_id=Channels.test,
     conversation=ConversationAccount(id="convo"),
 )
 MISSING_CHANNEL_ID = Activity(
     type="message", text="received", conversation=ConversationAccount(id="convo")
 )
-MISSING_CONVERSATION = Activity(type="message", text="received", channel_id="test")
+MISSING_CONVERSATION = Activity(
+    type="message",
+    text="received",
+    channel_id=Channels.test,
+)
 END_OF_CONVERSATION = Activity(
     type="endOfConversation",
-    channel_id="test",
+    channel_id=Channels.test,
     conversation=ConversationAccount(id="convo"),
 )
 

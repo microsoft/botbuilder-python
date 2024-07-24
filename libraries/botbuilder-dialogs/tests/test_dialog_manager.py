@@ -42,6 +42,7 @@ from botbuilder.schema import (
     InputHints,
 )
 from botframework.connector.auth import AuthenticationConstants, ClaimsIdentity
+from botframework.connector import Channels
 
 
 class SkillFlowTestCase(str, Enum):
@@ -103,7 +104,7 @@ class SimpleComponentDialog(ComponentDialog):
         user_state = UserState(storage)
 
         activity = Activity(
-            channel_id="test",
+            channel_id=Channels.test,
             service_url="https://test.com",
             from_property=ChannelAccount(id="user1", name="User1"),
             recipient=ChannelAccount(id="bot", name="Bot"),

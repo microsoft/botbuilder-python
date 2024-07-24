@@ -12,9 +12,10 @@ from botframework.connector.aio import ConnectorClient
 from botframework.connector.auth import MicrosoftAppCredentials
 
 from authentication_stub import MicrosoftTokenAuthenticationStub
+from botframework.connector import Channels
 
 SERVICE_URL = "https://slack.botframework.com"
-CHANNEL_ID = "slack"
+CHANNEL_ID = Channels.slack
 BOT_NAME = "botbuilder-pc-bot"
 BOT_ID = "B21UTEF8S:T03CWQ0QB"
 RECIPIENT_ID = "U19KH8EHJ:T03CWQ0QB"

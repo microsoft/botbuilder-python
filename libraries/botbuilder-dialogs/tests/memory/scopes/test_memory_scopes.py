@@ -32,6 +32,7 @@ from botbuilder.schema import (
     ChannelAccount,
     ConversationAccount,
 )
+from botframework.connector import Channels
 
 
 class TestDialog(Dialog):
@@ -92,7 +93,7 @@ class MemoryScopesTests(aiounittest.AsyncTestCase):
     begin_message = Activity(
         text="begin",
         type=ActivityTypes.message,
-        channel_id="test",
+        channel_id=Channels.test,
         from_property=ChannelAccount(id="user"),
         recipient=ChannelAccount(id="bot"),
         conversation=ConversationAccount(id="convo1"),

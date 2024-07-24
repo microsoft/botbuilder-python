@@ -34,6 +34,7 @@ class Channel:
             Channels.telegram: 100,
             Channels.emulator: 100,
             Channels.direct_line: 100,
+            Channels.direct_line_speech: 100,
             Channels.webchat: 100,
         }
         return (
@@ -64,6 +65,7 @@ class Channel:
             Channels.telegram: 100,
             Channels.emulator: 100,
             Channels.direct_line: 100,
+            Channels.direct_line_speech: 100,
             Channels.webchat: 100,
         }
         return (

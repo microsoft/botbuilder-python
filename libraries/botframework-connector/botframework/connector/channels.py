@@ -18,6 +18,9 @@ class Channels(str, Enum):
     direct_line = "directline"
     """Direct Line channel."""
 
+    direct_line_speech = "directlinespeech"
+    """Direct Line Speech channel."""
+
     email = "email"
     """Email channel."""
 
@@ -53,6 +56,9 @@ class Channels(str, Enum):
 
     telegram = "telegram"
     """Telegram channel."""
+
+    test = "test"
+    """Test channel."""
 
     webchat = "webchat"
     """WebChat channel."""

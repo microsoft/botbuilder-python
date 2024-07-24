@@ -6,17 +6,20 @@ import aiounittest
 from botbuilder.core import TurnContext, MemoryStorage, UserState
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.schema import Activity, ChannelAccount
+from botframework.connector import Channels
 
 RECEIVED_MESSAGE = Activity(
     type="message",
     text="received",
-    channel_id="test",
+    channel_id=Channels.test,
     from_property=ChannelAccount(id="user"),
 )
 MISSING_CHANNEL_ID = Activity(
     type="message", text="received", from_property=ChannelAccount(id="user")
 )
-MISSING_FROM_PROPERTY = Activity(type="message", text="received", channel_id="test")
+MISSING_FROM_PROPERTY = Activity(
+    type="message", text="received", channel_id=Channels.test
+)
 
 
 class TestUserState(aiounittest.AsyncTestCase):

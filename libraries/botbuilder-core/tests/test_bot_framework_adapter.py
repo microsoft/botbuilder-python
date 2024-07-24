@@ -27,6 +27,7 @@ from botbuilder.schema import (
     TokenExchangeInvokeRequest,
     TokenExchangeInvokeResponse,
 )
+from botframework.connector import Channels
 from botframework.connector.token_api.models import (
     TokenExchangeRequest,
     TokenResponse as ConnectorTokenResponse,
@@ -44,7 +45,7 @@ from botframework.connector.auth import (
 
 REFERENCE = ConversationReference(
     activity_id="1234",
-    channel_id="test",
+    channel_id=Channels.test,
     locale="en-uS",  # Intentionally oddly-cased to check that it isn't defaulted somewhere, but tests stay in English
     service_url="https://example.org/channel",
     user=ChannelAccount(id="user", name="User Name"),
@@ -305,7 +306,7 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
             is_incoming=True,
         )
 
-        incoming.channel_id = "msteams"
+        incoming.channel_id = Channels.ms_teams
         adapter = AdapterUnderTest()
 
         async def aux_func_assert_tenant_id_copied(context):
@@ -501,7 +502,7 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
         sut = BotFrameworkAdapter(settings)
         await sut.process_activity_with_identity(
             Activity(
-                channel_id="emulator",
+                channel_id=Channels.emulator,
                 service_url=service_url,
                 text="test",
             ),
@@ -549,7 +550,7 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
         sut = BotFrameworkAdapter(settings)
         await sut.process_activity_with_identity(
             Activity(
-                channel_id="emulator",
+                channel_id=Channels.emulator,
                 service_url=service_url,
                 text="test",
             ),
@@ -709,7 +710,7 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
 
         inbound_activity = Activity(
             type=ActivityTypes.message,
-            channel_id="emulator",
+            channel_id=Channels.emulator,
             service_url="http://tempuri.org/whatever",
             delivery_mode=DeliveryModes.expect_replies,
             text="hello world",
@@ -754,7 +755,7 @@ class TestBotFrameworkAdapter(aiounittest.AsyncTestCase):
 
         inbound_activity = Activity(
             type=ActivityTypes.message,
-            channel_id="emulator",
+            channel_id=Channels.emulator,
             service_url="http://tempuri.org/whatever",
             delivery_mode=DeliveryModes.normal,
             text="hello world",
