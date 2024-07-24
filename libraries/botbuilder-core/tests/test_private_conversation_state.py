@@ -6,11 +6,12 @@ import aiounittest
 from botbuilder.core import MemoryStorage, TurnContext, PrivateConversationState
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.schema import Activity, ChannelAccount, ConversationAccount
+from botframework.connector import Channels
 
 RECEIVED_MESSAGE = Activity(
     text="received",
     type="message",
-    channel_id="test",
+    channel_id=Channels.test,
     conversation=ConversationAccount(id="convo"),
     from_property=ChannelAccount(id="user"),
 )

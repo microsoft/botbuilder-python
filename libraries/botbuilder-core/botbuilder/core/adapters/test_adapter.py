@@ -31,6 +31,7 @@ from botbuilder.schema import (
 from ..bot_adapter import BotAdapter
 from ..turn_context import TurnContext
 from ..oauth.extended_user_token_provider import ExtendedUserTokenProvider
+from botframework.connector import Channels
 
 
 class UserToken:
@@ -121,7 +122,7 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
             template_or_conversation
             if isinstance(template_or_conversation, Activity)
             else Activity(
-                channel_id="test",
+                channel_id=Channels.test,
                 service_url="https://test.com",
                 from_property=ChannelAccount(id="User1", name="user"),
                 recipient=ChannelAccount(id="bot", name="Bot"),
@@ -308,7 +309,7 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
         name: str, user: str = "User1", bot: str = "Bot"
     ) -> ConversationReference:
         return ConversationReference(
-            channel_id="test",
+            channel_id=Channels.test,
             service_url="https://test.com",
             conversation=ConversationAccount(
                 is_group=False,

@@ -7,6 +7,7 @@ from botframework.connector.auth import MicrosoftAppCredentials
 from botbuilder.core import TurnContext
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.schema import Activity, ConversationReference, ChannelAccount
+from botframework.connector import Channels
 
 RECEIVED_MESSAGE = Activity(type="message", text="received")
 UPDATED_ACTIVITY = Activity(type="message", text="update")
@@ -141,7 +142,7 @@ class TestTestAdapter(aiounittest.AsyncTestCase):
     async def test_get_user_token_returns_null(self):
         adapter = TestAdapter()
         activity = Activity(
-            channel_id="directline", from_property=ChannelAccount(id="testuser")
+            channel_id=Channels.direct_line, from_property=ChannelAccount(id="testuser")
         )
 
         turn_context = TurnContext(adapter, activity)
@@ -158,7 +159,7 @@ class TestTestAdapter(aiounittest.AsyncTestCase):
     async def test_get_user_token_returns_null_with_code(self):
         adapter = TestAdapter()
         activity = Activity(
-            channel_id="directline", from_property=ChannelAccount(id="testuser")
+            channel_id=Channels.direct_line, from_property=ChannelAccount(id="testuser")
         )
 
         turn_context = TurnContext(adapter, activity)
@@ -180,7 +181,7 @@ class TestTestAdapter(aiounittest.AsyncTestCase):
     async def test_get_user_token_returns_token(self):
         adapter = TestAdapter()
         connection_name = "myConnection"
-        channel_id = "directline"
+        channel_id = Channels.direct_line
         user_id = "testUser"
         token = "abc123"
         activity = Activity(
@@ -207,7 +208,7 @@ class TestTestAdapter(aiounittest.AsyncTestCase):
     async def test_get_user_token_returns_token_with_magice_code(self):
         adapter = TestAdapter()
         connection_name = "myConnection"
-        channel_id = "directline"
+        channel_id = Channels.direct_line
         user_id = "testUser"
         token = "abc123"
         magic_code = "888999"

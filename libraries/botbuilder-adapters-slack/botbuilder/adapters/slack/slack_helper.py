@@ -15,6 +15,7 @@ from botbuilder.schema import (
     ChannelAccount,
     ActivityTypes,
 )
+from botframework.connector import Channels
 
 from .slack_message import SlackMessage
 from .slack_client import SlackClient
@@ -125,7 +126,7 @@ class SlackHelper:
             raise Exception("payload is required")
 
         activity = Activity(
-            channel_id="slack",
+            channel_id=Channels.slack,
             conversation=ConversationAccount(id=payload.channel["id"], properties={}),
             from_property=ChannelAccount(
                 id=(
@@ -178,7 +179,7 @@ class SlackHelper:
 
         activity = Activity(
             id=event.event_ts,
-            channel_id="slack",
+            channel_id=Channels.slack,
             conversation=ConversationAccount(
                 id=event.channel if event.channel else event.channel_id, properties={}
             ),
@@ -235,7 +236,7 @@ class SlackHelper:
 
         activity = Activity(
             id=body.trigger_id,
-            channel_id="slack",
+            channel_id=Channels.slack,
             conversation=ConversationAccount(id=body.channel_id, properties={}),
             from_property=ChannelAccount(id=body.user_id),
             recipient=ChannelAccount(id=None),

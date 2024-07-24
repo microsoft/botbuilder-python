@@ -40,7 +40,7 @@ class TestTelemetryMiddleware(aiounittest.AsyncTestCase):
 
         adapter = TestAdapter(
             template_or_conversation=Activity(
-                channel_id="test",
+                channel_id=Channels.test,
                 recipient=ChannelAccount(id="bot", name="Bot"),
                 conversation=ConversationAccount(id=str(uuid.uuid4())),
             )
