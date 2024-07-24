@@ -510,6 +510,7 @@ class ConversationsOperations:
         header_parameters = {}
         header_parameters["Accept"] = "application/json"
         header_parameters["Content-Type"] = "application/json; charset=utf-8"
+        header_parameters["x-ms-conversation-id"] = conversation_id
         if custom_headers:
             header_parameters.update(custom_headers)
 
