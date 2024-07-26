@@ -6,7 +6,10 @@ from setuptools import setup
 
 NAME = "botbuilder-schema"
 VERSION = os.environ["packageVersion"] if "packageVersion" in os.environ else "4.17.0"
-REQUIRES = ["msrest== 0.7.*", "urllib3<2.0.0"]
+REQUIRES = [
+    "msrest== 0.7.*",
+    "urllib3",
+]
 
 root = os.path.abspath(os.path.dirname(__file__))
 
