@@ -747,7 +747,6 @@ class Activity(Model):
         :returns: A conversation reference for the conversation that contains this activity.
         """
         return ConversationReference(
-            activity_id=self.id,
             activity_id=(
                 self.id
                 if not type == ActivityTypes.conversation_update
