@@ -80,6 +80,20 @@ from ._models_py3 import TaskModuleCardResponse
 from ._models_py3 import UserMeetingDetails
 from ._models_py3 import TeamsMeetingMember
 from ._models_py3 import MeetingParticipantsEventDetails
+from .meeting_notification_base import MeetingNotificationBase
+from .meeting_notification_channel_data import MeetingNotificationChannelData
+from .meeting_notification_recipient_failure_info import (
+    MeetingNotificationRecipientFailureInfo,
+)
+from .meeting_notification_response import MeetingNotificationResponse
+from .meeting_notification import MeetingNotification
+from .meeting_stage_surface import MeetingStageSurface
+from .meeting_tab_icon_surface import MeetingTabIconSurface
+from .on_behalf_of import OnBehalfOf
+from .surface_type import SurfaceType
+from .surface import Surface
+from .targeted_meeting_notification import TargetedMeetingNotification
+from .targeted_meeting_notification_value import TargetedMeetingNotificationValue
 
 __all__ = [
     "AppBasedLinkQuery",
@@ -161,4 +175,16 @@ __all__ = [
     "UserMeetingDetails",
     "TeamsMeetingMember",
     "MeetingParticipantsEventDetails",
+    "MeetingNotificationBase",
+    "MeetingNotificationChannelData",
+    "MeetingNotificationRecipientFailureInfo",
+    "MeetingNotificationResponse",
+    "MeetingNotification",
+    "MeetingStageSurface",
+    "MeetingTabIconSurface",
+    "OnBehalfOf",
+    "SurfaceType",
+    "Surface",
+    "TargetedMeetingNotification",
+    "TargetedMeetingNotificationValue",
 ]

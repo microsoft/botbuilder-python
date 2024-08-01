@@ -709,7 +709,7 @@ class TeamsActivityHandler(ActivityHandler):
 
     async def on_teams_members_added_dispatch(  # pylint: disable=unused-argument
         self,
-        members_added: [ChannelAccount],
+        members_added: ChannelAccount,
         team_info: TeamInfo,
         turn_context: TurnContext,
     ):
@@ -762,7 +762,7 @@ class TeamsActivityHandler(ActivityHandler):
 
     async def on_teams_members_added(  # pylint: disable=unused-argument
         self,
-        teams_members_added: [TeamsChannelAccount],
+        teams_members_added: TeamsChannelAccount,
         team_info: TeamInfo,
         turn_context: TurnContext,
     ):
@@ -785,7 +785,7 @@ class TeamsActivityHandler(ActivityHandler):
 
     async def on_teams_members_removed_dispatch(  # pylint: disable=unused-argument
         self,
-        members_removed: [ChannelAccount],
+        members_removed: ChannelAccount,
         team_info: TeamInfo,
         turn_context: TurnContext,
     ):
@@ -816,7 +816,7 @@ class TeamsActivityHandler(ActivityHandler):
 
     async def on_teams_members_removed(  # pylint: disable=unused-argument
         self,
-        teams_members_removed: [TeamsChannelAccount],
+        teams_members_removed: TeamsChannelAccount,
         team_info: TeamInfo,
         turn_context: TurnContext,
     ):

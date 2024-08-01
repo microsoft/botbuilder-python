@@ -1,8 +1,12 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from typing import List, Tuple
+from typing import Any, List, Optional, Tuple
 
+from botbuilder.schema.teams.meeting_notification_base import MeetingNotificationBase
+from botbuilder.schema.teams.meeting_notification_response import (
+    MeetingNotificationResponse,
+)
 from botframework.connector import Channels
 from botframework.connector.aio import ConnectorClient
 from botframework.connector.teams import TeamsConnectorClient
@@ -25,6 +29,9 @@ from botbuilder.schema.teams import (
     TeamsChannelAccount,
     TeamsPagedMembersResult,
     TeamsMeetingParticipant,
+)
+from botframework.connector.teams.operations.teams_operations_extensions import (
+    TeamsOperationsExtensions,
 )
 
 
@@ -401,3 +408,30 @@ class TeamsInfo:
         return TeamsChannelAccount().deserialize(
             dict(member.serialize(), **member.additional_properties)
         )
+
+    @staticmethod
+    async def send_meeting_notification_async(
+        turn_context: TurnContext,
+        notification: MeetingNotificationBase,
+        meeting_id: Optional[str] = None,
+        cancellation_token: Optional[Any] = None,
+    ) -> MeetingNotificationResponse:
+        if meeting_id is None:
+            meeting_id = turn_context.activity.id
+        else:
+            raise ValueError(
+                "This method is only valid within the scope of a MS Teams Meeting."
+            )
+
+        if not notification:
+            raise Exception(f"{notification} is required.")
+
+        teams_client = TeamsInfo.get_teams_connector_client(turn_context)
+
+        try:
+            return await TeamsOperationsExtensions.send_meeting_notification_async(
+                meeting_id, notification, notification
+            )
+
+        finally:
+            await teams_client.close()
