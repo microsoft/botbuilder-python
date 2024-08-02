@@ -158,7 +158,7 @@ class TurnContext:
         activity_or_text: Union[Activity, str],
         speak: str = None,
         input_hint: str = None,
-    ) -> ResourceResponse:
+    ) -> Union[ResourceResponse, None]:
         """
         Sends a single activity or message to the user.
         :param activity_or_text:
