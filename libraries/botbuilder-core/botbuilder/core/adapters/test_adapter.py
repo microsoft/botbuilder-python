@@ -142,7 +142,9 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
             if activity.type is None:
                 activity.type = ActivityTypes.message
 
-            activity.channel_id = self.template.channel_id
+            if activity.channel_id is None:
+                activity.channel_id = self.template.channel_id
+
             activity.from_property = self.template.from_property
             activity.recipient = self.template.recipient
             activity.conversation = self.template.conversation
