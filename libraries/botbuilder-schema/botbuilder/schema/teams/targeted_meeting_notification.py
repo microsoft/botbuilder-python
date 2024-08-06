@@ -13,6 +13,7 @@ class TargetedMeetingNotification(
     """
     Specifies Teams targeted meeting notification.
     """
+
     value: Optional[TargetedMeetingNotificationValue] = field(
         default=None, metadata={"json": "value"}
     )
@@ -31,4 +32,3 @@ class TargetedMeetingNotification(
             sort_keys=True,
             indent=4,
         )
-    

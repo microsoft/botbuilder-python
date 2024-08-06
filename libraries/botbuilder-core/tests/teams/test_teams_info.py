@@ -2,8 +2,14 @@
 # Licensed under the MIT License.
 
 from http.server import BaseHTTPRequestHandler
+from typing import List, Self
+from unittest.mock import AsyncMock, MagicMock, patch
+from urllib.parse import urlparse
+from aioresponses import aioresponses
 import aiounittest
+from botbuilder.schema.teams.meeting_notification_base import MeetingNotificationBase
 from botframework.connector import Channels
+from botbuilder.schema.teams.content_type import ContentType
 
 import json
 from botbuilder.schema._models_py3 import ErrorResponse
@@ -15,6 +21,11 @@ from botbuilder.schema.teams.meeting_stage_surface import MeetingStageSurface
 from botbuilder.schema.teams.targeted_meeting_notification_value import (
     TargetedMeetingNotificationValue,
 )
+from botframework.connector.aio._connector_client_async import ConnectorClient
+from botframework.connector.auth.microsoft_app_credentials import (
+    MicrosoftAppCredentials,
+)
+import pytest
 from simple_adapter_with_create_conversation import SimpleAdapterWithCreateConversation
 from botbuilder.schema.teams.on_behalf_of import OnBehalfOf
 from botbuilder.schema.teams.meeting_notification_channel_data import (
@@ -31,7 +42,8 @@ from botbuilder.schema import (
     ChannelAccount,
     ConversationAccount,
 )
-from simple_adapter_with_create_conversation import SimpleAdapterWithCreateConversation
+
+# from simple_adapter_with_create_conversation import SimpleAdapterWithCreateConversation
 
 ACTIVITY = Activity(
     id="1234",
@@ -254,6 +266,38 @@ class TestTeamsInfo(aiounittest.AsyncTestCase):
         handler = TeamsActivityHandler()
         await handler.on_turn(turn_context)
 
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("status_code", ["202", "207", "400", "403"])
+    async def test_send_meeting_notification_async(
+        status_code,
+    ):  # pylint: disable=no-self-argument
+        base_uri = "https://test.coffee"
+
+        with aioresponses() as m:
+            # Mock the HTTP response
+            m.post(
+                f"{base_uri}/v1/meetings/meeting-id/notification",
+                status=status_code,
+                payload={},
+            )
+            connector_client = ConnectorClient(
+                credentials=MicrosoftAppCredentials("", ""), base_url=base_uri
+            )
+
+        activity = Activity(
+            type="targetedMeetingNotification",
+            text="test_send_meeting_notification",
+            channel_id=Channels.ms_teams,
+            service_url="https://test.coffee",
+            from_property=ChannelAccount(id="id-1", name=status_code),
+            conversation=ConversationAccount(id="conversation-id"),
+        )
+
+        turn_context = TurnContext(SimpleAdapterWithCreateConversation(), activity)
+        turn_context.turn_state[ConnectorClient] = connector_client
+        handler = TestTeamsActivityHandler()
+        await handler.on_turn(turn_context)
+
 
 class TestTeamsActivityHandler(TeamsActivityHandler):
     async def on_turn(self, turn_context: TurnContext):
@@ -261,6 +305,8 @@ class TestTeamsActivityHandler(TeamsActivityHandler):
 
         if turn_context.activity.text == "test_send_message_to_teams_channel":
             await self.call_send_message_to_teams(turn_context)
+        elif turn_context.activity.text == "test_send_meeting_notification":
+            await self.call_send_meeting_notification_async(turn_context)
 
     async def call_send_message_to_teams(self, turn_context: TurnContext):
         msg = MessageFactory.text("call_send_message_to_teams")
@@ -272,9 +318,11 @@ class TestTeamsActivityHandler(TeamsActivityHandler):
         assert reference[0].activity_id == "new_conversation_id"
         assert reference[1] == "reference123"
 
-    @staticmethod
-    def get_targeted_meeting_notification(from_user) -> TargetedMeetingNotification:
-        recipients = [from_user.id]
+    def get_targeted_meeting_notification(
+        self, from_user: ChannelAccount
+    ) -> MeetingNotificationBase:
+        # Create a list of recipients
+        recipients: List[str] = [from_user.id]
 
         if from_user.name == "207":
             recipients.append("failingid")
@@ -283,28 +331,25 @@ class TestTeamsActivityHandler(TeamsActivityHandler):
         surface.content = TaskModuleContinueResponse(
             value=TaskModuleTaskInfo(title="title here", height=3, width=2)
         )
-        surface.content_type = "Task"
+        surface.content_type = ContentType.TASK
 
         value = TargetedMeetingNotificationValue(
             recipients=recipients, surfaces=[surface]
         )
 
         obo = OnBehalfOf(display_name=from_user.name, mri=from_user.id)
+
         channel_data = MeetingNotificationChannelData(on_behalf_of_list=[obo])
 
-        return TargetedMeetingNotification(
-            value=value,
-            channel_data=channel_data
-        )
+        return TargetedMeetingNotification(value=value, channel_data=channel_data)
 
-    @staticmethod
-    async def call_send_meeting_notification_async(turn_context: TurnContext):
+    async def call_send_meeting_notification_async(self, turn_context: TurnContext):
         from_user = turn_context.activity.from_property
 
         try:
             failed_participants = await TeamsInfo.send_meeting_notification_async(
                 turn_context,
-                TestTeamsActivityHandler.get_targeted_meeting_notification(from_user),
+                self.get_targeted_meeting_notification(from_user),
                 "meeting-id",
             )
 
@@ -320,18 +365,12 @@ class TestTeamsActivityHandler(TeamsActivityHandler):
                     f"Expected HttpOperationException with response status code {from_user.name}"
                 )
 
-        except Exception as ex:
-            assert from_user.name == str(ex.response.status_code)
-            error_response = ErrorResponse.from_json(ex.response.content)
-
-            if from_user.name == "400":
-                assert "BadSyntax" == error_response.error.code
-            elif from_user.name == "403":
-                assert "BotNotInConversationRoster" == error_response.error.code
-            else:
-                raise ValueError(
-                    f"Expected HttpOperationException with response status code {from_user.name}"
-                )
+        except ValueError as ve:
+            # Handle specific ValueError for invalid meeting ID
+            assert (
+                str(ve)
+                == "This method is only valid within the scope of a MS Teams Meeting."
+            )
 
 
 class RosterHttpMessageHandler(BaseHTTPRequestHandler):

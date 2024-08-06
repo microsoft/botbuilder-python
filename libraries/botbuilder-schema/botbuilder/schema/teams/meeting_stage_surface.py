@@ -8,6 +8,6 @@ T = TypeVar("T")
 
 class MeetingStageSurface(Generic[T], Surface):
     def __init__(self):
-        super().__init__(self, SurfaceType.MEETING_STAGE)
+        super().__init__(SurfaceType.MEETING_STAGE)
         self.content_type = ContentType.TASK
         self.content: Optional[T] = None

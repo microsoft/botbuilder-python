@@ -414,7 +414,6 @@ class TeamsInfo:
         turn_context: TurnContext,
         notification: MeetingNotificationBase,
         meeting_id: Optional[str] = None,
-        cancellation_token: Optional[Any] = None,
     ) -> MeetingNotificationResponse:
         if meeting_id is None:
             meeting_id = turn_context.activity.id
