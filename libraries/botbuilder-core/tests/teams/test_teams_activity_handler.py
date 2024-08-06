@@ -50,7 +50,7 @@ class TestingTeamsActivityHandler(TeamsActivityHandler):
 
     async def on_teams_members_added(  # pylint: disable=unused-argument
         self,
-        teams_members_added: TeamsChannelAccount,
+        teams_members_added: [TeamsChannelAccount],
         team_info: TeamInfo,
         turn_context: TurnContext,
     ):
@@ -61,7 +61,7 @@ class TestingTeamsActivityHandler(TeamsActivityHandler):
 
     async def on_teams_members_removed(
         self,
-        teams_members_removed: TeamsChannelAccount,
+        teams_members_removed: [TeamsChannelAccount],
         team_info: TeamInfo,
         turn_context: TurnContext,
     ):
