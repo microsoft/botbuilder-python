@@ -5,8 +5,16 @@
 # license information.
 # --------------------------------------------------------------------------
 
+import logging
 from msrest.pipeline import ClientRawResponse
 from msrest.exceptions import HttpOperationError
+
+from botbuilder.schema.teams.meeting_notification_base import MeetingNotificationBase
+from typing import Any, Dict, List, Optional
+from botbuilder.schema.teams import MeetingNotificationBase
+from botbuilder.schema.teams.meeting_notification_response import (
+    MeetingNotificationResponse,
+)
 
 from ... import models
 
@@ -148,7 +156,7 @@ class TeamsOperations(object):
         tenant_id: str,
         custom_headers=None,
         raw=False,
-        **operation_config
+        **operation_config,
     ):
         """Fetches Teams meeting participant details.
 
@@ -266,3 +274,53 @@ class TeamsOperations(object):
         return deserialized
 
     fetch_participant.metadata = {"url": "/v1/meetings/{meetingId}"}
+
+    @staticmethod
+    async def send_meeting_notification_message_async(
+        meeting_id: str,
+        notification: MeetingNotificationBase,
+        custom_headers: Optional[Dict[str, List[str]]] = None,
+    ) -> MeetingNotificationResponse:
+        if meeting_id is None:
+            raise ValueError("meeting_id cannot be null")
+
+        # Using static method for trace_activity
+        invocation_id = TeamsOperations.trace_activity(
+            "SendMeetingNotification", {"meeting_id": meeting_id}
+        )
+
+        # Construct URL
+        url = f"v1/meetings/{meeting_id}/notification"
+
+        response = await TeamsOperations.get_response_async(
+            url,
+            "POST",
+            invocation_id,
+            content=notification,
+            custom_headers=custom_headers,
+        )
+        return response
+
+    @staticmethod
+    def trace_activity(operation_name: str, content: Any) -> str:
+        logging.basicConfig(level=logging.DEBUG)
+        invocation_id = None
+        tracing_parameters: Dict[str, Any] = {}
+        for attr in dir(content):
+            if not attr.startswith("__") and not callable(getattr(content, attr)):
+                tracing_parameters[attr] = getattr(content, attr)
+        logging.debug(
+            "Operation: %s, Parameters: %s", operation_name, tracing_parameters
+        )
+        return invocation_id
+
+    @staticmethod
+    async def get_response_async(
+        api_url: str,
+        http_method: str,
+        invocation_id: Optional[str] = None,
+        content: Optional[Any] = None,
+        custom_headers: Optional[Dict[str, List[str]]] = None,
+    ) -> None:
+        should_trace = invocation_id is not None
+        return None
