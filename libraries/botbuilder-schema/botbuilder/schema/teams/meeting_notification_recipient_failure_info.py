@@ -1,8 +1,6 @@
 import json
-from dataclasses import dataclass
 
 
-@dataclass
 class MeetingNotificationRecipientFailureInfo:
     recipient_mri: str
     error_code: str

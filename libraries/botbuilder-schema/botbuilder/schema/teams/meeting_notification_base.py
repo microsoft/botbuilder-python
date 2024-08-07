@@ -1,15 +1,14 @@
-from dataclasses import dataclass, field
 from typing import Optional
 import json
 
 
-@dataclass
 class MeetingNotificationBase:
     """
     Specifies Bot meeting notification base including channel data and type.
     """
 
-    type: Optional[str] = field(default=None)
+    def __init__(self, type: Optional[str] = None):
+        self.type = type
 
     def to_json(self) -> str:
         """
@@ -17,8 +16,10 @@ class MeetingNotificationBase:
         :return: JSON representation of the MeetingNotificationBase object.
         """
         return json.dumps(
-            self,
-            default=lambda o: {k: v for k, v in o.__dict__.items() if v is not None},
+            {
+                "type": self.type
+            },
             sort_keys=True,
-            indent=4,
+            indent=4
         )
+    

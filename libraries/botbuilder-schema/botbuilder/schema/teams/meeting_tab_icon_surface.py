@@ -1,9 +1,7 @@
-from dataclasses import dataclass
 from .surface import Surface
 from .surface_type import SurfaceType
 
 
-@dataclass
 class MeetingTabIconSurface(Surface):
     """
     Specifies meeting tab icon surface.

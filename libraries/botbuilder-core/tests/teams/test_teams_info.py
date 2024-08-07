@@ -43,8 +43,6 @@ from botbuilder.schema import (
     ConversationAccount,
 )
 
-# from simple_adapter_with_create_conversation import SimpleAdapterWithCreateConversation
-
 ACTIVITY = Activity(
     id="1234",
     type="message",

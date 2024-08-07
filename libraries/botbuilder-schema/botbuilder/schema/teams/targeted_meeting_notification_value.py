@@ -1,17 +1,20 @@
-from dataclasses import dataclass, field
-from typing import List
+from typing import List, Optional
 import json
 from .surface import Surface
 
 
-@dataclass
 class TargetedMeetingNotificationValue:
     """
     Specifies the targeted meeting notification value, including recipients and surfaces.
     """
 
-    recipients: List[str] = field(default_factory=list, metadata={"json": "recipients"})
-    surfaces: List[Surface] = field(default_factory=list, metadata={"json": "surfaces"})
+    def __init__(
+        self,
+        recipients: Optional[List[str]] = None,
+        surfaces: Optional[List[Surface]] = None,
+    ):
+        self.recipients = recipients if recipients is not None else []
+        self.surfaces = surfaces if surfaces is not None else []
 
     def to_json(self) -> str:
         """
@@ -19,8 +22,10 @@ class TargetedMeetingNotificationValue:
         :return: JSON representation of the TargetedMeetingNotificationValue object.
         """
         return json.dumps(
-            self,
-            default=lambda o: {k: v for k, v in o.__dict__.items() if v is not None},
+            {
+                "recipients": self.recipients,
+                "surfaces": [surface.to_dict() for surface in self.surfaces],
+            },
             sort_keys=True,
             indent=4,
         )

@@ -425,12 +425,8 @@ class TeamsInfo:
         if not notification:
             raise Exception(f"{notification} is required.")
 
-        teams_client = TeamsInfo.get_teams_connector_client(turn_context)
+        teams_client = await TeamsInfo.get_teams_connector_client(turn_context)
 
-        try:
-            return await TeamsOperationsExtensions.send_meeting_notification_async(
-                meeting_id, notification, notification
-            )
-
-        finally:
-            await teams_client.close()
+        return await teams_client.teams.send_meeting_notification_async(
+            meeting_id, notification, notification
+        )

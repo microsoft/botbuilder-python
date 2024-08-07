@@ -1,14 +1,26 @@
-from dataclasses import dataclass, field
-from typing import List
+import json
+from typing import List, Optional
 from .on_behalf_of import OnBehalfOf
 
 
-@dataclass
 class MeetingNotificationChannelData:
     """
     Specify Teams Bot meeting notification channel data.
     """
 
-    on_behalf_of_list: List[OnBehalfOf] = field(
-        default_factory=list, metadata={"json": "OnBehalfOf"}
-    )
+    def __init__(self, on_behalf_of_list: Optional[List[OnBehalfOf]] = None):
+        self.on_behalf_of_list = (
+            on_behalf_of_list if on_behalf_of_list is not None else []
+        )
+
+    def to_json(self) -> str:
+        """
+        Converts the MeetingNotificationChannelData object to JSON.
+
+        :return: JSON representation of the MeetingNotificationChannelData object.
+        """
+        return json.dumps(
+            {"OnBehalfOf": [item.to_dict() for item in self.on_behalf_of_list]},
+            sort_keys=True,
+            indent=4,
+        )

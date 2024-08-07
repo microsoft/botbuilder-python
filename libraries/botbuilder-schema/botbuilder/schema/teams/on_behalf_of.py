@@ -1,17 +1,23 @@
-from dataclasses import dataclass, field
 import json
+from typing import Optional
 
 
-@dataclass
 class OnBehalfOf:
     """
     Specifies attribution for notifications.
     """
 
-    item_id: int = field(default=0, metadata={"json": "itemid"})
-    mention_type: str = field(default="person", metadata={"json": "mentionType"})
-    mri: str = field(default=None, metadata={"json": "mri"})
-    display_name: str = field(default=None, metadata={"json": "displayName"})
+    def __init__(
+        self,
+        item_id: int = 0,
+        mention_type: str = "person",
+        mri: Optional[str] = None,
+        display_name: Optional[str] = None,
+    ):
+        self.item_id = item_id
+        self.mention_type = mention_type
+        self.mri = mri
+        self.display_name = display_name
 
     def to_json(self) -> str:
         """
@@ -20,8 +26,12 @@ class OnBehalfOf:
         :return: JSON representation of the OnBehalfOf object.
         """
         return json.dumps(
-            self,
-            default=lambda o: {k: v for k, v in o.__dict__.items() if v is not None},
+            {
+                "itemid": self.item_id,
+                "mentionType": self.mention_type,
+                "mri": self.mri,
+                "displayName": self.display_name,
+            },
             sort_keys=True,
             indent=4,
         )

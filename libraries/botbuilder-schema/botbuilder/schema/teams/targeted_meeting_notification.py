@@ -1,4 +1,3 @@
-from dataclasses import dataclass, field
 from typing import Optional
 import json
 from .meeting_notification import MeetingNotification
@@ -6,7 +5,6 @@ from .targeted_meeting_notification_value import TargetedMeetingNotificationValu
 from .meeting_notification_channel_data import MeetingNotificationChannelData
 
 
-@dataclass
 class TargetedMeetingNotification(
     MeetingNotification[TargetedMeetingNotificationValue]
 ):
@@ -14,12 +12,14 @@ class TargetedMeetingNotification(
     Specifies Teams targeted meeting notification.
     """
 
-    value: Optional[TargetedMeetingNotificationValue] = field(
-        default=None, metadata={"json": "value"}
-    )
-    channel_data: Optional[MeetingNotificationChannelData] = field(
-        default=None, metadata={"json": "channelData"}
-    )
+    def __init__(
+        self,
+        value: Optional[TargetedMeetingNotificationValue] = None,
+        channel_data: Optional[MeetingNotificationChannelData] = None,
+        type: Optional[str] = None
+    ):
+        super().__init__(value=value, type=type)
+        self.channel_data = channel_data
 
     def to_json(self) -> str:
         """
@@ -27,8 +27,13 @@ class TargetedMeetingNotification(
         :return: JSON representation of the TargetedMeetingNotification object.
         """
         return json.dumps(
-            self,
-            default=lambda o: {k: v for k, v in o.__dict__.items() if v is not None},
+            {
+                "type": self.type,
+                "value": self.value.to_dict() if self.value else None,
+                "channelData": (
+                    self.channel_data.to_dict() if self.channel_data else None
+                ),
+            },
             sort_keys=True,
             indent=4,
         )
