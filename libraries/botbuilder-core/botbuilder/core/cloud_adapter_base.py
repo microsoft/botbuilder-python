@@ -296,7 +296,7 @@ class CloudAdapterBase(BotAdapter, ABC):
         )
 
         # Run the pipeline
-        await self.run_pipeline(context, logic)
+        return await self.run_pipeline(context, logic)
 
     async def process_activity(
         self,

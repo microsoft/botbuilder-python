@@ -182,4 +182,4 @@ class BotAdapter(ABC):
         else:
             # callback to caller on proactive case
             if callback is not None:
-                await callback(context)
+                return await callback(context)
