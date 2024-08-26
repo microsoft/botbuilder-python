@@ -347,7 +347,6 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
                 self._knowledge_base_id, trace_activity.value.knowledge_base_id
             )
 
-
     async def test_returns_answer_with_timeout(self):
         question: str = "how do I clean the stove?"
         options = QnAMakerOptions(timeout=999999)

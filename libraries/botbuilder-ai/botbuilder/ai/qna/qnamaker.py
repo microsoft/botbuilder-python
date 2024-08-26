@@ -58,9 +58,11 @@ class QnAMaker(QnAMakerTelemetryClient):
         except RuntimeError:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
-            
+
         instance_timeout = ClientTimeout(total=opt.timeout / 1000)
-        self._http_client = http_client or ClientSession(timeout=instance_timeout, loop=loop)
+        self._http_client = http_client or ClientSession(
+            timeout=instance_timeout, loop=loop
+        )
 
         self.telemetry_client: Union[BotTelemetryClient, NullTelemetryClient] = (
             telemetry_client or NullTelemetryClient()
