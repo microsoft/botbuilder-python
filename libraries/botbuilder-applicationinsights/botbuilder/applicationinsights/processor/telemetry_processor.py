@@ -3,7 +3,7 @@
 import base64
 import json
 from abc import ABC, abstractmethod
-from _sha256 import sha256
+from hashlib import sha256
 
 
 class TelemetryProcessor(ABC):

@@ -8,7 +8,7 @@
 import asyncio
 import inspect
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import uuid4
 from typing import Awaitable, Coroutine, Dict, List, Callable, Union
 from copy import copy
@@ -155,7 +155,7 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
         finally:
             self._conversation_lock.release()
 
-        activity.timestamp = activity.timestamp or datetime.utcnow()
+        activity.timestamp = activity.timestamp or datetime.now(timezone.utc)
         await self.run_pipeline(self.create_turn_context(activity), logic)
 
     async def send_activities(
