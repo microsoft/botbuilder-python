@@ -1,9 +1,10 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from http.server import BaseHTTPRequestHandler
+from http.server import BaseHTTPRequestHandler, HTTPServer
+import socket
 from typing import List, Self
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, Mock, patch
 from urllib.parse import urlparse
 from aioresponses import aioresponses
 import aiounittest
@@ -26,6 +27,7 @@ from botframework.connector.auth.microsoft_app_credentials import (
     MicrosoftAppCredentials,
 )
 import pytest
+from simple_adapter import SimpleAdapter
 from simple_adapter_with_create_conversation import SimpleAdapterWithCreateConversation
 from botbuilder.schema.teams.on_behalf_of import OnBehalfOf
 from botbuilder.schema.teams.meeting_notification_channel_data import (

@@ -413,7 +413,7 @@ class TeamsInfo:
     async def send_meeting_notification_async(
         turn_context: TurnContext,
         notification: MeetingNotificationBase,
-        meeting_id: Optional[str] = None,
+        meeting_id: str = None,
     ) -> MeetingNotificationResponse:
         if meeting_id is None:
             meeting_id = turn_context.activity.id
@@ -421,12 +421,11 @@ class TeamsInfo:
             raise ValueError(
                 "This method is only valid within the scope of a MS Teams Meeting."
             )
-
         if not notification:
             raise Exception(f"{notification} is required.")
 
         teams_client = await TeamsInfo.get_teams_connector_client(turn_context)
 
-        return await teams_client.teams.send_meeting_notification_async(
-            meeting_id, notification, notification
+        return await teams_client.teams.send_meeting_notification_message_async(
+            meeting_id, notification
         )

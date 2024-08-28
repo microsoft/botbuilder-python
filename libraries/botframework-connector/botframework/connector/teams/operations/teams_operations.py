@@ -279,7 +279,7 @@ class TeamsOperations(object):
     async def send_meeting_notification_message_async(
         meeting_id: str,
         notification: MeetingNotificationBase,
-        custom_headers: Optional[Dict[str, List[str]]] = None,
+        custom_headers = None,
     ) -> MeetingNotificationResponse:
         if meeting_id is None:
             raise ValueError("meeting_id cannot be null")
@@ -320,7 +320,7 @@ class TeamsOperations(object):
         http_method: str,
         invocation_id: Optional[str] = None,
         content: Optional[Any] = None,
-        custom_headers: Optional[Dict[str, List[str]]] = None,
+        custom_header = None,
     ) -> None:
         should_trace = invocation_id is not None
         return None
