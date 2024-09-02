@@ -38,6 +38,8 @@ class BotTelemetryMiddleware:
 
     def process_request(self, environ) -> bool:
         """Process the incoming Flask request."""
+        body_unicode = None
+
         # Bot Service doesn't handle anything over 256k
         length = int(environ.get("CONTENT_LENGTH", "0"))
         if length > 256 * 1024:

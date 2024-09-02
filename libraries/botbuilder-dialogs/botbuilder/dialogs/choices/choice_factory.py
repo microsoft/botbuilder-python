@@ -46,8 +46,7 @@ class ChoiceFactory:
             else:
                 size = len(choice.value)
 
-            if size > max_title_length:
-                max_title_length = size
+            max_title_length = max(max_title_length, size)
 
         # Determine list style
         supports_suggested_actions = Channel.supports_suggested_actions(
