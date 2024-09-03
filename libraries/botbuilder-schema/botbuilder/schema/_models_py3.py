@@ -641,7 +641,7 @@ class Activity(Model):
             ),
             reply_to_id=(
                 self.id
-                if not type == ActivityTypes.conversation_update
+                if type != ActivityTypes.conversation_update
                 or self.channel_id not in ["directline", "webchat"]
                 else None
             ),
@@ -688,7 +688,7 @@ class Activity(Model):
             ),
             reply_to_id=(
                 self.id
-                if not type == ActivityTypes.conversation_update
+                if type != ActivityTypes.conversation_update
                 or self.channel_id not in ["directline", "webchat"]
                 else None
             ),
@@ -749,7 +749,7 @@ class Activity(Model):
         return ConversationReference(
             activity_id=(
                 self.id
-                if not type == ActivityTypes.conversation_update
+                if type != ActivityTypes.conversation_update
                 or self.channel_id not in ["directline", "webchat"]
                 else None
             ),
