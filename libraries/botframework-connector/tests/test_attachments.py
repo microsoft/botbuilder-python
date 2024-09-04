@@ -46,7 +46,15 @@ def read_base64(path_to_file):
         return encoded_string
 
 
-LOOP = asyncio.get_event_loop()
+# Ensure there's an event loop and get the auth token
+# LOOP = asyncio.get_event_loop()
+try:
+    LOOP = asyncio.get_running_loop()
+except RuntimeError:
+    LOOP = asyncio.new_event_loop()
+    asyncio.set_event_loop(LOOP)
+
+# Run the async function to get the auth token
 AUTH_TOKEN = LOOP.run_until_complete(get_auth_token())
 
 
