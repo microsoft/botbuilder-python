@@ -4,7 +4,7 @@
 from typing import List
 
 from botbuilder.schema._connector_client_enums import ActivityTypes
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from msrest.serialization import Model
 from msrest.exceptions import HttpOperationError
@@ -630,7 +630,7 @@ class Activity(Model):
         """
         return Activity(
             type=ActivityTypes.message,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             from_property=ChannelAccount(
                 id=self.recipient.id if self.recipient else None,
                 name=self.recipient.name if self.recipient else None,
@@ -641,7 +641,7 @@ class Activity(Model):
             ),
             reply_to_id=(
                 self.id
-                if not type == ActivityTypes.conversation_update
+                if type != ActivityTypes.conversation_update
                 or self.channel_id not in ["directline", "webchat"]
                 else None
             ),
@@ -677,7 +677,7 @@ class Activity(Model):
 
         return Activity(
             type=ActivityTypes.trace,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             from_property=ChannelAccount(
                 id=self.recipient.id if self.recipient else None,
                 name=self.recipient.name if self.recipient else None,
@@ -688,7 +688,7 @@ class Activity(Model):
             ),
             reply_to_id=(
                 self.id
-                if not type == ActivityTypes.conversation_update
+                if type != ActivityTypes.conversation_update
                 or self.channel_id not in ["directline", "webchat"]
                 else None
             ),
@@ -749,7 +749,7 @@ class Activity(Model):
         return ConversationReference(
             activity_id=(
                 self.id
-                if not type == ActivityTypes.conversation_update
+                if type != ActivityTypes.conversation_update
                 or self.channel_id not in ["directline", "webchat"]
                 else None
             ),

@@ -176,7 +176,6 @@ class Dialog(ABC):
         Registers a SourceRange in the provided location.
         :param path: The path to the source file.
         :param line_number: The line number where the source will be located on the file.
-        :return:
         """
         if path:
             # This will be added when debbuging support is ported.
@@ -185,4 +184,4 @@ class Dialog(ABC):
             #     start_point = SourcePoint(line_index = line_number, char_index = 0 ),
             #     end_point = SourcePoint(line_index = line_number + 1, char_index = 0 ),
             # )
-            return
+            pass

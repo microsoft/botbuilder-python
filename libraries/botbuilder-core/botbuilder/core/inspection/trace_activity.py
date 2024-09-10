@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Union
 
 from botbuilder.core import BotState
@@ -11,7 +11,7 @@ from botbuilder.schema import Activity, ActivityTypes, ConversationReference
 def make_command_activity(command: str) -> Activity:
     return Activity(
         type=ActivityTypes.trace,
-        timestamp=datetime.utcnow(),
+        timestamp=datetime.now(timezone.utc),
         name="Command",
         label="Command",
         value=command,
@@ -22,7 +22,7 @@ def make_command_activity(command: str) -> Activity:
 def from_activity(activity: Activity, name: str, label: str) -> Activity:
     return Activity(
         type=ActivityTypes.trace,
-        timestamp=datetime.utcnow(),
+        timestamp=datetime.now(timezone.utc),
         name=name,
         label=label,
         value=activity,
@@ -33,7 +33,7 @@ def from_activity(activity: Activity, name: str, label: str) -> Activity:
 def from_state(bot_state: Union[BotState, Dict]) -> Activity:
     return Activity(
         type=ActivityTypes.trace,
-        timestamp=datetime.utcnow(),
+        timestamp=datetime.now(timezone.utc),
         name="Bot State",
         label="BotState",
         value=bot_state,

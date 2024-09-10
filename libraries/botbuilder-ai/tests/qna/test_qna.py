@@ -347,8 +347,6 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
                 self._knowledge_base_id, trace_activity.value.knowledge_base_id
             )
 
-            return result
-
     async def test_returns_answer_with_timeout(self):
         question: str = "how do I clean the stove?"
         options = QnAMakerOptions(timeout=999999)
@@ -823,7 +821,7 @@ class QnaApplicationTest(aiounittest.AsyncTestCase):
             QnAMaker, "call_train", return_value=None
         ) as mocked_call_train:
             qna = QnAMaker(QnaApplicationTest.tests_endpoint)
-            qna.call_train(feedback_records)
+            await qna.call_train(feedback_records)
 
             mocked_call_train.assert_called_once_with(feedback_records)
 

@@ -3,7 +3,7 @@
 
 import re
 from copy import copy, deepcopy
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Callable, Union, Dict
 from botframework.connector import Channels
 from botbuilder.schema import (
@@ -308,7 +308,7 @@ class TurnContext:
     ) -> ResourceResponse:
         trace_activity = Activity(
             type=ActivityTypes.trace,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             name=name,
             value=value,
             value_type=value_type,
