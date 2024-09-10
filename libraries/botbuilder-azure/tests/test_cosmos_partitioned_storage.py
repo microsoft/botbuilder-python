@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import azure.cosmos.errors as cosmos_errors
+import azure.cosmos.exceptions as cosmos_exceptions
 from azure.cosmos import documents
 import pytest
 from botbuilder.azure import CosmosDbPartitionedStorage, CosmosDbPartitionedConfig
@@ -27,8 +27,8 @@ async def reset():
     storage = CosmosDbPartitionedStorage(get_settings())
     await storage.initialize()
     try:
-        storage.client.DeleteDatabase(database_link="dbs/" + get_settings().database_id)
-    except cosmos_errors.HTTPFailure:
+        storage.client.delete_database(get_settings().database_id)
+    except cosmos_exceptions.HttpResponseError:
         pass
 
 
@@ -99,9 +99,12 @@ class TestCosmosDbPartitionedStorageConstructor:
         client = CosmosDbPartitionedStorage(settings_with_options)
         await client.initialize()
 
-        assert client.client.connection_policy.DisableSSLVerification is True
         assert (
-            client.client.default_headers["x-ms-consistency-level"]
+            client.client.client_connection.connection_policy.DisableSSLVerification
+            is True
+        )
+        assert (
+            client.client.client_connection.default_headers["x-ms-consistency-level"]
             == documents.ConsistencyLevel.Eventual
         )
 

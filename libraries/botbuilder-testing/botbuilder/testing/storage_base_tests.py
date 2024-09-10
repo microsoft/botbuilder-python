@@ -24,7 +24,7 @@ Note: Python cannot have dicts with properties with a None value like other SDKs
         assert test_ran
 """
 import pytest
-from botbuilder.azure import CosmosDbStorage
+from botbuilder.azure import CosmosDbPartitionedStorage
 from botbuilder.core import (
     ConversationState,
     TurnContext,
@@ -57,7 +57,7 @@ class StorageBaseTests:
 
     @staticmethod
     async def handle_null_keys_when_reading(storage) -> bool:
-        if isinstance(storage, (CosmosDbStorage, MemoryStorage)):
+        if isinstance(storage, (CosmosDbPartitionedStorage, MemoryStorage)):
             result = await storage.read(None)
             assert len(result.keys()) == 0
         # Catch-all
