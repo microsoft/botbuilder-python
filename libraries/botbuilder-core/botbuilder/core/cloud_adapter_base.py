@@ -436,7 +436,9 @@ class CloudAdapterBase(BotAdapter, ABC):
         if context.activity.delivery_mode == DeliveryModes.expect_replies:
             return InvokeResponse(
                 status=HTTPStatus.OK,
-                body=ExpectedReplies(activities=context.buffered_reply_activities).serialize(),
+                body=ExpectedReplies(
+                    activities=context.buffered_reply_activities
+                ).serialize(),
             )
 
         # Handle Invoke scenarios where the bot will return a specific body and return code.
