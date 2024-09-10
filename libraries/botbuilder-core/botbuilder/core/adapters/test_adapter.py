@@ -8,7 +8,7 @@
 import asyncio
 import inspect
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import uuid4
 from typing import Awaitable, Coroutine, Dict, List, Callable, Union
 from copy import copy
@@ -142,7 +142,9 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
             if activity.type is None:
                 activity.type = ActivityTypes.message
 
-            activity.channel_id = self.template.channel_id
+            if activity.channel_id is None:
+                activity.channel_id = self.template.channel_id
+
             activity.from_property = self.template.from_property
             activity.recipient = self.template.recipient
             activity.conversation = self.template.conversation
@@ -153,7 +155,7 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
         finally:
             self._conversation_lock.release()
 
-        activity.timestamp = activity.timestamp or datetime.utcnow()
+        activity.timestamp = activity.timestamp or datetime.now(timezone.utc)
         await self.run_pipeline(self.create_turn_context(activity), logic)
 
     async def send_activities(

@@ -4,7 +4,7 @@
 from typing import List
 
 from botbuilder.schema._connector_client_enums import ActivityTypes
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from msrest.serialization import Model
 from msrest.exceptions import HttpOperationError
@@ -630,7 +630,7 @@ class Activity(Model):
         """
         return Activity(
             type=ActivityTypes.message,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             from_property=ChannelAccount(
                 id=self.recipient.id if self.recipient else None,
                 name=self.recipient.name if self.recipient else None,
@@ -639,7 +639,12 @@ class Activity(Model):
                 id=self.from_property.id if self.from_property else None,
                 name=self.from_property.name if self.from_property else None,
             ),
-            reply_to_id=self.id,
+            reply_to_id=(
+                self.id
+                if type != ActivityTypes.conversation_update
+                or self.channel_id not in ["directline", "webchat"]
+                else None
+            ),
             service_url=self.service_url,
             channel_id=self.channel_id,
             conversation=ConversationAccount(
@@ -672,7 +677,7 @@ class Activity(Model):
 
         return Activity(
             type=ActivityTypes.trace,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             from_property=ChannelAccount(
                 id=self.recipient.id if self.recipient else None,
                 name=self.recipient.name if self.recipient else None,
@@ -681,7 +686,12 @@ class Activity(Model):
                 id=self.from_property.id if self.from_property else None,
                 name=self.from_property.name if self.from_property else None,
             ),
-            reply_to_id=self.id,
+            reply_to_id=(
+                self.id
+                if type != ActivityTypes.conversation_update
+                or self.channel_id not in ["directline", "webchat"]
+                else None
+            ),
             service_url=self.service_url,
             channel_id=self.channel_id,
             conversation=ConversationAccount(
@@ -737,7 +747,12 @@ class Activity(Model):
         :returns: A conversation reference for the conversation that contains this activity.
         """
         return ConversationReference(
-            activity_id=self.id,
+            activity_id=(
+                self.id
+                if type != ActivityTypes.conversation_update
+                or self.channel_id not in ["directline", "webchat"]
+                else None
+            ),
             user=self.from_property,
             bot=self.recipient,
             conversation=self.conversation,

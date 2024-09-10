@@ -40,6 +40,8 @@ class AiohttpWebSocket(WebSocket):
         try:
             message = await self._aiohttp_ws.receive()
 
+            message_data = None
+
             if message.type == WSMsgType.TEXT:
                 message_data = list(str(message.data).encode("ascii"))
             elif message.type == WSMsgType.BINARY:
