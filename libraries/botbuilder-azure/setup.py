@@ -5,7 +5,7 @@ import os
 from setuptools import setup
 
 REQUIRES = [
-    "azure-cosmos==3.2.0",
+    "azure-cosmos==4.7.0",
     "azure-storage-blob==12.7.0",
     "azure-storage-queue==12.4.0",
     "botbuilder-schema==4.17.0",
