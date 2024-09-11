@@ -2568,3 +2568,54 @@ class MeetingParticipantsEventDetails(Model):
     def __init__(self, *, members: List[TeamsMeetingMember] = None, **kwargs) -> None:
         super(MeetingParticipantsEventDetails, self).__init__(**kwargs)
         self.members = members
+
+
+class ReadReceiptInfo(Model):
+    """General information about a read receipt.
+
+    :param last_read_message_id: The id of the last read message.
+    :type last_read_message_id: str
+    """
+
+    _attribute_map = {
+        "last_read_message_id": {"key": "lastReadMessageId", "type": "str"},
+    }
+
+    def __init__(self, *, last_read_message_id: str = None, **kwargs) -> None:
+        super(ReadReceiptInfo, self).__init__(**kwargs)
+        self.last_read_message_id = last_read_message_id
+
+    @staticmethod
+    def is_message_read(compare_message_id, last_read_message_id):
+        """
+        Helper method useful for determining if a message has been read.
+        This method converts the strings to integers. If the compare_message_id is
+        less than or equal to the last_read_message_id, then the message has been read.
+
+        :param compare_message_id: The id of the message to compare.
+        :param last_read_message_id: The id of the last message read by the user.
+        :return: True if the compare_message_id is less than or equal to the last_read_message_id.
+        """
+        if not compare_message_id or not last_read_message_id:
+            return False
+
+        try:
+            compare_message_id_long = int(compare_message_id)
+            last_read_message_id_long = int(last_read_message_id)
+        except ValueError:
+            return False
+
+        return compare_message_id_long <= last_read_message_id_long
+
+    def is_message_read_instance(self, compare_message_id):
+        """
+        Helper method useful for determining if a message has been read.
+        If the compare_message_id is less than or equal to the last_read_message_id,
+        then the message has been read.
+
+        :param compare_message_id: The id of the message to compare.
+        :return: True if the compare_message_id is less than or equal to the last_read_message_id.
+        """
+        return ReadReceiptInfo.is_message_read(
+            compare_message_id, self.last_read_message_id
+        )
