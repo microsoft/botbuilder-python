@@ -80,6 +80,7 @@ from ._models_py3 import TaskModuleCardResponse
 from ._models_py3 import UserMeetingDetails
 from ._models_py3 import TeamsMeetingMember
 from ._models_py3 import MeetingParticipantsEventDetails
+from ._models_py3 import ReadReceiptInfo
 
 __all__ = [
     "AppBasedLinkQuery",
@@ -161,4 +162,5 @@ __all__ = [
     "UserMeetingDetails",
     "TeamsMeetingMember",
     "MeetingParticipantsEventDetails",
+    "ReadReceiptInfo",
 ]
