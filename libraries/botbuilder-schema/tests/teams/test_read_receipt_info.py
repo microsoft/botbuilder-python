@@ -8,9 +8,6 @@ from botbuilder.schema.teams import ReadReceiptInfo
 class TestReadReceiptInfo(aiounittest.AsyncTestCase):
     def test_read_receipt_info(self):
         # Arrange
-        last_read = "1000"
-        compare = "1000"
-        is_read = True
         test_cases = [
             ("1000", "1000", True),
             ("1001", "1000", True),
