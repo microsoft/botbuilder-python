@@ -2619,3 +2619,83 @@ class ReadReceiptInfo(Model):
         return ReadReceiptInfo.is_message_read(
             compare_message_id, self.last_read_message_id
         )
+
+
+class BotConfigAuth(Model):
+    """Specifies bot config auth, including type and suggestedActions.
+
+    :param type: The type of bot config auth.
+    :type type: str
+    :param suggested_actions: The suggested actions of bot config auth.
+    :type suggested_actions: ~botframework.connector.models.SuggestedActions
+    """
+
+    _attribute_map = {
+        "type": {"key": "type", "type": "str"},
+        "suggested_actions": {"key": "suggestedActions", "type": "SuggestedActions"},
+    }
+
+    def __init__(self, *, type: str = "auth", suggested_actions=None, **kwargs) -> None:
+        super(BotConfigAuth, self).__init__(**kwargs)
+        self.type = type
+        self.suggested_actions = suggested_actions
+
+
+class ConfigResponseBase(Model):
+    """Specifies Invoke response base, including response type.
+
+    :param response_type: Response type for invoke request
+    :type response_type: str
+    """
+
+    _attribute_map = {
+        "response_type": {"key": "responseType", "type": "str"},
+    }
+
+    def __init__(self, *, response_type: str = None, **kwargs) -> None:
+        super(ConfigResponseBase, self).__init__(**kwargs)
+        self.response_type = response_type
+
+
+class ConfigResponse(ConfigResponseBase):
+    """Envelope for Config Response Payload.
+
+    :param config: The response to the config message. Possible values: 'auth', 'task'
+    :type config: T
+    :param cache_info: Response cache info
+    :type cache_info: ~botframework.connector.teams.models.CacheInfo
+    """
+
+    _attribute_map = {
+        "config": {"key": "config", "type": "object"},
+        "cache_info": {"key": "cacheInfo", "type": "CacheInfo"},
+    }
+
+    def __init__(self, *, config=None, cache_info=None, **kwargs) -> None:
+        super(ConfigResponse, self).__init__(response_type="config", **kwargs)
+        self.config = config
+        self.cache_info = cache_info
+
+
+class ConfigTaskResponse(ConfigResponse):
+    """Envelope for Config Task Response.
+
+    This class uses TaskModuleResponseBase as the type for the config parameter.
+    """
+
+    def __init__(self, *, config=None, **kwargs) -> None:
+        super(ConfigTaskResponse, self).__init__(
+            config=config or TaskModuleResponseBase(), **kwargs
+        )
+
+
+class ConfigAuthResponse(ConfigResponse):
+    """Envelope for Config Auth Response.
+
+    This class uses BotConfigAuth as the type for the config parameter.
+    """
+
+    def __init__(self, *, config=None, **kwargs) -> None:
+        super(ConfigAuthResponse, self).__init__(
+            config=config or BotConfigAuth(), **kwargs
+        )

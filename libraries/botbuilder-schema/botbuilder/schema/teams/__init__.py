@@ -81,6 +81,10 @@ from ._models_py3 import UserMeetingDetails
 from ._models_py3 import TeamsMeetingMember
 from ._models_py3 import MeetingParticipantsEventDetails
 from ._models_py3 import ReadReceiptInfo
+from ._models_py3 import BotConfigAuth
+from ._models_py3 import ConfigAuthResponse
+from ._models_py3 import ConfigResponse
+from ._models_py3 import ConfigTaskResponse
 
 __all__ = [
     "AppBasedLinkQuery",
@@ -163,4 +167,8 @@ __all__ = [
     "TeamsMeetingMember",
     "MeetingParticipantsEventDetails",
     "ReadReceiptInfo",
+    "BotConfigAuth",
+    "ConfigAuthResponse",
+    "ConfigResponse",
+    "ConfigTaskResponse",
 ]
