@@ -186,6 +186,22 @@ class TeamsActivityHandler(ActivityHandler):
                     )
                 )
 
+            if turn_context.activity.name == "config/fetch":
+                return self._create_invoke_response(
+                    await self.on_teams_config_fetch(
+                        turn_context,
+                        turn_context.activity.value,
+                    )
+                )
+
+            if turn_context.activity.name == "config/submit":
+                return self._create_invoke_response(
+                    await self.on_teams_config_submit(
+                        turn_context,
+                        turn_context.activity.value,
+                    )
+                )
+
             return await super().on_invoke_activity(turn_context)
 
         except _InvokeResponseException as invoke_exception:
@@ -512,6 +528,32 @@ class TeamsActivityHandler(ActivityHandler):
         :param tab_submit: The tab submit invoke request value payload.
 
         :returns: A Tab Response for the request.
+        """
+        raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
+
+    async def on_teams_config_fetch(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext, config_data: any
+    ):
+        """
+        Override this in a derived class to provide logic for when a config is fetched.
+
+        :param turn_context: A context object for this turn.
+        :param config_data: The config fetch invoke request value payload.
+
+        :returns: A Config Response for the request.
+        """
+        raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
+
+    async def on_teams_config_submit(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext, config_data: any
+    ):
+        """
+        Override this in a derived class to provide logic for when a config is submitted.
+
+        :param turn_context: A context object for this turn.
+        :param config_data: The config fetch invoke request value payload.
+
+        :returns: A Config Response for the request.
         """
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
