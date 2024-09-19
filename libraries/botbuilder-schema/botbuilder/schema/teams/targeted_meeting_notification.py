@@ -16,7 +16,7 @@ class TargetedMeetingNotification(
         self,
         value: Optional[TargetedMeetingNotificationValue] = None,
         channel_data: Optional[MeetingNotificationChannelData] = None,
-        type: Optional[str] = None
+        type: Optional[str] = None,
     ):
         super().__init__(value=value, type=type)
         self.channel_data = channel_data

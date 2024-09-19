@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from typing import Any,List,Optional, Tuple
+from typing import Any, List, Optional, Tuple
 
 from botbuilder.schema.teams.meeting_notification_base import MeetingNotificationBase
 from botbuilder.schema.teams.meeting_notification_response import (

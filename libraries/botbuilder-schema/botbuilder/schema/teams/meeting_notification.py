@@ -19,12 +19,11 @@ class MeetingNotification(Generic[T], MeetingNotificationBase):
         Converts the MeetingNotification object to JSON.
         :return: JSON representation of the MeetingNotification object.
         """
-        value_dict = self.value.to_dict() if self.value and hasattr(self.value, 'to_dict') else self.value
+        value_dict = (
+            self.value.to_dict()
+            if self.value and hasattr(self.value, "to_dict")
+            else self.value
+        )
         return json.dumps(
-            {
-                "type": self.type,
-                "value": value_dict
-            },
-            sort_keys=True,
-            indent=4
+            {"type": self.type, "value": value_dict}, sort_keys=True, indent=4
         )

@@ -15,11 +15,4 @@ class MeetingNotificationBase:
         Converts the MeetingNotificationBase object to JSON.
         :return: JSON representation of the MeetingNotificationBase object.
         """
-        return json.dumps(
-            {
-                "type": self.type
-            },
-            sort_keys=True,
-            indent=4
-        )
-    
+        return json.dumps({"type": self.type}, sort_keys=True, indent=4)
