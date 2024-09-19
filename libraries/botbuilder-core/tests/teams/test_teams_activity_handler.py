@@ -33,6 +33,7 @@ from botbuilder.schema.teams import (
     TabSubmit,
     TabContext,
     MeetingParticipantsEventDetails,
+    ReadReceiptInfo,
 )
 from botframework.connector import Channels
 from simple_adapter import SimpleAdapter
@@ -314,9 +315,25 @@ class TestingTeamsActivityHandler(TeamsActivityHandler):
         self.record.append("on_teams_tab_submit")
         return await super().on_teams_tab_submit(turn_context, tab_submit)
 
+    async def on_teams_config_fetch(self, turn_context: TurnContext, config_data: any):
+        self.record.append("on_teams_config_fetch")
+        return await super().on_teams_config_fetch(turn_context, config_data)
+
+    async def on_teams_config_submit(self, turn_context: TurnContext, config_data: any):
+        self.record.append("on_teams_config_submit")
+        return await super().on_teams_config_submit(turn_context, config_data)
+
     async def on_event_activity(self, turn_context: TurnContext):
         self.record.append("on_event_activity")
         return await super().on_event_activity(turn_context)
+
+    async def on_teams_read_receipt_event(
+        self, read_receipt_info: ReadReceiptInfo, turn_context: TurnContext
+    ):
+        self.record.append("on_teams_read_receipt_event")
+        return await super().on_teams_read_receipt_event(
+            turn_context.activity.value, turn_context
+        )
 
     async def on_teams_meeting_start_event(
         self, meeting: MeetingStartEventDetails, turn_context: TurnContext
@@ -1117,6 +1134,50 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         assert bot.record[0] == "on_invoke_activity"
         assert bot.record[1] == "on_teams_tab_submit"
 
+    async def test_on_teams_config_fetch(self):
+        # Arrange
+        activity = Activity(
+            type=ActivityTypes.invoke,
+            name="config/fetch",
+            value={
+                "data": {"key": "value", "type": "config/fetch"},
+                "context": {"theme": "default"},
+            },
+        )
+
+        turn_context = TurnContext(SimpleAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        # Assert
+        assert len(bot.record) == 2
+        assert bot.record[0] == "on_invoke_activity"
+        assert bot.record[1] == "on_teams_config_fetch"
+
+    async def test_on_teams_config_submit(self):
+        # Arrange
+        activity = Activity(
+            type=ActivityTypes.invoke,
+            name="config/submit",
+            value={
+                "data": {"key": "value", "type": "config/submit"},
+                "context": {"theme": "default"},
+            },
+        )
+
+        turn_context = TurnContext(SimpleAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        # Assert
+        assert len(bot.record) == 2
+        assert bot.record[0] == "on_invoke_activity"
+        assert bot.record[1] == "on_teams_config_submit"
+
     async def test_on_end_of_conversation_activity(self):
         activity = Activity(type=ActivityTypes.end_of_conversation)
 
@@ -1140,6 +1201,24 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
 
         assert len(bot.record) == 1
         assert bot.record[0] == "on_typing_activity"
+
+    async def test_on_teams_read_receipt_event(self):
+        activity = Activity(
+            type=ActivityTypes.event,
+            name="application/vnd.microsoft.readReceipt",
+            channel_id=Channels.ms_teams,
+            value={"lastReadMessageId": "10101010"},
+        )
+
+        turn_context = TurnContext(SimpleAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        assert len(bot.record) == 2
+        assert bot.record[0] == "on_event_activity"
+        assert bot.record[1] == "on_teams_read_receipt_event"
 
     async def test_on_teams_meeting_start_event(self):
         activity = Activity(

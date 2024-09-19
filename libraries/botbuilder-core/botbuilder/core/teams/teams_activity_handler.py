@@ -28,6 +28,7 @@ from botbuilder.schema.teams import (
     TabRequest,
     TabSubmit,
     MeetingParticipantsEventDetails,
+    ReadReceiptInfo,
 )
 from botframework.connector import Channels
 from ..serializer_helper import deserializer_helper
@@ -182,6 +183,22 @@ class TeamsActivityHandler(ActivityHandler):
                     await self.on_teams_tab_submit(
                         turn_context,
                         deserializer_helper(TabSubmit, turn_context.activity.value),
+                    )
+                )
+
+            if turn_context.activity.name == "config/fetch":
+                return self._create_invoke_response(
+                    await self.on_teams_config_fetch(
+                        turn_context,
+                        turn_context.activity.value,
+                    )
+                )
+
+            if turn_context.activity.name == "config/submit":
+                return self._create_invoke_response(
+                    await self.on_teams_config_submit(
+                        turn_context,
+                        turn_context.activity.value,
                     )
                 )
 
@@ -511,6 +528,32 @@ class TeamsActivityHandler(ActivityHandler):
         :param tab_submit: The tab submit invoke request value payload.
 
         :returns: A Tab Response for the request.
+        """
+        raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
+
+    async def on_teams_config_fetch(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext, config_data: any
+    ):
+        """
+        Override this in a derived class to provide logic for when a config is fetched.
+
+        :param turn_context: A context object for this turn.
+        :param config_data: The config fetch invoke request value payload.
+
+        :returns: A Config Response for the request.
+        """
+        raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
+
+    async def on_teams_config_submit(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext, config_data: any
+    ):
+        """
+        Override this in a derived class to provide logic for when a config is submitted.
+
+        :param turn_context: A context object for this turn.
+        :param config_data: The config fetch invoke request value payload.
+
+        :returns: A Config Response for the request.
         """
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
@@ -906,6 +949,10 @@ class TeamsActivityHandler(ActivityHandler):
             the scope of a channel.
         """
         if turn_context.activity.channel_id == Channels.ms_teams:
+            if turn_context.activity.name == "application/vnd.microsoft.readReceipt":
+                return await self.on_teams_read_receipt_event(
+                    turn_context.activity.value, turn_context
+                )
             if turn_context.activity.name == "application/vnd.microsoft.meetingStart":
                 return await self.on_teams_meeting_start_event(
                     turn_context.activity.value, turn_context
@@ -930,6 +977,19 @@ class TeamsActivityHandler(ActivityHandler):
                 )
 
         return await super().on_event_activity(turn_context)
+
+    async def on_teams_read_receipt_event(
+        self, read_receipt_info: ReadReceiptInfo, turn_context: TurnContext
+    ):  # pylint: disable=unused-argument
+        """
+        Override this in a derived class to provide logic for when the bot receives a read receipt event.
+
+        :param read_receipt_info: Information regarding the read receipt. i.e. Id of the message last read by the user.
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
+        return
 
     async def on_teams_meeting_start_event(
         self, meeting: MeetingStartEventDetails, turn_context: TurnContext

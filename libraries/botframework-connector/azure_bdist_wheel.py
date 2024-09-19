@@ -555,9 +555,7 @@ class azure_bdist_wheel(bdist_wheel):
         for azure_sub_package in folder_with_init:
             init_file = os.path.join(bdist_dir, azure_sub_package, "__init__.py")
             if os.path.isfile(init_file):
-                logger.info(
-                    "manually remove {} while building the wheel".format(init_file)
-                )
+                logger.info("manually remove %s while building the wheel", init_file)
                 os.remove(init_file)
             else:
                 raise ValueError(

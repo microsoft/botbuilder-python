@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 from botbuilder.schema import (
     Activity,
@@ -51,7 +51,7 @@ class ActivityUtil:
 
         reply = Activity(
             type=ActivityTypes.trace,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             from_property=from_property,
             recipient=ChannelAccount(
                 id=turn_activity.from_property.id, name=turn_activity.from_property.name

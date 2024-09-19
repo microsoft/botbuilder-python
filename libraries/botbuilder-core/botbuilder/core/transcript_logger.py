@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 """Logs incoming and outgoing activities to a TranscriptStore.."""
 
-import datetime
+from datetime import datetime, timezone
 import copy
 import random
 import string
@@ -86,11 +86,11 @@ class TranscriptLoggerMiddleware(Middleware):
                     prefix = "g_" + "".join(
                         random.choice(alphanumeric) for i in range(5)
                     )
-                    epoch = datetime.datetime.utcfromtimestamp(0)
+                    epoch = datetime.fromtimestamp(0, timezone.utc)
                     if cloned_activity.timestamp:
                         reference = cloned_activity.timestamp
                     else:
-                        reference = datetime.datetime.today()
+                        reference = datetime.now(timezone.utc)
                     delta = (reference - epoch).total_seconds() * 1000
                     cloned_activity.id = f"{prefix}{delta}"
                 await self.log_activity(transcript, cloned_activity)

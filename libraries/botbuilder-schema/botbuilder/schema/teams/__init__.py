@@ -94,6 +94,11 @@ from .surface_type import SurfaceType
 from .surface import Surface
 from .targeted_meeting_notification import TargetedMeetingNotification
 from .targeted_meeting_notification_value import TargetedMeetingNotificationValue
+from ._models_py3 import ReadReceiptInfo
+from ._models_py3 import BotConfigAuth
+from ._models_py3 import ConfigAuthResponse
+from ._models_py3 import ConfigResponse
+from ._models_py3 import ConfigTaskResponse
 
 __all__ = [
     "AppBasedLinkQuery",
@@ -187,4 +192,9 @@ __all__ = [
     "Surface",
     "TargetedMeetingNotification",
     "TargetedMeetingNotificationValue",
+    "ReadReceiptInfo",
+    "BotConfigAuth",
+    "ConfigAuthResponse",
+    "ConfigResponse",
+    "ConfigTaskResponse",
 ]

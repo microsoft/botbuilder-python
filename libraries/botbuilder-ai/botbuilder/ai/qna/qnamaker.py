@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import asyncio
 import json
 from typing import Dict, List, NamedTuple, Union
 from aiohttp import ClientSession, ClientTimeout
@@ -52,8 +53,16 @@ class QnAMaker(QnAMakerTelemetryClient):
         opt = options or QnAMakerOptions()
         self._validate_options(opt)
 
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+
         instance_timeout = ClientTimeout(total=opt.timeout / 1000)
-        self._http_client = http_client or ClientSession(timeout=instance_timeout)
+        self._http_client = http_client or ClientSession(
+            timeout=instance_timeout, loop=loop
+        )
 
         self.telemetry_client: Union[BotTelemetryClient, NullTelemetryClient] = (
             telemetry_client or NullTelemetryClient()
