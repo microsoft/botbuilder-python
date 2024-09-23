@@ -2799,7 +2799,9 @@ class MeetingNotification(MeetingNotificationBase):
         "value": {"key": "value", "type": "TargetedMeetingNotificationValue"},
     }
 
-    def __init__(self, *, value: "TargetedMeetingNotificationValue" =None, **kwargs) -> None:
+    def __init__(
+        self, *, value: "TargetedMeetingNotificationValue" = None, **kwargs
+    ) -> None:
         super(MeetingNotification, self).__init__(**kwargs)
         self.value = value
 
@@ -2953,20 +2955,14 @@ class TargetedMeetingNotificationValue(Model):
     }
 
     def __init__(
-        self,
-        *,
-        recipients: List[str] = None,
-        surfaces: List[Surface] = None,
-        **kwargs
+        self, *, recipients: List[str] = None, surfaces: List[Surface] = None, **kwargs
     ):
         super(TargetedMeetingNotificationValue, self).__init__(**kwargs)
         self.recipients = recipients
         self.surfaces = surfaces
 
 
-class TargetedMeetingNotification(
-    MeetingNotification
-):
+class TargetedMeetingNotification(MeetingNotification):
     """Specifies Teams targeted meeting notification.
 
     :param value: The value of the TargetedMeetingNotification.
