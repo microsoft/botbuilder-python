@@ -85,6 +85,8 @@ from ._models_py3 import BotConfigAuth
 from ._models_py3 import ConfigAuthResponse
 from ._models_py3 import ConfigResponse
 from ._models_py3 import ConfigTaskResponse
+from ._models_py3 import MeetingNotificationBase
+from ._models_py3 import MeetingNotificationResponse
 
 __all__ = [
     "AppBasedLinkQuery",
@@ -171,4 +173,6 @@ __all__ = [
     "ConfigAuthResponse",
     "ConfigResponse",
     "ConfigTaskResponse",
+    "MeetingNotificationBase",
+    "MeetingNotificationResponse",
 ]
