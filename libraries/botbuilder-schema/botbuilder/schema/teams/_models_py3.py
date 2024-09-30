@@ -88,17 +88,23 @@ class ChannelInfo(Model):
     :type id: str
     :param name: Name of the channel
     :type name: str
+    :param type: The channel type
+    :type type: str
     """
 
     _attribute_map = {
         "id": {"key": "id", "type": "str"},
         "name": {"key": "name", "type": "str"},
+        "type": {"key": "type", "type": "str"},
     }
 
-    def __init__(self, *, id: str = None, name: str = None, **kwargs) -> None:
+    def __init__(
+        self, *, id: str = None, name: str = None, type: str = None, **kwargs
+    ) -> None:
         super(ChannelInfo, self).__init__(**kwargs)
         self.id = id
         self.name = name
+        self.type = type
 
 
 class CacheInfo(Model):
@@ -1821,6 +1827,8 @@ class TeamDetails(Model):
     :type channel_count: int
     :param member_count: The count of members in the team.
     :type member_count: int
+    :param type: The team type
+    :type type: str
     """
 
     _attribute_map = {
@@ -1829,6 +1837,7 @@ class TeamDetails(Model):
         "aad_group_id": {"key": "aadGroupId", "type": "str"},
         "channel_count": {"key": "channelCount", "type": "int"},
         "member_count": {"key": "memberCount", "type": "int"},
+        "type": {"key": "type", "type": "str"},
     }
 
     def __init__(
@@ -1839,6 +1848,7 @@ class TeamDetails(Model):
         aad_group_id: str = None,
         member_count: int = None,
         channel_count: int = None,
+        type: str = None,
         **kwargs
     ) -> None:
         super(TeamDetails, self).__init__(**kwargs)
@@ -1847,6 +1857,7 @@ class TeamDetails(Model):
         self.aad_group_id = aad_group_id
         self.channel_count = channel_count
         self.member_count = member_count
+        self.type = type
 
 
 class TeamInfo(Model):
@@ -1959,6 +1970,26 @@ class TeamsPagedMembersResult(PagedMembersResult):
         self.members = members
 
 
+class TeamsChannelDataSettings(Model):
+    """
+    Represents the settings information for a Teams channel data.
+
+    :param selected_channel: Information about the selected Teams channel.
+    :type selected_channel: ~botframework.connector.teams.models.ChannelInfo
+    :param additional_properties: Gets or sets properties that are not otherwise defined by the
+     type but that might appear in the REST JSON object.
+    :type additional_properties: object
+    """
+
+    _attribute_map = {
+        "selected_channel": {"key": "selectedChannel", "type": "ChannelInfo"},
+    }
+
+    def __init__(self, *, selected_channel=None, **kwargs) -> None:
+        super(TeamsChannelDataSettings, self).__init__(**kwargs)
+        self.selected_channel = selected_channel
+
+
 class TeamsChannelData(Model):
     """Channel data specific to messages received in Microsoft Teams.
 
@@ -1975,6 +2006,8 @@ class TeamsChannelData(Model):
     :type tenant: ~botframework.connector.teams.models.TenantInfo
     :param meeting: Information about the meeting in which the message was sent
     :type meeting: ~botframework.connector.teams.models.TeamsMeetingInfo
+    :param meeting: Information about the about the settings in which the message was sent
+    :type meeting: ~botframework.connector.teams.models.TeamsChannelDataSettings
     """
 
     _attribute_map = {
@@ -1984,6 +2017,7 @@ class TeamsChannelData(Model):
         "notification": {"key": "notification", "type": "NotificationInfo"},
         "tenant": {"key": "tenant", "type": "TenantInfo"},
         "meeting": {"key": "meeting", "type": "TeamsMeetingInfo"},
+        "settings": {"key": "settings", "type": "TeamsChannelDataSettings"},
     }
 
     def __init__(
@@ -1995,6 +2029,7 @@ class TeamsChannelData(Model):
         notification=None,
         tenant=None,
         meeting=None,
+        settings: TeamsChannelDataSettings = None,
         **kwargs
     ) -> None:
         super(TeamsChannelData, self).__init__(**kwargs)
@@ -2005,6 +2040,7 @@ class TeamsChannelData(Model):
         self.notification = notification
         self.tenant = tenant
         self.meeting = meeting
+        self.settings = settings
 
 
 class TenantInfo(Model):

@@ -59,6 +59,7 @@ from ._models_py3 import TaskModuleTaskInfo
 from ._models_py3 import TeamDetails
 from ._models_py3 import TeamInfo
 from ._models_py3 import TeamsChannelAccount
+from ._models_py3 import TeamsChannelDataSettings
 from ._models_py3 import TeamsChannelData
 from ._models_py3 import TeamsPagedMembersResult
 from ._models_py3 import TenantInfo
@@ -147,6 +148,7 @@ __all__ = [
     "TeamDetails",
     "TeamInfo",
     "TeamsChannelAccount",
+    "TeamsChannelDataSettings",
     "TeamsChannelData",
     "TeamsPagedMembersResult",
     "TenantInfo",

@@ -31,6 +31,23 @@ def teams_get_channel_id(activity: Activity) -> str:
     return None
 
 
+def teams_get_selected_channel_id(activity: Activity) -> str:
+    if not activity:
+        return None
+
+    if activity.channel_data:
+        channel_data = TeamsChannelData().deserialize(activity.channel_data)
+        return (
+            channel_data.settings.selected_channel.id
+            if channel_data
+            and channel_data.settings
+            and channel_data.settings.selected_channel
+            else None
+        )
+
+    return None
+
+
 def teams_get_team_info(activity: Activity) -> TeamInfo:
     if not activity:
         return None

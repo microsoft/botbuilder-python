@@ -7,6 +7,7 @@ from botbuilder.schema import Activity
 from botbuilder.schema.teams import TeamInfo
 from botbuilder.core.teams import (
     teams_get_channel_id,
+    teams_get_selected_channel_id,
     teams_get_team_info,
     teams_notify_user,
 )
@@ -25,6 +26,35 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
 
         # Assert
         assert result == "id123"
+
+    def test_teams_get_selected_channel_id(self):
+        # Arrange
+        activity = Activity(
+            channel_data={
+                "channel": {"id": "id123", "name": "channel_name"},
+                "settings": {
+                    "selectedChannel": {"id": "id12345", "name": "channel_name"}
+                },
+            }
+        )
+
+        # Act
+        result = teams_get_selected_channel_id(activity)
+
+        # Assert
+        assert result == "id12345"
+
+    def test_teams_get_selected_channel_id_with_no_selected_channel(self):
+        # Arrange
+        activity = Activity(
+            channel_data={"channel": {"id": "id123", "name": "channel_name"}}
+        )
+
+        # Act
+        result = teams_get_selected_channel_id(activity)
+
+        # Assert
+        assert result is None
 
     def test_teams_get_channel_id_with_no_channel(self):
         # Arrange
