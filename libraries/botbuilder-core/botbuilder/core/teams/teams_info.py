@@ -25,6 +25,8 @@ from botbuilder.schema.teams import (
     TeamsChannelAccount,
     TeamsPagedMembersResult,
     TeamsMeetingParticipant,
+    MeetingNotificationBase,
+    MeetingNotificationResponse,
 )
 
 
@@ -99,6 +101,31 @@ class TeamsInfo:
             old_ref, TeamsInfo._create_conversation_callback, conversation_parameters
         )
         return (result[0], result[1])
+
+    @staticmethod
+    async def send_meeting_notification(
+        turn_context: TurnContext,
+        notification: MeetingNotificationBase,
+        meeting_id: str = None,
+    ) -> MeetingNotificationResponse:
+        meeting_id = (
+            meeting_id
+            if meeting_id
+            else teams_get_meeting_info(turn_context.activity).id
+        )
+        if meeting_id is None:
+            raise TypeError(
+                "TeamsInfo._send_meeting_notification: method requires a meeting_id or "
+                "TurnContext that contains a meeting id"
+            )
+
+        if notification is None:
+            raise TypeError("notification is required.")
+
+        connector_client = await TeamsInfo.get_teams_connector_client(turn_context)
+        return await connector_client.teams.send_meeting_notification(
+            meeting_id, notification
+        )
 
     @staticmethod
     async def _create_conversation_callback(

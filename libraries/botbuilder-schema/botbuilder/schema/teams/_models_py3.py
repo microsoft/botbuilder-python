@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from enum import Enum
 from typing import List
 from msrest.serialization import Model
 from botbuilder.schema import (
@@ -2735,3 +2736,291 @@ class ConfigAuthResponse(ConfigResponse):
         super(ConfigAuthResponse, self).__init__(
             config=config or BotConfigAuth(), **kwargs
         )
+
+
+class OnBehalfOf(Model):
+    """Specifies attribution for notifications.
+
+    :param item_id: The identification of the item. Default is 0.
+    :type item_id: int
+    :param mention_type: The mention type. Default is "person".
+    :type mention_type: str
+    :param mri: Message resource identifier (MRI) of the person on whose behalf the message is sent.
+    :type mri: str
+    :param display_name: Name of the person. Used as fallback in case name resolution is unavailable.
+    :type display_name: str
+    """
+
+    _attribute_map = {
+        "item_id": {"key": "itemid", "type": "int"},
+        "mention_type": {"key": "mentionType", "type": "str"},
+        "mri": {"key": "mri", "type": "str"},
+        "display_name": {"key": "displayName", "type": "str"},
+    }
+
+    def __init__(
+        self,
+        *,
+        item_id: int = 0,
+        mention_type: str = "person",
+        mri: str = None,
+        display_name: str = None,
+        **kwargs
+    ) -> None:
+        super(OnBehalfOf, self).__init__(**kwargs)
+        self.item_id = item_id
+        self.mention_type = mention_type
+        self.mri = mri
+        self.display_name = display_name
+
+
+class SurfaceType(Enum):
+    """
+    Defines Teams Surface type for use with a Surface object.
+
+    :var Unknown: TeamsSurfaceType is Unknown.
+    :vartype Unknown: int
+    :var MeetingStage: TeamsSurfaceType is MeetingStage..
+    :vartype MeetingStage: int
+    :var MeetingTabIcon: TeamsSurfaceType is MeetingTabIcon.
+    :vartype MeetingTabIcon: int
+    """
+
+    Unknown = 0
+
+    MeetingStage = 1
+
+    MeetingTabIcon = 2
+
+
+class ContentType(Enum):
+    """
+    Defines content type. Depending on contentType, content field will have a different structure.
+
+    :var Unknown: Content type is Unknown.
+    :vartype Unknown: int
+    :var Task: TContent type is Task.
+    :vartype Task: int
+    """
+
+    Unknown = 0
+
+    Task = 1
+
+
+class MeetingNotificationBase(Model):
+    """Specifies Bot meeting notification base including channel data and type.
+
+    :param type: Type of Bot meeting notification.
+    :type type: str
+    """
+
+    _attribute_map = {
+        "type": {"key": "type", "type": "str"},
+    }
+
+    def __init__(self, *, type: str = None, **kwargs) -> None:
+        super(MeetingNotificationBase, self).__init__(**kwargs)
+        self.type = type
+
+
+class MeetingNotification(MeetingNotificationBase):
+    """Specifies Bot meeting notification including meeting notification value.
+
+    :param value: Teams Bot meeting notification value.
+    :type value: TargetedMeetingNotificationValue
+    """
+
+    _attribute_map = {
+        "value": {"key": "value", "type": "TargetedMeetingNotificationValue"},
+    }
+
+    def __init__(
+        self, *, value: "TargetedMeetingNotificationValue" = None, **kwargs
+    ) -> None:
+        super(MeetingNotification, self).__init__(**kwargs)
+        self.value = value
+
+
+class MeetingNotificationChannelData(Model):
+    """Specify Teams Bot meeting notification channel data.
+
+    :param on_behalf_of_list: The Teams Bot meeting notification's OnBehalfOf list.
+    :type on_behalf_of_list: list[~botframework.connector.teams.models.OnBehalfOf]
+    """
+
+    _attribute_map = {
+        "on_behalf_of_list": {"key": "OnBehalfOf", "type": "[OnBehalfOf]"}
+    }
+
+    def __init__(self, *, on_behalf_of_list: List["OnBehalfOf"] = None, **kwargs):
+        super(MeetingNotificationChannelData, self).__init__(**kwargs)
+        self.on_behalf_of_list = on_behalf_of_list
+
+
+class MeetingNotificationRecipientFailureInfo(Model):
+    """Information regarding failure to notify a recipient of a meeting notification.
+
+    :param recipient_mri: The MRI for a recipient meeting notification failure.
+    :type recipient_mri: str
+    :param error_code: The error code for a meeting notification.
+    :type error_code: str
+    :param failure_reason: The reason why a participant meeting notification failed.
+    :type failure_reason: str
+    """
+
+    _attribute_map = {
+        "recipient_mri": {"key": "recipientMri", "type": "str"},
+        "error_code": {"key": "errorcode", "type": "str"},
+        "failure_reason": {"key": "failureReason", "type": "str"},
+    }
+
+    def __init__(
+        self,
+        *,
+        recipient_mri: str = None,
+        error_code: str = None,
+        failure_reason: str = None,
+        **kwargs
+    ):
+        super(MeetingNotificationRecipientFailureInfo, self).__init__(**kwargs)
+        self.recipient_mri = recipient_mri
+        self.error_code = error_code
+        self.failure_reason = failure_reason
+
+
+class MeetingNotificationResponse(Model):
+    """Specifies Bot meeting notification response.
+
+    Contains list of MeetingNotificationRecipientFailureInfo.
+
+    :param recipients_failure_info: The list of MeetingNotificationRecipientFailureInfo.
+    :type recipients_failure_info: list[~botframework.connector.teams.models.MeetingNotificationRecipientFailureInfo]
+    """
+
+    _attribute_map = {
+        "recipients_failure_info": {
+            "key": "recipientsFailureInfo",
+            "type": "[MeetingNotificationRecipientFailureInfo]",
+        }
+    }
+
+    def __init__(
+        self,
+        *,
+        recipients_failure_info: List["MeetingNotificationRecipientFailureInfo"] = None,
+        **kwargs
+    ):
+        super(MeetingNotificationResponse, self).__init__(**kwargs)
+        self.recipients_failure_info = recipients_failure_info
+
+
+class Surface(Model):
+    """Specifies where the notification will be rendered in the meeting UX.
+
+    :param type: The value indicating where the notification will be rendered in the meeting UX.
+    :type type: ~botframework.connector.teams.models.SurfaceType
+    """
+
+    _attribute_map = {
+        "type": {"key": "surface", "type": "SurfaceType"},
+    }
+
+    def __init__(self, *, type: SurfaceType = None, **kwargs):
+        super(Surface, self).__init__(**kwargs)
+        self.type = type
+
+
+class MeetingStageSurface(Surface):
+    """Specifies meeting stage surface.
+
+    :param content_type: The content type of this MeetingStageSurface.
+    :type content_type: ~botframework.connector.teams.models.ContentType
+    :param content: The content of this MeetingStageSurface.
+    :type content: object
+    """
+
+    _attribute_map = {
+        "content_type": {"key": "contentType", "type": "ContentType"},
+        "content": {"key": "content", "type": "object"},
+    }
+
+    def __init__(
+        self,
+        *,
+        content_type: ContentType = ContentType.Task,
+        content: object = None,
+        **kwargs
+    ):
+        super(MeetingStageSurface, self).__init__(SurfaceType.MeetingStage, **kwargs)
+        self.content_type = content_type
+        self.content = content
+
+
+class MeetingTabIconSurface(Surface):
+    """
+    Specifies meeting tab icon surface.
+
+    :param tab_entity_id: The tab entity Id of this MeetingTabIconSurface.
+    :type tab_entity_id: str
+    """
+
+    _attribute_map = {
+        "tab_entity_id": {"key": "tabEntityId", "type": "str"},
+    }
+
+    def __init__(self, *, tab_entity_id: str = None, **kwargs):
+        super(MeetingTabIconSurface, self).__init__(
+            SurfaceType.MeetingTabIcon, **kwargs
+        )
+        self.tab_entity_id = tab_entity_id
+
+
+class TargetedMeetingNotificationValue(Model):
+    """Specifies the targeted meeting notification value, including recipients and surfaces.
+
+    :param recipients: The collection of recipients of the targeted meeting notification.
+    :type recipients: list[str]
+    :param surfaces: The collection of surfaces on which to show the notification.
+    :type surfaces: list[~botframework.connector.teams.models.Surface]
+    """
+
+    _attribute_map = {
+        "recipients": {"key": "recipients", "type": "[str]"},
+        "surfaces": {"key": "surfaces", "type": "[Surface]"},
+    }
+
+    def __init__(
+        self, *, recipients: List[str] = None, surfaces: List[Surface] = None, **kwargs
+    ):
+        super(TargetedMeetingNotificationValue, self).__init__(**kwargs)
+        self.recipients = recipients
+        self.surfaces = surfaces
+
+
+class TargetedMeetingNotification(MeetingNotification):
+    """Specifies Teams targeted meeting notification.
+
+    :param value: The value of the TargetedMeetingNotification.
+    :type value: ~botframework.connector.teams.models.TargetedMeetingNotificationValue
+    :param channel_data: Teams Bot meeting notification channel data.
+    :type channel_data: ~botframework.connector.teams.models.MeetingNotificationChannelData
+    """
+
+    _attribute_map = {
+        "value": {"key": "value", "type": "TargetedMeetingNotificationValue"},
+        "channel_data": {
+            "key": "channelData",
+            "type": "MeetingNotificationChannelData",
+        },
+    }
+
+    def __init__(
+        self,
+        *,
+        value: "TargetedMeetingNotificationValue" = None,
+        channel_data: "MeetingNotificationChannelData" = None,
+        **kwargs
+    ):
+        super(TargetedMeetingNotification, self).__init__(value=value, **kwargs)
+        self.channel_data = channel_data
