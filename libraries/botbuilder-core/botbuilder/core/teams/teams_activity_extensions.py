@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from typing import List
 from botbuilder.schema import Activity
 from botbuilder.schema.teams import (
     NotificationInfo,
@@ -87,7 +88,7 @@ def teams_get_meeting_info(activity: Activity) -> TeamsMeetingInfo:
     return None
 
 
-def teams_get_team_on_behalf_of(activity: Activity) -> list[OnBehalfOf]:
+def teams_get_team_on_behalf_of(activity: Activity) -> List[OnBehalfOf]:
     if not activity:
         return None
 
