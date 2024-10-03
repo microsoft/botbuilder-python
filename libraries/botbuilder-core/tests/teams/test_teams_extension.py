@@ -12,7 +12,10 @@ from botbuilder.core.teams import (
     teams_get_team_info,
     teams_notify_user,
 )
-from botbuilder.core.teams.teams_activity_extensions import teams_get_meeting_info, teams_get_team_on_behalf_of
+from botbuilder.core.teams.teams_activity_extensions import (
+    teams_get_meeting_info,
+    teams_get_team_on_behalf_of,
+)
 from botbuilder.schema.teams._models_py3 import OnBehalfOf
 
 
