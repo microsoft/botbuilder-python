@@ -7,6 +7,7 @@ from botbuilder.schema.teams import (
     TeamsChannelData,
     TeamInfo,
     TeamsMeetingInfo,
+    OnBehalfOf,
 )
 
 
@@ -82,5 +83,16 @@ def teams_get_meeting_info(activity: Activity) -> TeamsMeetingInfo:
     if activity.channel_data:
         channel_data = TeamsChannelData().deserialize(activity.channel_data)
         return channel_data.meeting
+
+    return None
+
+
+def teams_get_team_on_behalf_of(activity: Activity) -> list[OnBehalfOf]:
+    if not activity:
+        return None
+
+    if activity.channel_data:
+        channel_data = TeamsChannelData().deserialize(activity.channel_data)
+        return channel_data.on_behalf_of
 
     return None
