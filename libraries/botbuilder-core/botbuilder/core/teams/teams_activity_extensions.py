@@ -1,12 +1,14 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from typing import List
 from botbuilder.schema import Activity
 from botbuilder.schema.teams import (
     NotificationInfo,
     TeamsChannelData,
     TeamInfo,
     TeamsMeetingInfo,
+    OnBehalfOf,
 )
 
 
@@ -82,5 +84,16 @@ def teams_get_meeting_info(activity: Activity) -> TeamsMeetingInfo:
     if activity.channel_data:
         channel_data = TeamsChannelData().deserialize(activity.channel_data)
         return channel_data.meeting
+
+    return None
+
+
+def teams_get_team_on_behalf_of(activity: Activity) -> List[OnBehalfOf]:
+    if not activity:
+        return None
+
+    if activity.channel_data:
+        channel_data = TeamsChannelData().deserialize(activity.channel_data)
+        return channel_data.on_behalf_of
 
     return None

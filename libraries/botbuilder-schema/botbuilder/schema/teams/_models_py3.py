@@ -2006,8 +2006,10 @@ class TeamsChannelData(Model):
     :type tenant: ~botframework.connector.teams.models.TenantInfo
     :param meeting: Information about the meeting in which the message was sent
     :type meeting: ~botframework.connector.teams.models.TeamsMeetingInfo
-    :param meeting: Information about the about the settings in which the message was sent
-    :type meeting: ~botframework.connector.teams.models.TeamsChannelDataSettings
+    :param settings: Information about the about the settings in which the message was sent
+    :type settings: ~botframework.connector.teams.models.TeamsChannelDataSettings
+    :param on_behalf_of: The OnBehalfOf list for user attribution
+    :type on_behalf_of: list[~botframework.connector.teams.models.OnBehalfOf]
     """
 
     _attribute_map = {
@@ -2018,6 +2020,7 @@ class TeamsChannelData(Model):
         "tenant": {"key": "tenant", "type": "TenantInfo"},
         "meeting": {"key": "meeting", "type": "TeamsMeetingInfo"},
         "settings": {"key": "settings", "type": "TeamsChannelDataSettings"},
+        "on_behalf_of": {"key": "onBehalfOf", "type": "[OnBehalfOf]"},
     }
 
     def __init__(
@@ -2030,6 +2033,7 @@ class TeamsChannelData(Model):
         tenant=None,
         meeting=None,
         settings: TeamsChannelDataSettings = None,
+        on_behalf_of: List["OnBehalfOf"] = None,
         **kwargs
     ) -> None:
         super(TeamsChannelData, self).__init__(**kwargs)
@@ -2041,6 +2045,7 @@ class TeamsChannelData(Model):
         self.tenant = tenant
         self.meeting = meeting
         self.settings = settings
+        self.on_behalf_of = on_behalf_of if on_behalf_of is not None else []
 
 
 class TenantInfo(Model):
