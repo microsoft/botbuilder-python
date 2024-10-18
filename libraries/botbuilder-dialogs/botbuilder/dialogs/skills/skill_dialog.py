@@ -283,9 +283,12 @@ class SkillDialog(Dialog):
             return False
 
         oauth_card_attachment = next(
-            attachment
-            for attachment in activity.attachments
-            if attachment.content_type == ContentTypes.oauth_card
+            (
+                attachment
+                for attachment in activity.attachments
+                if attachment.content_type == ContentTypes.oauth_card
+            ),
+            None,
         )
         if oauth_card_attachment is None:
             return False
@@ -299,7 +302,9 @@ class SkillDialog(Dialog):
             return False
 
         try:
-            settings = OAuthPromptSettings(connection_name=connection_name)
+            settings = OAuthPromptSettings(
+                connection_name=connection_name, title="Sign In"
+            )
             result = await _UserTokenAccess.exchange_token(
                 context,
                 settings,
