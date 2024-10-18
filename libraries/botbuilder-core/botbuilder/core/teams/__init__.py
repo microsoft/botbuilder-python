@@ -9,6 +9,7 @@ from .teams_activity_handler import TeamsActivityHandler
 from .teams_info import TeamsInfo
 from .teams_activity_extensions import (
     teams_get_channel_id,
+    teams_get_selected_channel_id,
     teams_get_team_info,
     teams_notify_user,
 )
@@ -19,6 +20,7 @@ __all__ = [
     "TeamsInfo",
     "TeamsSSOTokenExchangeMiddleware",
     "teams_get_channel_id",
+    "teams_get_selected_channel_id",
     "teams_get_team_info",
     "teams_notify_user",
 ]
