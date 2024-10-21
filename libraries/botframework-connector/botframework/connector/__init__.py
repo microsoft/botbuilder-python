@@ -16,6 +16,7 @@ from .http_client_base import HttpClientBase
 from .http_client_factory import HttpClientFactory
 from .http_request import HttpRequest
 from .http_response_base import HttpResponseBase
+from .retry_action import RetryAction
 
 __all__ = [
     "AsyncBfPipeline",
@@ -27,6 +28,7 @@ __all__ = [
     "HttpClientFactory",
     "HttpRequest",
     "HttpResponseBase",
+    "RetryAction",
 ]
 
 __version__ = VERSION

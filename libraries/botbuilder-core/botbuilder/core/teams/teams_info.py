@@ -27,6 +27,9 @@ from botbuilder.schema.teams import (
     TeamsMeetingParticipant,
     MeetingNotificationBase,
     MeetingNotificationResponse,
+    BatchFailedEntriesResponse,
+    BatchOperationState,
+    TeamMember,
 )
 
 
@@ -136,6 +139,111 @@ class TeamsInfo:
             new_turn_context.activity
         )
         return (conversation_reference, new_activity_id)
+
+    @staticmethod
+    async def send_message_to_list_of_users(
+        turn_context: TurnContext,
+        activity: Activity,
+        teams_members: List["TeamMember"],
+        tenant_id: str,
+    ) -> str:
+        """Sends a message to the provided list of Teams members."""
+        if activity is None:
+            raise ValueError("activity is required.")
+        if not teams_members:
+            raise ValueError("teamsMembers is required.")
+        if not tenant_id:
+            raise ValueError("tenantId is required.")
+
+        connector_client = await TeamsInfo.get_teams_connector_client(turn_context)
+        return await connector_client.teams.send_message_to_list_of_users(
+            activity, teams_members, tenant_id
+        )
+
+    @staticmethod
+    async def send_message_to_all_users_in_tenant(
+        turn_context: TurnContext, activity: Activity, tenant_id: str
+    ) -> str:
+        """Sends a message to all the users in a tenant."""
+        if activity is None:
+            raise ValueError("activity is required.")
+        if not tenant_id:
+            raise ValueError("tenantId is required.")
+
+        connector_client = await TeamsInfo.get_teams_connector_client(turn_context)
+        return await connector_client.teams.send_message_to_all_users_in_tenant(
+            activity, tenant_id
+        )
+
+    @staticmethod
+    async def send_message_to_all_users_in_team(
+        turn_context: TurnContext, activity: Activity, team_id: str, tenant_id: str
+    ) -> str:
+        """Sends a message to all the users in a team."""
+        if activity is None:
+            raise ValueError("activity is required.")
+        if not team_id:
+            raise ValueError("teamId is required.")
+        if not tenant_id:
+            raise ValueError("tenantId is required.")
+
+        connector_client = await TeamsInfo.get_teams_connector_client(turn_context)
+        return await connector_client.teams.send_message_to_all_users_in_team(
+            activity, team_id, tenant_id
+        )
+
+    @staticmethod
+    async def send_message_to_list_of_channels(
+        turn_context: TurnContext,
+        activity: Activity,
+        channels_members: List["TeamMember"],
+        tenant_id: str,
+    ) -> str:
+        """Sends a message to the provided list of Teams channels."""
+        if activity is None:
+            raise ValueError("activity is required.")
+        if not channels_members:
+            raise ValueError("channelsMembers is required.")
+        if not tenant_id:
+            raise ValueError("tenantId is required.")
+
+        connector_client = await TeamsInfo.get_teams_connector_client(turn_context)
+        return await connector_client.teams.send_message_to_list_of_channels(
+            activity, channels_members, tenant_id
+        )
+
+    @staticmethod
+    async def get_operation_state(
+        turn_context: TurnContext, operation_id: str
+    ) -> BatchOperationState:
+        """Gets the state of an operation."""
+        if not operation_id:
+            raise ValueError("operationId is required.")
+
+        connector_client = await TeamsInfo.get_teams_connector_client(turn_context)
+        return await connector_client.teams.get_operation_state(operation_id)
+
+    @staticmethod
+    async def get_paged_failed_entries(
+        turn_context: TurnContext, operation_id: str, continuation_token: str = None
+    ) -> BatchFailedEntriesResponse:
+        """Gets the failed entries of a batch operation."""
+        if not operation_id:
+            raise ValueError("operationId is required.")
+
+        connector_client = await TeamsInfo.get_teams_connector_client(turn_context)
+        return await connector_client.teams.get_paged_failed_entries(
+            operation_id, continuation_token
+        )
+
+    @staticmethod
+    async def cancel_operation(turn_context: TurnContext, operation_id: str) -> None:
+        """Cancels a batch operation by its id."""
+        if not operation_id:
+            raise ValueError("operationId is required.")
+
+        connector_client = await TeamsInfo.get_teams_connector_client(turn_context)
+        await connector_client.teams.cancel_operation(operation_id)
 
     @staticmethod
     async def get_team_details(
