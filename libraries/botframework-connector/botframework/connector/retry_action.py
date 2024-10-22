@@ -1,6 +1,8 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 import asyncio
 import random
-import time
 
 
 class RetryAction:
@@ -21,10 +23,8 @@ class RetryAction:
                     and retry_exception_handler(ex, current_retry_count) == 429
                 ):
                     await RetryAction._wait_with_jitter(delay)
-                    delay *= current_retry_count
-                    current_retry_count += 1
-                else:
-                    break
+                    delay *= 2  # Exponential backoff
+                current_retry_count += 1
         raise Exception(f"Failed after {max_retries} retries", errors)
 
     @staticmethod
