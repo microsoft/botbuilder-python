@@ -89,6 +89,10 @@ from ._models_py3 import ConfigTaskResponse
 from ._models_py3 import MeetingNotificationBase
 from ._models_py3 import MeetingNotificationResponse
 from ._models_py3 import OnBehalfOf
+from ._models_py3 import TeamMember
+from ._models_py3 import BatchFailedEntry
+from ._models_py3 import BatchFailedEntriesResponse
+from ._models_py3 import BatchOperationState
 
 __all__ = [
     "AppBasedLinkQuery",
@@ -179,4 +183,8 @@ __all__ = [
     "MeetingNotificationBase",
     "MeetingNotificationResponse",
     "OnBehalfOf",
+    "TeamMember",
+    "BatchFailedEntry",
+    "BatchFailedEntriesResponse",
+    "BatchOperationState",
 ]
