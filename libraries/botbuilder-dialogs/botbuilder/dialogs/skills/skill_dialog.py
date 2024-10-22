@@ -26,6 +26,8 @@ from botbuilder.dialogs import (
 
 from .begin_skill_dialog_options import BeginSkillDialogOptions
 from .skill_dialog_options import SkillDialogOptions
+from botbuilder.dialogs.prompts import OAuthPromptSettings
+from .._user_token_access import _UserTokenAccess
 
 
 class SkillDialog(Dialog):
@@ -275,50 +277,55 @@ class SkillDialog(Dialog):
         """
         Tells is if we should intercept the OAuthCard message.
         """
-        if not connection_name or not isinstance(
-            context.adapter, ExtendedUserTokenProvider
-        ):
+        if not connection_name or connection_name.isspace():
             # The adapter may choose not to support token exchange, in which case we fallback to
             # showing an oauth card to the user.
             return False
 
         oauth_card_attachment = next(
-            attachment
-            for attachment in activity.attachments
-            if attachment.content_type == ContentTypes.oauth_card
+            (
+                attachment
+                for attachment in activity.attachments
+                if attachment.content_type == ContentTypes.oauth_card
+            ),
+            None,
         )
-        if oauth_card_attachment:
-            oauth_card = oauth_card_attachment.content
-            if (
-                oauth_card
-                and oauth_card.token_exchange_resource
-                and oauth_card.token_exchange_resource.uri
-            ):
-                try:
-                    result = await context.adapter.exchange_token(
-                        turn_context=context,
-                        connection_name=connection_name,
-                        user_id=context.activity.from_property.id,
-                        exchange_request=TokenExchangeRequest(
-                            uri=oauth_card.token_exchange_resource.uri
-                        ),
-                    )
+        if oauth_card_attachment is None:
+            return False
 
-                    if result and result.token:
-                        # If token above is null, then SSO has failed and hence we return false.
-                        # If not, send an invoke to the skill with the token.
-                        return await self._send_token_exchange_invoke_to_skill(
-                            activity,
-                            oauth_card.token_exchange_resource.id,
-                            oauth_card.connection_name,
-                            result.token,
-                        )
-                except:
-                    # Failures in token exchange are not fatal. They simply mean that the user needs
-                    # to be shown the OAuth card.
-                    return False
+        oauth_card = oauth_card_attachment.content
+        if (
+            not oauth_card
+            or not oauth_card.token_exchange_resource
+            or not oauth_card.token_exchange_resource.uri
+        ):
+            return False
 
-        return False
+        try:
+            settings = OAuthPromptSettings(
+                connection_name=connection_name, title="Sign In"
+            )
+            result = await _UserTokenAccess.exchange_token(
+                context,
+                settings,
+                TokenExchangeRequest(uri=oauth_card.token_exchange_resource.uri),
+            )
+
+            if not result or not result.token:
+                # If token above is null, then SSO has failed and hence we return false.
+                return False
+
+            # If not, send an invoke to the skill with the token.
+            return await self._send_token_exchange_invoke_to_skill(
+                activity,
+                oauth_card.token_exchange_resource.id,
+                oauth_card.connection_name,
+                result.token,
+            )
+        except:
+            # Failures in token exchange are not fatal. They simply mean that the user needs
+            # to be shown the OAuth card.
+            return False
 
     async def _send_token_exchange_invoke_to_skill(
         self,
