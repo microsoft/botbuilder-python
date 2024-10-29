@@ -90,6 +90,16 @@ class TeamsActivityHandler(ActivityHandler):
                     )
                 )
 
+            if turn_context.activity.name == "composeExtension/anonymousQueryLink":
+                return self._create_invoke_response(
+                    await self.on_teams_anonymous_app_based_link_query(
+                        turn_context,
+                        deserializer_helper(
+                            AppBasedLinkQuery, turn_context.activity.value
+                        ),
+                    )
+                )
+
             if turn_context.activity.name == "composeExtension/query":
                 return self._create_invoke_response(
                     await self.on_teams_messaging_extension_query(
@@ -323,6 +333,19 @@ class TeamsActivityHandler(ActivityHandler):
     ) -> MessagingExtensionResponse:
         """
         Invoked when an app based link query activity is received from the connector.
+
+        :param turn_context: A context object for this turn.
+        :param query: The invoke request body type for app-based link query.
+
+        :returns: The Messaging Extension Response for the query.
+        """
+        raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
+
+    async def on_teams_anonymous_app_based_link_query(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext, query: AppBasedLinkQuery
+    ) -> MessagingExtensionResponse:
+        """
+        Invoked when an anonymous app based link query activity is received from the connector.
 
         :param turn_context: A context object for this turn.
         :param query: The invoke request body type for app-based link query.
