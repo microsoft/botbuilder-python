@@ -104,6 +104,7 @@ class _UserTokenAccess(ABC):
             channel_id = turn_context.activity.channel_id
             return await user_token_client.exchange_token(
                 user_id,
+                settings.connection_name,
                 channel_id,
                 token_exchange_request,
             )
