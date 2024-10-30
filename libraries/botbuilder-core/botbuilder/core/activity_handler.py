@@ -68,6 +68,10 @@ class ActivityHandler(Bot):
 
         if turn_context.activity.type == ActivityTypes.message:
             await self.on_message_activity(turn_context)
+        elif turn_context.activity.type == ActivityTypes.message_update:
+            await self.on_message_update_activity(turn_context)
+        elif turn_context.activity.type == ActivityTypes.message_delete:
+            await self.on_message_delete_activity(turn_context)
         elif turn_context.activity.type == ActivityTypes.conversation_update:
             await self.on_conversation_update_activity(turn_context)
         elif turn_context.activity.type == ActivityTypes.message_reaction:
@@ -94,6 +98,34 @@ class ActivityHandler(Bot):
             await self.on_unrecognized_activity_type(turn_context)
 
     async def on_message_activity(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext
+    ):
+        """
+        Override this method in a derived class to provide logic specific to activities,
+        such as the conversational logic.
+
+        :param turn_context: The context object for this turn
+        :type turn_context: :class:`botbuilder.core.TurnContext`
+
+        :returns: A task that represents the work queued to execute
+        """
+        return
+
+    async def on_message_update_activity(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext
+    ):
+        """
+        Override this method in a derived class to provide logic specific to activities,
+        such as the conversational logic.
+
+        :param turn_context: The context object for this turn
+        :type turn_context: :class:`botbuilder.core.TurnContext`
+
+        :returns: A task that represents the work queued to execute
+        """
+        return
+
+    async def on_message_delete_activity(  # pylint: disable=unused-argument
         self, turn_context: TurnContext
     ):
         """
