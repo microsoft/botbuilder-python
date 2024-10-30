@@ -26,6 +26,14 @@ class TestingActivityHandler(ActivityHandler):
         self.record.append("on_message_activity")
         return await super().on_message_activity(turn_context)
 
+    async def on_message_update_activity(self, turn_context: TurnContext):
+        self.record.append("on_message_update_activity")
+        return await super().on_message_update_activity(turn_context)
+
+    async def on_message_delete_activity(self, turn_context: TurnContext):
+        self.record.append("on_message_delete_activity")
+        return await super().on_message_delete_activity(turn_context)
+
     async def on_members_added_activity(
         self, members_added: ChannelAccount, turn_context: TurnContext
     ):
@@ -207,6 +215,32 @@ class TestActivityHandler(aiounittest.AsyncTestCase):
         assert len(bot.record) == 1
         assert bot.record[0] == "on_invoke_activity"
         assert adapter.activity.value.status == int(HTTPStatus.NOT_IMPLEMENTED)
+
+    async def test_on_message_update_activity(self):
+        activity = Activity(type=ActivityTypes.message_update)
+
+        adapter = TestInvokeAdapter()
+        turn_context = TurnContext(adapter, activity)
+
+        # Act
+        bot = TestingActivityHandler()
+        await bot.on_turn(turn_context)
+
+        assert len(bot.record) == 1
+        assert bot.record[0] == "on_message_update_activity"
+
+    async def test_on_message_delete_activity(self):
+        activity = Activity(type=ActivityTypes.message_delete)
+
+        adapter = TestInvokeAdapter()
+        turn_context = TurnContext(adapter, activity)
+
+        # Act
+        bot = TestingActivityHandler()
+        await bot.on_turn(turn_context)
+
+        assert len(bot.record) == 1
+        assert bot.record[0] == "on_message_delete_activity"
 
     async def test_on_end_of_conversation_activity(self):
         activity = Activity(type=ActivityTypes.end_of_conversation)
