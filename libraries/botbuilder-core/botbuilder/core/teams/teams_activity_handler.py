@@ -1065,3 +1065,73 @@ class TeamsActivityHandler(ActivityHandler):
         :returns: A task that represents the work queued to execute.
         """
         return
+
+    async def on_message_update_activity(self, turn_context: TurnContext):
+        """
+        Invoked when a message update activity is received, such as a message edit or undelete.
+
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
+        if turn_context.activity.channel_id == Channels.ms_teams:
+            channel_data = TeamsChannelData().deserialize(
+                turn_context.activity.channel_data
+            )
+
+            if channel_data:
+                if channel_data.event_type == "editMessage":
+                    return await self.on_teams_message_edit(turn_context)
+                if channel_data.event_type == "undeleteMessage":
+                    return await self.on_teams_message_undelete(turn_context)
+
+        return await super().on_message_update_activity(turn_context)
+
+    async def on_message_delete_activity(self, turn_context: TurnContext):
+        """
+        Invoked when a message delete activity is received, such as a soft delete message.
+
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
+        if turn_context.activity.channel_id == Channels.ms_teams:
+            channel_data = TeamsChannelData().deserialize(
+                turn_context.activity.channel_data
+            )
+
+            if channel_data:
+                if channel_data.event_type == "softDeleteMessage":
+                    return await self.on_teams_message_soft_delete(turn_context)
+
+        return await super().on_message_delete_activity(turn_context)
+
+    async def on_teams_message_edit(self, turn_context: TurnContext):
+        """
+        Invoked when a Teams edit message event activity is received.
+
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
+        return
+
+    async def on_teams_message_undelete(self, turn_context: TurnContext):
+        """
+        Invoked when a Teams undo soft delete message event activity is received.
+
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
+        return
+
+    async def on_teams_message_soft_delete(self, turn_context: TurnContext):
+        """
+        Invoked when a Teams soft delete message event activity is received.
+
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
+        return
