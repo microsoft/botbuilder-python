@@ -34,6 +34,7 @@ from botbuilder.schema.teams import (
     TabContext,
     MeetingParticipantsEventDetails,
     ReadReceiptInfo,
+    TeamsChannelData,
 )
 from botframework.connector import Channels
 from simple_adapter import SimpleAdapter
@@ -219,6 +220,14 @@ class TestingTeamsActivityHandler(TeamsActivityHandler):
         self.record.append("on_teams_messaging_extension_query")
         return await super().on_teams_messaging_extension_query(turn_context, query)
 
+    async def on_teams_anonymous_app_based_link_query(
+        self, turn_context: TurnContext, query: AppBasedLinkQuery
+    ):
+        self.record.append("on_teams_anonymous_app_based_link_query")
+        return await super().on_teams_anonymous_app_based_link_query(
+            turn_context, query
+        )
+
     async def on_teams_messaging_extension_submit_action_dispatch(
         self, turn_context: TurnContext, action: MessagingExtensionAction
     ):
@@ -350,6 +359,26 @@ class TestingTeamsActivityHandler(TeamsActivityHandler):
         return await super().on_teams_meeting_end_event(
             turn_context.activity.value, turn_context
         )
+
+    async def on_message_update_activity(self, turn_context: TurnContext):
+        self.record.append("on_message_update_activity")
+        return await super().on_message_update_activity(turn_context)
+
+    async def on_teams_message_edit(self, turn_context: TurnContext):
+        self.record.append("on_teams_message_edit")
+        return await super().on_teams_message_edit(turn_context)
+
+    async def on_teams_message_undelete(self, turn_context: TurnContext):
+        self.record.append("on_teams_message_undelete")
+        return await super().on_teams_message_undelete(turn_context)
+
+    async def on_message_delete_activity(self, turn_context: TurnContext):
+        self.record.append("on_message_delete_activity")
+        return await super().on_message_delete_activity(turn_context)
+
+    async def on_teams_message_soft_delete(self, turn_context: TurnContext):
+        self.record.append("on_teams_message_soft_delete")
+        return await super().on_teams_message_soft_delete(turn_context)
 
     async def on_teams_meeting_participants_join_event(
         self, meeting: MeetingParticipantsEventDetails, turn_context: TurnContext
@@ -816,6 +845,25 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         assert bot.record[0] == "on_invoke_activity"
         assert bot.record[1] == "on_teams_messaging_extension_query"
 
+    async def test_compose_extension_anonymous_query_link(self):
+        # arrange
+        activity = Activity(
+            type=ActivityTypes.invoke,
+            name="composeExtension/anonymousQueryLink",
+            value={"url": "http://www.test.com"},
+        )
+
+        turn_context = TurnContext(SimpleAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        # Assert
+        assert len(bot.record) == 2
+        assert bot.record[0] == "on_invoke_activity"
+        assert bot.record[1] == "on_teams_anonymous_app_based_link_query"
+
     async def test_on_teams_messaging_extension_bot_message_preview_edit_activity(self):
         # Arrange
 
@@ -1253,6 +1301,124 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         assert len(bot.record) == 2
         assert bot.record[0] == "on_event_activity"
         assert bot.record[1] == "on_teams_meeting_end_event"
+
+    async def test_message_update_activity_teams_message_edit(self):
+        # Arrange
+        activity = Activity(
+            type=ActivityTypes.message_update,
+            channel_data=TeamsChannelData(event_type="editMessage"),
+            channel_id=Channels.ms_teams,
+        )
+        turn_context = TurnContext(SimpleAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        # Assert
+        self.assertEqual(2, len(bot.record))
+        self.assertEqual("on_message_update_activity", bot.record[0])
+        self.assertEqual("on_teams_message_edit", bot.record[1])
+
+    async def test_message_update_activity_teams_message_undelete(self):
+        # Arrange
+        activity = Activity(
+            type=ActivityTypes.message_update,
+            channel_data=TeamsChannelData(event_type="undeleteMessage"),
+            channel_id=Channels.ms_teams,
+        )
+        turn_context = TurnContext(SimpleAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        # Assert
+        self.assertEqual(2, len(bot.record))
+        self.assertEqual("on_message_update_activity", bot.record[0])
+        self.assertEqual("on_teams_message_undelete", bot.record[1])
+
+    async def test_message_update_activity_teams_message_undelete_no_msteams(self):
+        # Arrange
+        activity = Activity(
+            type=ActivityTypes.message_update,
+            channel_data=TeamsChannelData(event_type="undeleteMessage"),
+        )
+        turn_context = TurnContext(SimpleAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        # Assert
+        self.assertEqual(1, len(bot.record))
+        self.assertEqual("on_message_update_activity", bot.record[0])
+
+    async def test_message_update_activity_teams_no_channel_data(self):
+        # Arrange
+        activity = Activity(
+            type=ActivityTypes.message_update,
+            channel_id=Channels.ms_teams,
+        )
+        turn_context = TurnContext(SimpleAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        # Assert
+        self.assertEqual(1, len(bot.record))
+        self.assertEqual("on_message_update_activity", bot.record[0])
+
+    async def test_message_delete_activity_teams_message_soft_delete(self):
+        # Arrange
+        activity = Activity(
+            type=ActivityTypes.message_delete,
+            channel_data=TeamsChannelData(event_type="softDeleteMessage"),
+            channel_id=Channels.ms_teams,
+        )
+        turn_context = TurnContext(SimpleAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        # Assert
+        self.assertEqual(2, len(bot.record))
+        self.assertEqual("on_message_delete_activity", bot.record[0])
+        self.assertEqual("on_teams_message_soft_delete", bot.record[1])
+
+    async def test_message_delete_activity_teams_message_soft_delete_no_msteams(self):
+        # Arrange
+        activity = Activity(
+            type=ActivityTypes.message_delete,
+            channel_data=TeamsChannelData(event_type="softDeleteMessage"),
+        )
+        turn_context = TurnContext(SimpleAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        # Assert
+        self.assertEqual(1, len(bot.record))
+        self.assertEqual("on_message_delete_activity", bot.record[0])
+
+    async def test_message_delete_activity_teams_no_channel_data(self):
+        # Arrange
+        activity = Activity(
+            type=ActivityTypes.message_delete,
+            channel_id=Channels.ms_teams,
+        )
+        turn_context = TurnContext(SimpleAdapter(), activity)
+
+        # Act
+        bot = TestingTeamsActivityHandler()
+        await bot.on_turn(turn_context)
+
+        # Assert
+        self.assertEqual(1, len(bot.record))
+        self.assertEqual("on_message_delete_activity", bot.record[0])
 
     async def test_on_teams_meeting_participants_join_event(self):
         # arrange

@@ -90,6 +90,16 @@ class TeamsActivityHandler(ActivityHandler):
                     )
                 )
 
+            if turn_context.activity.name == "composeExtension/anonymousQueryLink":
+                return self._create_invoke_response(
+                    await self.on_teams_anonymous_app_based_link_query(
+                        turn_context,
+                        deserializer_helper(
+                            AppBasedLinkQuery, turn_context.activity.value
+                        ),
+                    )
+                )
+
             if turn_context.activity.name == "composeExtension/query":
                 return self._create_invoke_response(
                     await self.on_teams_messaging_extension_query(
@@ -323,6 +333,19 @@ class TeamsActivityHandler(ActivityHandler):
     ) -> MessagingExtensionResponse:
         """
         Invoked when an app based link query activity is received from the connector.
+
+        :param turn_context: A context object for this turn.
+        :param query: The invoke request body type for app-based link query.
+
+        :returns: The Messaging Extension Response for the query.
+        """
+        raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
+
+    async def on_teams_anonymous_app_based_link_query(  # pylint: disable=unused-argument
+        self, turn_context: TurnContext, query: AppBasedLinkQuery
+    ) -> MessagingExtensionResponse:
+        """
+        Invoked when an anonymous app based link query activity is received from the connector.
 
         :param turn_context: A context object for this turn.
         :param query: The invoke request body type for app-based link query.
@@ -1037,6 +1060,76 @@ class TeamsActivityHandler(ActivityHandler):
         Override this in a derived class to provide logic for when meeting participants are removed.
 
         :param meeting: The details of the meeting.
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
+        return
+
+    async def on_message_update_activity(self, turn_context: TurnContext):
+        """
+        Invoked when a message update activity is received, such as a message edit or undelete.
+
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
+        if turn_context.activity.channel_id == Channels.ms_teams:
+            channel_data = TeamsChannelData().deserialize(
+                turn_context.activity.channel_data
+            )
+
+            if channel_data:
+                if channel_data.event_type == "editMessage":
+                    return await self.on_teams_message_edit(turn_context)
+                if channel_data.event_type == "undeleteMessage":
+                    return await self.on_teams_message_undelete(turn_context)
+
+        return await super().on_message_update_activity(turn_context)
+
+    async def on_message_delete_activity(self, turn_context: TurnContext):
+        """
+        Invoked when a message delete activity is received, such as a soft delete message.
+
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
+        if turn_context.activity.channel_id == Channels.ms_teams:
+            channel_data = TeamsChannelData().deserialize(
+                turn_context.activity.channel_data
+            )
+
+            if channel_data:
+                if channel_data.event_type == "softDeleteMessage":
+                    return await self.on_teams_message_soft_delete(turn_context)
+
+        return await super().on_message_delete_activity(turn_context)
+
+    async def on_teams_message_edit(self, turn_context: TurnContext):
+        """
+        Invoked when a Teams edit message event activity is received.
+
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
+        return
+
+    async def on_teams_message_undelete(self, turn_context: TurnContext):
+        """
+        Invoked when a Teams undo soft delete message event activity is received.
+
+        :param turn_context: A context object for this turn.
+
+        :returns: A task that represents the work queued to execute.
+        """
+        return
+
+    async def on_teams_message_soft_delete(self, turn_context: TurnContext):
+        """
+        Invoked when a Teams soft delete message event activity is received.
+
         :param turn_context: A context object for this turn.
 
         :returns: A task that represents the work queued to execute.
