@@ -155,6 +155,17 @@ class TestTeamsActivityHandler(aiounittest.AsyncTestCase):
         # Assert
         assert activity.channel_data.notification.alert
 
+    def test_teams_notify_user_alert_in_meeting(self):
+        # Arrange
+        activity = Activity()
+
+        # Act
+        teams_notify_user(activity, alert_in_meeting=True)
+
+        # Assert
+        assert activity.channel_data.notification.alert_in_meeting is True
+        assert activity.channel_data.notification.alert is False
+
     def test_teams_notify_user_with_no_activity(self):
         # Arrange
         activity = None
