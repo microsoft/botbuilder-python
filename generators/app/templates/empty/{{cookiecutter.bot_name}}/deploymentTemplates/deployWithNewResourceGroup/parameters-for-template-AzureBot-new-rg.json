@@ -20,7 +20,19 @@
         "botEndpoint": {
             "value": ""
         },
+        "appType": {
+            "value": "MultiTenant"
+        },
         "appId": {
+            "value": ""
+        },
+        "UMSIName": {
+            "value": ""
+        },
+        "UMSIResourceGroupName": {
+            "value": ""
+        },
+        "tenantId": {
             "value": ""
         }
     }
