@@ -8,7 +8,7 @@ REQUIRES = [
     "azure-cognitiveservices-language-luis==0.2.0",
     "botbuilder-schema==4.17.0",
     "botbuilder-core==4.17.0",
-    "aiohttp==3.10.5",
+    "aiohttp==3.10.11",
 ]
 
 TESTS_REQUIRES = ["aiounittest>=1.1.0"]
