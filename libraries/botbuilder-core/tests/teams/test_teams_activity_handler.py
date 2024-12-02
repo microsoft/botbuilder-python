@@ -5,6 +5,10 @@
 
 from typing import List
 import aiounittest
+import sys
+import os
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from botbuilder.core import BotAdapter, TurnContext
 from botbuilder.core.teams import TeamsActivityHandler
 from botbuilder.schema import (

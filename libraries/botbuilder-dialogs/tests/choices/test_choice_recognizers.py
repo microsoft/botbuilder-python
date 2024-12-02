@@ -57,10 +57,9 @@ def assert_choice(result, value, index, score, synonym=None):
         resolution.score == score
     ), f"Invalid resolution.score of '{resolution.score}' for '{value}' choice."
     if synonym:
-        assert (  # pylint: disable=assert-on-tuple
-            resolution.synonym == synonym,
-            f"Invalid resolution.synonym of '{resolution.synonym}' for '{value}' choice.",
-        )
+        assert (
+            resolution.synonym == synonym
+        ), f"Invalid resolution.synonym of '{resolution.synonym}' for '{value}' choice."
 
 
 _color_choices: List[str] = ["red", "green", "blue"]
