@@ -67,7 +67,17 @@ class CertificateAppCredentials(AppCredentials, ABC):
         if not auth_token:
             # No suitable token exists in cache. Let's get a new one from AAD.
             auth_token = self.__get_msal_app().acquire_token_for_client(scopes=scopes)
-        return auth_token["access_token"]
+        if "access_token" in auth_token:
+            return auth_token["access_token"]
+        error = auth_token["error"] if "error" in auth_token else "Unknown error"
+        error_description = (
+            auth_token["error_description"]
+            if "error_description" in auth_token
+            else "Unknown error description"
+        )
+        raise PermissionError(
+            f"Failed to get access token with error: {error}, error_description: {error_description}"
+        )
 
     def __get_msal_app(self):
         if not self.app:
