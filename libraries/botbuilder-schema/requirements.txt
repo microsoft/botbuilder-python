@@ -1,2 +1,3 @@
 aiounittest==1.3.0
 msrest== 0.7.*
+adaptivecards==0.4.1

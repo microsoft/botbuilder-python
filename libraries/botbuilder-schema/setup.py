@@ -6,10 +6,7 @@ from setuptools import setup
 
 NAME = "botbuilder-schema"
 VERSION = os.environ["packageVersion"] if "packageVersion" in os.environ else "4.17.0"
-REQUIRES = [
-    "msrest== 0.7.*",
-    "urllib3",
-]
+REQUIRES = ["msrest== 0.7.*", "urllib3", "adaptivecards==0.4.1"]
 
 root = os.path.abspath(os.path.dirname(__file__))
 
@@ -30,6 +27,7 @@ setup(
     packages=[
         "botbuilder.schema",
         "botbuilder.schema.teams",
+        "botbuilder.schema.sharepoint",
     ],
     include_package_data=True,
     classifiers=[
