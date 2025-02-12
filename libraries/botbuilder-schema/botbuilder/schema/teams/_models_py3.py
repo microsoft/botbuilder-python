@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import datetime
 from enum import Enum
 from typing import List
 from msrest.serialization import Model
@@ -3029,3 +3030,101 @@ class TargetedMeetingNotification(MeetingNotification):
     ):
         super(TargetedMeetingNotification, self).__init__(value=value, **kwargs)
         self.channel_data = channel_data
+
+
+class BatchFailedEntry(Model):
+    """Specifies the failed entry with its id and error.
+
+    :param entry_id: The id of the failed entry.
+    :type entry_id: str
+    :param error: The error of the failed entry.
+    :type error: str
+    """
+
+    _attribute_map = {
+        "entry_id": {"key": "entryId", "type": "str"},
+        "error": {"key": "error", "type": "str"},
+    }
+
+    def __init__(self, *, entry_id: str = None, error: str = None, **kwargs):
+        super(BatchFailedEntry, self).__init__(**kwargs)
+        self.entry_id = entry_id
+        self.error = error
+
+
+class BatchOperationState(Model):
+    """Object representing operation state.
+
+    :param state: The operation state.
+    :type state: str
+    :param retry_after: The datetime value to retry the operation.
+    :type retry_after: datetime or None
+    :param total_entries_count: The number of entries.
+    :type total_entries_count: int
+    """
+
+    _attribute_map = {
+        "state": {"key": "state", "type": "str"},
+        "status_map": {"key": "statusMap", "type": "{int, int}"},
+        "retry_after": {"key": "retryAfter", "type": "iso-8601"},
+        "total_entries_count": {"key": "totalEntriesCount", "type": "int"},
+    }
+
+    def __init__(
+        self,
+        *,
+        state: str = None,
+        status_map: dict = None,
+        retry_after: datetime = None,
+        total_entries_count: int = 0,
+        **kwargs
+    ):
+        super(BatchOperationState, self).__init__(**kwargs)
+        self.state = state
+        self.status_map = status_map or {}
+        self.retry_after = retry_after
+        self.total_entries_count = total_entries_count
+
+
+class BatchFailedEntriesResponse(Model):
+    """Specifies the failed entries response.
+
+    Contains a list of BatchFailedEntry.
+
+    :param continuation_token: The continuation token for paginated results.
+    :type continuation_token: str
+    :param failed_entries: The list of failed entries result of a batch operation.
+    :type failed_entries: list[~botframework.connector.teams.models.BatchFailedEntry]
+    """
+
+    _attribute_map = {
+        "continuation_token": {"key": "continuationToken", "type": "str"},
+        "failed_entries": {"key": "failedEntryResponses", "type": "[BatchFailedEntry]"},
+    }
+
+    def __init__(
+        self,
+        *,
+        continuation_token: str = None,
+        failed_entries: List["BatchFailedEntry"] = None,
+        **kwargs
+    ):
+        super(BatchFailedEntriesResponse, self).__init__(**kwargs)
+        self.continuation_token = continuation_token
+        self.failed_entries = failed_entries or []
+
+
+class TeamMember(Model):
+    """Describes a member.
+
+    :param id: Unique identifier representing a member (user or channel).
+    :type id: str
+    """
+
+    _attribute_map = {
+        "id": {"key": "id", "type": "str"},
+    }
+
+    def __init__(self, *, id: str = None, **kwargs) -> None:
+        super(TeamMember, self).__init__(**kwargs)
+        self.id = id
