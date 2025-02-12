@@ -9,6 +9,7 @@ from msrest.serialization import Model, Deserializer, Serializer
 
 import botbuilder.schema as schema
 import botbuilder.schema.teams as teams_schema
+import botbuilder.schema.sharepoint as sharepoint_schema
 
 DEPENDICIES = [
     schema_cls
@@ -18,6 +19,11 @@ DEPENDICIES = [
 DEPENDICIES += [
     schema_cls
     for key, schema_cls in getmembers(teams_schema)
+    if isinstance(schema_cls, type) and issubclass(schema_cls, (Model, Enum))
+]
+DEPENDICIES += [
+    schema_cls
+    for key, schema_cls in getmembers(sharepoint_schema)
     if isinstance(schema_cls, type) and issubclass(schema_cls, (Model, Enum))
 ]
 DEPENDICIES_DICT = {dependency.__name__: dependency for dependency in DEPENDICIES}
