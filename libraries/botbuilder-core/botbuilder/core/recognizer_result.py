@@ -33,7 +33,7 @@ class RecognizerResult(Model):
         intents: Dict[str, IntentScore] = None,
         entities: Dict[str, object] = None,
         properties: Dict[str, object] = None,
-        **kwargs
+        **kwargs,
     ):
         super(RecognizerResult, self).__init__(**kwargs)
         self.text = text

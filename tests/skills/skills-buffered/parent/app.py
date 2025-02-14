@@ -16,7 +16,7 @@ from botbuilder.core import (
 from botbuilder.core.integration import (
     aiohttp_channel_service_routes,
     aiohttp_error_middleware,
-    BotFrameworkHttpClient
+    BotFrameworkHttpClient,
 )
 from botbuilder.core.skills import SkillHandler
 from botbuilder.schema import Activity
@@ -34,7 +34,8 @@ CONFIG = DefaultConfig()
 # Create adapter.
 # See https://aka.ms/about-bot-adapter to learn more about how bots work.
 SETTINGS = BotFrameworkAdapterSettings(
-    app_id=CONFIG.APP_ID, app_password=CONFIG.APP_PASSWORD,
+    app_id=CONFIG.APP_ID,
+    app_password=CONFIG.APP_PASSWORD,
 )
 ADAPTER = BotFrameworkAdapter(SETTINGS)
 

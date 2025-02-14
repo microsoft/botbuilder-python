@@ -10,7 +10,9 @@ class RoutingIdFactory:
         self._forward_x_ref: Dict[str, str] = {}
         self._backward_x_ref: Dict[str, Tuple[str, str]] = {}
 
-    def create_skill_conversation_id(self, conversation_id: str, service_url: str) -> str:
+    def create_skill_conversation_id(
+        self, conversation_id: str, service_url: str
+    ) -> str:
         result = self._forward_x_ref.get(conversation_id, str(uuid4()))
 
         self._forward_x_ref[conversation_id] = result

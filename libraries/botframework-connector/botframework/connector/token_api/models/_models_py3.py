@@ -197,7 +197,7 @@ class TokenResponse(Model):
         connection_name: str = None,
         token: str = None,
         expiration: str = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(TokenResponse, self).__init__(**kwargs)
         self.channel_id = channel_id
@@ -238,7 +238,7 @@ class TokenStatus(Model):
         connection_name: str = None,
         has_token: bool = None,
         service_provider_display_name: str = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(TokenStatus, self).__init__(**kwargs)
         self.channel_id = channel_id

@@ -14,7 +14,7 @@ class RequestPayload(Serializable):
         *,
         verb: str = None,
         path: str = None,
-        streams: List[StreamDescription] = None
+        streams: List[StreamDescription] = None,
     ):
         self.verb = verb
         self.path = path

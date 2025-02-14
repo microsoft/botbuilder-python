@@ -12,7 +12,7 @@ class RequestManager:
     def __init__(
         self,
         *,
-        pending_requests: Dict[UUID, "Future[streaming.ReceiveResponse]"] = None
+        pending_requests: Dict[UUID, "Future[streaming.ReceiveResponse]"] = None,
     ):
         self._pending_requests = pending_requests or {}
 

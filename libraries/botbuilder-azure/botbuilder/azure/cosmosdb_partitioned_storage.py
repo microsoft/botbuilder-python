@@ -1,5 +1,4 @@
-"""Implements a CosmosDB based storage provider using partitioning for a bot.
-"""
+"""Implements a CosmosDB based storage provider using partitioning for a bot."""
 
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.

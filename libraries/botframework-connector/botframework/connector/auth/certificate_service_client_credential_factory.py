@@ -22,7 +22,7 @@ class CertificateServiceClientCredentialsFactory(ServiceClientCredentialsFactory
         tenant_id: str = None,
         certificate_public: str = None,
         *,
-        logger: Logger = None
+        logger: Logger = None,
     ) -> None:
         """
         CertificateServiceClientCredentialsFactory implementation using a certificate.

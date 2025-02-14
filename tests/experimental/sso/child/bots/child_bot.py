@@ -44,7 +44,7 @@ class ChildBot(ActivityHandler):
         await DialogHelper.run_dialog(
             self._dialog,
             turn_context,
-            self._conversation_state.create_property(DialogState.__name__)
+            self._conversation_state.create_property(DialogState.__name__),
         )
 
     async def on_message_activity(self, turn_context: TurnContext):
@@ -55,7 +55,7 @@ class ChildBot(ActivityHandler):
                 await DialogHelper.run_dialog(
                     self._dialog,
                     turn_context,
-                    self._conversation_state.create_property(DialogState.__name__)
+                    self._conversation_state.create_property(DialogState.__name__),
                 )
                 return
             elif "skill logout" in turn_context.activity.text:
@@ -64,10 +64,17 @@ class ChildBot(ActivityHandler):
                     turn_context,
                     self._connection_name,
                     turn_context.activity.from_property.id,
-                    MicrosoftAppCredentials(self._config.APP_ID, self._config.APP_PASSWORD))
-                await turn_context.send_activity(MessageFactory.text("logout from child bot successful"))
+                    MicrosoftAppCredentials(
+                        self._config.APP_ID, self._config.APP_PASSWORD
+                    ),
+                )
+                await turn_context.send_activity(
+                    MessageFactory.text("logout from child bot successful")
+                )
         else:
             await turn_context.send_activity(MessageFactory.text("child: activity (1)"))
             await turn_context.send_activity(MessageFactory.text("child: activity (2)"))
             await turn_context.send_activity(MessageFactory.text("child: activity (3)"))
-            await turn_context.send_activity(MessageFactory.text(f"child: {turn_context.activity.text}"))
+            await turn_context.send_activity(
+                MessageFactory.text(f"child: {turn_context.activity.text}")
+            )

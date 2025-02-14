@@ -4,10 +4,14 @@ from botbuilder.schema import Activity
 
 
 class SkillHttpClient(BotFrameworkHttpClient):
-    def __init__(self, credential_provider, conversation_id_factory, channel_provider=None):
+    def __init__(
+        self, credential_provider, conversation_id_factory, channel_provider=None
+    ):
         super().__init__(credential_provider, channel_provider)
 
-        self._conversation_id_factory: ConversationIdFactoryBase = conversation_id_factory
+        self._conversation_id_factory: ConversationIdFactoryBase = (
+            conversation_id_factory
+        )
 
     async def post_activity_to_skill(
         self,
@@ -16,8 +20,10 @@ class SkillHttpClient(BotFrameworkHttpClient):
         callback_url: str,
         activity: Activity,
     ) -> InvokeResponse:
-        skill_conversation_id = await self._conversation_id_factory.create_skill_conversation_id(
-            TurnContext.get_conversation_reference(activity)
+        skill_conversation_id = (
+            await self._conversation_id_factory.create_skill_conversation_id(
+                TurnContext.get_conversation_reference(activity)
+            )
         )
 
         return await self.post_activity(
@@ -26,5 +32,5 @@ class SkillHttpClient(BotFrameworkHttpClient):
             to_skill.skill_endpoint,
             callback_url,
             skill_conversation_id,
-            activity
+            activity,
         )

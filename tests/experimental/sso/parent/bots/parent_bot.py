@@ -99,9 +99,7 @@ class ParentBot(ActivityHandler):
                 )
 
                 if activities:
-                    if not await self._intercept_oauth_cards(
-                        activities, turn_context
-                    ):
+                    if not await self._intercept_oauth_cards(activities, turn_context):
                         await turn_context.send_activities(activities)
 
             return
@@ -138,7 +136,9 @@ class ParentBot(ActivityHandler):
                 )
 
     async def _intercept_oauth_cards(
-        self, activities: List[Activity], turn_context: TurnContext,
+        self,
+        activities: List[Activity],
+        turn_context: TurnContext,
     ) -> bool:
         if not activities:
             return False
@@ -150,8 +150,10 @@ class ParentBot(ActivityHandler):
                 activity.attachments,
             ):
                 oauth_card: OAuthCard = OAuthCard().from_dict(attachment.content)
-                oauth_card.token_exchange_resource: TokenExchangeResource = TokenExchangeResource().from_dict(
-                    oauth_card.token_exchange_resource
+                oauth_card.token_exchange_resource: TokenExchangeResource = (
+                    TokenExchangeResource().from_dict(
+                        oauth_card.token_exchange_resource
+                    )
                 )
                 if oauth_card.token_exchange_resource:
                     token_exchange_provider: BotFrameworkAdapter = turn_context.adapter
@@ -184,7 +186,10 @@ class ParentBot(ActivityHandler):
         activity = self._create_reply(incoming_activity)
         activity.type = ActivityTypes.invoke
         activity.name = "signin/tokenExchange"
-        activity.value = TokenExchangeInvokeRequest(id=identifier, token=token,)
+        activity.value = TokenExchangeInvokeRequest(
+            id=identifier,
+            token=token,
+        )
 
         # route the activity to the skill
         response = await self._client.post_activity(

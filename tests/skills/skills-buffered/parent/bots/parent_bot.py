@@ -15,7 +15,8 @@ from botbuilder.schema import DeliveryModes
 
 class ParentBot(ActivityHandler):
     def __init__(
-        self, skill_client: BotFrameworkHttpClient,
+        self,
+        skill_client: BotFrameworkHttpClient,
     ):
         self.client = skill_client
 

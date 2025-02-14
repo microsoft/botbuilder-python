@@ -42,7 +42,7 @@ class BotSignInOperations:
         final_redirect=None,
         custom_headers=None,
         raw=False,
-        **operation_config
+        **operation_config,
     ):
         """
 
@@ -119,7 +119,7 @@ class BotSignInOperations:
         final_redirect=None,
         custom_headers=None,
         raw=False,
-        **operation_config
+        **operation_config,
     ):
         """
 

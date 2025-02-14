@@ -12,7 +12,9 @@ from botbuilder.schema import ActivityTypes
 
 class LogoutDialog(ComponentDialog):
     def __init__(
-        self, dialog_id: str, connection_name: str,
+        self,
+        dialog_id: str,
+        connection_name: str,
     ):
         super().__init__(dialog_id)
 
@@ -41,7 +43,9 @@ class LogoutDialog(ComponentDialog):
             if text == "logout":
                 bot_adapter: BotFrameworkAdapter = inner_dc.context.adapter
                 await bot_adapter.sign_out_user(inner_dc.context, self.connection_name)
-                await inner_dc.context.send_activity(MessageFactory.text("You have been signed out."))
+                await inner_dc.context.send_activity(
+                    MessageFactory.text("You have been signed out.")
+                )
                 return await inner_dc.cancel_all_dialogs()
 
         return None

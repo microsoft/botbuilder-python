@@ -28,7 +28,7 @@ class ConfigurationBotFrameworkAuthentication(BotFrameworkAuthentication):
         credentials_factory: ServiceClientCredentialsFactory = None,
         auth_configuration: AuthenticationConfiguration = None,
         http_client_factory: HttpClientFactory = None,
-        logger: Logger = None
+        logger: Logger = None,
     ):
         self._inner: BotFrameworkAuthentication = (
             BotFrameworkAuthenticationFactory.create(

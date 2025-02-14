@@ -20,7 +20,7 @@ class BotFrameworkConnectorConfiguration(ConnectorClientConfiguration):
         *,
         pipeline_type: Optional[Type[AsyncPipeline]] = None,
         sender: Optional[AsyncHTTPSender] = None,
-        driver: Optional[AsyncHttpDriver] = None
+        driver: Optional[AsyncHttpDriver] = None,
     ):
         super().__init__(credentials, base_url)
 

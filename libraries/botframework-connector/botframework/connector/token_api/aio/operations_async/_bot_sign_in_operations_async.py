@@ -43,7 +43,7 @@ class BotSignInOperations:
         *,
         custom_headers=None,
         raw=False,
-        **operation_config
+        **operation_config,
     ):
         """
 
@@ -123,7 +123,7 @@ class BotSignInOperations:
         *,
         custom_headers=None,
         raw=False,
-        **operation_config
+        **operation_config,
     ):
         """
 

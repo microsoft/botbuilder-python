@@ -10,7 +10,7 @@ class HttpRequest:
         *,
         request_uri: str = None,
         content: Any = None,
-        headers: Dict[str, str] = None
+        headers: Dict[str, str] = None,
     ) -> None:
         self.request_uri = request_uri
         self.content = content

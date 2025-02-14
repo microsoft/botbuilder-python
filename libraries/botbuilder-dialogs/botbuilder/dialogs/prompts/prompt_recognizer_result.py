@@ -1,8 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-""" Result returned by a prompts recognizer function.
-"""
+"""Result returned by a prompts recognizer function."""
 
 
 class PromptRecognizerResult:

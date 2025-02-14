@@ -42,7 +42,7 @@ class UserTokenOperations:
         *,
         custom_headers=None,
         raw=False,
-        **operation_config
+        **operation_config,
     ):
         """
 
@@ -122,7 +122,7 @@ class UserTokenOperations:
         *,
         custom_headers=None,
         raw=False,
-        **operation_config
+        **operation_config,
     ):
         """
 
@@ -205,7 +205,7 @@ class UserTokenOperations:
         *,
         custom_headers=None,
         raw=False,
-        **operation_config
+        **operation_config,
     ):
         """
 
@@ -278,7 +278,7 @@ class UserTokenOperations:
         *,
         custom_headers=None,
         raw=False,
-        **operation_config
+        **operation_config,
     ):
         """
 
@@ -354,7 +354,7 @@ class UserTokenOperations:
         *,
         custom_headers=None,
         raw=False,
-        **operation_config
+        **operation_config,
     ):
         """
 

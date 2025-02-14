@@ -148,7 +148,7 @@ class TeamsOperations(object):
         tenant_id: str,
         custom_headers=None,
         raw=False,
-        **operation_config
+        **operation_config,
     ):
         """Fetches Teams meeting participant details.
 
@@ -273,7 +273,7 @@ class TeamsOperations(object):
         notification: models.MeetingNotificationBase,
         custom_headers=None,
         raw=False,
-        **operation_config
+        **operation_config,
     ):
         """Send a teams meeting notification.
 

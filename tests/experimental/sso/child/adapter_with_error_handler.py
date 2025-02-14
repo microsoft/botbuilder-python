@@ -57,7 +57,7 @@ class AdapterWithErrorHandler(BotFrameworkAdapter):
             await self._conversation_state.delete(context)
 
         self.on_turn_error = on_error
-    
+
     async def send_activities(self, context, activities):
         await self._conversation_state.save_changes(context)
         await self._user_state.save_changes(context)

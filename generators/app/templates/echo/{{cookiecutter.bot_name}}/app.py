@@ -10,7 +10,10 @@ from aiohttp import web
 from aiohttp.web import Request, Response, json_response
 from botbuilder.core import TurnContext
 from botbuilder.core.integration import aiohttp_error_middleware
-from botbuilder.integration.aiohttp import CloudAdapter, ConfigurationBotFrameworkAuthentication
+from botbuilder.integration.aiohttp import (
+    CloudAdapter,
+    ConfigurationBotFrameworkAuthentication,
+)
 from botbuilder.schema import Activity, ActivityTypes
 
 from bot import MyBot
@@ -21,6 +24,7 @@ CONFIG = DefaultConfig()
 # Create adapter.
 # See https://aka.ms/about-bot-adapter to learn more about how bots work.
 ADAPTER = CloudAdapter(ConfigurationBotFrameworkAuthentication(CONFIG))
+
 
 # Catch-all for errors.
 async def on_error(context: TurnContext, error: Exception):

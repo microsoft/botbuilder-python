@@ -4,8 +4,14 @@
 from aiohttp import web
 from aiohttp.web import Request, Response
 
-from botframework.connector.auth import AuthenticationConfiguration, SimpleCredentialProvider
-from botbuilder.core.integration import aiohttp_channel_service_routes, BotFrameworkHttpClient
+from botframework.connector.auth import (
+    AuthenticationConfiguration,
+    SimpleCredentialProvider,
+)
+from botbuilder.core.integration import (
+    aiohttp_channel_service_routes,
+    BotFrameworkHttpClient,
+)
 from botbuilder.schema import Activity
 
 from config import DefaultConfig
@@ -38,10 +44,20 @@ async def messages(req: Request) -> Response:
     current_conversation_id = inbound_activity.conversation.id
     current_service_url = inbound_activity.service_url
 
-    next_conversation_id = FACTORY.create_skill_conversation_id(current_conversation_id, current_service_url)
+    next_conversation_id = FACTORY.create_skill_conversation_id(
+        current_conversation_id, current_service_url
+    )
 
-    await CLIENT.post_activity(CONFIG.APP_ID, CONFIG.SKILL_APP_ID, TO_URI, SERVICE_URL, next_conversation_id, inbound_activity)
+    await CLIENT.post_activity(
+        CONFIG.APP_ID,
+        CONFIG.SKILL_APP_ID,
+        TO_URI,
+        SERVICE_URL,
+        next_conversation_id,
+        inbound_activity,
+    )
     return Response(status=201)
+
 
 APP = web.Application()
 

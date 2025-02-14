@@ -59,7 +59,7 @@ class ConversationReference(Model):
         channel_id: str = None,
         locale: str = None,
         service_url: str = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(ConversationReference, self).__init__(**kwargs)
         self.activity_id = activity_id
@@ -339,7 +339,7 @@ class Activity(Model):
         text_highlights=None,
         semantic_action=None,
         caller_id: str = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(Activity, self).__init__(**kwargs)
         self.type = type
@@ -920,7 +920,7 @@ class AnimationCard(Model):
         aspect: str = None,
         duration: str = None,
         value=None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(AnimationCard, self).__init__(**kwargs)
         self.title = title
@@ -968,7 +968,7 @@ class Attachment(Model):
         content=None,
         name: str = None,
         thumbnail_url: str = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(Attachment, self).__init__(**kwargs)
         self.content_type = content_type
@@ -1005,7 +1005,7 @@ class AttachmentData(Model):
         name: str = None,
         original_base64: bytearray = None,
         thumbnail_base64: bytearray = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(AttachmentData, self).__init__(**kwargs)
         self.type = type
@@ -1125,7 +1125,7 @@ class AudioCard(Model):
         aspect: str = None,
         duration: str = None,
         value=None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(AudioCard, self).__init__(**kwargs)
         self.title = title
@@ -1178,7 +1178,7 @@ class BasicCard(Model):
         images=None,
         buttons=None,
         tap=None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(BasicCard, self).__init__(**kwargs)
         self.title = title
@@ -1237,7 +1237,7 @@ class CardAction(Model):
         value=None,
         channel_data=None,
         image_alt_text: str = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(CardAction, self).__init__(**kwargs)
         self.type = type
@@ -1306,7 +1306,7 @@ class ChannelAccount(Model):
         aad_object_id: str = None,
         role=None,
         properties=None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(ChannelAccount, self).__init__(**kwargs)
         self.id = id
@@ -1364,7 +1364,7 @@ class ConversationAccount(Model):
         role=None,
         tenant_id=None,
         properties=None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(ConversationAccount, self).__init__(**kwargs)
         self.is_group = is_group
@@ -1439,7 +1439,7 @@ class ConversationParameters(Model):
         activity=None,
         channel_data=None,
         tenant_id=None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(ConversationParameters, self).__init__(**kwargs)
         self.is_group = is_group
@@ -1475,7 +1475,7 @@ class ConversationResourceResponse(Model):
         activity_id: str = None,
         service_url: str = None,
         id: str = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(ConversationResourceResponse, self).__init__(**kwargs)
         self.activity_id = activity_id
@@ -1645,7 +1645,7 @@ class GeoCoordinates(Model):
         longitude: float = None,
         type: str = None,
         name: str = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(GeoCoordinates, self).__init__(**kwargs)
         self.elevation = elevation
@@ -1691,7 +1691,7 @@ class HeroCard(Model):
         images=None,
         buttons=None,
         tap=None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(HeroCard, self).__init__(**kwargs)
         self.title = title
@@ -1825,7 +1825,7 @@ class MediaCard(Model):
         aspect: str = None,
         duration: str = None,
         value=None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(MediaCard, self).__init__(**kwargs)
         self.title = title
@@ -1918,7 +1918,7 @@ class OAuthCard(Model):
         connection_name: str = None,
         buttons=None,
         token_exchange_resource=None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(OAuthCard, self).__init__(**kwargs)
         self.text = text
@@ -1983,7 +1983,7 @@ class Place(Model):
         has_map=None,
         type: str = None,
         name: str = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(Place, self).__init__(**kwargs)
         self.address = address
@@ -2036,7 +2036,7 @@ class ReceiptCard(Model):
         tax: str = None,
         vat: str = None,
         buttons=None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(ReceiptCard, self).__init__(**kwargs)
         self.title = title
@@ -2091,7 +2091,7 @@ class ReceiptItem(Model):
         price: str = None,
         quantity: str = None,
         tap=None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(ReceiptItem, self).__init__(**kwargs)
         self.title = title
@@ -2246,7 +2246,7 @@ class ThumbnailCard(Model):
         images=None,
         buttons=None,
         tap=None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(ThumbnailCard, self).__init__(**kwargs)
         self.title = title
@@ -2304,7 +2304,7 @@ class TokenExchangeInvokeRequest(Model):
         connection_name: str = None,
         token: str = None,
         properties=None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(TokenExchangeInvokeRequest, self).__init__(**kwargs)
         self.id = id
@@ -2340,7 +2340,7 @@ class TokenExchangeInvokeResponse(Model):
         connection_name: str = None,
         failure_detail: str = None,
         properties=None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(TokenExchangeInvokeResponse, self).__init__(**kwargs)
         self.id = id
@@ -2380,7 +2380,7 @@ class TokenExchangeState(Model):
         relates_to=None,
         bot_url: str = None,
         ms_app_id: str = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(TokenExchangeState, self).__init__(**kwargs)
         self.connection_name = connection_name
@@ -2439,7 +2439,7 @@ class TokenResponse(Model):
         token: str = None,
         expiration: str = None,
         channel_id: str = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(TokenResponse, self).__init__(**kwargs)
         self.connection_name = connection_name
@@ -2528,7 +2528,7 @@ class VideoCard(Model):
         aspect: str = None,
         duration: str = None,
         value=None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(VideoCard, self).__init__(**kwargs)
         self.title = title

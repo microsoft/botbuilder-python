@@ -51,8 +51,10 @@ class RootBot(ActivityHandler):
     async def on_message_activity(self, turn_context: TurnContext):
         # If there is an active skill
         active_skill_id: str = await self._active_skill_property.get(turn_context)
-        skill_conversation_id = await self._conversation_id_factory.create_skill_conversation_id(
-            TurnContext.get_conversation_reference(turn_context.activity)
+        skill_conversation_id = (
+            await self._conversation_id_factory.create_skill_conversation_id(
+                TurnContext.get_conversation_reference(turn_context.activity)
+            )
         )
 
         if active_skill_id:

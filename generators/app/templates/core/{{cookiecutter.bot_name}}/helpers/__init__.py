@@ -4,8 +4,4 @@
 from .luis_helper import Intent, LuisHelper
 from .dialog_helper import DialogHelper
 
-__all__ = [
-    "DialogHelper",
-    "LuisHelper",
-    "Intent"
-]
+__all__ = ["DialogHelper", "LuisHelper", "Intent"]

@@ -5,12 +5,9 @@ from botbuilder.dialogs import (
     ComponentDialog,
     DialogTurnResult,
     WaterfallDialog,
-    WaterfallStepContext
+    WaterfallStepContext,
 )
-from botbuilder.dialogs.prompts import (
-    OAuthPrompt,
-    OAuthPromptSettings
-)
+from botbuilder.dialogs.prompts import OAuthPrompt, OAuthPromptSettings
 from botbuilder.schema import TokenResponse
 from botbuilder.core import MessageFactory
 
@@ -36,7 +33,8 @@ class MainDialog(ComponentDialog):
 
         self.add_dialog(
             WaterfallDialog(
-                WaterfallDialog.__name__, [self._sign_in_step, self._show_token_response]
+                WaterfallDialog.__name__,
+                [self._sign_in_step, self._show_token_response],
             )
         )
 
@@ -45,12 +43,18 @@ class MainDialog(ComponentDialog):
     async def _sign_in_step(self, context: WaterfallStepContext) -> DialogTurnResult:
         return await context.begin_dialog(OAuthPrompt.__name__)
 
-    async def _show_token_response(self, context: WaterfallStepContext) -> DialogTurnResult:
+    async def _show_token_response(
+        self, context: WaterfallStepContext
+    ) -> DialogTurnResult:
         result: TokenResponse = context.result
 
         if not result:
-            await context.context.send_activity(MessageFactory.text("No token response from OAuthPrompt"))
+            await context.context.send_activity(
+                MessageFactory.text("No token response from OAuthPrompt")
+            )
         else:
-            await context.context.send_activity(MessageFactory.text(f"Your token is {result.token}"))
+            await context.context.send_activity(
+                MessageFactory.text(f"Your token is {result.token}")
+            )
 
         return await context.end_dialog()

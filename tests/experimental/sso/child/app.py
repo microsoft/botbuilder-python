@@ -72,6 +72,7 @@ DIALOG = MainDialog(CONFIG)
 # Create the Bot
 BOT = ChildBot(DIALOG, USER_STATE, CONVERSATION_STATE, CONFIG)
 
+
 # Listen for incoming requests on /api/messages
 async def messages(req: Request) -> Response:
     # Main bot message handler.
@@ -90,6 +91,7 @@ async def messages(req: Request) -> Response:
         return Response(status=201)
     except Exception as exception:
         raise exception
+
 
 """async def options(req: Request) -> Response:
     return Response(status=200)"""

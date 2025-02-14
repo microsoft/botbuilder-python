@@ -98,7 +98,7 @@ class AttachmentsOperations:
         custom_headers=None,
         raw=False,
         callback=None,
-        **operation_config
+        **operation_config,
     ):
         """GetAttachment.
 

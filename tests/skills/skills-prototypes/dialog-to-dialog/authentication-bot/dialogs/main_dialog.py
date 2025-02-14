@@ -6,14 +6,20 @@ from botbuilder.dialogs import (
     WaterfallStepContext,
     DialogTurnResult,
 )
-from botbuilder.dialogs.prompts import ConfirmPrompt, PromptOptions, OAuthPrompt, OAuthPromptSettings
+from botbuilder.dialogs.prompts import (
+    ConfirmPrompt,
+    PromptOptions,
+    OAuthPrompt,
+    OAuthPromptSettings,
+)
 from botbuilder.core import MessageFactory
 from dialogs import LogoutDialog
 
 
 class MainDialog(LogoutDialog):
     def __init__(
-        self, configuration,
+        self,
+        configuration,
     ):
         super().__init__(MainDialog.__name__, configuration.CONNECTION_NAME)
 
@@ -25,37 +31,48 @@ class MainDialog(LogoutDialog):
                     text="Please Sign In",
                     title="Sign In",
                     timeout=30000,
-                )
+                ),
             )
         )
         self.add_dialog(ConfirmPrompt(ConfirmPrompt.__name__))
         self.add_dialog(
             WaterfallDialog(
                 "WFDialog",
-                [self.prompt_step, self.login_step, self.display_token_phase_one, self.display_token_phase_two]
+                [
+                    self.prompt_step,
+                    self.login_step,
+                    self.display_token_phase_one,
+                    self.display_token_phase_two,
+                ],
             )
         )
 
         self.initial_dialog_id = "WFDialog"
 
     async def prompt_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
-        return await step_context.begin_dialog(
-            OAuthPrompt.__name__
-        )
+        return await step_context.begin_dialog(OAuthPrompt.__name__)
 
     async def login_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
         token_response = step_context.result
         if token_response:
-            await step_context.context.send_activity(MessageFactory.text("You are now logged in."))
+            await step_context.context.send_activity(
+                MessageFactory.text("You are now logged in.")
+            )
             return await step_context.prompt(
                 ConfirmPrompt.__name__,
-                PromptOptions(prompt=MessageFactory.text("Would you like to view your token?"))
+                PromptOptions(
+                    prompt=MessageFactory.text("Would you like to view your token?")
+                ),
             )
 
-        await step_context.context.send_activity(MessageFactory.text("Login was not successful please try again."))
+        await step_context.context.send_activity(
+            MessageFactory.text("Login was not successful please try again.")
+        )
         return await step_context.end_dialog()
 
-    async def display_token_phase_one(self, step_context: WaterfallStepContext) -> DialogTurnResult:
+    async def display_token_phase_one(
+        self, step_context: WaterfallStepContext
+    ) -> DialogTurnResult:
         await step_context.context.send_activity(MessageFactory.text("Thank you"))
 
         result = step_context.result
@@ -64,9 +81,13 @@ class MainDialog(LogoutDialog):
 
         return await step_context.end_dialog()
 
-    async def display_token_phase_two(self, step_context: WaterfallStepContext) -> DialogTurnResult:
+    async def display_token_phase_two(
+        self, step_context: WaterfallStepContext
+    ) -> DialogTurnResult:
         token_response = step_context.result
         if token_response:
-            await step_context.context.send_activity(MessageFactory.text(f"Here is your token {token_response.token}"))
+            await step_context.context.send_activity(
+                MessageFactory.text(f"Here is your token {token_response.token}")
+            )
 
         return await step_context.end_dialog()

@@ -19,7 +19,7 @@ class PasswordServiceClientCredentialFactory(ServiceClientCredentialsFactory):
         password: str = None,
         tenant_id: str = None,
         *,
-        logger: Logger = None
+        logger: Logger = None,
     ) -> None:
         self.app_id = app_id
         self.password = password

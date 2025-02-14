@@ -41,7 +41,7 @@ class UserTokenOperations:
         code=None,
         custom_headers=None,
         raw=False,
-        **operation_config
+        **operation_config,
     ):
         """
 
@@ -118,7 +118,7 @@ class UserTokenOperations:
         resource_urls=None,
         custom_headers=None,
         raw=False,
-        **operation_config
+        **operation_config,
     ):
         """
 
@@ -198,7 +198,7 @@ class UserTokenOperations:
         channel_id=None,
         custom_headers=None,
         raw=False,
-        **operation_config
+        **operation_config,
     ):
         """
 
@@ -268,7 +268,7 @@ class UserTokenOperations:
         include=None,
         custom_headers=None,
         raw=False,
-        **operation_config
+        **operation_config,
     ):
         """
 
@@ -341,7 +341,7 @@ class UserTokenOperations:
         token=None,
         custom_headers=None,
         raw=False,
-        **operation_config
+        **operation_config,
     ):
         """
 

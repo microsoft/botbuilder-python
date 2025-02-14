@@ -13,7 +13,7 @@ class SendPacket:
         header: Header,
         payload: object,
         is_length_known: bool,
-        sent_callback: Callable[[Header], Awaitable]
+        sent_callback: Callable[[Header], Awaitable],
     ):
         self.header = header
         self.payload = payload

@@ -39,7 +39,7 @@ class ConversationsOperations:
         continuation_token=None,
         custom_headers=None,
         raw=False,
-        **operation_config
+        **operation_config,
     ):
         """GetConversations.
 
@@ -187,7 +187,7 @@ class ConversationsOperations:
         activity,
         custom_headers=None,
         raw=False,
-        **operation_config
+        **operation_config,
     ):
         """SendToConversation.
 
@@ -275,7 +275,7 @@ class ConversationsOperations:
         activities=None,
         custom_headers=None,
         raw=False,
-        **operation_config
+        **operation_config,
     ):
         """SendConversationHistory.
 
@@ -360,7 +360,7 @@ class ConversationsOperations:
         activity,
         custom_headers=None,
         raw=False,
-        **operation_config
+        **operation_config,
     ):
         """UpdateActivity.
 
@@ -444,7 +444,7 @@ class ConversationsOperations:
         activity,
         custom_headers=None,
         raw=False,
-        **operation_config
+        **operation_config,
     ):
         """ReplyToActivity.
 
@@ -535,7 +535,7 @@ class ConversationsOperations:
         activity_id,
         custom_headers=None,
         raw=False,
-        **operation_config
+        **operation_config,
     ):
         """DeleteActivity.
 
@@ -657,7 +657,7 @@ class ConversationsOperations:
         member_id,
         custom_headers=None,
         raw=False,
-        **operation_config
+        **operation_config,
     ):
         """GetConversationMember.
 
@@ -727,7 +727,7 @@ class ConversationsOperations:
         continuation_token=None,
         custom_headers=None,
         raw=False,
-        **operation_config
+        **operation_config,
     ):
         """GetConversationPagedMembers.
 
@@ -817,7 +817,7 @@ class ConversationsOperations:
         continuation_token=None,
         custom_headers=None,
         raw=False,
-        **operation_config
+        **operation_config,
     ):
         """GetTeamsConversationPagedMembers.
 
@@ -906,7 +906,7 @@ class ConversationsOperations:
         member_id,
         custom_headers=None,
         raw=False,
-        **operation_config
+        **operation_config,
     ):
         """DeleteConversationMember.
 
@@ -969,7 +969,7 @@ class ConversationsOperations:
         activity_id,
         custom_headers=None,
         raw=False,
-        **operation_config
+        **operation_config,
     ):
         """GetActivityMembers.
 
@@ -1039,7 +1039,7 @@ class ConversationsOperations:
         attachment_upload,
         custom_headers=None,
         raw=False,
-        **operation_config
+        **operation_config,
     ):
         """UploadAttachment.
 

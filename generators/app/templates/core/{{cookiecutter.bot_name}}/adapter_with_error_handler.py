@@ -8,7 +8,10 @@ from botbuilder.core import (
     ConversationState,
     TurnContext,
 )
-from botbuilder.integration.aiohttp import CloudAdapter, ConfigurationBotFrameworkAuthentication
+from botbuilder.integration.aiohttp import (
+    CloudAdapter,
+    ConfigurationBotFrameworkAuthentication,
+)
 from botbuilder.schema import ActivityTypes, Activity
 
 

@@ -16,7 +16,7 @@ class AuthBot(DialogBot):
             await DialogHelper.run_dialog(
                 self.dialog,
                 turn_context,
-                self.conversation_state.create_property("DialogState")
+                self.conversation_state.create_property("DialogState"),
             )
         else:
             await super().on_turn(turn_context)
@@ -30,13 +30,11 @@ class AuthBot(DialogBot):
                     MessageFactory.text("Hello and welcome!")
                 )
 
-    async def on_token_response_event(
-        self, turn_context: TurnContext
-    ):
+    async def on_token_response_event(self, turn_context: TurnContext):
         print("on token: Running dialog with Message Activity.")
 
         return await DialogHelper.run_dialog(
             self.dialog,
             turn_context,
-            self.conversation_state.create_property("DialogState")
+            self.conversation_state.create_property("DialogState"),
         )

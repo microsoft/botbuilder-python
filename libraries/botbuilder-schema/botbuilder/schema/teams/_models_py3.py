@@ -176,7 +176,7 @@ class FileConsentCard(Model):
         size_in_bytes: int = None,
         accept_context=None,
         decline_context=None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(FileConsentCard, self).__init__(**kwargs)
         self.description = description
@@ -241,7 +241,7 @@ class FileDownloadInfo(Model):
         unique_id: str = None,
         file_type: str = None,
         etag=None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(FileDownloadInfo, self).__init__(**kwargs)
         self.download_url = download_url
@@ -308,7 +308,7 @@ class FileUploadInfo(Model):
         content_url: str = None,
         unique_id: str = None,
         file_type: str = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(FileUploadInfo, self).__init__(**kwargs)
         self.name = name
@@ -344,7 +344,7 @@ class MessageActionsPayloadApp(Model):
         application_identity_type=None,
         id: str = None,
         display_name: str = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(MessageActionsPayloadApp, self).__init__(**kwargs)
         self.application_identity_type = application_identity_type
@@ -389,7 +389,7 @@ class MessageActionsPayloadAttachment(Model):
         content=None,
         name: str = None,
         thumbnail_url: str = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(MessageActionsPayloadAttachment, self).__init__(**kwargs)
         self.id = id
@@ -450,7 +450,7 @@ class MessageActionsPayloadConversation(Model):
         conversation_identity_type=None,
         id: str = None,
         display_name: str = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(MessageActionsPayloadConversation, self).__init__(**kwargs)
         self.conversation_identity_type = conversation_identity_type
@@ -569,7 +569,7 @@ class MessageActionsPayloadUser(Model):
         user_identity_type=None,
         id: str = None,
         display_name: str = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(MessageActionsPayloadUser, self).__init__(**kwargs)
         self.user_identity_type = user_identity_type
@@ -669,7 +669,7 @@ class MessageActionsPayload(Model):
         attachments=None,
         mentions=None,
         reactions=None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(MessageActionsPayload, self).__init__(**kwargs)
         self.id = id
@@ -737,7 +737,7 @@ class MessagingExtensionAction(TaskModuleRequest):
         bot_message_preview_action=None,
         bot_activity_preview=None,
         message_payload=None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(MessagingExtensionAction, self).__init__(
             data=data, context=context, **kwargs
@@ -776,7 +776,7 @@ class MessagingExtensionActionResponse(Model):
         task=None,
         compose_extension=None,
         cache_info: CacheInfo = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(MessagingExtensionActionResponse, self).__init__(**kwargs)
         self.task = task
@@ -819,7 +819,7 @@ class MessagingExtensionAttachment(Attachment):
         name: str = None,
         thumbnail_url: str = None,
         preview=None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(MessagingExtensionAttachment, self).__init__(
             content_type=content_type,
@@ -827,7 +827,7 @@ class MessagingExtensionAttachment(Attachment):
             content=content,
             name=name,
             thumbnail_url=thumbnail_url,
-            **kwargs
+            **kwargs,
         )
         self.preview = preview
 
@@ -885,7 +885,7 @@ class MessagingExtensionQuery(Model):
         parameters=None,
         query_options=None,
         state: str = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(MessagingExtensionQuery, self).__init__(**kwargs)
         self.command_id = command_id
@@ -980,7 +980,7 @@ class MessagingExtensionResult(Model):
         suggested_actions=None,
         text: str = None,
         activity_preview=None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(MessagingExtensionResult, self).__init__(**kwargs)
         self.attachment_layout = attachment_layout
@@ -1027,7 +1027,7 @@ class NotificationInfo(Model):
         alert: bool = None,
         alert_in_meeting: bool = None,
         external_resource_url: str = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(NotificationInfo, self).__init__(**kwargs)
         self.alert = alert
@@ -1075,7 +1075,7 @@ class O365ConnectorCard(Model):
         theme_color: str = None,
         sections=None,
         potential_action=None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(O365ConnectorCard, self).__init__(**kwargs)
         self.title = title
@@ -1119,7 +1119,7 @@ class O365ConnectorCardInputBase(Model):
         is_required: bool = None,
         title: str = None,
         value: str = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(O365ConnectorCardInputBase, self).__init__(**kwargs)
         self.type = type
@@ -1193,7 +1193,7 @@ class O365ConnectorCardActionCard(O365ConnectorCardActionBase):
         id: str = None,
         inputs=None,
         actions=None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(O365ConnectorCardActionCard, self).__init__(
             type=type, name=name, id=id, **kwargs
@@ -1263,7 +1263,7 @@ class O365ConnectorCardDateInput(O365ConnectorCardInputBase):
         title: str = None,
         value: str = None,
         include_time: bool = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(O365ConnectorCardDateInput, self).__init__(
             type=type,
@@ -1271,7 +1271,7 @@ class O365ConnectorCardDateInput(O365ConnectorCardInputBase):
             is_required=is_required,
             title=title,
             value=value,
-            **kwargs
+            **kwargs,
         )
         self.include_time = include_time
 
@@ -1398,7 +1398,7 @@ class O365ConnectorCardMultichoiceInput(O365ConnectorCardInputBase):
         choices=None,
         style=None,
         is_multi_select: bool = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(O365ConnectorCardMultichoiceInput, self).__init__(
             type=type,
@@ -1406,7 +1406,7 @@ class O365ConnectorCardMultichoiceInput(O365ConnectorCardInputBase):
             is_required=is_required,
             title=title,
             value=value,
-            **kwargs
+            **kwargs,
         )
         self.choices = choices
         self.style = style
@@ -1549,7 +1549,7 @@ class O365ConnectorCardSection(Model):
         facts=None,
         images=None,
         potential_action=None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(O365ConnectorCardSection, self).__init__(**kwargs)
         self.title = title
@@ -1608,7 +1608,7 @@ class O365ConnectorCardTextInput(O365ConnectorCardInputBase):
         value: str = None,
         is_multiline: bool = None,
         max_length: float = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(O365ConnectorCardTextInput, self).__init__(
             type=type,
@@ -1616,7 +1616,7 @@ class O365ConnectorCardTextInput(O365ConnectorCardInputBase):
             is_required=is_required,
             title=title,
             value=value,
-            **kwargs
+            **kwargs,
         )
         self.is_multiline = is_multiline
         self.max_length = max_length
@@ -1802,7 +1802,7 @@ class TaskModuleTaskInfo(Model):
         card=None,
         fallback_url: str = None,
         completion_bot_id: str = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(TaskModuleTaskInfo, self).__init__(**kwargs)
         self.title = title
@@ -1849,7 +1849,7 @@ class TeamDetails(Model):
         member_count: int = None,
         channel_count: int = None,
         type: str = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(TeamDetails, self).__init__(**kwargs)
         self.id = id
@@ -1931,7 +1931,7 @@ class TeamsChannelAccount(ChannelAccount):
         user_principal_name: str = None,
         tenant_id: str = None,
         user_role: str = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(TeamsChannelAccount, self).__init__(id=id, name=name, **kwargs)
         self.given_name = given_name
@@ -1961,7 +1961,7 @@ class TeamsPagedMembersResult(PagedMembersResult):
         *,
         continuation_token: str = None,
         members: List[TeamsChannelAccount] = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(TeamsPagedMembersResult, self).__init__(
             continuation_token=continuation_token, members=members, **kwargs
@@ -2034,7 +2034,7 @@ class TeamsChannelData(Model):
         meeting=None,
         settings: TeamsChannelDataSettings = None,
         on_behalf_of: List["OnBehalfOf"] = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(TeamsChannelData, self).__init__(**kwargs)
         self.channel = channel
@@ -2123,7 +2123,7 @@ class TeamsMeetingParticipant(Model):
         user: TeamsChannelAccount = None,
         meeting: MeetingParticipantInfo = None,
         conversation: ConversationAccount = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(TeamsMeetingParticipant, self).__init__(**kwargs)
         self.user = user
@@ -2468,7 +2468,7 @@ class MeetingDetails(MeetingDetailsBase):
         scheduled_start_time: str = None,
         scheduled_end_time: str = None,
         type: str = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(MeetingDetails, self).__init__(**kwargs)
         self.ms_graph_resource_id = ms_graph_resource_id
@@ -2500,7 +2500,7 @@ class MeetingInfo(Model):
         details: MeetingDetails = None,
         conversation: ConversationAccount = None,
         organizer: TeamsChannelAccount = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(MeetingInfo, self).__init__(**kwargs)
         self.details = details
@@ -2589,7 +2589,7 @@ class TeamsMeetingMember(Model):
         *,
         user: TeamsChannelAccount = None,
         meeting: UserMeetingDetails = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(TeamsMeetingMember, self).__init__(**kwargs)
         self.user = user
@@ -2770,7 +2770,7 @@ class OnBehalfOf(Model):
         mention_type: str = "person",
         mri: str = None,
         display_name: str = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         super(OnBehalfOf, self).__init__(**kwargs)
         self.item_id = item_id
@@ -2886,7 +2886,7 @@ class MeetingNotificationRecipientFailureInfo(Model):
         recipient_mri: str = None,
         error_code: str = None,
         failure_reason: str = None,
-        **kwargs
+        **kwargs,
     ):
         super(MeetingNotificationRecipientFailureInfo, self).__init__(**kwargs)
         self.recipient_mri = recipient_mri
@@ -2914,7 +2914,7 @@ class MeetingNotificationResponse(Model):
         self,
         *,
         recipients_failure_info: List["MeetingNotificationRecipientFailureInfo"] = None,
-        **kwargs
+        **kwargs,
     ):
         super(MeetingNotificationResponse, self).__init__(**kwargs)
         self.recipients_failure_info = recipients_failure_info
@@ -2955,7 +2955,7 @@ class MeetingStageSurface(Surface):
         *,
         content_type: ContentType = ContentType.Task,
         content: object = None,
-        **kwargs
+        **kwargs,
     ):
         super(MeetingStageSurface, self).__init__(SurfaceType.MeetingStage, **kwargs)
         self.content_type = content_type
@@ -3025,7 +3025,7 @@ class TargetedMeetingNotification(MeetingNotification):
         *,
         value: "TargetedMeetingNotificationValue" = None,
         channel_data: "MeetingNotificationChannelData" = None,
-        **kwargs
+        **kwargs,
     ):
         super(TargetedMeetingNotification, self).__init__(value=value, **kwargs)
         self.channel_data = channel_data

@@ -10,7 +10,7 @@ from botbuilder.core.skills import BotFrameworkSkill
 
 
 class DefaultConfig:
-    """ Bot Configuration """
+    """Bot Configuration"""
 
     PORT = 3428
     APP_ID = os.environ.get("MicrosoftAppId", "")

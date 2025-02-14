@@ -41,7 +41,7 @@ class BotFrameworkAuthenticationFactory:
         auth_configuration: AuthenticationConfiguration = AuthenticationConfiguration(),
         http_client_factory: HttpClientFactory = None,
         connector_client_configuration: BotFrameworkConnectorConfiguration = None,
-        logger: Logger = None
+        logger: Logger = None,
     ) -> BotFrameworkAuthentication:
         """
         Creates the appropriate BotFrameworkAuthentication instance.
