@@ -1,14 +1,15 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from typing import Union
 
 class ChoiceFactoryOptions:
     def __init__(
         self,
-        inline_separator: str = None,
-        inline_or: str = None,
-        inline_or_more: str = None,
-        include_numbers: bool = None,
+        inline_separator: Union[str, None] = None,
+        inline_or: Union[str, None] = None,
+        inline_or_more: Union[str, None] = None,
+        include_numbers: Union[bool, None] = None,
     ) -> None:
         """Initializes a new instance.
         Refer to the code in the ConfirmPrompt for an example of usage.

@@ -37,10 +37,10 @@ from botframework.connector import Channels
 class UserToken:
     def __init__(
         self,
-        connection_name: str = None,
-        user_id: str = None,
-        channel_id: str = None,
-        token: str = None,
+        connection_name: Union[str, None] = None,
+        user_id: Union[str, None] = None,
+        channel_id: Union[str, None] = None,
+        token: Union[str, None] = None,
     ):
         self.connection_name = connection_name
         self.user_id = user_id
@@ -59,11 +59,11 @@ class UserToken:
 class ExchangeableToken(UserToken):
     def __init__(
         self,
-        connection_name: str = None,
-        user_id: str = None,
-        channel_id: str = None,
-        token: str = None,
-        exchangeable_item: str = None,
+        connection_name: Union[str, None] = None,
+        user_id: Union[str, None] = None,
+        channel_id: Union[str, None] = None,
+        token: Union[str, None] = None,
+        exchangeable_item: Union[str, None] = None,
     ):
         super(ExchangeableToken, self).__init__(
             connection_name=connection_name,
@@ -86,7 +86,7 @@ class ExchangeableToken(UserToken):
 
 
 class TokenMagicCode:
-    def __init__(self, key: UserToken = None, magic_code: str = None):
+    def __init__(self, key: UserToken = None, magic_code: Union[str, None] = None):
         self.key = key
         self.magic_code = magic_code
 
@@ -204,9 +204,9 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
         self,
         reference: ConversationReference,
         callback: Callable,
-        bot_id: str = None,
+        bot_id: Union[str, None] = None,
         claims_identity: ClaimsIdentity = None,  # pylint: disable=unused-argument
-        audience: str = None,
+        audience: Union[str, None] = None,
     ):
         """
         The `TestAdapter` just calls parent implementation.
@@ -334,7 +334,7 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
         channel_id: str,
         user_id: str,
         token: str,
-        magic_code: str = None,
+        magic_code: Union[str, None] = None,
     ):
         key = UserToken()
         key.channel_id = channel_id
@@ -354,7 +354,7 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
         self,
         context: TurnContext,
         connection_name: str,
-        magic_code: str = None,
+        magic_code: Union[str, None] = None,
         oauth_app_credentials: AppCredentials = None,  # pylint: disable=unused-argument
     ) -> TokenResponse:
         key = UserToken()
@@ -393,8 +393,8 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
     async def sign_out_user(
         self,
         context: TurnContext,
-        connection_name: str = None,
-        user_id: str = None,
+        connection_name: Union[str, None] = None,
+        user_id: Union[str, None] = None,
         oauth_app_credentials: AppCredentials = None,  # pylint: disable=unused-argument
     ):
         channel_id = context.activity.channel_id
@@ -414,7 +414,7 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
         self,
         context: TurnContext,
         connection_name: str,
-        final_redirect: str = None,  # pylint: disable=unused-argument
+        final_redirect: Union[str, None] = None,  # pylint: disable=unused-argument
         oauth_app_credentials: AppCredentials = None,  # pylint: disable=unused-argument
     ) -> str:
         return (
@@ -425,9 +425,9 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
     async def get_token_status(
         self,
         context: TurnContext,
-        connection_name: str = None,
-        user_id: str = None,
-        include_filter: str = None,
+        connection_name: Union[str, None] = None,
+        user_id: Union[str, None] = None,
+        include_filter: Union[str, None] = None,
         oauth_app_credentials: AppCredentials = None,
     ) -> Dict[str, TokenResponse]:
         return None
@@ -437,7 +437,7 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
         context: TurnContext,
         connection_name: str,
         resource_urls: List[str],
-        user_id: str = None,  # pylint: disable=unused-argument
+        user_id: Union[str, None] = None,  # pylint: disable=unused-argument
         oauth_app_credentials: AppCredentials = None,  # pylint: disable=unused-argument
     ) -> Dict[str, TokenResponse]:
         return None
@@ -481,7 +481,7 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
         turn_context: TurnContext,
         connection_name: str,
         user_id: str,
-        final_redirect: str = None,
+        final_redirect: Union[str, None] = None,
     ) -> SignInUrlResponse:
         return await self.get_sign_in_resource_from_user_and_credentials(
             turn_context, None, connection_name, user_id, final_redirect
@@ -493,7 +493,7 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
         oauth_app_credentials: AppCredentials,
         connection_name: str,
         user_id: str,
-        final_redirect: str = None,
+        final_redirect: Union[str, None] = None,
     ) -> SignInUrlResponse:
         return SignInUrlResponse(
             sign_in_link=f"https://fake.com/oauthsignin/{connection_name}/{turn_context.activity.channel_id}/{user_id}",

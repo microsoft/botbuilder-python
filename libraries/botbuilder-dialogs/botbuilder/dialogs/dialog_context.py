@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from botbuilder.core.turn_context import TurnContext
 from botbuilder.dialogs.memory import DialogStateManager
@@ -208,8 +208,8 @@ class DialogContext:
 
     async def cancel_all_dialogs(
         self,
-        cancel_parents: bool = None,
-        event_name: str = None,
+        cancel_parents: Union[bool, None] = None,
+        event_name: Union[str, None] = None,
         event_value: object = None,
     ):
         """

@@ -584,7 +584,7 @@ class SkillDialogTests(aiounittest.AsyncTestCase):
     def create_skill_dialog_options(
         conversation_state: ConversationState,
         skill_client: BotFrameworkClient,
-        connection_name: str = None,
+        connection_name: Union[str, None] = None,
     ):
         return SkillDialogOptions(
             bot_id=str(uuid.uuid4()),

@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 import inspect
 from hashlib import sha256
-from typing import Dict
+from typing import Dict, Union
 
 from botbuilder.core import (
     NullTelemetryClient,
@@ -43,7 +43,7 @@ class DialogSet:
         self.__telemetry_client = NullTelemetryClient()
 
         self._dialogs: Dict[str, Dialog] = {}
-        self._version: str = None
+        self._version: Union[str, None] = None
 
     @property
     def telemetry_client(self) -> BotTelemetryClient:

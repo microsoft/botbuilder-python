@@ -150,9 +150,9 @@ class CloudAdapterBase(BotAdapter, ABC):
         self,
         reference: ConversationReference,
         callback: Callable,
-        bot_app_id: str = None,  # pylint: disable=unused-argument
+        bot_app_id: Union[str, None] = None,  # pylint: disable=unused-argument
         claims_identity: ClaimsIdentity = None,  # pylint: disable=unused-argument
-        audience: str = None,  # pylint: disable=unused-argument
+        audience: Union[str, None] = None,  # pylint: disable=unused-argument
     ):
         """
         Sends a proactive message to a conversation.
@@ -199,9 +199,9 @@ class CloudAdapterBase(BotAdapter, ABC):
         bot_app_id: str,
         callback: Callable[[TurnContext], Awaitable] = None,
         conversation_parameters: ConversationParameters = None,
-        channel_id: str = None,
-        service_url: str = None,
-        audience: str = None,
+        channel_id: Union[str, None] = None,
+        service_url: Union[str, None] = None,
+        audience: Union[str, None] = None,
     ):
         if not service_url:
             raise TypeError(

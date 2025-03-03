@@ -4,7 +4,7 @@
 import traceback
 
 from http import HTTPStatus
-from typing import Awaitable, Callable
+from typing import Awaitable, Callable, Union
 from botframework.connector.channels import Channels
 
 from botframework.connector.token_api.models import (
@@ -30,7 +30,7 @@ from botbuilder.core import (
 
 class _TokenStoreItem(StoreItem):
     def __init__(self, **kwargs):
-        self.e_tag: str = None
+        self.e_tag: Union[str, None] = None
         super().__init__(**kwargs)
 
     @staticmethod
