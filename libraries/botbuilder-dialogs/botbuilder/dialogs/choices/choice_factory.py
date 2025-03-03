@@ -18,8 +18,8 @@ class ChoiceFactory:
     def for_channel(
         channel_id: str,
         choices: List[Union[str, Choice]],
-        text: str = None,
-        speak: str = None,
+        text: Union[str, None] = None,
+        speak: Union[str, None] = None,
         options: ChoiceFactoryOptions = None,
     ) -> Activity:
         """
@@ -73,8 +73,8 @@ class ChoiceFactory:
     @staticmethod
     def inline(
         choices: List[Union[str, Choice]],
-        text: str = None,
-        speak: str = None,
+        text: Union[str, None] = None,
+        speak: Union[str, None] = None,
         options: ChoiceFactoryOptions = None,
     ) -> Activity:
         """
@@ -132,8 +132,8 @@ class ChoiceFactory:
     @staticmethod
     def list_style(
         choices: List[Union[str, Choice]],
-        text: str = None,
-        speak: str = None,
+        text: Union[str, None] = None,
+        speak: Union[str, None] = None,
         options: ChoiceFactoryOptions = None,
     ):
         """
@@ -187,7 +187,7 @@ class ChoiceFactory:
 
     @staticmethod
     def suggested_action(
-        choices: List[Choice], text: str = None, speak: str = None
+        choices: List[Choice], text: Union[str, None] = None, speak: Union[str, None] = None
     ) -> Activity:
         """
         Creates a message activity that includes a list of choices that have been added as suggested actions.
@@ -202,7 +202,7 @@ class ChoiceFactory:
 
     @staticmethod
     def hero_card(
-        choices: List[Union[Choice, str]], text: str = None, speak: str = None
+        choices: List[Union[Choice, str]], text: Union[str, None] = None, speak: Union[str, None] = None
     ) -> Activity:
         """
         Creates a message activity that includes a lsit of coices that have been added as `HeroCard`'s

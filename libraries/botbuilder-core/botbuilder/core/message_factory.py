@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 from typing import List, Union
+
 from botbuilder.schema import (
     ActivityTypes,
     Activity,
@@ -16,8 +17,8 @@ from botbuilder.schema import (
 def attachment_activity(
     attachment_layout: AttachmentLayoutTypes,
     attachments: List[Attachment],
-    text: str = None,
-    speak: str = None,
+    text: Union[str, None] = None,
+    speak: Union[str, None] = None,
     input_hint: Union[InputHints, str] = InputHints.accepting_input,
 ) -> Activity:
     message = Activity(
@@ -42,7 +43,7 @@ class MessageFactory:
     @staticmethod
     def text(
         text: str,
-        speak: str = None,
+        speak: Union[str, None] = None,
         input_hint: Union[InputHints, str] = InputHints.accepting_input,
     ) -> Activity:
         """
@@ -66,8 +67,8 @@ class MessageFactory:
     @staticmethod
     def suggested_actions(
         actions: List[CardAction],
-        text: str = None,
-        speak: str = None,
+        text: Union[str, None] = None,
+        speak: Union[str, None] = None,
         input_hint: Union[InputHints, str] = InputHints.accepting_input,
     ) -> Activity:
         """
@@ -99,8 +100,8 @@ class MessageFactory:
     @staticmethod
     def attachment(
         attachment: Attachment,
-        text: str = None,
-        speak: str = None,
+        text: Union[str, None] = None,
+        speak: Union[str, None] = None,
         input_hint: Union[InputHints, str] = None,
     ):
         """
@@ -127,8 +128,8 @@ class MessageFactory:
     @staticmethod
     def list(
         attachments: List[Attachment],
-        text: str = None,
-        speak: str = None,
+        text: Union[str, None] = None,
+        speak: Union[str, None] = None,
         input_hint: Union[InputHints, str] = None,
     ) -> Activity:
         """
@@ -159,8 +160,8 @@ class MessageFactory:
     @staticmethod
     def carousel(
         attachments: List[Attachment],
-        text: str = None,
-        speak: str = None,
+        text: Union[str, None] = None,
+        speak: Union[str, None] = None,
         input_hint: Union[InputHints, str] = None,
     ) -> Activity:
         """
@@ -192,9 +193,9 @@ class MessageFactory:
     def content_url(
         url: str,
         content_type: str,
-        name: str = None,
-        text: str = None,
-        speak: str = None,
+        name: Union[str, None] = None,
+        text: Union[str, None] = None,
+        speak: Union[str, None] = None,
         input_hint: Union[InputHints, str] = None,
     ):
         """

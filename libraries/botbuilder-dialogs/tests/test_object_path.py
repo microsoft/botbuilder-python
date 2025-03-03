@@ -1,3 +1,8 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
+from typing import Union
+
 import aiounittest
 
 from botbuilder.dialogs import ObjectPath
@@ -12,11 +17,11 @@ class Location:
 class Options:
     def __init__(
         self,
-        first_name: str = None,
-        last_name: str = None,
-        age: int = None,
-        boolean: bool = None,
-        dictionary: dict = None,
+        first_name: Union[str, None] = None,
+        last_name: Union[str, None] = None,
+        age: Union[int, None] = None,
+        boolean: Union[bool, None] = None,
+        dictionary: Union[dict, None] = None,
         location: Location = None,
     ):
         self.first_name = first_name

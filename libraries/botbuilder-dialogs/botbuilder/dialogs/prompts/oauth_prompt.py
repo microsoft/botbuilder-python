@@ -44,7 +44,7 @@ from .._user_token_access import _UserTokenAccess
 
 
 class CallerInfo:
-    def __init__(self, caller_service_url: str = None, scope: str = None):
+    def __init__(self, caller_service_url: Union[str, None] = None, scope: Union[str, None] = None):
         self.caller_service_url = caller_service_url
         self.scope = scope
 
@@ -251,7 +251,7 @@ class OAuthPrompt(Dialog):
         return Dialog.end_of_turn
 
     async def get_user_token(
-        self, context: TurnContext, code: str = None
+        self, context: TurnContext, code: Union[str, None] = None
     ) -> TokenResponse:
         """
         Gets the user's tokeN.
@@ -537,7 +537,7 @@ class OAuthPrompt(Dialog):
         )
 
     def _get_token_exchange_invoke_response(
-        self, status: int, failure_detail: str, identifier: str = None
+        self, status: int, failure_detail: str, identifier: Union[str, None] = None
     ) -> Activity:
         return Activity(
             type=ActivityTypes.invoke_response,

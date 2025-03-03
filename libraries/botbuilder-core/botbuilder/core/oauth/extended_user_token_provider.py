@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 from abc import ABC
-from typing import Dict, List
+from typing import Dict, List, Union
 
 from botframework.connector.token_api.models import (
     SignInUrlResponse,
@@ -38,7 +38,7 @@ class ExtendedUserTokenProvider(UserTokenProvider, ABC):
         turn_context: TurnContext,
         connection_name: str,
         user_id: str,
-        final_redirect: str = None,
+        final_redirect: Union[str, None] = None,
     ) -> SignInUrlResponse:
         """
         Get the raw signin link to be sent to the user for signin for a connection name.
@@ -60,7 +60,7 @@ class ExtendedUserTokenProvider(UserTokenProvider, ABC):
         oauth_app_credentials: AppCredentials,
         connection_name: str,
         user_id: str,
-        final_redirect: str = None,
+        final_redirect: Union[str, None] = None,
     ) -> SignInUrlResponse:
         """
         Get the raw signin link to be sent to the user for signin for a connection name.
@@ -123,7 +123,7 @@ class ExtendedUserTokenProvider(UserTokenProvider, ABC):
         self,
         context: TurnContext,
         connection_name: str,
-        magic_code: str = None,
+        magic_code: Union[str, None] = None,
         oauth_app_credentials: AppCredentials = None,
     ) -> TokenResponse:
         """
@@ -139,8 +139,8 @@ class ExtendedUserTokenProvider(UserTokenProvider, ABC):
     async def sign_out_user(
         self,
         context: TurnContext,
-        connection_name: str = None,
-        user_id: str = None,
+        connection_name: Union[str, None] = None,
+        user_id: Union[str, None] = None,
         oauth_app_credentials: AppCredentials = None,
     ):
         """
@@ -157,7 +157,7 @@ class ExtendedUserTokenProvider(UserTokenProvider, ABC):
         self,
         context: TurnContext,
         connection_name: str,
-        final_redirect: str = None,
+        final_redirect: Union[str, None] = None,
         oauth_app_credentials: AppCredentials = None,
     ) -> str:
         """
@@ -175,7 +175,7 @@ class ExtendedUserTokenProvider(UserTokenProvider, ABC):
         context: TurnContext,
         connection_name: str,
         resource_urls: List[str],
-        user_id: str = None,
+        user_id: Union[str, None] = None,
         oauth_app_credentials: AppCredentials = None,
     ) -> Dict[str, TokenResponse]:
         """

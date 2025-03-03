@@ -3,6 +3,7 @@
 
 from datetime import datetime, timedelta
 from threading import Lock
+from typing import Union
 from warnings import warn
 
 from botbuilder.core import (
@@ -38,7 +39,7 @@ class DialogManager:
     Class which runs the dialog system.
     """
 
-    def __init__(self, root_dialog: Dialog = None, dialog_state_property: str = None):
+    def __init__(self, root_dialog: Dialog = None, dialog_state_property: Union[str, None] = None):
         """
         Initializes a instance of the <see cref="DialogManager"/> class.
         :param root_dialog: Root dialog to use.
@@ -68,7 +69,7 @@ class DialogManager:
         self.state_configuration: DialogStateManagerConfiguration = None
 
         # Gets or sets (optional) number of milliseconds to expire the bot's state after.
-        self.expire_after: int = None
+        self.expire_after: Union[int, None] = None
 
     async def on_turn(self, context: TurnContext) -> DialogManagerResult:
         """
@@ -156,7 +157,7 @@ class DialogManager:
     @staticmethod
     async def send_state_snapshot_trace(
         dialog_context: DialogContext,
-        trace_label: str = None,  # pylint: disable=unused-argument
+        trace_label: Union[str, None] = None,  # pylint: disable=unused-argument
     ):
         """
         Helper to send a trace activity with a memory snapshot of the active dialog DC.

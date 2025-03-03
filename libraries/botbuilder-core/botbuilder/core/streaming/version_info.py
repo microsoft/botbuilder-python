@@ -2,12 +2,13 @@
 # Licensed under the MIT License.
 
 import json
+from typing import Union
 
 from botframework.streaming.payloads.models import Serializable
 
 
 class VersionInfo(Serializable):
-    def __init__(self, *, user_agent: str = None):
+    def __init__(self, *, user_agent: Union[str, None] = None):
         self.user_agent = user_agent
 
     def to_json(self) -> str:

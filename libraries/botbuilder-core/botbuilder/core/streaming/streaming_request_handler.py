@@ -7,7 +7,7 @@ from http import HTTPStatus
 from datetime import datetime
 from logging import Logger
 from json import loads
-from typing import Dict, List
+from typing import Dict, List, Union
 
 from botbuilder.core import Bot
 from botbuilder.schema import Activity, Attachment, ResourceResponse
@@ -56,7 +56,7 @@ class StreamingRequestHandler(RequestHandler):
         self._server = WebSocketServer(web_socket, self)
         self._server_is_connected = True
         self._server.disconnected_event_handler = self._server_disconnected
-        self._service_url: str = None
+        self._service_url: Union[str, None] = None
 
     @property
     def service_url(self) -> str:

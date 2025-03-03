@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from typing import Dict
+from typing import Dict, Union
 
 
 class DialogInstance:
@@ -10,7 +10,7 @@ class DialogInstance:
     """
 
     def __init__(
-        self, id: str = None, state: Dict[str, object] = None
+        self, id: Union[str, None] = None, state: Dict[str, object] = None
     ):  # pylint: disable=invalid-name
         """
         Gets or sets the ID of the dialog and gets or sets the instance's persisted state.

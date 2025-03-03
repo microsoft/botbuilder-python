@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from typing import Union
+
 import aiounittest
 from botbuilder.dialogs.prompts import OAuthPromptSettings
 from botbuilder.schema import (
@@ -74,7 +76,7 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
         )
 
         async def inspector(
-            activity: Activity, description: str = None
+            activity: Activity, description: Union[str, None] = None
         ):  # pylint: disable=unused-argument
             self.assertTrue(len(activity.attachments) == 1)
             self.assertTrue(
@@ -141,7 +143,7 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
         )
 
         def inspector(
-            activity: Activity, description: str = None
+            activity: Activity, description: Union[str, None] = None
         ):  # pylint: disable=unused-argument
             assert len(activity.attachments) == 1
             assert (
@@ -206,7 +208,7 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
         )
 
         def inspector(
-            activity: Activity, description: str = None
+            activity: Activity, description: Union[str, None] = None
         ):  # pylint: disable=unused-argument
             assert len(activity.attachments) == 1
             assert (
@@ -300,7 +302,7 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
         )
 
         def inspector(
-            activity: Activity, description: str = None
+            activity: Activity, description: Union[str, None] = None
         ):  # pylint: disable=unused-argument
             assert len(activity.attachments) == 1
             assert (
@@ -396,7 +398,7 @@ class OAuthPromptTests(aiounittest.AsyncTestCase):
         )
 
         def inspector(
-            activity: Activity, description: str = None
+            activity: Activity, description: Union[str, None] = None
         ):  # pylint: disable=unused-argument
             assert len(activity.attachments) == 1
             assert (

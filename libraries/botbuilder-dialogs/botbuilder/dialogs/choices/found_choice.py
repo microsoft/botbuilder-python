@@ -1,11 +1,12 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from typing import Union
 
 class FoundChoice:
     """Represents a result from matching user input against a list of choices"""
 
-    def __init__(self, value: str, index: int, score: float, synonym: str = None):
+    def __init__(self, value: str, index: int, score: float, synonym: Union[str, None] = None):
         """
         Parameters
         ----------

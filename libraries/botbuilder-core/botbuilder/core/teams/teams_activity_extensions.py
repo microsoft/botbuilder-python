@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from typing import List
+from typing import List, Union
 from botbuilder.schema import Activity
 from botbuilder.schema.teams import (
     NotificationInfo,
@@ -62,7 +62,7 @@ def teams_get_team_info(activity: Activity) -> TeamInfo:
 
 
 def teams_notify_user(
-    activity: Activity, alert_in_meeting: bool = None, external_resource_url: str = None
+    activity: Activity, alert_in_meeting: Union[bool, None] = None, external_resource_url: Union[str, None] = None
 ):
     if not activity:
         return

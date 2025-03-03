@@ -31,7 +31,7 @@ async def jwt_token_validation_validate_auth_header_with_channel_service_succeed
     app_id: str,
     pwd: str,
     channel_service_or_provider: Union[str, ChannelProvider],
-    header: str = None,
+    header: Union[str, None] = None,
 ):
     if header is None:
         header = f"Bearer {MicrosoftAppCredentials(app_id, pwd).get_access_token()}"

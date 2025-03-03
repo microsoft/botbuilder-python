@@ -1,7 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from typing import Dict
+from typing import Dict, Union
+
 from recognizers_choice import recognize_boolean
 from botbuilder.core.turn_context import TurnContext
 from botbuilder.schema import ActivityTypes, Activity
@@ -32,7 +33,7 @@ class ConfirmPrompt(Prompt):
         self,
         dialog_id: str,
         validator: object = None,
-        default_locale: str = None,
+        default_locale: Union[str, None] = None,
         choice_defaults: Dict[str, object] = None,
     ):
         super().__init__(dialog_id, validator)

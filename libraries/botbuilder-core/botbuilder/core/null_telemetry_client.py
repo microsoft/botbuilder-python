@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 import traceback
-from typing import Dict
+from typing import Dict, Union
 from .bot_telemetry_client import BotTelemetryClient, TelemetryDataPointType, Severity
 
 
@@ -68,7 +68,7 @@ class NullTelemetryClient(BotTelemetryClient):
         name: str,
         value: float,
         tel_type: TelemetryDataPointType = None,
-        count: int = None,
+        count: Union[int, None] = None,
         min_val: float = None,
         max_val: float = None,
         std_dev: float = None,
@@ -104,13 +104,13 @@ class NullTelemetryClient(BotTelemetryClient):
         name: str,
         url: str,
         success: bool,
-        start_time: str = None,
-        duration: int = None,
-        response_code: str = None,
-        http_method: str = None,
+        start_time: Union[str, None] = None,
+        duration: Union[int, None] = None,
+        response_code: Union[str, None] = None,
+        http_method: Union[str, None] = None,
         properties: Dict[str, object] = None,
         measurements: Dict[str, object] = None,
-        request_id: str = None,
+        request_id: Union[str, None] = None,
     ):
         """
         Sends a single request that was captured for the application.
@@ -133,14 +133,14 @@ class NullTelemetryClient(BotTelemetryClient):
         self,
         name: str,
         data: str,
-        type_name: str = None,
-        target: str = None,
-        duration: int = None,
-        success: bool = None,
-        result_code: str = None,
+        type_name: Union[str, None] = None,
+        target: Union[str, None] = None,
+        duration: Union[int, None] = None,
+        success: Union[bool, None] = None,
+        result_code: Union[str, None] = None,
         properties: Dict[str, object] = None,
         measurements: Dict[str, object] = None,
-        dependency_id: str = None,
+        dependency_id: Union[str, None] = None,
     ):
         """
         Sends a single dependency telemetry that was captured for the application.

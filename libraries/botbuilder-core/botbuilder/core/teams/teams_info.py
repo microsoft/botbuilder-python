@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 from botframework.connector import Channels
 from botframework.connector.aio import ConnectorClient
@@ -37,7 +37,7 @@ class TeamsInfo:
         activity: Activity,
         teams_channel_id: str,
         *,
-        bot_app_id: str = None,
+        bot_app_id: Union[str, None] = None,
     ) -> Tuple[ConversationReference, str]:
         if not turn_context:
             raise ValueError("The turn_context cannot be None")
@@ -106,7 +106,7 @@ class TeamsInfo:
     async def send_meeting_notification(
         turn_context: TurnContext,
         notification: MeetingNotificationBase,
-        meeting_id: str = None,
+        meeting_id: Union[str, None] = None,
     ) -> MeetingNotificationResponse:
         meeting_id = (
             meeting_id
@@ -199,8 +199,8 @@ class TeamsInfo:
     async def get_paged_team_members(
         turn_context: TurnContext,
         team_id: str = "",
-        continuation_token: str = None,
-        page_size: int = None,
+        continuation_token: Union[str, None] = None,
+        page_size: Union[int, None] = None,
     ) -> List[TeamsPagedMembersResult]:
         if not team_id:
             team_id = TeamsInfo.get_team_id(turn_context)
@@ -220,7 +220,7 @@ class TeamsInfo:
 
     @staticmethod
     async def get_paged_members(
-        turn_context: TurnContext, continuation_token: str = None, page_size: int = None
+        turn_context: TurnContext, continuation_token: Union[str, None] = None, page_size: Union[int, None] = None
     ) -> List[TeamsPagedMembersResult]:
         team_id = TeamsInfo.get_team_id(turn_context)
         if not team_id:
@@ -236,7 +236,7 @@ class TeamsInfo:
 
     @staticmethod
     async def get_team_member(
-        turn_context: TurnContext, team_id: str = "", member_id: str = None
+        turn_context: TurnContext, team_id: str = "", member_id: Union[str, None] = None
     ) -> TeamsChannelAccount:
         if not team_id:
             team_id = TeamsInfo.get_team_id(turn_context)
@@ -271,9 +271,9 @@ class TeamsInfo:
     @staticmethod
     async def get_meeting_participant(
         turn_context: TurnContext,
-        meeting_id: str = None,
-        participant_id: str = None,
-        tenant_id: str = None,
+        meeting_id: Union[str, None] = None,
+        participant_id: Union[str, None] = None,
+        tenant_id: Union[str, None] = None,
     ) -> TeamsMeetingParticipant:
         meeting_id = (
             meeting_id
@@ -312,7 +312,7 @@ class TeamsInfo:
 
     @staticmethod
     async def get_meeting_info(
-        turn_context: TurnContext, meeting_id: str = None
+        turn_context: TurnContext, meeting_id: Union[str, None] = None
     ) -> MeetingInfo:
         meeting_id = (
             meeting_id
@@ -387,8 +387,8 @@ class TeamsInfo:
     async def _get_paged_members(
         connector_client: ConnectorClient,
         conversation_id: str,
-        continuation_token: str = None,
-        page_size: int = None,
+        continuation_token: Union[str, None] = None,
+        page_size: Union[int, None] = None,
     ) -> List[TeamsPagedMembersResult]:
         if connector_client is None:
             raise TypeError(

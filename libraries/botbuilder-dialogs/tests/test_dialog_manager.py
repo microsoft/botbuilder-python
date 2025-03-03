@@ -3,7 +3,7 @@
 # pylint: disable=pointless-string-statement
 
 from enum import Enum
-from typing import Callable, List, Tuple
+from typing import Callable, List, Tuple, Union
 
 import aiounittest
 
@@ -74,7 +74,7 @@ class SimpleComponentDialog(ComponentDialog):
     dm_turn_result: DialogManagerResult = None
 
     def __init__(
-        self, id: str = None, prop: str = None
+        self, id: Union[str, None] = None, prop: Union[str, None] = None
     ):  # pylint: disable=unused-argument
         super().__init__(id or "SimpleComponentDialog")
         self.text_prompt = "TextPrompt"

@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 from abc import ABC, abstractmethod
-from typing import Dict, List
+from typing import Dict, List, Union
 
 from botbuilder.core.turn_context import TurnContext
 from botbuilder.schema import TokenResponse
@@ -15,7 +15,7 @@ class UserTokenProvider(ABC):
         self,
         context: TurnContext,
         connection_name: str,
-        magic_code: str = None,
+        magic_code: Union[str, None] = None,
         oauth_app_credentials: AppCredentials = None,
     ) -> TokenResponse:
         """
@@ -33,8 +33,8 @@ class UserTokenProvider(ABC):
     async def sign_out_user(
         self,
         context: TurnContext,
-        connection_name: str = None,
-        user_id: str = None,
+        connection_name: Union[str, None] = None,
+        user_id: Union[str, None] = None,
         oauth_app_credentials: AppCredentials = None,
     ):
         """
@@ -53,7 +53,7 @@ class UserTokenProvider(ABC):
         self,
         context: TurnContext,
         connection_name: str,
-        final_redirect: str = None,
+        final_redirect: Union[str, None] = None,
         oauth_app_credentials: AppCredentials = None,
     ) -> str:
         """
@@ -71,9 +71,9 @@ class UserTokenProvider(ABC):
     async def get_token_status(
         self,
         context: TurnContext,
-        connection_name: str = None,
-        user_id: str = None,
-        include_filter: str = None,
+        connection_name: Union[str, None] = None,
+        user_id: Union[str, None] = None,
+        include_filter: Union[str, None] = None,
         oauth_app_credentials: AppCredentials = None,
     ) -> Dict[str, TokenResponse]:
         """
@@ -95,7 +95,7 @@ class UserTokenProvider(ABC):
         context: TurnContext,
         connection_name: str,
         resource_urls: List[str],
-        user_id: str = None,
+        user_id: Union[str, None] = None,
         oauth_app_credentials: AppCredentials = None,
     ) -> Dict[str, TokenResponse]:
         """

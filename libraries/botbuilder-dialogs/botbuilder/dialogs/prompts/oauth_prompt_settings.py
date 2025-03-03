@@ -1,5 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+
+from typing import Union
+
 from botframework.connector.auth import AppCredentials
 
 
@@ -8,8 +11,8 @@ class OAuthPromptSettings:
         self,
         connection_name: str,
         title: str,
-        text: str = None,
-        timeout: int = None,
+        text: Union[str, None] = None,
+        timeout: Union[int, None] = None,
         oauth_app_credentials: AppCredentials = None,
         end_on_invalid_message: bool = False,
     ):

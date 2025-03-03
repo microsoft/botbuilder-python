@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 """The memory transcript store stores transcripts in volatile memory."""
 import datetime
-from typing import List, Dict
+from typing import List, Dict, Union
 from botbuilder.schema import Activity
 from .transcript_logger import PagedResult, TranscriptInfo, TranscriptStore
 
@@ -41,7 +41,7 @@ class MemoryTranscriptStore(TranscriptStore):
         self,
         channel_id: str,
         conversation_id: str,
-        continuation_token: str = None,
+        continuation_token: Union[str, None] = None,
         start_date: datetime = datetime.datetime.min,
     ) -> "PagedResult[Activity]":
         if not channel_id:
@@ -98,7 +98,7 @@ class MemoryTranscriptStore(TranscriptStore):
                 del self.channels[channel_id][conversation_id]
 
     async def list_transcripts(
-        self, channel_id: str, continuation_token: str = None
+        self, channel_id: str, continuation_token: Union[str, None] = None
     ) -> "PagedResult[TranscriptInfo]":
         if not channel_id:
             raise TypeError("Missing channel_id")

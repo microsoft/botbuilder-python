@@ -156,8 +156,8 @@ class TurnContext:
     async def send_activity(
         self,
         activity_or_text: Union[Activity, str],
-        speak: str = None,
-        input_hint: str = None,
+        speak: Union[str, None] = None,
+        input_hint: Union[str, None] = None,
     ) -> Union[ResourceResponse, None]:
         """
         Sends a single activity or message to the user.
@@ -304,7 +304,7 @@ class TurnContext:
         return await logic
 
     async def send_trace_activity(
-        self, name: str, value: object = None, value_type: str = None, label: str = None
+        self, name: str, value: object = None, value_type: Union[str, None] = None, label: Union[str, None] = None
     ) -> ResourceResponse:
         trace_activity = Activity(
             type=ActivityTypes.trace,
