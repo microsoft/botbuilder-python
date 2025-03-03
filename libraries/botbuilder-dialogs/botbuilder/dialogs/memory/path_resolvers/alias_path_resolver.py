@@ -1,11 +1,13 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from typing import Union
+
 from botbuilder.dialogs.memory import PathResolverBase
 
 
 class AliasPathResolver(PathResolverBase):
-    def __init__(self, alias: str, prefix: str, postfix: str = None):
+    def __init__(self, alias: str, prefix: str, postfix: Union[str, None] = None):
         """
         Initializes a new instance of the <see cref="AliasPathResolver"/> class.
         <param name="alias">Alias name.</param>

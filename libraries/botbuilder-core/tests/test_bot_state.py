@@ -2,6 +2,8 @@
 # Licensed under the MIT License.
 
 from unittest.mock import MagicMock
+from typing import Union
+
 import aiounittest
 
 from botbuilder.core import (
@@ -41,7 +43,7 @@ class BotStateForTest(BotState):
 
 
 class CustomState(StoreItem):
-    def __init__(self, custom_string: str = None, e_tag: str = "*"):
+    def __init__(self, custom_string: Union[str, None] = None, e_tag: str = "*"):
         super().__init__(custom_string=custom_string, e_tag=e_tag)
 
 

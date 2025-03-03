@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 from abc import ABC
-from typing import List, Callable, Awaitable
+from typing import List, Callable, Awaitable, Union
 
 from aiohttp.web_request import Request
 from aiohttp.web_response import Response
@@ -143,9 +143,9 @@ class SlackAdapter(BotAdapter, ABC):
         self,
         reference: ConversationReference,
         callback: Callable,
-        bot_id: str = None,  # pylint: disable=unused-argument
+        bot_id: Union[str, None] = None,  # pylint: disable=unused-argument
         claims_identity: ClaimsIdentity = None,
-        audience: str = None,  # pylint: disable=unused-argument
+        audience: Union[str, None] = None,  # pylint: disable=unused-argument
     ):
         """
         Send a proactive message to a conversation.

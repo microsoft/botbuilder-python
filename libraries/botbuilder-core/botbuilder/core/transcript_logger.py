@@ -8,7 +8,7 @@ import random
 import string
 from queue import Queue
 from abc import ABC, abstractmethod
-from typing import Awaitable, Callable, List
+from typing import Awaitable, Callable, List, Union
 from botbuilder.schema import (
     Activity,
     ActivityEventNames,
@@ -209,9 +209,9 @@ class TranscriptInfo:
     # pylint: disable=invalid-name
     def __init__(
         self,
-        channel_id: str = None,
+        channel_id: Union[str, None] = None,
         created: datetime = None,
-        conversation_id: str = None,
+        conversation_id: Union[str, None] = None,
     ):
         """
         :param channel_id: Channel ID the transcript was taken from
@@ -229,4 +229,4 @@ class PagedResult:
     # Page of Items
     items: List[object] = None
     # Token used to page through multiple pages.
-    continuation_token: str = None
+    continuation_token: Union[str, None] = None
