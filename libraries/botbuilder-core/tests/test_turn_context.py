@@ -241,7 +241,7 @@ class TestBotContext(aiounittest.AsyncTestCase):
             assert context is not None
             assert activity.id == activity_id
             assert activity.conversation.id == ACTIVITY.conversation.id
-            await next_handler_coroutine()
+            return await next_handler_coroutine()
 
         context.on_update_activity(update_handler)
         new_activity = MessageFactory.text("test text")
