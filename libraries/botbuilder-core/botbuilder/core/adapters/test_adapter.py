@@ -699,6 +699,7 @@ class TestFlow:
                     reply = adapter.activity_buffer.pop(0)
                     raise RuntimeError(
                         f"TestAdapter.assert_no_reply(): '{reply.text}' is responded when waiting for no reply."
+                        f"(Activity type: {reply.type})"
                     )
 
                 await asyncio.sleep(0.05)
