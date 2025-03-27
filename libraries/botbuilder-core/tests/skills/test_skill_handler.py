@@ -6,7 +6,7 @@ import json
 from datetime import datetime
 from uuid import uuid4
 from asyncio import Future
-from typing import Dict, List, Callable
+from typing import Dict, List, Callable, Union
 
 from unittest.mock import Mock, MagicMock
 import aiounittest
@@ -190,7 +190,7 @@ class SkillHandlerInstanceForTests(SkillHandler):
         self,
         claims_identity: ClaimsIdentity,
         conversation_id: str,
-        page_size: int = None,
+        page_size: Union[int, None] = None,
         continuation_token: str = "",
     ) -> PagedMembersResult:
         return await self.on_get_conversation_paged_members(
@@ -296,9 +296,9 @@ class TestSkillHandler(aiounittest.AsyncTestCase):
         async def continue_conversation(
             reference: ConversationReference,
             callback: Callable,
-            bot_id: str = None,
+            bot_id: Union[str, None] = None,
             claims_identity: ClaimsIdentity = None,
-            audience: str = None,
+            audience: Union[str, None] = None,
         ):  # pylint: disable=unused-argument
             # Invoke the callback created by the handler so we can assert the rest of the execution.
             turn_context = TurnContext(
@@ -338,9 +338,9 @@ class TestSkillHandler(aiounittest.AsyncTestCase):
         async def continue_conversation(
             reference: ConversationReference,
             callback: Callable,
-            bot_id: str = None,
+            bot_id: Union[str, None] = None,
             claims_identity: ClaimsIdentity = None,
-            audience: str = None,
+            audience: Union[str, None] = None,
         ):  # pylint: disable=unused-argument
             # Invoke the callback created by the handler so we can assert the rest of the execution.
             turn_context = TurnContext(
@@ -515,9 +515,9 @@ class TestSkillHandler(aiounittest.AsyncTestCase):
         async def continue_conversation(
             reference: ConversationReference,
             callback: Callable,
-            bot_id: str = None,
+            bot_id: Union[str, None] = None,
             claims_identity: ClaimsIdentity = None,
-            audience: str = None,
+            audience: Union[str, None] = None,
         ):  # pylint: disable=unused-argument
             # Invoke the callback created by the handler so we can assert the rest of the execution.
             nonlocal called_continue
@@ -574,9 +574,9 @@ class TestSkillHandler(aiounittest.AsyncTestCase):
         async def continue_conversation(
             reference: ConversationReference,
             callback: Callable,
-            bot_id: str = None,
+            bot_id: Union[str, None] = None,
             claims_identity: ClaimsIdentity = None,
-            audience: str = None,
+            audience: Union[str, None] = None,
         ):  # pylint: disable=unused-argument
             # Invoke the callback created by the handler so we can assert the rest of the execution.
             nonlocal called_continue

@@ -3,7 +3,7 @@
 
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
-from typing import Dict, List
+from typing import Dict, List, Union
 from threading import Lock
 import json
 from hashlib import sha256
@@ -21,10 +21,10 @@ class CosmosDbPartitionedConfig:
 
     def __init__(
         self,
-        cosmos_db_endpoint: str = None,
-        auth_key: str = None,
-        database_id: str = None,
-        container_id: str = None,
+        cosmos_db_endpoint: Union[str, None] = None,
+        auth_key: Union[str, None] = None,
+        database_id: Union[str, None] = None,
+        container_id: Union[str, None] = None,
         cosmos_client_options: dict = None,
         container_throughput: int = 400,
         key_suffix: str = "",

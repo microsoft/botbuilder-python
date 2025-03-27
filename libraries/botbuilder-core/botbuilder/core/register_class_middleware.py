@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
-from typing import Callable, Awaitable
+
+from typing import Callable, Awaitable, Union
 
 from botbuilder.core import Middleware, TurnContext
 
@@ -10,7 +11,7 @@ class RegisterClassMiddleware(Middleware):
     Middleware for adding an object to or registering a service with the current turn context.
     """
 
-    def __init__(self, service, key: str = None):
+    def __init__(self, service, key: Union[str, None] = None):
         self.service = service
         self._key = key
 

@@ -94,11 +94,11 @@ class TokenExchangeState(Model):
     def __init__(
         self,
         *,
-        connection_name: str = None,
+        connection_name: Union[str, None] = None,
         conversation=None,
         relates_to=None,
-        bot_url: str = None,
-        ms_app_id: str = None,
+        bot_url: Union[str, None] = None,
+        ms_app_id: Union[str, None] = None,
         **kwargs,
     ) -> None:
         super(TokenExchangeState, self).__init__(**kwargs)
@@ -113,10 +113,10 @@ class BotFrameworkAdapterSettings:
     def __init__(
         self,
         app_id: str,
-        app_password: str = None,
-        channel_auth_tenant: str = None,
-        oauth_endpoint: str = None,
-        open_id_metadata: str = None,
+        app_password: Union[str, None] = None,
+        channel_auth_tenant: Union[str, None] = None,
+        oauth_endpoint: Union[str, None] = None,
+        open_id_metadata: Union[str, None] = None,
         channel_provider: ChannelProvider = None,
         auth_configuration: AuthenticationConfiguration = None,
         app_credentials: AppCredentials = None,
@@ -221,9 +221,9 @@ class BotFrameworkAdapter(
         self,
         reference: ConversationReference,
         callback: Callable,
-        bot_id: str = None,
+        bot_id: Union[str, None] = None,
         claims_identity: ClaimsIdentity = None,
-        audience: str = None,
+        audience: Union[str, None] = None,
     ):
         """
         Continues a conversation with a user.
@@ -291,8 +291,8 @@ class BotFrameworkAdapter(
         reference: ConversationReference,
         logic: Callable[[TurnContext], Awaitable] = None,
         conversation_parameters: ConversationParameters = None,
-        channel_id: str = None,
-        service_url: str = None,
+        channel_id: Union[str, None] = None,
+        service_url: Union[str, None] = None,
         credentials: AppCredentials = None,
     ):
         """
@@ -870,7 +870,7 @@ class BotFrameworkAdapter(
         self,
         service_url: str,
         credentials: AppCredentials,
-        continuation_token: str = None,
+        continuation_token: Union[str, None] = None,
     ):
         """
         Lists the Conversations in which this bot has participated for a given channel server.
@@ -900,7 +900,7 @@ class BotFrameworkAdapter(
         self,
         context: TurnContext,
         connection_name: str,
-        magic_code: str = None,
+        magic_code: Union[str, None] = None,
         oauth_app_credentials: AppCredentials = None,  # pylint: disable=unused-argument
     ) -> TokenResponse:
         """
@@ -951,8 +951,8 @@ class BotFrameworkAdapter(
     async def sign_out_user(
         self,
         context: TurnContext,
-        connection_name: str = None,  # pylint: disable=unused-argument
-        user_id: str = None,
+        connection_name: Union[str, None] = None,  # pylint: disable=unused-argument
+        user_id: Union[str, None] = None,
         oauth_app_credentials: AppCredentials = None,
     ):
         """
@@ -983,7 +983,7 @@ class BotFrameworkAdapter(
         self,
         context: TurnContext,
         connection_name: str,
-        final_redirect: str = None,  # pylint: disable=unused-argument
+        final_redirect: Union[str, None] = None,  # pylint: disable=unused-argument
         oauth_app_credentials: AppCredentials = None,
     ) -> str:
         """
@@ -1019,9 +1019,9 @@ class BotFrameworkAdapter(
     async def get_token_status(
         self,
         context: TurnContext,
-        connection_name: str = None,
-        user_id: str = None,
-        include_filter: str = None,
+        connection_name: Union[str, None] = None,
+        user_id: Union[str, None] = None,
+        include_filter: Union[str, None] = None,
         oauth_app_credentials: AppCredentials = None,
     ) -> List[TokenStatus]:
         """
@@ -1061,7 +1061,7 @@ class BotFrameworkAdapter(
         context: TurnContext,
         connection_name: str,
         resource_urls: List[str],
-        user_id: str = None,  # pylint: disable=unused-argument
+        user_id: Union[str, None] = None,  # pylint: disable=unused-argument
         oauth_app_credentials: AppCredentials = None,
     ) -> Dict[str, TokenResponse]:
         """
@@ -1096,7 +1096,7 @@ class BotFrameworkAdapter(
         )
 
     async def create_connector_client(
-        self, service_url: str, identity: ClaimsIdentity = None, audience: str = None
+        self, service_url: str, identity: ClaimsIdentity = None, audience: Union[str, None] = None
     ) -> ConnectorClient:
         """
         Implementation of ConnectorClientProvider.create_connector_client.
@@ -1165,7 +1165,7 @@ class BotFrameworkAdapter(
         turn_context: TurnContext,
         connection_name: str,
         user_id: str,
-        final_redirect: str = None,
+        final_redirect: Union[str, None] = None,
     ) -> SignInUrlResponse:
         return await self.get_sign_in_resource_from_user_and_credentials(
             turn_context, None, connection_name, user_id, final_redirect
@@ -1177,7 +1177,7 @@ class BotFrameworkAdapter(
         oauth_app_credentials: AppCredentials,
         connection_name: str,
         user_id: str,
-        final_redirect: str = None,
+        final_redirect: Union[str, None] = None,
     ) -> SignInUrlResponse:
         if not connection_name:
             raise TypeError(
@@ -1375,7 +1375,7 @@ class BotFrameworkAdapter(
         return app_credentials
 
     async def __build_credentials(
-        self, app_id: str, oauth_scope: str = None
+        self, app_id: str, oauth_scope: Union[str, None] = None
     ) -> AppCredentials:
         app_password = await self._credential_provider.get_app_password(app_id)
 

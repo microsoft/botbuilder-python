@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from typing import Callable, Dict, List
+from typing import Callable, Dict, List, Union
 
 from botbuilder.core import TurnContext
 from botbuilder.dialogs.choices import (
@@ -42,7 +42,7 @@ class ChoicePrompt(Prompt):
         self,
         dialog_id: str,
         validator: Callable[[PromptValidatorContext], bool] = None,
-        default_locale: str = None,
+        default_locale: Union[str, None] = None,
         choice_defaults: Dict[str, ChoiceFactoryOptions] = None,
     ):
         """
