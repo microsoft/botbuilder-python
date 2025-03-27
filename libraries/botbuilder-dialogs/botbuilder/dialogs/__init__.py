@@ -9,6 +9,7 @@ from .about import __version__
 from .component_dialog import ComponentDialog
 from .dialog_container import DialogContainer
 from .dialog_context import DialogContext
+from .dialog_dependencies import DialogDependencies
 from .dialog_event import DialogEvent
 from .dialog_events import DialogEvents
 from .dialog_instance import DialogInstance
@@ -35,6 +36,7 @@ __all__ = [
     "ComponentDialog",
     "DialogContainer",
     "DialogContext",
+    "DialogDependencies",
     "DialogEvent",
     "DialogEvents",
     "DialogInstance",
