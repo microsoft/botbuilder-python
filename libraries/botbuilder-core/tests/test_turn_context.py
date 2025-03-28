@@ -350,6 +350,48 @@ class TestBotContext(aiounittest.AsyncTestCase):
         assert text == " test activity"
         assert activity.text == " test activity"
 
+    def test_should_remove_custom_mention_from_activity(self):
+        activity = Activity(
+            text="Hallo",
+            text_format="plain",
+            type="message",
+            timestamp="2025-03-11T14:16:47.0093935Z",
+            id="1741702606984",
+            channel_id="msteams",
+            service_url="https://smba.trafficmanager.net/emea/REDACTED/",
+            from_property=ChannelAccount(
+                id="29:1J-K4xVh-sLpdwQ-R5GkOZ_TB0W3ec_37p710aH8qe8bITA0zxdgIGc9l-MdDdkdE_jasSfNOeWXyyL1nsrHtBQ",
+                name="",
+                aad_object_id="REDACTED",
+            ),
+            conversation=ConversationAccount(
+                is_group=True,
+                conversation_type="groupChat",
+                tenant_id="REDACTED",
+                id="19:Ql86tXNM2lTBXNKJdqKdwIF9ltGZwpvluLvnJdA0tmg1@thread.v2",
+            ),
+            recipient=ChannelAccount(
+                id="28:c5d5fb56-a1a4-4467-a7a3-1b37905498a0", name="Azure AI Agent"
+            ),
+            entities=[
+                Entity().deserialize(
+                    Mention(
+                        type="mention",
+                        mentioned=ChannelAccount(
+                            id="28:c5d5fb56-a1a4-4467-a7a3-1b37905498a0",
+                            name="Custom Agent",
+                        ),
+                    ).serialize()
+                )
+            ],
+            channel_data={"tenant": {"id": "REDACTED"}, "productContext": "COPILOT"},
+        )
+
+        text = TurnContext.remove_mention_text(activity, activity.recipient.id)
+
+        assert text == "Hallo"
+        assert activity.text == "Hallo"
+
     async def test_should_send_a_trace_activity(self):
         context = TurnContext(SimpleAdapter(), ACTIVITY)
         called = False
