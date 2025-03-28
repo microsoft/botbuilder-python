@@ -125,7 +125,7 @@ class Dialog(ABC):
 
         # Bubble as needed
         if (not handled) and dialog_event.bubble and dialog_context.parent:
-            handled = await dialog_context.parent.emit(
+            handled = await dialog_context.parent.emit_event(
                 dialog_event.name, dialog_event.value, True, False
             )
 
