@@ -43,7 +43,6 @@ class SharePointActivityHandler(ActivityHandler):
                 raise NotImplementedError()
 
             if turn_context.activity.name == "cardExtension/getCardView":
-                print("Printing AceReq", turn_context.activity.value)
                 return self._create_invoke_response(
                     await self.on_sharepoint_task_get_card_view(
                         turn_context,
