@@ -3,4 +3,4 @@ botbuilder-schema==4.17.0
 requests==2.32.0
 PyJWT==2.4.0
 cryptography==43.0.1
-msal>=1.29.0
+msal>=1.31.1
