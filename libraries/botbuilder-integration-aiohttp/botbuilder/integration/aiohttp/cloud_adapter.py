@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import json
+
 from typing import Awaitable, Callable, Optional
 
 from aiohttp.web import (
@@ -17,6 +19,7 @@ from botbuilder.core import (
     Bot,
     CloudAdapterBase,
     InvokeResponse,
+    serializer_helper,
     TurnContext,
 )
 from botbuilder.core.streaming import (
@@ -102,7 +105,8 @@ class CloudAdapter(CloudAdapterBase, BotFrameworkHttpAdapterIntegrationBase):
                 # Write the response, serializing the InvokeResponse
                 if invoke_response:
                     return json_response(
-                        data=invoke_response.body, status=invoke_response.status
+                        data=serializer_helper(invoke_response.body),
+                        status=invoke_response.status,
                     )
                 return Response(status=201)
             else:
