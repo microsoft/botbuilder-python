@@ -56,13 +56,6 @@ class TeamsActivityHandler(ActivityHandler):
             ):
                 return await self.on_teams_card_action_invoke(turn_context)
 
-            if (
-                turn_context.activity.name
-                == SignInConstants.token_exchange_operation_name
-            ):
-                await self.on_teams_signin_token_exchange(turn_context)
-                return self._create_invoke_response()
-
             if turn_context.activity.name == "fileConsent/invoke":
                 return await self.on_teams_file_consent(
                     turn_context,
@@ -250,7 +243,9 @@ class TeamsActivityHandler(ActivityHandler):
         raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
 
     async def on_teams_signin_token_exchange(self, turn_context: TurnContext):
-        raise _InvokeResponseException(status_code=HTTPStatus.NOT_IMPLEMENTED)
+        # This is for back-compat with previous versions of Python SDK.  This method does not
+        # exist in the C# SDK, and is not used in the Python SDK.
+        return await self.on_teams_signin_verify_state(turn_context)
 
     async def on_teams_file_consent(
         self,

@@ -104,6 +104,9 @@ class SignInUrlResponse(Model):
     :param token_exchange_resource:
     :type token_exchange_resource:
      ~botframework.tokenapi.models.TokenExchangeResource
+    :param token_post_resource:
+    :type token_post_resource:
+     ~botframework.tokenapi.models.TokenPostResource
     """
 
     _attribute_map = {
@@ -112,12 +115,17 @@ class SignInUrlResponse(Model):
             "key": "tokenExchangeResource",
             "type": "TokenExchangeResource",
         },
+        "token_post_resource": {
+            "key": "tokenPostResource",
+            "type": "TokenPostResource",
+        },
     }
 
     def __init__(self, **kwargs):
         super(SignInUrlResponse, self).__init__(**kwargs)
         self.sign_in_link = kwargs.get("sign_in_link", None)
         self.token_exchange_resource = kwargs.get("token_exchange_resource", None)
+        self.token_exchange_resource = kwargs.get("token_post_resource", None)
 
 
 class TokenExchangeRequest(Model):
@@ -162,6 +170,22 @@ class TokenExchangeResource(Model):
         self.id = kwargs.get("id", None)
         self.uri = kwargs.get("uri", None)
         self.provider_id = kwargs.get("provider_id", None)
+
+
+class TokenPostResource(Model):
+    """TokenPostResource.
+
+    :param sas_url:
+    :type id: str
+    """
+
+    _attribute_map = {
+        "sas_url": {"key": "sasUrl", "type": "str"},
+    }
+
+    def __init__(self, **kwargs):
+        super(TokenPostResource, self).__init__(**kwargs)
+        self.sas_url = kwargs.get("sas_url", None)
 
 
 class TokenResponse(Model):

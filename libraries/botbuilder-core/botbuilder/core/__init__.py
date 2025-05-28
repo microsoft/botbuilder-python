@@ -48,6 +48,7 @@ from .transcript_logger import TranscriptLogger, TranscriptLoggerMiddleware
 from .user_state import UserState
 from .register_class_middleware import RegisterClassMiddleware
 from .adapter_extensions import AdapterExtensions
+from .serializer_helper import serializer_helper
 
 __all__ = [
     "ActivityHandler",
@@ -100,5 +101,6 @@ __all__ = [
     "TurnContext",
     "UserState",
     "UserTokenProvider",
+    "serializer_helper",
     "__version__",
 ]

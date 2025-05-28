@@ -1909,6 +1909,7 @@ class OAuthCard(Model):
         "connection_name": {"key": "connectionName", "type": "str"},
         "buttons": {"key": "buttons", "type": "[CardAction]"},
         "token_exchange_resource": {"key": "tokenExchangeResource", "type": "object"},
+        "token_post_resource": {"key": "tokenPostResource", "type": "object"},
     }
 
     def __init__(
@@ -1918,6 +1919,7 @@ class OAuthCard(Model):
         connection_name: str = None,
         buttons=None,
         token_exchange_resource=None,
+        token_post_resource=None,
         **kwargs
     ) -> None:
         super(OAuthCard, self).__init__(**kwargs)
@@ -1925,6 +1927,7 @@ class OAuthCard(Model):
         self.connection_name = connection_name
         self.buttons = buttons
         self.token_exchange_resource = token_exchange_resource
+        self.token_post_resource = token_post_resource
 
 
 class PagedMembersResult(Model):
