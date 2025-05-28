@@ -124,7 +124,12 @@ class SignInUrlResponse(Model):
     }
 
     def __init__(
-        self, *, sign_in_link: str = None, token_exchange_resource=None, token_post_resource=None, **kwargs
+        self,
+        *,
+        sign_in_link: str = None,
+        token_exchange_resource=None,
+        token_post_resource=None,
+        **kwargs
     ) -> None:
         super(SignInUrlResponse, self).__init__(**kwargs)
         self.sign_in_link = sign_in_link
@@ -177,6 +182,7 @@ class TokenExchangeResource(Model):
         self.uri = uri
         self.provider_id = provider_id
 
+
 class TokenPostResource(Model):
     """TokenPostResource.
 
@@ -188,9 +194,7 @@ class TokenPostResource(Model):
         "sas_url": {"key": "sasUrl", "type": "str"},
     }
 
-    def __init__(
-        self, *, sas_url: str = None, **kwargs
-    ) -> None:
+    def __init__(self, *, sas_url: str = None, **kwargs) -> None:
         super(TokenPostResource, self).__init__(**kwargs)
         self.sas_url = sas_url
 

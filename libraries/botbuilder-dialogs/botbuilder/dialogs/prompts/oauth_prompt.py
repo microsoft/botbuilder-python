@@ -362,7 +362,7 @@ class OAuthPrompt(Dialog):
                                 )
                             ],
                             token_exchange_resource=json_token_ex_resource,
-                            token_post_resource=json_token_ex_post
+                            token_post_resource=json_token_ex_post,
                         )
                     )
                 )

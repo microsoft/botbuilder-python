@@ -171,6 +171,7 @@ class TokenExchangeResource(Model):
         self.uri = kwargs.get("uri", None)
         self.provider_id = kwargs.get("provider_id", None)
 
+
 class TokenPostResource(Model):
     """TokenPostResource.
 
@@ -185,6 +186,7 @@ class TokenPostResource(Model):
     def __init__(self, **kwargs):
         super(TokenPostResource, self).__init__(**kwargs)
         self.sas_url = kwargs.get("sas_url", None)
+
 
 class TokenResponse(Model):
     """TokenResponse.
