@@ -86,10 +86,10 @@ class SlackClient(WebClient):
     async def im_history_ex(
         self,
         channel: str,
-        latest_timestamp: str = None,
-        oldest_timestamp: str = None,
-        count: int = None,
-        unreads: bool = None,
+        latest_timestamp: Union[str, None] = None,
+        oldest_timestamp: Union[str, None] = None,
+        count: Union[int, None] = None,
+        unreads: Union[bool, None] = None,
     ) -> SlackResponse:
         args = {}
         if latest_timestamp:
@@ -104,18 +104,18 @@ class SlackClient(WebClient):
         return await self.im_history(channel=channel, **args)
 
     async def files_info_ex(
-        self, file_id: str, page: int = None, count: int = None
+        self, file_id: str, page: Union[int, None] = None, count: Union[int, None] = None
     ) -> SlackResponse:
         args = {"count": str(count), "page": str(page)}
         return await self.files_info(file=file_id, **args)
 
     async def files_list_ex(
         self,
-        user_id: str = None,
-        date_from: str = None,
-        date_to: str = None,
-        count: int = None,
-        page: int = None,
+        user_id: Union[str, None] = None,
+        date_from: Union[str, None] = None,
+        date_to: Union[str, None] = None,
+        count: Union[int, None] = None,
+        page: Union[int, None] = None,
         types: List[str] = None,
     ) -> SlackResponse:
         args = {}
@@ -139,7 +139,7 @@ class SlackClient(WebClient):
         return await self.files_list(**args)
 
     async def groups_history_ex(
-        self, channel: str, latest: str = None, oldest: str = None, count: int = None
+        self, channel: str, latest: Union[str, None] = None, oldest: Union[str, None] = None, count: Union[int, None] = None
     ) -> SlackResponse:
         args = {}
 
@@ -161,7 +161,7 @@ class SlackClient(WebClient):
         return await self.api_call("users.prefs.get", http_verb="GET")
 
     async def stars_list_ex(
-        self, user: str = None, count: int = None, page: int = None
+        self, user: Union[str, None] = None, count: Union[int, None] = None, page: Union[int, None] = None
     ) -> SlackResponse:
         args = {}
 
@@ -183,7 +183,7 @@ class SlackClient(WebClient):
         channel: str,
         text: str,
         target_user: str,
-        parse: str = None,
+        parse: Union[str, None] = None,
         link_names: bool = False,
         attachments: List[str] = None,  # pylint: disable=unused-argument
         as_user: bool = False,
@@ -207,14 +207,14 @@ class SlackClient(WebClient):
         self,
         channel: str,
         text: str,
-        bot_name: str = None,
-        parse: str = None,
+        bot_name: Union[str, None] = None,
+        parse: Union[str, None] = None,
         link_names: bool = False,
         blocks: List[str] = None,  # pylint: disable=unused-argument
         attachments: List[str] = None,  # pylint: disable=unused-argument
         unfurl_links: bool = False,
-        icon_url: str = None,
-        icon_emoji: str = None,
+        icon_url: Union[str, None] = None,
+        icon_emoji: Union[str, None] = None,
         as_user: bool = False,
     ) -> SlackResponse:
         args = {
@@ -248,11 +248,11 @@ class SlackClient(WebClient):
     async def search_all_ex(
         self,
         query: str,
-        sorting: str = None,
-        direction: str = None,
+        sorting: Union[str, None] = None,
+        direction: Union[str, None] = None,
         enable_highlights: bool = False,
-        count: int = None,
-        page: int = None,
+        count: Union[int, None] = None,
+        page: Union[int, None] = None,
     ) -> SlackResponse:
         args = {"highlight": "1" if enable_highlights else "0"}
 
@@ -273,11 +273,11 @@ class SlackClient(WebClient):
     async def search_files_ex(
         self,
         query: str,
-        sorting: str = None,
-        direction: str = None,
+        sorting: Union[str, None] = None,
+        direction: Union[str, None] = None,
         enable_highlights: bool = False,
-        count: int = None,
-        page: int = None,
+        count: Union[int, None] = None,
+        page: Union[int, None] = None,
     ) -> SlackResponse:
         args = {"highlight": "1" if enable_highlights else "0"}
 
@@ -298,11 +298,11 @@ class SlackClient(WebClient):
     async def search_messages_ex(
         self,
         query: str,
-        sorting: str = None,
-        direction: str = None,
+        sorting: Union[str, None] = None,
+        direction: Union[str, None] = None,
         enable_highlights: bool = False,
-        count: int = None,
-        page: int = None,
+        count: Union[int, None] = None,
+        page: Union[int, None] = None,
     ) -> SlackResponse:
         args = {"highlight": "1" if enable_highlights else "0"}
 
@@ -325,8 +325,8 @@ class SlackClient(WebClient):
         timestamp: str,
         channel: str,
         text: str,
-        bot_name: str = None,
-        parse: str = None,
+        bot_name: Union[str, None] = None,
+        parse: Union[str, None] = None,
         link_names: bool = False,
         attachments: List[str] = None,  # pylint: disable=unused-argument
         as_user: bool = False,
@@ -352,11 +352,11 @@ class SlackClient(WebClient):
     async def files_upload_ex(
         self,
         file: Union[str, IOBase] = None,
-        content: str = None,
+        content: Union[str, None] = None,
         channels: List[str] = None,
-        title: str = None,
-        initial_comment: str = None,
-        file_type: str = None,
+        title: Union[str, None] = None,
+        initial_comment: Union[str, None] = None,
+        file_type: Union[str, None] = None,
     ):
         args = {}
 

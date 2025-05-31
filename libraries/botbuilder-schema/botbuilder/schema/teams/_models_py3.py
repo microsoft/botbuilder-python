@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 from enum import Enum
-from typing import List
+from typing import List, Union
 from msrest.serialization import Model
 from botbuilder.schema import (
     Attachment,
@@ -75,7 +75,7 @@ class AppBasedLinkQuery(Model):
         "state": {"key": "state", "type": "str"},
     }
 
-    def __init__(self, *, url: str = None, state: str = None, **kwargs) -> None:
+    def __init__(self, *, url: Union[str, None] = None, state: Union[str, None] = None, **kwargs) -> None:
         super(AppBasedLinkQuery, self).__init__(**kwargs)
         self.url = url
         self.state = state
@@ -99,7 +99,7 @@ class ChannelInfo(Model):
     }
 
     def __init__(
-        self, *, id: str = None, name: str = None, type: str = None, **kwargs
+        self, *, id: Union[str, None] = None, name: Union[str, None] = None, type: Union[str, None] = None, **kwargs
     ) -> None:
         super(ChannelInfo, self).__init__(**kwargs)
         self.id = id
@@ -122,7 +122,7 @@ class CacheInfo(Model):
     }
 
     def __init__(
-        self, *, cache_type: str = None, cache_duration: int = None, **kwargs
+        self, *, cache_type: Union[str, None] = None, cache_duration: Union[int, None] = None, **kwargs
     ) -> None:
         super(CacheInfo, self).__init__(**kwargs)
         self.cache_type = cache_type
@@ -172,8 +172,8 @@ class FileConsentCard(Model):
     def __init__(
         self,
         *,
-        description: str = None,
-        size_in_bytes: int = None,
+        description: Union[str, None] = None,
+        size_in_bytes: Union[int, None] = None,
         accept_context=None,
         decline_context=None,
         **kwargs
@@ -237,9 +237,9 @@ class FileDownloadInfo(Model):
     def __init__(
         self,
         *,
-        download_url: str = None,
-        unique_id: str = None,
-        file_type: str = None,
+        download_url: Union[str, None] = None,
+        unique_id: Union[str, None] = None,
+        file_type: Union[str, None] = None,
         etag=None,
         **kwargs
     ) -> None:
@@ -268,7 +268,7 @@ class FileInfoCard(Model):
     }
 
     def __init__(
-        self, *, unique_id: str = None, file_type: str = None, etag=None, **kwargs
+        self, *, unique_id: Union[str, None] = None, file_type: Union[str, None] = None, etag=None, **kwargs
     ) -> None:
         super(FileInfoCard, self).__init__(**kwargs)
         self.unique_id = unique_id
@@ -303,11 +303,11 @@ class FileUploadInfo(Model):
     def __init__(
         self,
         *,
-        name: str = None,
-        upload_url: str = None,
-        content_url: str = None,
-        unique_id: str = None,
-        file_type: str = None,
+        name: Union[str, None] = None,
+        upload_url: Union[str, None] = None,
+        content_url: Union[str, None] = None,
+        unique_id: Union[str, None] = None,
+        file_type: Union[str, None] = None,
         **kwargs
     ) -> None:
         super(FileUploadInfo, self).__init__(**kwargs)
@@ -342,8 +342,8 @@ class MessageActionsPayloadApp(Model):
         self,
         *,
         application_identity_type=None,
-        id: str = None,
-        display_name: str = None,
+        id: Union[str, None] = None,
+        display_name: Union[str, None] = None,
         **kwargs
     ) -> None:
         super(MessageActionsPayloadApp, self).__init__(**kwargs)
@@ -383,12 +383,12 @@ class MessageActionsPayloadAttachment(Model):
     def __init__(
         self,
         *,
-        id: str = None,
-        content_type: str = None,
-        content_url: str = None,
+        id: Union[str, None] = None,
+        content_type: Union[str, None] = None,
+        content_url: Union[str, None] = None,
         content=None,
-        name: str = None,
-        thumbnail_url: str = None,
+        name: Union[str, None] = None,
+        thumbnail_url: Union[str, None] = None,
         **kwargs
     ) -> None:
         super(MessageActionsPayloadAttachment, self).__init__(**kwargs)
@@ -415,7 +415,7 @@ class MessageActionsPayloadBody(Model):
         "content": {"key": "content", "type": "str"},
     }
 
-    def __init__(self, *, content_type=None, content: str = None, **kwargs) -> None:
+    def __init__(self, *, content_type=None, content: Union[str, None] = None, **kwargs) -> None:
         super(MessageActionsPayloadBody, self).__init__(**kwargs)
         self.content_type = content_type
         self.content = content
@@ -448,8 +448,8 @@ class MessageActionsPayloadConversation(Model):
         self,
         *,
         conversation_identity_type=None,
-        id: str = None,
-        display_name: str = None,
+        id: Union[str, None] = None,
+        display_name: Union[str, None] = None,
         **kwargs
     ) -> None:
         super(MessageActionsPayloadConversation, self).__init__(**kwargs)
@@ -509,7 +509,7 @@ class MessageActionsPayloadMention(Model):
     }
 
     def __init__(
-        self, *, id: int = None, mention_text: str = None, mentioned=None, **kwargs
+        self, *, id: Union[int, None] = None, mention_text: Union[str, None] = None, mentioned=None, **kwargs
     ) -> None:
         super(MessageActionsPayloadMention, self).__init__(**kwargs)
         self.id = id
@@ -537,7 +537,7 @@ class MessageActionsPayloadReaction(Model):
     }
 
     def __init__(
-        self, *, reaction_type=None, created_date_time: str = None, user=None, **kwargs
+        self, *, reaction_type=None, created_date_time: Union[str, None] = None, user=None, **kwargs
     ) -> None:
         super(MessageActionsPayloadReaction, self).__init__(**kwargs)
         self.reaction_type = reaction_type
@@ -567,8 +567,8 @@ class MessageActionsPayloadUser(Model):
         self,
         *,
         user_identity_type=None,
-        id: str = None,
-        display_name: str = None,
+        id: Union[str, None] = None,
+        display_name: Union[str, None] = None,
         **kwargs
     ) -> None:
         super(MessageActionsPayloadUser, self).__init__(**kwargs)
@@ -652,20 +652,20 @@ class MessageActionsPayload(Model):
     def __init__(
         self,
         *,
-        id: str = None,
-        reply_to_id: str = None,
+        id: Union[str, None] = None,
+        reply_to_id: Union[str, None] = None,
         message_type=None,
-        created_date_time: str = None,
-        last_modified_date_time: str = None,
-        deleted: bool = None,
-        subject: str = None,
-        summary: str = None,
+        created_date_time: Union[str, None] = None,
+        last_modified_date_time: Union[str, None] = None,
+        deleted: Union[bool, None] = None,
+        subject: Union[str, None] = None,
+        summary: Union[str, None] = None,
         importance=None,
-        locale: str = None,
-        link_to_message: str = None,
+        locale: Union[str, None] = None,
+        link_to_message: Union[str, None] = None,
         from_property=None,
         body=None,
-        attachment_layout: str = None,
+        attachment_layout: Union[str, None] = None,
         attachments=None,
         mentions=None,
         reactions=None,
@@ -732,7 +732,7 @@ class MessagingExtensionAction(TaskModuleRequest):
         *,
         data=None,
         context=None,
-        command_id: str = None,
+        command_id: Union[str, None] = None,
         command_context=None,
         bot_message_preview_action=None,
         bot_activity_preview=None,
@@ -813,11 +813,11 @@ class MessagingExtensionAttachment(Attachment):
     def __init__(
         self,
         *,
-        content_type: str = None,
-        content_url: str = None,
+        content_type: Union[str, None] = None,
+        content_url: Union[str, None] = None,
         content=None,
-        name: str = None,
-        thumbnail_url: str = None,
+        name: Union[str, None] = None,
+        thumbnail_url: Union[str, None] = None,
         preview=None,
         **kwargs
     ) -> None:
@@ -846,7 +846,7 @@ class MessagingExtensionParameter(Model):
         "value": {"key": "value", "type": "object"},
     }
 
-    def __init__(self, *, name: str = None, value=None, **kwargs) -> None:
+    def __init__(self, *, name: Union[str, None] = None, value=None, **kwargs) -> None:
         super(MessagingExtensionParameter, self).__init__(**kwargs)
         self.name = name
         self.value = value
@@ -881,10 +881,10 @@ class MessagingExtensionQuery(Model):
     def __init__(
         self,
         *,
-        command_id: str = None,
+        command_id: Union[str, None] = None,
         parameters=None,
         query_options=None,
-        state: str = None,
+        state: Union[str, None] = None,
         **kwargs
     ) -> None:
         super(MessagingExtensionQuery, self).__init__(**kwargs)
@@ -908,7 +908,7 @@ class MessagingExtensionQueryOptions(Model):
         "count": {"key": "count", "type": "int"},
     }
 
-    def __init__(self, *, skip: int = None, count: int = None, **kwargs) -> None:
+    def __init__(self, *, skip: Union[int, None] = None, count: Union[int, None] = None, **kwargs) -> None:
         super(MessagingExtensionQueryOptions, self).__init__(**kwargs)
         self.skip = skip
         self.count = count
@@ -978,7 +978,7 @@ class MessagingExtensionResult(Model):
         type=None,
         attachments=None,
         suggested_actions=None,
-        text: str = None,
+        text: Union[str, None] = None,
         activity_preview=None,
         **kwargs
     ) -> None:
@@ -1024,9 +1024,9 @@ class NotificationInfo(Model):
     def __init__(
         self,
         *,
-        alert: bool = None,
-        alert_in_meeting: bool = None,
-        external_resource_url: str = None,
+        alert: Union[bool, None] = None,
+        alert_in_meeting: Union[bool, None] = None,
+        external_resource_url: Union[str, None] = None,
         **kwargs
     ) -> None:
         super(NotificationInfo, self).__init__(**kwargs)
@@ -1069,10 +1069,10 @@ class O365ConnectorCard(Model):
     def __init__(
         self,
         *,
-        title: str = None,
-        text: str = None,
-        summary: str = None,
-        theme_color: str = None,
+        title: Union[str, None] = None,
+        text: Union[str, None] = None,
+        summary: Union[str, None] = None,
+        theme_color: Union[str, None] = None,
         sections=None,
         potential_action=None,
         **kwargs
@@ -1115,10 +1115,10 @@ class O365ConnectorCardInputBase(Model):
         self,
         *,
         type=None,
-        id: str = None,
-        is_required: bool = None,
-        title: str = None,
-        value: str = None,
+        id: Union[str, None] = None,
+        is_required: Union[bool, None] = None,
+        title: Union[str, None] = None,
+        value: Union[str, None] = None,
         **kwargs
     ) -> None:
         super(O365ConnectorCardInputBase, self).__init__(**kwargs)
@@ -1148,7 +1148,7 @@ class O365ConnectorCardActionBase(Model):
     }
 
     def __init__(
-        self, *, type=None, name: str = None, id: str = None, **kwargs
+        self, *, type=None, name: Union[str, None] = None, id: Union[str, None] = None, **kwargs
     ) -> None:
         super(O365ConnectorCardActionBase, self).__init__(**kwargs)
         self.type = type
@@ -1189,8 +1189,8 @@ class O365ConnectorCardActionCard(O365ConnectorCardActionBase):
         self,
         *,
         type=None,
-        name: str = None,
-        id: str = None,
+        name: Union[str, None] = None,
+        id: Union[str, None] = None,
         inputs=None,
         actions=None,
         **kwargs
@@ -1218,7 +1218,7 @@ class O365ConnectorCardActionQuery(Model):
         "action_id": {"key": "actionId", "type": "str"},
     }
 
-    def __init__(self, *, body: str = None, actionId: str = None, **kwargs) -> None:
+    def __init__(self, *, body: Union[str, None] = None, actionId: Union[str, None] = None, **kwargs) -> None:
         super(O365ConnectorCardActionQuery, self).__init__(**kwargs)
         self.body = body
         # This is how it comes in from Teams
@@ -1258,11 +1258,11 @@ class O365ConnectorCardDateInput(O365ConnectorCardInputBase):
         self,
         *,
         type=None,
-        id: str = None,
-        is_required: bool = None,
-        title: str = None,
-        value: str = None,
-        include_time: bool = None,
+        id: Union[str, None] = None,
+        is_required: Union[bool, None] = None,
+        title: Union[str, None] = None,
+        value: Union[str, None] = None,
+        include_time: Union[bool, None] = None,
         **kwargs
     ) -> None:
         super(O365ConnectorCardDateInput, self).__init__(
@@ -1290,7 +1290,7 @@ class O365ConnectorCardFact(Model):
         "value": {"key": "value", "type": "str"},
     }
 
-    def __init__(self, *, name: str = None, value: str = None, **kwargs) -> None:
+    def __init__(self, *, name: Union[str, None] = None, value: Union[str, None] = None, **kwargs) -> None:
         super(O365ConnectorCardFact, self).__init__(**kwargs)
         self.name = name
         self.value = value
@@ -1318,7 +1318,7 @@ class O365ConnectorCardHttpPOST(O365ConnectorCardActionBase):
     }
 
     def __init__(
-        self, *, type=None, name: str = None, id: str = None, body: str = None, **kwargs
+        self, *, type=None, name: Union[str, None] = None, id: Union[str, None] = None, body: Union[str, None] = None, **kwargs
     ) -> None:
         super(O365ConnectorCardHttpPOST, self).__init__(
             type=type, name=name, id=id, **kwargs
@@ -1340,7 +1340,7 @@ class O365ConnectorCardImage(Model):
         "title": {"key": "title", "type": "str"},
     }
 
-    def __init__(self, *, image: str = None, title: str = None, **kwargs) -> None:
+    def __init__(self, *, image: Union[str, None] = None, title: Union[str, None] = None, **kwargs) -> None:
         super(O365ConnectorCardImage, self).__init__(**kwargs)
         self.image = image
         self.title = title
@@ -1391,13 +1391,13 @@ class O365ConnectorCardMultichoiceInput(O365ConnectorCardInputBase):
         self,
         *,
         type=None,
-        id: str = None,
-        is_required: bool = None,
-        title: str = None,
-        value: str = None,
+        id: Union[str, None] = None,
+        is_required: Union[bool, None] = None,
+        title: Union[str, None] = None,
+        value: Union[str, None] = None,
         choices=None,
         style=None,
-        is_multi_select: bool = None,
+        is_multi_select: Union[bool, None] = None,
         **kwargs
     ) -> None:
         super(O365ConnectorCardMultichoiceInput, self).__init__(
@@ -1427,7 +1427,7 @@ class O365ConnectorCardMultichoiceInputChoice(Model):
         "value": {"key": "value", "type": "str"},
     }
 
-    def __init__(self, *, display: str = None, value: str = None, **kwargs) -> None:
+    def __init__(self, *, display: Union[str, None] = None, value: Union[str, None] = None, **kwargs) -> None:
         super(O365ConnectorCardMultichoiceInputChoice, self).__init__(**kwargs)
         self.display = display
         self.value = value
@@ -1456,7 +1456,7 @@ class O365ConnectorCardOpenUri(O365ConnectorCardActionBase):
     }
 
     def __init__(
-        self, *, type=None, name: str = None, id: str = None, targets=None, **kwargs
+        self, *, type=None, name: Union[str, None] = None, id: Union[str, None] = None, targets=None, **kwargs
     ) -> None:
         super(O365ConnectorCardOpenUri, self).__init__(
             type=type, name=name, id=id, **kwargs
@@ -1479,7 +1479,7 @@ class O365ConnectorCardOpenUriTarget(Model):
         "uri": {"key": "uri", "type": "str"},
     }
 
-    def __init__(self, *, os=None, uri: str = None, **kwargs) -> None:
+    def __init__(self, *, os=None, uri: Union[str, None] = None, **kwargs) -> None:
         super(O365ConnectorCardOpenUriTarget, self).__init__(**kwargs)
         self.os = os
         self.uri = uri
@@ -1538,14 +1538,14 @@ class O365ConnectorCardSection(Model):
     def __init__(
         self,
         *,
-        title: str = None,
-        text: str = None,
-        activity_title: str = None,
-        activity_subtitle: str = None,
-        activity_text: str = None,
-        activity_image: str = None,
+        title: Union[str, None] = None,
+        text: Union[str, None] = None,
+        activity_title: Union[str, None] = None,
+        activity_subtitle: Union[str, None] = None,
+        activity_text: Union[str, None] = None,
+        activity_image: Union[str, None] = None,
         activity_image_type=None,
-        markdown: bool = None,
+        markdown: Union[bool, None] = None,
         facts=None,
         images=None,
         potential_action=None,
@@ -1602,11 +1602,11 @@ class O365ConnectorCardTextInput(O365ConnectorCardInputBase):
         self,
         *,
         type=None,
-        id: str = None,
-        is_required: bool = None,
-        title: str = None,
-        value: str = None,
-        is_multiline: bool = None,
+        id: Union[str, None] = None,
+        is_required: Union[bool, None] = None,
+        title: Union[str, None] = None,
+        value: Union[str, None] = None,
+        is_multiline: Union[bool, None] = None,
         max_length: float = None,
         **kwargs
     ) -> None:
@@ -1644,7 +1644,7 @@ class O365ConnectorCardViewAction(O365ConnectorCardActionBase):
     }
 
     def __init__(
-        self, *, type=None, name: str = None, id: str = None, target=None, **kwargs
+        self, *, type=None, name: Union[str, None] = None, id: Union[str, None] = None, target=None, **kwargs
     ) -> None:
         super(O365ConnectorCardViewAction, self).__init__(
             type=type, name=name, id=id, **kwargs
@@ -1665,7 +1665,7 @@ class SigninStateVerificationQuery(Model):
         "state": {"key": "state", "type": "str"},
     }
 
-    def __init__(self, *, state: str = None, **kwargs) -> None:
+    def __init__(self, *, state: Union[str, None] = None, **kwargs) -> None:
         super(SigninStateVerificationQuery, self).__init__(**kwargs)
         self.state = state
 
@@ -1717,7 +1717,7 @@ class TaskModuleMessageResponse(TaskModuleResponseBase):
         "value": {"key": "value", "type": "str"},
     }
 
-    def __init__(self, *, value: str = None, **kwargs) -> None:
+    def __init__(self, *, value: Union[str, None] = None, **kwargs) -> None:
         super(TaskModuleMessageResponse, self).__init__(type="message", **kwargs)
         self.value = value
 
@@ -1733,7 +1733,7 @@ class TaskModuleRequestContext(Model):
         "theme": {"key": "theme", "type": "str"},
     }
 
-    def __init__(self, *, theme: str = None, **kwargs) -> None:
+    def __init__(self, *, theme: Union[str, None] = None, **kwargs) -> None:
         super(TaskModuleRequestContext, self).__init__(**kwargs)
         self.theme = theme
 
@@ -1795,13 +1795,13 @@ class TaskModuleTaskInfo(Model):
     def __init__(
         self,
         *,
-        title: str = None,
+        title: Union[str, None] = None,
         height=None,
         width=None,
-        url: str = None,
+        url: Union[str, None] = None,
         card=None,
-        fallback_url: str = None,
-        completion_bot_id: str = None,
+        fallback_url: Union[str, None] = None,
+        completion_bot_id: Union[str, None] = None,
         **kwargs
     ) -> None:
         super(TaskModuleTaskInfo, self).__init__(**kwargs)
@@ -1843,12 +1843,12 @@ class TeamDetails(Model):
     def __init__(
         self,
         *,
-        id: str = None,
-        name: str = None,
-        aad_group_id: str = None,
-        member_count: int = None,
-        channel_count: int = None,
-        type: str = None,
+        id: Union[str, None] = None,
+        name: Union[str, None] = None,
+        aad_group_id: Union[str, None] = None,
+        member_count: Union[int, None] = None,
+        channel_count: Union[int, None] = None,
+        type: Union[str, None] = None,
         **kwargs
     ) -> None:
         super(TeamDetails, self).__init__(**kwargs)
@@ -1878,7 +1878,7 @@ class TeamInfo(Model):
     }
 
     def __init__(
-        self, *, id: str = None, name: str = None, aad_group_id: str = None, **kwargs
+        self, *, id: Union[str, None] = None, name: Union[str, None] = None, aad_group_id: Union[str, None] = None, **kwargs
     ) -> None:
         super(TeamInfo, self).__init__(**kwargs)
         self.id = id
@@ -1923,14 +1923,14 @@ class TeamsChannelAccount(ChannelAccount):
     def __init__(
         self,
         *,
-        id: str = None,
-        name: str = None,
-        given_name: str = None,
-        surname: str = None,
-        email: str = None,
-        user_principal_name: str = None,
-        tenant_id: str = None,
-        user_role: str = None,
+        id: Union[str, None] = None,
+        name: Union[str, None] = None,
+        given_name: Union[str, None] = None,
+        surname: Union[str, None] = None,
+        email: Union[str, None] = None,
+        user_principal_name: Union[str, None] = None,
+        tenant_id: Union[str, None] = None,
+        user_role: Union[str, None] = None,
         **kwargs
     ) -> None:
         super(TeamsChannelAccount, self).__init__(id=id, name=name, **kwargs)
@@ -1959,7 +1959,7 @@ class TeamsPagedMembersResult(PagedMembersResult):
     def __init__(
         self,
         *,
-        continuation_token: str = None,
+        continuation_token: Union[str, None] = None,
         members: List[TeamsChannelAccount] = None,
         **kwargs
     ) -> None:
@@ -2027,7 +2027,7 @@ class TeamsChannelData(Model):
         self,
         *,
         channel=None,
-        event_type: str = None,
+        event_type: Union[str, None] = None,
         team=None,
         notification=None,
         tenant=None,
@@ -2059,7 +2059,7 @@ class TenantInfo(Model):
         "id": {"key": "id", "type": "str"},
     }
 
-    def __init__(self, *, id: str = None, **kwargs) -> None:
+    def __init__(self, *, id: Union[str, None] = None, **kwargs) -> None:
         super(TenantInfo, self).__init__(**kwargs)
         self.id = id
 
@@ -2075,7 +2075,7 @@ class TeamsMeetingInfo(Model):
         "id": {"key": "id", "type": "str"},
     }
 
-    def __init__(self, *, id: str = None, **kwargs) -> None:
+    def __init__(self, *, id: Union[str, None] = None, **kwargs) -> None:
         super(TeamsMeetingInfo, self).__init__(**kwargs)
         self.id = id
 
@@ -2094,7 +2094,7 @@ class MeetingParticipantInfo(Model):
         "in_meeting": {"key": "inMeeting", "type": "bool"},
     }
 
-    def __init__(self, *, role: str = None, in_meeting: bool = None, **kwargs) -> None:
+    def __init__(self, *, role: Union[str, None] = None, in_meeting: Union[bool, None] = None, **kwargs) -> None:
         super(MeetingParticipantInfo, self).__init__(**kwargs)
         self.role = role
         self.in_meeting = in_meeting
@@ -2433,7 +2433,7 @@ class MeetingDetailsBase(Model):
     }
 
     def __init__(
-        self, *, id: str = None, join_url: str = None, title: str = None, **kwargs
+        self, *, id: Union[str, None] = None, join_url: Union[str, None] = None, title: Union[str, None] = None, **kwargs
     ) -> None:
         super(MeetingDetailsBase, self).__init__(**kwargs)
         self.id = id
@@ -2464,10 +2464,10 @@ class MeetingDetails(MeetingDetailsBase):
     def __init__(
         self,
         *,
-        ms_graph_resource_id: str = None,
-        scheduled_start_time: str = None,
-        scheduled_end_time: str = None,
-        type: str = None,
+        ms_graph_resource_id: Union[str, None] = None,
+        scheduled_start_time: Union[str, None] = None,
+        scheduled_end_time: Union[str, None] = None,
+        type: Union[str, None] = None,
         **kwargs
     ) -> None:
         super(MeetingDetails, self).__init__(**kwargs)
@@ -2517,7 +2517,7 @@ class MeetingEventDetails(MeetingDetailsBase):
 
     _attribute_map = {"meeting_type": {"key": "MeetingType", "type": "str"}}
 
-    def __init__(self, *, meeting_type: str = None, **kwargs):
+    def __init__(self, *, meeting_type: Union[str, None] = None, **kwargs):
         super(MeetingEventDetails, self).__init__(**kwargs)
         self.meeting_type = meeting_type
 
@@ -2531,7 +2531,7 @@ class MeetingStartEventDetails(MeetingDetailsBase):
 
     _attribute_map = {"start_time": {"key": "StartTime", "type": "str"}}
 
-    def __init__(self, *, start_time: str = None, **kwargs):
+    def __init__(self, *, start_time: Union[str, None] = None, **kwargs):
         super(MeetingStartEventDetails, self).__init__(**kwargs)
         self.start_time = start_time
 
@@ -2545,7 +2545,7 @@ class MeetingEndEventDetails(MeetingDetailsBase):
 
     _attribute_map = {"end_time": {"key": "EndTime", "type": "str"}}
 
-    def __init__(self, *, end_time: str = None, **kwargs):
+    def __init__(self, *, end_time: Union[str, None] = None, **kwargs):
         super(MeetingEndEventDetails, self).__init__(**kwargs)
         self.end_time = end_time
 
@@ -2564,7 +2564,7 @@ class UserMeetingDetails(Model):
         "in_meeting": {"key": "inMeeting", "type": "bool"},
     }
 
-    def __init__(self, *, role: str = None, in_meeting: bool = None, **kwargs) -> None:
+    def __init__(self, *, role: Union[str, None] = None, in_meeting: Union[bool, None] = None, **kwargs) -> None:
         super(UserMeetingDetails, self).__init__(**kwargs)
         self.in_meeting = in_meeting
         self.role = role
@@ -2623,7 +2623,7 @@ class ReadReceiptInfo(Model):
         "last_read_message_id": {"key": "lastReadMessageId", "type": "str"},
     }
 
-    def __init__(self, *, last_read_message_id: str = None, **kwargs) -> None:
+    def __init__(self, *, last_read_message_id: Union[str, None] = None, **kwargs) -> None:
         super(ReadReceiptInfo, self).__init__(**kwargs)
         self.last_read_message_id = last_read_message_id
 
@@ -2694,7 +2694,7 @@ class ConfigResponseBase(Model):
         "response_type": {"key": "responseType", "type": "str"},
     }
 
-    def __init__(self, *, response_type: str = None, **kwargs) -> None:
+    def __init__(self, *, response_type: Union[str, None] = None, **kwargs) -> None:
         super(ConfigResponseBase, self).__init__(**kwargs)
         self.response_type = response_type
 
@@ -2768,8 +2768,8 @@ class OnBehalfOf(Model):
         *,
         item_id: int = 0,
         mention_type: str = "person",
-        mri: str = None,
-        display_name: str = None,
+        mri: Union[str, None] = None,
+        display_name: Union[str, None] = None,
         **kwargs
     ) -> None:
         super(OnBehalfOf, self).__init__(**kwargs)
@@ -2824,7 +2824,7 @@ class MeetingNotificationBase(Model):
         "type": {"key": "type", "type": "str"},
     }
 
-    def __init__(self, *, type: str = None, **kwargs) -> None:
+    def __init__(self, *, type: Union[str, None] = None, **kwargs) -> None:
         super(MeetingNotificationBase, self).__init__(**kwargs)
         self.type = type
 
@@ -2883,9 +2883,9 @@ class MeetingNotificationRecipientFailureInfo(Model):
     def __init__(
         self,
         *,
-        recipient_mri: str = None,
-        error_code: str = None,
-        failure_reason: str = None,
+        recipient_mri: Union[str, None] = None,
+        error_code: Union[str, None] = None,
+        failure_reason: Union[str, None] = None,
         **kwargs
     ):
         super(MeetingNotificationRecipientFailureInfo, self).__init__(**kwargs)
@@ -2974,7 +2974,7 @@ class MeetingTabIconSurface(Surface):
         "tab_entity_id": {"key": "tabEntityId", "type": "str"},
     }
 
-    def __init__(self, *, tab_entity_id: str = None, **kwargs):
+    def __init__(self, *, tab_entity_id: Union[str, None] = None, **kwargs):
         super(MeetingTabIconSurface, self).__init__(
             SurfaceType.MeetingTabIcon, **kwargs
         )

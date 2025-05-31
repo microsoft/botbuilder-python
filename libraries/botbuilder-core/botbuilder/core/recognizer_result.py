@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from typing import Dict, NamedTuple
+from typing import Dict, NamedTuple, Union
 
 from msrest.serialization import Model
 from botbuilder.core import IntentScore
@@ -28,8 +28,8 @@ class RecognizerResult(Model):
     def __init__(
         self,
         *,
-        text: str = None,
-        altered_text: str = None,
+        text: Union[str, None] = None,
+        altered_text: Union[str, None] = None,
         intents: Dict[str, IntentScore] = None,
         entities: Dict[str, object] = None,
         properties: Dict[str, object] = None,

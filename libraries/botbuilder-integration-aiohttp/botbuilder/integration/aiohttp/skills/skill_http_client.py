@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from typing import Union
 from logging import Logger
 
 from botbuilder.core import InvokeResponse
@@ -43,7 +44,7 @@ class SkillHttpClient(BotFrameworkHttpClient):
         to_skill: BotFrameworkSkill,
         service_url: str,
         activity: Activity,
-        originating_audience: str = None,
+        originating_audience: Union[str, None] = None,
     ) -> InvokeResponse:
         if originating_audience is None:
             originating_audience = (

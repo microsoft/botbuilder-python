@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 from abc import ABC, abstractmethod
-
+from typing import Union
 
 from botbuilder.core import NullTelemetryClient, BotTelemetryClient
 from .dialog import Dialog
@@ -13,7 +13,7 @@ from .dialog_set import DialogSet
 
 
 class DialogContainer(Dialog, ABC):
-    def __init__(self, dialog_id: str = None):
+    def __init__(self, dialog_id: Union[str, None] = None):
         super().__init__(dialog_id)
 
         self.dialogs = DialogSet()
