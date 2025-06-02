@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from typing import List
+from typing import List, Union
 
 from botbuilder.schema._connector_client_enums import ActivityTypes
 from datetime import datetime, timezone
@@ -52,13 +52,13 @@ class ConversationReference(Model):
     def __init__(
         self,
         *,
-        activity_id: str = None,
+        activity_id: Union[str, None] = None,
         user=None,
         bot=None,
         conversation=None,
-        channel_id: str = None,
-        locale: str = None,
-        service_url: str = None,
+        channel_id: Union[str, None] = None,
+        locale: Union[str, None] = None,
+        service_url: Union[str, None] = None,
         **kwargs
     ) -> None:
         super(ConversationReference, self).__init__(**kwargs)
@@ -89,7 +89,7 @@ class Mention(Model):
     }
 
     def __init__(
-        self, *, mentioned=None, text: str = None, type: str = None, **kwargs
+        self, *, mentioned=None, text: Union[str, None] = None, type: Union[str, None] = None, **kwargs
     ) -> None:
         super(Mention, self).__init__(**kwargs)
         self.mentioned = mentioned
@@ -106,7 +106,7 @@ class ResourceResponse(Model):
 
     _attribute_map = {"id": {"key": "id", "type": "str"}}
 
-    def __init__(self, *, id: str = None, **kwargs) -> None:
+    def __init__(self, *, id: Union[str, None] = None, **kwargs) -> None:
         super(ResourceResponse, self).__init__(**kwargs)
         self.id = id
 
@@ -298,12 +298,12 @@ class Activity(Model):
         self,
         *,
         type=None,
-        id: str = None,
+        id: Union[str, None] = None,
         timestamp=None,
         local_timestamp=None,
-        local_timezone: str = None,
-        service_url: str = None,
-        channel_id: str = None,
+        local_timezone: Union[str, None] = None,
+        service_url: Union[str, None] = None,
+        channel_id: Union[str, None] = None,
         from_property=None,
         conversation=None,
         recipient=None,
@@ -313,23 +313,23 @@ class Activity(Model):
         members_removed=None,
         reactions_added=None,
         reactions_removed=None,
-        topic_name: str = None,
-        history_disclosed: bool = None,
-        locale: str = None,
-        text: str = None,
-        speak: str = None,
+        topic_name: Union[str, None] = None,
+        history_disclosed: Union[bool, None] = None,
+        locale: Union[str, None] = None,
+        text: Union[str, None] = None,
+        speak: Union[str, None] = None,
         input_hint=None,
-        summary: str = None,
+        summary: Union[str, None] = None,
         suggested_actions=None,
         attachments=None,
         entities=None,
         channel_data=None,
-        action: str = None,
-        reply_to_id: str = None,
-        label: str = None,
-        value_type: str = None,
+        action: Union[str, None] = None,
+        reply_to_id: Union[str, None] = None,
+        label: Union[str, None] = None,
+        value_type: Union[str, None] = None,
         value=None,
-        name: str = None,
+        name: Union[str, None] = None,
         relates_to=None,
         code=None,
         expiration=None,
@@ -338,7 +338,7 @@ class Activity(Model):
         listen_for=None,
         text_highlights=None,
         semantic_action=None,
-        caller_id: str = None,
+        caller_id: Union[str, None] = None,
         **kwargs
     ) -> None:
         super(Activity, self).__init__(**kwargs)
@@ -616,7 +616,7 @@ class Activity(Model):
         """
         return Activity(type=ActivityTypes.message)
 
-    def create_reply(self, text: str = None, locale: str = None):
+    def create_reply(self, text: Union[str, None] = None, locale: Union[str, None] = None):
         """
         Creates a new message activity as a response to this activity.
 
@@ -659,7 +659,7 @@ class Activity(Model):
         )
 
     def create_trace(
-        self, name: str, value: object = None, value_type: str = None, label: str = None
+        self, name: str, value: object = None, value_type: Union[str, None] = None, label: Union[str, None] = None
     ):
         """
         Creates a new trace activity based on this activity.
@@ -707,7 +707,7 @@ class Activity(Model):
 
     @staticmethod
     def create_trace_activity(
-        name: str, value: object = None, value_type: str = None, label: str = None
+        name: str, value: object = None, value_type: Union[str, None] = None, label: Union[str, None] = None
     ):
         """
         Creates an instance of the :class:`Activity` class as a TraceActivity object.
@@ -908,17 +908,17 @@ class AnimationCard(Model):
     def __init__(
         self,
         *,
-        title: str = None,
-        subtitle: str = None,
-        text: str = None,
+        title: Union[str, None] = None,
+        subtitle: Union[str, None] = None,
+        text: Union[str, None] = None,
         image=None,
         media=None,
         buttons=None,
-        shareable: bool = None,
-        autoloop: bool = None,
-        autostart: bool = None,
-        aspect: str = None,
-        duration: str = None,
+        shareable: Union[bool, None] = None,
+        autoloop: Union[bool, None] = None,
+        autostart: Union[bool, None] = None,
+        aspect: Union[str, None] = None,
+        duration: Union[str, None] = None,
         value=None,
         **kwargs
     ) -> None:
@@ -963,11 +963,11 @@ class Attachment(Model):
     def __init__(
         self,
         *,
-        content_type: str = None,
-        content_url: str = None,
+        content_type: Union[str, None] = None,
+        content_url: Union[str, None] = None,
         content=None,
-        name: str = None,
-        thumbnail_url: str = None,
+        name: Union[str, None] = None,
+        thumbnail_url: Union[str, None] = None,
         **kwargs
     ) -> None:
         super(Attachment, self).__init__(**kwargs)
@@ -1001,8 +1001,8 @@ class AttachmentData(Model):
     def __init__(
         self,
         *,
-        type: str = None,
-        name: str = None,
+        type: Union[str, None] = None,
+        name: Union[str, None] = None,
         original_base64: bytearray = None,
         thumbnail_base64: bytearray = None,
         **kwargs
@@ -1032,7 +1032,7 @@ class AttachmentInfo(Model):
     }
 
     def __init__(
-        self, *, name: str = None, type: str = None, views=None, **kwargs
+        self, *, name: Union[str, None] = None, type: Union[str, None] = None, views=None, **kwargs
     ) -> None:
         super(AttachmentInfo, self).__init__(**kwargs)
         self.name = name
@@ -1054,7 +1054,7 @@ class AttachmentView(Model):
         "size": {"key": "size", "type": "int"},
     }
 
-    def __init__(self, *, view_id: str = None, size: int = None, **kwargs) -> None:
+    def __init__(self, *, view_id: Union[str, None] = None, size: Union[int, None] = None, **kwargs) -> None:
         super(AttachmentView, self).__init__(**kwargs)
         self.view_id = view_id
         self.size = size
@@ -1113,17 +1113,17 @@ class AudioCard(Model):
     def __init__(
         self,
         *,
-        title: str = None,
-        subtitle: str = None,
-        text: str = None,
+        title: Union[str, None] = None,
+        subtitle: Union[str, None] = None,
+        text: Union[str, None] = None,
         image=None,
         media=None,
         buttons=None,
-        shareable: bool = None,
-        autoloop: bool = None,
-        autostart: bool = None,
-        aspect: str = None,
-        duration: str = None,
+        shareable: Union[bool, None] = None,
+        autoloop: Union[bool, None] = None,
+        autostart: Union[bool, None] = None,
+        aspect: Union[str, None] = None,
+        duration: Union[str, None] = None,
         value=None,
         **kwargs
     ) -> None:
@@ -1172,9 +1172,9 @@ class BasicCard(Model):
     def __init__(
         self,
         *,
-        title: str = None,
-        subtitle: str = None,
-        text: str = None,
+        title: Union[str, None] = None,
+        subtitle: Union[str, None] = None,
+        text: Union[str, None] = None,
         images=None,
         buttons=None,
         tap=None,
@@ -1230,13 +1230,13 @@ class CardAction(Model):
         self,
         *,
         type=None,
-        title: str = None,
-        image: str = None,
-        text: str = None,
-        display_text: str = None,
+        title: Union[str, None] = None,
+        image: Union[str, None] = None,
+        text: Union[str, None] = None,
+        display_text: Union[str, None] = None,
         value=None,
         channel_data=None,
-        image_alt_text: str = None,
+        image_alt_text: Union[str, None] = None,
         **kwargs
     ) -> None:
         super(CardAction, self).__init__(**kwargs)
@@ -1267,7 +1267,7 @@ class CardImage(Model):
         "tap": {"key": "tap", "type": "CardAction"},
     }
 
-    def __init__(self, *, url: str = None, alt: str = None, tap=None, **kwargs) -> None:
+    def __init__(self, *, url: Union[str, None] = None, alt: Union[str, None] = None, tap=None, **kwargs) -> None:
         super(CardImage, self).__init__(**kwargs)
         self.url = url
         self.alt = alt
@@ -1301,9 +1301,9 @@ class ChannelAccount(Model):
     def __init__(
         self,
         *,
-        id: str = None,
-        name: str = None,
-        aad_object_id: str = None,
+        id: Union[str, None] = None,
+        name: Union[str, None] = None,
+        aad_object_id: Union[str, None] = None,
         role=None,
         properties=None,
         **kwargs
@@ -1356,11 +1356,11 @@ class ConversationAccount(Model):
     def __init__(
         self,
         *,
-        is_group: bool = None,
-        conversation_type: str = None,
-        id: str = None,
-        name: str = None,
-        aad_object_id: str = None,
+        is_group: Union[bool, None] = None,
+        conversation_type: Union[str, None] = None,
+        id: Union[str, None] = None,
+        name: Union[str, None] = None,
+        aad_object_id: Union[str, None] = None,
         role=None,
         tenant_id=None,
         properties=None,
@@ -1391,7 +1391,7 @@ class ConversationMembers(Model):
         "members": {"key": "members", "type": "[ChannelAccount]"},
     }
 
-    def __init__(self, *, id: str = None, members=None, **kwargs) -> None:
+    def __init__(self, *, id: Union[str, None] = None, members=None, **kwargs) -> None:
         super(ConversationMembers, self).__init__(**kwargs)
         self.id = id
         self.members = members
@@ -1432,10 +1432,10 @@ class ConversationParameters(Model):
     def __init__(
         self,
         *,
-        is_group: bool = None,
+        is_group: Union[bool, None] = None,
         bot=None,
         members=None,
-        topic_name: str = None,
+        topic_name: Union[str, None] = None,
         activity=None,
         channel_data=None,
         tenant_id=None,
@@ -1472,9 +1472,9 @@ class ConversationResourceResponse(Model):
     def __init__(
         self,
         *,
-        activity_id: str = None,
-        service_url: str = None,
-        id: str = None,
+        activity_id: Union[str, None] = None,
+        service_url: Union[str, None] = None,
+        id: Union[str, None] = None,
         **kwargs
     ) -> None:
         super(ConversationResourceResponse, self).__init__(**kwargs)
@@ -1499,7 +1499,7 @@ class ConversationsResult(Model):
     }
 
     def __init__(
-        self, *, continuation_token: str = None, conversations=None, **kwargs
+        self, *, continuation_token: Union[str, None] = None, conversations=None, **kwargs
     ) -> None:
         super(ConversationsResult, self).__init__(**kwargs)
         self.continuation_token = continuation_token
@@ -1530,7 +1530,7 @@ class Entity(Model):
 
     _attribute_map = {"type": {"key": "type", "type": "str"}}
 
-    def __init__(self, *, type: str = None, **kwargs) -> None:
+    def __init__(self, *, type: Union[str, None] = None, **kwargs) -> None:
         super(Entity, self).__init__(**kwargs)
         self.type = type
 
@@ -1553,7 +1553,7 @@ class Error(Model):
     }
 
     def __init__(
-        self, *, code: str = None, message: str = None, inner_http_error=None, **kwargs
+        self, *, code: Union[str, None] = None, message: Union[str, None] = None, inner_http_error=None, **kwargs
     ) -> None:
         super(Error, self).__init__(**kwargs)
         self.code = code
@@ -1605,7 +1605,7 @@ class Fact(Model):
         "value": {"key": "value", "type": "str"},
     }
 
-    def __init__(self, *, key: str = None, value: str = None, **kwargs) -> None:
+    def __init__(self, *, key: Union[str, None] = None, value: Union[str, None] = None, **kwargs) -> None:
         super(Fact, self).__init__(**kwargs)
         self.key = key
         self.value = value
@@ -1643,8 +1643,8 @@ class GeoCoordinates(Model):
         elevation: float = None,
         latitude: float = None,
         longitude: float = None,
-        type: str = None,
-        name: str = None,
+        type: Union[str, None] = None,
+        name: Union[str, None] = None,
         **kwargs
     ) -> None:
         super(GeoCoordinates, self).__init__(**kwargs)
@@ -1685,9 +1685,9 @@ class HeroCard(Model):
     def __init__(
         self,
         *,
-        title: str = None,
-        subtitle: str = None,
-        text: str = None,
+        title: Union[str, None] = None,
+        subtitle: Union[str, None] = None,
+        text: Union[str, None] = None,
         images=None,
         buttons=None,
         tap=None,
@@ -1716,7 +1716,7 @@ class InnerHttpError(Model):
         "body": {"key": "body", "type": "object"},
     }
 
-    def __init__(self, *, status_code: int = None, body=None, **kwargs) -> None:
+    def __init__(self, *, status_code: Union[int, None] = None, body=None, **kwargs) -> None:
         super(InnerHttpError, self).__init__(**kwargs)
         self.status_code = status_code
         self.body = body
@@ -1738,7 +1738,7 @@ class InvokeResponse(Model):
         "body": {"key": "body", "type": "object"},
     }
 
-    def __init__(self, *, status: int = None, body: object = None, **kwargs):
+    def __init__(self, *, status: Union[int, None] = None, body: object = None, **kwargs):
         """
         Gets or sets the HTTP status and/or body code for the response
         :param status: The HTTP status code.
@@ -1813,17 +1813,17 @@ class MediaCard(Model):
     def __init__(
         self,
         *,
-        title: str = None,
-        subtitle: str = None,
-        text: str = None,
+        title: Union[str, None] = None,
+        subtitle: Union[str, None] = None,
+        text: Union[str, None] = None,
         image=None,
         media=None,
         buttons=None,
-        shareable: bool = None,
-        autoloop: bool = None,
-        autostart: bool = None,
-        aspect: str = None,
-        duration: str = None,
+        shareable: Union[bool, None] = None,
+        autoloop: Union[bool, None] = None,
+        autostart: Union[bool, None] = None,
+        aspect: Union[str, None] = None,
+        duration: Union[str, None] = None,
         value=None,
         **kwargs
     ) -> None:
@@ -1872,7 +1872,7 @@ class MediaUrl(Model):
         "profile": {"key": "profile", "type": "str"},
     }
 
-    def __init__(self, *, url: str = None, profile: str = None, **kwargs) -> None:
+    def __init__(self, *, url: Union[str, None] = None, profile: Union[str, None] = None, **kwargs) -> None:
         super(MediaUrl, self).__init__(**kwargs)
         self.url = url
         self.profile = profile
@@ -1915,8 +1915,8 @@ class OAuthCard(Model):
     def __init__(
         self,
         *,
-        text: str = None,
-        connection_name: str = None,
+        text: Union[str, None] = None,
+        connection_name: Union[str, None] = None,
         buttons=None,
         token_exchange_resource=None,
         token_post_resource=None,
@@ -1945,7 +1945,7 @@ class PagedMembersResult(Model):
     }
 
     def __init__(
-        self, *, continuation_token: str = None, members=None, **kwargs
+        self, *, continuation_token: Union[str, None] = None, members=None, **kwargs
     ) -> None:
         super(PagedMembersResult, self).__init__(**kwargs)
         self.continuation_token = continuation_token
@@ -1984,8 +1984,8 @@ class Place(Model):
         address=None,
         geo=None,
         has_map=None,
-        type: str = None,
-        name: str = None,
+        type: Union[str, None] = None,
+        name: Union[str, None] = None,
         **kwargs
     ) -> None:
         super(Place, self).__init__(**kwargs)
@@ -2031,13 +2031,13 @@ class ReceiptCard(Model):
     def __init__(
         self,
         *,
-        title: str = None,
+        title: Union[str, None] = None,
         facts=None,
         items=None,
         tap=None,
-        total: str = None,
-        tax: str = None,
-        vat: str = None,
+        total: Union[str, None] = None,
+        tax: Union[str, None] = None,
+        vat: Union[str, None] = None,
         buttons=None,
         **kwargs
     ) -> None:
@@ -2087,12 +2087,12 @@ class ReceiptItem(Model):
     def __init__(
         self,
         *,
-        title: str = None,
-        subtitle: str = None,
-        text: str = None,
+        title: Union[str, None] = None,
+        subtitle: Union[str, None] = None,
+        text: Union[str, None] = None,
         image=None,
-        price: str = None,
-        quantity: str = None,
+        price: Union[str, None] = None,
+        quantity: Union[str, None] = None,
         tap=None,
         **kwargs
     ) -> None:
@@ -2123,7 +2123,7 @@ class SemanticAction(Model):
         "state": {"key": "state", "type": "str"},
     }
 
-    def __init__(self, *, id: str = None, entities=None, state=None, **kwargs) -> None:
+    def __init__(self, *, id: Union[str, None] = None, entities=None, state=None, **kwargs) -> None:
         super(SemanticAction, self).__init__(**kwargs)
         self.id = id
         self.entities = entities
@@ -2144,7 +2144,7 @@ class SigninCard(Model):
         "buttons": {"key": "buttons", "type": "[CardAction]"},
     }
 
-    def __init__(self, *, text: str = None, buttons=None, **kwargs) -> None:
+    def __init__(self, *, text: Union[str, None] = None, buttons=None, **kwargs) -> None:
         super(SigninCard, self).__init__(**kwargs)
         self.text = text
         self.buttons = buttons
@@ -2187,7 +2187,7 @@ class TextHighlight(Model):
         "occurrence": {"key": "occurrence", "type": "int"},
     }
 
-    def __init__(self, *, text: str = None, occurrence: int = None, **kwargs) -> None:
+    def __init__(self, *, text: Union[str, None] = None, occurrence: Union[int, None] = None, **kwargs) -> None:
         super(TextHighlight, self).__init__(**kwargs)
         self.text = text
         self.occurrence = occurrence
@@ -2207,7 +2207,7 @@ class Thing(Model):
         "name": {"key": "name", "type": "str"},
     }
 
-    def __init__(self, *, type: str = None, name: str = None, **kwargs) -> None:
+    def __init__(self, *, type: Union[str, None] = None, name: Union[str, None] = None, **kwargs) -> None:
         super(Thing, self).__init__(**kwargs)
         self.type = type
         self.name = name
@@ -2243,9 +2243,9 @@ class ThumbnailCard(Model):
     def __init__(
         self,
         *,
-        title: str = None,
-        subtitle: str = None,
-        text: str = None,
+        title: Union[str, None] = None,
+        subtitle: Union[str, None] = None,
+        text: Union[str, None] = None,
         images=None,
         buttons=None,
         tap=None,
@@ -2274,7 +2274,7 @@ class ThumbnailUrl(Model):
         "alt": {"key": "alt", "type": "str"},
     }
 
-    def __init__(self, *, url: str = None, alt: str = None, **kwargs) -> None:
+    def __init__(self, *, url: Union[str, None] = None, alt: Union[str, None] = None, **kwargs) -> None:
         super(ThumbnailUrl, self).__init__(**kwargs)
         self.url = url
         self.alt = alt
@@ -2303,9 +2303,9 @@ class TokenExchangeInvokeRequest(Model):
     def __init__(
         self,
         *,
-        id: str = None,
-        connection_name: str = None,
-        token: str = None,
+        id: Union[str, None] = None,
+        connection_name: Union[str, None] = None,
+        token: Union[str, None] = None,
         properties=None,
         **kwargs
     ) -> None:
@@ -2339,9 +2339,9 @@ class TokenExchangeInvokeResponse(Model):
     def __init__(
         self,
         *,
-        id: str = None,
-        connection_name: str = None,
-        failure_detail: str = None,
+        id: Union[str, None] = None,
+        connection_name: Union[str, None] = None,
+        failure_detail: Union[str, None] = None,
         properties=None,
         **kwargs
     ) -> None:
@@ -2378,11 +2378,11 @@ class TokenExchangeState(Model):
     def __init__(
         self,
         *,
-        connection_name: str = None,
+        connection_name: Union[str, None] = None,
         conversation=None,
         relates_to=None,
-        bot_url: str = None,
-        ms_app_id: str = None,
+        bot_url: Union[str, None] = None,
+        ms_app_id: Union[str, None] = None,
         **kwargs
     ) -> None:
         super(TokenExchangeState, self).__init__(**kwargs)
@@ -2408,7 +2408,7 @@ class TokenRequest(Model):
         "settings": {"key": "settings", "type": "{object}"},
     }
 
-    def __init__(self, *, provider: str = None, settings=None, **kwargs) -> None:
+    def __init__(self, *, provider: Union[str, None] = None, settings=None, **kwargs) -> None:
         super(TokenRequest, self).__init__(**kwargs)
         self.provider = provider
         self.settings = settings
@@ -2438,10 +2438,10 @@ class TokenResponse(Model):
     def __init__(
         self,
         *,
-        connection_name: str = None,
-        token: str = None,
-        expiration: str = None,
-        channel_id: str = None,
+        connection_name: Union[str, None] = None,
+        token: Union[str, None] = None,
+        expiration: Union[str, None] = None,
+        channel_id: Union[str, None] = None,
         **kwargs
     ) -> None:
         super(TokenResponse, self).__init__(**kwargs)
@@ -2519,17 +2519,17 @@ class VideoCard(Model):
     def __init__(
         self,
         *,
-        title: str = None,
-        subtitle: str = None,
-        text: str = None,
+        title: Union[str, None] = None,
+        subtitle: Union[str, None] = None,
+        text: Union[str, None] = None,
         image=None,
         media=None,
         buttons=None,
-        shareable: bool = None,
-        autoloop: bool = None,
-        autostart: bool = None,
-        aspect: str = None,
-        duration: str = None,
+        shareable: Union[bool, None] = None,
+        autoloop: Union[bool, None] = None,
+        autostart: Union[bool, None] = None,
+        aspect: Union[str, None] = None,
+        duration: Union[str, None] = None,
         value=None,
         **kwargs
     ) -> None:
@@ -2572,7 +2572,7 @@ class AdaptiveCardInvokeAction(Model):
     }
 
     def __init__(
-        self, *, type: str = None, id: str = None, verb: str = None, data=None, **kwargs
+        self, *, type: Union[str, None] = None, id: Union[str, None] = None, verb: Union[str, None] = None, data=None, **kwargs
     ) -> None:
         super(AdaptiveCardInvokeAction, self).__init__(**kwargs)
         self.type = type
@@ -2601,7 +2601,7 @@ class AdaptiveCardInvokeResponse(Model):
     }
 
     def __init__(
-        self, *, status_code: int = None, type: str = None, value=None, **kwargs
+        self, *, status_code: Union[int, None] = None, type: Union[str, None] = None, value=None, **kwargs
     ) -> None:
         super(AdaptiveCardInvokeResponse, self).__init__(**kwargs)
         self.status_code = status_code
@@ -2629,7 +2629,7 @@ class AdaptiveCardInvokeValue(Model):
     }
 
     def __init__(
-        self, *, action=None, authentication=None, state: str = None, **kwargs
+        self, *, action=None, authentication=None, state: Union[str, None] = None, **kwargs
     ) -> None:
         super(AdaptiveCardInvokeValue, self).__init__(**kwargs)
         self.action = action

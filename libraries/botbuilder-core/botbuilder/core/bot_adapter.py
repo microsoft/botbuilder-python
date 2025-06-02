@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 from abc import ABC, abstractmethod
-from typing import List, Callable, Awaitable
+from typing import List, Callable, Awaitable, Union
 from botbuilder.schema import (
     Activity,
     ConversationReference,
@@ -87,9 +87,9 @@ class BotAdapter(ABC):
         self,
         reference: ConversationReference,
         callback: Callable,
-        bot_id: str = None,  # pylint: disable=unused-argument
+        bot_id: Union[str, None] = None,  # pylint: disable=unused-argument
         claims_identity: ClaimsIdentity = None,  # pylint: disable=unused-argument
-        audience: str = None,  # pylint: disable=unused-argument
+        audience: Union[str, None] = None,  # pylint: disable=unused-argument
     ):
         """
         Sends a proactive message to a conversation. Call this method to proactively send a message to a conversation.
@@ -118,8 +118,8 @@ class BotAdapter(ABC):
         reference: ConversationReference,
         logic: Callable[[TurnContext], Awaitable] = None,
         conversation_parameters: ConversationParameters = None,
-        channel_id: str = None,
-        service_url: str = None,
+        channel_id: Union[str, None] = None,
+        service_url: Union[str, None] = None,
         credentials: AppCredentials = None,
     ):
         """
