@@ -288,20 +288,15 @@ class TurnContext:
 
         async def emit_next(i: int):
             context = self
-            try:
-                if i < len(handlers):
+            if i < len(handlers):
+                try:
+                    return await handlers[i](context, arg, lambda: emit_next(i + 1))
+                except Exception as error:
+                    raise error
+            else:
+                return await logic
 
-                    async def next_handler():
-                        await emit_next(i + 1)
-
-                    await handlers[i](context, arg, next_handler)
-
-            except Exception as error:
-                raise error
-
-        await emit_next(0)
-        # logic does not use parentheses because it's a coroutine
-        return await logic
+        return await emit_next(0)
 
     async def send_trace_activity(
         self, name: str, value: object = None, value_type: str = None, label: str = None
