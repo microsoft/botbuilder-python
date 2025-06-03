@@ -3,6 +3,7 @@
 
 from asyncio import iscoroutinefunction
 from abc import ABC, abstractmethod
+from functools import partial
 from typing import Awaitable, Callable
 
 from .turn_context import TurnContext
@@ -86,6 +87,6 @@ class MiddlewareSet(Middleware):
             )
 
         try:
-            return await next_middleware.on_turn(context, call_next_middleware)
+            return await next_middleware.on_turn(context, partial(call_next_middleware))
         except Exception as error:
             raise error
