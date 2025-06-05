@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 import inspect
 from hashlib import sha256
-from typing import Dict
+from typing import Dict, TYPE_CHECKING
 
 from botbuilder.core import (
     NullTelemetryClient,
@@ -13,6 +13,9 @@ from botbuilder.core import (
 )
 from .dialog import Dialog
 from .dialog_state import DialogState
+
+if TYPE_CHECKING:
+    from .dialog_context import DialogContext
 
 
 class DialogSet:
@@ -92,6 +95,8 @@ class DialogSet:
             )
 
         if dialog.id in self._dialogs:
+            if self._dialogs[dialog.id] == dialog:
+                return self
             raise TypeError(
                 "DialogSet.add(): A dialog with an id of '%s' already added."
                 % dialog.id
@@ -99,6 +104,11 @@ class DialogSet:
 
         # dialog.telemetry_client = this._telemetry_client;
         self._dialogs[dialog.id] = dialog
+
+        # Automatically add any child dependencies the dialog might have, see DialogDependencies.
+        if hasattr(dialog, "get_dependencies") and callable(dialog.get_dependencies):
+            for child in dialog.get_dependencies():
+                self.add(child)
 
         return self
 
