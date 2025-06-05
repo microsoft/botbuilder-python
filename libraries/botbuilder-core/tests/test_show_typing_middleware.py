@@ -4,8 +4,8 @@ import asyncio
 from uuid import uuid4
 import aiounittest
 
-from botbuilder.core import ShowTypingMiddleware, TurnContext
-from botbuilder.core.adapters import TestAdapter
+from botbuilder.core import Middleware, ShowTypingMiddleware, TurnContext
+from botbuilder.core.adapters import TestAdapter, TestFlow
 from botbuilder.schema import Activity, ActivityTypes
 from botframework.connector.auth import AuthenticationConstants, ClaimsIdentity
 
@@ -46,6 +46,28 @@ class TestShowTypingMiddleware(aiounittest.AsyncTestCase):
         step4 = await step3.send("bar")
         step5 = await step4.assert_reply(assert_is_typing)
         await step5.assert_reply("echo:bar")
+
+    async def test_should_stop_sendind_typing_indicators_when_exception_raised(self):
+        async def aux(context):
+            await context.send_activity(f"echo:{context.activity.text}")
+            raise Exception("test:error")
+
+        class ErrorHandlingMiddleware(Middleware):
+            async def on_turn(self, context, logic):
+                try:
+                    await logic()
+                except Exception as e:
+                    await context.send_activity(f"error:{e.args[0]}")
+
+        adapter = TestAdapter(aux)
+
+        adapter.use(ErrorHandlingMiddleware())
+        adapter.use(ShowTypingMiddleware(0.2, 0.4))
+
+        step1: TestFlow = await adapter.send("foo")
+        step2 = await step1.assert_reply("echo:foo")
+        step3 = await step2.assert_reply("error:test:error")
+        await step3.assert_no_reply("no typing activity should be shown", timeout=450)
 
     async def test_should_not_automatically_send_a_typing_indicator_if_no_middleware(
         self,

@@ -93,12 +93,10 @@ class ShowTypingMiddleware(Middleware):
         ):
             start_interval(context, self._delay, self._period)
 
-        # call the bot logic
-        result = await logic()
-
-        stop_interval()
-
-        return result
+        try:
+            return await logic()
+        finally:
+            stop_interval()
 
     @staticmethod
     def _is_skill_bot(context: TurnContext) -> bool:
