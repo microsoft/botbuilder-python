@@ -9,7 +9,7 @@ REQUIRES = [
     "botbuilder-schema==4.17.0",
     "botframework-connector==4.17.0",
     "botframework-streaming==4.17.0",
-    "jsonpickle>=1.2,<1.5",
+    "jsonpickle>=1.2,<4",
 ]
 
 root = os.path.abspath(os.path.dirname(__file__))
