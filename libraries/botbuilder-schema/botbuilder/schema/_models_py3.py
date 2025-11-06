@@ -1526,13 +1526,27 @@ class Entity(Model):
 
     :param type: Type of this entity (RFC 3987 IRI)
     :type type: str
+    :param stream_type: Stream type
+    :type stream_type: str
+    :param stream_sequence: Stream sequence
+    :type stream_sequence: int
+    :param stream_id: Stream ID
+    :type stream_id: str
     """
 
-    _attribute_map = {"type": {"key": "type", "type": "str"}}
+    _attribute_map = {
+        "type": {"key": "type", "type": "str"},
+        "stream_type": {"key": "streamType", "type": "str"},
+        "stream_sequence": {"key": "streamSequence", "type": "int"},
+        "stream_id": {"key": "streamId", "type": "str"},
+    }
 
-    def __init__(self, *, type: str = None, **kwargs) -> None:
+    def __init__(self, *, type: str = None, stream_type: str = None, stream_sequence: int = None, stream_id: str = None, **kwargs) -> None:
         super(Entity, self).__init__(**kwargs)
         self.type = type
+        self.stream_type = stream_type
+        self.stream_sequence = stream_sequence
+        self.stream_id = stream_id
 
 
 class Error(Model):
