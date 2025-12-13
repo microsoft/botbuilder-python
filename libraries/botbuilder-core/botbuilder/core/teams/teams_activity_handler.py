@@ -314,7 +314,7 @@ class TeamsActivityHandler(ActivityHandler):
         self, turn_context: TurnContext, query: O365ConnectorCardActionQuery
     ):
         """
-        Invoked when a O365 Connector Card Action activity is received from the connector.
+        Invoked when an O365 Connector Card Action activity is received from the connector.
 
         :param turn_context: A context object for this turn.
         :param query: The O365 connector card HttpPOST invoke query.
