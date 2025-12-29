@@ -478,10 +478,17 @@ class ActivityHandler(Bot):
             if (
                 turn_context.activity.name
                 == SignInConstants.verify_state_operation_name
-                or turn_context.activity.name
-                == SignInConstants.token_exchange_operation_name
             ):
                 await self.on_sign_in_invoke(turn_context)
+                return self._create_invoke_response()
+
+            # This is for back-compat with previous versions of Python SDK.  This method does not
+            # exist in the C# SDK, and is not used in the Python SDK.
+            if (
+                turn_context.activity.name
+                == SignInConstants.token_exchange_operation_name
+            ):
+                await self.on_teams_signin_token_exchange(turn_context)
                 return self._create_invoke_response()
 
             if turn_context.activity.name == "adaptiveCard/action":

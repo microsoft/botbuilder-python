@@ -10,7 +10,7 @@ REQUIRES = [
     "botframework-connector==4.17.0",
     "botbuilder-core==4.17.0",
     "yarl>=1.8.1",
-    "aiohttp==3.10.11",
+    "aiohttp>=3.10,<4.0",
 ]
 
 root = os.path.abspath(os.path.dirname(__file__))
