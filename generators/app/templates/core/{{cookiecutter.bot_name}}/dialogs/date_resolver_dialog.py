@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from typing import Union
+
 from botbuilder.core import MessageFactory
 from botbuilder.dialogs import WaterfallDialog, DialogTurnResult, WaterfallStepContext
 from botbuilder.dialogs.prompts import (
@@ -16,7 +18,7 @@ from .cancel_and_help_dialog import CancelAndHelpDialog
 
 
 class DateResolverDialog(CancelAndHelpDialog):
-    def __init__(self, dialog_id: str = None):
+    def __init__(self, dialog_id: Union[str, None] = None):
         super(DateResolverDialog, self).__init__(
             dialog_id or DateResolverDialog.__name__
         )

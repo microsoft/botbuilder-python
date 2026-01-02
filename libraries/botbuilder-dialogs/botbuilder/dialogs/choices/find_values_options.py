@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from typing import Callable, List
+from typing import Callable, List, Union
 
 from .token import Token
 
@@ -11,9 +11,9 @@ class FindValuesOptions:
 
     def __init__(
         self,
-        allow_partial_matches: bool = None,
-        locale: str = None,
-        max_token_distance: int = None,
+        allow_partial_matches: Union[bool, None] = None,
+        locale: Union[str, None] = None,
+        max_token_distance: Union[int, None] = None,
         tokenizer: Callable[[str, str], List[Token]] = None,
     ):
         """

@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 from abc import ABC, abstractmethod
+from typing import Union
 
 from botframework.connector import ConnectorClient
 from botframework.connector.auth import ClaimsIdentity
@@ -13,7 +14,7 @@ class ConnectorClientBuilder(ABC):
 
     @abstractmethod
     async def create_connector_client(
-        self, service_url: str, identity: ClaimsIdentity = None, audience: str = None
+        self, service_url: str, identity: ClaimsIdentity = None, audience: Union[str, None] = None
     ) -> ConnectorClient:
         """
         Creates the connector client asynchronous.
